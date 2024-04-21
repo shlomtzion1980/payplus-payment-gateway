@@ -1,0 +1,429 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PayPlus Payment Gateway\n"
+"POT-Creation-Date: 2021-02-24 16:08+0300\n"
+"PO-Revision-Date: 2021-09-14 16:17+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ru_RU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.0\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: payplus-payment-gateway.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: languages\n"
+"X-Poedit-SearchPath-1: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: includes/wc_payplus_admin_payments.php:55
+msgid "Charge Order Using PayPlus"
+msgstr "Оплатить заказ с помощью PayPlus"
+
+#: includes/wc_payplus_admin_payments.php:57
+msgid "Make Payment"
+msgstr "Сделать платеж"
+
+#: includes/wc_payplus_admin_payments.php:105
+#, php-format
+msgid "PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s"
+msgstr "Платеж PayPlus успешно выполнен<br />Номер транзакции: %s<br />Сумма: %s %s"
+
+#: includes/wc_payplus_admin_payments.php:110
+#, php-format
+msgid "PayPlus Charge is Failed<br />Status: %s<br />Description: %s"
+msgstr "Платеж PayPlus не выполнен<br />Статус: %s<br />Описание: %s"
+
+#: includes/wc_payplus_admin_payments.php:147 payplus-payment-gateway.php:66
+msgid "PayPlus Payment Gateway"
+msgstr "Платежный шлюз PayPlus"
+
+#: includes/wc_payplus_admin_payments.php:151
+msgid "user or other, please contact payplus support"
+msgstr "Пользователь или представитель, пожалуйста свяжитесь с поддержкой payplus"
+
+#: includes/wc_payplus_admin_payments.php:154
+msgid "Credit card company declined, check credit card details and credit line"
+msgstr "Компания-эмитент кредитной карты отклонила сделку, проверить детали кредитной карты и кредитные лимиты"
+
+#: includes/wc_payplus_admin_payments.php:157
+msgid "PayPlus Payment Successful"
+msgstr "Успешная оплата PayPlus"
+
+#: payplus-payment-gateway.php:41
+msgid "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" target=\"_blank\">WooCommerce</a> to be activated."
+msgstr "Плагин <a href=\"https://wordpress.org/plugins/woocommerce/\" target=\"_blank\">WooCommerce</a> должен быть активирован."
+
+#: payplus-payment-gateway.php:75
+msgid "View PayPlus Settings"
+msgstr "Посмотреть настройки PayPlus"
+
+#: payplus-payment-gateway.php:75
+msgid "Settings"
+msgstr "Настройки"
+
+#: includes/wc_payplus_gateway.php:302 includes/wc_payplus_gateway.php:12
+msgid "PayPlus"
+msgstr "PayPlus"
+
+#: includes/wc_payplus_gateway.php:13
+msgid "PayPlus Credit Card Secure Payment"
+msgstr "Безопасный платеж PayPlus с помощью кредитной карты"
+
+#: includes/wc_payplus_gateway.php:101
+msgid "Title"
+msgstr "Название"
+
+#: includes/wc_payplus_gateway.php:103
+msgid "This controls the title which the user sees during checkout"
+msgstr "Настройка названия, которое видит пользователь вовремя оплаты"
+
+#: includes/wc_payplus_gateway.php:104
+msgid "Pay with Debit or Credit Card"
+msgstr "Оплатить дебетовой или кредитной картойי"
+
+#: includes/wc_payplus_gateway.php:108
+msgid "Description"
+msgstr "Описание"
+
+#: includes/wc_payplus_gateway.php:110
+msgid "Pay securely by Debit or Credit Card through PayPlus"
+msgstr "Безопасная оплата PayPlus с помощью кредитной карты"
+
+#: includes/wc_payplus_gateway.php:113
+msgid "PayPlus API Settings"
+msgstr "Настройки API PayPlus"
+
+#: includes/wc_payplus_gateway.php:117
+msgid "Test mode"
+msgstr "Режим тестирования"
+
+#: includes/wc_payplus_gateway.php:119
+msgid "Enable Sandbox Mode"
+msgstr "Активировать тестовый режим"
+
+#: includes/wc_payplus_gateway.php:122
+msgid "API KEY"
+msgstr "API ключ"
+
+#: includes/wc_payplus_gateway.php:124
+msgid "PayPlus API Key you can find in your account under Settings"
+msgstr "API ключ PayPlus вы можете найти в настройках вашего аккаунта"
+
+#: includes/wc_payplus_gateway.php:129
+msgid "SECRET KEY"
+msgstr "Секретный ключ"
+
+#: includes/wc_payplus_gateway.php:131
+msgid "PayPlus Secret Key you can find in your account under Settings"
+msgstr "Секретный ключ PayPlus вы можете найти в настройках вашего аккаунта"
+
+#: includes/wc_payplus_gateway.php:136
+msgid "Payment Page UID"
+msgstr "UID страницы оплаты"
+
+#: includes/wc_payplus_gateway.php:138
+msgid "Your payment page UID can be found under Payment Pages in your side menu in PayPlus account"
+msgstr "UID страницы оплаты находятся в разделе Страницы Оплаты в боковм меню вашего аккаунта"
+
+#: includes/wc_payplus_gateway.php:143
+msgid "PayPlus Payment Options"
+msgstr "Настройки платежа PayPlus"
+
+#: includes/wc_payplus_gateway.php:147
+msgid "Transactions Type"
+msgstr "Тип транзакции"
+
+#: includes/wc_payplus_gateway.php:150
+msgid "Charge"
+msgstr "Оплата"
+
+#: includes/wc_payplus_gateway.php:151
+msgid "Authorization"
+msgstr "Авторизация"
+
+#: includes/wc_payplus_gateway.php:156
+msgid "Initial Invoice / Receipt"
+msgstr "Предварительный инвойс / чек"
+
+#: includes/wc_payplus_gateway.php:159 includes/wc_payplus_gateway.php:204 includes/wc_payplus_gateway.php:214
+msgid "Payment Page Default Setting"
+msgstr "Настройки страницы оплаты по умолчанию"
+
+#: includes/wc_payplus_gateway.php:160 includes/wc_payplus_gateway.php:205 includes/wc_payplus_gateway.php:215 includes/wc_payplus_gateway.php:241
+#: includes/wc_payplus_gateway.php:250
+msgid "Yes"
+msgstr "Да"
+
+#: includes/wc_payplus_gateway.php:161 includes/wc_payplus_gateway.php:206 includes/wc_payplus_gateway.php:216 includes/wc_payplus_gateway.php:240
+#: includes/wc_payplus_gateway.php:249
+msgid "No"
+msgstr "Нет"
+
+#: includes/wc_payplus_gateway.php:166
+msgid "Display Options"
+msgstr "Настройки отображения"
+
+#: includes/wc_payplus_gateway.php:170
+msgid "Display Mode"
+msgstr "Режим отображения"
+
+#: includes/wc_payplus_gateway.php:173
+msgid "Redirect"
+msgstr "Переадресация (Redirect)"
+
+#: includes/wc_payplus_gateway.php:174
+msgid "iFrame"
+msgstr "встроенный блок (IFrame)"
+
+#: includes/wc_payplus_gateway.php:179
+msgid "iFrame Height"
+msgstr "Высота блока IFrame"
+
+#: includes/wc_payplus_gateway.php:184
+msgid "Payment Page Options"
+msgstr "Настройки страницы оплаты"
+
+#: includes/wc_payplus_gateway.php:186
+msgid "You can set your payment pages as you like to"
+msgstr "Вы можете настроить страницы оплаты по своему желанию"
+
+#: includes/wc_payplus_gateway.php:189 includes/wc_payplus_gateway.php:191
+msgid "Use IPN Authentication from PayPlus Servers"
+msgstr "Используйте IPN авторизацию серверов PayPlus"
+
+#: includes/wc_payplus_gateway.php:195
+msgid "Saved Credit Cards"
+msgstr "Сохраненные кредитные карты"
+
+#: includes/wc_payplus_gateway.php:197
+msgid "Enable Payment via Saved Cards"
+msgstr "Активировать оплату с помощью сохраненных карт"
+
+#: includes/wc_payplus_gateway.php:201
+msgid "Hide Identification Field In Payment Form"
+msgstr "Скрыть поле идентификации в форме оплаты"
+
+#: includes/wc_payplus_gateway.php:211
+msgid "Hide Payments Number In Payment Form"
+msgstr "Скрыть номер платежа в форме оплаты "
+
+#: includes/wc_payplus_gateway.php:221
+msgid "Order Settings"
+msgstr "Настройки заказа"
+
+#: includes/wc_payplus_gateway.php:225
+msgid "Successful Order Status"
+msgstr "Успешный статус заказа"
+
+#: includes/wc_payplus_gateway.php:231
+msgid "Failure Order Status"
+msgstr "Неудачный статус заказа"
+
+#: includes/wc_payplus_gateway.php:237
+msgid "Successful Transaction E-mail Through PayPlus Servers"
+msgstr "Электронная почта успешной транзакции с помощью серверов PayPlus"
+
+#: includes/wc_payplus_gateway.php:246
+msgid "Failure Transaction E-mail Through PayPlus Servers"
+msgstr "Электронная почта неудачной транзакции с помощью серверов PayPlus"
+
+#: includes/wc_payplus_gateway.php:255
+msgid "Logging"
+msgstr "Логирование"
+
+#: includes/wc_payplus_gateway.php:257
+msgid "Log debug messages"
+msgstr "Отладочные сообщения"
+
+#: includes/wc_payplus_gateway.php:272
+#, php-format
+msgid "PayPlus Refund is Failed<br />You cannot refund transaction that not charged. Current Transaction Type Status: %s"
+msgstr "Возврат PayPlus не выполнен<br />Вы не можете сделать возврат средств, которые не были сняты.<br />Текущий статус транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:277
+#, php-format
+msgid "PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %s %s"
+msgstr "Возврат PayPlus не выполнен<br />Вы не можете вернуть больше чем общая сума возврата. Сумма к возврату: %s %s"
+
+#: includes/wc_payplus_gateway.php:290
+#, php-format
+msgid "PayPlus Refund is Successful<br />Refund Transaction Number: %s<br />Amount: %s %s<br />Reason: %s"
+msgstr "Возврат PayPlus успешно выполнен<br />Номер транзакции возврата: %s<br />Сумма: %s %s<br />Причина: %s"
+
+#: includes/wc_payplus_gateway.php:294
+#, php-format
+msgid "PayPlus Refund is Failed<br />Status: %s<br />Description: %s"
+msgstr "Возврат PayPlus не выполнен<br />Статус: %s<br />Описание: %s"
+
+#: includes/wc_payplus_gateway.php:303
+msgid "For more information about PayPlus and Plugin versions <a href=\"https://www.payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</a>"
+msgstr "Чтобы получить детальную информацию о PayPlus и версиях плагинов <a href=\"https://www.payplus.co.il/wordpress\" target=\"_blank\">Перейти</a>"
+
+#: includes/wc_payplus_gateway.php:304
+msgid "This plugin was developed by <a href=\"https://www.payplus.co.il\">PayPlus LTD</a>"
+msgstr "Этот плагин был разработан <a href=\"https://www.payplus.co.il/\" target=\"_blank\">PayPlus LTD</a> - Все права защищены"
+
+#: includes/wc_payplus_gateway.php:341
+msgid "Save credit card in my account"
+msgstr "Сохранить кредитную карту в моем аккаунте"
+
+#: includes/wc_payplus_gateway.php:360
+msgid "Error: user or other, please contact PayPlus support"
+msgstr "Ошибка: пользователь или представитель, пожалуйста свяжитесь с поддержкой PayPlus"
+
+#: includes/wc_payplus_gateway.php:374
+#, php-format
+msgid "PayPlus Token Payment Successful<br/>Transaction Number: %s"
+msgstr "Токен Платеж PayPlus выполнен успешно<br />Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:381
+#, php-format
+msgid "PayPlus Token Payment Failed<br/>Transaction Number: %s"
+msgstr "Токен Платеж PayPlus не выполнен<br />Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:383
+msgid "Error: credit card company decline, check credit card details and credit line"
+msgstr "Ошибка: банк-эмитент кредитной карты отклонил транзакцию, проверьте детали кредитной карты и кредитную линию"
+
+#: includes/wc_payplus_gateway.php:434
+msgid "Shipping"
+msgstr "Доставка"
+
+#: includes/wc_payplus_gateway.php:446
+msgid "Discount"
+msgstr "Скидка"
+
+#: includes/wc_payplus_gateway.php:500 includes/wc_payplus_gateway.php:712
+msgid "Something went wrong with the payment page"
+msgstr "Что-то пошло не так на странице оплаты"
+
+#: includes/wc_payplus_gateway.php:573
+#, php-format
+msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
+msgstr "PayPlus IPN не выполнен<br />UID транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:576
+#, php-format
+msgid "PayPlus Pre-Authorization is Successful<br/>Transaction Number: %s"
+msgstr "Преавторизация PayPlus успешно выполнена<br />Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:588
+#, php-format
+msgid "PayPlus Payment Successful<br/>Transaction Number: %s"
+msgstr "Платеж PayPlus выполнен успешно<br />Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:592
+msgid "PayPlus payment failed"
+msgstr "Платеж PayPlus не выполнен"
+
+#: includes/wc_payplus_gateway.php:730
+msgid "Your new payment method has been added"
+msgstr "Ваш новый метод оплаты был добавлен"
+
+#: includes/wc_payplus_gateway.php:734
+msgid "There was a problem adding this card"
+msgstr "Произошла ошибка при добавлении карты"
+
+#: includes/wc_payplus_gateway.php:380
+msgid "Error: credit card declined: %s"
+msgstr "Ошибка: Кредитная карта отклонена: %s"
+
+#: includes/wc_payplus_gateway.php:380
+msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
+msgstr "Платеж подписки PayPlus выполнен успешно<br/>Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:380
+msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
+msgstr "Платеж подписки PayPlus не выполнен<br/>Номер транзакции: %s"
+
+#: includes/wc_payplus_gateway.php:380
+msgid "Subscription Renewal: "
+msgstr "Обновление подписки: "
+
+#: includes/wc_payplus_gateway.php:380
+msgid "Hide PayPlus Icon In The Checkout Page"
+msgstr "Скрыть иконку PayPlus на странице оплаты"
+
+msgid "Invoice For Foreign Customers"
+msgstr "Инвойс для иностранных граждан"
+
+msgid "Paying VAT"
+msgstr "С НДС"
+
+msgid "Exempt VAT"
+msgstr "Без НДС"
+
+msgid "Exempt VAT If Customer Billing ISO Country Is Different Than..."
+msgstr "Без НДС если страна платежных данных клиента отличается от ..."
+
+msgid "Your Business VAT Registration Country ISO Code"
+msgstr "Код страны вашей налоговой регистрации компании"
+
+msgid "The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)"
+msgstr "Язык инвойсов или документов для иностранных клиентов (предположительно поддерживаемый компанией клиентом язык)"
+
+msgid "Invoicing & Documents Settings"
+msgstr "Настройки инвойсов и документов"
+
+msgid "Charge for Order Number: "
+msgstr "Сделать платеж по номеру заказу: "
+
+msgid "Refund for Order Number: "
+msgstr "Сделать возврат по номеру заказа: "
+
+msgid "Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when finishing testing"
+msgstr "Тестовый режим активирован и реальная транзакция не может быть выполнена. Пожалуйста убедитесь, что вы переключили в  рабочий режим после тестирования"
+
+msgid "PayPlus Refund is Failed<br />You cannot refund more then the charge total amount. Charged Amount: %s %s"
+msgstr "Возврат PayPlus не выполнен. <br />Вы не можете вернуть сумму больше платежа. Сумма платежа: %s %s"
+
+msgid "PayPlus Gateway: Cannot Charge then original order sum"
+msgstr "Шлюз PayPlus: сумма платежа не может отличаться от суммы заказа"
+
+msgid "Rounding Product Decimals"
+msgstr "Количество десятичных цифр"
+
+msgid "Hide Products To Invoices and Documents"
+msgstr "Не отображать товары в инвойсах"
+
+msgid "Payment Completed"
+msgstr "Платеж выполнен"
+
+msgid "Fire Payment Completed On Successful Charge"
+msgstr "Платеж fire выполнен с успешным списанием"
+
+msgid "Send Add Data Parameter When Payment Created"
+msgstr "Отправьте параметр данных когда платеж создан"
+
+msgid "Add Data Parameter"
+msgstr "добавьте параметр данных"
+
+msgid "Apple Pay"
+msgstr "Apple Pay"
+
+msgid "Include Apple Pay Script in Iframe Mode (You have to join the service before)"
+msgstr "Включить Apple Pay iframe скрипт (необходимо подключить услугу перед активацией)"
+
+msgid "Send product variations among with products (for invoices)"
+msgstr "Слать характеристики товара (в счетах)"
+
+msgid "Вариант оплаты по умолчанию"
+msgstr "אמצעי תשלום ברירת מחדל"
+
+msgid "Credit Card"
+msgstr "Кредитная карта"
+
+msgid "bit"
+msgstr "bit"
+
+msgid "Max Pay"
+msgstr "Max Pay"
+
+msgid "Please wait"
+msgstr "Пожалуйста, подождите"

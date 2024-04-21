@@ -1,0 +1,394 @@
+tr:has(.list-hidden) {
+  display: none;
+}
+#poststuff #woocommerce-order-actions .inside ul.order_actions li.delayed-payment {
+  padding-bottom: 20px;
+  text-align: center;
+  h3{
+    margin: 15px 0;
+  }
+  button span{
+    vertical-align: -5px;
+  }
+}
+
+.payplus-visibility {
+  visibility: hidden !important;
+  width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: 0 !important;
+}
+
+.payment-order-ajax {
+  position: relative;
+}
+.payment-order-ajax .payplus_loader {
+  right: 120px;
+}
+.payment-order-ajax.payment-invoice .payplus_loader{
+  right: 0px;
+  top: 40px;
+}
+html[lang=he-IL] {
+  .payment-order-ajax {
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    .payment-invoice{
+      .payplus_loader{
+        left: 0px;
+        top: 35px;
+      }
+    }
+  }
+  .payplus_loader_refund{
+    left: 100%;
+    right: inherit;
+    margin-left: 20px;
+  }
+  .loading-express {
+    left: inherit;
+    right: 30px;
+  }
+}
+#sub-option-paylus,.tab-option-payplus {
+  margin: 10px 20px 0 0;
+  a{
+    display: flex;
+    align-items: center;
+    height: 32px;
+    img{
+      margin-left: 10px;
+    }
+  }
+}
+.payplus-delete-error{
+  position: absolute;
+  left: 0px;
+  top: 5px;
+}
+html[lang='en-US'] {
+
+  #sub-option-paylus, .tab-option-payplus {
+    a {
+      img {
+        margin-right: 10px;
+      }
+
+    }
+  }
+  .payplus-delete-error{
+    right: 0px;
+    left: inherit;
+  }
+}
+.payplus_loader {
+  border: 16px solid #2271b1;
+  border-top: 16px solid #2271b1;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  bottom: 10px;
+  display: none;
+  border-radius: 25%;
+  z-index: 9999;
+  bottom: -30px;
+}
+
+.payplus_loader_refund {
+  border: 16px solid #2271b1;
+  border-top: 16px solid #2271b1;
+  width: 15px;
+  height: 15px;
+  animation: spin 2s linear infinite;
+  position: absolute;
+  bottom: 10px;
+  display: none;
+  border-radius: 25%;
+  z-index: 9999;
+}
+
+#box-payplus-payment {
+  display: none;
+}
+
+
+.do-api-refund-payplus {
+  position: relative;
+}
+.do-api-refund-payplus .payplus_loader_refund {
+  left: inherit;
+  right: 100%;
+  bottom: -5px;
+  margin-right: 20px;
+}
+
+.woocommerce table{
+  .form-table {
+    fieldset {
+      position: relative;
+    }
+    .forminp-textarea{
+      p{
+        max-width: 500px;
+        position: relative;
+      }
+    }
+  }
+
+}
+
+.payplus-error-setting .form-table .forminp-textarea textarea{
+    resize: none;
+}
+
+label:has(>.enable_checkout){
+  position: relative;
+}
+
+.loading-express {
+  animation: loading-bar-spinner 400ms linear infinite;
+  position: absolute;
+  top: 0;
+  left: 30px;
+  display: none;
+  .spinner-icon {
+    width: 20px;
+    height: 20px;
+    border: solid 4px transparent;
+    border-top-color: #00c8b1;
+    border-left-color: #00c8b1;
+    border-radius: 50%;
+  }
+}
+
+
+
+ /* total table */
+#woocommerce-order-items .wc-order-totals tr.payplus-row {
+  th, td {
+    text-align: center;
+    border: 1px solid #000;
+  }
+}
+/* button refund */
+.button-loading{
+
+    .refund_text {
+      visibility: hidden;
+      opacity: 0;
+    }
+
+}
+.button-loading:after{
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  border: 4px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: button-loading-spinner 1s ease infinite;
+}
+#woocommerce-order-items .wc-order-totals.payplus-table-refund{
+  width: 100%;
+  margin: 20px 0px;
+  float: none;
+}
+#woocommerce-order-items .wc-order-totals.payplus-change-status{
+  width: 100%;
+  margin-top: 20px;
+  float: none;
+  .payplus-row{
+    display: none;
+  }
+  #payplus-change-status{
+    margin-bottom: 10px;
+  }
+  p.log{
+   text-align: left;
+    border-bottom: 1px solid #000;
+    word-wrap: break-word;
+
+  }
+  th,td{
+    border: 1px solid #000;
+    padding: 0px;
+    width: 25%;
+  }
+  td.log-row{
+    padding: 0px 1%;
+    width: 23%;
+
+  }
+  td.payplus-no-border{
+    border: 0px;
+  }
+
+  th{
+    text-align: center;
+    background: #135e96;
+    color: #fff;
+
+  }
+}
+/*  invoice order back*/
+.button-primary#payplus-create-invoice,.button-primary#payplus-create-invoice-refund{
+  display: inline-block;
+  position: relative;
+}
+html[lang='en-US'] #woocommerce-order-items .wc-order-totals.payplus-table-payment{
+  direction: rtl;
+}
+#woocommerce-order-items .wc-order-totals.payplus-table-payment{
+  float: none;
+  width: 100%;
+  thead{
+    background: #2271b1;
+    th{
+      text-align: center;
+      color: #fff;
+      width: 20%;
+    }
+  }
+  tbody{
+    td{
+      text-align: center;
+      border: 1px solid #000;
+      padding:10px;
+      a.link-action{
+        cursor: pointer;
+        background: #34aa54;
+        color: #fff;
+        display: inline-block;
+        padding: 2px;
+        width: 40%;
+        border-radius: 20px;
+      }
+    }
+  }
+
+}
+
+#payplus-error-all{
+  font-size: 18px;
+}
+.flex-row{
+  display: flex;
+}
+.flex-item{
+  margin: 10px 0px;
+  width: 12.5%;
+  text-align: right;
+}
+html[lang='en-US'] .flex-item{
+  text-align: left;
+}
+.flex-item  label{
+  font-weight: bold;
+}
+
+.type-payment,.payplus-paymnet-button{
+  border: 1.5px solid #34aa54;
+  text-align: center;
+  border-radius: 43px;
+  padding: 12px 18px;
+  cursor: pointer;
+  background: #fff;
+  width:90%;
+  color: #34aa54;
+  font-weight: bold;
+  font-size: 12px;
+
+}
+.payplus_sum_paymnet{
+  text-align: left;
+  color: #000;
+  font-size: 16px;
+  line-height: 2em;
+  display: none;
+}
+html[lang="en-US"] .payplus_sum_paymnet{
+  text-align: right;
+}
+#all-paymnet-invoice{
+  display: none;
+}
+.type-payment:hover,.payplus-paymnet-button:hover{
+  background: #34aa54;
+  color: #fff;
+}
+.hover{
+  background: #34aa54;
+  color: #fff;
+}
+.select-type-payment{
+  display: none;
+}
+.select-type-payment .flex-item *{
+  width: 90%;
+
+}
+.select-type-payment .flex-item label{
+  text-align: right;
+}
+html[lang="en-US"]  #woocommerce-order-items .wc-order-data-row .select-type-payment .flex-item label{
+  text-align: left;
+}
+.payplus-full-amount{
+  background: rgba(52,170,84,0.05);
+  border: 0px;
+  color: #34aa54;
+  cursor: pointer;
+}
+.flex-item.full-amount{
+  width: 26%;
+}
+.flex-row-reverse{
+  flex-direction: row-reverse;
+  width: 100%;
+}
+.payplus-error{
+  color: red;
+  font-weight: bold;
+  font-size: 11px;
+  display: none;
+}
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes loading-bar-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media screen and (max-width: 700px) {
+  #payplus-options {
+    padding: 0 15px;
+  }
+  .tab-option-payplus a {
+    width: 97%;
+    justify-content: center;
+    margin: 0 auto;
+  }
+  #sub-option-paylus {
+    margin: 20px 0;
+  }
+}
+/*# sourceMappingURL=admin.css.map */
