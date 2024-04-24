@@ -1109,6 +1109,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;
         $order->delete_meta_data("save_payment_method");
         $order->add_meta_data("save_payment_method", isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0');
+        payplus_update_post_meta_object($order, array('save_new_token' => isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0'));
         $order->save_meta_data();
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
@@ -2385,6 +2386,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function requestPayPlusIpn($payload, $data, $countLoop = 1, $handle = 'payplus_process_payment', $inline = false)
     {
+
         $order_id = isset($data['order_id']) ? trim($data['order_id']) : '';
         $flagPayplus = true;
         $flagProcess = true;
@@ -2404,9 +2406,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $createToken = false;
         if ($order) {
             if ($order->get_user_id()) {
-                $createToken = true;
+                $createToken = get_post_meta($order_id, 'save_new_token', true);
                 $userID = $order->get_user_id();
             }
+
             $insertMeta = array();
             for ($i = 0; $i < $countLoop; $i++) {
                 $response = $this->post_payplus_ws($this->ipn_url, $payload);
@@ -2466,7 +2469,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     $insertMeta['payplus_transaction_type'] = "1";
                                 }
                             }
-                            if ($this->create_pp_token && $token_uid && $userID && $createToken === true) {
+                            if ($this->create_pp_token && $token_uid && $userID && $createToken) {
                                 $this->save_token($data, $userID);
                             }
                             if ($userID > 0) {
