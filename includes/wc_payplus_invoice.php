@@ -11,6 +11,7 @@ class PayplusInvoice
     private $payplus_invoice_api_key;
     private $payplus_invoice_secret_key;
     private $payplus_invoice_brand_uid;
+    private $payplus_website_code;
     private $payplus_invoice_type_document;
     private $payplus_invoice_type_document_refund;
     private $payplus_invoice_status_order;
@@ -21,10 +22,11 @@ class PayplusInvoice
     private $payment_method;
     private $payment_method_club;
     private $payplus_create_invoice_automatic;
-    private $payplus_invoice_manual_list=null ;
+    private $payplus_invoice_manual_list = null;
+    private $payplus_is_table_exists = null;
     private $payplus_invoice_send_document_sms;
     private $payplus_invoice_send_document_email;
-    private  $payplus_unique_identifier;
+    private $payplus_unique_identifier;
     /**
      *
      */
@@ -33,37 +35,37 @@ class PayplusInvoice
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->payplus_invoice_api_key = (isset($this->payplus_invoice_option['payplus_invoice_api_key'])) ?
-            $this->payplus_invoice_option['payplus_invoice_api_key'] : EMPTY_STRING_PAYPLUS;
+        $this->payplus_invoice_option['payplus_invoice_api_key'] : EMPTY_STRING_PAYPLUS;
 
         $this->payplus_invoice_secret_key = (isset($this->payplus_invoice_option['payplus_invoice_secret_key'])) ?
-            $this->payplus_invoice_option['payplus_invoice_secret_key'] : EMPTY_STRING_PAYPLUS;
+        $this->payplus_invoice_option['payplus_invoice_secret_key'] : EMPTY_STRING_PAYPLUS;
 
         $this->payplus_invoice_brand_uid = (isset($this->payplus_invoice_option['payplus_invoice_brand_uid'])) ?
-            $this->payplus_invoice_option['payplus_invoice_brand_uid'] : EMPTY_STRING_PAYPLUS;
+        $this->payplus_invoice_option['payplus_invoice_brand_uid'] : EMPTY_STRING_PAYPLUS;
 
-        $this->payplus_create_invoice_automatic = (isset($this->payplus_invoice_option ['create-invoice-automatic'])
-            && $this->payplus_invoice_option ['create-invoice-automatic']=="yes")?
-            true:false;
+        $this->payplus_create_invoice_automatic = (isset($this->payplus_invoice_option['create-invoice-automatic'])
+            && $this->payplus_invoice_option['create-invoice-automatic'] == "yes") ?
+        true : false;
 
-        $this->payplus_invoice_send_document_sms = (isset($this->payplus_invoice_option ['payplus_invoice_send_document_sms'])
-            && ($this->payplus_invoice_option ['payplus_invoice_send_document_sms']=="on"  ||
-            $this->payplus_invoice_option ['payplus_invoice_send_document_sms']=="yes"))?
-            true:false;
+        $this->payplus_invoice_send_document_sms = (isset($this->payplus_invoice_option['payplus_invoice_send_document_sms'])
+            && ($this->payplus_invoice_option['payplus_invoice_send_document_sms'] == "on" ||
+                $this->payplus_invoice_option['payplus_invoice_send_document_sms'] == "yes")) ?
+        true : false;
 
-        $this->payplus_invoice_send_document_email= (isset($this->payplus_invoice_option ['payplus_invoice_send_document_email'])
-            && ($this->payplus_invoice_option ['payplus_invoice_send_document_email']=="on" ||
-            $this->payplus_invoice_option ['payplus_invoice_send_document_email']=="yes"))?
-            true:false;
+        $this->payplus_invoice_send_document_email = (isset($this->payplus_invoice_option['payplus_invoice_send_document_email'])
+            && ($this->payplus_invoice_option['payplus_invoice_send_document_email'] == "on" ||
+                $this->payplus_invoice_option['payplus_invoice_send_document_email'] == "yes")) ?
+        true : false;
 
-        $this->payplus_unique_identifier ="";
+        $this->payplus_unique_identifier = "";
         if (empty($this->payplus_invoice_api_key)) {
             $this->payplus_invoice_api_key =
-                (!empty($this->payplus_gateway_option['api_key'])) ?
-                    $this->payplus_gateway_option['api_key'] : EMPTY_STRING_PAYPLUS;
+            (!empty($this->payplus_gateway_option['api_key'])) ?
+            $this->payplus_gateway_option['api_key'] : EMPTY_STRING_PAYPLUS;
         }
         if (empty($this->payplus_invoice_secret_key)) {
             $this->payplus_invoice_secret_key = (!empty($this->payplus_gateway_option['secret_key'])) ?
-                $this->payplus_gateway_option['secret_key'] : EMPTY_STRING_PAYPLUS;
+            $this->payplus_gateway_option['secret_key'] : EMPTY_STRING_PAYPLUS;
         }
         $this->payplus_invoice_status_order = "processing";
 
@@ -74,24 +76,23 @@ class PayplusInvoice
         $this->payplus_create_invocie_manual = (isset($this->payplus_invoice_option['create-invoice-manual']) &&
             $this->payplus_invoice_option['create-invoice-manual'] == "yes") ? true : false;
 
-
         $this->payplus_api_url = ($this->payplus_invoice_option
             && isset($this->payplus_invoice_option['payplus_enable_sandbox'])
             && ($this->payplus_invoice_option['payplus_enable_sandbox'] === "yes"))
-            ? PAYPLUS_PAYMNET_URL_DEV : PAYPLUS_PAYMNET_URL_PRODUCTION;
+        ? PAYPLUS_PAYMNET_URL_DEV : PAYPLUS_PAYMNET_URL_PRODUCTION;
 
         $this->logging = true;
 
-        $this->payment_method =array('credit-card','bit','apple-pay','google-pay','paypal');
-        $this->payment_method_club =array('multipass','valuecard' ,'tav-zahav','finitione');
+        $this->payment_method = array('credit-card', 'bit', 'apple-pay', 'google-pay', 'paypal');
+        $this->payment_method_club = array('multipass', 'valuecard', 'tav-zahav', 'finitione');
         $this->url_payplus_create_invoice .= $this->payplus_api_url . "books/docs/new/";
         $this->payplus_invoice_type_document =
-            (isset($this->payplus_invoice_option['payplus_invoice_type_document'])) ?
-            $this->payplus_invoice_option['payplus_invoice_type_document'] : "";
+        (isset($this->payplus_invoice_option['payplus_invoice_type_document'])) ?
+        $this->payplus_invoice_option['payplus_invoice_type_document'] : "";
         $this->payplus_invoice_type_document_refund = (isset($this->payplus_invoice_option['payplus_invoice_type_document_refund']))
-            ? $this->payplus_invoice_option['payplus_invoice_type_document_refund'] : "";
+        ? $this->payplus_invoice_option['payplus_invoice_type_document_refund'] : "";
 
-        $this->payplus_invoice_manual_list =(isset($this->payplus_invoice_option['list-hidden']))?$this->payplus_invoice_option['list-hidden']:null;
+        $this->payplus_invoice_manual_list = (isset($this->payplus_invoice_option['list-hidden'])) ? $this->payplus_invoice_option['list-hidden'] : null;
 
         //actions
         add_action('admin_enqueue_scripts', [$this, 'payplus_invoice_css_admin']);
@@ -101,9 +102,7 @@ class PayplusInvoice
         //filters
         add_filter('manage_edit-shop_order_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
-
-
-
+        $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table();
     }
     /**
      * @return mixed
@@ -146,7 +145,7 @@ class PayplusInvoice
         return (isset($this->payplus_invoice_option['payplus_invoice_enable'])
             && ($this->payplus_invoice_option['payplus_invoice_enable'] == "yes"
                 || $this->payplus_invoice_option['payplus_invoice_enable'] == "on")) ?
-            true : false;
+        true : false;
 
     }
 
@@ -218,19 +217,19 @@ class PayplusInvoice
         $orderId = (payplus_check_woocommerce_custom_orders_table_enabled()) ? $order->get_id() : $order;
         $payplusInvoiceOriginalDocAddressRefund = get_post_meta($orderId, "payplus_refund", true);
         $payplusType = get_post_meta($orderId, "payplus_type", true);
-        $optionPaypluspaymentgGteway = (object)get_option('woocommerce_payplus-payment-gateway_settings');
+        $optionPaypluspaymentgGteway = (object) get_option('woocommerce_payplus-payment-gateway_settings');
 
         if ($this->payplus_get_invoice_enable() && $optionPaypluspaymentgGteway->enabled == "no"
             && !$payplusInvoiceOriginalDocAddressRefund
             && $payplusType !== "Approval"
             && $payplusType !== "Check"):
-            ?>
+        ?>
             <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
                     class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
             <div class='payplus_loader_refund'></div>
 
         <?php
-        endif;
+endif;
         $output = ob_get_clean();
         echo $output;
     }
@@ -250,7 +249,7 @@ class PayplusInvoice
         $postal_code = str_replace(["'", '"', "\\"], '', $order->get_billing_postcode());
         $customer_country_iso = $order->get_billing_country();
         $customerName = "";
-        $vat_number =get_post_meta($order_id,'_billing_vat_number',true);
+        $vat_number = get_post_meta($order_id, '_billing_vat_number', true);
         $company = $order->get_billing_company();
 
         if ($WC_PayPlus_Gateway->exist_company && !empty($company)) {
@@ -270,8 +269,8 @@ class PayplusInvoice
         } else {
             $customer['name'] = $customerName;
         }
-        if(!empty($vat_number)){
-            $customer['vat_number'] =$vat_number;
+        if (!empty($vat_number)) {
+            $customer['vat_number'] = $vat_number;
         }
         $customer['phone'] = $order->get_billing_phone();
         $customer['email'] = $order->get_billing_email();
@@ -316,7 +315,7 @@ class PayplusInvoice
 
         }
         $payload = array();
-        $payload ['customer'] = $this->payplus_get_client_by_order_id($order_id);
+        $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         $totalCartAmount = 0;
         $totallCart = floatval($order->get_total());
         $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
@@ -333,23 +332,23 @@ class PayplusInvoice
             $payload['transaction_uuid'] = $payplusTransactionUid;
         }
         if (!count($resultApps)) {
-            $objectInvociePaymentNoPayplus = array('meta_key' => 'other', 'price' => $dual * $totallCart *100);
-            $objectInvociePaymentNoPayplus = (object)$objectInvociePaymentNoPayplus;
-            $resultApps [] = $objectInvociePaymentNoPayplus;
+            $objectInvociePaymentNoPayplus = array('meta_key' => 'other', 'price' => $dual * $totallCart * 100);
+            $objectInvociePaymentNoPayplus = (object) $objectInvociePaymentNoPayplus;
+            $resultApps[] = $objectInvociePaymentNoPayplus;
         }
         $sumPayment = floatval($this->payplus_sum_payment($resultApps));
-        if ($totalCartAmount == $sumPayment || $totalCartAmount==$order->get_total()) {
+        if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total()) {
             $payload['items'] = $productsItems;
             $payload['totalAmount'] = $dual * $totallCart;
         } else {
-            $payload['items'] [] = [
+            $payload['items'][] = [
                 'name' => __('General product', 'payplus-payment-gateway'),
                 'quantity' => 1,
-                'price' => $sumPayment
+                'price' => $sumPayment,
             ];
             $payload['totalAmount'] = $sumPayment;
         }
-        $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps,$payplusApprovalNum,$dual,$order->get_total()));
+        $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
         $handle = 'payplus_process_invoice';
         $handle .= ($typePayment == "charge") ? "" : "_refund";
 
@@ -360,22 +359,21 @@ class PayplusInvoice
 
         $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $typeDocument, $payload);
 
-
         if (is_wp_error($response)) {
             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
             return false;
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if ($res->status === "success") {
-                $responeType = ($typePayment == "charge") ? "" : "_refund_" ;
+                $responeType = ($typePayment == "charge") ? "" : "_refund_";
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                $insetData["payplus_invoice_docUID_refund_" . $responeType] =$res->details->docUID;
-                $insetData["payplus_invoice_numberD_refund_" . $responeType] =$res->details->number;
-                $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] =$res->details->originalDocAddress;
-                $insetData["payplus_invoice_copyDocAddress" . $responeType] =$res->details->copyDocAddress;
-                $insetData["payplus_invoice_customer_uuid" . $responeType] =$res->details->customer_uuid;
-                $insetData["payplus_check_invoice_send_refund"] =1;
-                payplus_update_post_meta_object($order,$insetData);
+                $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
+                $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
+                $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
+                $insetData["payplus_invoice_copyDocAddress" . $responeType] = $res->details->copyDocAddress;
+                $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
+                $insetData["payplus_check_invoice_send_refund"] = 1;
+                payplus_update_post_meta_object($order, $insetData);
                 $titleNote = ($typePayment == "charge") ? "PayPlus Document" : "PayPlus Document Refund " . $nameRefund;
                 $link = ($typePayment == "charge") ? __('Link Document', 'payplus-payment-gateway') : __('Link Document Refund', 'payplus-payment-gateway');
                 $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
@@ -417,7 +415,7 @@ class PayplusInvoice
             $dual = -1;
         }
 
-        $payload ['customer'] = $this->payplus_get_client_by_order_id($order_id);
+        $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
         }
@@ -442,16 +440,16 @@ class PayplusInvoice
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
             $payload['totalAmount'] = $sum;
             $payload['items'][] = array(
-                'name' => __('Refund for Order Number: ', 'payplus-payment-gateway').$order_id,
+                'name' => __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id,
                 'price' => $sum,
-                "quantity" => 1
+                "quantity" => 1,
             );
         }
         $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
         $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 
         if (!empty($unique_identifier)) {
-            $payload['unique_identifier'] = $unique_identifier.$this->payplus_unique_identifier;
+            $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
         }
         if (!count($resultApps)) {
             $method_payment = 'other';
@@ -459,14 +457,14 @@ class PayplusInvoice
             if (strpos($otherMethod, 'paypal') !== false) {
                 $method_payment = 'paypal';
             }
-            $objectInvociePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum)*100);
-            $objectInvociePaymentNoPayplus = (object)$objectInvociePaymentNoPayplus;
-            $resultApps [] = $objectInvociePaymentNoPayplus;
+            $objectInvociePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
+            $objectInvociePaymentNoPayplus = (object) $objectInvociePaymentNoPayplus;
+            $resultApps[] = $objectInvociePaymentNoPayplus;
         }
-        $payload = array_merge($payload,$this->payplus_get_payments_invocie($resultApps,$payplusApprovalNum,$dual,$order->get_total()));
+        $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
         if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
             if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
-                $payload ['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
+                $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
             }
         }
         return $payload;
@@ -497,13 +495,13 @@ class PayplusInvoice
                 $responeType = "_refund" . $documentType;
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
 
-                $insetData["payplus_invoice_docUID_refund_" . $responeType] =$res->details->docUID;
-                $insetData["payplus_invoice_numberD_refund_" . $responeType] =$res->details->number;
-                $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] =$res->details->originalDocAddress;
-                $insetData["payplus_invoice_copyDocAddress" . $responeType] =$res->details->copyDocAddress;
-                $insetData["payplus_invoice_customer_uuid" . $responeType] =$res->details->customer_uuid;
-                $insetData["payplus_check_invoice_send_refund"] =1;
-                payplus_update_post_meta_object($order,$insetData);
+                $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
+                $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
+                $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
+                $insetData["payplus_invoice_copyDocAddress" . $responeType] = $res->details->copyDocAddress;
+                $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
+                $insetData["payplus_check_invoice_send_refund"] = 1;
+                payplus_update_post_meta_object($order, $insetData);
                 $titleNote = "PayPlus Document Refund " . $nameDocment;
                 $link = __('Link Document Refund', 'payplus-payment-gateway');
                 $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
@@ -566,7 +564,7 @@ class PayplusInvoice
                 $resultReceipt = $this->payplus_create_dcoment($order_id, "inv_refund_receipt", '', CREDIT_RECEIPT);
                 if ($resultinvoice && $resultReceipt) {
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
-                    payplus_update_post_meta_object($order,array('payplus_refund'=> true));
+                    payplus_update_post_meta_object($order, array('payplus_refund' => true));
                     wp_die();
                 } else {
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
@@ -578,7 +576,7 @@ class PayplusInvoice
 
                 if ($resultinvoice) {
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
-                    payplus_update_post_meta_object($order,array('payplus_refund'=> true));
+                    payplus_update_post_meta_object($order, array('payplus_refund' => true));
                     wp_die();
                 } else {
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
@@ -624,7 +622,7 @@ class PayplusInvoice
         $payplus_invoice_option = $this->payplus_get_invoice_enable();
         $new_columns = array();
         if ($payplus_invoice_option) {
-            if(count($columns)) {
+            if (count($columns)) {
                 foreach ($columns as $column_name => $column_info) {
                     $new_columns[$column_name] = $column_info;
                     if ('shipping_address' === $column_name) {
@@ -683,7 +681,7 @@ class PayplusInvoice
     {
         global $wpdb;
         $tax_rate_shipping = 0;
-        $rates = $wpdb->get_results($wpdb->prepare("SELECT * 
+        $rates = $wpdb->get_results($wpdb->prepare("SELECT *
             FROM {$wpdb->prefix}woocommerce_tax_rates"));
 
         if (count($rates)) {
@@ -711,16 +709,16 @@ class PayplusInvoice
         $totalCartAmount = 0;
         $arrBalanceName = array();
         $allProductSku = "";
-        $temptax =payplus_woocommerce_get_tax_rates($order);
+        $temptax = payplus_woocommerce_get_tax_rates($order);
         $isAdmin = is_admin();
-        $items =$order->get_items(['line_item', 'fee', 'coupon']);
-        $tax =1;
+        $items = $order->get_items(['line_item', 'fee', 'coupon']);
+        $tax = 1;
         $wc_tax_enabled = wc_tax_enabled();
-        if(is_numeric($temptax)){
-            $tax=1+($temptax/100);
+        if (is_numeric($temptax)) {
+            $tax = 1 + ($temptax / 100);
         }
         foreach ($items as $item => $item_data) {
-            $discount=0;
+            $discount = 0;
             $product = new WC_Product($item_data['product_id']);
             $balanceName = get_post_meta($item_data['product_id'], 'payplus_balance_name', true);
             if (!empty($balanceName)) {
@@ -729,16 +727,16 @@ class PayplusInvoice
             $dataArr = $item_data->get_data();
             $item_name = $item_data['name'];
             $name = str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_data['name']));
-            $quantity = ($item_data['quantity'] ?  round($item_data['quantity'],$WC_PayPlus_Gateway->rounding_decimals) : '1');
-            $meta_html = wc_display_item_meta( $item_data, array( 'before' => '', 'after' => '',
-                'separator' => ' | ', 'echo' => false, 'autop' => false ) );
+            $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $WC_PayPlus_Gateway->rounding_decimals) : '1');
+            $meta_html = wc_display_item_meta($item_data, array('before' => '', 'after' => '',
+                'separator' => ' | ', 'echo' => false, 'autop' => false));
 
             if ($item_data['type'] == "coupon") {
                 $allProductSku .= (empty($allProductSku)) ? " ( " . $name : ' , ' . $name;
             } else {
                 if ($item_data['type'] == "fee") {
                     $productPrice = $item_data['total'];
-                    if($WC_PayPlus_Gateway->rounding_decimals !=0 && $wc_tax_enabled ){
+                    if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
                         $productPrice += $item_data['total_tax'];
                     }
                     $productPrice *= $dual;
@@ -746,34 +744,33 @@ class PayplusInvoice
                     $totalCartAmount += ($productPrice);
                 } else {
                     if ($WC_PayPlus_Gateway->single_quantity_per_line == 'yes') {
-                        $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled)*$quantity *$dual;
+                        $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled) * $quantity * $dual;
                         $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
                         $totalCartAmount += $productPrice;
                         $item_name .= ' ×  ' . $quantity;
                         $quantity = 1;
                     } else {
-                        if($WC_PayPlus_Gateway->rounding_decimals ==0 && $wc_tax_enabled  ){
+                        if ($WC_PayPlus_Gateway->rounding_decimals == 0 && $wc_tax_enabled) {
                             $productPrice = $order->get_item_subtotal($item_data);
-                        }else{
+                        } else {
                             $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled);
 
                         }
                         $productPrice *= $dual;
                         $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
-                        if($isAdmin && $item_data->get_subtotal() !== $item_data->get_total() ){
-                            $discount =(($item_data->get_subtotal() - $item_data->get_total())*$tax)   ;
-                            if($dual==-1){
-                                $discount*=$dual;
+                        if ($isAdmin && $item_data->get_subtotal() !== $item_data->get_total()) {
+                            $discount = (($item_data->get_subtotal() - $item_data->get_total()) * $tax);
+                            if ($dual == -1) {
+                                $discount *= $dual;
                             }
-                            $discount=round($discount,$WC_PayPlus_Gateway->rounding_decimals);
+                            $discount = round($discount, $WC_PayPlus_Gateway->rounding_decimals);
                         }
 
-					   $totalCartAmount +=($productPrice *$quantity)-$discount;
+                        $totalCartAmount += ($productPrice * $quantity) - $discount;
 
                     }
 
                 }
-
 
                 //LearnPress
                 if (get_class($item_data) === "WC_Order_Item_LP_Course") {
@@ -786,27 +783,26 @@ class PayplusInvoice
                 }
                 $productSKU = ($product->get_sku()) ? $product->get_sku() : $item_data['product_id'];
 
-
                 if (!empty($dataArr['variation_id'])) {
 
                     $product1 = new WC_Product_Variable($dataArr['product_id']);
                     $variationsProduct = $product1->get_available_variations();
                     if (count($variationsProduct)) {
                         $productSKU = ($variationsProduct[0]['sku']) ? $variationsProduct[0]['sku'] :
-                            $variationsProduct[0]['variation_id'];
+                        $variationsProduct[0]['variation_id'];
 
                     }
 
                 }
                 $itemDetails = [
                     'name' => str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_name)),
-                    'barcode' => (string)$productSKU,
+                    'barcode' => (string) $productSKU,
                     'quantity' => ($quantity ? $quantity : '1'),
-                    'price' => round($productPrice ,$WC_PayPlus_Gateway->rounding_decimals)
+                    'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
                 ];
-                if($discount){
-                    $itemDetails['discount_type'] ='amount';
-                    $itemDetails['discount_value'] =$discount;
+                if ($discount) {
+                    $itemDetails['discount_type'] = 'amount';
+                    $itemDetails['discount_value'] = $discount;
                 }
                 if ($productImageData && isset($productImageData[0])) {
                     $itemDetails['image_url'] = $productImageData[0];
@@ -826,49 +822,49 @@ class PayplusInvoice
                 }
             }
         }
-        $shipping_methods =$order->get_shipping_methods();
+        $shipping_methods = $order->get_shipping_methods();
         foreach ($shipping_methods as $shipping_method) {
-            $shipping_tax=0;
+            $shipping_tax = 0;
             $shipping_method_data = $shipping_method->get_data();
             $shipping_total = $order->get_shipping_total();
-            if($WC_PayPlus_Gateway->rounding_decimals !=0 && $wc_tax_enabled ) {
+            if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
                 $shipping_tax = $order->get_shipping_tax();
             }
             $productPrice = ($shipping_total + $shipping_tax) * $dual;
 
-         /*   if (
-                || $shipping_method_data['method_id'] === "free_shipping"
-                || ($shipping_method_data['method_id'] === "woo-ups-pickups" && $WC_PayPlus_Gateway->enable_pickup)
-                || ($shipping_method_data['method_id'] === "local_pickup" && $WC_PayPlus_Gateway->is_Local_pickup)
-           ) {*/
-                $description = "";
-                if ($shipping_method_data['method_id'] === "woo-ups-pickups") {
-                    $description = $WC_PayPlus_Gateway->getDiscrptionUpPickup($order_id);
-                }
+            /*   if (
+            || $shipping_method_data['method_id'] === "free_shipping"
+            || ($shipping_method_data['method_id'] === "woo-ups-pickups" && $WC_PayPlus_Gateway->enable_pickup)
+            || ($shipping_method_data['method_id'] === "local_pickup" && $WC_PayPlus_Gateway->is_Local_pickup)
+            ) {*/
+            $description = "";
+            if ($shipping_method_data['method_id'] === "woo-ups-pickups") {
+                $description = $WC_PayPlus_Gateway->getDiscrptionUpPickup($order_id);
+            }
 
-                $name = __('Shipping', 'payplus-payment-gateway') . ' - ' . str_replace(["'", '"', "\\"], '', $shipping_method_data['name']) . ' ' . $description;
-                $itemDetails = [
-                    'name' => $name,
-                    'barcode' => 'order-shipping',
-                    'quantity' => 1,
-                    'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
+            $name = __('Shipping', 'payplus-payment-gateway') . ' - ' . str_replace(["'", '"', "\\"], '', $shipping_method_data['name']) . ' ' . $description;
+            $itemDetails = [
+                'name' => $name,
+                'barcode' => 'order-shipping',
+                'quantity' => 1,
+                'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
 
-                ];
-                if ($tax_rate_shipping || !$wc_tax_enabled) {
-                    $itemDetails['vat_type_code'] = 'vat-type-included';
-                }
-                $productsItems[] = $itemDetails;
-                $totalCartAmount += $productPrice;
-           // }
+            ];
+            if ($tax_rate_shipping || !$wc_tax_enabled) {
+                $itemDetails['vat_type_code'] = 'vat-type-included';
+            }
+            $productsItems[] = $itemDetails;
+            $totalCartAmount += $productPrice;
+            // }
 
         }
         if (!$isAdmin && $order->get_total_discount()) {
             $productCouponPrice = ($order->get_total_discount());
-            if($WC_PayPlus_Gateway->rounding_decimals !=0 && $wc_tax_enabled ) {
+            if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
                 $productCouponPrice += $order->get_discount_tax();
             }
             $productCouponPrice *= -1;
-            $productCouponPrice *=$dual;
+            $productCouponPrice *= $dual;
             $productCouponPrice = round($productCouponPrice, $WC_PayPlus_Gateway->rounding_decimals);
             $totalCartAmount += $productCouponPrice;
 
@@ -876,21 +872,21 @@ class PayplusInvoice
                 'name' => ($allProductSku) ? $allProductSku . " ) " : __('Discount coupons', 'payplus-payment-gateway'),
                 'barcode' => __('Discount coupons', 'payplus-payment-gateway'),
                 'quantity' => 1,
-                'price' => round($productCouponPrice, $WC_PayPlus_Gateway->rounding_decimals)
+                'price' => round($productCouponPrice, $WC_PayPlus_Gateway->rounding_decimals),
             ];
-            $productsItems[] =$itemDetails;
+            $productsItems[] = $itemDetails;
         }
-        if ($WC_PayPlus_Gateway->rounding_decimals==0 && $order->get_total_tax()) {
+        if ($WC_PayPlus_Gateway->rounding_decimals == 0 && $order->get_total_tax()) {
             $productPrice = round($order->get_total_tax(), $WC_PayPlus_Gateway->rounding_decimals);
-            $productPrice *=$dual;
+            $productPrice *= $dual;
             $itemDetails = [
                 'name' => __("Round", "payplus-payment-gateway"),
                 'quantity' => 1,
                 'price' => $productPrice,
-                'is_summary_item' => true
+                'is_summary_item' => true,
 
             ];
-            $productsItems[] =$itemDetails;
+            $productsItems[] = $itemDetails;
             $totalCartAmount += $productPrice;
         }
         $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');
@@ -909,14 +905,14 @@ class PayplusInvoice
                 'name' => ($allProductSku) ? $allProductSku . " ) " : __('Discount coupons', 'payplus-payment-gateway'),
                 'barcode' => __('Discount coupons', 'payplus-payment-gateway'),
                 'quantity' => 1,
-                'price' => $priceGift
+                'price' => $priceGift,
             ];
             $productsItems[] = $itemDetails;
             $totalCartAmount += $priceGift;
         }
         $productsItems = $this->payplus_set_vat_all_product($order_id, $productsItems);
         $totalCartAmount = round($totalCartAmount, $WC_PayPlus_Gateway->rounding_decimals);
-        $return = (object)["productsItems" => $productsItems, 'amount' => $totalCartAmount, 'balanceNames' => $arrBalanceName];
+        $return = (object) ["productsItems" => $productsItems, 'amount' => $totalCartAmount, 'balanceNames' => $arrBalanceName];
         return $return;
     }
 
@@ -955,7 +951,7 @@ class PayplusInvoice
     {
 
         $total = array_reduce($resultApps, function ($sum, $entry) {
-            $sum += ($entry->price/100);
+            $sum += ($entry->price / 100);
             return $sum;
         }, 0);
         return $total;
@@ -965,54 +961,55 @@ class PayplusInvoice
      * @param $order_id
      * @return array|object|stdClass[]|null
      */
-    public function payplus_get_payments($order_id ,$notPayment='')
+    public function payplus_get_payments($order_id, $notPayment = '')
     {
         global $wpdb;
-       if(!WC_PayPlus::payplus_check_exists_table()){
-           $payplus_related_transactions = get_post_meta($order_id, 'payplus_related_transactions', true);
-            if(empty($notPayment)){
-                $sql="SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =".$order_id." AND delete_at =0 ";
+        if (!WC_PayPlus::payplus_check_exists_table()) {
+            $payplus_related_transactions = get_post_meta($order_id, 'payplus_related_transactions', true);
+            if (empty($notPayment)) {
+                $sql = "SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =" . $order_id . " AND delete_at =0 ";
 
-                if($payplus_related_transactions){
-                    $sql.=" AND related_transactions=0 ";
+                if ($payplus_related_transactions) {
+                    $sql .= " AND related_transactions=0 ";
                 }
-            }else{
-                $sql="SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =".$order_id." AND delete_at =0";
+            } else {
+                $sql = "SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =" . $order_id . " AND delete_at =0";
             }
-           $resultApps = $wpdb->get_results($sql, OBJECT);
-       }else{
-            $sql ="SELECT * FROM {$wpdb->prefix}postmeta WHERE post_id = " . $order_id ." AND (";
+            $resultApps = $wpdb->get_results($sql, OBJECT);
+        } else {
+            $sql = "SELECT * FROM {$wpdb->prefix}postmeta WHERE post_id = " . $order_id . " AND (";
 
-            foreach ($this->payment_method as $key =>$value){
-                $operator= ($key) ? ' OR ' :'';
-                $sql.=$operator ." meta_key LIKE '%payplus_".$value."%'";
+            foreach ($this->payment_method as $key => $value) {
+                $operator = ($key) ? ' OR ' : '';
+                $sql .= $operator . " meta_key LIKE '%payplus_" . $value . "%'";
 
             }
-            if(empty($notPayment)){
-                foreach ($this->payment_method_club as $key =>$value){
-                    $operator= ' OR ' ;
-                    $sql.=$operator ." meta_key LIKE '%payplus_".$value."%'";
+            if (empty($notPayment)) {
+                foreach ($this->payment_method_club as $key => $value) {
+                    $operator = ' OR ';
+                    $sql .= $operator . " meta_key LIKE '%payplus_" . $value . "%'";
                 }
             }
-            $sql.=" ) ";
-           $resultApps = $wpdb->get_results($sql, OBJECT);
-           $resultApps =$this->payplus_set_object_paymnet($order_id,$resultApps);
+            $sql .= " ) ";
+            $resultApps = $wpdb->get_results($sql, OBJECT);
+            $resultApps = $this->payplus_set_object_paymnet($order_id, $resultApps);
 
-       }
+        }
         return $resultApps;
     }
-    public  function  payplus_set_object_paymnet($order_id,$resultApps){
-        $arr =array();
+    public function payplus_set_object_paymnet($order_id, $resultApps)
+    {
+        $arr = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        foreach ($resultApps as $key =>$resultApp){
-            $objectPayment =new stdClass();
-            $objectPayment->order_id =$order_id;
-            $objectPayment->method_payment =str_replace("payplus_",'',$resultApp->meta_key);
-            $objectPayment->price = round(floatval($resultApp->meta_value) *100 ,$WC_PayPlus_Gateway->rounding_decimals);
-            $objectPayment->four_digits =get_post_meta($order_id,'payplus_four_digits',true);
-            $objectPayment->brand_name =get_post_meta($order_id,'payplus_brand_name',true);
-            $objectPayment->number_of_payments =get_post_meta($order_id,'payplus_number_of_payments',true);
-            $arr[] =$objectPayment;
+        foreach ($resultApps as $key => $resultApp) {
+            $objectPayment = new stdClass();
+            $objectPayment->order_id = $order_id;
+            $objectPayment->method_payment = str_replace("payplus_", '', $resultApp->meta_key);
+            $objectPayment->price = round(floatval($resultApp->meta_value) * 100, $WC_PayPlus_Gateway->rounding_decimals);
+            $objectPayment->four_digits = get_post_meta($order_id, 'payplus_four_digits', true);
+            $objectPayment->brand_name = get_post_meta($order_id, 'payplus_brand_name', true);
+            $objectPayment->number_of_payments = get_post_meta($order_id, 'payplus_number_of_payments', true);
+            $arr[] = $objectPayment;
         }
         return $arr;
     }
@@ -1021,41 +1018,42 @@ class PayplusInvoice
      * @param $order_id
      * @return void
      */
-    public function payplus_invoice_create_order_automatic($order_id){
+    public function payplus_invoice_create_order_automatic($order_id)
+    {
         $order = wc_get_order($order_id);
-        $typePaymentMethod=$order->get_payment_method();
-        if($typePaymentMethod=="bacs" || $typePaymentMethod=="cod"){
-          $this->payplus_invoice_create_order($order_id,'inv_tax');
+        $typePaymentMethod = $order->get_payment_method();
+        if ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod") {
+            $this->payplus_invoice_create_order($order_id, 'inv_tax');
         }
     }
-    public  function  payplus_check_sum_withholding_tax($payments){
+    public function payplus_check_sum_withholding_tax($payments)
+    {
 
         $sumWithholdingTax = array_reduce($payments, function ($sum, $entry) {
-            if($entry->method_payment =='withholding-tax') {
+            if ($entry->method_payment == 'withholding-tax') {
                 $sum += ($entry->price / 100);
             }
 
             return $sum;
         }, 0);
         $sumNotWithholdingTax = array_reduce($payments, function ($sum, $entry) {
-            if($entry->method_payment !='withholding-tax') {
+            if ($entry->method_payment != 'withholding-tax') {
                 $sum += ($entry->price / 100);
             }
 
             return $sum;
         }, 0);
-        if($sumWithholdingTax ==$sumNotWithholdingTax){
+        if ($sumWithholdingTax == $sumNotWithholdingTax) {
             return true;
         }
         return false;
-
 
     }
     /**
      * @param $order_id
      * @return void
      */
-    public function payplus_invoice_create_order($order_id,$typeInvoice=false)
+    public function payplus_invoice_create_order($order_id, $typeInvoice = false)
     {
         $payload = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
@@ -1069,21 +1067,19 @@ class PayplusInvoice
         $order = wc_get_order($order_id);
         if ($payplusErrorInvoice !== "unique-identifier-exists") {
             if (!$checkInvocieSend && $this->payplus_get_invoice_enable()) {
-                payplus_update_post_meta_object($order,array('payplus_check_invoice_send'=> true));
+                payplus_update_post_meta_object($order, array('payplus_check_invoice_send' => true));
                 $payplusType = get_post_meta($order_id, 'payplus_type', true);
                 $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
 
                 if ($invocie_manual || $j5 || ($this->payplus_gateway_option['enabled'] === "no" || ($this->payplus_gateway_option['transaction_type'] !== "2"
-                            && $payplusType !== "Check" && $payplusType !== "Approval"))) {
-                    $payplus_document_type =($typeInvoice)?$typeInvoice: $this->payplus_invoice_option['payplus_invoice_type_document'];
-                    $typePaymentMethod=$order->get_payment_method();
-                    if( $this->payplus_get_create_invoice_automatic() &&($typePaymentMethod=="bacs" || $typePaymentMethod=="cod") ){
-                        $payplus_document_type ='inv_tax';
+                    && $payplusType !== "Check" && $payplusType !== "Approval"))) {
+                    $payplus_document_type = ($typeInvoice) ? $typeInvoice : $this->payplus_invoice_option['payplus_invoice_type_document'];
+                    $typePaymentMethod = $order->get_payment_method();
+                    if ($this->payplus_get_create_invoice_automatic() && ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod")) {
+                        $payplus_document_type = 'inv_tax';
                     }
                     $dual = 1;
                     $resultApps = $this->payplus_get_payments($order_id);
-
-
 
                     if ($payplus_document_type === "inv_refund_receipt") {
                         $dual = -1;
@@ -1111,35 +1107,45 @@ class PayplusInvoice
                     $payload['totalAmount'] = $dual * $totalCartAmount;
                     $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
                     $payload['more_info'] = $order_id;
-                    $payload['unique_identifier'] = "payplus_order_" . $order_id.  $this->payplus_unique_identifier;
+
+                    $payload['unique_identifier'] = "payplus_order_" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
 
                     $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
                     $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 
-
                     if (!count($resultApps)) {
-                        $method_payment = 'other';
-                        $otherMethod = strtolower(get_post_meta($order_id, '_payment_method_title', true));
-                        if (strpos($otherMethod, 'paypal') !== false) {
-                            $method_payment = 'paypal';
+                        $method_payment = get_post_meta($order_id, 'payplus_method', true) == "" ? 'other' : get_post_meta($order_id, 'payplus_method', true);
+                        if ($method_payment == 'credit-card') {
+                            $paymentArray['method_payment'] = 'credit-card';
+                            $paymentArray['four_digits'] = get_post_meta($order_id, 'payplus_four_digits', true);
+                            $paymentArray['brand_name'] = get_post_meta($order_id, 'payplus_brand_name', true);
+                            $paymentArray['number_of_payments'] = get_post_meta($order_id, 'payplus_number_of_payments', true);
+                            $paymentArray['price'] = ($dual * $totalCartAmount) * 100;
+                            $resultApps[] = (object) $paymentArray;
+                        } else {
+                            $otherMethod = strtolower(get_post_meta($order_id, '_payment_method_title', true));
+                            if (strpos($otherMethod, 'paypal') !== false) {
+                                $method_payment = 'paypal';
+                            }
+                            $objectInvociePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
+                            $objectInvociePaymentNoPayplus = (object) $objectInvociePaymentNoPayplus;
+                            $resultApps[] = $objectInvociePaymentNoPayplus;
                         }
-                        $objectInvociePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount)*100);
-                        $objectInvociePaymentNoPayplus = (object)$objectInvociePaymentNoPayplus;
-                        $resultApps [] = $objectInvociePaymentNoPayplus;
+
                     }
 
                     $sumPayment = floatval($this->payplus_sum_payment($resultApps));
 
-                    $checkWithHoldingtTax =$this->payplus_check_sum_withholding_tax($resultApps) ;
-                    if ($totalCartAmount == $sumPayment || $totalCartAmount ==$order->get_total() || $checkWithHoldingtTax) {
+                    $checkWithHoldingtTax = $this->payplus_check_sum_withholding_tax($resultApps);
+                    if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total() || $checkWithHoldingtTax) {
                         $payload['items'] = $productsItems;
                         $payload['totalAmount'] = $dual * $totalCartAmount;
                     } else {
 
-                        $payload['items'] [] = [
+                        $payload['items'][] = [
                             'name' => __('General product', 'payplus-payment-gateway'),
                             'quantity' => 1,
-                            'price' => $sumPayment
+                            'price' => $sumPayment,
                         ];
                         $payload['totalAmount'] = $dual * $sumPayment;
                     }
@@ -1147,13 +1153,11 @@ class PayplusInvoice
                     $payplusApprovalNum = get_post_meta($order_id, "payplus_approval_num", true);
                     $payplusApprovalNumPaypl = get_post_meta($order_id, "_transaction_id", true);
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
-                    $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps,$payplusApprovalNum,$dual,$order->get_total()));
-
-
+                    $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
                     if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
                         if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
-                            $payload ['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
+                            $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
                         } else {
                             $order->add_order_note(__("We will not send a balance number to create an invoice because you have more than one product with a balance number", 'payplus-payment-gateway'));
                         }
@@ -1170,17 +1174,17 @@ class PayplusInvoice
 
                         if ($res->status === "success") {
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                            $insetData['payplus_invoice_docUID'] =$res->details->docUID;
-                            $insetData['payplus_invoice_numberD'] =$res->details->number;
-                            $insetData['payplus_invoice_numberD'] =$res->details->number;
-                            $insetData['payplus_invoice_originalDocAddress'] =$res->details->originalDocAddress;
-                            $insetData['payplus_invoice_copyDocAddress'] =$res->details->copyDocAddress;
-                            $insetData['payplus_invoice_customer_uuid'] =$res->details->customer_uuid;
-                            payplus_update_post_meta_object($order,$insetData);
+                            $insetData['payplus_invoice_docUID'] = $res->details->docUID;
+                            $insetData['payplus_invoice_numberD'] = $res->details->number;
+                            $insetData['payplus_invoice_numberD'] = $res->details->number;
+                            $insetData['payplus_invoice_originalDocAddress'] = $res->details->originalDocAddress;
+                            $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
+                            $insetData['payplus_invoice_customer_uuid'] = $res->details->customer_uuid;
+                            payplus_update_post_meta_object($order, $insetData);
                             $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
                          <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
                         } else {
-                            payplus_update_post_meta_object($order,array('payplus_error_invoice'=> $res->error));
+                            payplus_update_post_meta_object($order, array('payplus_error_invoice' => $res->error));
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
                         }
@@ -1211,7 +1215,7 @@ class PayplusInvoice
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->payplus_invoice_api_key . '","secret_key":"' . $this->payplus_invoice_secret_key . '"}',
                 'X-creationsource' => 'WordPress Source',
-                'X-versionpayplus' => PAYPLUS_VERSION
+                'X-versionpayplus' => PAYPLUS_VERSION,
             )
         );
         $response = wp_remote_post($url, $args);
@@ -1222,10 +1226,11 @@ class PayplusInvoice
      * @param $metas
      * @return void
      */
-    public  function get_meta_data($metas){
-        $name ="";
-        $index =0;
-        if(count($metas)) {
+    public function get_meta_data($metas)
+    {
+        $name = "";
+        $index = 0;
+        if (count($metas)) {
             foreach ($metas as $key => $meta) {
                 if ($index) {
                     $name .= "," . $meta->display_key . " : " . $meta->value;
@@ -1238,32 +1243,33 @@ class PayplusInvoice
         return $name;
     }
 
-    public  function payplus_get_payments_invocie($resultApps,$payplusApprovalNum,$dual=1,$total =0){
-       $payments= array();
+    public function payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual = 1, $total = 0)
+    {
+        $payments = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        if(count($resultApps)) {
-            $sum=0;
+        if (count($resultApps)) {
+            $sum = 0;
             for ($i = 0; $i < count($resultApps); $i++) {
 
                 $resultApp = $resultApps[$i];
-                $create_at =$resultApp->create_at;
+                $create_at = $resultApp->create_at;
                 $paymentType = 'payment-app';
                 $typePayment = array();
-                if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other','cash','payment-check','bank-transfer','withholding-tax'))) {
+                if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax'))) {
                     $paymentType = $resultApp->method_payment;
                 }
-                $arrTypeNotApp = array('credit-card', 'paypal', 'other','cash','payment-check','bank-transfer','withholding-tax');
+                $arrTypeNotApp = array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax');
                 $typeAll = array('multipass', 'credit-card', 'google-pay', 'apple-pay', 'tav-zahav', 'valuecard', 'finitione');
                 $typePayment['payment_type'] = $paymentType;
-                $amount =round($dual * floatval($resultApp->price / 100), $WC_PayPlus_Gateway->rounding_decimals);
-                $sum +=$amount;
+                $amount = round($dual * floatval($resultApp->price / 100), $WC_PayPlus_Gateway->rounding_decimals);
+                $sum += $amount;
                 $typePayment['amount'] = round($dual * floatval($resultApp->price / 100), $WC_PayPlus_Gateway->rounding_decimals);
                 if (!in_array($resultApp->method_payment, $arrTypeNotApp)) {
                     $typePayment['payment_app'] = $resultApp->method_payment;
                 }
                 if (in_array($resultApp->method_payment, $typeAll)) {
                     if ($resultApp->method_payment == "credit-card") {
-                        if($resultApp->transaction_type=="payments" ||$resultApp->transaction_type=="credit"){
+                        if ($resultApp->transaction_type == "payments" || $resultApp->transaction_type == "credit") {
                             $typePayment['payments'] = (intval($resultApp->number_of_payments) > 1) ? $resultApp->number_of_payments : 1;
                         }
                         $typePayment['transaction_type'] = $resultApp->transaction_type;
@@ -1278,35 +1284,35 @@ class PayplusInvoice
                     $typePayment['transaction_number'] = $payplusApprovalNum;
                     $typePayment['transaction_id'] = $payplusApprovalNum;
                 }
-                if(!empty($resultApp->notes)){
+                if (!empty($resultApp->notes)) {
                     $typePayment['notes'] = $resultApp->notes;
                 }
-                if(!empty($resultApp->transaction_id)){
+                if (!empty($resultApp->transaction_id)) {
                     $typePayment['transaction_id'] = $resultApp->transaction_id;
                     $typePayment['transaction_number'] = $resultApp->transaction_id;
                 }
-                if(!empty($resultApp->payer_account)){
+                if (!empty($resultApp->payer_account)) {
                     $typePayment['payer_account'] = $resultApp->payer_account;
                 }
 
-                if($paymentType =='payment-check' || $paymentType=="bank-transfer"){
+                if ($paymentType == 'payment-check' || $paymentType == "bank-transfer") {
                     $typePayment['account_number'] = $resultApp->account_number;
                     $typePayment['branch_number'] = $resultApp->branch_number;
                     $typePayment['bank_number'] = $resultApp->bank_number;
-                    if($paymentType =='payment-check'){
+                    if ($paymentType == 'payment-check') {
                         $typePayment['check_number'] = $resultApp->check_number;
                     }
 
                 }
-                if(!empty($create_at)){
-                    $create_at =explode(' ',$create_at);
-                    if(count($create_at)){
-                        $typePayment['payment_date'] =$create_at[0];
+                if (!empty($create_at)) {
+                    $create_at = explode(' ', $create_at);
+                    if (count($create_at)) {
+                        $typePayment['payment_date'] = $create_at[0];
                     }
 
                 }
-                $payments ['payments'][] = $typePayment;
-                if($sum ==$total){
+                $payments['payments'][] = $typePayment;
+                if ($sum == $total) {
                     break;
                 }
             }
@@ -1315,4 +1321,3 @@ class PayplusInvoice
     }
 }
 new PayplusInvoice();
-

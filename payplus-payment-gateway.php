@@ -3,22 +3,22 @@
 Plugin Name: PayPlus Payment Gateway
 Description: WooCommerce integration for PayPlus Payment Gateway. Accept credit cards and more alternative methods directly to your WordPress e-commerce websites, More options to Refund, Charge, Capture, Subscriptions, Tokens and much more!
 Plugin URI: https://www.payplus.co.il/wordpress
-Version:6.6.2
-Tested up to:6.4.3
+Version:6.6.3
+Tested up to:6.5.2
 Author: PayPlus LTD
 Author URI: https://www.payplus.co.il/
 License: GPLv2 or later
 Text Domain: PayPlus Payment Gateway Plugin
-*/
+ */
 
 defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if accessed directly
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '6.6.2');
-define('PAYPLUS_VERSION_DB' ,'payplus_2_0');
-define('PAYPLUS_TABLE_PROCESS' ,'payplus_payment_process');
-define('PAYPLUS_TABLE_SESSION' ,'payplus_payment_session');
+define('PAYPLUS_VERSION', '6.6.3');
+define('PAYPLUS_VERSION_DB', 'payplus_2_0');
+define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
+define('PAYPLUS_TABLE_SESSION', 'payplus_payment_session');
 class WC_PayPlus
 {
     protected static $instance = null;
@@ -38,7 +38,10 @@ class WC_PayPlus
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
         add_action('wp_head', [$this, 'payplus_no_index_page_error']);
+        //this is a custom callback hook that runs when the wc-api=payplus_gateway is returned in the url!
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
+        //end custom hook
+
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('woocommerce_order_status_changed', [$this, 'payplus_order_status_changed_action'], 50, 4);
         //FILTER
@@ -48,7 +51,6 @@ class WC_PayPlus
         //SHORTCODE
         add_shortcode('error-payplus-content', [$this, 'payplus_text_error_page']);
 
-
     }
     /**
      * @return void
@@ -57,9 +59,11 @@ class WC_PayPlus
     {
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
-        if ($WC_PayPlus_Gateway->api_test_mode) echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">' . __('Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when finishing testing', 'payplus-payment-gateway') . '</div>';
+        if ($WC_PayPlus_Gateway->api_test_mode) {
+            echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">' . __('Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when finishing testing', 'payplus-payment-gateway') . '</div>';
+        }
 
-        if ($woocommerce_price_num_decimal > 2  ||  $woocommerce_price_num_decimal ==1  || $woocommerce_price_num_decimal < 0 ) {
+        if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">' . __('Please change the "Number of decimal digits" to 2 or  0  in your WooCommerce settings>General>Currency settings', 'payplus-payment-gateway') . '</div>';
         }
 
@@ -70,27 +74,27 @@ class WC_PayPlus
      */
     public function ipn_response()
     {
-        global  $wpdb;
+        global $wpdb;
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $REQUEST = $WC_PayPlus_Gateway->arr_clean($_REQUEST);
-        $tblname = $wpdb->prefix.'payplus_payment_process';
-        $indexRow=0;
-        if(!empty($REQUEST['more_info'])) {
-            $status_code =$REQUEST['status_code'];
+        $tblname = $wpdb->prefix . 'payplus_payment_process';
+        $indexRow = 0;
+        if (!empty($REQUEST['more_info'])) {
+            $status_code = $REQUEST['status_code'];
             $order_id = $REQUEST['more_info'];
-            $sql = 'SELECT id as rowId,count(*) as rowCount ,count_process FROM ' .  $tblname . ' WHERE  order_id=' . $order_id . ' AND  ( status_code="'.$status_code.'")';
+            $sql = 'SELECT id as rowId,count(*) as rowCount ,count_process FROM ' . $tblname . ' WHERE  order_id=' . $order_id . ' AND  ( status_code="' . $status_code . '")';
             $result = $wpdb->get_results($sql);
-            $result =$result[$indexRow];
+            $result = $result[$indexRow];
             if (!$result->rowCount) {
 
                 $wpdb->insert($tblname, array(
                     'order_id' => $order_id,
                     'function_begin' => 'ipn_response',
-                    'status_code' => $status_code ,
-                    'count_process' =>1
+                    'status_code' => $status_code,
+                    'count_process' => 1,
                 ));
-                if( $wpdb->last_error){
-                    payplus_Add_log_payplus($wpdb->last_error );
+                if ($wpdb->last_error) {
+                    payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $data = [
                     'transaction_uid' => $REQUEST['transaction_uid'] ?? null,
@@ -109,7 +113,6 @@ class WC_PayPlus
 
                 $order = $WC_PayPlus_Gateway->validateOrder($data);
 
-
                 $linkRedirect = $WC_PayPlus_Gateway->get_return_url($order);
 
                 if (!empty($REQUEST['paymentPayPlusDashboard'])) {
@@ -126,13 +129,12 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
 
-
             } else {
-                $wpdb->update($tblname,array(
-                    'count_process'=>$result->count_process+1
-                ),array('id'=>$result->rowId));
-                if( $wpdb->last_error){
-                    payplus_Add_log_payplus($wpdb->last_error );
+                $wpdb->update($tblname, array(
+                    'count_process' => $result->count_process + 1,
+                ), array('id' => $result->rowId));
+                if ($wpdb->last_error) {
+                    payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $order = wc_get_order($order_id);
                 $linkRedirect = $WC_PayPlus_Gateway->get_return_url($order);
@@ -154,7 +156,7 @@ class WC_PayPlus
             ?>
             <meta name="robots" content="noindex,nofollow">
             <?php
-        }
+}
     }
 
     /**
@@ -164,7 +166,7 @@ class WC_PayPlus
      */
     public function payplus_after_refund($order_id, $refund_id)
     {
-        $invocie_api = new   PayplusInvoice();
+        $invocie_api = new PayplusInvoice();
         $payment_method = get_post_meta($order_id, '_payment_method', true);
         if (strpos($payment_method, 'payplus') === false) {
             $amount = get_post_meta($refund_id, '_refund_amount', true);
@@ -188,7 +190,7 @@ class WC_PayPlus
             'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway",
             'meta' => array(
                 'title' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
-                'target' => '_blank'
+                'target' => '_blank',
             ),
         ));
         $admin_bar->add_menu(array(
@@ -199,7 +201,7 @@ class WC_PayPlus
             'meta' => array(
                 'title' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
                 'target' => '_blank',
-                'class' => 'my_menu_item_class'
+                'class' => 'my_menu_item_class',
             ),
         ));
     }
@@ -342,7 +344,7 @@ class WC_PayPlus
         if (count($optionlanguages)) {
             foreach ($optionlanguages as $key => $optionlanguage) {
                 if (strpos($key, $locale) !== false) {
-                    return "<p style='text-align: center' class='payplus-error-text'>" . $optionlanguage . "</p>";;
+                    return "<p style='text-align: center' class='payplus-error-text'>" . $optionlanguage . "</p>";
                 }
             }
             return "<p  style='text-align: center' class='payplus-error-text'>" . $optionlanguages['en_US_-English'] . "</p>";
@@ -365,13 +367,12 @@ class WC_PayPlus
         $required_php_version = '7.2';
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
-
         if (version_compare($required_php_version, $php_version, '>')) {
             $message = sprintf(__('Your server is running PHP version %1$s but some features requires at least %2$s.', 'payplus-payment-gateway'), $php_version, $required_php_version);
             $this->add_admin_notice('warning', $message);
         }
 
-         if($woocommerce_price_num_decimal > 2  ||  $woocommerce_price_num_decimal ==1  || $woocommerce_price_num_decimal < 0 ) {
+        if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             $message = '<b>' . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency setting', 'payplus-payment-gateway') . '</b>';
             $this->add_admin_notice('warning', $message);
         }
@@ -386,7 +387,7 @@ class WC_PayPlus
     {
         $this->notices[] = [
             'class' => "notice notice-$type is-dismissible",
-            'message' => $message
+            'message' => $message,
         ];
     }
 
@@ -397,7 +398,7 @@ class WC_PayPlus
     {
         $output = '';
         $title = __('PayPlus Payment Gateway', 'payplus-payment-gateway');
-        if(count($this->notices)) {
+        if (count($this->notices)) {
             foreach ($this->notices as $notice) {
                 $output .= "<div class='$notice[class]'><p><b>$title:</b> $notice[message]</p></div>";
             }
@@ -412,7 +413,7 @@ class WC_PayPlus
     public static function plugin_action_links($links)
     {
         $action_links = [
-            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . __('View PayPlus Settings', 'payplus-payment-gateway') . '">' . __('Settings') . '</a>'
+            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . __('View PayPlus Settings', 'payplus-payment-gateway') . '">' . __('Settings') . '</a>',
         ];
         $links = array_merge($action_links, $links);
 
@@ -425,21 +426,21 @@ class WC_PayPlus
     public function payplus_get_seetting_plugin()
     {
         if (get_option('woocommerce_payplus-payment-gateway_settings')) {
-            $options =get_option('woocommerce_payplus-payment-gateway_settings');
-            $arrNotSave=array('enable_design_checkout','balance_name','add_product_field_transaction_type');
-            $isSave=false;
-            if(count($arrNotSave)){
-                foreach ($arrNotSave as $key =>$value){
-                    if(!array_key_exists($value,$options)){
-                        $options[$value]="no";
-                        $isSave=true;
+            $options = get_option('woocommerce_payplus-payment-gateway_settings');
+            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type');
+            $isSave = false;
+            if (count($arrNotSave)) {
+                foreach ($arrNotSave as $key => $value) {
+                    if (!array_key_exists($value, $options)) {
+                        $options[$value] = "no";
+                        $isSave = true;
                     }
                 }
-                if($isSave){
-                    update_option('woocommerce_payplus-payment-gateway_settings',$options);
+                if ($isSave) {
+                    update_option('woocommerce_payplus-payment-gateway_settings', $options);
                 }
             }
-            $payplus_payment_gateway_settings = (object)$options;
+            $payplus_payment_gateway_settings = (object) $options;
             $this->payplus_payment_gateway_settings = $payplus_payment_gateway_settings;
         }
     }
@@ -452,23 +453,22 @@ class WC_PayPlus
         load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages');
         if (class_exists("WooCommerce")) {
 
-            include_once(PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php');
-            include_once(PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php');
-            include_once(PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php');
-            include_once(PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php');
-            add_action( 'woocommerce_blocks_loaded', [ $this, 'woocommerce_payplus_woocommerce_block_support' ] );
-            include_once(PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_admin_payments.php');
+            include_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
+            include_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
+            include_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
+            include_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
+            add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+            include_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_admin_payments.php';
             if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                 add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
             }
-
 
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
             $this->payplus_get_seetting_plugin();
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
-            if(WP_DEBUG_LOG){
+            if (WP_DEBUG_LOG) {
                 add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);
             }
 
@@ -479,20 +479,18 @@ class WC_PayPlus
             add_action('woocommerce_shop_order_list_table_custom_column', [$this->invocie_api, 'payplus_add_order_column_order_invoice'], 100, 2);
             add_action('woocommerce_order_item_add_action_buttons', [$this->invocie_api, 'payplus_order_item_add_action_buttons_callback'], 100, 1);
 
-
             if ($this->invocie_api->payplus_get_invoice_enable() && !$this->invocie_api->payplus_get_create_invocie_manual()) {
 
                 add_action('woocommerce_order_status_' . $this->invocie_api->payplus_get_invoice_status_order(), [$this->invocie_api, 'payplus_invoice_create_order']);
-                if($this->invocie_api->payplus_get_create_invoice_automatic()){
-                    add_action('woocommerce_order_status_on-hold' , [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
-                    add_action('woocommerce_order_status_processing' , [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
+                if ($this->invocie_api->payplus_get_create_invoice_automatic()) {
+                    add_action('woocommerce_order_status_on-hold', [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
+                    add_action('woocommerce_order_status_processing', [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
                 }
 
             }
 
-
             if ($this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings,'add_product_field_transaction_type')
+                && property_exists($this->payplus_payment_gateway_settings, 'add_product_field_transaction_type')
                 && $this->payplus_payment_gateway_settings->add_product_field_transaction_type == "yes") {
                 add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_transaction_type']);
                 add_action('manage_product_posts_columns', [$this, 'payplus_add_order_column_order_product'], 100);
@@ -500,7 +498,7 @@ class WC_PayPlus
                 add_filter('manage_edit-shop_order_columns', [$this, 'payplus_add_order_column_orders'], 20);
             }
             if ($this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings,'balance_name')
+                && property_exists($this->payplus_payment_gateway_settings, 'balance_name')
                 && $this->payplus_payment_gateway_settings->balance_name == "yes") {
                 add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_balance_name']);
             }
@@ -511,8 +509,6 @@ class WC_PayPlus
             payplus_add_file_ApplePay();
 
         }
-
-
 
     }
     /**
@@ -532,7 +528,6 @@ class WC_PayPlus
             }
             wp_localize_script('wc-checkout', 'payplus_script_checkout'
                 , array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile));
-
 
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
@@ -571,7 +566,7 @@ class WC_PayPlus
      */
     public function payplus_body_classes($classes)
     {
-        if($this->payplus_payment_gateway_settings->enable_design_checkout=="yes"){
+        if ($this->payplus_payment_gateway_settings->enable_design_checkout == "yes") {
             $classes[] = 'checkout-payplus';
         }
         return $classes;
@@ -589,7 +584,7 @@ class WC_PayPlus
         <div class="payplus-option-description-area"></div>
         <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
         <?php
-        $html = ob_get_clean();
+$html = ob_get_clean();
         echo $html;
     }
 
@@ -599,19 +594,19 @@ class WC_PayPlus
      */
     public function payplus_applepay_disable_manager($available_gateways)
     {
-        $currency =strtolower(get_woocommerce_currency());
+        $currency = strtolower(get_woocommerce_currency());
         if (isset($available_gateways['payplus-payment-gateway-applepay']) && !is_admin() &&
             !preg_match('/Mac|iPad|iPod|iPhone/', $_SERVER['HTTP_USER_AGENT'])) {
             unset($available_gateways['payplus-payment-gateway-applepay']);
         }
-        if(!is_admin()  && $currency !='ils'){
-            $arrPayment =array('payplus-payment-gateway'
-            ,'payplus-payment-gateway-bit'
-            ,'payplus-payment-gateway-googlepay',
-                'payplus-payment-gateway-applepay' ,
+        if (!is_admin() && $currency != 'ils') {
+            $arrPayment = array('payplus-payment-gateway'
+                , 'payplus-payment-gateway-bit'
+                , 'payplus-payment-gateway-googlepay',
+                'payplus-payment-gateway-applepay',
                 'payplus-payment-gateway-paypal');
-            foreach ($available_gateways as $key  =>$available_gateway){
-                if(strpos($key,'payplus-payment-gateway') && !in_array($key ,$arrPayment)){
+            foreach ($available_gateways as $key => $available_gateway) {
+                if (strpos($key, 'payplus-payment-gateway') && !in_array($key, $arrPayment)) {
                     unset($available_gateways[$key]);
                 }
             }
@@ -619,8 +614,8 @@ class WC_PayPlus
         return $available_gateways;
     }
     /*
-        ===  Begin Section  field "transaction_type" ==
-    */
+    ===  Begin Section  field "transaction_type" ==
+     */
     /**
      * @param $post
      * @return void
@@ -634,7 +629,7 @@ class WC_PayPlus
 
         $transactionTypes = array('1' => __('Charge', 'payplus-payment-gateway'),
             '2' => __('Authorization', 'payplus-payment-gateway'));
-        if(count($transactionTypes)) {
+        if (count($transactionTypes)) {
             echo "<select id='payplus_transaction_type' name='payplus_transaction_type'>";
             echo "<option value=''>" . __('Transactions Type', 'payplus-payment-gateway') . "</option>";
 
@@ -656,7 +651,7 @@ class WC_PayPlus
     {
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $new_columns = array();
-        if(count($columns)) {
+        if (count($columns)) {
             foreach ($columns as $column_name => $column_info) {
                 $new_columns[$column_name] = $column_info;
                 if ('shipping_address' === $column_name && $WC_PayPlus_Gateway->enabled === "yes") {
@@ -676,7 +671,7 @@ class WC_PayPlus
     {
         $new_columns = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        if(count($columns)) {
+        if (count($columns)) {
             foreach ($columns as $column_name => $column_info) {
                 $new_columns[$column_name] = $column_info;
                 if ('price' === $column_name && $WC_PayPlus_Gateway->enabled === "yes") {
@@ -707,11 +702,11 @@ class WC_PayPlus
         }
     }
     /*
-      ===  END Section  field "transaction_type" ==
-  */
+    ===  END Section  field "transaction_type" ==
+     */
     /*
     ===  Begin Section  field "balance_name" ==
-*/
+     */
     /**
      * @return void
      */
@@ -744,7 +739,7 @@ class WC_PayPlus
         echo ob_get_clean();
     }
     /*
-         ===  End Section  field "balance_name" ==
+    ===  End Section  field "balance_name" ==
      */
     /**
      * @param int $post_id
@@ -874,12 +869,12 @@ class WC_PayPlus
      * @param $errors
      * @return void
      */
-    function payplus_validation_cart_checkout($fields, $errors)
+    public function payplus_validation_cart_checkout($fields, $errors)
     {
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
-        if ($woocommerce_price_num_decimal > 2 ||  $woocommerce_price_num_decimal ==1 || $woocommerce_price_num_decimal < 0 ) {
+        if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             $errors->add('error', __('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
         }
         if ($WC_PayPlus_Gateway->payplus_check_blocked_ip()) {
@@ -896,61 +891,62 @@ class WC_PayPlus
     public function payplus_register_widgets($widgets_manager)
     {
 
-        include_once(PAYPLUS_PLUGIN_DIR . '/includes/elementor/widgets/express_checkout.php');
+        include_once PAYPLUS_PLUGIN_DIR . '/includes/elementor/widgets/express_checkout.php';
         $widgets_manager->register(new \Elementor_Express_Checkout());
     }
 
     /**
      * @return bool
      */
-    public  static function  payplus_check_exists_table($table='payplus_order'){
+    public static function payplus_check_exists_table($table = 'payplus_order')
+    {
         global $wpdb;
-        $table_name = $wpdb->prefix.$table;
-        $flag= ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name)?true:false;
+        $table_name = $wpdb->prefix . $table;
+        $flag = ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) ? true : false;
         return $flag;
     }
-    public  static function payplus_get_admin_menu(){
+    public static function payplus_get_admin_menu()
+    {
 
         ob_start();
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $arrLink = array('payplus-payment-gateway' => array(
             'name' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
             'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
-            'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>"
+            'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>",
         ),
             'payplus-invoice' => array(
                 'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invocie+.svg'>"
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invocie+.svg'>",
             ),
             'payplus-express-checkout' => array(
                 'name' => __('Express Checkout', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/express.svg'>"
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/express.svg'>",
             ),
             'payplus-error-setting' => array(
                 'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
-                'img' => ""
-            )
+                'img' => "",
+            ),
         );
-            echo "<div id='payplus-options'>";
-            if(count($arrLink)) {
-                echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
-                foreach ($arrLink as $key => $arrValue) {
-                    $seleted = ($key == $currentSection) ? "nav-tab-active" : "";
-                    echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $seleted . "' >
+        echo "<div id='payplus-options'>";
+        if (count($arrLink)) {
+            echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
+            foreach ($arrLink as $key => $arrValue) {
+                $seleted = ($key == $currentSection) ? "nav-tab-active" : "";
+                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $seleted . "' >
                                " . $arrValue['img'] .
-                        $arrValue['name'] .
-                        "</a>";
+                    $arrValue['name'] .
+                    "</a>";
 
-                }
-                echo "</nav>";
             }
-            echo "</div>";
-            return ob_get_clean();
+            echo "</nav>";
+        }
+        echo "</div>";
+        return ob_get_clean();
     }
-
 
     /**
      * Function for `woocommerce_order_status_changed` action-hook.
@@ -962,45 +958,47 @@ class WC_PayPlus
      *
      * @return void
      */
-    public   function  payplus_order_status_changed_action( $order_id, $status_transition_from, $status_transition_to, $order ){
+    public function payplus_order_status_changed_action($order_id, $status_transition_from, $status_transition_to, $order)
+    {
 
         global $wpdb;
         $table_name = $wpdb->prefix . 'payplus_order_log';
-        $debug_backtrace =debug_backtrace();
-        $log="";
-        foreach ($debug_backtrace as $key =>$debug){
-            $class =(isset($debug['class'])) ? $debug['class']."=>":'';
-            $log.=$debug['file']."=>".$class.$debug['function'] ."=>".$debug['line'] ."\n";
+        $debug_backtrace = debug_backtrace();
+        $log = "";
+        foreach ($debug_backtrace as $key => $debug) {
+            $class = (isset($debug['class'])) ? $debug['class'] . "=>" : '';
+            $log .= $debug['file'] . "=>" . $class . $debug['function'] . "=>" . $debug['line'] . "\n";
         }
-        $data  =array(
-                'action_name'=>'change-status',
-                 'order_id' =>$order_id,
-                 'status_transition_from' =>$status_transition_from,
-                 'status_transition_to' =>$status_transition_to,
-                  "log"=>$log
+        $data = array(
+            'action_name' => 'change-status',
+            'order_id' => $order_id,
+            'status_transition_from' => $status_transition_from,
+            'status_transition_to' => $status_transition_to,
+            "log" => $log,
         );
-        $wpdb->insert($table_name,$data);
-        if( $wpdb->last_error){
-            payplus_Add_log_payplus($wpdb->last_error );
+        $wpdb->insert($table_name, $data);
+        if ($wpdb->last_error) {
+            payplus_Add_log_payplus($wpdb->last_error);
         }
 
     }
-    public  function woocommerce_payplus_woocommerce_block_support(){
-        if ( class_exists( 'Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType' ) ) {
+    public function woocommerce_payplus_woocommerce_block_support()
+    {
+        if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
 
             require_once 'includes/blocks/wc_payplus_blocks_paymnet.php';
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
-                function( Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry ) {
-                    $payment_method_registry->register(new WC_Gateway_Payplus_credit_Card_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Googlepay_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Multipas_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Bit_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Applepay_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_TavZahav_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Valuecard_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_FinitiOne_Block() );
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block() );
+                function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                    $payment_method_registry->register(new WC_Gateway_Payplus_credit_Card_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Googlepay_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Multipas_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Bit_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Applepay_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_TavZahav_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Valuecard_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_FinitiOne_Block());
+                    $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
                 }
             );
         }
@@ -1032,7 +1030,7 @@ function payplus_register_order_statuses()
         'exclude_from_search' => false,
         'show_in_admin_all_list' => true,
         'show_in_admin_status_list' => true,
-        'label_count' => _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'woocommerce')
+        'label_count' => _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'woocommerce'),
     ));
 }
 add_filter('wc_order_statuses', 'payplus_wc_order_statuses');
@@ -1068,7 +1066,7 @@ function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
         $action = explode("_", $action);
         if ($action[1] == $statusOrder) {
             if ($invocie->payplus_get_invoice_enable()) {
-                if(count($post_ids)) {
+                if (count($post_ids)) {
                     foreach ($post_ids as $key => $value) {
                         $postStr .= $value . ",";
                     }
@@ -1087,7 +1085,7 @@ add_action('payplus_cron_send_order', function () {
     if ($invocie->payplus_get_invoice_enable()) {
         $orders = get_option('payplus_create_invoice');
         $orders = explode(",", $orders);
-        if(count($orders)) {
+        if (count($orders)) {
             foreach ($orders as $key => $order) {
                 if (!empty($order)) {
                     $currentOrder = wc_get_order($order);
@@ -1132,21 +1130,21 @@ function payplus_check_woocommerce_custom_orders_table_enabled()
  */
 function payplus_update_post_meta_object($order, $values)
 {
-    if($order) {
+    if ($order) {
         $isOrderCustomEnable = payplus_check_woocommerce_custom_orders_table_enabled();
         $id = $order->get_id();
-        foreach ($values as $key=> $value) {
-            $meta =get_post_meta($id,$key,true);
-             if ($isOrderCustomEnable) {
-                 if ($key != "_payment_method_title") {
-                     $order->update_meta_data($key, $value);
-                 }
-             }
-             if(!empty($meta)) {
-                    update_post_meta($id, $key, $value,$meta);
-             }else {
-                    update_post_meta($id, $key, $value);
-             }
+        foreach ($values as $key => $value) {
+            $meta = get_post_meta($id, $key, true);
+            if ($isOrderCustomEnable) {
+                if ($key != "_payment_method_title") {
+                    $order->update_meta_data($key, $value);
+                }
+            }
+            if (!empty($meta)) {
+                update_post_meta($id, $key, $value, $meta);
+            } else {
+                update_post_meta($id, $key, $value);
+            }
 
         }
         if ($isOrderCustomEnable) {
@@ -1159,44 +1157,43 @@ function payplus_update_post_meta_object($order, $values)
  * @param $order
  * @return float | array
  */
-function payplus_woocommerce_get_tax_rates($order ) {
+function payplus_woocommerce_get_tax_rates($order)
+{
     $rates = array();
-    foreach ( $order->get_items('tax') as $item_id => $item ) {
+    foreach ($order->get_items('tax') as $item_id => $item) {
         $tax_rate_id = $item->get_rate_id();
-        $rates[] = WC_Tax::get_rate_percent_value( $tax_rate_id );
+        $rates[] = WC_Tax::get_rate_percent_value($tax_rate_id);
     }
-    if(count($rates)==1){
+    if (count($rates) == 1) {
         return $rates[0];
     }
     return $rates;
 }
-function payplus_create_table_db(){
+function payplus_create_table_db()
+{
 
-
-    if(PAYPLUS_VERSION_DB!=get_option( 'payplus_db_version' )){
+    if (PAYPLUS_VERSION_DB != get_option('payplus_db_version')) {
 
         payplus_create_table_order();
         payplus_create_table_change_status_order();
         payplus_create_table_log();
         payplus_create_table_payment_session();
         payplus_create_table_process();
-       update_option('payplus_db_version',PAYPLUS_VERSION_DB);
+        update_option('payplus_db_version', PAYPLUS_VERSION_DB);
     }
-
-
 
 }
 /**
  * @return void
  */
 
-function payplus_create_table_order(){
+function payplus_create_table_order()
+{
 
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
     $table_name = $wpdb->prefix . 'payplus_order';
-
 
     $sql = "CREATE TABLE " . $table_name . " (
                 id  int(11) NOT NULL AUTO_INCREMENT,
@@ -1213,8 +1210,8 @@ function payplus_create_table_order(){
                 alternative_method_name varchar(20) DEFAULT NULL,
                 type_payment  varchar(255) DEFAULT NULL ,
                 token_uid varchar(255) DEFAULT NULL,
-                price   int(11) DEFAULT  0, 
-                refund   int(11) DEFAULT  0, 
+                price   int(11) DEFAULT  0,
+                refund   int(11) DEFAULT  0,
                 payplus_response  LONGTEXT  DEFAULT NULL,
                 related_transactions int(11) DEFAULT  0 ,
                 delete_at  int(11) DEFAULT  0 ,
@@ -1233,51 +1230,50 @@ function payplus_create_table_order(){
                 PRIMARY KEY  (id)
                 ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
-    if( $wpdb->last_error){
-        payplus_Add_log_payplus($wpdb->last_error );
+    if ($wpdb->last_error) {
+        payplus_Add_log_payplus($wpdb->last_error);
     }
-
 
 }
 
 /**
  * @return void
  */
-function  payplus_create_table_change_status_order(){
+function payplus_create_table_change_status_order()
+{
 
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
     $table_name = $wpdb->prefix . 'payplus_order_status';
 
-
     $sql = "CREATE TABLE " . $table_name . " (
                 id  BIGINT NOT NULL AUTO_INCREMENT,
                 order_id BIGINT NOT NULL,
                 create_at timestamp  default CURRENT_TIMESTAMP,
-                update_at  datetime DEFAULT NULL, 
-                create_at_refURL_success datetime  DEFAULT NULL, 
-                create_at_refURL_callback datetime  DEFAULT NULL, 
+                update_at  datetime DEFAULT NULL,
+                create_at_refURL_success datetime  DEFAULT NULL,
+                create_at_refURL_callback datetime  DEFAULT NULL,
                 status  varchar(255) DEFAULT NULL,
                 PRIMARY KEY  (id)
                 ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
-    if( $wpdb->last_error){
-        payplus_Add_log_payplus($wpdb->last_error );
+    if ($wpdb->last_error) {
+        payplus_Add_log_payplus($wpdb->last_error);
     }
 }
 
-function  payplus_create_table_log(){
+function payplus_create_table_log()
+{
 
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
 
     $table_name = $wpdb->prefix . 'payplus_order_log';
-
 
     $sql = "CREATE TABLE " . $table_name . " (
                 id  int(11) NOT NULL AUTO_INCREMENT,
@@ -1290,21 +1286,22 @@ function  payplus_create_table_log(){
                 PRIMARY KEY  (id)
                 ) $charset_collate;";
 
-    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
     dbDelta($sql);
-    if( $wpdb->last_error){
-        payplus_Add_log_payplus($wpdb->last_error );
+    if ($wpdb->last_error) {
+        payplus_Add_log_payplus($wpdb->last_error);
     }
 }
 /**
  * @return void
  */
 
-function  payplus_check_table_exist_db($nameTable){
+function payplus_check_table_exist_db($nameTable)
+{
 
-    global  $wpdb;
+    global $wpdb;
     if ($wpdb->get_var("show tables like '$nameTable'") != $nameTable) {
-        return  false;
+        return false;
     }
     return true;
 
@@ -1327,10 +1324,10 @@ function payplus_create_table_payment_session()
                    payplus_status int(11) DEFAULT  1,
                   PRIMARY KEY (id)
                 ) $charset_collate;";
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
-        if( $wpdb->last_error){
-            payplus_Add_log_payplus($wpdb->last_error );
+        if ($wpdb->last_error) {
+            payplus_Add_log_payplus($wpdb->last_error);
         }
     }
 }
@@ -1347,17 +1344,17 @@ function payplus_create_table_process()
                   id int(11) NOT NULL AUTO_INCREMENT,
                   order_id BIGINT NOT NULL,
                   create_at timestamp  default CURRENT_TIMESTAMP,
-                  function_begin  varchar(255)  DEFAULT NULL ,   
-                  status_code  varchar(255)  DEFAULT NULL ,   
+                  function_begin  varchar(255)  DEFAULT NULL ,
+                  status_code  varchar(255)  DEFAULT NULL ,
                   count_process int(11) NOT NULL,
                   function_end varchar(255)  DEFAULT NULL ,
                   PRIMARY KEY (id)
                 ) $charset_collate;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    if( $wpdb->last_error){
-        payplus_Add_log_payplus($wpdb->last_error );
+    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+    dbDelta($sql);
+    if ($wpdb->last_error) {
+        payplus_Add_log_payplus($wpdb->last_error);
     }
 
 }
@@ -1390,23 +1387,26 @@ function payplus_add_file_ApplePay()
         return true;
     }
 }
-function payplus_Add_log_payplus($last_error){
-    $beforeMsg = 'Plugin Version: ' . PAYPLUS_VERSION ;
-    $logger= wc_get_logger();
-    $logger->add('error-db-payplus',$beforeMsg."\n" .$last_error."\n" .  str_repeat("=", 232));
+function payplus_Add_log_payplus($last_error)
+{
+    $beforeMsg = 'Plugin Version: ' . PAYPLUS_VERSION;
+    $logger = wc_get_logger();
+    $logger->add('error-db-payplus', $beforeMsg . "\n" . $last_error . "\n" . str_repeat("=", 232));
 }
 register_activation_hook(__FILE__, 'payplus_create_table_order');
-register_activation_hook(__FILE__,'payplus_create_table_change_status_order');
+register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
 register_activation_hook(__FILE__, 'payplus_create_table_log');
 register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
 add_filter('woocommerce_price_trim_zeros', '__return_true');
 add_filter('acf/settings/remove_wp_meta_box', '__return_false');
-add_filter( 'woocommerce_admin_billing_fields' , 'payplus_order_admin_custom_fields' );
-function payplus_order_admin_custom_fields( $fields ) {
+
+add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
+function payplus_order_admin_custom_fields($fields)
+{
     global $theorder;
 
-    if($theorder) {
+    if ($theorder) {
         $sorted_fields = [];
         foreach ($fields as $key => $values) {
             if ($key === 'company') {
@@ -1426,14 +1426,16 @@ function payplus_order_admin_custom_fields( $fields ) {
         }
         return $sorted_fields;
     }
-    return  $fields;
+    return $fields;
 
 }
-add_action( 'woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta' ,10, );
-function payplus_checkout_field_update_order_meta( $order_id ) {
 
-    if ( isset( $_POST['_billing_vat_number'] ) ) {
-        update_post_meta( $order_id, '_billing_vat_number', sanitize_text_field( $_POST['_billing_vat_number'] ) );
+add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10, );
+function payplus_checkout_field_update_order_meta($order_id)
+{
+
+    if (isset($_POST['_billing_vat_number'])) {
+        update_post_meta($order_id, '_billing_vat_number', sanitize_text_field($_POST['_billing_vat_number']));
     }
 
 }
