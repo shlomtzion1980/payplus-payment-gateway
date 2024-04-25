@@ -1114,6 +1114,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
         if ($is_token) {
+
             $token_id = wc_clean($_POST['wc-' . $this->id . '-payment-token']);
             $token = WC_Payment_Tokens::get($token_id);
 
@@ -1128,15 +1129,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($response->results->status === "error" && $response->results->code === 1) {
 
                 // Customize the error message here
-                $error_message = 'This credit card token was saved with different billing and or shipping information. It cannot be used for this order. Please enter the credit card information manually.';
+                $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
+                wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
 
-                // Display the custom error message
-                wp_die($error_message);
+                return;
 
             }
 
             $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
             if ($response->data->status == "approved" && $response->data->status_code == "000" && $response->data->transaction_uid) {
+                $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
+
                 $this->updateMetaData($order_id, (array) $response->data);
                 if ($response->data->type == "Charge") {
                     if ($this->fire_completed) {
@@ -1146,19 +1149,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($this->successful_order_status !== 'default-woo') {
                         $order->update_status($this->successful_order_status);
                     }
-                    $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
+
                 } else {
                     $order->update_status('wc-on-hold');
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
 
             } else {
-                $order->add_order_note(sprintf(__('PayPlus Token Payment Failed<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
-                if ($this->failure_order_status !== 'default-woo') {
-                    $order->update_status($this->failure_order_status);
+                if ($this->display_mode !== 'iframe') {
+                    $order->add_order_note(sprintf(__('PayPlus Token Payment Failed<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
+                    if ($this->failure_order_status !== 'default-woo') {
+                        $order->update_status($this->failure_order_status);
+                    }
+                    wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response, true)), 'error');
+                    return;
                 }
-                wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response, true)), 'error');
-                return;
             }
         }
 
@@ -1167,7 +1172,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'redirect' => $redirect_to,
             'viewMode' => $this->display_mode,
         ];
-        if (in_array($this->display_mode, ['samePageIframe', 'popupIframe'])) {
+        if (in_array($this->display_mode, ['samePageIframe', 'popupIframe']) && !$is_token) {
 
             $result['payplus_iframe'] = $this->receipt_page($order_id, null, false, '', 0, true);
 
