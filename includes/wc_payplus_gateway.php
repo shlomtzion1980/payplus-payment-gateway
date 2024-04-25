@@ -2814,6 +2814,31 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $current_user = wp_get_current_user();
 
+        $customer = new WC_Customer($current_user->ID);
+
+        if ($this->exist_company && !empty($customer->get_billing_company())) {
+            $customerBilling['customer_name'] = $customer->get_billing_company();
+        } else {
+            if (!empty($customer->get_billing_first_name()) || !empty($customer->get_billing_last_name())) {
+                $customerBilling['customer_name'] = $customer->get_billing_first_name() . ' ' . $customer->get_billing_last_name();
+            }
+            if (!$customerBilling['customer_name']) {
+                $customerBilling['customer_name'] = $customer->get_billing_company();
+            } elseif ($customer->get_billing_company()) {
+                $customerBilling['customer_name'] .= " (" . $customer->get_billing_company() . ")";
+            }
+        }
+
+        $customerBilling['email'] = $customer->get_billing_email();
+        $customerBilling['phone'] = str_replace(["'", '"', "\\"], '', $customer->get_billing_phone());
+        $customerBilling['address'] = trim(str_replace(["'", '"', "\\"], '', $customer->get_billing_address_1() . ' ' . $customer->get_billing_address_2()));
+        $customerBilling['city'] = str_replace(["'", '"', "\\"], '', $customer->get_billing_city());
+        $customerBilling['postal_code'] = str_replace(["'", '"', "\\"], '', $customer->get_billing_postcode());
+        $customerBilling['country_iso'] = $customer->get_billing_country();
+        $customerBilling['customer_external_number'] = $current_user->ID;
+
+        $customerData = json_encode($customerBilling);
+
         $langCode = explode("_", get_locale());
         $payload = '{
             "payment_page_uid": "' . $this->settings['payment_page_id'] . '",
@@ -2823,10 +2848,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             "refURL_success": "' . $this->add_payment_res_url . '",
             "refURL_failure": "' . wc_get_endpoint_url('add-payment-method') . '",
             "refURL_callback": null,
-            "customer": {
-                "customer_name":"' . $current_user->display_name . '",
-                "email":"' . $current_user->user_email . '"
-            },
+            "customer": ' . $customerData . ',
             "amount": ' . rand(1, 9) . ',
             "currency_code": "' . get_woocommerce_currency() . '",
             "sendEmailApproval": false,
