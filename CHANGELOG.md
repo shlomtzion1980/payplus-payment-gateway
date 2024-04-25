@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 - Check/Get order - ipn data from payplus in Admin orders via button click.
 - Create invoice in a non-automatic management interface.
+- "Website code" - Added to Invoice+: Add a unique string for each website if you have more than one website connected to our gateway.
 
 ### Changed
 - Refactored codebase to enhance performance.
