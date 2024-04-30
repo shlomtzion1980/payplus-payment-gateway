@@ -1154,7 +1154,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $order->update_status('wc-on-hold');
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
-
+                // Add payments data to the DB
+                $inData = json_decode(json_encode($response->data), true);
+                $this->payplus_add_order($order_id, $inData);
             } else {
                 if ($this->display_mode !== 'iframe') {
                     $order->add_order_note(sprintf(__('PayPlus Token Payment Failed<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
@@ -2455,6 +2457,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             payplus_update_post_meta_object($order, $insertMeta);
                         }
                         $rowOrder = $this->invocie_api->payplus_get_payments($order_id);
+
                         if (!count($rowOrder)) {
                             $this->payplus_add_order($order_id, $inData);
                         }

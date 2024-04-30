@@ -1155,6 +1155,20 @@ endif;
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
                     $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
+                    $j5Amount = get_post_meta($order_id, 'payplus_charged_j5_amount', true);
+
+                    if ($j5 && ($j5Amount != $payload['totalAmount'])) {
+
+                        $payload['items'] = [];
+                        $payload['items'][] = [
+                            'name' => __('General product', 'payplus-payment-gateway'),
+                            'quantity' => 1,
+                            'price' => $j5Amount,
+                        ];
+                        $payload['totalAmount'] = $dual * $j5Amount;
+                        $payload['payments'][0]['amount'] = $dual * $j5Amount;
+                    }
+
                     if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
                         if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
                             $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
@@ -1162,9 +1176,11 @@ endif;
                             $order->add_order_note(__("We will not send a balance number to create an invoice because you have more than one product with a balance number", 'payplus-payment-gateway'));
                         }
                     }
+
                     $payload = json_encode($payload);
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+
                     $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $payplus_document_type, $payload);
 
                     if (is_wp_error($response)) {
