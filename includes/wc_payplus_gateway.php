@@ -486,7 +486,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'api_test_mode' => [
                 'title' => __('Test mode', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'description' => __('If to activate test mode ?', 'payplus-payment-gateway'),
+                'description' => __('Activate test mode', 'payplus-payment-gateway'),
                 'label' => __('Enable Sandbox Mode', 'payplus-payment-gateway'),
                 'desc_tip' => true,
 
@@ -630,11 +630,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'type' => 'select',
                 'options' => [
                     'redirect' => __('Redirect', 'payplus-payment-gateway'),
-                    'iframe' => __('iFrame', 'payplus-payment-gateway'),
+                    'iframe' => __('iFrame on the next page', 'payplus-payment-gateway'),
                     'samePageIframe' => __('iFrame on the same page', 'payplus-payment-gateway'),
                     'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
                 ],
                 'default' => 'redirect',
+                'description' => __('Also supported with the new "WooCommerce Checkout Blocks"', 'payplus-payment-gateway'),
             ],
             'iframe_height' => [
                 'title' => __('iFrame Height', 'payplus-payment-gateway'),
