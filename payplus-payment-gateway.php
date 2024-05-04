@@ -69,17 +69,47 @@ class WC_PayPlus
         print_r($theTokens);
     }
 
+    public function removeOrderMetaField($order_id, $meta_key)
+    {
+        global $wpdb;
+        $tblname = $wpdb->prefix . 'wc_orders_meta';
+        //$meta_key = 'payplus_token_uid';
+
+        // Prepare the SQL query to delete the meta field
+        $sql = $wpdb->prepare(
+            "
+    DELETE FROM $tblname
+    WHERE order_id = %d
+    AND meta_key = %s
+    ",
+            $order_id,
+            $meta_key
+        );
+        // Execute the query
+        $result = $wpdb->query($sql);
+
+        if (false === $result) {
+            // There was an error executing the query
+            echo "Error deleting meta field.";
+        } else {
+            // Meta field deleted successfully
+            echo "Meta field deleted successfully.";
+        }
+    }
+
     public function ajax_payplus_delete_token()
     {
         echo 'delete token!';
         print_r($_POST);
         $order_id = $_POST['orderId'];
         delete_post_meta($order_id, 'payplus_token_uid');
+        $this->removeOrderMetaField($order_id, 'payplus_token_uid');
         wp_die();
     }
 
     public function custom_thankyou_content($order_id)
     {
+
         // Get the order object
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
@@ -115,32 +145,31 @@ class WC_PayPlus
         if (!in_array($order_meta['payplus_token_uid'][0], $theTokens) && $order_meta['payplus_token_uid'][0] != null) {
 
 ?>
-            <div id="newToken" style="background-color: white; min-height: 20%; display: flex; border: solid 0.7px; border-radius: 30px; padding: 30px 30px 30px 30px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); flex-direction: column;">
-                <div class="payplus_save_token_messsage">
-                    <?php echo __('This is a new credit card, would you like to save it securely to your account for future purchases?'); ?>
-                </div>
-                <form action="" method="post">
+<div id="newToken"
+    style="background-color: white; min-height: 20%; display: flex; border: solid 0.7px; border-radius: 30px; padding: 30px 30px 30px 30px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); flex-direction: column;">
+    <div class="payplus_save_token_messsage">
+        <?php echo __('This is a new credit card, would you like to save it securely to your account for future purchases?'); ?>
+    </div>
+    <form action="" method="post">
 
-                    <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid'][0]; ?>">
-                    <input type="hidden" name="brand" value="<?php echo $order_meta['payplus_brand_id'][0]; ?>">
-                    <input type="hidden" name="last4" value="<?php echo $order_meta['payplus_four_digits'][0]; ?>">
-                    <input type="hidden" name="expiry_month" value="<?php echo $order_meta['payplus_expiry_month'][0]; ?>">
-                    <input type="hidden" name="expiry_year" value="<?php echo $order_meta['payplus_expiry_year'][0]; ?>">
-                    <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
-                    <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
+        <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid'][0]; ?>">
+        <input type="hidden" name="brand" value="<?php echo $order_meta['payplus_brand_id'][0]; ?>">
+        <input type="hidden" name="last4" value="<?php echo $order_meta['payplus_four_digits'][0]; ?>">
+        <input type="hidden" name="expiry_month" value="<?php echo $order_meta['payplus_expiry_month'][0]; ?>">
+        <input type="hidden" name="expiry_year" value="<?php echo $order_meta['payplus_expiry_year'][0]; ?>">
+        <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
+        <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
 
-                    <input type="submit" name="saveToken" value="<?php echo __('Save this card.'); ?>">
-                    <input type="submit" name="deleteToken" value="<?php echo __('No do not save.'); ?>">
-                    <div class='payplus_loader'></div </div> <?php
+        <input type="submit" name="saveToken" value="<?php echo __('Save this card.'); ?>">
+        <input type="submit" name="deleteToken" value="<?php echo __('No do not save.'); ?>">
+        <div class='payplus_loader'></div </div> <?php
                                                             }
                                                             if ($_POST['saveToken']) {
                                                                 $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
                                                                 $WC_PayPlus_Gateway->save_token($data, $user_id);
                                                                 delete_post_meta($order_id, 'payplus_token_uid');
+                                                                $this->removeOrderMetaField($order_id, 'payplus_token_uid');
                                                             }
-                                                            // if ($_POST['deleteToken']) {
-                                                            //     // delete_post_meta($order_id, 'payplus_token_uid');
-                                                            // }
                                                         }
 
 
@@ -250,8 +279,8 @@ class WC_PayPlus
                                                             $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
                                                             if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
                                                                 ?>
-                    <meta name=" robots" content="noindex,nofollow">
-                <?php
+        <meta name=" robots" content="noindex,nofollow">
+        <?php
                                                             }
                                                         }
 
@@ -695,8 +724,8 @@ class WC_PayPlus
                                                             $height = $this->payplus_payment_gateway_settings->iframe_height;
                                                             ob_start();
                 ?>
-                <div class="payplus-option-description-area"></div>
-                <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
         <?php
                                                             $html = ob_get_clean();
                                                             echo $html;
