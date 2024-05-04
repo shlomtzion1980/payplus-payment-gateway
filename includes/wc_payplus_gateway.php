@@ -2478,9 +2478,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     $insertMeta['payplus_transaction_type'] = "1";
                                 }
                             }
-                            if ($this->create_pp_token && $token_uid && $userID && $createToken) {
-                                $this->save_token($data, $userID);
-                            }
+                            // if ($this->create_pp_token && $token_uid && $userID && $createToken) {
+                            //     $this->save_token($data, $userID);
+                            // }
                             if ($userID > 0) {
                                 update_user_meta($userID, 'cc_token', $data['token_uid']);
                             }
