@@ -52,6 +52,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $use_ipn;
     public $send_variations;
     public $create_pp_token;
+    public $save_pp_token_receipt_page;
     public $send_add_data;
     public $hide_identification_id;
     public $hide_payments_field;
@@ -164,6 +165,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->send_variations = $this->get_option('send_variations') == 'yes' ? true : false;
 
         $this->create_pp_token = $this->get_option('create_pp_token') == 'yes' ? true : false;
+        $this->save_pp_token_receipt_page = $this->get_option('save_pp_token_receipt_page') == 'yes' ? true : false;
         $this->send_add_data = $this->get_option('send_add_data') == 'yes' ? true : false;
         $this->hide_identification_id = $this->get_option('hide_identification_id');
         $this->vat_number_field = $this->get_option('vat_number_field');
@@ -667,6 +669,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'description' => __('Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.
                 <br><br>Saving cards can be done either during purchase or through the "My Account" section in the website.', 'payplus-payment-gateway'),
             ],
+            'save_pp_token_receipt_page' => [
+                'title' => __('Save credit cards receipt page', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Allow save credit card token securely at the end of the order process', 'payplus-payment-gateway'),
+                'default' => 'no',
+                'desc_tip' => true,
+                'description' => __('If this is a new card, ask if the customer want to save credit card securely in the receipt page - the end of the order process.', 'payplus-payment-gateway'),
+            ],
             'send_add_data' => [
                 'title' => __('Add Data Parameter', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
@@ -1110,7 +1120,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;
         $order->delete_meta_data("save_payment_method");
         $order->add_meta_data("save_payment_method", isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0');
-        payplus_update_post_meta_object($order, array('save_new_token' => isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0'));
+        payplus_update_post_meta_object($order, array('save_new_token' => isset($_POST['wc-' . $this->id . '-new-payment-method']) && $_POST['wc-' . $this->id . '-new-payment-method'] ? '1' : '0'));
         $order->save_meta_data();
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
@@ -2417,7 +2427,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $createToken = get_post_meta($order_id, 'save_new_token', true);
                 $userID = $order->get_user_id();
             }
-
             $insertMeta = array();
             for ($i = 0; $i < $countLoop; $i++) {
                 $response = $this->post_payplus_ws($this->ipn_url, $payload);
@@ -2478,9 +2487,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     $insertMeta['payplus_transaction_type'] = "1";
                                 }
                             }
-                            // if ($this->create_pp_token && $token_uid && $userID && $createToken) {
-                            //     $this->save_token($data, $userID);
-                            // }
+                            if ($this->create_pp_token && $token_uid && $userID && $createToken) {
+                                $this->save_token($data, $userID);
+                            }
                             if ($userID > 0) {
                                 update_user_meta($userID, 'cc_token', $data['token_uid']);
                             }

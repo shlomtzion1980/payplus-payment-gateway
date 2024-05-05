@@ -4,6 +4,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 {
     protected static $instance = null;
     private $initiated = false;
+    public $payPlusInvoice;
     public $error_msg = 0;
     public $arrPayment = array(
         'payplus-payment-gateway',
@@ -51,7 +52,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
 
         }
-
+        if (get_option('payplus_invoice_option')['payplus_invoice_enable'] === 'yes') {
+            $this->payPlusInvoice = new PayplusInvoice();
+        }
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);
         // process make payment
@@ -77,8 +80,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_filter('removable_query_args', [$this, 'add_removable_arg']);
         add_filter('woocommerce_get_settings_checkout', [$this, 'payplus_get_error_setting'], 10, 2);
         add_filter('admin_body_class', [$this, 'payplus_admin_classes']);
-        $invocie_api = new PayplusInvoice();
-        if ($invocie_api->payplus_get_invoice_enable()) {
+
+        if ($this->payPlusInvoice->payplus_get_invoice_enable()) {
             add_action('woocommerce_order_refunded', [$this, 'payplus_after_refund'], 10, 2);
         }
 
@@ -663,8 +666,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payments = array_map('set_payment_payplus', $payments);
                 $this->payplus_add_payments($order_id, $payments);
             }
-            $payplusInvoice = new PayplusInvoice();
-            $payplusInvoice->payplus_invoice_create_order($order_id, $type_document);
+
+            $this->payPlusInvoice->payplus_invoice_create_order($order_id, $type_document);
             echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
             wp_die();
 
@@ -687,9 +690,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $type_document = $_POST['type_document'];
 
-            $payplusInvoice = new PayplusInvoice();
-
-            $resultApps = $payplusInvoice->payplus_get_payments($order_id);
+            $resultApps = $this->payPlusInvoice->payplus_get_payments($order_id);
 
             $sum = 0;
             $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
@@ -709,7 +710,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             if (count($resultApps)) {
 
-                $payplusInvoice->payplus_create_dcoment_dashboard($order_id,
+                $this->payPlusInvoice->payplus_create_dcoment_dashboard($order_id,
                     $type_document, $resultApps, round($amount, $WC_PayPlus_Gateway->rounding_decimals), 'payplus_order_refund' . $order_id . "_" . rand(1, 1000));
                 $wpdb->update($table_name, array('invoice_refund' => 0), array('order_id' => $order_id));
                 if ($amount == $order->get_total()) {
@@ -1013,9 +1014,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'inv_tax_receipt' => __('Tax Invoice Receipt ', 'payplus-payment-gateway'),
             'inv_receipt' => __('Receipt', 'payplus-payment-gateway'),
             'inv_don_receipt' => __('Donation Reciept', 'payplus-payment-gateway'));
-        $payplusInvoice = new PayplusInvoice();
-        $invoiceManualList = $payplusInvoice->payplus_get_invoice_manual_list();
-        $currentStatus = $payplusInvoice->payplus_get_invoice_type_document();
+
+        $invoiceManualList = $this->payPlusInvoice->payplus_get_invoice_manual_list();
+        $currentStatus = $this->payPlusInvoice->payplus_get_invoice_type_document();
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
         $chackAllPaymnet = in_array($currentStatus, $chackStatus) ? "block" : 'none';
         $payments = $WC_PayPlus_Gateway->invocie_api->payplus_get_payments($orderId);
@@ -1045,8 +1046,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $selected = ($currentStatus == $key) ?
                 'selected' : '';
                 ?>
-																																																																																																																																																																																																												                            <option <?php echo $selected ?> value="<?php echo $key ?>"><?php echo $value ?> </option>
-																																																																																																																																																																																																												                        <?php
+																																																																																																																																																																																																																																																																																																																																				                            <option <?php echo $selected ?> value="<?php echo $key ?>"><?php echo $value ?> </option>
+																																																																																																																																																																																																																																																																																																																																				                        <?php
     endif;
         endforeach;
         ?>
@@ -1189,10 +1190,10 @@ $sum = $order->get_total();
 for ($i = 2; $i <= 99; $i++):
                 $selected = ($i == 2) ? "selected='selected'" : "";
                 ?>
-																																																																																																						                                    <option <?php echo $selected ?> value="<?php echo $i ?>">
-																																																																																																						                                        <?php echo $i ?>
-																																																																																																						                                    </option>
-																																																																																																						                                <?php
+																																																																																																																																																																		                                    <option <?php echo $selected ?> value="<?php echo $i ?>">
+																																																																																																																																																																		                                        <?php echo $i ?>
+																																																																																																																																																																		                                    </option>
+																																																																																																																																																																		                                <?php
 
             endfor;
             ?>
@@ -1543,8 +1544,8 @@ foreach ($payment as $key => $value) {
                         endif;
                         $keyCurrent = str_replace("_", " ", ucfirst($key));
                         ?>
-																																																																																																																																																																																																												                                    <p> <strong> <?php echo $keyCurrent ?> </strong> : <?php echo $value ?> </p>
-																																																																																																																																																																																																												                                <?php
+																																																																																																																																																																																																																																																																																																																																				                                    <p> <strong> <?php echo $keyCurrent ?> </strong> : <?php echo $value ?> </p>
+																																																																																																																																																																																																																																																																																																																																				                                <?php
     endif;
                 endif;
             }
@@ -1601,15 +1602,16 @@ foreach ($payment as $key => $value) {
     {
 
         global $wpdb;
+        $this->isInitiated();
         $order = wc_get_order($orderId);
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $transaction_uid = $order->get_meta('payplus_transaction_uid');
         $order_validated = $order->get_meta('order_validated');
         $order_validated_error = $order->get_meta('order_validated_error');
-        $payplusInvoice = new PayplusInvoice();
-        $invocie_manual = $payplusInvoice->payplus_get_create_invocie_manual();
+
+        $invocie_manual = $this->payPlusInvoice->payplus_get_create_invocie_manual();
         $checkInvocieSend = get_post_meta($orderId, 'payplus_check_invoice_send', true);
-        $resultApps = $payplusInvoice->payplus_get_payments($orderId, 'otherClub');
+        $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
         $checkInvocieRefundSend = get_post_meta($orderId, 'payplus_send_refund', true);
         $sum = 0;
         $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
@@ -1639,7 +1641,7 @@ foreach ($payment as $key => $value) {
 $result = $this->payplus_get_order_payment($orderId);
             if (!count($result)) {
                 if (count($payplus_response)) {
-                    $WC_PayPlus_Gateway->payplus_add_order($orderId, $payplus_response);
+                    $this->payplus_add_order($orderId, $payplus_response);
                 } else {
                     $transaction_uid = get_post_meta($orderId, 'payplus_transaction_uid', true);
 
@@ -1651,9 +1653,9 @@ $result = $this->payplus_get_order_payment($orderId);
                     $payload['related_transaction'] = true;
                     $payload = json_encode($payload);
                     $data['order_id'] = $orderId;
-                    $res = $WC_PayPlus_Gateway->requestPayPlusIpn($payload, $data, 1, 'payplus_process_payment', true);
+                    $res = $this->requestPayPlusIpn($payload, $data, 1, 'payplus_process_payment', true);
                     payplus_update_post_meta_object($order, array('payplus_response' => json_encode($res->data, true)));
-                    $WC_PayPlus_Gateway->payplus_add_order($orderId, (array) $res->data);
+                    $this->payplus_add_order($orderId, (array) $res->data);
 
                 }
                 $result = $this->payplus_get_order_payment($orderId);
@@ -1665,33 +1667,33 @@ $result = $this->payplus_get_order_payment($orderId);
 
                         ?>
 
-																																																																																																																																																																																																																																																																																																																		            <tr class="payplus-row coupon-<?php echo $values->id ?>">
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						            <tr class="payplus-row coupon-<?php echo $values->id ?>">
 
-																																																																																																																																																																																																																																																																																																																		                <td>
-																																																																																																																																																																																																																																																																																																																		                    <?php
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						                <td>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						                    <?php
 
                         if ($refund): ?>
-																																																																																																																																																																																																																																																																																																																		                    <button data-refund="<?php echo $refund ?>" data-method='<?php echo $values->method_payment ?>' data-id="<?php echo $values->id ?>"  data-transaction-uid="<?php echo $values->transaction_uid ?>"   class="button button-primary width-100 do-api-refund-payplus">
-																																																																																																																																																																																																																																																																																																																		                      <span class="refund_text"> <?php echo __('Refund', 'payplus-payment-gateway') ?> </span></button>
-																																																																																																																																																																																																																																																																																																																		                    <?php endif;?>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						                    <button data-refund="<?php echo $refund ?>" data-method='<?php echo $values->method_payment ?>' data-id="<?php echo $values->id ?>"  data-transaction-uid="<?php echo $values->transaction_uid ?>"   class="button button-primary width-100 do-api-refund-payplus">
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						                      <span class="refund_text"> <?php echo __('Refund', 'payplus-payment-gateway') ?> </span></button>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						                    <?php endif;?>
 
-																																																																																																																																																																																																												                </td>
+																																																																																																																																																																																																																																																																																																																																				                </td>
 
-																																																																																																																																																																																																												                <td>
-																																																																																																																																																																																																												                 <?php
+																																																																																																																																																																																																																																																																																																																																				                <td>
+																																																																																																																																																																																																																																																																																																																																				                 <?php
         if ($refund): ?>
-																																																																																																																																																																																																												                    <input  class="width-100 sum-coupon-<?php echo $values->id ?>" type="number"   step="0.1" min="0" max="<?php echo $refund ?>"  value="0" />
-																																																																																																																																																																																																												                 <?php endif;?>
-																																																																																																						                </td>
-																																																																																																						                <td>
-																																																																																																						                    <bdi><?php echo $values->refund / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi>
-																																																																																																						                </td>
-																																																																																																						                <td>
-																																																																																																						                    <span class="woocommerce-Price-amount amount"><bdi><?php echo $values->price / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi></span>
-																																																																																																						                </td>
-																																																																																																						                <td class="label label-highlight"  ><?php echo __($values->method_payment, 'payplus-payment-gateway') ?></td>
-																																																																																																						            </tr>
-																																																																																																						                   <?php
+																																																																																																																																																																																																																																																																																																																																				                    <input  class="width-100 sum-coupon-<?php echo $values->id ?>" type="number"   step="0.1" min="0" max="<?php echo $refund ?>"  value="0" />
+																																																																																																																																																																																																																																																																																																																																				                 <?php endif;?>
+																																																																																																																																																																		                </td>
+																																																																																																																																																																		                <td>
+																																																																																																																																																																		                    <bdi><?php echo $values->refund / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi>
+																																																																																																																																																																		                </td>
+																																																																																																																																																																		                <td>
+																																																																																																																																																																		                    <span class="woocommerce-Price-amount amount"><bdi><?php echo $values->price / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi></span>
+																																																																																																																																																																		                </td>
+																																																																																																																																																																		                <td class="label label-highlight"  ><?php echo __($values->method_payment, 'payplus-payment-gateway') ?></td>
+																																																																																																																																																																		            </tr>
+																																																																																																																																																																		                   <?php
 endif;
             endforeach;
             endif;
@@ -1701,7 +1703,7 @@ endif;
 
         }
 
-        if ($order->get_status() != 'auto-draft' && $order->get_status() != 'on-hold' && $total && $payplusInvoice->payplus_get_invoice_enable()
+        if ($order->get_status() != 'auto-draft' && $order->get_status() != 'on-hold' && $total && $this->payPlusInvoice->payplus_get_invoice_enable()
             && $invocie_manual) {
 
             if (empty($checkInvocieSend)):
@@ -1710,7 +1712,7 @@ endif;
 
         }
 
-        if ($total && $payplusInvoice->payplus_get_invoice_enable()
+        if ($total && $this->payPlusInvoice->payplus_get_invoice_enable()
             && $invocie_manual && $sumTransactionRefund && !$checkInvocieRefundSend) {
             ?>
             <div class="payment-order-ajax  payment-invoice" style="margin:20px 0px">
@@ -1721,11 +1723,11 @@ endif;
             foreach ($selectInvoiceRefund as $key => $value):
                 $flag = true;
                 if ($flag):
-                    $selected = ($payplusInvoice->payplus_get_invoice_type_document_refund() == $key) ?
+                    $selected = ($this->payPlusInvoice->payplus_get_invoice_type_document_refund() == $key) ?
                     'selected' : '';
                     ?>
-																																																																																																																																																																																																												                            <option <?php echo $selected ?> value="<?php echo $key ?>"><?php echo $value ?> </option>
-																																																																																																																																																																																																												                        <?php
+																																																																																																																																																																																																																																																																																																																																				                            <option <?php echo $selected ?> value="<?php echo $key ?>"><?php echo $value ?> </option>
+																																																																																																																																																																																																																																																																																																																																				                        <?php
     endif;
             endforeach;
             ?>
@@ -1766,7 +1768,7 @@ endif;
         $table = $wpdb->prefix . 'payplus_order_log';
         $logs = $wpdb->get_results(' SELECT  *  FROM  ' . $table . ' WHERE order_id= ' . $orderId . ' AND action_name ="change-status"');
 
-        if ($WC_PayPlus_Gateway->log_status && count($logs)): ?>
+        if ($this->log_status && count($logs)): ?>
             <div class="flex">
 
             </div>
@@ -1793,14 +1795,14 @@ foreach ($logs as $key => $log):
             $time = $dateTime[1];
             $dateTime = $date . " " . $time;
             ?>
-																																																																																																						                <tr class="payplus-row">
-																																																																																																						                    <td class="log-row">
-																																																																																																						                        <?php
+																																																																																																																																																																		                <tr class="payplus-row">
+																																																																																																																																																																		                    <td class="log-row">
+																																																																																																																																																																		                        <?php
     foreach ($tempLogs as $key1 => $tempLog):
                 if (!empty($tempLog)):
                 ?>
-																																																																																																																																																																																																												                                    <p class="log"><?php echo ($key1 + 1) . " ) " . $tempLog ?></p>
-																																																																																																																																																																																																												                                <?php
+																																																																																																																																																																																																																																																																																																																																				                                    <p class="log"><?php echo ($key1 + 1) . " ) " . $tempLog ?></p>
+																																																																																																																																																																																																																																																																																																																																				                                <?php
     endif;
         endforeach;
         ?>
@@ -2041,14 +2043,16 @@ endif;
      */
     public function make_payment_button($post_id)
     {
-        if (!in_array(get_post_meta($post_id, 'payplus_type', true), ["Approval", "Check"])) {
+        $this->isInitiated();
 
+        if (!in_array(get_post_meta($post_id, 'payplus_type', true), ["Approval", "Check"])) {
             return;
         }
+
         $order = wc_get_order($post_id);
         $total = $order->get_total();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        $class = ($WC_PayPlus_Gateway->check_amount_authorization) ? 'payplus-visibility' : '';
+
+        $class = ($this->check_amount_authorization) ? 'payplus-visibility' : '';
         echo "<li class='wide delayed-payment'>
                     <h3>" . __('Charge Order Using PayPlus', 'payplus-payment-gateway') . "</h3>
                         <input class='" . $class . "'  data-amount='" . $total . "'  type='number' id='payplus_charge_amount' name='payplus_charge_amount' value='" . $total . "' min='0' max='" . $total . "' step='0.01' required />
@@ -2269,7 +2273,7 @@ endif;
      */
     public function payplus_after_refund($order_id, $refund_id)
     {
-        $invocie_api = new PayplusInvoice();
+
         $refund = new WC_Order_Refund($refund_id);
         $amount = $refund->get_amount();
         $order = $this->payplus_get_order_payment($order_id);
@@ -2285,10 +2289,10 @@ endif;
         if ($payment_method != ""
             && strpos($payment_method, 'payplus') === false) {
 
-            if (!$invocie_api->payplus_get_create_invocie_manual()
+            if (!$this->payPlusInvoice->payplus_get_create_invocie_manual()
                 && floatval($amount)) {
-                $invocie_api->payplus_create_dcoment_dashboard($order_id,
-                    $invocie_api->payplus_get_invoice_type_document_refund(), array(), $amount, 'payplus_order_refund' . $order_id);
+                $this->payPlusInvoice->payplus_create_dcoment_dashboard($order_id,
+                    $this->payPlusInvoice->payplus_get_invoice_type_document_refund(), array(), $amount, 'payplus_order_refund' . $order_id);
             }
         }
     }
