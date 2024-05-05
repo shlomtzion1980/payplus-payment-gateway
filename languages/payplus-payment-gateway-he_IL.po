@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-05-05 12:23+0300\n"
-"PO-Revision-Date: 2024-05-05 12:23+0300\n"
+"POT-Creation-Date: 2024-05-05 12:29+0300\n"
+"PO-Revision-Date: 2024-05-05 12:29+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -1375,8 +1375,8 @@ msgstr ""
 
 #: payplus-payment-gateway.php:150
 msgid ""
-"This is a new credit card, would you like to save it securely to your "
-"account for future purchases?"
+"Would you like to save this credit card securely to you account, for future "
+"purchases?"
 msgstr "האם לשמור את הכרטיס (בצורה מאובטחת) לשימוש בעסקאות עתידיות?"
 
 #: payplus-payment-gateway.php:183

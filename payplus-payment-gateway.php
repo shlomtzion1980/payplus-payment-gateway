@@ -147,14 +147,14 @@ class WC_PayPlus
                 <div id="newToken"
                     style="background-color: white; min-height: 20%; display: flex; border: solid 0.7px; border-radius: 30px; padding: 30px 30px 30px 30px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); flex-direction: column;">
                     <div class="payplus_save_token_messsage">
-                        <?php echo __('This is a new credit card, would you like to save it securely to your account for future purchases?'); ?>
+                        <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
                     </div>
                     <form action="" method="post">
                         <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid'][0]; ?>">
                         <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
                         <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
-                        <input type="submit" name="saveToken" value="<?php echo __('Yes'); ?>">
-                        <input type="submit" name="deleteToken" value="<?php echo __('No'); ?>">
+                        <input type="submit" name="saveToken" value="<?php echo __('Yes', 'payplus-payment-gateway'); ?>">
+                        <input type="submit" name="deleteToken" value="<?php echo __('No', 'payplus-payment-gateway'); ?>">
                         <div class='payplus_loader'></div>
                     </form>
                 </div>
