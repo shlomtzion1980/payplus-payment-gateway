@@ -5,7 +5,8 @@ jQuery(document).ready(function ($) {
   let token = payplus_script_thankyou.token;
   $("#newToken").css("display", "none");
   $("#newToken").fadeIn();
-  //show loader on page load
+  $(".payplus_loader").fadeIn();
+  //show loader on div load
 
   $("input[name='saveToken']").on("click", function (e) {
     $(".payplus_loader").fadeIn();
