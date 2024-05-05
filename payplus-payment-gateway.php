@@ -144,8 +144,7 @@ class WC_PayPlus
             // checking the $order_meta array for the payplus_token_uid key - if it's not there, then we know it's a new card
             if (!in_array($order_meta['payplus_token_uid'][0], $theTokens) && $order_meta['payplus_token_uid'][0] != null) {
                 ?>
-                <div id="newToken"
-                    style="background-color: white; min-height: 20%; display: flex; border: solid 0.7px; border-radius: 30px; padding: 30px 30px 30px 30px; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); flex-direction: column;">
+                <div id="newToken" class="payplus_thankyou-new-token">
                     <div class="payplus_save_token_messsage">
                         <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
                     </div>
@@ -157,6 +156,7 @@ class WC_PayPlus
                         <input type="submit" name="deleteToken" value="<?php echo __('No', 'payplus-payment-gateway'); ?>">
                         <div class='payplus_loader'></div>
                     </form>
+                    <div class="payplus_icon"></div>
                 </div>
 <?php
 }

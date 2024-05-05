@@ -3,17 +3,18 @@ jQuery(document).ready(function ($) {
   var userId = payplus_script_thankyou.userId;
   let orderId = payplus_script_thankyou.orderId;
   let token = payplus_script_thankyou.token;
-
+  $("#newToken").css("display", "none");
+  $("#newToken").fadeIn();
   //show loader on page load
-  $(".payplus_loader").fadeIn();
 
   $("input[name='saveToken']").on("click", function (e) {
     $(".payplus_loader").fadeIn();
   });
 
   $("input[name='deleteToken']").on("click", function (e) {
+    $(".payplus_loader").fadeIn();
     e.preventDefault();
-    $("#newToken").css("display", "none");
+
     let data = {
       action: "payplus-delete-token",
       userId: userId,
@@ -21,6 +22,7 @@ jQuery(document).ready(function ($) {
     };
     $.post(payplus_script_thankyou.ajax_url, data, function (response) {
       // console.log(response);
+      $("#newToken").fadeOut();
     });
   });
 
@@ -32,6 +34,7 @@ jQuery(document).ready(function ($) {
       userId: userId,
     };
     $.post(payplus_script_thankyou.ajax_url, data, function (response) {
+      $("#newToken").addClass("show-border");
       if (response.indexOf(token) !== -1) {
         $("#newToken").css("display", "none");
       }
