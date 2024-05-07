@@ -21,8 +21,13 @@ All notable changes to this project will be documented in this file.
 - Correct display information on invoice for card on invoice creation with token payment.
 - Display correct currency on automatic invoice creation.
 - Add/Save Payment methods through "My account -> Payment methods" now saves the token with customer default billing and will work on checkout (When billing information is the same).
+- Add/Save Payment methods in receipt page after successfull transaction.
+
+### In the future
+- Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
 
 ## [6.6.2] - 2024-02-01
 ### Added
+- Added support for the new WooCommerce Checkout Blocks.
 
 
