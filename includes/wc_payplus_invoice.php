@@ -4,7 +4,7 @@ define('CREDIT_INVOICE', 'Credit Invoice');
 define('CREDIT_RECEIPT', 'Credit Receipt');
 define("COUNT_BALANCE_NAME", 1);
 
-class PayplusInvoice
+class PayplusInvoice extends WC_PayPlus
 {
     private $payplus_invoice_option;
     private $payplus_gateway_option;
@@ -27,6 +27,7 @@ class PayplusInvoice
     private $payplus_invoice_send_document_sms;
     private $payplus_invoice_send_document_email;
     private $payplus_unique_identifier;
+    private $WC_PayPlus_Gateway;
     /**
      *
      */
@@ -103,7 +104,9 @@ class PayplusInvoice
         add_filter('manage_edit-shop_order_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table();
+
     }
+
     /**
      * @return mixed
      */
@@ -243,7 +246,7 @@ endif;
 
         $customer = [];
         $order = wc_get_order($order_id);
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $address = trim(str_replace(["'", '"', "\\"], '', $order->get_billing_address_1() . ' ' . $order->get_billing_address_2()));
         $city = str_replace(["'", '"', "\\"], '', $order->get_billing_city());
         $postal_code = str_replace(["'", '"', "\\"], '', $order->get_billing_postcode());
@@ -299,7 +302,7 @@ endif;
     public function payplus_create_dcoment($order_id, $typeDocument, $typePayment = "", $nameRefund = "")
     {
 
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $payplus_invoice_option = get_option('payplus_invoice_option');
 
@@ -400,7 +403,7 @@ endif;
     public function generatePayloadInvocie($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
     {
 
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payload = array();
         $productsItems = [];
         $payplus_invoice_rounding_decimals = $WC_PayPlus_Gateway->rounding_decimals;
@@ -481,7 +484,7 @@ endif;
     {
         $order = wc_get_order($order_id);
         $payload = json_encode($payload);
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
@@ -660,7 +663,7 @@ endif;
     public function payplus_check_vat_payment($order_id)
     {
         $handle = 'payplus_process_invoice';
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $customer_country_iso = $order->get_billing_country();
         $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'paying_vat:' . $WC_PayPlus_Gateway->paying_vat);
@@ -701,7 +704,7 @@ endif;
     public function payplus_get_products_by_order_id($order_id, $dual)
     {
 
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $tax_rate_shipping = $this->getRateshipping();
 
@@ -924,7 +927,7 @@ endif;
     public function payplus_set_vat_all_product($order_id, $productsItems)
     {
         $handle = 'payplus_process_invoice';
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payingVatAllOrder = $WC_PayPlus_Gateway->paying_vat_all_order === "yes";
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
         $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat == "1";
@@ -1000,7 +1003,7 @@ endif;
     public function payplus_set_object_paymnet($order_id, $resultApps)
     {
         $arr = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         foreach ($resultApps as $key => $resultApp) {
             $objectPayment = new stdClass();
             $objectPayment->order_id = $order_id;
@@ -1056,7 +1059,7 @@ endif;
     public function payplus_invoice_create_order($order_id, $typeInvoice = false)
     {
         $payload = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';
 
         $checkInvocieSend = get_post_meta($order_id, 'payplus_check_invoice_send', true);
@@ -1262,7 +1265,7 @@ endif;
     public function payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual = 1, $total = 0)
     {
         $payments = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         if (count($resultApps)) {
             $sum = 0;
             for ($i = 0; $i < count($resultApps); $i++) {
@@ -1336,4 +1339,4 @@ endif;
         return $payments;
     }
 }
-new PayplusInvoice();
+// new PayplusInvoice();

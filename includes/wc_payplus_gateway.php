@@ -122,7 +122,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         ];
         $this->add_product_field_transaction_type =
         $this->get_option('add_product_field_transaction_type') == "yes" ? true : false;
-
         // menu
         $this->disable_menu_header = $this->get_option('disable_menu_header') == 'yes' ? false : true;
         $this->disable_menu_side = $this->get_option('disable_menu_side') == 'yes' ? false : true;
@@ -237,6 +236,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_receipt_' . $this->id, [$this, 'receipt_page']);
         add_action('woocommerce_api_payplus_add_payment', [$this, 'add_payment_ipn_response']);
         add_action('admin_init', [$this, 'payplus_hide_editor']);
+        add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
 
         /****** ACTION END ******/
 
@@ -395,6 +395,29 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         }
 
+    }
+
+    /**
+     * Adds a notice for customer when they update their billing address.
+     *
+     * @since 4.1.0
+     * @param int    $user_id      The ID of the current user.
+     * @param string $load_address The address to load.
+     */
+    public function show_update_card_notice($user_id, $load_address)
+    {
+        wc_clear_notices();
+        if (
+            is_admin() ||
+            !$this->create_pp_token ||
+            !WC_PayPlus_Payment_Tokens::customer_has_saved_methods($user_id) ||
+            'billing' !== $load_address
+        ) {
+            return;
+        }
+
+        /* translators: 1) Opening anchor tag 2) closing anchor tag */
+        wc_add_notice(sprintf(__('If your billing address has been changed for saved payment methods, be sure to remove any %1$ssaved payment methods%2$s on file and re-add them.', 'paypluse-payment-gateway'), '<a href="' . esc_url(wc_get_endpoint_url('payment-methods')) . '" class="wc-payplus-update-card-notice" style="text-decoration:underline;">', '</a>'), 'notice');
     }
 
     /**
