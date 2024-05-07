@@ -157,10 +157,11 @@ class WC_PayPlus
             // Get the order object
             $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
-            $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_uid']);
+            $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_saved']);
 
             $data = json_decode($order_meta['payplus_response'], true);
-            $tokenUid = $data['token_uid'];
+            $tokenUid = isset($data['token_uid']) ? $data['token_uid'] : null;
+            $tokenSaved = isset($order_meta['payplus_token_saved']) ? $order_meta['payplus_token_saved'] : false;
             $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
             $theTokens = [];
 
@@ -168,7 +169,7 @@ class WC_PayPlus
                 $theTokens[] = $customerToken->get_token();
             };
 
-            if (!in_array($tokenUid, $theTokens) && $tokenUid != null) {
+            if (!in_array($tokenUid, $theTokens) && $tokenUid != null && !$tokenSaved) {
                 // call thankyou.js and register the script
                 wp_register_script('thankyou-js', PAYPLUS_PLUGIN_URL . '/assets/js/thankyou.js', ['jquery'], time(), true);
                 wp_localize_script(
@@ -188,7 +189,7 @@ class WC_PayPlus
                         <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
                     </div>
                     <form action="" method="post">
-                        <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid']; ?>">
+                        <input type="hidden" name="token" value="<?php echo $tokenUid; ?>">
                         <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
                         <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
                         <input type="submit" name="saveToken" value="<?php echo __('Yes', 'payplus-payment-gateway'); ?>">
@@ -202,6 +203,7 @@ class WC_PayPlus
             if (isset($_POST['saveToken'])) {
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 $this->payplus_gateway->save_token($data, $user_id);
+                WC_PayPlus_Order_Data::update_meta($order, ['payplus_token_saved' => true]);
             }
         }
 
