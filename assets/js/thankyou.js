@@ -3,7 +3,6 @@ jQuery(document).ready(function ($) {
   var userId = payplus_script_thankyou.userId;
   let orderId = payplus_script_thankyou.orderId;
   let token = payplus_script_thankyou.token;
-  $("#newToken").css("display", "none");
   $("#newToken").fadeIn();
   $(".payplus_loader").fadeIn();
   //show loader on div load

@@ -157,40 +157,38 @@ class WC_PayPlus
             // Get the order object
             $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
-            $order_meta = get_post_meta($order_id);
-            if (!isset($order_meta['payplus_token_uid'][0])) {
-                return;
-            }
+            $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_uid']);
 
-            $data = json_decode($order_meta['payplus_response'][0], true);
+            $data = json_decode($order_meta['payplus_response'], true);
+            $tokenUid = $data['token_uid'];
             $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
             $theTokens = [];
 
             foreach ($customerTokens as $customerToken) {
                 $theTokens[] = $customerToken->get_token();
             };
-            // call thankyou.js and register the script
-            wp_register_script('thankyou-js', PAYPLUS_PLUGIN_URL . '/assets/js/thankyou.js', ['jquery'], time(), true);
-            wp_localize_script(
-                'thankyou-js',
-                'payplus_script_thankyou',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'userId' => $user_id,
-                    'orderId' => $order_id,
-                    'token' => $order_meta['payplus_token_uid'][0],
-                )
-            );
-            wp_enqueue_script('thankyou-js');
-            // checking the $order_meta array for the payplus_token_uid key - if it's not there, then we know it's a new card
-            if (!in_array($order_meta['payplus_token_uid'][0], $theTokens) && $order_meta['payplus_token_uid'][0] != null) {
+
+            if (!in_array($tokenUid, $theTokens) && $tokenUid != null) {
+                // call thankyou.js and register the script
+                wp_register_script('thankyou-js', PAYPLUS_PLUGIN_URL . '/assets/js/thankyou.js', ['jquery'], time(), true);
+                wp_localize_script(
+                    'thankyou-js',
+                    'payplus_script_thankyou',
+                    array(
+                        'ajax_url' => admin_url('admin-ajax.php'),
+                        'userId' => $user_id,
+                        'orderId' => $order_id,
+                        'token' => $tokenUid,
+                    )
+                );
+                wp_enqueue_script('thankyou-js');
                 ?>
                 <div id="newToken" class="payplus_thankyou-new-token">
                     <div class="payplus_save_token_messsage">
                         <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
                     </div>
                     <form action="" method="post">
-                        <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid'][0]; ?>">
+                        <input type="hidden" name="token" value="<?php echo $order_meta['payplus_token_uid']; ?>">
                         <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
                         <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
                         <input type="submit" name="saveToken" value="<?php echo __('Yes', 'payplus-payment-gateway'); ?>">
@@ -204,8 +202,6 @@ class WC_PayPlus
             if (isset($_POST['saveToken'])) {
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 $this->payplus_gateway->save_token($data, $user_id);
-                delete_post_meta($order_id, 'payplus_token_uid');
-                $this->removeOrderMetaField($order_id, 'payplus_token_uid');
             }
         }
 
@@ -632,6 +628,7 @@ class WC_PayPlus
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
             add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_admin_payments.php';
             if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
