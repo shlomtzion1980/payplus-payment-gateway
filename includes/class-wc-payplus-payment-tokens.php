@@ -23,11 +23,11 @@ class WC_PayPlus_Payment_Tokens
     {
         self::$_this = $this;
 
-        add_filter('woocommerce_get_customer_payment_tokens', [$this, 'woocommerce_get_customer_payment_tokens'], 10, 3);
-        add_filter('woocommerce_payment_methods_list_item', [$this, 'get_account_saved_payment_methods_list_item_sepa'], 10, 2);
-        add_filter('woocommerce_get_credit_card_type_label', [$this, 'normalize_sepa_label']);
-        add_action('woocommerce_payment_token_deleted', [$this, 'woocommerce_payment_token_deleted'], 10, 2);
-        add_action('woocommerce_payment_token_set_default', [$this, 'woocommerce_payment_token_set_default']);
+        // add_filter('woocommerce_get_customer_payment_tokens', [$this, 'woocommerce_get_customer_payment_tokens'], 10, 3);
+        // add_filter('woocommerce_payment_methods_list_item', [$this, 'get_account_saved_payment_methods_list_item_sepa'], 10, 2);
+        // add_filter('woocommerce_get_credit_card_type_label', [$this, 'normalize_sepa_label']);
+        // add_action('woocommerce_payment_token_deleted', [$this, 'woocommerce_payment_token_deleted'], 10, 2);
+        // add_action('woocommerce_payment_token_set_default', [$this, 'woocommerce_payment_token_set_default']);
     }
 
     /**

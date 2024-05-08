@@ -910,10 +910,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %s %s'), $refunded_amount, $order->get_currency()));
             return false;
         }
-        $payplusRrelatedTransactions = get_post_meta($order_id, 'payplus_related_transactions', true);
+        $payplusRrelatedTransactions = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_related_transactions', true);
 
         if ($payplusRrelatedTransactions) {
-            $transaction_uid = get_post_meta($order_id, 'payplus_transaction_uid_credit-card', true);
+            $transaction_uid = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_transaction_uid_credit-card', true);
         }
         $this->payplus_add_log_all($handle, 'WP Refund (' . $order_id . ')');
         if (floatval($amount)) {
@@ -950,7 +950,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
 
                     $insertMeta = array(
-                        'payplus_credit-card' => floatval(get_post_meta($order_id, 'payplus_credit-card', true)) - $amount,
+                        'payplus_credit-card' => floatval(WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_credit-card', true)) - $amount,
                         'payplus_total_refunded_amount' => round($refunded_amount + $amount, 2),
                     );
                     WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
@@ -1275,7 +1275,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         if (count($items)) {
             foreach ($items as $item => $item_data) {
-                $transactionTypeValue = get_post_meta($item_data['product_id'], 'payplus_transaction_type', true);
+                $transactionTypeValue = WC_PayPlus_Order_Data::get_meta($item_data['product_id'], 'payplus_transaction_type', true);
                 if ($transactionTypeValue == $checkChargemMethod) {
                     return true;
                 }
@@ -1321,8 +1321,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function getRecurring($external_recurring_id, $order_id)
     {
 
-        $billing_interval = get_post_meta($external_recurring_id, '_billing_interval', true);
-        $billing_period = get_post_meta($external_recurring_id, '_billing_period', true);
+        $billing_interval = WC_PayPlus_Order_Data::get_meta($external_recurring_id, '_billing_interval', true);
+        $billing_period = WC_PayPlus_Order_Data::get_meta($external_recurring_id, '_billing_period', true);
         $external_recurring_payment['external_recurring_id'] = $external_recurring_id;
         $external_recurring_payment['external_recurring_charge_id'] = $order_id;
 
@@ -1472,7 +1472,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function getDiscrptionUpPickup($order_id)
     {
-        $jsondata = str_replace('\\"', '"', get_post_meta($order_id, 'pkps_json', true));
+        $jsondata = str_replace('\\"', '"', WC_PayPlus_Order_Data::get_meta($order_id, 'pkps_json', true));
         $jsondata = preg_replace('/\\\"/', "\"", $jsondata);
         $jsondata = preg_replace('/\\\'/', "\'", $jsondata);
         $jsondata = json_decode($jsondata);
@@ -1607,7 +1607,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 //LearnPress
                 if (get_class($item_data) === "WC_Order_Item_LP_Course") {
                     $product = new WC_Product_LP_Course($item_data['product_id']);
-                    $productImageData = wp_get_attachment_image_src(get_post_meta($item_data['product_id'], '_thumbnail_id', true), 'full');
+                    $productImageData = wp_get_attachment_image_src(WC_PayPlus_Order_Data::get_meta($item_data['product_id'], '_thumbnail_id', true), 'full');
 
                 } else {
                     $product = new WC_Product($item_data['product_id']);
@@ -1875,7 +1875,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $external_recurring_payment = '"external_recurring_payment":' . $this->getRecurring($external_recurring_id, $order_id) . ",";
         } elseif ($subscription) {
 
-            $external_recurring_id = get_post_meta($order_id, '_subscription_renewal', true);
+            $external_recurring_id = WC_PayPlus_Order_Data::get_meta($order_id, '_subscription_renewal', true);
             $external_recurring_payment = '"external_recurring_payment":' . $this->getRecurring($external_recurring_id, $order_id) . ",";
         }
         $json_move_token = "";
@@ -1925,8 +1925,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function checkPayemntPageTime($order_id, $check_payplus_generate_products_link)
     {
         $date = new DateTime();
-        $payplus_generate_products_link = get_post_meta($order_id, 'payplus_generate_products_link', true);
-        $dateLink = new DateTime(get_post_meta($order_id, 'payplus_time_link', true));
+        $payplus_generate_products_link = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_generate_products_link', true);
+        $dateLink = new DateTime(WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_time_link', true));
         $interval = $dateLink->diff($date);
 
         if ($interval->i < 30 && $interval->h == 0) {
@@ -1967,7 +1967,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             return false;
         }
 
-        $payplus_payment_page_link = get_post_meta($order_id, 'payplus_payment_page_link', true);
+        $payplus_payment_page_link = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_payment_page_link', true);
         $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         $check_payplus_generate_products_link = $this->payplus_generate_products_link($objectProducts->productsItems, $order_id);
 
@@ -2248,9 +2248,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($order) {
             $textLog = "status: " . $order->get_status() . " , ";
             $this->payplus_add_log_all($handle, 'New ' . $layout . ' Fired (' . $order_id . ')');
-            $textLog .= "order_validated : " . get_post_meta($order_id, 'order_validated', true) . " , ";
-            $textLog .= "status_code : " . get_post_meta($order_id, 'payplus_status_code', true) . " , ";
-            $textLog .= "payplus_transaction_uid : " . get_post_meta($order_id, 'payplus_transaction_uid', true);
+            $textLog .= "order_validated : " . WC_PayPlus_Order_Data::get_meta($order_id, 'order_validated', true) . " , ";
+            $textLog .= "status_code : " . WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_status_code', true) . " , ";
+            $textLog .= "payplus_transaction_uid : " . WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_transaction_uid', true);
             $this->payplus_add_log_all($handle, $textLog);
             $this->payplus_add_log_all($handle, '', 'space');
         }
@@ -2265,8 +2265,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function checkOrderBegin($order_id, $order)
     {
         if (($order && $order->get_status() != "pending")
-            || get_post_meta($order_id, 'order_validated', true) == '1'
-            || !empty(get_post_meta($order_id, 'payplus_transaction_uid', true))) {
+            || WC_PayPlus_Order_Data::get_meta($order_id, 'order_validated', true) == '1'
+            || !empty(WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_transaction_uid', true))) {
             return true;
         }
         return false;
@@ -2317,7 +2317,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $transaction_uid = $data['transaction_uid'];
         $page_request_uid = $data['page_request_uid'];
 
-        $titleMethod = get_post_meta($order_id, '_payment_method_title', true);
+        $titleMethod = WC_PayPlus_Order_Data::get_meta($order_id, '_payment_method_title', true);
         $titleMethod = str_replace(array('<span>', "</span>"), '', $titleMethod);
         $insertMeta = array('_payment_method_title' => $titleMethod);
         WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
@@ -2340,7 +2340,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $flag = $this->requestPayPlusIpn($payload, $data);
         if (!$flag) {
-            $payplus_transaction_uid = get_post_meta($order_id, 'payplus_transaction_uid', true);
+            $payplus_transaction_uid = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_transaction_uid', true);
             if (!$payplus_transaction_uid) {
                 $flag = $this->requestPayPlusIpn($payload, $data, COUNT_PAY_PLUS);
             }
@@ -2447,7 +2447,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $createToken = false;
         if ($order) {
             if ($order->get_user_id()) {
-                $createToken = get_post_meta($order_id, 'save_new_token', true);
+                $createToken = WC_PayPlus_Order_Data::get_meta($order_id, 'save_new_token', true);
                 $userID = $order->get_user_id();
             }
             $insertMeta = array();
@@ -2464,7 +2464,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                     $res = json_decode(wp_remote_retrieve_body($response));
                     $orderPayplus = $this->getOrderPayplus($order_id);
-                    $payplus_function_end = get_post_meta($order_id, 'payplus_function_end', true);
+                    $payplus_function_end = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_function_end', true);
                     if ($payplus_function_end && $payplus_function_end != $handleLog || $orderPayplus->function_end != $handleLog) {
                         $flagPayplus = false;
                         $flagProcess = false;
@@ -2517,7 +2517,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 update_user_meta($userID, 'cc_token', $data['token_uid']);
                             }
 
-                            if (empty(get_post_meta($order_id, 'payplus_print_log', true))) {
+                            if (empty(WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_print_log', true))) {
                                 WC_PayPlus_Order_Data::update_meta($order, array('payplus_print_log' => 1));
                                 if (property_exists($res->data, 'related_transactions')) {
 
@@ -2545,7 +2545,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                             $alternative_method_name = $method;
                                         }
 
-                                        $transactionUid = get_post_meta($order_id, "payplus_transaction_uid_" . $method, true);
+                                        $transactionUid = WC_PayPlus_Order_Data::get_meta($order_id, "payplus_transaction_uid_" . $method, true);
                                         if (!empty($transactionUid)) {
                                             $transactionUid = $transactionUid . "|" . $relatedTransaction->transaction_uid;
                                             $insertMeta["payplus_transaction_uid_" . $method] = $transactionUid;
@@ -2961,7 +2961,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $handle = 'payplus_process_payment_subscription';
         if ($order) {
             $insertMeta = array();
-            $payplus_status_active = get_post_meta($order->get_id(), 'payplus_status_active', true);
+            $payplus_status_active = WC_PayPlus_Order_Data::get_meta($order->get_id(), 'payplus_status_active', true);
 
             if (empty($payplus_status_active)) {
                 $token = get_user_meta($order->user_id, 'cc_token', true);
@@ -2971,14 +2971,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                 if ($result->data->status == "approved" && $result->data->status_code == "000" && $result->data->transaction_uid) {
                     $this->payplus_add_log_all($handle, print_r($result, true), 'completed');
-                    $external_recurring_id = get_post_meta($order->get_id(), '_subscription_renewal', true);
+                    $external_recurring_id = WC_PayPlus_Order_Data::get_meta($order->get_id(), '_subscription_renewal', true);
                     $post = $this->payplus_get_posts_id($external_recurring_id);
                     if ($post && $post[0]->post_parent) {
                         $post_parent = $post[0]->post_parent;
 
-                        $payplusFourDigits = get_post_meta($post_parent, "payplus_four_digits", true);
-                        $payplusBrandName = get_post_meta($post_parent, "payplus_brand_name", true);
-                        $payplusNumberOfPayments = get_post_meta($post_parent, "payplus_number_of_payments", true);
+                        $payplusFourDigits = WC_PayPlus_Order_Data::get_meta($post_parent, "payplus_four_digits", true);
+                        $payplusBrandName = WC_PayPlus_Order_Data::get_meta($post_parent, "payplus_brand_name", true);
+                        $payplusNumberOfPayments = WC_PayPlus_Order_Data::get_meta($post_parent, "payplus_number_of_payments", true);
                         $insertMeta['payplus_credit-card'] = $amount_to_charge;
                         $insertMeta['payplus_four_digits'] = $payplusFourDigits;
                         $insertMeta['payplus_brand_name'] = $payplusBrandName;
@@ -3004,7 +3004,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if (property_exists($result, 'results')
                         && property_exists($result->results, 'status')
                         && $result->results->status === "error") {
-                        $payplus_error_sub = get_post_meta($order->get_id(), 'payplus_error_sub', true);
+                        $payplus_error_sub = WC_PayPlus_Order_Data::get_meta($order->get_id(), 'payplus_error_sub', true);
                         if ($result->results->description == 'can-not-find-card' && empty($payplus_error_sub)) {
                             $insertMeta['payplus_error_sub'] = 1;
                             WC_PayPlus_Order_Data::update_meta($order, $insertMeta);

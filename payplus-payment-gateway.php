@@ -326,10 +326,12 @@ class WC_PayPlus
      */
     public function payplus_after_refund($order_id, $refund_id)
     {
+        $order = wc_get_order($order_id);
         $invocie_api = new PayplusInvoice();
-        $payment_method = get_post_meta($order_id, '_payment_method', true);
+        $payment_method = $order->get_payment_method();
         if (strpos($payment_method, 'payplus') === false) {
-            $amount = get_post_meta($refund_id, '_refund_amount', true);
+            //$amount = WC_PayPlus_Order_Data::get_meta($refund_id, '_refund_amount', true);
+            $amount = $order->get_total_refunded();
             if (floatval($amount)) {
                 $invocie_api->payplus_create_dcoment_dashboard(
                     $order_id,
@@ -382,7 +384,7 @@ class WC_PayPlus
     {
 
         if ($email->id == 'new_order') {
-            $payplusFourDigits = get_post_meta($order->get_id(), "payplus_four_digits", true);
+            $payplusFourDigits = WC_PayPlus_Order_Data::get_meta($order->get_id(), "payplus_four_digits", true);
             if ($payplusFourDigits) {
                 $payplusFourDigits = __("Four last digits", "payplus-payment-gateway") . " : " . $payplusFourDigits;
                 echo '<p class="email-upsell-p">' . $payplusFourDigits . '</p>';
@@ -413,7 +415,7 @@ class WC_PayPlus
                 '1' => __('Charge', 'payplus-payment-gateway'),
                 '2' => __('Authorization', 'payplus-payment-gateway'),
             );
-            $payplusTransactionType = get_post_meta($post_id, 'payplus_transaction_type', true);
+            $payplusTransactionType = WC_PayPlus_Order_Data::get_meta($post_id, 'payplus_transaction_type', true);
             if (!empty($payplusTransactionType)) {
                 echo '<p>' . $transactionTypes[$payplusTransactionType] . "</p>";
             }
@@ -807,7 +809,7 @@ $html = ob_get_clean();
 
         ob_start();
         wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
-        $transactionTypeValue = get_post_meta($post->ID, 'payplus_transaction_type', true);
+        $transactionTypeValue = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_transaction_type', true);
 
         $transactionTypes = array(
             '1' => __('Charge', 'payplus-payment-gateway'),
@@ -915,7 +917,7 @@ $html = ob_get_clean();
     {
         ob_start();
         wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
-        $balanceName = get_post_meta($post->ID, 'payplus_balance_name', true);
+        $balanceName = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_balance_name', true);
 
         printf('<input maxlength="20"   value="' . $balanceName . '" placeholder ="' . __('Balance Name', 'payplus-payment-gateway') . '"   type="text" id="payplus_balance_name" name="payplus_balance_name" />');
         echo ob_get_clean();
@@ -991,7 +993,7 @@ $html = ob_get_clean();
 
         if ($column == "payplus_transaction_type" && $this->payplus_gateway->add_product_field_transaction_type) {
             global $post;
-            $payplusTransactionType = get_post_meta($post->ID, 'payplus_transaction_type', true);
+            $payplusTransactionType = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_transaction_type', true);
             if (!empty($payplusTransactionType)) {
                 $transactionTypes = array(
                     '1' => __('Charge', 'payplus-payment-gateway'),
@@ -1302,35 +1304,35 @@ function payplus_check_woocommerce_custom_orders_table_enabled()
     return (get_option('woocommerce_custom_orders_table_enabled')) == "yes" ? true : false;
 }
 
-/**
- * @param  $order
- * @param $key
- * @param $value
- * @return void
- */
-function payplus_update_post_meta_object($order, $values)
-{
-    if ($order) {
-        $isOrderCustomEnable = payplus_check_woocommerce_custom_orders_table_enabled();
-        $id = $order->get_id();
-        foreach ($values as $key => $value) {
-            $meta = get_post_meta($id, $key, true);
-            if ($isOrderCustomEnable) {
-                if ($key != "_payment_method_title") {
-                    $order->update_meta_data($key, $value);
-                }
-            }
-            if (!empty($meta)) {
-                update_post_meta($id, $key, $value, $meta);
-            } else {
-                update_post_meta($id, $key, $value);
-            }
-        }
-        if ($isOrderCustomEnable) {
-            $order->save();
-        }
-    }
-}
+// /**
+//  * @param  $order
+//  * @param $key
+//  * @param $value
+//  * @return void
+//  */
+// function payplus_update_post_meta_object($order, $values)
+// {
+//     if ($order) {
+//         $isOrderCustomEnable = payplus_check_woocommerce_custom_orders_table_enabled();
+//         $id = $order->get_id();
+//         foreach ($values as $key => $value) {
+//             $meta = WC_PayPlus_Order_Data::get_meta($id, $key, true);
+//             if ($isOrderCustomEnable) {
+//                 if ($key != "_payment_method_title") {
+//                     $order->update_meta_data($key, $value);
+//                 }
+//             }
+//             if (!empty($meta)) {
+//                 update_post_meta($id, $key, $value, $meta);
+//             } else {
+//                 update_post_meta($id, $key, $value);
+//             }
+//         }
+//         if ($isOrderCustomEnable) {
+//             $order->save();
+//         }
+//     }
+// }
 /**
  * @param $order
  * @return float | array
@@ -1587,7 +1589,7 @@ function payplus_order_admin_custom_fields($fields)
                 $sorted_fields[$key] = $values;
                 $sorted_fields['vat_number'] = array(
                     'label' => __('ID \ VAT Number', 'payplus-payment-gateway'),
-                    'value' => get_post_meta($theorder->get_id(), '_billing_vat_number', true),
+                    'value' => WC_PayPlus_Order_Data::get_meta($theorder->get_id(), '_billing_vat_number', true),
                     'show' => true,
                     'wrapper_class' => 'form-field-wide',
                     'position ' => 1,
