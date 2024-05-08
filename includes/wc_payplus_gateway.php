@@ -2317,10 +2317,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $transaction_uid = $data['transaction_uid'];
         $page_request_uid = $data['page_request_uid'];
 
-        $titleMethod = WC_PayPlus_Order_Data::get_meta($order_id, '_payment_method_title', true);
+        $titleMethod = $order->get_payment_method_title();
         $titleMethod = str_replace(array('<span>', "</span>"), '', $titleMethod);
-        $insertMeta = array('_payment_method_title' => $titleMethod);
-        WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
+        $order->set_payment_method_title($titleMethod);
 
         $this->payplus_add_log_all($handle, 'New  ipn  Fired (' . $order_id . ')');
         $this->payplus_add_log_all($handle, 'Result: ' . print_r($data, true));

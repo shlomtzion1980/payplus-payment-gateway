@@ -281,9 +281,8 @@ class WC_PayPlus
                     $order = wc_get_order($order_id);
                     $paymentPayPlusDashboard = $REQUEST['paymentPayPlusDashboard'];
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
-                        $insetData['_payment_method'] = "payplus-payment-gateway";
-                        $insetData['_payment_method_title'] = "Pay with Debit or Credit Card";
-                        WC_PayPlus_Order_Data::update_meta($order, $insetData);
+                        $order->set_payment_method('payplus-payment-gateway');
+                        $order->set_payment_method_title('Pay with Debit or Credit Card');
                         $linkRedirect = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
                     }
                 }

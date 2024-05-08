@@ -453,7 +453,7 @@ endif;
         }
         if (!count($resultApps)) {
             $method_payment = 'other';
-            $otherMethod = strtolower(WC_PayPlus_Order_Data::get_meta($order_id, '_payment_method_title', true));
+            $otherMethod = strtolower($order->get_payment_method_title());
             if (strpos($otherMethod, 'paypal') !== false) {
                 $method_payment = 'paypal';
             }
@@ -1125,7 +1125,7 @@ endif;
                             $paymentArray['price'] = ($dual * $totalCartAmount) * 100;
                             $resultApps[] = (object) $paymentArray;
                         } else {
-                            $otherMethod = strtolower(WC_PayPlus_Order_Data::get_meta($order_id, '_payment_method_title', true));
+                            $otherMethod = strtolower($order->get_payment_method_title());
                             if (strpos($otherMethod, 'paypal') !== false) {
                                 $method_payment = 'paypal';
                             }

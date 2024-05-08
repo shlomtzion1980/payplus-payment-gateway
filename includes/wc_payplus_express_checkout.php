@@ -545,8 +545,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
         }
         $insertMeta['payplus_transaction_uid'] = $insertMeta['payplus_uid'];
-        $insertMeta['_payment_method'] = 'payplus-payment-gateway';
-        $insertMeta['_payment_method_title'] = 'Pay with Debit or Credit Card';
+        $order->set_payment_method('payplus-payment-gateway');
+        $order->set_payment_method_title('Pay with Debit or Credit Card');
         $insertMeta['payplus_refunded'] = $order->get_total();
         $insertMeta['payplus_type_current'] = 'Express Checkout';
         $insertMeta['payplus_type'] = 'Charge';
