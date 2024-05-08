@@ -158,7 +158,6 @@ class WC_PayPlus
             $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
             $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_saved']);
-
             $data = json_decode($order_meta['payplus_response'], true);
             $tokenUid = isset($data['token_uid']) ? $data['token_uid'] : null;
             $tokenSaved = isset($order_meta['payplus_token_saved']) ? $order_meta['payplus_token_saved'] : false;
@@ -284,7 +283,7 @@ class WC_PayPlus
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
                         $insetData['_payment_method'] = "payplus-payment-gateway";
                         $insetData['_payment_method_title'] = "Pay with Debit or Credit Card";
-                        payplus_update_post_meta_object($order, $insetData);
+                        WC_PayPlus_Order_Data::update_meta($order, $insetData);
                         $linkRedirect = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
                     }
                 }
@@ -1168,7 +1167,7 @@ $html = ob_get_clean();
     {
         if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
 
-            require_once 'includes/blocks/wc_payplus_blocks_paymnet.php';
+            require_once 'includes/blocks/wc_payplus_blocks_payment.php';
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
                 function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {

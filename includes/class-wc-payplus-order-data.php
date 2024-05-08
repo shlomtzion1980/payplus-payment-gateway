@@ -44,7 +44,11 @@ class WC_PayPlus_Order_Data
 
     public static function get_meta($order, $values)
     {
+        //check if $order is an object or an id and if it id convert it to an order object
+        $order = is_object($order) ? $order : wc_get_order($order);
+        $singleValue = !is_array($values) ? true : false;
         $values = is_array($values) ? $values : [$values];
+
         if ($order) {
             $orderMetaValues = [];
             $isHPOS = WC_PayPlus_Order_Data::isHPOS();
@@ -62,6 +66,8 @@ class WC_PayPlus_Order_Data
                     }
                 }
             }
+            //return the value of the first key if $values is not an array
+            $orderMetaValues = $singleValue ? reset($orderMetaValues) : $orderMetaValues;
             return $orderMetaValues;
         }
     }
