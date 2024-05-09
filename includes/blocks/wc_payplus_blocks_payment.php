@@ -2,7 +2,7 @@
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 
- class WC_Gateway_Payplus_Paymnet_Block extends AbstractPaymentMethodType
+class WC_Gateway_Payplus_Paymnet_Block extends AbstractPaymentMethodType
 {
 
     /**
@@ -17,18 +17,17 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
      *
      * @var string
      */
-    protected $name ;
+    protected $name;
 
     /**
      * Initializes the payment method type.
      */
     public function initialize()
     {
-        $this->settings = get_option('woocommerce_'.$this->name.'_settings', []);
+        $this->settings = get_option('woocommerce_' . $this->name . '_settings', []);
 
         $gateways = WC()->payment_gateways->payment_gateways();
         $this->gateway = $gateways[$this->name];
-
     }
 
     /**
@@ -81,6 +80,7 @@ use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodTyp
             'title' => $this->get_setting('title'),
             'description' => $this->get_setting('description'),
             'supports' => array_filter($this->gateway->supports, [$this->gateway, 'supports']),
+            'showSaveOption'                 => true,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
         ];
     }
