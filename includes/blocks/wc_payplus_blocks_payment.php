@@ -80,7 +80,7 @@ class WC_Gateway_Payplus_Paymnet_Block extends AbstractPaymentMethodType
             'title' => $this->get_setting('title'),
             'description' => $this->get_setting('description'),
             'supports' => array_filter($this->gateway->supports, [$this->gateway, 'supports']),
-            'showSaveOption'                 => true,
+            'showSaveOption'                 => $this->settings['create_pp_token'] == 'yes' ? true : false,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
         ];
     }
