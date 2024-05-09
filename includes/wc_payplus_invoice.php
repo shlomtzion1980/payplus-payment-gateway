@@ -1069,7 +1069,6 @@ endif;
         if ($payplusErrorInvoice !== "unique-identifier-exists") {
             if (!$checkInvocieSend && $this->payplus_get_invoice_enable()) {
 
-                WC_PayPlus_Order_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                 $payplusType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_type', true);
                 $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
 
@@ -1189,6 +1188,7 @@ endif;
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
+                            WC_PayPlus_Order_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
                             $insetData['payplus_invoice_docUID'] = $res->details->docUID;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
