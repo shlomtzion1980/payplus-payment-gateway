@@ -153,12 +153,13 @@ class WC_PayPlus
      */
     public function thankyou_check_save_tokens($order_id)
     {
-        if ($this->payplus_payment_gateway_settings->save_pp_token_receipt_page === 'yes') {
+
+        $order = wc_get_order($order_id);
+        if ($order->get_payment_method() === 'payplus-payment-gateway' && $this->payplus_payment_gateway_settings->save_pp_token_receipt_page === 'yes' && $this->payplus_payment_gateway_settings->enabled === 'yes') {
             // Get the order object
-            $order = wc_get_order($order_id);
             $user_id = $order->get_user_id();
             $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_saved']);
-            $data = json_decode($order_meta['payplus_response'], true);
+            $data = isset($order_meta['payplus_response']) ? json_decode($order_meta['payplus_response'], true) : null;
             $tokenUid = isset($data['token_uid']) ? $data['token_uid'] : null;
             $tokenSaved = isset($order_meta['payplus_token_saved']) ? $order_meta['payplus_token_saved'] : false;
             $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
