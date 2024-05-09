@@ -48,7 +48,7 @@ class WC_Gateway_Payplus_Paymnet_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/checkout.js';
 
         $script_asset = array(
             'dependencies' => array(),
