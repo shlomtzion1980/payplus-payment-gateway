@@ -64,3 +64,22 @@
     }
   })();
 })();
+
+var checkExist = setInterval(function () {
+  if (
+    document.querySelector(
+      ".wc-block-components-checkbox.wc-block-components-payment-methods__save-card-info"
+    )
+  ) {
+    clearInterval(checkExist);
+    var saveCardInfo = document.querySelector(
+      ".wc-block-components-checkbox__label"
+    ).textContent;
+
+    if (document.documentElement.lang === "he-IL") {
+      document.querySelector(
+        ".wc-block-components-checkbox__label"
+      ).textContent = "שמירת פרטי התשלום בחשבון שלי, לרכישות עתידיות";
+    }
+  }
+}, 100); // check every 100ms
