@@ -1,21 +1,14 @@
 (() => {
-  "use strict";
+  const gateways = window.wc.wcSettings.getPaymentMethodData(
+    "payplus-payment-gateway"
+  ).gateways;
+  ("use strict");
   const e = window.React,
     t = window.wc.wcBlocksRegistry,
     a = window.wp.i18n,
     p = window.wc.wcSettings,
     n = window.wp.htmlEntities,
-    i = [
-      "payplus-payment-gateway",
-      "payplus-payment-gateway-bit",
-      "payplus-payment-gateway-googlepay",
-      "payplus-payment-gateway-applepay",
-      "payplus-payment-gateway-multipass",
-      "payplus-payment-gateway-tavzahav",
-      "payplus-payment-gateway-valuecard",
-      "payplus-payment-gateway-finitione",
-      "payplus-payment-gateway-paypal",
-    ],
+    i = gateways,
     s = (e) => (0, n.decodeEntities)(e.description || ""),
     y = (t) => {
       const { PaymentMethodLabel: a } = t.components;
@@ -56,7 +49,8 @@
           canMakePayment: () => !0,
           ariaLabel: r,
           supports: {
-            showSaveOption: o.showSaveOption,
+            showSaveOption:
+              l === "payplus-payment-gateway" ? o.showSaveOption : false,
             features: o.supports,
           },
         };
@@ -64,22 +58,3 @@
     }
   })();
 })();
-
-var checkExist = setInterval(function () {
-  if (
-    document.querySelector(
-      ".wc-block-components-checkbox.wc-block-components-payment-methods__save-card-info"
-    )
-  ) {
-    clearInterval(checkExist);
-    var saveCardInfo = document.querySelector(
-      ".wc-block-components-checkbox__label"
-    ).textContent;
-
-    if (document.documentElement.lang === "he-IL") {
-      document.querySelector(
-        ".wc-block-components-checkbox__label"
-      ).textContent = "שמירת פרטי התשלום בחשבון שלי, לרכישות עתידיות";
-    }
-  }
-}, 100); // check every 100ms
