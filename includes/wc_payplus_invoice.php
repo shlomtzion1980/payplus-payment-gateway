@@ -1095,6 +1095,7 @@ class PayplusInvoice
                     $payload['more_info'] = $order_id;
 
                     $payload['unique_identifier'] = "payplus_order_" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
+                    WC_PayPlus_Order_Data::update_meta($order, array('payplus_invoice_unique_identifier' => $payload['unique_identifier']));
 
                     $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
                     $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;

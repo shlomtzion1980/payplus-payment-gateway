@@ -457,6 +457,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     'name' => __('Legacy post meta support', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[use_old_fields]',
                     'type' => 'checkbox',
+                    'desc' =>  __('Support for legacy post meta fields', 'payplus-payment-gateway'),
+                    'default' => 'yes',
                 );
                 $settings[] = array(
                     'name' => __('Logging', 'payplus-payment-gateway'),

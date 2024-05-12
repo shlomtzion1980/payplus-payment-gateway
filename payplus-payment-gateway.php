@@ -3,7 +3,7 @@
 Plugin Name: PayPlus Payment Gateway
 Description: WooCommerce integration for PayPlus Payment Gateway. Accept credit cards and more alternative methods directly to your WordPress e-commerce websites, More options to Refund, Charge, Capture, Subscriptions, Tokens and much more!
 Plugin URI: https://www.payplus.co.il/wordpress
-Version:6.6.3newSaveCC
+Version:6.6.3
 Tested up to:6.5.2
 Author: PayPlus LTD
 Author URI: https://www.payplus.co.il/
@@ -91,7 +91,6 @@ class WC_PayPlus
         };
         echo json_encode($theTokens);
         wp_die();
-
     }
 
     /**
@@ -183,7 +182,7 @@ class WC_PayPlus
                     )
                 );
                 wp_enqueue_script('thankyou-js');
-                ?>
+?>
                 <div id="newToken" class="payplus_thankyou-new-token">
                     <div class="payplus_save_token_messsage">
                         <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
@@ -198,15 +197,14 @@ class WC_PayPlus
                     </form>
                     <div class="payplus_icon"></div>
                 </div>
-<?php
-}
+            <?php
+            }
             if (isset($_POST['saveToken'])) {
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 $this->payplus_gateway->save_token($data, $user_id);
                 WC_PayPlus_Order_Data::update_meta($order, ['payplus_token_saved' => true]);
             }
         }
-
     }
 
     /**
@@ -225,7 +223,7 @@ class WC_PayPlus
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">'
-            . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
+                . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
     settings', 'payplus-payment-gateway') . '</div>';
         }
     }
@@ -314,9 +312,9 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
             ?>
-        <meta name=" robots" content="noindex,nofollow">
+            <meta name=" robots" content="noindex,nofollow">
         <?php
-}
+        }
     }
 
     /**
@@ -765,8 +763,8 @@ class WC_PayPlus
         ?>
         <div class="payplus-option-description-area"></div>
         <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
-        <?php
-$html = ob_get_clean();
+<?php
+        $html = ob_get_clean();
         echo $html;
     }
 
@@ -1604,7 +1602,7 @@ function payplus_order_admin_custom_fields($fields)
     return $fields;
 }
 
-add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10, );
+add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
 function payplus_checkout_field_update_order_meta($order_id)
 {
 
