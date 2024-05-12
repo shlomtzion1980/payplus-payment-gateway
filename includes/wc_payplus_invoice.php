@@ -17,6 +17,7 @@ class PayplusInvoice
     private $payplus_invoice_status_order;
     private $payplus_api_url;
     private $url_payplus_create_invoice;
+    private $url_payplus_get_invoice;
     private $logging;
     private $payplus_create_invocie_manual;
     private $payment_method;
@@ -86,6 +87,7 @@ class PayplusInvoice
         $this->payment_method = array('credit-card', 'bit', 'apple-pay', 'google-pay', 'paypal');
         $this->payment_method_club = array('multipass', 'valuecard', 'tav-zahav', 'finitione');
         $this->url_payplus_create_invoice .= $this->payplus_api_url . "books/docs/new/";
+        $this->url_payplus_get_invoice .= $this->payplus_api_url . "books/docs/getBy/unique_identifier/";
         $this->payplus_invoice_type_document =
             (isset($this->payplus_invoice_option['payplus_invoice_type_document'])) ?
             $this->payplus_invoice_option['payplus_invoice_type_document'] : "";
@@ -1055,6 +1057,30 @@ class PayplusInvoice
             if (!$checkInvocieSend && $this->payplus_get_invoice_enable()) {
 
                 $payplusType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_type', true);
+                $payplusUniqueIdentifier = "payplus_order_" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
+
+                if ($invocie_manual) {
+                    $invoiceVerify = $this->post_payplus_ws($this->url_payplus_get_invoice . $payplusUniqueIdentifier, null, 'GET');
+                    if (is_wp_error($invoiceVerify)) {
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($invoiceVerify, true), 'error');
+                    } else {
+                        $res = json_decode(wp_remote_retrieve_body($invoiceVerify));
+                        if ($res->status === "success") {
+                            WC_PayPlus_Order_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $insetData['payplus_invoice_docUID'] = $res->details->uuid;
+                            $insetData['payplus_invoice_numberD'] = $res->details->number;
+                            $insetData['payplus_invoice_originalDocAddress'] = $res->details->original_doc;
+                            $insetData['payplus_invoice_copyDocAddress'] = $res->details->true_copy_doc;
+                            $insetData['payplus_invoice_customer_uuid'] = $res->details->customer->uuid;
+                            WC_PayPlus_Order_Data::update_meta($order, $insetData);
+                            $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
+                     <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                            return;
+                        }
+                    }
+                }
+
                 $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
 
                 if ($invocie_manual || $j5 || ($this->payplus_gateway_option['enabled'] === "no" || ($this->payplus_gateway_option['transaction_type'] !== "2"
@@ -1094,8 +1120,7 @@ class PayplusInvoice
                     $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
                     $payload['more_info'] = $order_id;
 
-                    $payload['unique_identifier'] = "payplus_order_" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
-                    WC_PayPlus_Order_Data::update_meta($order, array('payplus_invoice_unique_identifier' => $payload['unique_identifier']));
+                    $payload['unique_identifier'] = $payplusUniqueIdentifier;
 
                     $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
                     $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
@@ -1203,7 +1228,7 @@ class PayplusInvoice
      * @param $payload
      * @return array|WP_Error
      */
-    public function post_payplus_ws($url, $payload)
+    public function post_payplus_ws($url, $payload = [], $method = "post")
     {
         $args = array(
             'body' => $payload,
@@ -1220,7 +1245,13 @@ class PayplusInvoice
                 'X-versionpayplus' => PAYPLUS_VERSION,
             )
         );
-        $response = wp_remote_post($url, $args);
+
+        if ($method == "post") {
+            $response = wp_remote_post($url, $args);
+        } else {
+            $response = wp_remote_get($url, $args);
+        }
+
         return $response;
     }
 
