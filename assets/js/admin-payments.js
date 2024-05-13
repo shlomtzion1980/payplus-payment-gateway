@@ -106,11 +106,7 @@ jQuery(document).ready(function ($) {
   });
 
   $("#custom-button-get-pp").click(function () {
-    let loaderHTML = '<div class="payplus_loader"></div>';
-
-    $("#order_data").append(loaderHTML);
-
-    let loader = $("#order_data").find(".payplus_loader");
+    let loader = $("#order_data").find(".payplus_loader_gpp");
     let side = "right";
 
     // check if page is rtl or ltr and change the direction of the loader
@@ -118,15 +114,13 @@ jQuery(document).ready(function ($) {
       side = "left";
     }
 
-    loader.css(side, "25%");
+    loader.css(side, "5%");
 
     loader.css({
       position: "absolute",
       top: "5px",
-      color: "red",
-      border: "16px solid green",
     });
-
+    $("#custom-button-get-pp").fadeOut();
     loader.fadeIn();
 
     var data = {
@@ -134,8 +128,6 @@ jQuery(document).ready(function ($) {
       payment_request_uid: $("#custom-button-get-pp").val(),
       order_id: $("#custom-button-get-pp").data("value"),
     };
-
-    alert("Checking order data with PayPlus!");
 
     $.post(ajaxurl, data, function (response) {
       loader.fadeOut();

@@ -44,7 +44,9 @@ class WC_PayPlus_Order_Data
     public static function get_meta($order, $values)
     {
         //check if $order is an object or an id and if it id convert it to an order object
-        $useOldFields = get_option('payplus_invoice_option')['use_old_fields'] === 'yes' ? true : false;
+        $payplusOptions = get_option('woocommerce_payplus-payment-gateway_settings');
+        $useOldFields = isset($payplusOptions['use_old_fields']) && $payplusOptions['use_old_fields'] == 'yes' ? true : false;
+
         $order = is_object($order) ? $order : wc_get_order($order);
         $singleValue = !is_array($values) ? true : false;
         $values = is_array($values) ? $values : [$values];

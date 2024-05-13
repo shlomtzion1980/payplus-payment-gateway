@@ -554,6 +554,8 @@ jQuery(function ($) {
     }
 
     $(self).addClass("button-loading");
+    $(self).hide();
+    $(self).next(".payplus_loader_gpp").fadeIn();
     const payments = payplus_get_storage(orderID);
     $.ajax({
       type: "post",

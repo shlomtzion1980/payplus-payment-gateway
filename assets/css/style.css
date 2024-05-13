@@ -1,31 +1,46 @@
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type {
   display: flex;
   order: 2;
   margin-bottom: 1px;
   align-items: center;
 }
 
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type span {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  span {
   order: 1;
 }
 
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img {
   order: -1;
   margin-left: 20px;
   max-height: 32px;
   max-width: 64px;
 }
 
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] .payment-method-description {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  .payment-method-description {
   margin-top: 0;
 }
 
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] input[type="radio"][name="payment_method"]~.payment_box {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  input[type="radio"][name="payment_method"]
+  ~ .payment_box {
   margin-top: 0.2rem;
 }
 
-.checkout-payplus input[type="radio"][name="payment_method"]+label::before,
-.checkout-payplus input[type="radio"][name="payment_method"]:checked+label::before {
+.checkout-payplus input[type="radio"][name="payment_method"] + label::before,
+.checkout-payplus
+  input[type="radio"][name="payment_method"]:checked
+  + label::before {
   order: -1;
   transform: none;
 }
@@ -79,7 +94,7 @@
     bottom: 15%;
     right: 15%;
     margin: auto;
-    border: 10px solid #EAF0F6;
+    border: 10px solid #eaf0f6;
     border-radius: 50%;
     border-top: 10px solid #15ca2d;
     width: 30px;
@@ -112,8 +127,16 @@
   }
 }
 
-html[lang="en-US"] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img,
-html[lang="en"] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img {
+html[lang="en-US"]
+  .checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img,
+html[lang="en"]
+  .checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img {
   margin-left: 0;
   margin-right: 20px;
 }

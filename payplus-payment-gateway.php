@@ -193,7 +193,13 @@ class WC_PayPlus
                         <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
                         <input type="submit" name="saveToken" value="<?php echo __('Yes', 'payplus-payment-gateway'); ?>">
                         <input type="submit" name="deleteToken" value="<?php echo __('No', 'payplus-payment-gateway'); ?>">
-                        <div class='payplus_loader'></div>
+                        <div class="payplus_loader">
+                            <div class="loader">
+                                <div class="loader-background">
+                                    <div class="text"></div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                     <div class="payplus_icon"></div>
                 </div>
