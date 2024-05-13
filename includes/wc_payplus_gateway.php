@@ -501,6 +501,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'type' => 'textarea',
                 'default' => __('Pay securely by Debit or Credit Card through PayPlus', 'payplus-payment-gateway'),
             ],
+            'use_old_fields' => [
+                'title' => __('Legacy post meta support', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('For stores that support HPOS.', 'payplus-payment-gateway'),
+                'description' =>  __('Check this to view orders data created before HPOS was enabled on your store.<br> This doesn`t affect stores with no HPOS.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'yes',
+            ],
             'settings_title' => [
                 'title' => __('PayPlus API Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
@@ -869,13 +877,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'label' => __('', 'payplus-payment-gateway'),
                 'default' => 'no',
 
-            ],
-            'use_old_fields' => [
-                'title' => __('Legacy post meta support', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('here i am!', 'payplus-payment-gateway'),
-                'desc' =>  __('Support for legacy post meta fields', 'payplus-payment-gateway'),
-                'default' => 'yes',
             ],
         ];
     }
