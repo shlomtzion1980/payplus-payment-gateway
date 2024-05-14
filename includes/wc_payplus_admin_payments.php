@@ -2019,9 +2019,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
 
                 if ($amount > $order->get_total()) {
-                    $this->payplus_add_log_all($handle, 'Cannot Charge then original order');
-                    $order->add_order_note(sprintf(__('Cannot Charge then original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                    echo $urlEdit;
+                    $this->payplus_add_log_all($handle, 'Cannot Charge more then the original order');
+                    $order->add_order_note(sprintf(__('Cannot Charge more then the original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+                    // echo $urlEdit;
+                    echo __('Cannot Charge more then the original order sum', 'payplus-payment-gateway');
                     wp_die();
                 }
 
@@ -2139,9 +2140,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
                 $order_id = $_GET['post'];
             }
-            // if (isset($_GET['page']) && isset($_GET['action']) && $_GET['page'] === 'wc-orders' && $_GET['action'] === 'edit') {
-            //     $order_id = $_GET['id'];
-            // }
+            if (isset($_GET['page']) && isset($_GET['action']) && $_GET['page'] === 'wc-orders' && $_GET['action'] === 'edit') {
+                $order_id = $_GET['id'];
+            }
 
             if (isset($order_id)) {
                 $order = wc_get_order($order_id);

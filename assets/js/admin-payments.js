@@ -245,6 +245,10 @@ jQuery(document).ready(function ($) {
           location.href = response.urlredirect;
         }
       },
+      error: function (response) {
+        alert(response.responseText);
+        location.reload();
+      },
     });
   });
 });

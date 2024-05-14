@@ -52,7 +52,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $use_ipn;
     public $send_variations;
     public $create_pp_token;
-    public $save_pp_token_receipt_page;
     public $send_add_data;
     public $hide_identification_id;
     public $hide_payments_field;
@@ -164,7 +163,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->send_variations = $this->get_option('send_variations') == 'yes' ? true : false;
 
         $this->create_pp_token = $this->get_option('create_pp_token') == 'yes' ? true : false;
-        $this->save_pp_token_receipt_page = $this->get_option('save_pp_token_receipt_page') == 'yes' ? true : false;
         $this->send_add_data = $this->get_option('send_add_data') == 'yes' ? true : false;
         $this->hide_identification_id = $this->get_option('hide_identification_id');
         $this->vat_number_field = $this->get_option('vat_number_field');
@@ -696,14 +694,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'desc_tip' => true,
                 'description' => __('Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.
                 <br><br>Saving cards can be done either during purchase or through the "My Account" section in the website.', 'payplus-payment-gateway'),
-            ],
-            'save_pp_token_receipt_page' => [
-                'title' => __('Save credit cards receipt page', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Allow save credit card token securely at the end of the order process', 'payplus-payment-gateway'),
-                'default' => 'no',
-                'desc_tip' => true,
-                'description' => __('If this is a new card, ask if the customer want to save credit card securely in the receipt page - the end of the order process.', 'payplus-payment-gateway'),
             ],
             'send_add_data' => [
                 'title' => __('Add Data Parameter', 'payplus-payment-gateway'),
@@ -1572,7 +1562,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $totalCartAmount = 0;
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         $wc_tax_enabled = (wc_tax_enabled());
-        $temptax = payplus_woocommerce_get_tax_rates($order);
+        $temptax = WC_PayPlus_Payment_Gateway::payplus_woocommerce_get_tax_rates($order);
         $tax = 1;
         $isAdmin = is_admin();
         if (is_numeric($temptax)) {
@@ -2395,11 +2385,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
-        if (payplus_check_table_exist_db($tblname)) {
+        if (WC_PayPlus_Payment_Gateway::payplus_check_table_exist_db($tblname)) {
             $sql = 'SELECT *   FROM ' . $tblname . ' WHERE  order_id=' . $order_id;
             $result = $wpdb->get_results($sql);
             if ($wpdb->last_error) {
-                payplus_Add_log_payplus($wpdb->last_error);
+                WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
             }
             if ($result) {
                 return $result[0];
@@ -2410,12 +2400,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
-        if (payplus_check_table_exist_db($tblname)) {
+        if (WC_PayPlus_Payment_Gateway::payplus_check_table_exist_db($tblname)) {
             $wpdb->update($tblname, array(
                 'function_end' => $functionCurrent,
             ), array('order_id' => $order_id));
             if ($wpdb->last_error) {
-                payplus_Add_log_payplus($wpdb->last_error);
+                WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
             }
         }
     }

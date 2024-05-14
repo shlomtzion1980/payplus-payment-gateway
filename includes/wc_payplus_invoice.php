@@ -95,17 +95,53 @@ class PayplusInvoice
             ? $this->payplus_invoice_option['payplus_invoice_type_document_refund'] : "";
 
         $this->payplus_invoice_manual_list = (isset($this->payplus_invoice_option['list-hidden'])) ? $this->payplus_invoice_option['list-hidden'] : null;
+        $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table();
 
         //actions
         add_action('admin_enqueue_scripts', [$this, 'payplus_invoice_css_admin']);
         add_action('wp_ajax_payplus-api-payment-refund', [$this, 'ajax_payplus_api_payment_refund']);
         add_action('admin_head', [$this, 'payplus_menu_css']);
+        add_action('payplus_cron_send_order', [$this, 'payplus_cron_send_order']);
 
         //filters
         add_filter('manage_edit-shop_order_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
-        $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table();
+        add_filter('handle_bulk_actions-edit-shop_order', [$this, 'payplus_orders_bulk_actions'], 10, 3);
     }
+
+
+    /**
+     * @param $redirect_to
+     * @param $action
+     * @param $post_ids
+     * @return mixed
+     */
+    public function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
+    {
+        $statusOrder = $this->payplus_get_invoice_status_order();
+        $pos = strpos($action, "mark");
+
+        if ($pos !== false) {
+            $postStr = get_option('payplus_create_invoice');
+            if (!$postStr) {
+                $postStr = "";
+            }
+            $action = explode("_", $action);
+            if ($action[1] == $statusOrder) {
+                if ($this->payplus_get_invoice_enable()) {
+                    if (count($post_ids)) {
+                        foreach ($post_ids as $key => $value) {
+                            $postStr .= $value . ",";
+                        }
+                    }
+                }
+            }
+            update_option('payplus_create_invoice', $postStr);
+        }
+        return $redirect_to;
+    }
+
+
     /**
      * @return mixed
      */
@@ -208,6 +244,26 @@ class PayplusInvoice
               </style>';
     }
 
+
+    public function payplus_cron_send_order()
+    {
+        if ($this->payplus_get_invoice_enable()) {
+            $orders = get_option('payplus_create_invoice');
+            $orders = explode(",", $orders);
+            if (count($orders)) {
+                foreach ($orders as $key => $order) {
+                    if (!empty($order)) {
+                        $currentOrder = wc_get_order($order);
+                        if ($this->payplus_get_invoice_status_order() == $currentOrder->get_status()) {
+                            $this->payplus_invoice_create_order($order);
+                        }
+                    }
+                }
+            }
+            delete_option('payplus_create_invoice');
+        }
+    }
+
     /**
      * @param $order
      * @return void
@@ -215,7 +271,7 @@ class PayplusInvoice
     public function payplus_order_item_add_action_buttons_callback($order)
     {
         ob_start();
-        $orderId = (payplus_check_woocommerce_custom_orders_table_enabled()) ? $order->get_id() : $order;
+        $orderId = (WC_PayPlus_Payment_Gateway::payplus_check_woocommerce_custom_orders_table_enabled()) ? $order->get_id() : $order;
         $payplusInvoiceOriginalDocAddressRefund = WC_PayPlus_Order_Data::get_meta($orderId, "payplus_refund", true);
         $payplusType = WC_PayPlus_Order_Data::get_meta($orderId, "payplus_type", true);
         $optionPaypluspaymentgGteway = (object) get_option('woocommerce_payplus-payment-gateway_settings');
@@ -703,7 +759,7 @@ class PayplusInvoice
         $totalCartAmount = 0;
         $arrBalanceName = array();
         $allProductSku = "";
-        $temptax = payplus_woocommerce_get_tax_rates($order);
+        $temptax = WC_PayPlus_Payment_Gateway::payplus_woocommerce_get_tax_rates($order);
         $isAdmin = is_admin();
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         $tax = 1;
@@ -1074,8 +1130,7 @@ class PayplusInvoice
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->true_copy_doc;
                             $insetData['payplus_invoice_customer_uuid'] = $res->details->customer->uuid;
                             WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                            $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
-                     <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                            $order->add_order_note('<div style="font-weight:600">PayPlus Document</div><a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
                             return;
                         }
                     }
