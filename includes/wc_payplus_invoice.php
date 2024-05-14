@@ -224,11 +224,11 @@ class PayplusInvoice
             && $payplusType !== "Approval"
             && $payplusType !== "Check"):
         ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
-                    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-            <div class='payplus_loader_refund'></div>
+<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
+    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+<div class='payplus_loader_refund'></div>
 
-        <?php
+<?php
 endif;
         $output = ob_get_clean();
         echo $output;
@@ -1155,6 +1155,8 @@ endif;
                     $payplusApprovalNumPaypl = $order->get_transaction_id();
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
                     $payload = array_merge($payload, $this->payplus_get_payments_invocie($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
+
+                    $j5Amount = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
 
                     if ($j5 && $j5Amount && ($j5Amount != $payload['totalAmount'])) {
 
