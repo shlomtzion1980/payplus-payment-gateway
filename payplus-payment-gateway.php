@@ -189,7 +189,7 @@ class WC_PayPlus
                     'count_process' => 1,
                 ));
                 if ($wpdb->last_error) {
-                    WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
+                    payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $data = [
                     'transaction_uid' => $REQUEST['transaction_uid'] ?? null,
@@ -227,7 +227,7 @@ class WC_PayPlus
                     'count_process' => $result->count_process + 1,
                 ), array('id' => $result->rowId));
                 if ($wpdb->last_error) {
-                    WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
+                    payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $order = wc_get_order($order_id);
                 $linkRedirect = $this->payplus_gateway->get_return_url($order);
@@ -247,8 +247,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -619,7 +619,7 @@ class WC_PayPlus
             add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
 
             WC_PayPlus_Payment_Gateway::PayPlusInit();
-            WC_PayPlus_Payment_Gateway::payplus_create_table_db();
+            payplus_create_table_db();
             WC_PayPlus_Payment_Gateway::payplus_add_file_ApplePay();
         }
     }
@@ -699,8 +699,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
@@ -1098,7 +1098,7 @@ class WC_PayPlus
         );
         $wpdb->insert($table_name, $data);
         if ($wpdb->last_error) {
-            WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
+            payplus_Add_log_payplus($wpdb->last_error);
         }
     }
     public function woocommerce_payplus_woocommerce_block_support()
@@ -1124,3 +1124,11 @@ class WC_PayPlus
     }
 }
 WC_PayPlus::get_instance();
+
+register_activation_hook(__FILE__, 'payplus_create_table_order');
+register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
+register_activation_hook(__FILE__, 'payplus_create_table_log');
+register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
+register_activation_hook(__FILE__, 'payplus_create_table_process');
+
+require_once PAYPLUS_PLUGIN_DIR . '/includes/activator.php';

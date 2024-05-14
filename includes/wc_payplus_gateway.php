@@ -2385,11 +2385,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
-        if (WC_PayPlus_Payment_Gateway::payplus_check_table_exist_db($tblname)) {
+        if (payplus_check_table_exist_db($tblname)) {
             $sql = 'SELECT *   FROM ' . $tblname . ' WHERE  order_id=' . $order_id;
             $result = $wpdb->get_results($sql);
             if ($wpdb->last_error) {
-                WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
+                payplus_Add_log_payplus($wpdb->last_error);
             }
             if ($result) {
                 return $result[0];
@@ -2400,12 +2400,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
-        if (WC_PayPlus_Payment_Gateway::payplus_check_table_exist_db($tblname)) {
+        if (payplus_check_table_exist_db($tblname)) {
             $wpdb->update($tblname, array(
                 'function_end' => $functionCurrent,
             ), array('order_id' => $order_id));
             if ($wpdb->last_error) {
-                WC_PayPlus_Payment_Gateway::payplus_Add_log_payplus($wpdb->last_error);
+                payplus_Add_log_payplus($wpdb->last_error);
             }
         }
     }
