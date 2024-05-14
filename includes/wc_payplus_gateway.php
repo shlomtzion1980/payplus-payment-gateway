@@ -502,8 +502,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'use_old_fields' => [
                 'title' => __('Legacy post meta support', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('For stores that support HPOS.', 'payplus-payment-gateway'),
-                'description' =>  __('Check this to view orders data created before HPOS was enabled on your store.<br> This doesn`t affect stores with no HPOS.', 'payplus-payment-gateway'),
+                'label' => __('(For stores that support HPOS)', 'payplus-payment-gateway'),
+                'description' =>  __('Check this to view orders meta data created before HPOS was enabled on your store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce DB queries and are viewing new orders, uncheck this.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
                 'default' => 'yes',
             ],
