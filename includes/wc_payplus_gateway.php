@@ -52,7 +52,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $use_ipn;
     public $send_variations;
     public $create_pp_token;
-    public $save_pp_token_receipt_page;
     public $send_add_data;
     public $hide_identification_id;
     public $hide_payments_field;
@@ -164,7 +163,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->send_variations = $this->get_option('send_variations') == 'yes' ? true : false;
 
         $this->create_pp_token = $this->get_option('create_pp_token') == 'yes' ? true : false;
-        $this->save_pp_token_receipt_page = $this->get_option('save_pp_token_receipt_page') == 'yes' ? true : false;
         $this->send_add_data = $this->get_option('send_add_data') == 'yes' ? true : false;
         $this->hide_identification_id = $this->get_option('hide_identification_id');
         $this->vat_number_field = $this->get_option('vat_number_field');
@@ -696,14 +694,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'desc_tip' => true,
                 'description' => __('Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.
                 <br><br>Saving cards can be done either during purchase or through the "My Account" section in the website.', 'payplus-payment-gateway'),
-            ],
-            'save_pp_token_receipt_page' => [
-                'title' => __('Save credit cards receipt page', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Allow save credit card token securely at the end of the order process', 'payplus-payment-gateway'),
-                'default' => 'no',
-                'desc_tip' => true,
-                'description' => __('If this is a new card, ask if the customer want to save credit card securely in the receipt page - the end of the order process.', 'payplus-payment-gateway'),
             ],
             'send_add_data' => [
                 'title' => __('Add Data Parameter', 'payplus-payment-gateway'),
