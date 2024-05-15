@@ -51,7 +51,6 @@ class WC_PayPlus
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('woocommerce_order_status_changed', [$this, 'payplus_order_status_changed_action'], 50, 4);
-        add_action('woocommerce_thankyou', [$this, 'thankyou_check_save_tokens'], 10, 1);
         add_action('wp_ajax_payplus-check-tokens', [$this, 'ajax_payplus_check_tokens']);
         add_action('wp_ajax_payplus-delete-token', [$this, 'ajax_payplus_delete_token']);
 
@@ -91,7 +90,6 @@ class WC_PayPlus
         };
         echo json_encode($theTokens);
         wp_die();
-
     }
 
     /**
@@ -143,71 +141,6 @@ class WC_PayPlus
         wp_die();
     }
 
-    /**
-     * Check if the the cc token is new and if so display the save token message
-     * @param int $order_id
-     * @param string $status
-     * @param string $old_status
-     * @param WC_Order $order
-     * @return void
-     */
-    public function thankyou_check_save_tokens($order_id)
-    {
-
-        $order = wc_get_order($order_id);
-        if ($order->get_payment_method() === 'payplus-payment-gateway' && $this->payplus_payment_gateway_settings->save_pp_token_receipt_page === 'yes' && $this->payplus_payment_gateway_settings->enabled === 'yes') {
-            // Get the order object
-            $user_id = $order->get_user_id();
-            $order_meta = WC_PayPlus_Order_Data::get_meta($order, ['payplus_response', 'payplus_token_saved']);
-            $data = isset($order_meta['payplus_response']) ? json_decode($order_meta['payplus_response'], true) : null;
-            $tokenUid = isset($data['token_uid']) ? $data['token_uid'] : null;
-            $tokenSaved = isset($order_meta['payplus_token_saved']) ? $order_meta['payplus_token_saved'] : false;
-            $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
-            $theTokens = [];
-
-            foreach ($customerTokens as $customerToken) {
-                $theTokens[] = $customerToken->get_token();
-            };
-
-            if (!in_array($tokenUid, $theTokens) && $tokenUid != null && !$tokenSaved) {
-                // call thankyou.js and register the script
-                wp_register_script('thankyou-js', PAYPLUS_PLUGIN_URL . '/assets/js/thankyou.js', ['jquery'], time(), true);
-                wp_localize_script(
-                    'thankyou-js',
-                    'payplus_script_thankyou',
-                    array(
-                        'ajax_url' => admin_url('admin-ajax.php'),
-                        'userId' => $user_id,
-                        'orderId' => $order_id,
-                        'token' => $tokenUid,
-                    )
-                );
-                wp_enqueue_script('thankyou-js');
-                ?>
-                <div id="newToken" class="payplus_thankyou-new-token">
-                    <div class="payplus_save_token_messsage">
-                        <?php echo __('Would you like to save this credit card securely to you account, for future purchases?', 'payplus-payment-gateway'); ?>
-                    </div>
-                    <form action="" method="post">
-                        <input type="hidden" name="token" value="<?php echo $tokenUid; ?>">
-                        <input type="hidden" id="user_id" value="<?php echo $user_id; ?>">
-                        <input type="hidden" id="order_id" value="<?php echo $order_id; ?>">
-                        <input type="submit" name="saveToken" value="<?php echo __('Yes', 'payplus-payment-gateway'); ?>">
-                        <input type="submit" name="deleteToken" value="<?php echo __('No', 'payplus-payment-gateway'); ?>">
-                        <div class='payplus_loader'></div>
-                    </form>
-                    <div class="payplus_icon"></div>
-                </div>
-<?php
-}
-            if (isset($_POST['saveToken'])) {
-                $this->payplus_gateway = $this->get_main_payplus_gateway();
-                $this->payplus_gateway->save_token($data, $user_id);
-                WC_PayPlus_Order_Data::update_meta($order, ['payplus_token_saved' => true]);
-            }
-        }
-
-    }
 
     /**
      * @return void
@@ -225,7 +158,7 @@ class WC_PayPlus
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">'
-            . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
+                . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
     settings', 'payplus-payment-gateway') . '</div>';
         }
     }
@@ -313,10 +246,10 @@ class WC_PayPlus
         $error_page_payplus = get_option('error_page_payplus');
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
-            ?>
-        <meta name=" robots" content="noindex,nofollow">
+?>
+            <meta name=" robots" content="noindex,nofollow">
         <?php
-}
+        }
     }
 
     /**
@@ -765,8 +698,8 @@ class WC_PayPlus
         ?>
         <div class="payplus-option-description-area"></div>
         <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
-        <?php
-$html = ob_get_clean();
+<?php
+        $html = ob_get_clean();
         echo $html;
     }
 
@@ -1604,7 +1537,7 @@ function payplus_order_admin_custom_fields($fields)
     return $fields;
 }
 
-add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10, );
+add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
 function payplus_checkout_field_update_order_meta($order_id)
 {
 
