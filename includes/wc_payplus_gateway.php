@@ -464,7 +464,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function load_admin_assets()
     {
-        wp_enqueue_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.js', ['jquery'], time(), true);
+        wp_enqueue_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
     }
 
     /**
