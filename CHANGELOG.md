@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
 - Added Legacy post meta support checkbox - Default is checked - In future releases this will be unchecked. (Plugin users that have been using our gateway up until now will be able to view all data that was stored in the post meta fields) - for more information regarding HPOS go to: https://woocommerce.com/document/high-performance-order-storage/
 - Added invoice check and update to admin on creation - If an invoice has already been created and for some reason it has not been updated to the admin orders panel, it's link will appear and it's data will be shown without duplicate creation.
+- Notice for customer when they update their billing address. (Regarding saved tokens)
 
 ### Changed
 
@@ -20,8 +21,8 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Save credit cards tokens - during checkout. (Supported currently only on woocommerce classic checkout).
-- Payments with saved tokens work on all kinds of checkout pages (Redirect, Iframe, Iframe on the same page, Iframe in a pop-up). (Supported currently only on woocommerce classic checkout).
+- Save credit cards tokens - during checkout. (Supported on both classic and new checkout blocks).
+- Payments with saved tokens now work on all checkout pages (Redirect, Iframe, Iframe on the same page, Iframe in a pop-up).
 - Save credit card tokens - no duplicates.
 - Removed log warnings for non-existing keys.
 - Save credit card token with brand name. (works only with newly saved card tokens from now on)
