@@ -266,6 +266,26 @@ jQuery(function ($) {
     toggle_foreign_invoice();
     toggle_invoice_options();
 
+    // Check if the invoice option is enabled if it is check if the type of document is selected,
+    // if not, show an error message and color the border of the select red and the text of the label
+    if (
+      $("#payplus_invoice_option\\[payplus_invoice_enable\\]").prop("checked")
+    ) {
+      let ids = [
+        "#payplus_invoice_option\\[payplus_invoice_type_document_refund\\]",
+        "#payplus_invoice_option\\[payplus_invoice_type_document\\]",
+        "#payplus_invoice_option\\[payplus_invoice_status_order\\]",
+      ];
+      ids.forEach(function (id) {
+        if ($(id).val() === "") {
+          $(id).css("border-color", "red");
+          var parent = $(id).parent().parent();
+          var th = parent.children("th");
+          th.css("color", "red");
+        }
+      });
+    }
+
     $(document).on(
       "change",
       "select#woocommerce_payplus-payment-gateway_display_mode",
