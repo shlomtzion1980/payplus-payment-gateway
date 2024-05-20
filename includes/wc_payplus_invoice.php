@@ -711,6 +711,7 @@ class PayplusInvoice
         if (is_numeric($temptax)) {
             $tax = 1 + ($temptax / 100);
         }
+
         foreach ($items as $item => $item_data) {
             $discount = 0;
             $product = new WC_Product($item_data['product_id']);
@@ -719,6 +720,7 @@ class PayplusInvoice
                 $arrBalanceName[] = $balanceName;
             }
             $dataArr = $item_data->get_data();
+
             $item_name = $item_data['name'];
             $name = str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_data['name']));
             $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $WC_PayPlus_Gateway->rounding_decimals) : '1');
@@ -776,14 +778,10 @@ class PayplusInvoice
                 $productSKU = ($product->get_sku()) ? $product->get_sku() : $item_data['product_id'];
 
                 if (!empty($dataArr['variation_id'])) {
-
-                    $product1 = new WC_Product_Variable($dataArr['product_id']);
-                    $variationsProduct = $product1->get_available_variations();
-                    if (count($variationsProduct)) {
-                        $productSKU = ($variationsProduct[0]['sku']) ? $variationsProduct[0]['sku'] :
-                            $variationsProduct[0]['variation_id'];
-                    }
+                    $productVariation = new WC_Product_Variation($dataArr['variation_id']);
+                    $productSKU = $productVariation->get_sku();
                 }
+
                 $itemDetails = [
                     'name' => str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_name)),
                     'barcode' => (string) $productSKU,
