@@ -48,14 +48,14 @@
 
     == Changelog ==
     = 6.6.3 =
-    * Check/Get order - ipn data from payplus in Admin orders via button click.
-    * Create invoice in a non-automatic management interface.
-    * "Website code" - Added to Invoice+: Add a unique string for each website if you have more than one website connected to our gateway.
-    * Save credit card checkbox in new WooCommerce Checkout Blocks.
-    * Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
-    * Added Legacy post meta support checkbox - Default is checked - In future releases this will be unchecked. (Plugin users that have been using our gateway up until now will be able to view all data that was stored in the post meta fields) - for more information regarding HPOS go to: https://woocommerce.com/document/high-performance-order-storage/
-    * Added invoice check and update to admin on creation - If an invoice has already been created and for some reason it has not been updated to the admin orders panel, it's link will appear and it's data will be shown without duplicate creation.
-    * Notice for customer when they update their billing address. (Regarding saved tokens)
+    * Add - Check/Get order - ipn data from payplus in Admin orders via button click.
+    * Fix - Create invoice in a non-automatic management interface.
+    * Add - "Website code" - Added to Invoice+: Add a unique string for each website if you have more than one website connected to our gateway.
+    * Add - Save credit card checkbox in new WooCommerce Checkout Blocks.
+    * Add - Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
+    * Add - Legacy post meta support checkbox - Default is checked - In future releases this will be unchecked. (Plugin users that have been using our gateway up until now will be able to view all data that was stored in the post meta fields) - for more information regarding HPOS go to: https://woocommerce.com/document/high-performance-order-storage/
+    * Add - Invoice check and update to admin on creation - If an invoice has already been created and for some reason it has not been updated to the admin orders panel, it's link will appear and it's data will be shown without duplicate creation.
+    * Add - Notice for customer when they update their billing address. (Regarding saved tokens)
 
     = 6.6.2 =
-    * Added support for the new WooCommerce Checkout Blocks.
+    * Add - Support for the new WooCommerce Checkout Blocks.
