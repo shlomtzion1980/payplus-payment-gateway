@@ -3,19 +3,19 @@
 Plugin Name: PayPlus Payment Gateway
 Description: WooCommerce integration for PayPlus Payment Gateway. Accept credit cards and more alternative methods directly to your WordPress e-commerce websites, More options to Refund, Charge, Capture, Subscriptions, Tokens and much more!
 Plugin URI: https://www.payplus.co.il/wordpress
-Version:6.6.3
+Version:6.6.4
 Tested up to:6.5.2
 Author: PayPlus LTD
 Author URI: https://www.payplus.co.il/
 License: GPLv2 or later
 Text Domain: PayPlus Payment Gateway Plugin
- */
+*/
 
 defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if accessed directly
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '6.6.3');
+define('PAYPLUS_VERSION', '6.6.4');
 define('PAYPLUS_VERSION_DB', 'payplus_2_0');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 define('PAYPLUS_TABLE_SESSION', 'payplus_payment_session');
