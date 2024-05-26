@@ -399,7 +399,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function show_update_card_notice($user_id, $load_address)
     {
-        wc_clear_notices();
+
         if (
             is_admin() ||
             !$this->create_pp_token ||
@@ -408,7 +408,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         ) {
             return;
         }
-
+        wc_clear_notices();
         /* translators: 1) Opening anchor tag 2) closing anchor tag */
         wc_add_notice(sprintf(__('If your billing address has been changed for saved payment methods, be sure to remove any %1$ssaved payment methods%2$s on file and re-add them.', 'paypluse-payment-gateway'), '<a href="' . esc_url(wc_get_endpoint_url('payment-methods')) . '" class="wc-payplus-update-card-notice" style="text-decoration:underline;">', '</a>'), 'notice');
     }
