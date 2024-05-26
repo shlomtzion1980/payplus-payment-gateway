@@ -1036,7 +1036,7 @@ class WC_PayPlus
             'payplus-invoice' => array(
                 'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invocie+.svg'>",
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invoice+.svg'>",
             ),
             'payplus-express-checkout' => array(
                 'name' => __('Express Checkout', 'payplus-payment-gateway'),
