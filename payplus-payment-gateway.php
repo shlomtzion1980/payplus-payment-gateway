@@ -8,8 +8,6 @@
  * Tested up to: 6.5.3
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
- * WC requires at least: 8.5
- * WC tested up to: 8.9
  * Author: PayPlus LTD
  * Author URI: https://www.payplus.co.il/
  * License: GPLv2 or later
