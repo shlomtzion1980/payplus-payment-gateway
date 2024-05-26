@@ -15,13 +15,13 @@ PayPlus.co.il Payment Gateway for WooCommerce extends the functionality of WooCo
 PayPlus Payment Gateway for WooCommerce
 Makes your website accept debit and credit cards on your WooCommerce store in a safe way and design your own payment page with high functionalities. SSL is not required.
 
-Before you install this plugin:
-To receive your account credentials you have to contact first PayPlus and to join the service before installing this Plugin
+Before installation: 
+You need your account credentials. For that, you have to contact PayPlus and to join the service.
 
 Plugin Disclaimer:
 PayPlus does not accept liability for any damage, loss, cost (including legal costs), expenses, indirect losses or consequential damage of any kind which may be suffered or incurred by the user from the use of this service.
 
-Before installation, it is important to know that this plugin relies on third-party services.
+It is important to know that this plugin relies on third-party services.
 However, the third-party so mentioned is the PayPlus core engine at their servers - the providers of this plugin.
 
 By being a payment processor, just like many of its kind, it must send some transaction details to the third-party server (itself) for token generation and transaction logging statistics and connecting to invoices.
