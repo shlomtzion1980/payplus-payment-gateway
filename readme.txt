@@ -4,7 +4,7 @@
     Requires at least: 3.0.1
     Tested up to: 6.5.3
     Requires PHP: 7.2
-    Stable tag: 6.6.3
+    Stable tag: 6.6.4
     PlugIn URL: https://www.payplus.co.il/wordpress
     License: GPLv2 or later
     License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -47,6 +47,11 @@
     7. Configure your PayPlus Gateway settings.
 
     == Changelog ==
+    = 6.6.4 =
+    * Fix - Bug preventing save users in admin.
+    * Fix - Show correct SKU when invoice with more than one variation product exist.
+    * Add - Mark in red - When Invoice+ is enabled shows the user which fields must be set.
+    
     = 6.6.3 =
     * Add - Check/Get order - ipn data from payplus in Admin orders via button click.
     * Fix - Create invoice in a non-automatic management interface.

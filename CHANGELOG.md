@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [6.6.4] - 2024-05-26
+
+### Changes
+ * Fix - Bug preventing save users in admin.
+ * Fix - Show correct SKU when invoice with more than one variation product exist.
+ * Add - Mark in red - When Invoice+ is enabled shows the user which fields must be set.
+
 ## [6.6.3] - 2024-05-19
 
 ### Added
