@@ -805,11 +805,11 @@ class PayplusInvoice
                 } else {
                     $itemDetails['vat_type_code'] = 'vat-type-included';
                 }
-                if ($productPrice) {
-                    $productsItems[] = $itemDetails;
-                }
+
+                $productsItems[] = $itemDetails;
             }
         }
+
         $shipping_methods = $order->get_shipping_methods();
         foreach ($shipping_methods as $shipping_method) {
             $shipping_tax = 0;
