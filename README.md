@@ -1,1 +1,0 @@
-# PayPlus-payment-gateway

@@ -155,11 +155,31 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $payplusResponse = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_response', true);
 
         if (!$payplusResponse && !empty($responseBody['data'])) {
-            WC_PayPlus_Order_Data::update_meta($order, array('payplus_response' => json_encode($responseBody['data'])));
-        }
-
-        if (!WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_type', true)) {
-            WC_PayPlus_Order_Data::update_meta($order, array('payplus_type' => $responseBody['data']['type']));
+            $responseArray = [
+                'payplus_response' => json_encode($responseBody['data']),
+                'payplus_type' => $responseBody['data']['type'],
+                'payplus_brand_name' => $responseBody['data']['brand_name'],
+                'payplus_method' => $responseBody['data']['method'],
+                'payplus_number' => $responseBody['data']['number'],
+                'payplus_number_of_payments' => $responseBody['data']['number_of_payments'],
+                'payplus_clearing_name' => $responseBody['data']['clearing_name'],
+                'payplus_credit_terms' => $responseBody['data']['credit_terms'],
+                'payplus_credit-card' => $responseBody['data']['amount'],
+                'payplus_customer_name' => $responseBody['data']['customer_name'],
+                'payplus_expiry_month' => $responseBody['data']['expiry_month'],
+                'payplus_expiry_year' => $responseBody['data']['expiry_year'],
+                'payplus_four_digits' => $responseBody['data']['four_digits'],
+                'payplus_issuer_id' => $responseBody['data']['issuer_id'],
+                'payplus_issuer_name' => $responseBody['data']['issuer_name'],
+                'payplus_more_info' => $responseBody['data']['more_info'],
+                'payplus_secure3D_tracking' => $responseBody['data']['secure3D_tracking'],
+                'payplus_status' => $responseBody['data']['status'],
+                'payplus_status_code' => $responseBody['data']['status_code'],
+                'payplus_status_description' => $responseBody['data']['status_description'],
+                'payplus_token_uid' => $responseBody['data']['token_uid'],
+                'payplus_voucher_num' => $responseBody['data']['voucher_num']
+            ];
+            WC_PayPlus_Order_Data::update_meta($order, $responseArray);
         }
 
         if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {

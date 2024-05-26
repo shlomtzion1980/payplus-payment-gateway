@@ -1,10 +1,10 @@
 ﻿    === PayPlus Payment Gateway ===
-    Contributors: PayPlus LTD
-    Tags: Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization, Woocommerce
+    Contributors: payplus
+    Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
     Requires at least: 3.0.1
     Tested up to: 6.5.3
     Requires PHP: 7.2
-    Stable tag: 6.6.4
+    Stable tag: 6.6.5
     PlugIn URL: https://www.payplus.co.il/wordpress
     License: GPLv2 or later
     License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -47,6 +47,12 @@
     7. Configure your PayPlus Gateway settings.
 
     == Changelog ==
+    = 6.6.5 =
+    * Tweak - New apple developer merchantid domain association file.
+    * Tweak - Show 0 priced products in invoices.
+    * Tweak - "Get PayPlus Data" button now adds all payplus meta fields to the order meta.
+    * Fix   - Invoices created with "Get PayPlus Data" button will have correct payment method data.
+
     = 6.6.4 =
     * Fix - Bug preventing save users in admin.
     * Fix - Show correct SKU when invoice with more than one variation product exist.
@@ -64,3 +70,7 @@
 
     = 6.6.2 =
     * Add - Support for the new WooCommerce Checkout Blocks.
+
+    == Upgrade Notice ==
+    = 6.6.5 =
+    * This update includes some minor patches and a new apple merchantid for domain association. Please update for the latest fixes.
