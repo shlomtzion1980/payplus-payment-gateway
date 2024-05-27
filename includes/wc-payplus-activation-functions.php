@@ -51,8 +51,8 @@ add_filter('handle_bulk_actions-edit-shop_order', 'payplus_orders_bulk_actions',
  */
 function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
 {
-    $invocie = new PayplusInvoice();
-    $statusOrder = $invocie->payplus_get_invoice_status_order();
+    $invoice = new PayplusInvoice();
+    $statusOrder = $invoice->payplus_get_invoice_status_order();
 
     $pos = strpos($action, "mark");
 
@@ -63,7 +63,7 @@ function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
         }
         $action = explode("_", $action);
         if ($action[1] == $statusOrder) {
-            if ($invocie->payplus_get_invoice_enable()) {
+            if ($invoice->payplus_get_invoice_enable()) {
                 if (count($post_ids)) {
                     foreach ($post_ids as $key => $value) {
                         $postStr .= $value . ",";
@@ -77,17 +77,17 @@ function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
 }
 
 add_action('payplus_cron_send_order', function () {
-    $invocie = new PayplusInvoice();
+    $invoice = new PayplusInvoice();
 
-    if ($invocie->payplus_get_invoice_enable()) {
+    if ($invoice->payplus_get_invoice_enable()) {
         $orders = get_option('payplus_create_invoice');
         $orders = explode(",", $orders);
         if (count($orders)) {
             foreach ($orders as $key => $order) {
                 if (!empty($order)) {
                     $currentOrder = wc_get_order($order);
-                    if ($invocie->payplus_get_invoice_status_order() == $currentOrder->get_status()) {
-                        $invocie->payplus_invoice_create_order($order);
+                    if ($invoice->payplus_get_invoice_status_order() == $currentOrder->get_status()) {
+                        $invoice->payplus_invoice_create_order($order);
                     }
                 }
             }

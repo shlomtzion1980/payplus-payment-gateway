@@ -603,7 +603,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payload['amount'] = $amount;
             $payload['more_info'] = __('Refund for Order Number: ', 'payplus-payment-gateway') . $orderID;
 
-            if ($this->invocie_api->payplus_get_invoice_enable()) {
+            if ($this->invoice_api->payplus_get_invoice_enable()) {
                 $payload['initial_invoice'] = false;
             }
 
@@ -630,17 +630,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                     /* invoice api*/
                     if (
-                        $this->invocie_api->payplus_get_invoice_enable() &&
-                        !$this->invocie_api->payplus_get_create_invocie_manual()
+                        $this->invoice_api->payplus_get_invoice_enable() &&
+                        !$this->invoice_api->payplus_get_create_invoice_manual()
                     ) {
                         $payments = $this->payplus_get_order_payment(false, $id);
                         if ($payments[$indexRow]->price > round($amount, $this->rounding_decimals)) {
                             $payments[$indexRow]->price = $amount * 100;
                         }
                         $rand = rand(0, intval($orderID));
-                        $this->invocie_api->payplus_create_dcoment_dashboard(
+                        $this->invoice_api->payplus_create_dcoment_dashboard(
                             $orderID,
-                            $this->invocie_api->payplus_get_invoice_type_document_refund(),
+                            $this->invoice_api->payplus_get_invoice_type_document_refund(),
                             $payments,
                             round($amount, $this->rounding_decimals),
                             'payplus_order_refund_' . $rand . "_" . $orderID
@@ -746,9 +746,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                 if (count($resultApps) > 1) {
                     $resultApps = array();
-                    $objectInvociePaymentNoPayplus = array('method_payment' => 'other', 'price' => $amount * 100);
-                    $objectInvociePaymentNoPayplus = (object) $objectInvociePaymentNoPayplus;
-                    $resultApps[] = $objectInvociePaymentNoPayplus;
+                    $objectInvoicePaymentNoPayplus = array('method_payment' => 'other', 'price' => $amount * 100);
+                    $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
+                    $resultApps[] = $objectInvoicePaymentNoPayplus;
                 } else {
                     $resultApps[$indexRow]->price = $amount * 100;
                 }
@@ -1060,7 +1060,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
-    public function payplus_get_section_invocie_not_automatic($orderId)
+    public function payplus_get_section_invoice_not_automatic($orderId)
     {
         $this->isInitiated();
         // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
@@ -1076,8 +1076,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $currentStatus = $this->payPlusInvoice->payplus_get_invoice_type_document();
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
         $chackAllPaymnet = in_array($currentStatus, $chackStatus) ? "block" : 'none';
-        $payments = $this->invocie_api->payplus_get_payments($orderId);
-        $checkInvocieSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
+        $payments = $this->invoice_api->payplus_get_payments($orderId);
+        $checkInvoiceSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
         if ($invoiceManualList) {
             $invoiceManualList = explode(",", $invoiceManualList);
             if (count($invoiceManualList) == 1 && $invoiceManualList[0] == "") {
@@ -1522,7 +1522,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         }
         $this->payplus_get_table_paypment($orderId, $currentStatus, $payments);
-        if (empty($checkInvocieSend)) :
+        if (empty($checkInvoiceSend)) :
             ?>
                 <div class="flex-row">
                     <div class="flex-item payplus-create-invoice">
@@ -1662,10 +1662,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order_validated = $order->get_meta('order_validated');
             $order_validated_error = $order->get_meta('order_validated_error');
 
-            $invocie_manual = $this->payPlusInvoice->payplus_get_create_invocie_manual();
-            $checkInvocieSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
+            $invoice_manual = $this->payPlusInvoice->payplus_get_create_invoice_manual();
+            $checkInvoiceSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
             $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
-            $checkInvocieRefundSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_send_refund', true);
+            $checkInvoiceRefundSend = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_send_refund', true);
             $sum = 0;
             $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
                 return $sum + $item->invoice_refund;
@@ -1759,17 +1759,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             if (
                 $order->get_status() != 'auto-draft' && $order->get_status() != 'on-hold' && $total && $this->payPlusInvoice->payplus_get_invoice_enable()
-                && $invocie_manual
+                && $invoice_manual
             ) {
 
-                if (empty($checkInvocieSend)) :
-                    $this->payplus_get_section_invocie_not_automatic($orderId);
+                if (empty($checkInvoiceSend)) :
+                    $this->payplus_get_section_invoice_not_automatic($orderId);
                 endif;
             }
 
             if (
                 $total && $this->payPlusInvoice->payplus_get_invoice_enable()
-                && $invocie_manual && $sumTransactionRefund && !$checkInvocieRefundSend
+                && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
             ) {
             ?>
                 <div class="payment-order-ajax  payment-invoice" style="margin:20px 0px">
@@ -1813,7 +1813,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
             $flagPayment = !floatval($order->get_total()) || !empty($transaction_uid) || $order_validated === "1" || $this->enabled === "no" || $order->get_status() !== "pending";
 
-            if (!$flagPayment && !$order_validated_error && empty($checkInvocieSend)) {
+            if (!$flagPayment && !$order_validated_error && empty($checkInvoiceSend)) {
             ?>
                 <div class="payment-order-ajax">
                     <button id="payment-payplus-dashboard" data-id="<?php echo $orderId ?>" class="button  button-primary"><?php echo __("Payment", "payplus-payment-gateway") ?></button>
@@ -2369,7 +2369,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             ) {
 
                 if (
-                    !$this->payPlusInvoice->payplus_get_create_invocie_manual()
+                    !$this->payPlusInvoice->payplus_get_create_invoice_manual()
                     && floatval($amount)
                 ) {
                     $this->payPlusInvoice->payplus_create_dcoment_dashboard(

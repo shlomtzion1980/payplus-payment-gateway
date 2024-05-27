@@ -27,7 +27,7 @@ class WC_PayPlus
     protected static $instance = null;
     public $notices = [];
     private $payplus_payment_gateway_settings = null;
-    public $invocie_api = null;
+    public $invoice_api = null;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -263,15 +263,15 @@ class WC_PayPlus
     public function payplus_after_refund($order_id, $refund_id)
     {
         $order = wc_get_order($order_id);
-        $invocie_api = new PayplusInvoice();
+        $invoice_api = new PayplusInvoice();
         $payment_method = $order->get_payment_method();
         if (strpos($payment_method, 'payplus') === false) {
             //$amount = WC_PayPlus_Order_Data::get_meta($refund_id, '_refund_amount', true);
             $amount = $order->get_total_refunded();
             if (floatval($amount)) {
-                $invocie_api->payplus_create_dcoment_dashboard(
+                $invoice_api->payplus_create_dcoment_dashboard(
                     $order_id,
-                    $invocie_api->payplus_get_invoice_type_document_refund(),
+                    $invoice_api->payplus_get_invoice_type_document_refund(),
                     array(),
                     $amount,
                     'payplus_order_refund' . $order_id
@@ -585,17 +585,17 @@ class WC_PayPlus
 
             add_action('woocommerce_review_order_before_submit', [$this, 'payplus_view_iframe_payment'], 1);
 
-            $this->invocie_api = new PayplusInvoice();
-            add_action('manage_shop_order_posts_custom_column', [$this->invocie_api, 'payplus_add_order_column_order_invoice'], 100, 2);
-            add_action('woocommerce_shop_order_list_table_custom_column', [$this->invocie_api, 'payplus_add_order_column_order_invoice'], 100, 2);
-            add_action('woocommerce_order_item_add_action_buttons', [$this->invocie_api, 'payplus_order_item_add_action_buttons_callback'], 100, 1);
+            $this->invoice_api = new PayplusInvoice();
+            add_action('manage_shop_order_posts_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
+            add_action('woocommerce_shop_order_list_table_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
+            add_action('woocommerce_order_item_add_action_buttons', [$this->invoice_api, 'payplus_order_item_add_action_buttons_callback'], 100, 1);
 
-            if ($this->invocie_api->payplus_get_invoice_enable() && !$this->invocie_api->payplus_get_create_invocie_manual()) {
+            if ($this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
 
-                add_action('woocommerce_order_status_' . $this->invocie_api->payplus_get_invoice_status_order(), [$this->invocie_api, 'payplus_invoice_create_order']);
-                if ($this->invocie_api->payplus_get_create_invoice_automatic()) {
-                    add_action('woocommerce_order_status_on-hold', [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
-                    add_action('woocommerce_order_status_processing', [$this->invocie_api, 'payplus_invoice_create_order_automatic']);
+                add_action('woocommerce_order_status_' . $this->invoice_api->payplus_get_invoice_status_order(), [$this->invoice_api, 'payplus_invoice_create_order']);
+                if ($this->invoice_api->payplus_get_create_invoice_automatic()) {
+                    add_action('woocommerce_order_status_on-hold', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
+                    add_action('woocommerce_order_status_processing', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
                 }
             }
 

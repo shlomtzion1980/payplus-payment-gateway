@@ -23,7 +23,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $disable_menu_side;
     public $disable_menu_header;
     public $enable_pickup;
-    public $invocie_api;
+    public $invoice_api;
     public $check_amount_authorization;
     public $api_test_mode;
     public $block_ip_transactions;
@@ -256,7 +256,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             );
             update_option('settings_payplus_page_error_option', $settingsPayplusPageErrorOption);
         }
-        $this->invocie_api = new PayplusInvoice();
+        $this->invoice_api = new PayplusInvoice();
         $payplus_invoice_option = get_option('payplus_invoice_option');
         if ($payplus_invoice_option) {
             $payplus_invoice_api_key = $payplus_invoice_option['payplus_invoice_api_key'];
@@ -882,7 +882,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         global $wpdb;
         $flag = false;
         $order = wc_get_order($order_id);
-        $invocie_manual = $this->invocie_api->payplus_get_create_invocie_manual();
+        $invoice_manual = $this->invoice_api->payplus_get_create_invoice_manual();
         $indexRow = 0;
         $handle = 'payplus_process_refund';
         $table_name = $wpdb->prefix . 'payplus_order';
@@ -916,7 +916,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payload['amount'] = round($amount, $this->rounding_decimals);
             $payload['more_info'] = __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id;
 
-            if ($this->invocie_api->payplus_get_invoice_enable()) {
+            if ($this->invoice_api->payplus_get_invoice_enable()) {
                 $payload['initial_invoice'] = false;
             }
 
@@ -934,14 +934,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $invoice_refund =intval($rowOrder[0]->invoice_refund );
                     $wpdb->update($table_name,array('invoice_refund'=>$invoice_refund +($amount*100)),array('order_id'=>$order_id,'parent_id'=>0));*/
 
-                    if ($this->invocie_api->payplus_get_invoice_enable() && !$invocie_manual) {
-                        $resultApps = $this->invocie_api->payplus_get_payments($order_id, 'otherClub');
+                    if ($this->invoice_api->payplus_get_invoice_enable() && !$invoice_manual) {
+                        $resultApps = $this->invoice_api->payplus_get_payments($order_id, 'otherClub');
                         if ($resultApps[$indexRow]->price > round($amount, $this->rounding_decimals)) {
                             $resultApps[$indexRow]->price = $amount * 100;
                         }
-                        $this->invocie_api->payplus_create_dcoment_dashboard(
+                        $this->invoice_api->payplus_create_dcoment_dashboard(
                             $order_id,
-                            $this->invocie_api->payplus_get_invoice_type_document_refund(),
+                            $this->invoice_api->payplus_get_invoice_type_document_refund(),
                             $resultApps,
                             round($amount, $this->rounding_decimals),
                             'payplus_order_refund' . $order_id
@@ -1820,7 +1820,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
 
-        if ($this->invocie_api->payplus_get_invoice_enable()) {
+        if ($this->invoice_api->payplus_get_invoice_enable()) {
             $flagInvoice = 'false';
             $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
         } elseif ($this->initial_invoice == "1") {
@@ -2177,7 +2177,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $order = wc_get_order($order_id);
             $handle = 'payplus_callback_begin';
             $this->logOrderBegin($order_id, 'callback');
-            $rowOrder = $this->invocie_api->payplus_get_payments($order_id);
+            $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
             if ($this->get_check_user_agent() || (count($rowOrder) && $rowOrder[0]->status_code == $status_code)) {
 
@@ -2292,7 +2292,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $order_id = trim($data['order_id']);
         $status_code = trim($data['status_code']);
         $order = wc_get_order($order_id);
-        $rowOrder = $this->invocie_api->payplus_get_payments($order_id);
+        $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
         if (count($rowOrder) && $rowOrder[0]->status_code == $status_code) {
             $this->payplus_add_log_all($handle, 'payplus_end_proces-' . $order_id);
             $this->payplus_add_log_all($handle, '', 'space');
@@ -2479,7 +2479,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             $insertMeta['payplus_related_transactions'] = 1;
                             WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
                         }
-                        $rowOrder = $this->invocie_api->payplus_get_payments($order_id);
+                        $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
                         if (!count($rowOrder)) {
                             $this->payplus_add_order($order_id, $inData);
@@ -2751,7 +2751,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ((isset($response['alternative_method_name'])) && ($response['alternative_method_name'] == "google-pay"
                             || $response['alternative_method_name'] == "apple-pay") &&
 
-                        $this->invocie_api->payplus_get_invoice_enable()
+                        $this->invoice_api->payplus_get_invoice_enable()
                     ) {
                         $flagMethod = false;
                     }
@@ -3127,7 +3127,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $is_multiple_transaction = $dataRow['is_multiple_transaction'];
             $parent_id = 0;
             $table = $wpdb->prefix . 'payplus_order';
-            $rowOrder = $this->invocie_api->payplus_get_payments($order_id);
+            $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
             if (count($rowOrder)) {
                 $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
