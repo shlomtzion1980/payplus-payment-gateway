@@ -9,7 +9,8 @@ PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-PayPlus.co.il Payment Gateway for WooCommerce extends the functionality of WooCommerce to accept payments from credit/debit cards and choose another alternative method such bit, Apple Pay, Google Pay on a single payment page. With PayPlus Gateway, You can choose a dedicated domain for your own payment page and a lot of different and other settings that will raise your conversions.
+Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page.
+Create digitally signed invoices & much more!
 
 == Description ==
 PayPlus Payment Gateway for WooCommerce
@@ -38,6 +39,7 @@ The above records, the transaction details, are not treated as belonging to PayP
 The external files referenced by this plugin, due to WordPress policy recommendations, are all included in the plugin directory.
 
 == Installation ==
+
 1. In your WordPress Dashboard go to "Plugins" -> "Add Plugin".
 2. Search for "payplus-payment-gateway".
 3. Install the plugin by pressing the "Install" button.
@@ -46,7 +48,41 @@ The external files referenced by this plugin, due to WordPress policy recommenda
 6. Click on the sub tab for "PayPlus Payment Gateway".
 7. Configure your PayPlus Gateway settings.
 
+== Frequently Asked Questions ==
+
+= Do this plugin support recurring payments, like subscriptions? =
+
+Yes!
+
+= Does this require an SSL certificate? =
+
+No! You can use ower Redirect option and you are free from SSL, However it is still recommended.
+
+= Does this support both production mode and sandbox mode for testing? =
+
+Yes, it does - production and Test (sandbox) mode is driven by the API keys you use with a checkbox in the admin settings to toggle between both.
+
+= Where can I find documentation? =
+
+For help setting up and configuration refer to [documentation](https://www.payplus.co.il/wordpress).
+
+= Where can I get support or talk to other users? =
+
+If you get stuck, you can ask for help in the Plugin Forum. or contact us directly at (https://www.payplus.co.il).
+
+== Screenshots ==
+
+1. The PayPlus Payment page! (Example).
+2. Go into Plugins -> Add New Plugin.
+3. Search for PayPlus Payment Gateway in the search line and click install.
+4. After installation click activate.
+5. Select WooCommerce -> Settings -> Payments.
+6. Activate the gateway under the "active" tab and select manage.
+7. Enter the 3 credentials you have received from PayPlus (when you signed up with us).
+8. Save your settings, now you have an active payment page!
+
 == Changelog ==
+
 = 6.6.5 =
 * Tweak - New apple developer merchantid domain association file.
 * Tweak - Show 0 priced products in invoices.
