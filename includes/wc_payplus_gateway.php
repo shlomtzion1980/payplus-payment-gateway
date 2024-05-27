@@ -941,7 +941,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if ($resultApps[$indexRow]->price > round($amount, $this->rounding_decimals)) {
                             $resultApps[$indexRow]->price = $amount * 100;
                         }
-                        $this->invoice_api->payplus_create_dcoment_dashboard(
+                        $this->invoice_api->payplus_create_document_dashboard(
                             $order_id,
                             $this->invoice_api->payplus_get_invoice_type_document_refund(),
                             $resultApps,

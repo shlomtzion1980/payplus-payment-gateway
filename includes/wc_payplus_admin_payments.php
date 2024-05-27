@@ -638,7 +638,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             $payments[$indexRow]->price = $amount * 100;
                         }
                         $rand = rand(0, intval($orderID));
-                        $this->invoice_api->payplus_create_dcoment_dashboard(
+                        $this->invoice_api->payplus_create_document_dashboard(
                             $orderID,
                             $this->invoice_api->payplus_get_invoice_type_document_refund(),
                             $payments,
@@ -756,7 +756,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             if (count($resultApps)) {
 
-                $this->payPlusInvoice->payplus_create_dcoment_dashboard(
+                $this->payPlusInvoice->payplus_create_document_dashboard(
                     $order_id,
                     $type_document,
                     $resultApps,
@@ -2372,7 +2372,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     !$this->payPlusInvoice->payplus_get_create_invoice_manual()
                     && floatval($amount)
                 ) {
-                    $this->payPlusInvoice->payplus_create_dcoment_dashboard(
+                    $this->payPlusInvoice->payplus_create_document_dashboard(
                         $order_id,
                         $this->payPlusInvoice->payplus_get_invoice_type_document_refund(),
                         array(),

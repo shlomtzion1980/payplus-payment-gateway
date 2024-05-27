@@ -522,22 +522,21 @@ class PayplusInvoice
      * @param $unique_identifier
      * @return void
      */
-    public function payplus_create_dcoment_dashboard($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null)
+    public function payplus_create_document_dashboard($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null)
     {
-
         if ($payplus_invoice_type_document_refund === "inv_refund_receipt") {
             $payplus_document_type = "inv_refund_receipt";
-            $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, $unique_identifier);
+            $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, CREDIT_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
-            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, $unique_identifier);
+            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, CREDIT_INVOICE);
             $payplus_document_type = "inv_receipt";
-            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, $unique_identifier . "_other");
+            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, CREDIT_RECEIPT);
         } else {
-            $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier);
+            $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, CREDIT_INVOICE);
         }
     }
