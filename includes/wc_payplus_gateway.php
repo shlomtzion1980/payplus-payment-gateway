@@ -744,6 +744,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'title' => __('Payment Completed', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('Fire Payment Completed On Successful Charge', 'payplus-payment-gateway'),
+                'description' => __('Only relevant if you are using the "Default Woo" in Successful Order Status option above this one.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
                 'default' => 'yes',
             ],
             'failure_order_status' => [
