@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-05-27 10:38+0300\n"
-"PO-Revision-Date: 2024-05-27 10:42+0300\n"
+"PO-Revision-Date: 2024-05-27 13:56+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -61,7 +61,7 @@ msgstr ""
 #: includes/wc_payplus_admin_payments.php:261
 #: includes/wc_payplus_admin_payments.php:310
 msgid "Language of the page"
-msgstr "בחירת שפה לתרגום  דף שגיעה תשלום"
+msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
 #: includes/wc_payplus_admin_payments.php:303
 #: includes/wc_payplus_admin_payments.php:2083
