@@ -72,7 +72,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Screenshots ==
 
-1. The PayPlus Payment page! (Example).
+1. The PayPlus Payment page! (Example - This page can be edited for design and more!).
 2. Go into Plugins -> Add New Plugin.
 3. Search for PayPlus Payment Gateway in the search line and click install.
 4. After installation click activate.
