@@ -1943,7 +1943,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
 
                 if ($OrderType != "Approval" and $OrderType != "Check") {
-                    $this->payplus_add_log_all($handle, 'ansaction Not J5 Or Changed to J4 After Charge');
+                    $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
 
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
                     wp_die();
