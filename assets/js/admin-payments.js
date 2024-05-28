@@ -253,6 +253,7 @@ jQuery(document).ready(function ($) {
         location.reload();
       },
     });
+    $(this).closest(".delayed-payment").find(".payplus_loader").fadeOut();
   });
 });
 function setFieldReadOnly() {

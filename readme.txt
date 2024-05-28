@@ -87,6 +87,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Tweak - Multiple refunds can now be done in an automatic way as well as manual.
 * Tweak - Some hebrew translations were fixed.
 * Tweak - Added description to fire completed configuration option.
+* Tweak - Added error message when an error occurs on "Make Payment" in admin orders edit.
+* Fix   - "Make Payment" button for J5 payment now allows admin to charge up until original J5 charge. 
+* Fix   - Removed short code usage with payplus error page.
+
 
 = 6.6.5 =
 * Tweak - New apple developer merchantid domain association file.

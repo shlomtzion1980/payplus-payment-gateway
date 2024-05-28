@@ -1936,13 +1936,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     wp_die();
                 }
 
-                if ($amount > round((float) $order->get_total(), 2)) {
-                    $this->payplus_add_log_all($handle, 'Cannot charge more than original order sum');
-                    $order->add_order_note(sprintf(__('Cannot charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                    echo $urlEdit . '&error=Cannot charge more than original order sum';
-                    wp_die();
-                }
-
                 if ($OrderType != "Approval" and $OrderType != "Check") {
                     $order->add_order_note(sprintf(__('The charge in PayPlus already made. Please check your PayPlus account<br />Amount: %s %s', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
@@ -2078,7 +2071,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'payplus_script_admin',
                 array(
                     'ajax_url' => admin_url('admin-ajax.php'),
-                    'error_payment' => __('Cannot Charge then original order sum', 'payplus-payment-gateway'),
+                    'error_payment' => __('Cannot Charge more than original order sum', 'payplus-payment-gateway'),
                     "payplus_title_tab" => array(
                         "tab-payplus-error-page" => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
                         "tab-invoice-payplus" => __('Invoice+ (PayPlus)', 'payplus-payment-gateway')
@@ -2174,8 +2167,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             if ($amount > $order->get_total()) {
-                $this->payplus_add_log_all($handle, 'Cannot Charge then original order');
-                $order->add_order_note(sprintf(__('Cannot Charge then original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+                $this->payplus_add_log_all($handle, 'Cannot Charge more than original order sum');
+                $order->add_order_note(sprintf(__('Cannot Charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
                 return false;
             }
 
