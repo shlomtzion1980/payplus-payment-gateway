@@ -1936,10 +1936,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     wp_die();
                 }
 
-                if ($amount > $order->get_total()) {
-                    $this->payplus_add_log_all($handle, 'Cannot Charge then original order');
-                    $order->add_order_note(sprintf(__('Cannot Charge then original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                    echo $urlEdit;
+                if ($amount > round((float) $order->get_total(), 2)) {
+                    $this->payplus_add_log_all($handle, 'Cannot charge more than original order sum');
+                    $order->add_order_note(sprintf(__('Cannot charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+                    echo $urlEdit . '&error=Cannot charge more than original order sum';
                     wp_die();
                 }
 

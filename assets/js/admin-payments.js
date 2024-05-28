@@ -245,6 +245,13 @@ jQuery(document).ready(function ($) {
           location.href = response.urlredirect;
         }
       },
+      error: function (xhr, status, error) {
+        let errorMessage = xhr.responseText.split("&error=")[1]
+          ? xhr.responseText.split("&error=")[1]
+          : "Failed, please check the order notes for the failure reason.";
+        alert(errorMessage);
+        location.reload();
+      },
     });
   });
 });

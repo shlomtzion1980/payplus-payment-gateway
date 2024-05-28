@@ -56,7 +56,7 @@ Yes!
 
 = Does this require an SSL certificate? =
 
-No! You can use ower Redirect option and you are free from SSL, However it is still recommended.
+No! You can use our Redirect option and you are free from SSL, However it is still recommended.
 
 = Does this support both production mode and sandbox mode for testing? =
 
@@ -82,6 +82,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 6.6.6 =
+* Tweak - Multiple refunds can now be done in an automatic way as well as manual.
+* Tweak - Some hebrew translations were fixed.
+* Tweak - Added description to fire completed configuration option.
 
 = 6.6.5 =
 * Tweak - New apple developer merchantid domain association file.
