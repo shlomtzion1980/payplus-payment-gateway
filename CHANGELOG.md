@@ -2,9 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [6.6.6] - 2024-05-29
+
+### Changes
+
+* Tweak - Multiple refunds can now be done in an automatic way as well as manual.
+* Tweak - Some hebrew translations were fixed.
+* Tweak - Added description to fire completed configuration option.
+* Tweak - Added error message when an error occurs on "Make Payment" in admin orders edit.
+* Fix   - "Make Payment" button for J5 payment now allows admin to charge up until original J5 charge. 
+* Fix   - Removed short code usage with payplus error page.
+
 ##  [6.6.5] - 2024-05-26
 
 ### Changes
+
 * Tweak - New apple developer merchantid domain association file.
 * Tweak - Show 0 priced products in invoices.
 * Tweak - "Get PayPlus Data" button now adds all payplus meta fields to the order meta.
@@ -13,29 +25,23 @@ All notable changes to this project will be documented in this file.
 ##  [6.6.4] - 2024-05-26
 
 ### Changes
+
 * Fix - Bug preventing save users in admin.
 * Fix - Show correct SKU when invoice with more than one variation product exist.
 * Add - Mark in red - When Invoice+ is enabled shows the user which fields must be set.
 
 ## [6.6.3] - 2024-05-19
 
-### Added
+### Changes
 
 * Add   - Check/Get order - ipn data from payplus in Admin orders via button click.
-* Fix   - Create invoice in a non-automatic management interface in different amount than the original order.
 * Add   - "Website code" - Added to Invoice+: Add a unique string for each website if you have more than one website connected to our gateway.
 * Add   - Save credit card checkbox in new WooCommerce Checkout Blocks.
 * Tweak - Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
 * Add   - Legacy post meta support checkbox - Default is checked - In future releases this will be unchecked. (Plugin users that have been using our gateway up until now will be able to view all data that was stored in the post meta fields) - for more information regarding HPOS go to: https://woocommerce.com/document/high-performance-order-storage/
 * Add   - Invoice check and update to admin on creation - If an invoice has already been created and for some reason it has not been updated to the admin orders panel, it's link will appear and it's data will be shown without duplicate creation.
 * Add   - Notice for customer when they update their billing address. (Regarding saved tokens)
-
-### Changed
-
-* Refactored codebase to enhance performance - still in progress - massive changes will come!
-
-### Fixed
-
+* Fix - Create invoice in a non-automatic management interface in different amount than the original order.
 * Fix - Save credit cards tokens - during checkout. (Supported on both classic and new checkout blocks).
 * Fix - Payments with saved tokens now work on all checkout pages (Redirect, Iframe, Iframe on the same page, Iframe in a pop-up).
 * Fix - Save credit card tokens - no duplicates.
@@ -46,12 +52,8 @@ All notable changes to this project will be documented in this file.
 * Fix - Add/Save Payment methods through "My account -> Payment methods" now saves the token with customer default billing and will work on checkout (When billing information is the same).
 * Fix -J5 Invoice creation from admin with partial amount paid - fixed.
 
-### In the future
-
-* Code refactor.
-
 ## [6.6.2] - 2024-02-01
 
-### Added
+### Changes
 
 * Add - Support for the new WooCommerce Checkout Blocks.
