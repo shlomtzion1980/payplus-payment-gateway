@@ -60,9 +60,6 @@ class WC_PayPlus
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
-
-        //SHORTCODE
-        add_shortcode('error-payplus-content', [$this, 'payplus_text_error_page']);
     }
 
     /**

@@ -429,19 +429,30 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         return $allcaps;
     }
 
+    public function check_if_page_exists_by_slug($page_slug)
+    {
+        $page = get_page_by_path($page_slug, OBJECT, 'page');
+        return !empty($page);
+    }
+
     /**
      * @return void
      */
     public function payplus_generate_page_error()
     {
-        $error_page_payplus = get_option('error_page_payplus');
-        $errorPagePayPlus = get_post($error_page_payplus);
-        if (!$errorPagePayPlus) {
-            $errorPagePayPlus = wp_insert_post(array(
-                'post_status' => 'publish', 'post_type' => 'page',
-                'post_title' => ucwords('error payment payplus'), "post_content" => "[error-payplus-content]"
-            ));
-            update_option('error_page_payplus', $errorPagePayPlus);
+        $page_slug = 'error-payment-payplus';
+        if ($this->check_if_page_exists_by_slug($page_slug)) {
+            return;
+        } else {
+            $error_page_payplus = get_option('error_page_payplus');
+            $errorPagePayPlus = get_post($error_page_payplus);
+            if (!$errorPagePayPlus) {
+                $errorPagePayPlus = wp_insert_post(array(
+                    'post_status' => 'publish', 'post_type' => 'page',
+                    'post_title' => ucwords('error payment payplus'), "post_content" => "There has been an error with the payment."
+                ));
+                update_option('error_page_payplus', $errorPagePayPlus);
+            }
         }
     }
 
