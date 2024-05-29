@@ -960,7 +960,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             'payplus_order_refund' . $order_id
                         );
                     }
-
                     $insertMeta = array(
                         'payplus_credit-card' => floatval(WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_credit-card', true)) - $amount,
                         'payplus_total_refunded_amount' => round($refunded_amount + $amount, 2),

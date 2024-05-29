@@ -75,6 +75,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // Place "Get Order Details" button from PayPlus if the order is marked as unpaid - allows to get the order details from PayPlus if exists and
         // updates the order status to processing if the payment was successful and adds order note!
         add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
+        add_action('add_meta_boxes', [$this, 'add_custom_order_metabox']);
 
         // remove query args after error shown
         add_filter('removable_query_args', [$this, 'add_removable_arg']);
@@ -85,6 +86,49 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             add_action('woocommerce_order_refunded', [$this, 'payplus_after_refund'], 10, 2);
         }
     }
+
+    public function add_custom_order_metabox()
+    {
+        add_meta_box(
+            'custom_order_metabox', // Unique ID for the metabox
+            'PayPlus Docs', // Metabox title
+            [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
+            'woocommerce_page_wc-orders', // Post type where it should be displayed (order page)
+            'side', // Context (position on the screen)
+            'default' // Priority
+        );
+    }
+
+    public function display_custom_order_metabox($post)
+    {
+        $order_id = $post->ID;
+        $refundDocs = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refund_docs', true);
+        $invDoc = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
+        $invDocNumber = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
+        if (strlen($invDoc) > 0) { ?>
+            <div>
+                <h4>PayPlus Invoice</h4>
+                <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>">Invoice (<?php echo $invDocNumber; ?>)</a>
+            </div>
+        <?php
+        }
+        if (strlen($refundDocs) > 0) {
+        ?>
+            <div>
+                <h4>PayPlus Refunds</h4>
+                <?php
+                $theDocs = explode(",", $refundDocs);
+                foreach ($theDocs as $doc) {
+                    $doc = explode("|", $doc); ?>
+                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $doc[0]; ?>">Refund <?php echo $doc[1]; ?></a>
+                <?php
+                }
+
+                ?>
+            </div>
+        <?php }
+    }
+
 
     public function isInitiated()
     {
@@ -1085,7 +1129,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
-?>
+        ?>
         <div class="flex-row">
             <div class="flex-item">
                 <select id="select-type-invoice-<?php echo $orderId ?>" class="select-type-invoice" name="select-type-invoice-<?php echo $orderId ?>">
@@ -1631,11 +1675,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if (isset($payplusResponse['page_request_uid'])) {
                         $pageRequestUid = $payplusResponse['page_request_uid'];
                     }
-
                     // check if is rtl or ltr
                     $rtl = is_rtl() ? 'left' : 'right';
                     // show button only if pageRequestUid is not empty
-                    if ($pageRequestUid !== "") {
+                    if (!empty($pageRequestUid)) {
                         echo '<button type="button" data-value="' . $order->get_id() . '" value="' . $pageRequestUid . '" class="button" id="custom-button-get-pp" style="position: absolute;' . $rtl . ': 5px;top:0px;margin: 10px 0 0 0;color: white;background-color: green">Get PayPlus Data</button>';
                         echo "<div class='payplus_loader_gpp'>
                         <div class='loader'>
