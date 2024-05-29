@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 6.6.5
+Stable tag: 6.6.7
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -14,7 +14,7 @@ Create digitally signed invoices & much more!
 
 == Description ==
 PayPlus Payment Gateway for WooCommerce
-Makes your website accept debit and credit cards on your WooCommerce store in a safe way and design your own payment page with high functionalities. SSL is not required.
+Accept debit and credit cards on your WooCommerce store in a secure way with the ability to design your own payment page and add high functionalities to it. SSL is not required.
 
 Before installation: 
 You need your account credentials. For that, you have to contact PayPlus and to join the service.
@@ -83,7 +83,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 6.6.6 =
+= 6.6.7 =
 * Tweak - Multiple refunds can now be done in an automatic way as well as manual.
 * Tweak - Some hebrew translations were fixed.
 * Tweak - Added description to fire completed configuration option.
