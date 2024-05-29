@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 6.6.7
+Stable tag: 6.6.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,6 +82,9 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 6.6.8 =
+* Add   - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page instead of in the notes.
 
 = 6.6.7 =
 * Tweak - Multiple refunds can now be done in an automatic way as well as manual.
