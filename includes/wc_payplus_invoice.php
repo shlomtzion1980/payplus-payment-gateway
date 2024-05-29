@@ -368,6 +368,8 @@ class PayplusInvoice
             if ($res->status === "success") {
                 $responeType = ($typePayment == "charge") ? "" : "_refund_";
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                $refundDocs = WC_PayPlus_Order_Data::get_meta($order, "payplus_refund_docs");
+                $insetData["payplus_refund_docs"] = strlen($refundDocs) > 0 ? $refundDocs . "," . $res->details->originalDocAddress : $res->details->originalDocAddress;
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
@@ -493,7 +495,8 @@ class PayplusInvoice
             if ($res->status === "success") {
                 $responeType = "_refund" . $documentType;
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-
+                $refundDocs = WC_PayPlus_Order_Data::get_meta($order, "payplus_refund_docs");
+                $insetData["payplus_refund_docs"] = strlen($refundDocs) > 0 ? $refundDocs . "," . $res->details->originalDocAddress : $res->details->originalDocAddress;
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
