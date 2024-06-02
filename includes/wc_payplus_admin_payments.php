@@ -1040,8 +1040,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         if ($this->fire_completed) {
                             $order->payment_complete();
                         }
-
-                        $order->update_status($this->successful_order_status);
+                        if ($this->successful_order_status !== 'default-woo') {
+                            $order->update_status($this->successful_order_status);
+                        }
                     } else {
                         $order->update_status('wc-on-hold');
                     }
