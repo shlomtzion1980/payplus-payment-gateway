@@ -106,27 +106,50 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     {
         $order_id = $post->ID;
         $refundDocs = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refund_docs', true);
+        $refundsJson = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refunds', true);
+        $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
+
         $invDoc = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
+        $invDocType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_type', true);
         $invDocNumber = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
         $chargeText = __('Charge', 'payplus-payment-gateway');
         $refundsText = __('Refunds', 'payplus-payment-gateway');
 
+        switch ($invDocType) {
+            case 'inv_tax':
+                $docType = __('Tax Invoice', 'payplus-payment-gateway');
+                break;
+            case 'inv_tax_receipt':
+                $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
+                break;
+            case 'inv_receipt':
+                $docType = __('Receipt', 'payplus-payment-gateway');
+                break;
+            case 'inv_don_receipt':
+                $docType = __('Donation Reciept', 'payplus-payment-gateway');
+                break;
+            default:
+                $docType = __('Invoice', 'payplus-payment-gateway');
+        }
+
+
         if (strlen($invDoc) > 0) { ?>
             <div>
                 <h4><?php echo $chargeText; ?></h4>
-                <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo __('Invoice', 'payplus-payment-gateway'); ?> (<?php echo $invDocNumber; ?>)</a>
+                <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
             </div>
         <?php
         }
-        if (strlen($refundDocs) > 0) {
+        if (is_array($refundsArray)) {
         ?>
             <div>
                 <h4><?php echo $refundsText; ?></h4>
                 <?php
-                $theDocs = explode(",", $refundDocs);
-                foreach ($theDocs as $doc) {
-                    $doc = explode("|", $doc); ?>
-                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $doc[0]; ?>"><?php echo __('Refund', 'payplus-payment-gateway'); ?> <?php echo $doc[1]; ?></a>
+                foreach ($refundsArray as $docNumber => $doc) {
+                    $docLink = $doc['link'];
+                    $docText = __($doc['type'], 'payplus-payment-gateway');
+                ?>
+                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
                 <?php
                 }
 
@@ -447,9 +470,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     'type' => 'select',
                     'options' => array(
                         '' => __('Type Documents Refund', 'payplus-payment-gateway'),
-                        'inv_refund' => __('Credit Invoice', 'payplus-payment-gateway'),
-                        'inv_refund_receipt' => __('Credit Receipt', 'payplus-payment-gateway'),
-                        'inv_refund_receipt_invoice' => __('Credit Invoice + Credit Receipt', 'payplus-payment-gateway')
+                        'inv_refund' => __('Refund Invoice', 'payplus-payment-gateway'),
+                        'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
+                        'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
                     )
                 );
 
@@ -1726,9 +1749,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payplus_response = (array) $payplus_response;
             $selectInvoiceRefund = array(
                 '' => __('Type Documents Refund', 'payplus-payment-gateway'),
-                'inv_refund' => __('Credit Invoice', 'payplus-payment-gateway'),
-                'inv_refund_receipt' => __('Credit Receipt', 'payplus-payment-gateway'),
-                'inv_refund_receipt_invoice' => __('Credit Invoice + Credit Receipt', 'payplus-payment-gateway')
+                'inv_refund' => __('Refund Invoice', 'payplus-payment-gateway'),
+                'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
+                'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
             );
             ob_start();
             if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table()) {

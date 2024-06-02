@@ -1,7 +1,7 @@
 <?php
 defined('ABSPATH') || exit; // Exit if accessed directly
-define('CREDIT_INVOICE', 'Credit Invoice');
-define('CREDIT_RECEIPT', 'Credit Receipt');
+define('REFUND_INVOICE', 'Refund Invoice');
+define('REFUND_RECEIPT', 'Refund Receipt');
 define("COUNT_BALANCE_NAME", 1);
 
 class PayplusInvoice
@@ -368,8 +368,11 @@ class PayplusInvoice
             if ($res->status === "success") {
                 $responeType = ($typePayment == "charge") ? "" : "_refund_";
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                $refundDocs = WC_PayPlus_Order_Data::get_meta($order, "payplus_refund_docs");
-                $insetData["payplus_refund_docs"] = strlen($refundDocs) > 0 ? $refundDocs . "," . $res->details->originalDocAddress . "|" . $nameRefund . " (" . $res->details->number . ")" : $res->details->originalDocAddress . "|" . $nameRefund . " (" . $res->details->number . ")";
+                $refundsJson = WC_PayPlus_Order_Data::get_meta($order, "payplus_refunds");
+                $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
+                $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
+                $refundsArray[$res->details->number]['type'] = $nameRefund;
+                $insetData["payplus_refunds"] = json_encode($refundsArray);
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
@@ -377,12 +380,6 @@ class PayplusInvoice
                 $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
                 $insetData["payplus_check_invoice_send_refund"] = 1;
                 WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                // if ($typePayment === "charge") {
-                //     $titleNote = ($typePayment == "charge") ? "PayPlus Document" : "PayPlus Document Refund " . $nameRefund;
-                //     $link = ($typePayment == "charge") ? __('Link Document', 'payplus-payment-gateway') : __('Link Document Refund', 'payplus-payment-gateway');
-                //     $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
-                //      <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . $link . '</a>');
-                // }
                 return true;
             } else {
                 $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
@@ -497,8 +494,11 @@ class PayplusInvoice
             if ($res->status === "success") {
                 $responeType = "_refund" . $documentType;
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                $refundDocs = WC_PayPlus_Order_Data::get_meta($order, "payplus_refund_docs");
-                $insetData["payplus_refund_docs"] = strlen($refundDocs) > 0 ? $refundDocs . "," . $res->details->originalDocAddress . "|" . $nameDocment . " (" . $res->details->number . ")" : $res->details->originalDocAddress . "|" . $nameDocment . " (" . $res->details->number . ")";
+                $refundsJson = WC_PayPlus_Order_Data::get_meta($order, "payplus_refunds");
+                $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
+                $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
+                $refundsArray[$res->details->number]['type'] = $nameDocment;
+                $insetData["payplus_refunds"] = json_encode($refundsArray);
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
@@ -533,16 +533,16 @@ class PayplusInvoice
             $payplus_document_type = "inv_refund_receipt";
             $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
-            $this->createRefundInvoice($order_id, $payplus_document_type, $payload, CREDIT_RECEIPT);
+            $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
-            $this->createRefundInvoice($order_id, 'inv_refund', $payload, CREDIT_INVOICE);
+            $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
-            $this->createRefundInvoice($order_id, $payplus_document_type, $payload, CREDIT_RECEIPT);
+            $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
-            $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, CREDIT_INVOICE);
+            $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
     }
 
@@ -558,8 +558,8 @@ class PayplusInvoice
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
             if ($payplus_document_type == "inv_refund_receipt_invoice") {
-                $resultinvoice = $this->payplus_create_dcoment($order_id, 'inv_refund', '', CREDIT_INVOICE);
-                $resultReceipt = $this->payplus_create_dcoment($order_id, "inv_refund_receipt", '', CREDIT_RECEIPT);
+                $resultinvoice = $this->payplus_create_dcoment($order_id, 'inv_refund', '', REFUND_INVOICE);
+                $resultReceipt = $this->payplus_create_dcoment($order_id, "inv_refund_receipt", '', REFUND_RECEIPT);
                 if ($resultinvoice && $resultReceipt) {
                     echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     WC_PayPlus_Order_Data::update_meta($order, array('payplus_refund' => true));
@@ -569,7 +569,7 @@ class PayplusInvoice
                     wp_die();
                 }
             } else {
-                $nameRefund = ($payplus_document_type == "inv_refund") ? CREDIT_INVOICE : CREDIT_RECEIPT;
+                $nameRefund = ($payplus_document_type == "inv_refund") ? REFUND_INVOICE : REFUND_RECEIPT;
                 $resultinvoice = $this->payplus_create_dcoment($order_id, $payplus_document_type, '', $nameRefund);
 
                 if ($resultinvoice) {
@@ -1070,14 +1070,13 @@ class PayplusInvoice
                         if ($res->status === "success") {
                             WC_PayPlus_Order_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $insetData['payplus_invoice_type'] = $_POST['typeDocument'];
                             $insetData['payplus_invoice_docUID'] = $res->details->uuid;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_originalDocAddress'] = $res->details->original_doc;
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->true_copy_doc;
                             $insetData['payplus_invoice_customer_uuid'] = $res->details->customer->uuid;
                             WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                            //         $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
-                            //  <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
                             return;
                         }
                     }
@@ -1205,6 +1204,7 @@ class PayplusInvoice
                         if ($res->status === "success") {
                             WC_PayPlus_Order_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $insetData['payplus_invoice_type'] = $payplus_document_type;
                             $insetData['payplus_invoice_docUID'] = $res->details->docUID;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
