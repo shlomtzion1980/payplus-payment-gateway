@@ -76,16 +76,30 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // updates the order status to processing if the payment was successful and adds order note!
         add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
         add_action('add_meta_boxes', [$this, 'add_custom_order_metabox']);
+        add_action('admin_head', [$this, 'hide_delete_update_buttons_css']);
 
         // remove query args after error shown
         add_filter('removable_query_args', [$this, 'add_removable_arg']);
         add_filter('woocommerce_get_settings_checkout', [$this, 'payplus_get_error_setting'], 10, 2);
         add_filter('admin_body_class', [$this, 'payplus_admin_classes']);
 
+
         if ($this->payPlusInvoice->payplus_get_invoice_enable()) {
             add_action('woocommerce_order_refunded', [$this, 'payplus_after_refund'], 10, 2);
         }
     }
+
+    /**
+     * Hide Delete/Update buttons of custom fields
+     * @return void
+     */
+    public function hide_delete_update_buttons_css()
+    {
+        echo '<style>.post-type-shop_order #the-list .deletemeta { display: none !important; } .post-type-shop_order #the-list .updatemeta { display: none !important; }</style>';
+    }
+
+
+
 
     public function add_custom_order_metabox()
     {
