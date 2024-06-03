@@ -600,6 +600,22 @@ jQuery(function ($) {
 
     return false;
   });
+
+  $(document).ready(function () {
+    $(".toggle-button").on("click", function (e) {
+      e.preventDefault();
+      var hiddenButtons = $(this).siblings(".hidden-buttons");
+      hiddenButtons.toggleClass(
+        "invoicePlusButtonHidden invoicePlusButtonVisible"
+      );
+      if (hiddenButtons.hasClass("invoicePlusButtonVisible")) {
+        $(this).toggleClass("flip");
+      } else {
+        $(this).toggleClass("flip");
+      }
+    });
+  });
+
   $(document).on("click", "#payplus-create-invoice-refund", function (event) {
     event.preventDefault();
     let orderId = $(this).attr("data-id");
@@ -954,6 +970,7 @@ function payplus_edit_element(index) {
     }
   }
 }
+
 function payplus_get_storage(orderID) {
   const payments = JSON.parse(
     localStorage.getItem("payplus_payment_" + orderID)

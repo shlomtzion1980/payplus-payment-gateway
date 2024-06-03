@@ -598,15 +598,7 @@ class PayplusInvoice
             $payplus_invoice_option = $this->payplus_get_invoice_enable();
 
             if ('order_invoice' === $column && $payplus_invoice_option) {
-
-                $payplus_invoice_originalDocAddress = WC_PayPlus_Order_Data::get_meta($order, "payplus_invoice_originalDocAddress", true);
-
-                $payplus_error_invoice = WC_PayPlus_Order_Data::get_meta($order, "payplus_error_invoice", true);
-                if ($payplus_invoice_originalDocAddress) {
-                    echo "<a  class='link-invoice' target='_blank' href='" . $payplus_invoice_originalDocAddress . "'>" . __('Link document', 'payplus-payment-gateway') . "</a>";
-                } elseif ($payplus_error_invoice) {
-                    echo "<p class='link-invoice-error'>" . $payplus_error_invoice . "</p>";
-                }
+                WC_PayPlus_Statics::invoice_plus_metabox($order, ['no-headlines' => true]);
             }
         }
     }
