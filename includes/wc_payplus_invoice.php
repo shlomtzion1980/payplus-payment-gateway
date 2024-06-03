@@ -28,6 +28,8 @@ class PayplusInvoice
     private $payplus_invoice_send_document_sms;
     private $payplus_invoice_send_document_email;
     private $payplus_unique_identifier;
+    private $invoice_notes_no;
+
     /**
      *
      */
@@ -35,6 +37,10 @@ class PayplusInvoice
     {
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
+
+
+        $this->invoice_notes_no = isset($this->payplus_invoice_option['invoice_notes_no']) && $this->payplus_invoice_option['invoice_notes_no'] === 'yes' ? true : false;
+
         $this->payplus_invoice_api_key = (isset($this->payplus_invoice_option['payplus_invoice_api_key'])) ?
             $this->payplus_invoice_option['payplus_invoice_api_key'] : EMPTY_STRING_PAYPLUS;
 
@@ -380,10 +386,13 @@ class PayplusInvoice
                 $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
                 $insetData["payplus_check_invoice_send_refund"] = 1;
                 WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                $titleNote = ($typePayment == "charge") ? "PayPlus Document" : "PayPlus Document Refund " . $nameRefund;
-                $link = ($typePayment == "charge") ? __('Link Document', 'payplus-payment-gateway') : __('Link Document Refund', 'payplus-payment-gateway');
-                $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
+                if (!$this->invoice_notes_no) {
+                    $titleNote = ($typePayment == "charge") ? "PayPlus Document" : "PayPlus Document " . $nameRefund;
+                    $link = ($typePayment == "charge") ? __('Link Document', 'payplus-payment-gateway') : __('Link Document Refund', 'payplus-payment-gateway');
+                    $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
                      <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . $link . '</a>');
+                }
+
                 return true;
             } else {
                 $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
@@ -510,10 +519,12 @@ class PayplusInvoice
                 $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
                 $insetData["payplus_check_invoice_send_refund"] = 1;
                 WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                $titleNote = "PayPlus Document Refund " . $nameDocment;
-                $link = __('Link Document Refund', 'payplus-payment-gateway');
-                $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
+                if (!$this->invoice_notes_no) {
+                    $titleNote = "PayPlus Document " . $nameDocment;
+                    $link = __('Link Document Refund', 'payplus-payment-gateway');
+                    $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
                      <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . $link . '</a>');
+                }
                 return true;
             } else {
                 $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
@@ -1073,8 +1084,10 @@ class PayplusInvoice
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->true_copy_doc;
                             $insetData['payplus_invoice_customer_uuid'] = $res->details->customer->uuid;
                             WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                            $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
-                     <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                            if (!$this->invoice_notes_no) {
+                                $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
+                                <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                            }
                             return;
                         }
                     }
@@ -1210,8 +1223,10 @@ class PayplusInvoice
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
                             $insetData['payplus_invoice_customer_uuid'] = $res->details->customer_uuid;
                             WC_PayPlus_Order_Data::update_meta($order, $insetData);
-                            $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
+                            if (!$this->invoice_notes_no) {
+                                $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
                              <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                            }
                         } else {
                             WC_PayPlus_Order_Data::update_meta($order, array('payplus_error_invoice' => $res->error));
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);

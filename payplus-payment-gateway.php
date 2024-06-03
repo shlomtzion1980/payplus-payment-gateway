@@ -1139,3 +1139,4 @@ register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
 register_activation_hook(__FILE__, 'payplus_create_table_log');
 register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
+register_activation_hook(__FILE__, 'check_payplus_options');

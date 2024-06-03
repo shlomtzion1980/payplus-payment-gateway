@@ -148,6 +148,31 @@ function payplus_create_table_db()
         update_option('payplus_db_version', PAYPLUS_VERSION_DB);
     }
 }
+
+/**
+ * Checks if the new options exist and if not adds them!
+ * @return void
+ */
+function check_payplus_options()
+{
+    $invoiceOptions = get_option('payplus_invoice_option');
+    $newOptionsYes = ['dedicated_invoice_metabox'];
+    $newOptionsNo = ['invoices_notes_no'];
+    foreach ($newOptionsYes as $option) {
+        if (!array_key_exists($option, $invoiceOptions)) {
+            $invoiceOptions[$option] = 'yes';
+        }
+        update_option('payplus_invoice_option', $invoiceOptions);
+    }
+    foreach ($newOptionsNo as $option) {
+        if (!array_key_exists($option, $invoiceOptions)) {
+            $invoiceOptions[$option] = 'no';
+        }
+        update_option('payplus_invoice_option', $invoiceOptions);
+    }
+}
+
+
 /**
  * @return void
  */

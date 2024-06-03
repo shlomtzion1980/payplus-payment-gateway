@@ -108,7 +108,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     {
         $screen = get_current_screen();
         $isInvoicePlus = get_option('payplus_invoice_option')['payplus_invoice_enable'];
-        if ($isInvoicePlus === 'yes') {
+        $useDedicatedMetaBox = get_option('payplus_invoice_option')['dedicated_invoice_metabox'];
+        if ($isInvoicePlus === 'yes' && $useDedicatedMetaBox === 'yes') {
             add_meta_box(
                 'custom_order_metabox', // Unique ID for the metabox
                 __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
@@ -570,7 +571,18 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     'type' => 'checkbox',
                     'custom_attributes' => array('disabled' => 'disabled', 'checked' => 'checked'),
                 );
-
+                $settings[] = array(
+                    'name' => __('Show Invoice+ metabox in order page', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[dedicated_invoice_metabox]',
+                    'type' => 'checkbox',
+                    'default' => 'yes',
+                );
+                $settings[] = array(
+                    'name' => __('Don`t add invoice+ links to order notes', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[invoices_notes_no]',
+                    'type' => 'checkbox',
+                    'default' => 'no',
+                );
                 $settings[] = array('type' => 'sectionend', 'id' => 'payplus-invoice');
                 break;
             case 'payplus-express-checkout':
