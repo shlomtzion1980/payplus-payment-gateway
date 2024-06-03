@@ -91,6 +91,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enable_product;
     public $enable_create_user;
     public $log_status;
+    public $hide_custom_fields_buttons;
+
     /**
      *
      */
@@ -137,6 +139,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->secret_key = $this->get_option('secret_key');
         $this->payment_page_id = $this->get_option('payment_page_id');
         $this->rounding_decimals = ROUNDING_DECIMALS;
+        $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -583,11 +586,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'title' => __('Invoicing & Documents Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
-            /* 'rounding_decimals' =>[
-            'title'   => __('The number of decimal digits', 'payplus-payment-gateway'),
-            'type'    => 'text',
-            'default' => ROUNDING_DECIMALS
-            ],*/
+            'hide_custom_fields_buttons' => [
+                'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
+                'type'    => 'checkbox',
+                'default' => 'yes',
+            ],
             'is_Local_pickup' => [
                 'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
@@ -1101,7 +1104,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table'>$settings</table>
                     </div>
-                    <div class='payplus-credit' style='position: absolute; bottom: 33px;'>$credit</div>
+                    <div class='payplus-credit' style='left:20px;position: absolute; bottom: 33px;'>$credit</div>
                 </div>
 
                 ";

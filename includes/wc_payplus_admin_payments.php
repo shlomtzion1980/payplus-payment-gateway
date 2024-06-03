@@ -95,7 +95,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function hide_delete_update_buttons_css()
     {
-        echo '<style>.post-type-shop_order #the-list .deletemeta { display: none !important; } .post-type-shop_order #the-list .updatemeta { display: none !important; }</style>';
+        $this->isInitiated();
+        if ($this->hide_custom_fields_buttons) {
+            echo '<style>.post-type-shop_order #the-list .deletemeta { display: none !important; } .post-type-shop_order #the-list .updatemeta { display: none !important; }</style>';
+        }
     }
 
 
