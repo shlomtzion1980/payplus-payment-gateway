@@ -54,14 +54,15 @@ class WC_PayPlus_Statics
                     <div>
                         <?php if ($options['no-headlines'] !== true) { ?><h4><?php echo $refundsText; ?></h4><?php } ?>
                         <?php
-                        foreach ($refundsArray as $docNumber => $doc) {
-                            $docLink = $doc['link'];
-                            $docText = __($doc['type'], 'payplus-payment-gateway');
+                        if (is_array($refundsArray)) {
+                            foreach ($refundsArray as $docNumber => $doc) {
+                                $docLink = $doc['link'];
+                                $docText = __($doc['type'], 'payplus-payment-gateway');
                         ?>
-                            <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
+                                <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
                         <?php
+                            }
                         }
-
                         ?>
                     </div>
                 </div>
