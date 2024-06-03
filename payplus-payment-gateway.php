@@ -529,11 +529,20 @@ class WC_PayPlus
     /**
      * @return void
      */
-    public function payplus_get_seetting_plugin()
+    public function payplus_check_settings_plugin()
     {
         if (get_option('woocommerce_payplus-payment-gateway_settings')) {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
             $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type');
+
+            $yesSaves = ['hide_custom_fields_buttons'];
+            foreach ($yesSaves as $option) {
+                if (!array_key_exists($option, $options)) {
+                    $options[$option] = 'yes';
+                }
+                update_option('woocommerce_payplus-payment-gateway_settings', $options);
+            }
+
             $isSave = false;
             if (count($arrNotSave)) {
                 foreach ($arrNotSave as $key => $value) {
@@ -572,7 +581,7 @@ class WC_PayPlus
             }
 
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
-            $this->payplus_get_seetting_plugin();
+            $this->payplus_check_settings_plugin();
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);

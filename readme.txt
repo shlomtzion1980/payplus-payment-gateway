@@ -83,7 +83,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 6.6.8 =
+= 6.6.8 = 
 * Add   - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page instead of in the notes.
 * Fix   - Fire Completed is fired only if not default-woo is selected and not together.
 * Tweak - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.

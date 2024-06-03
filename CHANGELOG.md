@@ -2,7 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [6.6.7] - 2024-05-29
+##  [6.6.8] - 2024-05-03 - (Eggman)
+
+### Changes 
+
+* Add   - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page instead of in the notes.
+* Fix   - Fire Completed is fired only if not default-woo is selected and not together.
+* Tweak - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
+* Tweak - Location of bottom plugin credit was fixed (for rtl and ltr).
+
+##  [6.6.7] - 2024-05-29 - (Knuckles)
 
 ### Changes
 
@@ -13,7 +22,7 @@ All notable changes to this project will be documented in this file.
 * Fix   - "Make Payment" button for J5 payment now allows admin to charge up until original J5 charge. 
 * Fix   - Removed short code usage with payplus error page.
 
-##  [6.6.5] - 2024-05-26
+##  [6.6.5] - 2024-05-26 - (Tails)
 
 ### Changes
 
@@ -22,7 +31,7 @@ All notable changes to this project will be documented in this file.
 * Tweak - "Get PayPlus Data" button now adds all payplus meta fields to the order meta.
 * Fix   - Invoices created with "Get PayPlus Data" button will have correct payment method data.
 
-##  [6.6.4] - 2024-05-26
+##  [6.6.4] - 2024-05-26 - (Sonic)
 
 ### Changes
 
@@ -30,7 +39,7 @@ All notable changes to this project will be documented in this file.
 * Fix - Show correct SKU when invoice with more than one variation product exist.
 * Add - Mark in red - When Invoice+ is enabled shows the user which fields must be set.
 
-## [6.6.3] - 2024-05-19
+## [6.6.3] - 2024-05-19 - (The New Way)
 
 ### Changes
 
