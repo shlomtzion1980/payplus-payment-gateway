@@ -1104,7 +1104,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table'>$settings</table>
                     </div>
-                    <div class='payplus-credit' style='left:20px;position: absolute; bottom: 33px;'>$credit</div>
+                    <div class='payplus-credit' style='left:10%;position: absolute; bottom: 20px;'>$credit</div>
                 </div>
 
                 ";
