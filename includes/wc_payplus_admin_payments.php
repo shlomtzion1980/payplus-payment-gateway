@@ -106,72 +106,74 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function add_custom_order_metabox()
     {
+        $screen = get_current_screen();
         $isInvoicePlus = get_option('payplus_invoice_option')['payplus_invoice_enable'];
         if ($isInvoicePlus === 'yes') {
             add_meta_box(
                 'custom_order_metabox', // Unique ID for the metabox
                 __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
                 [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
-                'woocommerce_page_wc-orders', // Post type where it should be displayed (order page)
+                $screen->id, // Post type where it should be displayed (order page)
                 'side', // Context (position on the screen)
                 'default' // Priority
             );
         }
     }
 
-    public function display_custom_order_metabox($post)
+    public function display_custom_order_metabox()
     {
-        $order_id = $post->ID;
-        $refundsJson = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refunds', true);
-        $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
+        $order_id = isset($_GET['id']) ? $_GET['id'] : $_GET['post'];
+        if (!empty($order_id)) {
+            $refundsJson = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refunds', true);
+            $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
 
-        $invDoc = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
-        $invDocType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_type', true);
-        $invDocNumber = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
-        $chargeText = __('Charge', 'payplus-payment-gateway');
-        $refundsText = __('Refunds', 'payplus-payment-gateway');
+            $invDoc = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
+            $invDocType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_type', true);
+            $invDocNumber = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
+            $chargeText = __('Charge', 'payplus-payment-gateway');
+            $refundsText = __('Refunds', 'payplus-payment-gateway');
 
-        switch ($invDocType) {
-            case 'inv_tax':
-                $docType = __('Tax Invoice', 'payplus-payment-gateway');
-                break;
-            case 'inv_tax_receipt':
-                $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
-                break;
-            case 'inv_receipt':
-                $docType = __('Receipt', 'payplus-payment-gateway');
-                break;
-            case 'inv_don_receipt':
-                $docType = __('Donation Reciept', 'payplus-payment-gateway');
-                break;
-            default:
-                $docType = __('Invoice', 'payplus-payment-gateway');
-        }
+            switch ($invDocType) {
+                case 'inv_tax':
+                    $docType = __('Tax Invoice', 'payplus-payment-gateway');
+                    break;
+                case 'inv_tax_receipt':
+                    $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
+                    break;
+                case 'inv_receipt':
+                    $docType = __('Receipt', 'payplus-payment-gateway');
+                    break;
+                case 'inv_don_receipt':
+                    $docType = __('Donation Reciept', 'payplus-payment-gateway');
+                    break;
+                default:
+                    $docType = __('Invoice', 'payplus-payment-gateway');
+            }
 
 
-        if (strlen($invDoc) > 0) { ?>
-            <div>
-                <h4><?php echo $chargeText; ?></h4>
-                <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
-            </div>
-        <?php
-        }
-        if (is_array($refundsArray)) {
-        ?>
-            <div>
-                <h4><?php echo $refundsText; ?></h4>
-                <?php
-                foreach ($refundsArray as $docNumber => $doc) {
-                    $docLink = $doc['link'];
-                    $docText = __($doc['type'], 'payplus-payment-gateway');
-                ?>
-                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
-                <?php
-                }
-
-                ?>
-            </div>
+            if (strlen($invDoc) > 0) { ?>
+                <div>
+                    <h4><?php echo $chargeText; ?></h4>
+                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
+                </div>
+            <?php
+            }
+            if (is_array($refundsArray)) {
+            ?>
+                <div>
+                    <h4><?php echo $refundsText; ?></h4>
+                    <?php
+                    foreach ($refundsArray as $docNumber => $doc) {
+                        $docLink = $doc['link'];
+                        $docText = __($doc['type'], 'payplus-payment-gateway');
+                    ?>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
+                    <?php
+                    }
+                    ?>
+                </div>
         <?php }
+        }
     }
 
 
