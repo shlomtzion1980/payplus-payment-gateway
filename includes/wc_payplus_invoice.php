@@ -40,7 +40,7 @@ class PayplusInvoice
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->invoiceDisplayOnly = $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
 
-        $this->invoice_notes_no = isset($this->payplus_invoice_option['invoice_notes_no']) && $this->payplus_invoice_option['invoice_notes_no'] === 'yes' ? true : false;
+        $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 
         $this->payplus_invoice_api_key = (isset($this->payplus_invoice_option['payplus_invoice_api_key'])) ?
             $this->payplus_invoice_option['payplus_invoice_api_key'] : EMPTY_STRING_PAYPLUS;
