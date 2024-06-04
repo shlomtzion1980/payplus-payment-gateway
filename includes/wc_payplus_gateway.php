@@ -1899,6 +1899,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $totalCartAmount = $objectProducts->amount;
+        $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
+
         $payload = '{
             "payment_page_uid": "' . $this->settings['payment_page_id'] . '",
             ' . $addChargeLine . '
@@ -1915,6 +1917,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 ' . implode(",", $objectProducts->productsItems) . '
             ],' : '') . '
             ' . ($token ? '"token" : "' . (is_object($token) ? $token->get_token() : $token) . '",' : '') . '
+            ' . $secure3d . '
             "amount": ' . ($this->send_products ? $totallCart : $totalCartAmount) . ',
             "currency_code": "' . $order->get_currency() . '",
             "sendEmailApproval": ' . ($this->sendEmailApproval == 1 ? 'true' : 'false') . ',
