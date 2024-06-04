@@ -47,24 +47,23 @@ class WC_PayPlus_Statics
             if (strlen($invDoc) > 0 || is_array($refundsArray)) { ?>
                 <button class="toggle-button invoicePlusButtonShow"></button>
                 <div class="hidden-buttons invoicePlusButtonHidden">
-                    <div>
-                        <?php if ($options['no-headlines'] !== true) { ?><h4><?php echo $chargeText; ?></h4><?php } ?>
-                        <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
-                    </div>
-                    <div>
-                        <?php if ($options['no-headlines'] !== true) { ?><h4><?php echo $refundsText; ?></h4><?php } ?>
-                        <?php
-                        if (is_array($refundsArray)) {
-                            foreach ($refundsArray as $docNumber => $doc) {
-                                $docLink = $doc['link'];
-                                $docText = __($doc['type'], 'payplus-payment-gateway');
-                        ?>
-                                <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
-                        <?php
-                            }
+
+                    <?php if ($options['no-headlines'] !== true) { ?><h4><?php echo $chargeText; ?></h4><?php } ?>
+                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
+
+                    <?php if ($options['no-headlines'] !== true) { ?><h4><?php echo $refundsText; ?></h4><?php } ?>
+                    <?php
+                    if (is_array($refundsArray)) {
+                        foreach ($refundsArray as $docNumber => $doc) {
+                            $docLink = $doc['link'];
+                            $docText = __($doc['type'], 'payplus-payment-gateway');
+                    ?>
+                            <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
+                    <?php
                         }
-                        ?>
-                    </div>
+                    }
+                    ?>
+
                 </div>
         </div>
     <?php

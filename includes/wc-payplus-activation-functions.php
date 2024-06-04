@@ -145,6 +145,7 @@ function payplus_create_table_db()
         payplus_create_table_log();
         payplus_create_table_payment_session();
         payplus_create_table_process();
+        check_payplus_options();
         update_option('payplus_db_version', PAYPLUS_VERSION_DB);
     }
 }
@@ -157,7 +158,7 @@ function check_payplus_options()
 {
     $invoiceOptions = get_option('payplus_invoice_option');
     $newOptionsYes = ['dedicated_invoice_metabox'];
-    $newOptionsNo = ['invoices_notes_no'];
+    $newOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
     foreach ($newOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'yes';

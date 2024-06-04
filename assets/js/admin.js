@@ -284,7 +284,25 @@ jQuery(function ($) {
           th.css("color", "red");
         }
       });
+
+      $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+        .closest("tr")
+        .hide();
     }
+
+    $("#payplus_invoice_option\\[payplus_invoice_enable\\]").change(
+      function () {
+        if ($(this).is(":checked")) {
+          $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+            .closest("tr")
+            .hide();
+        } else {
+          $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+            .closest("tr")
+            .show();
+        }
+      }
+    );
 
     $(document).on(
       "change",

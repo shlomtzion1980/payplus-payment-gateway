@@ -17,6 +17,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         'payplus-payment-gateway-valuecard',
         'payplus-payment-gateway-finitione',
     );
+    public $isInvoiceEnable;
+    public $useDedicatedMetaBox;
+    public $invoiceDisplayOnly;
 
     /**
      * @return null
@@ -55,6 +58,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
 
         $this->payPlusInvoice = new PayplusInvoice();
+        $this->isInvoiceEnable = get_option('payplus_invoice_option')['payplus_invoice_enable'] === 'yes' ? true : false;
+        $this->useDedicatedMetaBox = get_option('payplus_invoice_option')['dedicated_invoice_metabox'] === 'yes' ? true : false;
+        $this->invoiceDisplayOnly = get_option('payplus_invoice_option')['display_only_invoice_docs'] === 'yes' ? true : false;
+
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);
         // process make payment
@@ -107,9 +114,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function add_custom_order_metabox()
     {
         $screen = get_current_screen();
-        $isInvoicePlus = get_option('payplus_invoice_option')['payplus_invoice_enable'];
-        $useDedicatedMetaBox = get_option('payplus_invoice_option')['dedicated_invoice_metabox'];
-        if ($isInvoicePlus === 'yes' && $useDedicatedMetaBox === 'yes') {
+        if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
             add_meta_box(
                 'custom_order_metabox', // Unique ID for the metabox
                 __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
@@ -439,6 +444,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     'id' => 'payplus_invoice_option[payplus_invoice_enable]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
+                );
+                $settings[] = array(
+                    'name' => __('Display Only - Invoice+ Docs', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[display_only_invoice_docs]',
+                    'desc' => __('Only display existing Invoice+ docs without creating or enabling the Invoice+', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'type' => 'checkbox',
+                    'default' => 'no',
                 );
                 $checked = (isset($payplus_invoice_option['payplus_enable_sandbox']) &&
                     $payplus_invoice_option['payplus_enable_sandbox'] == "on") ? array('checked' => 'checked') : array();
@@ -2187,7 +2200,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 )
             );
             wp_enqueue_script('payplus-admin-payment');
-            wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
+            wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.js', ['jquery'], time(), true);
             wp_localize_script(
                 'wc-payplus-gateway-admin',
                 'payplus_script_payment',

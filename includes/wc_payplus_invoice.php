@@ -29,6 +29,7 @@ class PayplusInvoice
     private $payplus_invoice_send_document_email;
     private $payplus_unique_identifier;
     private $invoice_notes_no;
+    private $invoiceDisplayOnly;
 
     /**
      *
@@ -37,7 +38,7 @@ class PayplusInvoice
     {
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
-
+        $this->invoiceDisplayOnly = $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
 
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoice_notes_no']) && $this->payplus_invoice_option['invoice_notes_no'] === 'yes' ? true : false;
 
@@ -612,7 +613,7 @@ class PayplusInvoice
             $order = is_numeric($order) ? $order : $order->get_id();
             $payplus_invoice_option = $this->payplus_get_invoice_enable();
 
-            if ('order_invoice' === $column && $payplus_invoice_option) {
+            if (('order_invoice' === $column && $payplus_invoice_option) || ('order_invoice' === $column && $this->invoiceDisplayOnly)) {
                 WC_PayPlus_Statics::invoice_plus_metabox($order, ['no-headlines' => true]);
             }
         }
@@ -626,7 +627,7 @@ class PayplusInvoice
     {
         $payplus_invoice_option = $this->payplus_get_invoice_enable();
         $new_columns = array();
-        if ($payplus_invoice_option) {
+        if ($payplus_invoice_option || $this->invoiceDisplayOnly) {
             if (count($columns)) {
                 foreach ($columns as $column_name => $column_info) {
                     $new_columns[$column_name] = $column_info;
