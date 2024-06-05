@@ -1,28 +1,41 @@
 <?php
-
 class WC_PayPlus_Express_Checkout extends WC_PayPlus
 {
+    private $payPlusGateWaySettings;
+    public $isExpressCheckout;
+    public $isAppleEnabled;
+    public $isGoogleEnabled;
+
     /**
      *
      */
     public function __construct()
     {
-        add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
-        add_action('wp_ajax_nopriv_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
-        add_action('wp_ajax_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
-        add_action('wp_ajax_nopriv_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
-        add_action('wp_ajax_payplus-express-checkout-initialized', [$this, 'ajax_payplus_express_checkout_initialized']);
-        add_action('wp_ajax_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
-        add_action('wp_ajax_nopriv_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
-        add_action('wp_ajax_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
-        add_action('wp_ajax_nopriv_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
-        add_action('woocommerce_after_add_to_cart_form', [$this, 'payplus_extra_button_on_product_page'], 30);
-        add_action('woocommerce_before_checkout_form', [$this, 'payplus_extra_button_on_product_page'], 30);
-        add_action('woocommerce_before_cart', [$this, 'payplus_extra_button_on_product_page'], 20);
-        add_action('wp_footer', [$this, 'payplus_set_code_footer']);
-        add_shortcode('payplus-extra-express-checkout', [$this, 'payplus_extra_button_short_code']);
 
+        $this->payPlusGateWaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        // Initialize properties based on settings using boolval for boolean conversion
+        $this->isExpressCheckout = boolval(isset($this->payPlusGateWaySettings['payplus_express_checkout_enable']) && $this->payPlusGateWaySettings['payplus_express_checkout_enable'] === 'yes');
+        $this->isAppleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_apple_pay']) && $this->payPlusGateWaySettings['enable_apple_pay'] === 'yes');
+        $this->isGoogleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_google_pay']) && $this->payPlusGateWaySettings['enable_google_pay'] === 'yes');
+
+        if ($this->isExpressCheckout || $this->isAppleEnabled || $this->isGoogleEnabled) {
+            add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
+            add_action('wp_ajax_nopriv_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
+            add_action('wp_ajax_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
+            add_action('wp_ajax_nopriv_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
+            add_action('wp_ajax_payplus-express-checkout-initialized', [$this, 'ajax_payplus_express_checkout_initialized']);
+            add_action('wp_ajax_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
+            add_action('wp_ajax_nopriv_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
+            add_action('wp_ajax_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
+            add_action('wp_ajax_nopriv_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
+            add_action('woocommerce_after_add_to_cart_form', [$this, 'payplus_extra_button_on_product_page'], 30);
+            add_action('woocommerce_before_checkout_form', [$this, 'payplus_extra_button_on_product_page'], 30);
+            add_action('woocommerce_before_cart', [$this, 'payplus_extra_button_on_product_page'], 20);
+            add_action('wp_footer', [$this, 'payplus_set_code_footer']);
+            add_shortcode('payplus-extra-express-checkout', [$this, 'payplus_extra_button_short_code']);
+        }
     }
+
 
     /**
      * @return void
@@ -31,9 +44,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     {
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         if ($this->payplus_chkeck_one_click_visible()) {
-            ?>
+?>
             <script>
-
                 function isFacebookApp() {
                     var ua = navigator.userAgent || navigator.vendor || window.opera;
                     return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
@@ -44,13 +56,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
                 let removeGooglePay = isFacebookApp();
                 let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
-                let expresscheckouts =  document.querySelectorAll(".express-checkout");
+                let expresscheckouts = document.querySelectorAll(".express-checkout");
                 if (!showExpress) {
                     expresscheckouts.forEach(e => e.remove());
-                }else{
-                    if(expresscheckouts.length>1){
+                } else {
+                    if (expresscheckouts.length > 1) {
                         expresscheckouts.forEach((element, index) => {
-                            if(index) {
+                            if (index) {
                                 expresscheckouts[index].remove();
                             }
                         });
@@ -64,8 +76,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
 
                 }
             </script>
-            <?php
-}
+        <?php
+        }
     }
 
     /**
@@ -90,12 +102,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             echo json_encode(array("payment_response" => $res, "status" => true));
             wp_die();
         } else {
-            $resError = array('results' => array('description' => __('Cannot process the transaction. Contact your merchant. Error during validate merchant', 'payplus-payment-gateway'),
-                'code' => '-1'));
+            $resError = array('results' => array(
+                'description' => __('Cannot process the transaction. Contact your merchant. Error during validate merchant', 'payplus-payment-gateway'),
+                'code' => '-1'
+            ));
             echo json_encode(array("payment_response" => $resError, "status" => false));
             wp_die();
         }
-
     }
 
     /**
@@ -124,11 +137,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $customerId = wc_create_new_customer($customer['email'], '', $password, ['first_name' => $customer['customer_name']]);
             if (is_wp_error($customerId)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_error_user', $customerId->get_error_message());
-
             } else {
                 $order->set_customer_id($customerId);
             }
-
         }
         $order->set_address($address, 'billing');
         $order->set_address($address, 'shipping');
@@ -142,8 +153,10 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     {
         global $post_id;
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $resError = array('results' => array('description' => __('Server failure, please contact the site administrator', 'payplus-payment-gateway'),
-            'code' => '-1'));
+        $resError = array('results' => array(
+            'description' => __('Server failure, please contact the site administrator', 'payplus-payment-gateway'),
+            'code' => '-1'
+        ));
         $cart = WC()->cart;
         $discount = $cart->get_cart_discount_total();
         $taxDiscount = $cart->get_cart_discount_tax_total();
@@ -196,9 +209,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     $item_fee->set_tax_status($tax);
                     $item_fee->set_total($amount);
                     $order->add_item($item_fee);
-
                 }
-
             }
             if ($discount) {
                 $item_fee = new WC_Order_Item_Fee();
@@ -234,7 +245,6 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($response, true), 'error');
-
             } else {
                 $res = json_decode(wp_remote_retrieve_body($response));
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
@@ -261,7 +271,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                     $WC_PayPlus_Gateway->save_token($dataToken, $userID);
                                 }
                             }
-                            $order->add_order_note(sprintf(__('
+                            $order->add_order_note(sprintf(
+                                __(
+                                    '
                             <div style="font-weight:600;">PayPlus Express Checkout Successful</div>
                                 <table style="border-collapse:collapse">
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -272,7 +284,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                     <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
                                 </table>
                             ',
-                                'payplus-payment-gateway'),
+                                    'payplus-payment-gateway'
+                                ),
                                 $inData['transaction']->number,
                                 $inData['data']->card_information->four_digits,
                                 $inData['data']->card_information->expiry_month . $inData->data->expiry_year,
@@ -316,9 +329,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         $url = $WC_PayPlus_Gateway->api_url . 'Transactions/ExpressCheckoutInitialized';
 
-        $res = array('results' => array('description' => __('You do not have permission to connect Google Pay and Apple Pay. Contact to manage a website'
-            , 'payplus-payment-gateway'),
-            'code' => '-1'));
+        $res = array('results' => array(
+            'description' => __(
+                'You do not have permission to connect Google Pay and Apple Pay. Contact to manage a website',
+                'payplus-payment-gateway'
+            ),
+            'code' => '-1'
+        ));
         $resObj = null;
         if (!empty($_POST)) {
 
@@ -330,9 +347,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             if ($method == 'apple-pay') {
                 $result = $this->payplus_add_file_ApplePay();
                 if (!$result) {
-                    $res = array('results' => array('description' => __('Copy file Apple error. Please contact PayPlus to manage your express checkout onboarding.'
-                        , 'payplus-payment-gateway'),
-                        'code' => '-1'));
+                    $res = array('results' => array(
+                        'description' => __(
+                            'Copy file Apple error. Please contact PayPlus to manage your express checkout onboarding.',
+                            'payplus-payment-gateway'
+                        ),
+                        'code' => '-1'
+                    ));
                     echo json_encode(array("response_initialized" => $res, "status" => false));
                     wp_die();
                 }
@@ -433,7 +454,6 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     $tax = round($tax, $WC_PayPlus_Gateway->rounding_decimals);
                     $priceProductWithTax = round($productData['display_price'] + $tax, ROUNDING_DECIMALS);
                     $priceProductWithoutTax = round($productData['display_price'], ROUNDING_DECIMALS);
-
                 } else {
                     $product = new WC_Product($productId);
                     $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
@@ -441,12 +461,12 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     WC()->cart->add_to_cart($product->get_id(), $quantity);
                 }
 
-                $products[] = array('title' => $product->get_title(),
+                $products[] = array(
+                    'title' => $product->get_title(),
                     'priceProductWithTax' => $priceProductWithTax,
                     'priceProductWithoutTax' => $priceProductWithoutTax,
                     'quantity' => $quantity,
                 );
-
             } else {
                 $cart = WC()->cart->get_cart();
                 if (count($cart)) {
@@ -465,7 +485,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                             $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
                             $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
                         }
-                        $products[] = array('title' => $product->get_title(),
+                        $products[] = array(
+                            'title' => $product->get_title(),
                             'priceProductWithTax' => $priceProductWithTax,
                             'priceProductWithoutTax' => $priceProductWithoutTax,
                             'quantity' => $cart_item['quantity'],
@@ -532,11 +553,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         if (is_object($value)) {
                             foreach ($value as $key2 => $value2) {
                                 $insertMeta['payplus_' . $key2] = wc_clean($value2);
-
                             }
                         } else {
                             $insertMeta['payplus_' . $key1] = wc_clean($value);
-
                         }
                     }
                 } else {
@@ -578,11 +597,17 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     public function payplus_check_product_isnot_one_click()
     {
         global $product;
+
+        // Check if $product is a valid product object
+        if (!is_object($product) || !($product instanceof WC_Product)) {
+            return false;
+        }
+
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         return $product->get_type() !== "external"
-        && $product->get_type() !== "grouped"
-        && $product->get_type() !== "subscription"
-        && $WC_PayPlus_Gateway->enable_product;
+            && $product->get_type() !== "grouped"
+            && $product->get_type() !== "subscription"
+            && $WC_PayPlus_Gateway->enable_product;
     }
 
     /**
@@ -639,7 +664,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
             }
             echo '<div id="express-checkout" class="express-checkout ' . $disabled . '">';
-            ?>
+        ?>
             <input type="hidden" value="<?php echo $priceProductWithTax ?>" id="payplus_pricewt_product">
             <input type="hidden" value="<?php echo $priceProductWithoutTax ?>" id="payplus_pricewithouttax_product">
             <input type="hidden" value="<?php echo $productName ?>" id="payplus_product_name">
@@ -647,21 +672,20 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             <input type="hidden" value="<?php echo get_woocommerce_currency() ?>" id="payplus_currency_code">
             <input type="hidden" value="<?php echo $shippingWoo ?>" id="payplus_shipping_woo">
             <?php
-if ($shippingWoo === "false") {
+            if ($shippingWoo === "false") {
                 $globalShippingPriceTax = $globalShipping;
                 if ($globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
 
                     $rate = (floatval($globalShippingTaxRate)) ? round(floatval($globalShippingTaxRate) / 100, ROUNDING_DECIMALS) : 0;
                     $globalShippingPriceTax = $globalShipping * (1 + $rate);
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
-
                 }
-                ?>
+            ?>
                 <input type="hidden" value="<?php echo $globalShipping ?>" id="payplus_price_shipping">
                 <input type="hidden" value="<?php echo $globalShippingPriceTax ?>" id="payplus_pricewt_shipping">
                 <input type="hidden" value="<?php echo $globalShipping ?>" id="payplus_pricewithouttax_shipping">
-                <?php
-}
+<?php
+            }
             echo '<div class="express-flex" >';
             echo "<div class='line-express-left'>
              <span></span>
@@ -842,6 +866,5 @@ if ($shippingWoo === "false") {
         }
         return json_encode($all_shipping_costs);
     }
-
 }
 new WC_PayPlus_Express_Checkout();

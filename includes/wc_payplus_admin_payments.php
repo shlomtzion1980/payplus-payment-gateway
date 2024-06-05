@@ -608,6 +608,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 );
 
                 $settings[] = [
+                    'name' => __('Enable/Disable', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[payplus_express_checkout_enable]',
+                    'type' => 'checkbox',
+                    'default' => 'no'
+                ];
+
+                $settings[] = [
                     'name' => __('Google Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_google_pay]',
                     'type' => 'checkbox',

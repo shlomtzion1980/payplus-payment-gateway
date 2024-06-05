@@ -19,14 +19,14 @@ define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
 define('PAYPLUS_VERSION', '6.6.8');
-define('PAYPLUS_VERSION_DB', 'payplus_2_1');
+define('PAYPLUS_VERSION_DB', 'payplus_2_1_1');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 define('PAYPLUS_TABLE_SESSION', 'payplus_payment_session');
 class WC_PayPlus
 {
     protected static $instance = null;
     public $notices = [];
-    private $payplus_payment_gateway_settings = null;
+    public $payplus_payment_gateway_settings;
     public $invoice_api = null;
 
     /**
@@ -42,6 +42,8 @@ class WC_PayPlus
     private function __construct()
     {
         //ACTION
+        $this->payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('plugins_loaded', [$this, 'init']);
@@ -533,7 +535,7 @@ class WC_PayPlus
     {
         if (get_option('woocommerce_payplus-payment-gateway_settings')) {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
-            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type');
+            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type', 'payplus_express_checkout_enable');
 
             $yesSaves = ['hide_custom_fields_buttons'];
             foreach ($yesSaves as $option) {
@@ -582,7 +584,7 @@ class WC_PayPlus
             }
 
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
-            $this->payplus_check_settings_plugin();
+            // $this->payplus_check_settings_plugin();
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
@@ -608,8 +610,7 @@ class WC_PayPlus
 
             if (
                 $this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings, 'add_product_field_transaction_type')
-                && $this->payplus_payment_gateway_settings->add_product_field_transaction_type == "yes"
+                && $this->payplus_payment_gateway_settings['add_product_field_transaction_type'] == "yes"
             ) {
                 add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_transaction_type']);
                 add_action('manage_product_posts_columns', [$this, 'payplus_add_order_column_order_product'], 100);
@@ -618,8 +619,7 @@ class WC_PayPlus
             }
             if (
                 $this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings, 'balance_name')
-                && $this->payplus_payment_gateway_settings->balance_name == "yes"
+                && $this->payplus_payment_gateway_settings['balance_name'] == "yes"
             ) {
                 add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_balance_name']);
             }
@@ -659,7 +659,7 @@ class WC_PayPlus
             (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
         if (is_checkout() || is_product() || is_cart() || $isElementor) {
             if (
-                $this->payplus_payment_gateway_settings->enable_design_checkout === "yes" || $isEnableOneClick
+                $this->payplus_payment_gateway_settings['enable_design_checkout'] === "yes" || $isEnableOneClick
 
             ) {
 
