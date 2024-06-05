@@ -89,7 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Display PayPlus Invoice+ docs without activation of Invoice+.
 * Add    - Display PayPlus Invoice+ refunds and invoices in all orders page via show/hide list arrow button. 
 * Fix    - Fire Completed is fired only if not default-woo is selected and not together.
-* Tweak  - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
+* Add    - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
 * Tweak  - Location of plugin credit (bottom of the page in plugin settings).
 * Tweak  - Hide PayPlus loader if "Make Payment" fails because amount is larger than allowed.
 * Change - Disable express checkout functions run if not enabled.
