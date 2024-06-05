@@ -1215,7 +1215,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($this->failure_order_status !== 'default-woo') {
                         $order->update_status($this->failure_order_status);
                     }
-                    wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response, true)), 'error');
+                    wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response->data->status_description, true)), 'error');
                     return;
                 }
             }
