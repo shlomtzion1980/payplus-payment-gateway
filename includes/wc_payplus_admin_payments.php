@@ -128,7 +128,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function display_custom_order_metabox()
     {
-        $order_id = isset($_GET['id']) ? $_GET['id'] : $_GET['post'];
+        $order_id = $_GET['id'] ?? $_GET['post'] ?? null;
         if (!empty($order_id)) {
             $refundsJson = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refunds', true);
             $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
