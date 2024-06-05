@@ -2,7 +2,7 @@
 
 /**
  * Plugin Name: PayPlus Payment Gateway
- * Description: WooCommerce integration for PayPlus Payment Gateway. Accept credit cards and more alternative methods directly to your WordPress e-commerce websites, More options to Refund, Charge, Capture, Subscriptions, Tokens and much more!
+ * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
  * Version: 6.6.8
  * Tested up to: 6.5.3

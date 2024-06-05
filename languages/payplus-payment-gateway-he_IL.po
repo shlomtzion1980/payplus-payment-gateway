@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-06-04 12:55+0300\n"
-"PO-Revision-Date: 2024-06-04 13:00+0300\n"
+"POT-Creation-Date: 2024-06-05 10:06+0300\n"
+"PO-Revision-Date: 2024-06-05 10:06+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -247,7 +247,7 @@ msgid "Don`t add invoice+ links to order notes"
 msgstr "לא להוסיף קישורים למסמכי חשבונית+ בהערות הזמנה"
 
 #: includes/wc_payplus_admin_payments.php:604
-#: includes/wc_payplus_express_checkout.php:669
+#: includes/wc_payplus_express_checkout.php:691
 #: includes/wc_payplus_gateway.php:1002 payplus-payment-gateway.php:1052
 msgid "Express Checkout"
 msgstr ""
@@ -753,17 +753,17 @@ msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בד
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
-#: includes/wc_payplus_express_checkout.php:93
+#: includes/wc_payplus_express_checkout.php:104
 msgid ""
 "Cannot process the transaction. Contact your merchant. Error during validate "
 "merchant"
 msgstr ""
 
-#: includes/wc_payplus_express_checkout.php:145
+#: includes/wc_payplus_express_checkout.php:155
 msgid "Server failure, please contact the site administrator"
 msgstr ""
 
-#: includes/wc_payplus_express_checkout.php:264
+#: includes/wc_payplus_express_checkout.php:274
 #, php-format
 msgid ""
 "\n"
@@ -791,13 +791,13 @@ msgid ""
 "                            "
 msgstr ""
 
-#: includes/wc_payplus_express_checkout.php:319
+#: includes/wc_payplus_express_checkout.php:332
 msgid ""
 "You do not have permission to connect Google Pay and Apple Pay. Contact to "
 "manage a website"
 msgstr ""
 
-#: includes/wc_payplus_express_checkout.php:333
+#: includes/wc_payplus_express_checkout.php:350
 msgid ""
 "Copy file Apple error. Please contact PayPlus to manage your express "
 "checkout onboarding."
@@ -1554,11 +1554,16 @@ msgid "https://www.payplus.co.il/wordpress"
 msgstr ""
 
 #. Description of the plugin/theme
+#, fuzzy
+#| msgid ""
+#| "Accept credit/debit card payments or other methods such as bit, Apple "
+#| "Pay, Google Pay in one page. Create digitally signed invoices & much more!"
 msgid ""
-"WooCommerce integration for PayPlus Payment Gateway. Accept credit cards and "
-"more alternative methods directly to your WordPress e-commerce websites, "
-"More options to Refund, Charge, Capture, Subscriptions, Tokens and much more!"
+"Accept credit/debit card payments or other methods such as bit, Apple Pay, "
+"Google Pay in one page. Create digitally signed invoices & much more."
 msgstr ""
+"קבלת תשלומי אשראי/כרטיסי חיוב ועוד שיטות תשלום כגון גוגל פיי, אפל פיי בעמוד "
+"תשלום אחד. יצירת מסמכים חתומים דיגיטילית - חשבונית מס/קבלות/החזרים ועוד!"
 
 #. Author of the plugin/theme
 #, fuzzy
@@ -1569,6 +1574,13 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid ""
+#~ "WooCommerce integration for PayPlus Payment Gateway. Accept credit cards "
+#~ "and more alternative methods directly to your WordPress e-commerce "
+#~ "websites, More options to Refund, Charge, Capture, Subscriptions, Tokens "
+#~ "and much more!"
+#~ msgstr "תוסף ניהול תשלומים"
 
 #, fuzzy
 #~| msgid "Tax Invoice Receipt "
