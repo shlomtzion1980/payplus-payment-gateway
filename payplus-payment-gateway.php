@@ -26,7 +26,7 @@ class WC_PayPlus
 {
     protected static $instance = null;
     public $notices = [];
-    private $payplus_payment_gateway_settings = null;
+    private $payplus_payment_gateway_settings;
     public $invoice_api = null;
 
     /**
@@ -42,6 +42,7 @@ class WC_PayPlus
     private function __construct()
     {
         //ACTION
+        $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('plugins_loaded', [$this, 'init']);
@@ -535,40 +536,6 @@ class WC_PayPlus
     /**
      * @return void
      */
-    public function payplus_check_settings_plugin()
-    {
-        if (get_option('woocommerce_payplus-payment-gateway_settings')) {
-            $options = get_option('woocommerce_payplus-payment-gateway_settings');
-            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type');
-
-            $yesSaves = ['hide_custom_fields_buttons'];
-            foreach ($yesSaves as $option) {
-                if (!array_key_exists($option, $options)) {
-                    $options[$option] = 'yes';
-                }
-            }
-            update_option('woocommerce_payplus-payment-gateway_settings', $options);
-
-            $isSave = false;
-            if (count($arrNotSave)) {
-                foreach ($arrNotSave as $key => $value) {
-                    if (!array_key_exists($value, $options)) {
-                        $options[$value] = "no";
-                        $isSave = true;
-                    }
-                }
-                if ($isSave) {
-                    update_option('woocommerce_payplus-payment-gateway_settings', $options);
-                }
-            }
-            $payplus_payment_gateway_settings = (object) $options;
-            $this->payplus_payment_gateway_settings = $payplus_payment_gateway_settings;
-        }
-    }
-
-    /**
-     * @return void
-     */
     public function init()
     {
         load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages');
@@ -588,7 +555,6 @@ class WC_PayPlus
             }
 
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
-            $this->payplus_check_settings_plugin();
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);

@@ -150,6 +150,7 @@ function payplus_create_table_db()
     }
 }
 
+
 /**
  * Checks if the new options exist and if not adds them!
  * @return void
@@ -158,28 +159,38 @@ function check_payplus_options()
 {
     $invoiceOptions = get_option('payplus_invoice_option', []);
     $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
-    $newPayPlusOptionsYes = ['use_old_fields'];
+    $newPayPlusOptionsYes = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
+    $newPayPlusOptionsNo = ['enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
     $newInvoicOptionsYes = ['dedicated_invoice_metabox'];
     $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
 
     foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'yes';
+            $saveInvoiceYes = true;
         }
     }
     foreach ($newInvoiceOptionsNo as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'no';
+            $saveInvoiceNo = true;
         }
     }
-    update_option('payplus_invoice_option', $invoiceOptions);
+    $saveInvoiceYes || $saveInvoiceNo ? update_option('payplus_invoice_option', $invoiceOptions) : null;
 
     foreach ($newPayPlusOptionsYes as $option) {
         if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
             $payPlusOptions[$option] = 'yes';
+            $savePayPlusYes = true;
         }
     }
-    update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions);
+    foreach ($newInvoiceOptionsNo as $option) {
+        if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
+            $payPlusOptions[$option] = 'yes';
+            $savePayPlusNo = true;
+        }
+    }
+    $savePayPlusYes || $savePayPlusNo ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
 }
 
 
