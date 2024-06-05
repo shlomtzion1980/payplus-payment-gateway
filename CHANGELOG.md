@@ -6,10 +6,19 @@ All notable changes to this project will be documented in this file.
 
 ### Changes 
 
-* Add   - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page instead of in the notes.
-* Fix   - Fire Completed is fired only if not default-woo is selected and not together.
-* Tweak - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
-* Tweak - Location of bottom plugin credit was fixed (for rtl and ltr).
+* Add    - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page.
+* Add    - Option to hide the Invoice+ links in the order notes in Invoice+ settings.
+* Add    - Display PayPlus Invoice+ docs without activation of Invoice+.
+* Add    - Display PayPlus Invoice+ refunds and invoices in all orders page via show/hide list arrow button. 
+* Fix    - Fire Completed is fired only if not default-woo is selected and not together.
+* Tweak  - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
+* Tweak  - Location of plugin credit (bottom of the page in plugin settings).
+* Tweak  - Hide PayPlus loader if "Make Payment" fails because amount is larger than allowed.
+* Change - Disable express checkout functions run if not enabled.
+* Fix    - Check if product variable is a valid product object in express checkout function.
+* Add    - Prepare plugin support for Secure3d.
+* Tweak  - Updated plugin database version.
+
 
 ##  [6.6.7] - 2024-05-29 - (Knuckles)
 
