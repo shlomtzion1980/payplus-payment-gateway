@@ -2187,7 +2187,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'payplus_script_admin',
                 array(
                     'ajax_url' => admin_url('admin-ajax.php'),
-                    'error_payment' => __('Cannot Charge more than original order sum', 'payplus-payment-gateway'),
+                    'error_payment' => __('Cannot charge more than original order sum', 'payplus-payment-gateway'),
                     "payplus_title_tab" => array(
                         "tab-payplus-error-page" => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
                         "tab-invoice-payplus" => __('Invoice+ (PayPlus)', 'payplus-payment-gateway')
