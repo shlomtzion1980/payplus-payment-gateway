@@ -234,6 +234,12 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
             }
+        } elseif (isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' && wp_is_mobile()) {
+            $order_id = $_GET['success_order_id'];
+            $order = wc_get_order($order_id);
+            $linkRedirect = $this->payplus_gateway->get_return_url($order);
+            WC()->session->__unset('save_payment_method');
+            wp_redirect($linkRedirect);
         }
     }
 

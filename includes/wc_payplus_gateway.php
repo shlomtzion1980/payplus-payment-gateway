@@ -1817,7 +1817,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $customer = (count($customer)) ? '"customer":' . json_encode($customer) . "," : "";
-        $redriectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard : $this->response_url;
+        $redriectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard : $this->response_url . "&success_order_id=$order_id";
         $setInvoice = '';
         $payingVat = '';
         $invoiceLanguage = '';
@@ -1907,10 +1907,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             "expiry_datetime": "30",
             "hide_other_charge_methods": ' . $hideOtherChargeMethods . ',
             "language_code": "' . trim(strtolower($langCode[0])) . '",
-            "refURL_success": "' . $redriectSuccess . '",
+            "refURL_success": "' . $redriectSuccess . '&charge_method=' . $this->default_charge_method . '",
             "refURL_failure": "' . $this->response_error_url . '",
             "refURL_callback": "' . $callback . '",
-           "charge_default":"' . $this->default_charge_method . '",
+            "charge_default":"' . $this->default_charge_method . '",
             ' . $payingVat . $customer
             . (!$this->send_products ? '
             "items": [
