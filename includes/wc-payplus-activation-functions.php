@@ -156,20 +156,28 @@ function payplus_create_table_db()
  */
 function check_payplus_options()
 {
-    $invoiceOptions = get_option('payplus_invoice_option');
-    $newOptionsYes = ['dedicated_invoice_metabox'];
-    $newOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
-    foreach ($newOptionsYes as $option) {
+    $invoiceOptions = get_option('payplus_invoice_option', []);
+    $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
+    $newPayPlusOptionsYes = ['use_old_fields'];
+    $newInvoicOptionsYes = ['dedicated_invoice_metabox'];
+    $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
+    foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'yes';
         }
         update_option('payplus_invoice_option', $invoiceOptions);
     }
-    foreach ($newOptionsNo as $option) {
+    foreach ($newInvoiceOptionsNo as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'no';
         }
         update_option('payplus_invoice_option', $invoiceOptions);
+    }
+    foreach ($newPayPlusOptionsYes as $option) {
+        if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
+            $payPlusOptions[$option] = 'yes';
+        }
+        update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions);
     }
 }
 
