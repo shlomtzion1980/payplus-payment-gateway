@@ -163,34 +163,36 @@ function check_payplus_options()
     $newPayPlusOptionsNo = ['enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
     $newInvoicOptionsYes = ['dedicated_invoice_metabox'];
     $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
+    $saveInvoice = false;
+    $savePayPlus = false;
 
     foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'yes';
-            $saveInvoiceYes = true;
+            $saveInvoice = true;
         }
     }
     foreach ($newInvoiceOptionsNo as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'no';
-            $saveInvoiceNo = true;
+            $saveInvoice = true;
         }
     }
-    $saveInvoiceYes || $saveInvoiceNo ? update_option('payplus_invoice_option', $invoiceOptions) : null;
+    $saveInvoice ? update_option('payplus_invoice_option', $invoiceOptions) : null;
 
     foreach ($newPayPlusOptionsYes as $option) {
         if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
             $payPlusOptions[$option] = 'yes';
-            $savePayPlusYes = true;
+            $savePayPlus = true;
         }
     }
     foreach ($newInvoiceOptionsNo as $option) {
         if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
             $payPlusOptions[$option] = 'yes';
-            $savePayPlusNo = true;
+            $savePayPlus = true;
         }
     }
-    $savePayPlusYes || $savePayPlusNo ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
+    $savePayPlus ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
 }
 
 
