@@ -94,7 +94,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Tweak  - Hide PayPlus loader if "Make Payment" fails because amount is larger than allowed.
 * Change - Disable express checkout functions run if not enabled.
 * Fix    - Check if product variable is a valid product object in express checkout function.
-* Add    - Prepare plugin support for Secure3d.
+* Add    - Prepare plugin support for Secure3d - with saved cards only.
 * Tweak  - Updated plugin database version.
 
 
