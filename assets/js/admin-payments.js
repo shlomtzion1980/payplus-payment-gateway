@@ -205,6 +205,7 @@ jQuery(document).ready(function ($) {
       },
     });
   });
+
   $("#payplus-token-payment").click(function (event) {
     event.preventDefault();
     let payplusChargeAmount = $(this)
@@ -226,6 +227,24 @@ jQuery(document).ready(function ($) {
         payplus_charge_amount: payplusChargeAmount,
         payplus_order_id: payplusOrderId,
         payplus_token_payment: true,
+      },
+      beforeSend: function () {
+        const targetNode = document.querySelector(".payplus_error");
+        const observer = new MutationObserver((mutationsList, observer) => {
+          for (let mutation of mutationsList) {
+            if (
+              mutation.type === "attributes" &&
+              mutation.attributeName === "style"
+            ) {
+              if (targetNode.style.display !== "none") {
+              } else {
+                $(".payplus_loader").fadeOut();
+              }
+            }
+          }
+        });
+        const config = { attributes: true, attributeFilter: ["style"] };
+        observer.observe(targetNode, config);
       },
       success: function (response) {
         $(this).closest(".delayed-payment").find(".payplus_loader").fadeOut();
@@ -253,7 +272,6 @@ jQuery(document).ready(function ($) {
         location.reload();
       },
     });
-    $(this).closest(".delayed-payment").find(".payplus_loader").fadeOut();
   });
 });
 function setFieldReadOnly() {
