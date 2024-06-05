@@ -13,12 +13,10 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     {
 
         $this->payPlusGateWaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
-        // Initialize properties based on settings using boolval for boolean conversion
-        $this->isExpressCheckout = boolval(isset($this->payPlusGateWaySettings['payplus_express_checkout_enable']) && $this->payPlusGateWaySettings['payplus_express_checkout_enable'] === 'yes');
         $this->isAppleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_apple_pay']) && $this->payPlusGateWaySettings['enable_apple_pay'] === 'yes');
         $this->isGoogleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_google_pay']) && $this->payPlusGateWaySettings['enable_google_pay'] === 'yes');
 
-        if ($this->isExpressCheckout || $this->isAppleEnabled || $this->isGoogleEnabled) {
+        if ($this->isAppleEnabled || $this->isGoogleEnabled) {
             add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
             add_action('wp_ajax_nopriv_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
             add_action('wp_ajax_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);

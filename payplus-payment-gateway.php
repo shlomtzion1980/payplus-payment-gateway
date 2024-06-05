@@ -533,7 +533,7 @@ class WC_PayPlus
     {
         if (get_option('woocommerce_payplus-payment-gateway_settings')) {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
-            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type', 'payplus_express_checkout_enable');
+            $arrNotSave = array('enable_design_checkout', 'balance_name', 'add_product_field_transaction_type');
 
             $yesSaves = ['hide_custom_fields_buttons'];
             foreach ($yesSaves as $option) {
