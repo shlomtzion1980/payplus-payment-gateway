@@ -152,7 +152,9 @@ function payplus_create_table_db()
 
 
 /**
- * Checks if the new options exist and if not adds them!
+ * Checks if the new options exist and if not adds them // this is version dependant and should be 
+ * changed and edited after few version updates. before it becomes redundant!
+ * 
  * @return void
  */
 function check_payplus_options()
