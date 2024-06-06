@@ -186,7 +186,7 @@ function check_payplus_options()
             $savePayPlus = true;
         }
     }
-    foreach ($newInvoiceOptionsNo as $option) {
+    foreach ($newPayPlusOptionsNo as $option) {
         if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
             $payPlusOptions[$option] = 'yes';
             $savePayPlus = true;
