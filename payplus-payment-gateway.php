@@ -238,9 +238,11 @@ class WC_PayPlus
         } elseif (isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' && wp_is_mobile()) {
             $order_id = $_GET['success_order_id'];
             $order = wc_get_order($order_id);
-            $linkRedirect = $this->payplus_gateway->get_return_url($order);
-            WC()->session->__unset('save_payment_method');
-            wp_redirect($linkRedirect);
+            if ($order) {
+                $linkRedirect = $this->payplus_gateway->get_return_url($order);
+                WC()->session->__unset('save_payment_method');
+                wp_redirect($linkRedirect);
+            }
         }
     }
 
@@ -254,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -678,8 +680,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
