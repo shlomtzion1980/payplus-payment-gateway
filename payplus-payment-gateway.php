@@ -256,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -680,8 +680,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
@@ -1113,4 +1113,4 @@ register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
 register_activation_hook(__FILE__, 'payplus_create_table_log');
 register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
-register_activation_hook(__FILE__, 'check_payplus_options');
+register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
