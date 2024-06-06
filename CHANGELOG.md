@@ -17,7 +17,9 @@ All notable changes to this project will be documented in this file.
 * Change - Disable express checkout functions run if not enabled.
 * Fix    - Check if product variable is a valid product object in express checkout function.
 * Add    - Prepare plugin support for Secure3d - with saved cards only.
-* Tweak  - Updated plugin database version.
+* Fix    - Bit payments redirection after successful order purchase from uPay on mobile phones.
+* Tweak  - Database version update - refactored options check and settings to run only when needed.
+
 
 
 ##  [6.6.7] - 2024-05-29 - (Knuckles)
