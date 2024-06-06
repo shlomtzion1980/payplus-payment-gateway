@@ -114,15 +114,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function add_custom_order_metabox()
     {
         $screen = get_current_screen();
-        if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
-            add_meta_box(
-                'custom_order_metabox', // Unique ID for the metabox
-                __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
-                [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
-                $screen->id, // Post type where it should be displayed (order page)
-                'side', // Context (position on the screen)
-                'default' // Priority
-            );
+        if ($screen->post_type === 'shop_order') {
+            if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
+                add_meta_box(
+                    'custom_order_metabox', // Unique ID for the metabox
+                    __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
+                    [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
+                    $screen->id, // Post type where it should be displayed (order page)
+                    'side', // Context (position on the screen)
+                    'default' // Priority
+                );
+            }
         }
     }
 
