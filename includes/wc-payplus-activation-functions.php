@@ -161,8 +161,8 @@ function check_payplus_options()
 {
     $invoiceOptions = get_option('payplus_invoice_option', []);
     $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
-    $newPayPlusOptionsYes = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
-    $newPayPlusOptionsNo = ['enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
+    $newPayPlusOptionsYes = ['hide_custom_fields_buttons'];
+    $newPayPlusOptionsNo = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
     $newInvoicOptionsYes = ['dedicated_invoice_metabox'];
     $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
     $saveInvoice = false;
@@ -183,14 +183,14 @@ function check_payplus_options()
     $saveInvoice ? update_option('payplus_invoice_option', $invoiceOptions) : null;
 
     foreach ($newPayPlusOptionsYes as $option) {
-        if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
+        if (!array_key_exists($option, $payPlusOptions)) {
             $payPlusOptions[$option] = 'yes';
             $savePayPlus = true;
         }
     }
     foreach ($newPayPlusOptionsNo as $option) {
-        if (!array_key_exists($option, $payPlusOptions) || PAYPLUS_VERSION_DB === 'payplus_2_1') {
-            $payPlusOptions[$option] = 'yes';
+        if (!array_key_exists($option, $payPlusOptions)) {
+            $payPlusOptions[$option] = 'no';
             $savePayPlus = true;
         }
     }
