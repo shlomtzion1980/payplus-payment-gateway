@@ -238,6 +238,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_api_payplus_add_payment', [$this, 'add_payment_ipn_response']);
         add_action('admin_init', [$this, 'payplus_hide_editor']);
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
+        add_action('woocommerce_api_update_payplus_payment_method', [$this, 'updatePaymentMethodHook']);
 
         /****** ACTION END ******/
 
@@ -273,6 +274,55 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             update_option('payplus_invoice_option', $payplus_invoice_option);
         }
     }
+
+
+    public function updatePaymentMethodHook()
+    {
+        $methodsOptions = [
+            'bit' => 'woocommerce_payplus-payment-gateway-bit_settings',
+            'googlepay' => 'woocommerce_payplus-payment-gateway-googlepay_settings',
+            'applepay' => 'woocommerce_payplus-payment-gateway-applepay_settings',
+            'multipass' => 'woocommerce_payplus-payment-gateway-multipass_settings',
+            'paypal' => 'woocommerce_payplus-payment-gateway-paypal_settings',
+            'tavzahav' => 'woocommerce_payplus-payment-gateway-tavzahav_settings',
+            'valuecard' => 'woocommerce_payplus-payment-gateway-valuecard_settings',
+            'finitone' => 'woocommerce_payplus-payment-gateway-finitione_settings'
+        ];
+        // $json = '{"secret_key":"a489da6d-72b2-463f-afe5-c8c5f7993d0c","method_type":"bit","action":"enable"}';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Get the raw POST body
+            $postBody = file_get_contents('php://input');
+
+            // Parse the JSON data
+            $postData = json_decode($postBody, true);
+
+            $methodType = $postData['method_type'];
+            $methodOptions = get_option($methodsOptions[$methodType]);
+
+            $action = $postData['action'] === 'enable' ? 'yes' : 'no';
+
+            if ($methodOptions['secret_key'] === $postData['secret_key']) {
+                $methodOptions['enabled'] = $action;
+                update_option($methodsOptions[$methodType], $methodOptions);
+                $result = 'success';
+                $message = "Webhook received for $methodType successfully with action:{$postData['action']}";
+            } else {
+                $result = 'failed';
+                $message = "Webhook received for $methodType with action:{$postData['action']} but failed secret key comparison:";
+            }
+
+            $response = array(
+                'status' => $result,
+                'message' => $message
+            );
+            // Send the success response
+            wp_send_json($response);
+            // Log the POST data or process it as needed
+            error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true));
+        }
+    }
+
 
     /**
      * @param $clearing_id
