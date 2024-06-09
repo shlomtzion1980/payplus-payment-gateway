@@ -239,6 +239,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('admin_init', [$this, 'payplus_hide_editor']);
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
         add_action('woocommerce_api_update_payplus_payment_method', [$this, 'updatePaymentMethodHook']);
+        add_action('woocommerce_api_get_order_meta', [$this, 'getOrderMeta']);
 
         /****** ACTION END ******/
 
@@ -275,6 +276,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
+    public function getOrderMeta()
+    {
+        $orderId = $_GET['order_id'];
+        $paymentPageLink = WC_PayPlus_Order_Data::get_meta($orderId, 'payplus_payment_page_link');
+        $json = '{"paymentPageLink":"' . $paymentPageLink . '"}';
+        print_r($json);
+        die;
+    }
 
     public function updatePaymentMethodHook()
     {
@@ -2505,7 +2514,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $createToken = false;
         if ($order) {
             if ($order->get_user_id()) {
-                $createToken = WC_PayPlus_Order_Data::get_meta($order_id, 'save_new_token', true);
+                $createToken = WC_PayPlus_Order_Data::get_meta($order_id, 'save_payment_method');
                 $userID = $order->get_user_id();
             }
             $insertMeta = array();
