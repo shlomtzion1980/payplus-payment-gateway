@@ -183,17 +183,31 @@ if (
     // Function to start observing for the target element
     function startObserving() {
       console.log("observer started");
-      tokenRadioButtons = document.querySelectorAll(
-        ".wc-block-components-radio-control__input"
-      );
-      for (let c = 0; c < tokenRadioButtons.length; c++) {
-        if (
-          tokenRadioButtons[c].id.search("-saved-tokens-") &&
-          tokenRadioButtons[c].value == customerDefaultToken
-        ) {
-          tokenRadioButtons[c].checked = true;
-        }
-      }
+      // tokenRadioButtons = document.querySelectorAll(
+      //   ".wc-block-components-radio-control__input"
+      // );
+      // for (let c = 0; c < tokenRadioButtons.length; c++) {
+      //   console.log(tokenRadioButtons[c]);
+      //   const label = document.querySelector(
+      //     `label[for="${tokenRadioButtons[c].id}"]`
+      //   );
+      //   label.classList.remove(
+      //     "wc-block-components-radio-control__option-checked"
+      //   );
+      //   if (
+      //     tokenRadioButtons[c].id.search("-saved-tokens-") &&
+      //     tokenRadioButtons[c].value == customerDefaultToken
+      //   ) {
+      //     const label = document.querySelector(
+      //       `label[for="${tokenRadioButtons[c].id}"]`
+      //     );
+      //     // label.checked = true;
+      //     label.classList.add(
+      //       "wc-block-components-radio-control__option-checked"
+      //     );
+      //     tokenRadioButtons[c].checked = true;
+      //   }
+      // }
       // Set up the MutationObserver
       const observer = new MutationObserver((mutationsList, observer) => {
         mutationsList.forEach((mutation) => {

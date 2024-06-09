@@ -86,12 +86,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (!$is_payplus_payment_method) {
             return;
         }
+        $token_id = $context->payment_data['token'];
+        $token = WC_Payment_Tokens::get($token_id);
 
         $this->orderId = $context->order->id;
         $order = wc_get_order($this->orderId);
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
-        $payload = $this->WC_PayPlus_Gateway->generatePayloadLink($this->orderId, false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false);
+        $payload = $this->WC_PayPlus_Gateway->generatePayloadLink($this->orderId, is_admin(), $token, $subscription = false, $custom_more_info = '', $move_token = false);
         $response = $this->WC_PayPlus_Gateway->post_payplus_ws($this->WC_PayPlus_Gateway->payment_url, $payload);
+
         $payment_details['order_id'] = $this->orderId;
         $payment_details['secret_key'] = $this->secretKey;
 
@@ -105,11 +108,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'save_payment_method' => $saveToken
         );
         WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
-        //unset($context->payment_data['token']);
+
         $token = $context->payment_data['token'] ?? false;
-        // print_r($token);
-        // print_r($this->displayMode);
-        // die;
+
         if (!in_array($this->displayMode, ['iframe', 'redirect']) && !$token) {
             $result->set_payment_details($payment_details);
             $result->set_status('success');
