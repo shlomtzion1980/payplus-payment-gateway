@@ -297,7 +297,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'valuecard' => 'woocommerce_payplus-payment-gateway-valuecard_settings',
             'finitone' => 'woocommerce_payplus-payment-gateway-finitione_settings'
         ];
-        // $json = '{"secret_key":"a489da6d-72b2-463f-afe5-c8c5f7993d0c","method_type":"bit","action":"enable"}';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get the raw POST body
@@ -1220,8 +1219,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
         $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;
-        // $order->delete_meta_data("save_payment_method");
-        // $order->add_meta_data("save_payment_method", isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0');
         WC_PayPlus_Order_Data::update_meta($order, array('save_new_token' => isset($_POST['wc-' . $this->id . '-new-payment-method']) && $_POST['wc-' . $this->id . '-new-payment-method'] ? '1' : '0', 'save_payment_method' => isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0'));
         $order->save_meta_data();
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
