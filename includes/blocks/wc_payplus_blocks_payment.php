@@ -151,7 +151,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
         }
         $result->set_payment_details($payment_details);
-        !isset($payment_details['errorMessage']) ? $result->set_status('success') : $result->set_status('failure');
+        !isset($payment_details['errorMessage']) ? $result->set_status('pending') : $result->set_status('failure');
     }
 
 

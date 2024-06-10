@@ -59,7 +59,26 @@ if (isCheckout) {
                 })
               : "",
           }),
-          (0, e.createElement)("div", { className: "pp_iframe" })
+          (0, e.createElement)(
+            "div",
+            { className: "pp_iframe" },
+            (0, e.createElement)(
+              "button",
+              {
+                className: "closeFrame",
+                id: "closeFrame",
+                style: {
+                  position: "absolute",
+                  top: "10px",
+                  right: "20px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  display: "none",
+                },
+              },
+              "x"
+            )
+          )
         );
       };
     (() => {
@@ -174,27 +193,36 @@ if (isCheckout) {
           }
         }
 
-        pp_iframe.style.display = "block";
         switch (gateWaySettings.displayMode) {
           case "samePageIframe":
             pp_iframe.style.position = "relative";
             pp_iframe.style.height = payPlusGateWay.iFrameHeight;
-            pp_iframe.style.overflow = "hidden";
             break;
           case "popupIframe":
             pp_iframe.style.width = "60%";
             pp_iframe.style.height = payPlusGateWay.iFrameHeight;
             pp_iframe.style.position = "fixed";
-            pp_iframe.style.border = "solid";
             pp_iframe.style.top = "50%";
             pp_iframe.style.left = "50%";
             pp_iframe.style.transform = "translate(-50%, -50%)";
             pp_iframe.style.zIndex = 100000;
+            pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
+            pp_iframe.style.borderRadius = "25px";
             break;
           default:
             break;
         }
-        pp_iframe.style.overflow = "hidden";
+
+        pp_iframe.style.display = "block";
+        pp_iframe.style.border = "none";
+        pp_iframe.style.overflow = "scroll";
+        pp_iframe.style.msOverflowStyle = "none"; // For Internet Explorer 10+
+        pp_iframe.style.scrollbarWidth = "none"; // For Firefox
+        pp_iframe.firstElementChild.style.display = "block";
+        pp_iframe.firstElementChild.style.cursor = "pointer";
+        pp_iframe.firstElementChild.addEventListener("click", () => {
+          pp_iframe.style.display = "none";
+        });
         pp_iframe.appendChild(iframe);
       }
     }
