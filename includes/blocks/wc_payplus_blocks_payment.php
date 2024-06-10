@@ -43,10 +43,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function initialize()
     {
         $this->WC_PayPlus_Gateway = new WC_PayPlus_Gateway;
-        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $gateway_settings = get_option("woocommerce_{$this->name}_settings");
 
-        $this->displayMode = $payplus_payment_gateway_settings['display_mode'];
-        $this->iFrameHeight = $payplus_payment_gateway_settings['iframe_height'];
+        $this->displayMode = $gateway_settings['display_mode'];
+        $this->iFrameHeight = $gateway_settings['iframe_height'];
 
         $this->settings = get_option('woocommerce_' . $this->name . '_settings', []);
         $this->secretKey = $this->settings['secret_key'];
@@ -77,22 +77,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $token_id = $context->payment_data['token'];
         $token = WC_Payment_Tokens::get($token_id);
 
-        if (!in_array($this->name, $this->settings['gateways'])) {
+        if (!in_array($context->payment_method, $this->settings['gateways'])) {
             return;
         }
+        $gatewaySettings = get_option("woocommerce_{$context->payment_method}_settings");
 
         if ($token) {
             return;
         }
 
-        if (in_array($this->displayMode, ['iframe', 'redirect'])) {
+        if (in_array($gatewaySettings['display_mode'], ['iframe', 'redirect'])) {
             return;
         }
 
         $this->orderId = $context->order->id;
         $order = wc_get_order($this->orderId);
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
-        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), $token, $subscription = false, $custom_more_info = '', $move_token = false);
+        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false);
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
         $payment_details['order_id'] = $this->orderId;
@@ -115,13 +116,16 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 }
             );
         } else {
-            $saveToken = $data['wc-payplus-payment-gateway-new-payment-method'] ? true : false;
             $orderMeta = [
                 'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],
-                'payplus_payment_page_link' => $responseArray['data']['payment_page_link'],
-                'save_payment_method' => $saveToken
+                'payplus_payment_page_link' => $responseArray['data']['payment_page_link']
             ];
+
+            isset($data['wc-payplus-payment-gateway-new-payment-method']) ? $orderMeta['save_payment_method'] = $data['wc-payplus-payment-gateway-new-payment-method'] : null;
+
+
             WC_PayPlus_Order_Data::update_meta($order, $orderMeta);
+
             $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
         }
         $result->set_payment_details($payment_details);
