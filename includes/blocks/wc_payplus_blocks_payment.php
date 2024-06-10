@@ -98,9 +98,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $payment_details['order_id'] = $this->orderId;
         $payment_details['secret_key'] = $this->secretKey;
 
-        $res = json_decode(wp_remote_retrieve_body($response));
-        if ($res->results->status === 'error') {
-            $payment_details['errorMessage'] = wp_strip_all_tags($res->results->description);
+        $responseArray = json_decode(wp_remote_retrieve_body($response), true);
+
+        if ($responseArray['results']['status'] === 'error') {
+            $payment_details['errorMessage'] = wp_strip_all_tags($responseArray['results']['description']);
             $result->set_payment_details($payment_details);
 
             // Hook into PayPlus error processing so that we can capture the error to payment details.
@@ -114,22 +115,17 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 }
             );
         } else {
-            $saveToken = $data['wc-payplus-payment-gateway-new-payment-method'] ? $data['wc-payplus-payment-gateway-new-payment-method'] : false;
-            $dataLink = $res->data;
-            $insertMeta = array(
-                'payplus_page_request_uid' => $dataLink->page_request_uid,
-                'payplus_payment_page_link' => $dataLink->payment_page_link,
+            $saveToken = $data['wc-payplus-payment-gateway-new-payment-method'] ? true : false;
+            $orderMeta = [
+                'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],
+                'payplus_payment_page_link' => $responseArray['data']['payment_page_link'],
                 'save_payment_method' => $saveToken
-            );
-            WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
-
-            $payment_details       = $result->payment_details;
-            $payment_details['paymentPageLink'] = $dataLink->payment_page_link;
-            $paymentStatus = !$payment_details['errorMessage'] ? 'success' : 'failure';
-
-            $result->set_payment_details($payment_details);
-            $result->set_status($paymentStatus);
+            ];
+            WC_PayPlus_Order_Data::update_meta($order, $orderMeta);
+            $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
         }
+        $result->set_payment_details($payment_details);
+        !isset($payment_details['errorMessage']) ? $result->set_status('success') : $result->set_status('failure');
     }
 
 
