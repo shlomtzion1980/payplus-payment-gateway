@@ -196,11 +196,11 @@ if (isCheckout) {
         switch (gateWaySettings.displayMode) {
           case "samePageIframe":
             pp_iframe.style.position = "relative";
-            pp_iframe.style.height = payPlusGateWay.iFrameHeight;
+            pp_iframe.style.height = gateWaySettings.iFrameHeight;
             break;
           case "popupIframe":
             pp_iframe.style.width = "60%";
-            pp_iframe.style.height = payPlusGateWay.iFrameHeight;
+            pp_iframe.style.height = gateWaySettings.iFrameHeight;
             pp_iframe.style.position = "fixed";
             pp_iframe.style.top = "50%";
             pp_iframe.style.left = "50%";
