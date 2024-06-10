@@ -20,7 +20,7 @@ for (let c = 0; c < customerTokens.length; c++) {
 const gateways = window.wc.wcSettings.getPaymentMethodData(
   "payplus-payment-gateway"
 ).gateways;
-console.log(gateways);
+
 (() => {
   ("use strict");
   const e = window.React,
@@ -34,7 +34,7 @@ console.log(gateways);
       const { PaymentMethodLabel: a } = t.components;
       return (0, e.createElement)(
         "div",
-        { className: "payplus-method" },
+        { className: "payplus-method", style: { width: "100%" } },
         (0, e.createElement)(a, {
           text: t.text,
           icon: t.icon
@@ -87,157 +87,71 @@ if (
   payPlusGateWay.displayMode !== "iframe"
 ) {
   document.addEventListener("DOMContentLoaded", function () {
-    // Function to handle when the target element is found
-    function handleTargetElement(targetElement) {
-      console.log("observing!");
-      var processCheckout = document.querySelector(
-        "#wp--skip-link--target > div.entry-content.wp-block-post-content.is-layout-constrained.wp-block-post-content-is-layout-constrained > div > div.wc-block-components-sidebar-layout.wc-block-checkout.is-large > div.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block > form > div.wc-block-checkout__actions.wp-block-woocommerce-checkout-actions-block > div.wc-block-checkout__actions_row > button"
-      );
-      // console.log("processCheckout:", processCheckout);
-      processCheckout.addEventListener("click", () => {
-        console.log("paymentMethod: ", payment.getActivePaymentMethod());
-        if (
-          gateways.indexOf(payment.getActivePaymentMethod()) !== -1 &&
-          payment.getActiveSavedToken().length === 0
-        ) {
-          function getCheckOutProcess(callback) {
-            setTimeout(() => {
-              // Simulate a specific message being received
-              let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
-
-              var iframe = document.createElement("iframe");
-              // Set the attributes for the iframe
-
-              iframe.width = "100%";
-              iframe.height = "100%";
-              iframe.style.border = "0"; // Optional: remove the border
-              // Find the div where the iframe will be appended
-              var div = document.getElementById("pp_iframe");
-
-              var xhr = new XMLHttpRequest();
-              xhr.open(
-                "GET",
-                "?wc-api=get_order_meta&order_id=" + orderId,
-                true
-              );
-              let message;
-              xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4) {
-                  if (xhr.status === 200) {
-                    var data = JSON.parse(xhr.responseText);
-                    if (data.paymentPageLink) {
-                      console.log("dataPaymentLink:", data.paymentPageLink);
-                      message = data.paymentPageLink;
-                      iframe.src = data.paymentPageLink;
-                      pp_iframe.style.display = "block";
-                      switch (payPlusGateWay.displayMode) {
-                        case "samePageIframe":
-                          pp_iframe.style.position = "relative";
-                          pp_iframe.style.height = payPlusGateWay.iFrameHeight;
-                          break;
-                        case "popupIframe":
-                          pp_iframe.style.width = "60%";
-                          pp_iframe.style.height = payPlusGateWay.iFrameHeight;
-                          pp_iframe.style.position = "fixed";
-                          pp_iframe.style.border = "solid";
-                          pp_iframe.style.top = "50%";
-                          pp_iframe.style.left = "50%";
-                          pp_iframe.style.transform = "translate(-50%, -50%)";
-                          pp_iframe.style.zIndex = 100000;
-                          break;
-                        default:
-                          pp_iframe.style.position = "fixed";
-                          pp_iframe.style.border = "solid";
-                          break;
-                      }
-                      pp_iframe.style.overflow = "hidden";
-                      pp_iframe.appendChild(iframe);
-                    }
-                  } else {
-                    console.error("Error fetching data:", xhr.statusText);
-                  }
-                }
-              };
-              console.log("loading iframe...");
-              xhr.send();
-              callback(message);
-            }, 1000); // Simulates a delay of 2 seconds
-          }
-
-          function handleMessage(message) {
-            if (message) {
-              console.log("handlemessage", message);
-              clearTimeout(timeoutId);
-            }
-          }
-
-          // Set up a timeout that should be stopped if the specific message is received
-          const timeoutId = setTimeout(() => {
-            console.log("setting timeout");
-            getCheckOutProcess(handleMessage);
-          }, 1000); // Timeout set to 5 seconds
-        }
-      });
-    }
-
     // Function to start observing for the target element
     function startObserving() {
       console.log("observer started");
-      // tokenRadioButtons = document.querySelectorAll(
-      //   ".wc-block-components-radio-control__input"
-      // );
-      // for (let c = 0; c < tokenRadioButtons.length; c++) {
-      //   console.log(tokenRadioButtons[c]);
-      //   const label = document.querySelector(
-      //     `label[for="${tokenRadioButtons[c].id}"]`
-      //   );
-      //   label.classList.remove(
-      //     "wc-block-components-radio-control__option-checked"
-      //   );
-      //   if (
-      //     tokenRadioButtons[c].id.search("-saved-tokens-") &&
-      //     tokenRadioButtons[c].value == customerDefaultToken
-      //   ) {
-      //     const label = document.querySelector(
-      //       `label[for="${tokenRadioButtons[c].id}"]`
-      //     );
-      //     // label.checked = true;
-      //     label.classList.add(
-      //       "wc-block-components-radio-control__option-checked"
-      //     );
-      //     tokenRadioButtons[c].checked = true;
-      //   }
-      // }
-      // Set up the MutationObserver
       const observer = new MutationObserver((mutationsList, observer) => {
-        mutationsList.forEach((mutation) => {
-          // Check if the target element is added to the DOM
-          const targetElement = document.querySelector(
-            "#wp--skip-link--target > div.entry-content.wp-block-post-content.is-layout-constrained.wp-block-post-content-is-layout-constrained > div > div.wc-block-components-sidebar-layout.wc-block-checkout.is-large > div.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block > form > div.wc-block-checkout__actions.wp-block-woocommerce-checkout-actions-block > div.wc-block-checkout__actions_row > button"
+        if (store.isComplete()) {
+          console.log("isComplete: " + store.isComplete());
+          console.log(
+            "paymentPageLink",
+            payment.getPaymentResult().paymentDetails.paymentPageLink
           );
-
-          let button = document.querySelector(
-            "#wp--skip-link--target > div.entry-content.wp-block-post-content.is-layout-constrained.wp-block-post-content-is-layout-constrained > div > div.wc-block-components-sidebar-layout.wc-block-checkout.is-medium > div.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block > form > div.wc-block-checkout__actions.wp-block-woocommerce-checkout-actions-block > div.wc-block-checkout__actions_row > button > span"
+          // Call the function to handle the target element
+          startIframe(
+            payment.getPaymentResult().paymentDetails.paymentPageLink
           );
-          let form = document.querySelector(
-            "#wp--skip-link--target > div.entry-content.wp-block-post-content.is-layout-constrained.wp-block-post-content-is-layout-constrained > div > div.wc-block-components-sidebar-layout.wc-block-checkout.is-large > div.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block > form > div.wc-block-checkout__actions.wp-block-woocommerce-checkout-actions-block > div.wc-block-checkout__actions_row > button > span"
-          );
-          if (targetElement) {
-            // Call the function to handle the target element
-            handleTargetElement(targetElement);
-            // Disconnect the observer to stop observing further changes
-            observer.disconnect();
-          }
-        });
+          // Disconnect the observer to stop observing further changes
+          observer.disconnect();
+        }
       });
-
       // Start observing the target node for configured mutations
       const targetNode = document.body; // Or any other parent node where the element might be added
       const config = { childList: true, subtree: true };
       observer.observe(targetNode, config);
     }
-
     // Wait for a few seconds before starting to observe
     setTimeout(startObserving, 1000); // Adjust the time (in milliseconds) as needed
   });
+
+  function startIframe(paymentPageLink) {
+    if (
+      gateways.indexOf(payment.getActivePaymentMethod()) !== -1 &&
+      payment.getActiveSavedToken().length === 0
+    ) {
+      let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
+
+      var iframe = document.createElement("iframe");
+
+      // Set the attributes for the iframe
+      iframe.width = "100%";
+      iframe.height = "100%";
+      iframe.style.border = "0";
+
+      iframe.src = paymentPageLink;
+      pp_iframe.style.display = "block";
+      switch (payPlusGateWay.displayMode) {
+        case "samePageIframe":
+          pp_iframe.style.position = "relative";
+          pp_iframe.style.height = payPlusGateWay.iFrameHeight;
+          break;
+        case "popupIframe":
+          pp_iframe.style.width = "60%";
+          pp_iframe.style.height = payPlusGateWay.iFrameHeight;
+          pp_iframe.style.position = "fixed";
+          pp_iframe.style.border = "solid";
+          pp_iframe.style.top = "50%";
+          pp_iframe.style.left = "50%";
+          pp_iframe.style.transform = "translate(-50%, -50%)";
+          pp_iframe.style.zIndex = 100000;
+          break;
+        default:
+          pp_iframe.style.position = "fixed";
+          pp_iframe.style.border = "solid";
+          break;
+      }
+      pp_iframe.style.overflow = "hidden";
+      pp_iframe.appendChild(iframe);
+    }
+  }
 }
