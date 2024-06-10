@@ -220,8 +220,10 @@ if (isCheckout) {
         pp_iframe.style.scrollbarWidth = "none"; // For Firefox
         pp_iframe.firstElementChild.style.display = "block";
         pp_iframe.firstElementChild.style.cursor = "pointer";
-        pp_iframe.firstElementChild.addEventListener("click", () => {
+        pp_iframe.firstElementChild.addEventListener("click", (e) => {
+          e.preventDefault();
           pp_iframe.style.display = "none";
+          location.reload();
         });
         pp_iframe.appendChild(iframe);
       }
