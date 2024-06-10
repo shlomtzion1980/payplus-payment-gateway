@@ -100,6 +100,7 @@ if (isCheckout) {
       // Function to start observing for the target element
       function startObserving() {
         console.log("observer started");
+
         const observer = new MutationObserver((mutationsList, observer) => {
           if (store.isComplete()) {
             if (
@@ -130,9 +131,9 @@ if (isCheckout) {
     });
 
     function startIframe(paymentPageLink) {
-      const gateWaySettings = window.wc.wcSettings.getPaymentMethodData(
-        payment.getActivePaymentMethod()
-      );
+      const activePaymentMethod = payment.getActivePaymentMethod();
+      const gateWaySettings =
+        window.wc.wcSettings.getPaymentMethodData(activePaymentMethod);
 
       var iframe = document.createElement("iframe");
 
@@ -142,13 +143,37 @@ if (isCheckout) {
       iframe.style.border = "0";
 
       iframe.src = paymentPageLink;
-
+      let pp_iframes = document.querySelectorAll(".pp_iframe");
+      let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
       if (
         ["samePageIframe", "popupIframe"].indexOf(
           gateWaySettings.displayMode
         ) !== -1
       ) {
-        let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
+        if (activePaymentMethod !== "payplus-payment-gateway") {
+          for (let c = 0; c < pp_iframes.length; c++) {
+            const grandparent = pp_iframes[c].parentNode.parentNode;
+            if (grandparent) {
+              // Get the ID of the grandparent
+              const grandparentId = grandparent.id;
+              // console.log(grandparentId);
+              // Check if the ID contains 'payplus-payment-gateway'
+              if (grandparentId.includes(activePaymentMethod)) {
+                pp_iframe = pp_iframes[c];
+                // console.log(
+                //   "Found ID containing " + activePaymentMethod + ":",
+                //   grandparentId,
+                //   pp_iframe
+                // );
+              } else {
+                // console.log("ID does not contain " + activePaymentMethod + ".");
+              }
+            } else {
+              // console.log("Grandparent not found.");
+            }
+          }
+        }
+
         pp_iframe.style.display = "block";
         switch (gateWaySettings.displayMode) {
           case "samePageIframe":

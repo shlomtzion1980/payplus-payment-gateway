@@ -1859,7 +1859,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      * @param $custom_more_info
      * @return string
      */
-    public function generatePayloadLink($order_id, $isAdmin = false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false)
+    public function generatePayloadLink($order_id, $isAdmin = false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false, $options = [])
     {
         $order = wc_get_order($order_id);
         $langCode = explode("_", get_locale());
@@ -1927,6 +1927,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $this->default_charge_method = ($this->default_charge_method) ?: 'credit-card';
+        $this->default_charge_method = isset($options['chargeDefault']) ? $options['chargeDefault'] : $this->default_charge_method;
+
         $bSaveToken = true;
 
         $hideOtherChargeMethods = (isset($this->hide_other_charge_methods) && $this->hide_other_charge_methods === '1') ? 'true' : 'false';
@@ -1934,6 +1936,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (in_array($this->default_charge_method, CLUB_CARD)) {
             $hideOtherChargeMethods = 'false';
         }
+
+        $hideOtherChargeMethods = isset($options['hideOtherPayments']) ? $options['hideOtherPayments'] : $hideOtherChargeMethods;
 
         $callback = get_site_url(null, '/?wc-api=callback_response');
         if ($this->api_test_mode === true && $this->callback_addr) {

@@ -26,6 +26,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $WC_PayPlus_Gateway;
     private $secretKey;
     public $iFrameHeight;
+    public $hideOtherPayments;
 
 
     /**
@@ -47,6 +48,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $this->displayMode = $gateway_settings['display_mode'];
         $this->iFrameHeight = $gateway_settings['iframe_height'];
+        $this->hideOtherPayments = $gateway_settings['hide_other_charge_methods'];
 
         $this->settings = get_option('woocommerce_' . $this->name . '_settings', []);
         $this->secretKey = $this->settings['secret_key'];
@@ -80,6 +82,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (!in_array($context->payment_method, $this->settings['gateways'])) {
             return;
         }
+        $payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
         $gatewaySettings = get_option("woocommerce_{$context->payment_method}_settings");
 
         if ($token) {
@@ -89,11 +92,30 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (in_array($gatewaySettings['display_mode'], ['iframe', 'redirect'])) {
             return;
         }
+        $hideOtherPayments = 'false';
+        if (isset($gatewaySettings['sub_hide_other_charge_methods'])) {
+            $hideOtherPayments = $gatewaySettings['sub_hide_other_charge_methods'] == 2 ? $payPlusSettings['hide_other_charge_methods'] : $gatewaySettings['sub_hide_other_charge_methods'];
+            $hideOtherPayments = $hideOtherPayments == 1 ? 'true' : 'false';
+        }
+
+        $names = [
+            "payplus-payment-gateway" => 'credit-card',
+            "payplus-payment-gateway-bit" => 'bit',
+            "payplus-payment-gateway-applepay" => 'apple-pay',
+            "payplus-payment-gateway-googlepay" => 'google-pay',
+            "payplus-payment-gateway-paypal" => 'paypal',
+            "payplus-payment-gateway-multipass" => 'multipass',
+            "payplus-payment-gateway-valuecard" => 'valuecard',
+            "payplus-payment-gateway-tavzahav" => 'tav-zahav',
+            "payplus-payment-gateway-finitione" => 'finitione'
+        ];
+        $chargeDefault = $names[$context->payment_method];
 
         $this->orderId = $context->order->id;
         $order = wc_get_order($this->orderId);
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
-        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false);
+        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments]);
+
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
         $payment_details['order_id'] = $this->orderId;
@@ -187,6 +209,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'displayMode' => $this->displayMode,
             'iFrameHeight' => $this->iFrameHeight . 'px',
             'secretKey' => $this->secretKey,
+            'hideOtherPayments' => $this->hideOtherPayments,
+            "{$this->name}-settings" => [
+                'displayMode' => $this->displayMode,
+                'iFrameHeight' => $this->iFrameHeight . 'px',
+                'secretKey' => $this->secretKey,
+                'hideOtherPayments' => $this->hideOtherPayments,
+            ],
             'gateways' => $this->settings['gateways'],
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
         ];
