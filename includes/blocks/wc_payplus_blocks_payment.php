@@ -27,19 +27,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     private $secretKey;
     public $iFrameHeight;
 
-    /**
-     * The Payment Request configuration class used for Shortcode PRBs. We use it here to retrieve
-     * the same configurations.
-     *
-     * @var WC_Stripe_Payment_Request
-     */
-    private $payment_request_configuration;
 
     /**
      * Constructor
      *
-     * @param WC_Stripe_Payment_Request  The Stripe Payment Request configuration used for Payment
-     *                                   Request buttons.
      */
     public function __construct($payment_request_configuration = null)
     {
@@ -112,7 +103,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $payment_details['errorMessage'] = wp_strip_all_tags($res->results->description);
             $result->set_payment_details($payment_details);
 
-            // Hook into Stripe error processing so that we can capture the error to payment details.
+            // Hook into PayPlus error processing so that we can capture the error to payment details.
             // This error would have been registered via wc_add_notice() and thus is not helpful for block checkout processing.
             add_action(
                 'wc_gateway_payplus_process_payment_error',
@@ -131,8 +122,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'save_payment_method' => $saveToken
             );
             WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
-
-            $token = $context->payment_data['token'] ?? false;
 
             $payment_details       = $result->payment_details;
             $payment_details['paymentPageLink'] = $dataLink->payment_page_link;
