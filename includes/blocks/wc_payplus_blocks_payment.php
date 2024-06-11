@@ -49,7 +49,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->displayMode = $gateway_settings['display_mode'];
         $this->iFrameHeight = $gateway_settings['iframe_height'];
         $this->hideOtherPayments = $gateway_settings['hide_other_charge_methods'];
-
         $this->settings = get_option('woocommerce_' . $this->name . '_settings', []);
         $this->secretKey = $this->settings['secret_key'];
         $gateways = WC()->payment_gateways->payment_gateways();
@@ -92,10 +91,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (in_array($gatewaySettings['display_mode'], ['iframe', 'redirect'])) {
             return;
         }
-        $hideOtherPayments = 'false';
+
         if (isset($gatewaySettings['sub_hide_other_charge_methods'])) {
             $hideOtherPayments = $gatewaySettings['sub_hide_other_charge_methods'] == 2 ? $payPlusSettings['hide_other_charge_methods'] : $gatewaySettings['sub_hide_other_charge_methods'];
             $hideOtherPayments = $hideOtherPayments == 1 ? 'true' : 'false';
+        } else {
+            $hideOtherPayments = boolval($this->hideOtherPayments) ? 'true' : 'false';
         }
 
         $names = [

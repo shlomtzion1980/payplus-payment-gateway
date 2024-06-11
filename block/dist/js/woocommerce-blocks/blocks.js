@@ -20,13 +20,6 @@ if (isCheckout) {
     "payplus-payment-gateway"
   );
 
-  const customerTokens = wcSettings.customerPaymentMethods.cc;
-  let customerDefaultToken = "";
-  for (let c = 0; c < customerTokens.length; c++) {
-    if (customerTokens[c].is_default) {
-      customerDefaultToken = customerTokens[c].tokenId;
-    }
-  }
   const gateways = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
   ).gateways;

@@ -82,7 +82,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // Place "Get Order Details" button from PayPlus if the order is marked as unpaid - allows to get the order details from PayPlus if exists and
         // updates the order status to processing if the payment was successful and adds order note!
         add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
-        add_action('add_meta_boxes', [$this, 'add_custom_order_metabox']);
+        add_action('add_meta_boxes', [$this, 'add_invoice_plus_metabox']);
         add_action('admin_head', [$this, 'hide_delete_update_buttons_css']);
 
         // remove query args after error shown
@@ -111,7 +111,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
 
 
-    public function add_custom_order_metabox()
+    public function add_invoice_plus_metabox()
     {
         $screen = get_current_screen();
         if ($screen->post_type === 'shop_order') {
