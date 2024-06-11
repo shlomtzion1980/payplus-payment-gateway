@@ -234,8 +234,9 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-            <div class='payplus_loader_refund'></div>
+<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
+    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+<div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -656,7 +657,7 @@ class PayplusInvoice
             $current_screen->id === "shop_order"
             || $current_screen->id === "woocommerce_page_wc-orders"
         ) {
-            wp_enqueue_style('payplus_invoice-admin-css', PAYPLUS_PLUGIN_URL . 'assets/css/invoice_admin.min.css', __FILE__);
+            wp_enqueue_style('payplus_invoice-admin-css', PAYPLUS_PLUGIN_URL . 'assets/css/invoice_admin.min.css', [], PAYPLUS_VERSION);
         }
     }
 

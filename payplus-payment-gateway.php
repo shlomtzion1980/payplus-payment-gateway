@@ -256,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -636,10 +636,9 @@ class WC_PayPlus
                 $this->payplus_payment_gateway_settings->enable_design_checkout === "yes" || $isEnableOneClick
 
             ) {
-
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 add_filter('body_class', [$this, 'payplus_body_classes']);
-                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.css', [], time());
+                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.css', [], PAYPLUS_VERSION);
 
                 if ($isEnableOneClick) {
                     $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
@@ -680,8 +679,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
