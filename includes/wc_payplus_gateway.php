@@ -1996,6 +1996,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
             "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
             $json_move_token . '}';
+        $payload = str_replace("\n", "", $payload);
         return $payload;
     }
 
