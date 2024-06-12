@@ -325,6 +325,7 @@ function PayplusdisplayMenuInvoice() {
   const section = urlParams.get("section");
   if (
     section == "payplus-invoice" ||
+    section == "payplus-payment-gateway-setup-wizard" ||
     section == "payplus-express-checkout" ||
     section == "payplus-error-setting"
   ) {

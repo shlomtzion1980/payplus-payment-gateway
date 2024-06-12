@@ -46,9 +46,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             );
 
         $sections = $this->arrPayment;
+        $sections[] = 'payplus-payment-gateway-setup-wizard';
         $sections[] = 'payplus-error-setting';
         $sections[] = 'payplus-invoice';
         $sections[] = 'payplus-express-checkout';
+
         if (
             $isPageOrder
             || (('admin.php' === $pagenow) && isset($_GET['section']) && in_array($_GET['section'], $sections))
@@ -87,7 +89,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         // remove query args after error shown
         add_filter('removable_query_args', [$this, 'add_removable_arg']);
-        add_filter('woocommerce_get_settings_checkout', [$this, 'payplus_get_error_setting'], 10, 2);
+        add_filter('woocommerce_get_settings_checkout', [$this, 'payplusGetAdminSettings'], 10, 2);
         add_filter('admin_body_class', [$this, 'payplus_admin_classes']);
 
 
@@ -376,7 +378,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      * @param $current_section
      * @return mixed
      */
-    public function payplus_get_error_setting($settings, $current_section)
+    public function payplusGetAdminSettings($settings, $current_section)
     {
 
         /**
@@ -384,7 +386,109 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
          **/
 
         switch ($current_section) {
-
+            case 'payplus-payment-gateway-setup-wizard':
+                $settings[] = array(
+                    'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
+                    'type' => 'title',
+                    'desc' => __('Simple setup options - The base plugin options. Setup these and you can start working immediately!', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'id' => 'payplus-payment-gateway-setup-wizard'
+                );
+                $settings[] = [
+                    'title' => __('Enable/Disable', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
+                    'default' => 'yes',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[enable]'
+                ];
+                $settings[] = array(
+                    'name' => __('API Key', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'desc' => __('PayPlus Api Key you can find in your account under Settings', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[api_key]'
+                );
+                $settings[] = [
+                    'name' => __('Secret Key', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'desc' => __('PayPlus Secret Key you can find in your account under Settings', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[secret_key]'
+                ];
+                $settings[] = [
+                    'title' => __('Payment Page UID', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'desc' => __('Your payment page UID can be found under Payment Pages in your side menu in PayPlus account', 'payplus-payment-gateway'),
+                    'default' => '',
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[payment_page_id]'
+                ];
+                $settings[] = [
+                    'title' => __('Test mode', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Enable Test/Sandbox Mode', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[api_test_mode]'
+                ];
+                $settings[] =  [
+                    'title' => __('Transactions Type', 'payplus-payment-gateway'),
+                    'type' => 'select',
+                    'options' => [
+                        '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                        '1' => __('Charge', 'payplus-payment-gateway'),
+                        '2' => __('Authorization', 'payplus-payment-gateway'),
+                    ],
+                    'default' => '1',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[transaction_type]'
+                ];
+                $settings[] = [
+                    'title' => __('Display Mode', 'payplus-payment-gateway'),
+                    'type' => 'select',
+                    'options' => [
+                        'redirect' => __('Redirect', 'payplus-payment-gateway'),
+                        'iframe' => __('iFrame on the next page', 'payplus-payment-gateway'),
+                        'samePageIframe' => __('iFrame on the same page', 'payplus-payment-gateway'),
+                        'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
+                    ],
+                    'default' => 'redirect',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[display_mode]'
+                ];
+                $settings[] = [
+                    'title' => __('iFrame Height', 'payplus-payment-gateway'),
+                    'type' => 'number',
+                    'default' => 700,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[iframe_height]'
+                ];
+                $settings[] = [
+                    'title' => __('Allow Saved Credit Cards', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Enable Payment via Saved Cards', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'desc_tip' => true,
+                    'desc' => __('Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.
+                    <br>Saving cards can be done either during purchase or through the "My Account" section in the website.', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[create_pp_token]'
+                ];
+                $listOrderStatus = ['default-woo' => __('Default Woo', 'payplus-payment-gateway')];
+                $listOrderStatus = array_merge($listOrderStatus, wc_get_order_statuses());
+                $settings[] = [
+                    'title' => __('Successful Order Status', 'payplus-payment-gateway'),
+                    'type' => 'select',
+                    'options' => $listOrderStatus,
+                    'default' => 'default-woo',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[successful_order_status]'
+                ];
+                $settings[] = [
+                    'title' => __('Payment Completed', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Fire Payment Completed On Successful Charge', 'payplus-payment-gateway'),
+                    'desc' => __('Fire Payment Completed On Successful Charge.<br>Only relevant if you are using the "Default Woo" in Successful Order Status option above this one.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'default' => 'yes',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[fire_completed]'
+                ];
+                $settings[] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-setup-wizard');
+                break;
             case 'payplus-error-setting':
 
                 if (!empty($_POST) && isset($_POST['settings_payplus_page_error_option'])) {

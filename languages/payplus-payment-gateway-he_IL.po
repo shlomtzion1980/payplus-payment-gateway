@@ -1257,7 +1257,7 @@ msgstr ""
 #: includes/wc_payplus_gateway.php:1050 payplus-payment-gateway.php:298
 #: payplus-payment-gateway.php:301 payplus-payment-gateway.php:385
 #: payplus-payment-gateway.php:386 payplus-payment-gateway.php:1016
-msgid "PayPlus  Gateway"
+msgid "PayPlus Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
 #: includes/wc_payplus_gateway.php:1089
@@ -1842,7 +1842,7 @@ msgstr ""
 
 #, fuzzy
 #~| msgid "PayPlus Payment Gateway"
-#~ msgid "PayPlus  Gateway And Invoice+"
+#~ msgid "PayPlus Gateway And Invoice+"
 #~ msgstr "פיי פלוס פתרונות תשלום"
 
 #, fuzzy
@@ -1862,7 +1862,7 @@ msgstr ""
 
 #, fuzzy
 #~| msgid "PayPlus Payment Gateway"
-#~ msgid "PayPlus  Gateway "
+#~ msgid "PayPlus Gateway "
 #~ msgstr "פיי פלוס פתרונות תשלום"
 
 #~ msgid "payment payplus"

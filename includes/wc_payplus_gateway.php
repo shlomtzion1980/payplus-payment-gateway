@@ -1046,8 +1046,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $arrLink = array(
+            'payplus-payment-gateway-setup-wizard' => array(
+                'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
+                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus-settings.svg'>",
+            ),
             'payplus-payment-gateway' => array(
-                'name' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
+                'name' => __('PayPlus Gateway', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>",
             ),
@@ -1070,8 +1075,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (count($arrLink)) {
             echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($arrLink as $key => $arrValue) {
-                $seleted = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $seleted . "' >
+                $selected = ($key == $currentSection) ? "nav-tab-active" : "";
+                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $selected . "' >
                            " . $arrValue['img'] .
                     $arrValue['name'] .
                     "</a>";
@@ -1144,12 +1149,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "<nav  id='sub-option-paylus' class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($arrOtherPayment as $key => $value) {
 
-                $seleted = ($currentSection == $value['section']) ? "nav-tab-active" : "";
+                $selected = ($currentSection == $value['section']) ? "nav-tab-active" : "";
 
                 if ($currentSection == $value['section']) {
                     $title = __($key, 'payplus-payment-gateway');
                 }
-                echo "<a data-tab='payplus-blank' href='" . $value['link'] . "'  class='nav-tab " . $seleted . "'>
+                echo "<a data-tab='payplus-blank' href='" . $value['link'] . "'  class='nav-tab " . $selected . "'>
                                 <img  src ='" . $value['icon'] . "' alt='" . __($key, 'payplus-payment-gateway') . "'>"
                     . __($key, 'payplus-payment-gateway') . "</a>";
             }

@@ -256,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -295,10 +295,10 @@ class WC_PayPlus
 
         $admin_bar->add_menu(array(
             'id' => 'PayPlus-toolbar',
-            'title' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
-            'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway",
+            'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
+            'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard",
             'meta' => array(
-                'title' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
+                'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
                 'target' => '_blank',
             ),
         ));
@@ -382,8 +382,8 @@ class WC_PayPlus
         $parent_slug = 'payplus-payment-gateway';
 
         add_menu_page(
-            __('PayPlus  Gateway', 'payplus-payment-gateway'),
-            __('PayPlus  Gateway', 'payplus-payment-gateway'),
+            __('PayPlus Gateway', 'payplus-payment-gateway'),
+            __('PayPlus Gateway', 'payplus-payment-gateway'),
             "administrator",
             'payplus-payment-gateway',
             [$this, 'payplus_get_gateway'],
@@ -679,8 +679,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
@@ -1011,8 +1011,13 @@ class WC_PayPlus
         ob_start();
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $arrLink = array(
+            'payplus-payment-gateway-setup-wizard' => array(
+                'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
+                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus-settings.svg'>",
+            ),
             'payplus-payment-gateway' => array(
-                'name' => __('PayPlus  Gateway', 'payplus-payment-gateway'),
+                'name' => __('PayPlus Gateway', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>",
             ),
@@ -1036,8 +1041,8 @@ class WC_PayPlus
         if (count($arrLink)) {
             echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($arrLink as $key => $arrValue) {
-                $seleted = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $seleted . "' >
+                $selected = ($key == $currentSection) ? "nav-tab-active" : "";
+                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $selected . "' >
                                " . $arrValue['img'] .
                     $arrValue['name'] .
                     "</a>";
