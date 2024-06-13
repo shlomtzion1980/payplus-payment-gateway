@@ -158,7 +158,7 @@ if (isCheckout) {
             pp_iframe.style.borderRadius = "25px";
             pp_iframe.innerHTML =
               getPaymentResult.paymentDetails.errorMessage +
-              "\n" +
+              "<br>" +
               "Click this to close.";
             pp_iframe.addEventListener("click", (e) => {
               e.preventDefault();
