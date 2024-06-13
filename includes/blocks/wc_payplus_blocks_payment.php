@@ -27,6 +27,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     private $secretKey;
     public $iFrameHeight;
     public $hideOtherPayments;
+    public $payPlusSettings;
 
 
     /**
@@ -44,12 +45,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function initialize()
     {
         $this->WC_PayPlus_Gateway = new WC_PayPlus_Gateway;
-        $gateway_settings = get_option("woocommerce_{$this->name}_settings");
+        $this->settings = get_option("woocommerce_{$this->name}_settings", []);
+        $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
+        $this->displayMode = $this->settings['display_mode'];
+        $this->iFrameHeight = $this->settings['iframe_height'];
+        $this->hideOtherPayments = $this->settings['hide_other_charge_methods'];
 
-        $this->displayMode = $gateway_settings['display_mode'];
-        $this->iFrameHeight = $gateway_settings['iframe_height'];
-        $this->hideOtherPayments = $gateway_settings['hide_other_charge_methods'];
-        $this->settings = get_option('woocommerce_' . $this->name . '_settings', []);
         $this->secretKey = $this->settings['secret_key'];
         $gateways = WC()->payment_gateways->payment_gateways();
 
@@ -81,7 +82,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (!in_array($context->payment_method, $this->settings['gateways'])) {
             return;
         }
-        $payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
+
         $gatewaySettings = get_option("woocommerce_{$context->payment_method}_settings");
 
         if ($token) {
@@ -93,7 +94,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
 
         if (isset($gatewaySettings['sub_hide_other_charge_methods'])) {
-            $hideOtherPayments = $gatewaySettings['sub_hide_other_charge_methods'] == 2 ? $payPlusSettings['hide_other_charge_methods'] : $gatewaySettings['sub_hide_other_charge_methods'];
+            $hideOtherPayments = $gatewaySettings['sub_hide_other_charge_methods'] == 2 ? $this->payPlusSettings['hide_other_charge_methods'] : $gatewaySettings['sub_hide_other_charge_methods'];
             $hideOtherPayments = $hideOtherPayments == 1 ? 'true' : 'false';
         } else {
             $hideOtherPayments = boolval($this->hideOtherPayments) ? 'true' : 'false';
@@ -116,24 +117,22 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $order = wc_get_order($this->orderId);
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
         $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments]);
-
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
+        $result->set_payment_details('');
+        $payment_details = $result->payment_details;
         $payment_details['order_id'] = $this->orderId;
         $payment_details['secret_key'] = $this->secretKey;
 
         $responseArray = json_decode(wp_remote_retrieve_body($response), true);
 
-        if ($responseArray['results']['status'] === 'error') {
-            $payment_details['errorMessage'] = wp_strip_all_tags($responseArray['results']['description']);
-            $result->set_payment_details($payment_details);
-
+        if ($responseArray['results']['status'] === 'error' || !isset($responseArray['results']) && isset($responseArray['message'])) {
+            $payment_details['errorMessage'] = isset($responseArray['results']['description']) ? wp_strip_all_tags($responseArray['results']['description']) : $responseArray['message'];
             // Hook into PayPlus error processing so that we can capture the error to payment details.
             // This error would have been registered via wc_add_notice() and thus is not helpful for block checkout processing.
             add_action(
                 'wc_gateway_payplus_process_payment_error',
                 function ($error) use (&$result) {
-                    $payment_details                 = $result->payment_details;
                     $payment_details['errorMessage'] = wp_strip_all_tags($error->getLocalizedMessage());
                     $result->set_payment_details($payment_details);
                 }
@@ -207,12 +206,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'description' => $this->get_setting('description'),
             'supports' => array_filter($this->gateway->supports, [$this->gateway, 'supports']),
             'showSaveOption' => $this->settings['create_pp_token'] == 'yes' ? true : false,
-            'displayMode' => $this->displayMode,
-            'iFrameHeight' => $this->iFrameHeight . 'px',
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
             "{$this->name}-settings" => [
-                'displayMode' => $this->displayMode,
+                'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',
                 'secretKey' => $this->secretKey,
                 'hideOtherPayments' => $this->hideOtherPayments,
