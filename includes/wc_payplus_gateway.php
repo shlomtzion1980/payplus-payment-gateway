@@ -285,6 +285,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         die;
     }
 
+    /**
+     * The hook function callback that handles the post of update settings from PayPlus crm from endpoint
+     * ?wc-api=update_payplus_payment_method
+     * @param 
+     * @return void
+     */
     public function updatePaymentMethodHook()
     {
         $methodsOptions = [
@@ -300,38 +306,48 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Get the raw POST body
+            $verified = $this->verify_request();
+
+
             $postBody = file_get_contents('php://input');
-
-            // Parse the JSON data
             $postData = json_decode($postBody, true);
-
             $methodType = $postData['method_type'];
-            $methodOptions = get_option($methodsOptions[$methodType]);
 
-            $action = $postData['action'] === 'enable' ? 'yes' : 'no';
+            if (!$verified) {
+                $message = "Webhook received for $methodType with action: {$postData['action']} but failed X-Signature verification.";
+                wp_send_json_error($message, 403);
+                exit;
+            }
 
-            if ($methodOptions['secret_key'] === $postData['secret_key']) {
+            if (json_last_error() === JSON_ERROR_NONE) {
+                // Handle the data...
+                $methodOptions = get_option($methodsOptions[$methodType]);
+                $action = $postData['action'] === 'enable' ? 'yes' : 'no';
                 $methodOptions['enabled'] = $action;
                 update_option($methodsOptions[$methodType], $methodOptions);
                 $result = 'success';
-                $message = "Webhook received for $methodType successfully with action:{$postData['action']}";
+                $message = "Webhook received for $methodType successfully with action: {$postData['action']}";
+                wp_send_json_success($message);
             } else {
-                $result = 'failed';
-                $message = "Webhook received for $methodType with action:{$postData['action']} but failed secret key comparison:";
+                wp_send_json_error('Invalid JSON', 400);
             }
 
-            $response = array(
-                'status' => $result,
-                'message' => $message
-            );
-            // Send the success response
-            wp_send_json($response);
-            // Log the POST data or process it as needed
-            error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true));
+            error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true) . " - " . print_r($message, true));
         }
     }
 
-
+    public function verify_request()
+    {
+        $shared_secret = $this->secret_key;
+        // Retrieve the signature from the headers
+        $signature = isset($_SERVER['HTTP_X_SIGNATURE']) ? $_SERVER['HTTP_X_SIGNATURE'] : '';
+        // Retrieve the request body
+        $body = file_get_contents('php://input');
+        // Generate the expected signature
+        $expected_signature = hash_hmac('sha256', $body, $shared_secret);
+        // Verify the signature
+        return hash_equals($expected_signature, $signature);
+    }
     /**
      * @param $clearing_id
      * @return false|mixed|void
