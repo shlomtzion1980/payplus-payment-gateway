@@ -544,6 +544,7 @@ class WC_PayPlus
         if (class_exists("WooCommerce")) {
 
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-admin-settings.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
@@ -1007,7 +1008,6 @@ class WC_PayPlus
     }
     public static function payplus_get_admin_menu()
     {
-        require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-admin-settings.php';
         ob_start();
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
