@@ -256,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -679,8 +679,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
@@ -1007,40 +1007,14 @@ class WC_PayPlus
     }
     public static function payplus_get_admin_menu()
     {
-
+        require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-admin-settings.php';
         ob_start();
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
-        $arrLink = array(
-            'payplus-payment-gateway-setup-wizard' => array(
-                'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus-settings.svg'>",
-            ),
-            'payplus-payment-gateway' => array(
-                'name' => __('PayPlus Gateway', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>",
-            ),
-            'payplus-invoice' => array(
-                'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invoice+.svg'>",
-            ),
-            'payplus-express-checkout' => array(
-                'name' => __('Express Checkout', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/express.svg'>",
-            ),
-            'payplus-error-setting' => array(
-                'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
-                'img' => "",
-            ),
-        );
+        $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         echo "<div id='payplus-options'>";
-        if (count($arrLink)) {
+        if (count($adminTabs)) {
             echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
-            foreach ($arrLink as $key => $arrValue) {
+            foreach ($adminTabs as $key => $arrValue) {
                 $selected = ($key == $currentSection) ? "nav-tab-active" : "";
                 echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $selected . "' >
                                " . $arrValue['img'] .
