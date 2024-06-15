@@ -526,7 +526,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (!$errorPagePayPlus) {
                 $errorPagePayPlus = wp_insert_post(array(
                     'post_status' => 'publish', 'post_type' => 'page',
-                    'post_title' => ucwords('error payment payplus'), "post_content" => "There has been an error with the payment."
+                    'post_title' => ucwords('error payment payplus'), "post_content" => __("There has been an error with the payment.", "payplus-payment-gateway")
                 ));
                 update_option('error_page_payplus', $errorPagePayPlus);
             }
