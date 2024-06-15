@@ -519,6 +519,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $page_slug = 'error-payment-payplus';
         if ($this->check_if_page_exists_by_slug($page_slug)) {
+            $errorPageChange = get_option('payplus-error-page-content-change');
+
+            // if (boolval(!isset($errorPageChange)) || $errorPageChange !== 'no') {
+
+            //     update_option('payplus-error-page-content-change', $errorPageChange);
+            // } else {
+            // }
+
             return;
         } else {
             $error_page_payplus = get_option('error_page_payplus');
@@ -529,6 +537,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'post_title' => ucwords('error payment payplus'), "post_content" => __("There has been an error with the payment.", "payplus-payment-gateway")
                 ));
                 update_option('error_page_payplus', $errorPagePayPlus);
+                update_option('payplus-error-page-content-change', 'no');
             }
         }
     }

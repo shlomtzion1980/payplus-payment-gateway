@@ -175,7 +175,6 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'select',
                     'options' => self::payplus_get_languages(),
                     'class' => 'select-languages-payplus',
-
                 );
                 if ($languages) {
                     foreach ($languages as $key => $language) {
@@ -192,6 +191,13 @@ class WC_PayPlus_Admin_Settings
                         $settings[$section][] = $arrLang;
                     }
                 }
+                $settings[$section][] = array(
+                    'name' => __('PayPlus Page Save New Content', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => 'no',
+                    'desc' => '',
+                    'id' => 'payplus-error-page-change'
+                );
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-error-setting');
                 break;
             case 'payplus-invoice':
