@@ -256,8 +256,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -544,7 +544,7 @@ class WC_PayPlus
         if (class_exists("WooCommerce")) {
 
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-admin-settings.php';
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin-settings.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
@@ -552,7 +552,7 @@ class WC_PayPlus
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
             add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_admin_payments.php';
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
             if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                 add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
             }
@@ -680,8 +680,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;

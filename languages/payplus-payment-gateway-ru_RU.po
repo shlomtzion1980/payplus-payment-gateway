@@ -21,37 +21,37 @@ msgstr ""
 "X-Poedit-SearchPath-1: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
 
-#: includes/wc_payplus_admin_payments.php:55
+#: includes/admin/class-wc-payplus-admin.php:55
 msgid "Charge Order Using PayPlus"
 msgstr "Оплатить заказ с помощью PayPlus"
 
-#: includes/wc_payplus_admin_payments.php:57
+#: includes/admin/class-wc-payplus-admin.php:57
 msgid "Make Payment"
 msgstr "Сделать платеж"
 
-#: includes/wc_payplus_admin_payments.php:105
+#: includes/admin/class-wc-payplus-admin.php:105
 #, php-format
 msgid "PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s"
 msgstr "Платеж PayPlus успешно выполнен<br />Номер транзакции: %s<br />Сумма: %s %s"
 
-#: includes/wc_payplus_admin_payments.php:110
+#: includes/admin/class-wc-payplus-admin.php:110
 #, php-format
 msgid "PayPlus Charge is Failed<br />Status: %s<br />Description: %s"
 msgstr "Платеж PayPlus не выполнен<br />Статус: %s<br />Описание: %s"
 
-#: includes/wc_payplus_admin_payments.php:147 payplus-payment-gateway.php:66
+#: includes/admin/class-wc-payplus-admin.php:147 payplus-payment-gateway.php:66
 msgid "PayPlus Payment Gateway"
 msgstr "Платежный шлюз PayPlus"
 
-#: includes/wc_payplus_admin_payments.php:151
+#: includes/admin/class-wc-payplus-admin.php:151
 msgid "user or other, please contact payplus support"
 msgstr "Пользователь или представитель, пожалуйста свяжитесь с поддержкой payplus"
 
-#: includes/wc_payplus_admin_payments.php:154
+#: includes/admin/class-wc-payplus-admin.php:154
 msgid "Credit card company declined, check credit card details and credit line"
 msgstr "Компания-эмитент кредитной карты отклонила сделку, проверить детали кредитной карты и кредитные лимиты"
 
-#: includes/wc_payplus_admin_payments.php:157
+#: includes/admin/class-wc-payplus-admin.php:157
 msgid "PayPlus Payment Successful"
 msgstr "Успешная оплата PayPlus"
 
