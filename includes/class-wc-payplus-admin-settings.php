@@ -455,7 +455,8 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-express-checkout');
                 break;
         }
-        return $settings[$section];
+        $settings = isset($settings[$section]) ? $settings[$section] : $settings;
+        return $settings;
     }
     /**
      * @return array
