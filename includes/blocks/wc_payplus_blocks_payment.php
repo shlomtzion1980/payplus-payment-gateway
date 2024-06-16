@@ -148,7 +148,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             isset($data['wc-payplus-payment-gateway-new-payment-method']) ? $orderMeta['save_payment_method'] = $data['wc-payplus-payment-gateway-new-payment-method'] : null;
 
 
-            WC_PayPlus_Order_Data::update_meta($order, $orderMeta);
+            WC_PayPlus_Meta_Data::update_meta($order, $orderMeta);
 
             $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
         }

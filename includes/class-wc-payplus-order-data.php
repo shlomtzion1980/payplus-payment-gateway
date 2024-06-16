@@ -7,7 +7,7 @@ if (!defined('ABSPATH')) {
  * Handles and process WC PayPlus Orders Data.
  *
  */
-class WC_PayPlus_Order_Data
+class WC_PayPlus_Meta_Data
 {
 
     public function is_associative_array($array)
@@ -26,7 +26,7 @@ class WC_PayPlus_Order_Data
     public static function update_meta($order, $values)
     {
         if ($order) {
-            $isHPOS = WC_PayPlus_Order_Data::isHPOS();
+            $isHPOS = WC_PayPlus_Meta_Data::isHPOS();
             if ($isHPOS) {
                 foreach ($values as $key => $value) {
                     $order->update_meta_data($key, $value);
@@ -71,7 +71,7 @@ class WC_PayPlus_Order_Data
 
         if ($order) {
             $orderMetaValues = [];
-            $isHPOS = WC_PayPlus_Order_Data::isHPOS();
+            $isHPOS = WC_PayPlus_Meta_Data::isHPOS();
             if ($isHPOS && $useOldFields) {
                 foreach ($values as $key) {
                     if ($order->get_meta($key, true) != null) {

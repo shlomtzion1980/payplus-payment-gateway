@@ -14,13 +14,13 @@ class WC_PayPlus_Statics
      */
     public static function invoice_plus_metabox($order_id, $options = [])
     {
-        $refundsJson = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_refunds', true);
+        $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);
         $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
-        $errorInvoice = WC_PayPlus_Order_Data::get_meta($order_id, "payplus_error_invoice", true);
+        $errorInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, "payplus_error_invoice", true);
 
-        $invDoc = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
-        $invDocType = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_type', true);
-        $invDocNumber = WC_PayPlus_Order_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
+        $invDoc = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
+        $invDocType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_type', true);
+        $invDocNumber = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
         $chargeText = __('Charge', 'payplus-payment-gateway');
         $refundsText = __('Refunds', 'payplus-payment-gateway');
 

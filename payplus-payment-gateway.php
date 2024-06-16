@@ -272,7 +272,7 @@ class WC_PayPlus
         $invoice_api = new PayplusInvoice();
         $payment_method = $order->get_payment_method();
         if (strpos($payment_method, 'payplus') === false) {
-            //$amount = WC_PayPlus_Order_Data::get_meta($refund_id, '_refund_amount', true);
+            //$amount = WC_PayPlus_Meta_Data::get_meta($refund_id, '_refund_amount', true);
             $amount = $order->get_total_refunded();
             if (floatval($amount)) {
                 $invoice_api->payplus_create_document_dashboard(
@@ -326,7 +326,7 @@ class WC_PayPlus
     {
 
         if ($email->id == 'new_order') {
-            $payplusFourDigits = WC_PayPlus_Order_Data::get_meta($order->get_id(), "payplus_four_digits", true);
+            $payplusFourDigits = WC_PayPlus_Meta_Data::get_meta($order->get_id(), "payplus_four_digits", true);
             if ($payplusFourDigits) {
                 $payplusFourDigits = __("Four last digits", "payplus-payment-gateway") . " : " . $payplusFourDigits;
                 echo '<p class="email-upsell-p">' . $payplusFourDigits . '</p>';
@@ -357,7 +357,7 @@ class WC_PayPlus
                 '1' => __('Charge', 'payplus-payment-gateway'),
                 '2' => __('Authorization', 'payplus-payment-gateway'),
             );
-            $payplusTransactionType = WC_PayPlus_Order_Data::get_meta($post_id, 'payplus_transaction_type', true);
+            $payplusTransactionType = WC_PayPlus_Meta_Data::get_meta($post_id, 'payplus_transaction_type', true);
             if (!empty($payplusTransactionType)) {
                 echo '<p>' . $transactionTypes[$payplusTransactionType] . "</p>";
             }
@@ -726,7 +726,7 @@ class WC_PayPlus
 
         ob_start();
         wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
-        $transactionTypeValue = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_transaction_type', true);
+        $transactionTypeValue = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
 
         $transactionTypes = array(
             '1' => __('Charge', 'payplus-payment-gateway'),
@@ -834,7 +834,7 @@ class WC_PayPlus
     {
         ob_start();
         wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
-        $balanceName = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_balance_name', true);
+        $balanceName = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_balance_name', true);
 
         printf('<input maxlength="20"   value="' . $balanceName . '" placeholder ="' . __('Balance Name', 'payplus-payment-gateway') . '"   type="text" id="payplus_balance_name" name="payplus_balance_name" />');
         echo ob_get_clean();
@@ -910,7 +910,7 @@ class WC_PayPlus
 
         if ($column == "payplus_transaction_type" && $this->payplus_gateway->add_product_field_transaction_type) {
             global $post;
-            $payplusTransactionType = WC_PayPlus_Order_Data::get_meta($post->ID, 'payplus_transaction_type', true);
+            $payplusTransactionType = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
             if (!empty($payplusTransactionType)) {
                 $transactionTypes = array(
                     '1' => __('Charge', 'payplus-payment-gateway'),

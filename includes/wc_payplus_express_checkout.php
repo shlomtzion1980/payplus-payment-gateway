@@ -256,7 +256,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                             $inData = array_merge($data, (array) $res->data);
                             $WC_PayPlus_Gateway->payplus_add_order_express_checkout($order_id, $inData);
                             $this->updateMetaDataOneClick($order_id, $inData);
-                            WC_PayPlus_Order_Data::update_meta($order, array('payplus_' . $obj['method'] => $order->get_total()));
+                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] => $order->get_total()));
                             if ($order->get_user_id() > 0) {
                                 update_user_meta($order->get_user_id(), 'cc_token', $inData['data']->card_information->token);
                                 if ($WC_PayPlus_Gateway->create_pp_token && $inData['data']->card_information->token) {
@@ -567,7 +567,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $insertMeta['payplus_refunded'] = $order->get_total();
         $insertMeta['payplus_type_current'] = 'Express Checkout';
         $insertMeta['payplus_type'] = 'Charge';
-        WC_PayPlus_Order_Data::update_meta($order, $insertMeta);
+        WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
     }
 
     /**

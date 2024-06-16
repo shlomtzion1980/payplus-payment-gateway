@@ -482,7 +482,7 @@ function payplus_order_admin_custom_fields($fields)
                 $sorted_fields[$key] = $values;
                 $sorted_fields['vat_number'] = array(
                     'label' => __('ID \ VAT Number', 'payplus-payment-gateway'),
-                    'value' => WC_PayPlus_Order_Data::get_meta($theorder->get_id(), '_billing_vat_number', true),
+                    'value' => WC_PayPlus_Meta_Data::get_meta($theorder->get_id(), '_billing_vat_number', true),
                     'show' => true,
                     'wrapper_class' => 'form-field-wide',
                     'position ' => 1,
