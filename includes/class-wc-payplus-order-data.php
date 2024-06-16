@@ -41,8 +41,14 @@ class WC_PayPlus_Order_Data
         }
     }
 
+    /**
+     * Get Order metadata or Post metadata
+     * @return String|Array
+     */
     public static function get_meta($order, $values)
     {
+        //Keep the ID if indeed an id...
+        $postId = is_numeric($order) ? $order : null;
         //check if $order is an object or an id and if it id convert it to an order object
         $payplusOptions = get_option('woocommerce_payplus-payment-gateway_settings');
         $useOldFields = isset($payplusOptions['use_old_fields']) && $payplusOptions['use_old_fields'] == 'yes' ? true : false;
@@ -50,6 +56,17 @@ class WC_PayPlus_Order_Data
         $order = is_object($order) ? $order : wc_get_order($order);
         $singleValue = !is_array($values) ? true : false;
         $values = is_array($values) ? $values : [$values];
+
+        //In case the $order is actually a $post_id of a product for example...
+        if (empty($order) && is_numeric($postId)) {
+            foreach ($values as $key) {
+                if (get_post_meta($postId, $key, true) != null) {
+                    $orderMetaValues[$key] = get_post_meta($postId, $key, true);
+                }
+            }
+            $orderMetaValues = $singleValue ? reset($orderMetaValues) : $orderMetaValues;
+            return $orderMetaValues;
+        }
 
         if ($order) {
             $orderMetaValues = [];
