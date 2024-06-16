@@ -192,7 +192,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->display_mode = $this->get_option('display_mode');
         $this->iframe_height = $this->get_option('iframe_height');
         $this->import_applepay_script = $this->get_option('import_applepay_script') == 'yes' ? true : false;
-        $this->payplus_generate_page_error();
         $payplusLinkError = get_permalink(get_option('error_page_payplus'));
 
         $this->payplus_generate_key_dashboard = $this->payplus_generate_key_dashboard();
@@ -240,6 +239,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
         add_action('woocommerce_api_update_payplus_payment_method', [$this, 'updatePaymentMethodHook']);
         add_action('woocommerce_api_get_order_meta', [$this, 'getOrderMeta']);
+        add_action('update_option', [$this, 'settingsSave'], 10, 1);
 
         /****** ACTION END ******/
 
@@ -254,13 +254,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (class_exists('WC_Subscriptions_Order') && $this->disable_woocommerce_scheduler !== 'yes') {
             add_action('woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduled_subscription_payment'), 10, 2);
         }
-        if (empty(get_option('settings_payplus_page_error_option'))) {
-            $settingsPayplusPageErrorOption = array(
-                "he_IL-Hebrew" => "העיסקה נכשלה, נא ליצור קשר עם בית העסק",
-                "en_US_-English" => "The transaction failed, please contact the seller"
-            );
-            update_option('settings_payplus_page_error_option', $settingsPayplusPageErrorOption);
-        }
+
         $this->invoice_api = new PayplusInvoice();
         $payplus_invoice_option = get_option('payplus_invoice_option');
         if ($payplus_invoice_option) {
@@ -506,38 +500,23 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         return $allcaps;
     }
 
-    public function check_if_page_exists_by_slug($page_slug)
-    {
-        $page = get_page_by_path($page_slug, OBJECT, 'page');
-        return !empty($page);
-    }
-
     /**
+     * This function runs every time the settings are saved on the admin panel.
+     * @param $option
      * @return void
      */
-    public function payplus_generate_page_error()
+    public function settingsSave($option)
     {
-        $page_slug = 'error-payment-payplus';
-        if ($this->check_if_page_exists_by_slug($page_slug)) {
-            $errorPageChange = get_option('payplus-error-page-content-change');
-
-            // if (boolval(!isset($errorPageChange)) || $errorPageChange !== 'no') {
-
-            //     update_option('payplus-error-page-content-change', $errorPageChange);
-            // } else {
-            // }
-
-            return;
-        } else {
+        //Update PayPlus error-payment-payplus page content
+        if (isset($_GET['section']) && $_GET['section'] === 'payplus-error-setting') {
             $error_page_payplus = get_option('error_page_payplus');
             $errorPagePayPlus = get_post($error_page_payplus);
-            if (!$errorPagePayPlus) {
-                $errorPagePayPlus = wp_insert_post(array(
-                    'post_status' => 'publish', 'post_type' => 'page',
-                    'post_title' => ucwords('error payment payplus'), "post_content" => __("There has been an error with the payment.", "payplus-payment-gateway")
+            $errorPageOptions = get_option('settings_payplus_page_error_option');
+            if ($errorPageOptions['post-content'] !== $errorPagePayPlus->post_content) {
+                wp_update_post(array(
+                    'ID' => $error_page_payplus,
+                    "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
                 ));
-                update_option('error_page_payplus', $errorPagePayPlus);
-                update_option('payplus-error-page-content-change', 'no');
             }
         }
     }

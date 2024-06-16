@@ -146,10 +146,61 @@ function payplus_create_table_db()
         payplus_create_table_payment_session();
         payplus_create_table_process();
         checkSetPayPlusOptions();
+        payplusGenerateErrorPage();
         update_option('payplus_db_version', PAYPLUS_VERSION_DB);
     }
 }
 
+function check_if_page_exists_by_slug($page_slug)
+{
+    $page = get_page_by_path($page_slug, OBJECT, 'page');
+    $pageId = $page->ID ?? null;
+    return $pageId;
+}
+
+/**
+ * Create the payplus error page
+ * @return void
+ */
+function payplusGenerateErrorPage()
+{
+    $page_slug = 'error-payment-payplus';
+    $errorPageOptions = get_option('settings_payplus_page_error_option');
+    $pageId = check_if_page_exists_by_slug($page_slug);
+    if ($pageId) {
+        checkPayPlusErrorPage($errorPageOptions);
+        return;
+    } else {
+        $error_page_payplus = get_option('error_page_payplus');
+        $errorPagePayPlus = get_post($error_page_payplus);
+        if (!$errorPagePayPlus) {
+            $errorPagePayPlus = wp_insert_post(array(
+                'post_status' => 'publish', 'post_type' => 'page',
+                'post_title' => ucwords('error payment payplus'),
+                "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
+            ));
+            update_option('error_page_payplus', $errorPagePayPlus);
+        }
+    }
+}
+
+/**
+ * To get rid of the shortcodes...
+ * Check if the payplus error page has to shortcode instead of content if so replace it.
+ * 
+ * @return void
+ */
+function checkPayPlusErrorPage($errorPageOptions)
+{
+    $error_page_payplus = get_option('error_page_payplus');
+    $errorPagePayPlus = get_post($error_page_payplus);
+    if (strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
+        wp_update_post(array(
+            'ID' => $error_page_payplus,
+            "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
+        ));
+    }
+}
 
 /**
  * Checks if the new options exist and if not adds them // this is version dependant and should be 
@@ -161,6 +212,7 @@ function checkSetPayPlusOptions()
 {
     $invoiceOptions = get_option('payplus_invoice_option', []);
     $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
+    $payPlusErrorOptions = get_option('settings_payplus_page_error_option', []);
 
     $newPayPlusOptionsYes = ['hide_custom_fields_buttons'];
     $newPayPlusOptionsNo = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
@@ -196,6 +248,11 @@ function checkSetPayPlusOptions()
         }
     }
     ($savePayPlus ?? false) ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
+
+    if (!array_key_exists('post-content', $payPlusErrorOptions)) {
+        $payPlusErrorOptions['post-content'] = "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller";
+        update_option('settings_payplus_page_error_option', $payPlusErrorOptions);
+    }
 }
 
 

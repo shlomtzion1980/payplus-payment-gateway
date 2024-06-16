@@ -149,54 +149,19 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-setup-wizard');
                 break;
             case 'payplus-error-setting':
-                if (!empty($_POST) && isset($_POST['settings_payplus_page_error_option'])) {
-                    $settingsPayplusPageErrorOption = $_POST['settings_payplus_page_error_option'];
-                    unset($settingsPayplusPageErrorOption['select-languages-payplus']);
-                    update_option('settings_payplus_page_error_option', $settingsPayplusPageErrorOption);
-                }
-                $languages = get_option('settings_payplus_page_error_option');
-                unset($languages['select-languages-payplus']);
-                if (!count($languages)) {
-
-                    $languages['he_IL-Hebrew'] = "העיסקה נכשלה, נא ליצור קשר עם בית העסק";
-                    $languages['en_US_-English'] = "The transaction failed, please contact the seller";
-                }
-
                 $settings[$section][] = array(
                     'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
                     'type' => 'title',
                     'desc' => '',
                     'id' => 'payplus-error-setting'
                 );
-
                 $settings[$section][] = array(
-                    'name' => __('Language of the page', 'payplus-payment-gateway') . ":",
-                    'id' => 'settings_payplus_page_error_option[select-languages-payplus]',
-                    'type' => 'select',
-                    'options' => self::payplus_get_languages(),
-                    'class' => 'select-languages-payplus',
-                );
-                if ($languages) {
-                    foreach ($languages as $key => $language) {
-                        $otherKey = explode("-", $key);
-                        $arrLang = array(
-                            'name' => __($otherKey[1], 'payplus-payment-gateway') . ":",
-                            'id' => 'settings_payplus_page_error_option[' . $key . ']',
-                            'type' => 'textarea'
-                        );
-
-                        if ($key != 'he_IL-Hebrew' && $key != 'en_US_-English') {
-                            $arrLang['desc'] = "<a class='button-primary woocommerce-save-button payplus-delete-error'>Delete</a>";
-                        }
-                        $settings[$section][] = $arrLang;
-                    }
-                }
-                $settings[$section][] = array(
-                    'name' => __('PayPlus Page Save New Content', 'payplus-payment-gateway'),
-                    'type' => 'checkbox',
-                    'default' => 'no',
-                    'desc' => '',
-                    'id' => 'payplus-error-page-change'
+                    'name' => __('Content of the page', 'payplus-payment-gateway') . ":",
+                    'id' => 'settings_payplus_page_error_option[post-content]',
+                    'type' => 'textarea',
+                    'desc' => __('Edit the error page content', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'default' => "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller"
                 );
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-error-setting');
                 break;
