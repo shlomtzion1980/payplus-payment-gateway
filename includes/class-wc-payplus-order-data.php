@@ -31,13 +31,13 @@ class WC_PayPlus_Order_Data
                 foreach ($values as $key => $value) {
                     $order->update_meta_data($key, $value);
                 }
-                $order->save();
             } else {
                 $id = $order->get_id();
                 foreach ($values as $key => $value) {
                     update_post_meta($id, $key, $value);
                 }
             }
+            $order->save();
         }
     }
 
@@ -59,6 +59,7 @@ class WC_PayPlus_Order_Data
 
         //In case the $order is actually a $post_id of a product for example...
         if (empty($order) && is_numeric($postId)) {
+            $orderMetaValues = [];
             foreach ($values as $key) {
                 if (get_post_meta($postId, $key, true) != null) {
                     $orderMetaValues[$key] = get_post_meta($postId, $key, true);
