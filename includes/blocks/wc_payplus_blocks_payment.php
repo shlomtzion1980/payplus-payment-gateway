@@ -79,6 +79,17 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $token_id = $context->payment_data['token'];
         $token = WC_Payment_Tokens::get($token_id);
 
+        // Hook into PayPlus error processing so that we can capture the error to payment details.
+        // This error would have been registered via wc_add_notice() and thus is not helpful for block checkout processing.
+        add_action(
+            'wc_gateway_payplus_process_payment_error',
+            function ($error) use (&$result) {
+                $payment_details = $result->payment_details;
+                $payment_details['errorMessage'] = wp_strip_all_tags($error);
+                $result->set_payment_details($payment_details);
+            }
+        );
+
         if (!in_array($context->payment_method, $this->settings['gateways'])) {
             return;
         }
@@ -128,15 +139,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         if ($responseArray['results']['status'] === 'error' || !isset($responseArray['results']) && isset($responseArray['message'])) {
             $payment_details['errorMessage'] = isset($responseArray['results']['description']) ? wp_strip_all_tags($responseArray['results']['description']) : $responseArray['message'];
-            // Hook into PayPlus error processing so that we can capture the error to payment details.
-            // This error would have been registered via wc_add_notice() and thus is not helpful for block checkout processing.
-            add_action(
-                'wc_gateway_payplus_process_payment_error',
-                function ($error) use (&$result) {
-                    $payment_details['errorMessage'] = wp_strip_all_tags($error->getLocalizedMessage());
-                    $result->set_payment_details($payment_details);
-                }
-            );
         } else {
             $orderMeta = [
                 'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],

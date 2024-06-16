@@ -823,7 +823,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (!$this->checkValidateCard($token)) {
                 $this->payplus_add_log_all($handle, 'Token Expired: ' . $token, 'error');
                 wc_add_notice(__('Error: user or other, please contact PayPlus support', $this->id), 'error');
-                return;
+                do_action('wc_gateway_payplus_process_payment_error', __('Error: user or other, please contact PayPlus support', $this->id), $order);
+                $order->update_status('failed');
+
+                return [
+                    'result'   => 'fail',
+                    'redirect' => '',
+                ];
             }
 
             $response = $this->receipt_page($order_id, $token);
@@ -832,8 +838,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 // Customize the error message here
                 $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
+                do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), $order);
+                $order->update_status('failed');
 
-                return;
+                return [
+                    'result'   => 'fail',
+                    'redirect' => '',
+                ];
             }
 
             $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
