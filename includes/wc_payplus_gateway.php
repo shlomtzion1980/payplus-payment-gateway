@@ -828,8 +828,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             $response = $this->receipt_page($order_id, $token);
 
-            if ($response->results->status === "error" && $response->results->code === 1) {
-
+            if (property_exists($response, 'results') && $response->results->status === "error" && $response->results->code === 1) {
                 // Customize the error message here
                 $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
@@ -1661,9 +1660,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->payplus_add_log_all($handle, print_r($response, true), 'error');
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
+            if (property_exists($res->data, 'page_request_uid')) {
+                $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
+                WC_PayPlus_Order_Data::update_meta($order, $pageRequestUid);
+            }
 
-            $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
-            WC_PayPlus_Order_Data::update_meta($order, $pageRequestUid);
 
             if ($token || $inline) {
                 return $res;
