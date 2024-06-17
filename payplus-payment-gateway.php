@@ -286,34 +286,6 @@ class WC_PayPlus
         }
     }
 
-    /**
-     * @param WP_Admin_Bar $admin_bar
-     * @return void
-     */
-    public function payplus_add_toolbar_items($admin_bar)
-    {
-
-        $admin_bar->add_menu(array(
-            'id' => 'PayPlus-toolbar',
-            'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
-            'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard",
-            'meta' => array(
-                'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
-                'target' => '_blank',
-            ),
-        ));
-        $admin_bar->add_menu(array(
-            'id' => 'payPlus-toolbar-sub',
-            'parent' => 'PayPlus-toolbar',
-            'title' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
-            'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-invoice",
-            'meta' => array(
-                'title' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
-                'target' => '_blank',
-                'class' => 'my_menu_item_class',
-            ),
-        ));
-    }
 
     /**
      * @param  $order
@@ -855,7 +827,7 @@ class WC_PayPlus
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if ($payplus_payment_gateway_settings) {
             if ($payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
-                add_action('admin_bar_menu', [$this, 'payplus_add_toolbar_items'], 100);
+                add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
             }
             if ($payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
                 add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 99);
