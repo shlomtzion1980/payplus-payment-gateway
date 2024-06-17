@@ -991,11 +991,11 @@ class PayplusInvoice
             }
             $sql .= " ) ";
             $resultApps = $wpdb->get_results($sql, OBJECT);
-            $resultApps = $this->payplus_set_object_paymnet($order_id, $resultApps);
+            $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
         return $resultApps;
     }
-    public function payplus_set_object_paymnet($order_id, $resultApps)
+    public function payplus_set_object_payment($order_id, $resultApps)
     {
         $arr = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();

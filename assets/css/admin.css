@@ -378,7 +378,7 @@ html[lang="en-US"] .flex-item {
 }
 
 .type-payment,
-.payplus-paymnet-button {
+.payplus-payment-button {
   border: 1.5px solid #34aa54;
   text-align: center;
   border-radius: 43px;
@@ -391,7 +391,7 @@ html[lang="en-US"] .flex-item {
   font-size: 12px;
 }
 
-.payplus_sum_paymnet {
+.payplus_sum_payment {
   text-align: left;
   color: #000;
   font-size: 16px;
@@ -399,16 +399,16 @@ html[lang="en-US"] .flex-item {
   display: none;
 }
 
-html[lang="en-US"] .payplus_sum_paymnet {
+html[lang="en-US"] .payplus_sum_payment {
   text-align: right;
 }
 
-#all-paymnet-invoice {
+#all-payment-invoice {
   display: none;
 }
 
 .type-payment:hover,
-.payplus-paymnet-button:hover {
+.payplus-payment-button:hover {
   background: #34aa54;
   color: #fff;
 }

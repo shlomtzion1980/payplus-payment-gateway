@@ -827,7 +827,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $invoiceManualList = $this->payPlusInvoice->payplus_get_invoice_manual_list();
         $currentStatus = $this->payPlusInvoice->payplus_get_invoice_type_document();
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
-        $chackAllPaymnet = in_array($currentStatus, $chackStatus) ? "block" : 'none';
+        $chackAllPayment = in_array($currentStatus, $chackStatus) ? "block" : 'none';
         $payments = $this->invoice_api->payplus_get_payments($orderId);
         $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
         if ($invoiceManualList) {
@@ -885,7 +885,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $installed_payment_methods[] = 'pay-box';
         ?>
             <input id="all-sum" type="hidden" value="<?php echo $order->get_total() ?>">
-            <div id="all-paymnet-invoice" style="display: <?php echo $chackAllPaymnet ?>">
+            <div id="all-payment-invoice" style="display: <?php echo $chackAllPayment ?>">
 
                 <div class="flex-row">
                     <h2><strong><?php echo __("Payment details", "payplus-payment-gateway") ?> </strong></h2>
@@ -1019,7 +1019,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     </div>
                     <div class="flex-row flex-row-reverse">
                         <div class="flex-item">
-                            <button id="credit-card-payment-payplus" class="payplus-paymnet-button">
+                            <button id="credit-card-payment-payplus" class="payplus-payment-button">
                                 <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                         </div>
                     </div>
@@ -1049,7 +1049,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="cash-payment-payplus" class="payplus-paymnet-button">
+                                <button id="cash-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1089,7 +1089,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="payment-check-payment-payplus" class="payplus-paymnet-button">
+                                <button id="payment-check-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1127,7 +1127,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="bank-transfer-payment-payplus" class="payplus-paymnet-button">
+                                <button id="bank-transfer-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1171,7 +1171,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="payment-app-payment-payplus" class="payplus-paymnet-button">
+                                <button id="payment-app-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1205,7 +1205,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="paypal-payment-payplus" class="payplus-paymnet-button">
+                                <button id="paypal-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1231,7 +1231,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="withholding-tax-payment-payplus" class="payplus-paymnet-button">
+                                <button id="withholding-tax-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1264,7 +1264,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                         <div class="flex-row flex-row-reverse">
                             <div class="flex-item">
-                                <button id="other-payment-payplus" class="payplus-paymnet-button">
+                                <button id="other-payment-payplus" class="payplus-payment-button">
                                     <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
@@ -1296,10 +1296,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     {
         $order = wc_get_order($orderId);
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
-        $chackAllPaymnetTable = in_array($currentStatus, $chackStatus) ? "table" : 'none';
+        $chackAllPaymentTable = in_array($currentStatus, $chackStatus) ? "table" : 'none';
 
             ?>
-            <table data-method="<?php echo (strpos($order->get_payment_method(), 'payplus') !== false) ? true : false ?>" id="payplus-table-payment" style="display: <?php echo $chackAllPaymnetTable ?>" class="wc-order-totals payplus-table-payment">
+            <table data-method="<?php echo (strpos($order->get_payment_method(), 'payplus') !== false) ? true : false ?>" id="payplus-table-payment" style="display: <?php echo $chackAllPaymentTable ?>" class="wc-order-totals payplus-table-payment">
                 <thead>
                     <tr>
                         <th></th>
@@ -1364,7 +1364,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     ?>
                 </tbody>
             </table>
-            <div id="payplus_sum_paymnet"></div>
+            <div id="payplus_sum_payment"></div>
             <?php
         }
 
