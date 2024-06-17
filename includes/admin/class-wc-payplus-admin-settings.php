@@ -15,17 +15,17 @@ class WC_PayPlus_Admin_Settings
     {
         return $adminTabs = array(
             'payplus-payment-gateway-setup-wizard' => array(
-                'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
+                'name' => __('Basic Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus-settings.svg'>",
             ),
             'payplus-payment-gateway' => array(
-                'name' => __('PayPlus Gateway', 'payplus-payment-gateway'),
+                'name' => __('Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/payplus.svg'>",
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/PayPlusLogo.svg'>",
             ),
             'payplus-invoice' => array(
-                'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+                'name' => __('Invoice+', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invoice+.svg'>",
             ),
@@ -35,7 +35,7 @@ class WC_PayPlus_Admin_Settings
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/express.svg'>",
             ),
             'payplus-error-setting' => array(
-                'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
+                'name' => __('Error Page', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
                 'img' => "",
             ),
@@ -47,7 +47,7 @@ class WC_PayPlus_Admin_Settings
         switch ($section) {
             case 'payplus-payment-gateway-setup-wizard':
                 $settings[$section][] = array(
-                    'name' => __('PayPlus Basic Setup', 'payplus-payment-gateway'),
+                    'name' => __('PayPlus Basic Settings', 'payplus-payment-gateway'),
                     'type' => 'title',
                     'desc' => __('Simple setup options - The base plugin options. Setup these and you can start working immediately!', 'payplus-payment-gateway'),
                     'desc_tip' => true,
@@ -214,7 +214,7 @@ class WC_PayPlus_Admin_Settings
                 );
 
                 $settings[$section][] = array(
-                    'name' => __('SECRET KEY', 'payplus-payment-gateway'),
+                    'name' => __('Secret Key', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_secret_key]',
                     'type' => 'text'
                 );

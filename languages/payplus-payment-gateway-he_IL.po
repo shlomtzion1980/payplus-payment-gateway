@@ -292,7 +292,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:246
 #: includes/class-wc-payplus-form-fields.php:66
-msgid "SECRET KEY"
+msgid "Secret Key"
 msgstr "מפתח סודי (Secret Key)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:252
@@ -970,7 +970,7 @@ msgid "Activate test mode"
 msgstr "הפעלת מצב בדיקות (ארגז חול)"
 
 #: includes/class-wc-payplus-form-fields.php:58
-msgid "API KEY"
+msgid "API Key"
 msgstr "(API Key) מפתח API"
 
 #: includes/class-wc-payplus-form-fields.php:60

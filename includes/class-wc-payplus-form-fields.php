@@ -169,7 +169,7 @@ class WC_PayPlus_Form_Fields
 
             ],
             'api_key' => [
-                'title' => __('API KEY', 'payplus-payment-gateway'),
+                'title' => __('API Key', 'payplus-payment-gateway'),
                 'type' => 'text',
                 'description' => __('PayPlus API Key you can find in your account under Settings', 'payplus-payment-gateway'),
                 'default' => '',
@@ -177,7 +177,7 @@ class WC_PayPlus_Form_Fields
             ],
 
             'secret_key' => [
-                'title' => __('SECRET KEY', 'payplus-payment-gateway'),
+                'title' => __('Secret Key', 'payplus-payment-gateway'),
                 'type' => 'text',
                 'description' => __('PayPlus Secret Key you can find in your account under Settings', 'payplus-payment-gateway'),
                 'default' => '',

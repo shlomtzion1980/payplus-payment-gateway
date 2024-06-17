@@ -108,7 +108,7 @@ msgid "Enable Sandbox Mode"
 msgstr "Активировать тестовый режим"
 
 #: includes/wc_payplus_gateway.php:122
-msgid "API KEY"
+msgid "API Key"
 msgstr "API ключ"
 
 #: includes/wc_payplus_gateway.php:124
@@ -116,7 +116,7 @@ msgid "PayPlus API Key you can find in your account under Settings"
 msgstr "API ключ PayPlus вы можете найти в настройках вашего аккаунта"
 
 #: includes/wc_payplus_gateway.php:129
-msgid "SECRET KEY"
+msgid "Secret Key"
 msgstr "Секретный ключ"
 
 #: includes/wc_payplus_gateway.php:131
