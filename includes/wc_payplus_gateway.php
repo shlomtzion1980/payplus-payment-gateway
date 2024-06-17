@@ -3,8 +3,8 @@ defined('ABSPATH') || exit; // Exit if accessed directly
 define("COUNT_PAY_PLUS", 3);
 define('CLUB_CARD', array('multipass', 'valuecard', 'tav-zahav', 'finitione'));
 define('CREDIT_CARD', 'credit-card');
-define('PAYPLUS_PAYMNET_URL_PRODUCTION', 'https://restapi.payplus.co.il/api/v1.0/');
-define('PAYPLUS_PAYMNET_URL_DEV', 'https://restapidev.payplus.co.il/api/v1.0/');
+define('PAYPLUS_PAYMENT_URL_PRODUCTION', 'https://restapi.payplus.co.il/api/v1.0/');
+define('PAYPLUS_PAYMENT_URL_DEV', 'https://restapidev.payplus.co.il/api/v1.0/');
 define('PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_PRODUCTION', 'https://payments.payplus.co.il/occ/google-pay');
 define('PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_DEV', 'https://paymentsdev.payplus.co.il/occ/google-pay');
 define('ROUNDING_DECIMALS', 2);
@@ -199,7 +199,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         //wc-api=payplus_gateway added to the response url will initiate the woocommerce_api_payplus_add_payment action - which will start the add_payment_ipn_response
         $this->add_payment_res_url = add_query_arg('wc-api', 'payplus_add_payment', home_url('/'));
 
-        $this->api_url = ($this->api_test_mode) ? PAYPLUS_PAYMNET_URL_DEV : PAYPLUS_PAYMNET_URL_PRODUCTION;
+        $this->api_url = ($this->api_test_mode) ? PAYPLUS_PAYMENT_URL_DEV : PAYPLUS_PAYMENT_URL_PRODUCTION;
         $this->payment_url = $this->api_url . 'PaymentPages/generateLink';
         $this->ipn_url = $this->api_url . 'PaymentPages/ipn';
         $this->refund_url = $this->api_url . 'Transactions/RefundByTransactionUID';

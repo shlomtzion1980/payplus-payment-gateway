@@ -87,7 +87,7 @@ class PayplusInvoice
         $this->payplus_api_url = ($this->payplus_invoice_option
             && isset($this->payplus_invoice_option['payplus_enable_sandbox'])
             && ($this->payplus_invoice_option['payplus_enable_sandbox'] === "yes"))
-            ? PAYPLUS_PAYMNET_URL_DEV : PAYPLUS_PAYMNET_URL_PRODUCTION;
+            ? PAYPLUS_PAYMENT_URL_DEV : PAYPLUS_PAYMENT_URL_PRODUCTION;
 
         $this->logging = true;
 
