@@ -11,6 +11,91 @@ class WC_PayPlus_Form_Fields
 {
     public $formFields;
 
+    /**
+     * @return void
+     */
+    public static function getGateway()
+    {
+        wp_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway'));
+        exit;
+    }
+
+    /**
+     * @return void
+     */
+    public static function addAdminPageMenu()
+    {
+        global $submenu;
+        $parent_slug = 'payplus-payment-gateway';
+
+        add_menu_page(
+            __('PayPlus Gateway', 'payplus-payment-gateway'),
+            __('PayPlus Gateway', 'payplus-payment-gateway'),
+            "administrator",
+            'payplus-payment-gateway',
+            ['WC_PayPlus_Form_Fields', 'getGateway'],
+            PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-icon.svg"
+        );
+
+        add_submenu_page(
+            'payplus-payment-gateway',
+            __('bit', 'payplus-payment-gateway'),
+            __('bit', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
+
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('Google Pay', 'payplus-payment-gateway'),
+            __('Google Pay', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay' //Page slug
+
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('Apple Pay', 'payplus-payment-gateway'),
+            __('Apple Pay', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay' //Page slug
+
+        );
+
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('MULTIPASS', 'payplus-payment-gateway'),
+            __('MULTIPASS', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass' //Page slug
+
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('PayPal', 'payplus-payment-gateway'),
+            __('PayPal', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal' //Page slug
+
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('Tav zahav', 'payplus-payment-gateway'),
+            __('Tav Zahav', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav' //Page slug
+
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+            __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+            'administrator', //Capability
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice' //Page slug
+
+        );
+    }
+
     public static function getFormFields()
     {
         $listOrderStatus = ['default-woo' => __('Default Woo', 'payplus-payment-gateway')];
