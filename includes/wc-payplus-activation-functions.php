@@ -468,7 +468,6 @@ function payplus_Add_log_payplus($last_error)
 
 
 add_filter('woocommerce_price_trim_zeros', '__return_true');
-add_filter('acf/settings/remove_wp_meta_box', '__return_false');
 add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
 
 function payplus_order_admin_custom_fields($fields)
