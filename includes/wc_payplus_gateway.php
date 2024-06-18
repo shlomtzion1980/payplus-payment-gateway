@@ -208,7 +208,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->brands_list_url = $this->api_url . 'BrandsList';
 
         if ($this->hide_icon == "no") {
-            $this->icon = PAYPLUS_PLUGIN_URL . 'assets/images/payplus.svg';
+            $this->icon = PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg';
         }
         $this->payplus_iframe_google_pay_oneclick = ($this->api_test_mode) ? PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_DEV : PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_PRODUCTION;
 
@@ -688,45 +688,52 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $arrOtherPayment = array(
             "bit" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "bit.svg",
-
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "bitLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit",
-                "section" => "payplus-payment-gateway-bit"
+                "section" => "payplus-payment-gateway-bit",
+                "style" => "max-height: 100%;"
             ),
             "Google Pay" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "google-pay.svg",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "google-payLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay",
-                "section" => "payplus-payment-gateway-googlepay"
+                "section" => "payplus-payment-gateway-googlepay",
+                "style" => "max-height: 100%;"
             ),
             "Apple Pay" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "apple-pay.svg",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "apple-payLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay",
-                "section" => "payplus-payment-gateway-applepay"
+                "section" => "payplus-payment-gateway-applepay",
+                "style" => "max-height: 100%;"
             ),
             "MULTIPASS" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass.svg",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipassLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass",
-                "section" => "payplus-payment-gateway-multipass"
+                "section" => "payplus-payment-gateway-multipass",
+                "style" => "max-height: 100%;"
             ),
             "PayPal" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "paypal.svg",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "paypalLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal",
-                "section" => "payplus-payment-gateway-paypal"
+                "section" => "payplus-payment-gateway-paypal",
+                "style" => "max-height: 100%;"
             ),
             "Tav Zahav" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "tav-zahav.svg",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "verifoneLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav",
-                "section" => "payplus-payment-gateway-tavzahav"
+                "section" => "payplus-payment-gateway-tavzahav",
+                "style" => "max-height: 100%;"
             ),
             "Valuecard" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "valuecard.png",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "valuecardLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-valuecard",
-                "section" => "payplus-payment-gateway-valuecard"
+                "section" => "payplus-payment-gateway-valuecard",
+                "style" => "max-height: 100%;"
             ),
             "finitiOne" => array(
-                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "finitione.png",
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "finitioneLogo.png",
                 "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-finitione",
-                "section" => "payplus-payment-gateway-finitione"
+                "section" => "payplus-payment-gateway-finitione",
+                "style" => "max-height: 100%;"
             ),
         );
 
@@ -735,14 +742,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (count($arrOtherPayment)) {
             echo "<nav  id='sub-option-paylus' class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($arrOtherPayment as $key => $value) {
-
+                $iconStyle = isset($value['style']) ? $value['style'] : '';
                 $selected = ($currentSection == $value['section']) ? "nav-tab-active" : "";
 
                 if ($currentSection == $value['section']) {
                     $title = __($key, 'payplus-payment-gateway');
                 }
                 echo "<a data-tab='payplus-blank' href='" . $value['link'] . "'  class='nav-tab " . $selected . "'>
-                                <img  src ='" . $value['icon'] . "' alt='" . __($key, 'payplus-payment-gateway') . "'>"
+                                <img  style='" . $iconStyle . "' src ='" . $value['icon'] . "' alt='" . __($key, 'payplus-payment-gateway') . "'>"
                     . __($key, 'payplus-payment-gateway') . "</a>";
             }
             echo "</nav>";

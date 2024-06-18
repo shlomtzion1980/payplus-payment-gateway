@@ -47,6 +47,7 @@ if (isCheckout) {
                     height: "32px",
                     maxHeight: "100%",
                     margin: "0px 10px",
+                    objectPosition: "center",
                   },
                   src: t.icon,
                 })
@@ -109,6 +110,15 @@ if (isCheckout) {
     function startObserving() {
       console.log("observer started");
 
+      const overlay = document.createElement("div");
+      overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+      overlay.id = "overlay";
+      overlay.style.position = "fixed";
+      overlay.style.height = "100%";
+      overlay.style.width = "100%";
+      overlay.style.top = "0";
+      overlay.style.zIndex = "5";
+
       const observer = new MutationObserver((mutationsList, observer) => {
         if (store.isComplete()) {
           if (
@@ -122,7 +132,8 @@ if (isCheckout) {
             );
             // Call the function to handle the target element
             startIframe(
-              payment.getPaymentResult().paymentDetails.paymentPageLink
+              payment.getPaymentResult().paymentDetails.paymentPageLink,
+              overlay
             );
             // Disconnect the observer to stop observing further changes
             observer.disconnect();
@@ -183,7 +194,7 @@ if (isCheckout) {
     setTimeout(startObserving, 1000); // Adjust the time (in milliseconds) as needed
   });
 
-  function startIframe(paymentPageLink) {
+  function startIframe(paymentPageLink, overlay) {
     const activePaymentMethod = payment.getActivePaymentMethod();
     const gateWaySettings =
       window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
@@ -222,7 +233,7 @@ if (isCheckout) {
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           break;
         case "popupIframe":
-          pp_iframe.style.width = "60%";
+          pp_iframe.style.width = "55%";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           pp_iframe.style.position = "fixed";
           pp_iframe.style.top = "50%";
@@ -230,7 +241,9 @@ if (isCheckout) {
           pp_iframe.style.transform = "translate(-50%, -50%)";
           pp_iframe.style.zIndex = 100000;
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
-          pp_iframe.style.borderRadius = "25px";
+          pp_iframe.style.borderRadius = "15px";
+          document.body.appendChild(overlay);
+          document.body.style.overflow = "hidden";
           break;
         default:
           break;

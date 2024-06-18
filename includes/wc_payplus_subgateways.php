@@ -121,8 +121,6 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => '1',
             ],
         ];
-
-
     }
 
     /**
@@ -203,7 +201,7 @@ class WC_PayPlus_Gateway_Bit extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Bit payment via PayPlus';
     public $method_descrition_text = 'Pay with bit via PayPlus';
     public $payplus_default_charge_method = 'bit';
-    public $iconURL = 'assets/images/bit.svg';
+    public $iconURL = 'assets/images/bitLogo.png';
     public $pay_with_text = 'Pay with bit';
 }
 
@@ -214,7 +212,7 @@ class WC_PayPlus_Gateway_GooglePay extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Google Pay payment via PayPlus';
     public $method_descrition_text = 'Pay with Google Pay via PayPlus';
     public $payplus_default_charge_method = 'google-pay';
-    public $iconURL = 'assets/images/google-pay.svg';
+    public $iconURL = 'assets/images/google-payLogo.png';
     public $pay_with_text = 'Pay with Google Pay';
 }
 
@@ -225,7 +223,7 @@ class WC_PayPlus_Gateway_ApplePay extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Apple1 Pay payment via PayPlus';
     public $method_descrition_text = 'Pay with Apple Pay via PayPlus';
     public $payplus_default_charge_method = 'apple-pay';
-    public $iconURL = 'assets/images/apple-pay.svg';
+    public $iconURL = 'assets/images/apple-payLogo.png';
     public $pay_with_text = 'Pay with Apple Pay';
 }
 
@@ -236,7 +234,7 @@ class WC_PayPlus_Gateway_Multipass extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'BUYME payment via PayPlus';
     public $method_descrition_text = 'Pay With MULTIPASS via PayPlus';
     public $payplus_default_charge_method = 'multipass';
-    public $iconURL = 'assets/images/multipass.svg';
+    public $iconURL = 'assets/images/multipassLogo.png';
     public $pay_with_text = 'Pay with MULTIPASS';
 }
 
@@ -247,7 +245,7 @@ class WC_PayPlus_Gateway_Paypal extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'PayPal payment via PayPlus';
     public $method_descrition_text = 'Pay with PayPal via PayPlus';
     public $payplus_default_charge_method = 'paypal';
-    public $iconURL = 'assets/images/paypal.svg';
+    public $iconURL = 'assets/images/paypalLogo.png';
     public $pay_with_text = 'Pay with PayPal';
 }
 
@@ -258,7 +256,7 @@ class WC_PayPlus_Gateway_TavZahav extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Tav Zahav payment via PayPlus';
     public $method_descrition_text = 'Pay with Tav Zahav via PayPlus';
     public $payplus_default_charge_method = 'tav-zahav';
-    public $iconURL = 'assets/images/tav-zahav.svg';
+    public $iconURL = 'assets/images/verifoneLogo.png';
     public $pay_with_text = 'Pay with Tav Zahav';
 }
 
@@ -269,7 +267,7 @@ class WC_PayPlus_Gateway_Valuecard extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Valuecard  payment via PayPlus';
     public $method_descrition_text = 'Pay with Valuecard via PayPlus';
     public $payplus_default_charge_method = 'valuecard';
-    public $iconURL = 'assets/images/valuecard.png';
+    public $iconURL = 'assets/images/valuecardLogo.png';
     public $pay_with_text = 'Pay with  Valuecard ';
 }
 
@@ -280,8 +278,6 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'finitiOne  payment via PayPlus';
     public $method_descrition_text = 'Pay with finitiOne via PayPlus';
     public $payplus_default_charge_method = 'finitione';
-    public $iconURL = 'assets/images/finitione.png';
+    public $iconURL = 'assets/images/finitioneLogo.png';
     public $pay_with_text = 'Pay with Tav finitiOne';
 }
-
-
