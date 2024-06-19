@@ -1,17 +1,19 @@
+const { CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
+const { PAYMENT_STORE_KEY } = window.wc.wcBlocksData;
+
+const store = wp.data.select(CHECKOUT_STORE_KEY);
+const payment = wp.data.select(PAYMENT_STORE_KEY);
+const hasOrder = store.hasOrder();
+
 const isCheckout = !document.querySelector(
   'div[data-block-name="woocommerce/checkout"]'
 )
   ? false
   : true;
 
-if (isCheckout) {
+if (isCheckout || hasOrder) {
   console.log("checkout page?", isCheckout);
-
-  const { CHECKOUT_STORE_KEY } = window.wc.wcBlocksData;
-  const { PAYMENT_STORE_KEY } = window.wc.wcBlocksData;
-
-  const store = wp.data.select(CHECKOUT_STORE_KEY);
-  const payment = wp.data.select(PAYMENT_STORE_KEY);
+  console.log("has order?", hasOrder);
 
   const customerId = store.getCustomerId();
   const additinalFields = store.getAdditionalFields();
