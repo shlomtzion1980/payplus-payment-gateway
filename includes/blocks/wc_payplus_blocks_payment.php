@@ -23,7 +23,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
     public $orderId;
     public $displayMode;
-    public $WC_PayPlus_Gateway;
     private $secretKey;
     public $iFrameHeight;
     public $hideOtherPayments;
@@ -44,7 +43,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function initialize()
     {
-        $this->WC_PayPlus_Gateway = new WC_PayPlus_Gateway;
         $this->settings = get_option("woocommerce_{$this->name}_settings", []);
         $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
         $this->displayMode = $this->settings['display_mode'];
@@ -74,7 +72,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     {
         $data = $context->payment_data;
         $is_payplus_payment_method = $this->name === $context->payment_method;
-        $main_gateway              = $this->WC_PayPlus_Gateway;
+        $main_gateway              = new WC_PayPlus_Gateway;
 
         $token_id = $context->payment_data['token'];
         $token = WC_Payment_Tokens::get($token_id);
