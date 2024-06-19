@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 6.6.8
+Stable tag: 6.6.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,6 +82,21 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+
+= 6.6.9 = 
+* Add    - Iframe in the same page in WooCommerce Checkout Blocks.
+* Add    - Iframe popup in WooCommerce Checkout Blocks.
+* Add    - Error handling in WooCommerce Checkout Blocks.
+* Add    - Basic Settings Tab - Setup the plugin most important settings and start working immediately. This tab holds the main settings to activate the plugin. These are still available in the regular "Settings" Tab also.
+* Fix    - Removed filter: 'acf/settings/remove_wp_meta_box' was supposed to show custom fields on website with ACF, However it caused heavy load times - In future releases a diffrent solution will be offered.
+* Add    - New logos!
+* Tweak  - Code refactoring - Admin fields and settings were moved to their own files and are loaded with static functions for better readability.
+* Fix    - Get meta data for products transaction type and balance_name.
+* Change - PayPlus Error Page - No longer uses a short code - it displays a simple text message - users can edit it or create a different page with the same permlink instead.
+* Tweak  - Css cache is updated according to the version, will refresh on update, no need to manually refresh.
+* Tweak  - Minified all css and js files in use.
+
 
 = 6.6.8 = 
 * Add    - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page.
