@@ -82,8 +82,8 @@ class WC_PayPlus
      */
     public function ajax_payplus_check_tokens()
     {
-
-        $customerTokens = WC_Payment_Tokens::get_customer_tokens($_POST['userId']);
+        $userId = isset($_POST['userId']) ? intval($_POST['userId']) : 0;
+        $customerTokens = WC_Payment_Tokens::get_customer_tokens($userId);
         $theTokens = [];
 
         foreach ($customerTokens as $customerToken) {
@@ -136,7 +136,7 @@ class WC_PayPlus
      */
     public function ajax_payplus_delete_token()
     {
-        $order_id = $_POST['orderId'];
+        $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
         delete_post_meta($order_id, 'payplus_token_uid');
         $this->removeOrderMetaField($order_id, 'payplus_token_uid');
         wp_die();
@@ -175,15 +175,15 @@ class WC_PayPlus
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $indexRow = 0;
         if (!empty($REQUEST['more_info'])) {
-            $status_code = $REQUEST['status_code'];
-            $order_id = $REQUEST['more_info'];
+            $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
+            $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
             $sql = $wpdb->prepare(
                 'SELECT id as rowId, count(*) as rowCount, count_process FROM ' . $tblname . ' WHERE order_id = %d AND ( status_code = %d )',
                 $order_id,
                 $status_code
             );
             $result = $wpdb->get_results($sql);
-            $result = $result[$indexRow];
+            $result = $result[$indexRow] ?? null;
             if (!$result->rowCount) {
 
                 $wpdb->insert($tblname, array(

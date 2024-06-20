@@ -234,8 +234,9 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-            <div class='payplus_loader_refund'></div>
+<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
+    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+<div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -568,8 +569,7 @@ class PayplusInvoice
     public function ajax_payplus_api_payment_refund()
     {
         if (!empty($_POST)) {
-
-            $order_id = $_POST['order_id'];
+            $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
             $order = wc_get_order($order_id);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
@@ -1078,7 +1078,7 @@ class PayplusInvoice
                         if ($res->status === "success") {
                             WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                            $insetData['payplus_invoice_type'] = $_POST['typeDocument'];
+                            $insetData['payplus_invoice_type'] = sanitize_text_field($_POST['typeDocument']);
                             $insetData['payplus_invoice_docUID'] = $res->details->uuid;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_originalDocAddress'] = $res->details->original_doc;
