@@ -177,8 +177,11 @@ class WC_PayPlus
         if (!empty($REQUEST['more_info'])) {
             $status_code = $REQUEST['status_code'];
             $order_id = $REQUEST['more_info'];
-            $sql = 'SELECT id as rowId,count(*) as rowCount ,count_process FROM ' . $tblname . ' WHERE order_id=' . $order_id .
-                ' AND ( status_code="' . $status_code . '")';
+            $sql = $wpdb->prepare(
+                'SELECT id as rowId, count(*) as rowCount, count_process FROM ' . $tblname . ' WHERE order_id = %d AND ( status_code = %d )',
+                $order_id,
+                $status_code
+            );
             $result = $wpdb->get_results($sql);
             $result = $result[$indexRow];
             if (!$result->rowCount) {
@@ -236,7 +239,7 @@ class WC_PayPlus
                 wp_redirect($linkRedirect);
             }
         } elseif (isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' && wp_is_mobile()) {
-            $order_id = $_GET['success_order_id'];
+            $order_id = isset($_GET['success_order_id']) ? intval($_GET['success_order_id']) : 0;
             $order = wc_get_order($order_id);
             if ($order) {
                 $linkRedirect = $this->payplus_gateway->get_return_url($order);

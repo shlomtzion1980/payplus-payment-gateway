@@ -272,11 +272,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function getOrderMeta()
     {
-        $orderId = $_GET['order_id'];
+        $orderId = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
         $paymentPageLink = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_payment_page_link');
         $json = '{"paymentPageLink":"' . $paymentPageLink . '"}';
         print_r($json);
-        die;
+        exit;
     }
 
     /**

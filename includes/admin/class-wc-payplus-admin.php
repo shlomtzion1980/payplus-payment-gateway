@@ -132,7 +132,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function display_custom_order_metabox()
     {
-        $order_id = $_GET['id'] ?? $_GET['post'] ?? null;
+        $order_id = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['post']) ? intval($_GET['post']) : null);
         if (!empty($order_id)) {
             $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);
             $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
@@ -1799,13 +1799,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
-                $order_id = $_GET['post'];
+                $order_id = intval($_GET['post']);
             }
-            // if (isset($_GET['page']) && isset($_GET['action']) && $_GET['page'] === 'wc-orders' && $_GET['action'] === 'edit') {
-            //     $order_id = $_GET['id'];
-            // }
 
-            if (isset($order_id)) {
+            if (!empty($order_id)) {
                 $order = wc_get_order($order_id);
                 // Get the currency code
                 $currency_code = $order->get_currency();
