@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [6.6.9] - 2024-06-19 - (WonderBoy)
+##  [6.6.9] - 2024-06-22 - (WonderBoy)
 
 * Add    - Iframe in the same page in WooCommerce Checkout Blocks.
 * Add    - Iframe popup in WooCommerce Checkout Blocks.
@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 * Change - PayPlus Error Page - No longer uses a short code - it displays a simple text message - users can edit it or create a different page with the same permlink instead.
 * Tweak  - Css cache is updated according to the version, will refresh on update, no need to manually refresh.
 * Tweak  - Minified all css and js files in use.
+* Add    - Auto activate newly joined payment method (bit,google-pay,apple-pay...) in settings from PayPlus support (Happens only once on joining to service).
 
 ##  [6.6.8] - 2024-05-03 - (Eggman)
 

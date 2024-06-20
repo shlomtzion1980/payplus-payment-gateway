@@ -96,6 +96,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Change - PayPlus Error Page - No longer uses a short code - it displays a simple text message - users can edit it or create a different page with the same permlink instead.
 * Tweak  - Css cache is updated according to the version, will refresh on update, no need to manually refresh.
 * Tweak  - Minified all css and js files in use.
+* Add    - Auto activate newly joined payment method (bit,google-pay,apple-pay...) in settings from PayPlus support (Happens only once on joining to service).
 
 
 = 6.6.8 = 

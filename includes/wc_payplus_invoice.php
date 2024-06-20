@@ -1191,6 +1191,16 @@ class PayplusInvoice
                             ];
                             $payload['totalAmount'] = $dual * $j5Amount;
                             $payload['payments'][0]['amount'] = $dual * $j5Amount;
+                        } elseif ($j5) {
+                            $totalJ5ItemsAmount = 0;
+                            foreach ($payload['items'] as $item) {
+                                if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
+                                    $totalJ5ItemsAmount += ($item['price'] - $item['discount_value']) * $item['quantity'];
+                                } else {
+                                    $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
+                                }
+                            }
+                            $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
                         }
                     }
 
