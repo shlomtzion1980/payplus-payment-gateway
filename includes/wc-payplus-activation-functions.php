@@ -100,14 +100,21 @@ add_action('payplus_cron_send_order', function () {
  * @param string $payment_id
  * @return string
  */
-add_filter('woocommerce_gateway_title', 'change_cheque_payment_gateway_title', 100, 2);
+add_filter('woocommerce_gateway_title', 'change_payment_gateway_title', 100, 2);
 
-function change_cheque_payment_gateway_title($title, $payment_id)
+function change_payment_gateway_title($title, $payment_id)
 {
     $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
     if (is_checkout() && !is_admin() && $WC_PayPlus_Gateway->enable_design_checkout && strpos($payment_id, 'payplus-payment-gateway') !== false) {
-
-        $title = "<span>" . $title . "</span>";
+        echo
+        '<script>
+            for(let label of document.querySelectorAll(`label`)){
+                label.htmlFor.search(`payplus-payment-gateway`) !== -1 ? label.style.display = "inline-flex" : null;
+                label.htmlFor.search(`payplus-payment-gateway`) !== -1 ? label.style.position = "relative" : null;
+                label.htmlFor.search(`payment_method_payplus-payment-gateway`) !== -1 ? label.style.top = "9px" : label.style.top = "0px";
+            };
+        </script>';
+        $title = "<span>&nbsp;&nbsp;" . $title . "</span>";
     }
     return $title;
 }
