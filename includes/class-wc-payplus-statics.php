@@ -12,7 +12,7 @@ class WC_PayPlus_Statics
     /**
      * @return bool
      */
-    public static function invoice_plus_metabox($order_id, $options = [])
+    public static function invoicePlusDocsSelect($order_id, $options = [])
     {
         $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);
         $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;

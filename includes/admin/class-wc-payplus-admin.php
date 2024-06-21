@@ -130,9 +130,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
     }
 
-    public function display_custom_order_metabox()
+    public function getId()
     {
         $order_id = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['post']) ? intval($_GET['post']) : null);
+        return intval($order_id);
+    }
+
+    public function display_custom_order_metabox($post, $post_type)
+    {
+
+        $order_id = property_exists($post, 'id') === true ? $post->get_id() : $this->getId();
         if (!empty($order_id)) {
             $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);
             $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;

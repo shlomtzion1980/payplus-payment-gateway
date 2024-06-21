@@ -234,9 +234,8 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
-    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-<div class='payplus_loader_refund'></div>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+            <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -614,7 +613,7 @@ class PayplusInvoice
             $payplus_invoice_option = $this->payplus_get_invoice_enable();
 
             if (('order_invoice' === $column && $payplus_invoice_option) || ('order_invoice' === $column && $this->invoiceDisplayOnly)) {
-                WC_PayPlus_Statics::invoice_plus_metabox($order, ['no-headlines' => true]);
+                WC_PayPlus_Statics::invoicePlusDocsSelect($order, ['no-headlines' => true]);
             }
         }
     }
