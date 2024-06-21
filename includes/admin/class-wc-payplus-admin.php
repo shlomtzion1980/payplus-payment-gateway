@@ -130,67 +130,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
     }
 
-    public function getId()
-    {
-        $order_id = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['post']) ? intval($_GET['post']) : null);
-        return intval($order_id);
-    }
-
     public function display_custom_order_metabox($post, $post_type)
     {
-
-        $order_id = property_exists($post, 'id') === true ? $post->get_id() : $this->getId();
-        if (!empty($order_id)) {
-            $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);
-            $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : $refundsJson;
-
-            $invDoc = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
-            $invDocType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_type', true);
-            $invDocNumber = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
-            $chargeText = __('Charge', 'payplus-payment-gateway');
-            $refundsText = __('Refunds', 'payplus-payment-gateway');
-
-            switch ($invDocType) {
-                case 'inv_tax':
-                    $docType = __('Tax Invoice', 'payplus-payment-gateway');
-                    break;
-                case 'inv_tax_receipt':
-                    $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
-                    break;
-                case 'inv_receipt':
-                    $docType = __('Receipt', 'payplus-payment-gateway');
-                    break;
-                case 'inv_don_receipt':
-                    $docType = __('Donation Reciept', 'payplus-payment-gateway');
-                    break;
-                default:
-                    $docType = __('Invoice', 'payplus-payment-gateway');
-            }
-
-
-            if (strlen($invDoc) > 0) { ?>
-                <div>
-                    <h4><?php echo $chargeText; ?></h4>
-                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
-                </div>
-            <?php
-            }
-            if (is_array($refundsArray)) {
-            ?>
-                <div>
-                    <h4><?php echo $refundsText; ?></h4>
-                    <?php
-                    foreach ($refundsArray as $docNumber => $doc) {
-                        $docLink = $doc['link'];
-                        $docText = __($doc['type'], 'payplus-payment-gateway');
-                    ?>
-                        <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
-                    <?php
-                    }
-                    ?>
-                </div>
-        <?php }
-        }
+        WC_PayPlus_Statics::payPlusOrderMetaBox($post);
     }
 
 
@@ -844,7 +786,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
-        ?>
+?>
         <div class="flex-row">
             <div class="flex-item">
                 <select id="select-type-invoice-<?php echo $orderId ?>" class="select-type-invoice" name="select-type-invoice-<?php echo $orderId ?>">
