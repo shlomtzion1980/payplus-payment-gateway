@@ -1261,8 +1261,8 @@ class PayplusInvoice
             'redirection' => '5',
             'httpversion' => '1.0',
             'blocking' => true,
-            'headers' => [],
             'headers' => array(
+                'domain' => home_url(),
                 'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->payplus_invoice_api_key . '","secret_key":"' . $this->payplus_invoice_secret_key . '"}',

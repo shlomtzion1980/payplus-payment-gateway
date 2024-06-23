@@ -1749,15 +1749,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function post_payplus_ws($url, $payload = array(), $method = "post")
     {
-
         $args = array(
             'body' => $payload,
             'timeout' => '60',
             'redirection' => '5',
             'httpversion' => '1.0',
             'blocking' => true,
-            'headers' => [],
             'headers' => array(
+                'domain' => home_url(),
                 'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',

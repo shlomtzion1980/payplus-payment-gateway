@@ -119,20 +119,35 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if ($screen->post_type === 'shop_order') {
             if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
                 add_meta_box(
-                    'custom_order_metabox', // Unique ID for the metabox
+                    'invoice+_order_metabox', // Unique ID for the metabox
                     __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
                     [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
                     $screen->id, // Post type where it should be displayed (order page)
                     'side', // Context (position on the screen)
-                    'default' // Priority
+                    'default', // Priority
+                    ['metaBoxType' => 'payplusInvoice']
+                );
+
+                add_meta_box(
+                    'payplus_order_metabox', // Unique ID for the metabox
+                    __('PayPlus Data', 'payplus-payment-gateway'), // Metabox title
+                    [$this, 'display_payplus_order_metabox'], // Callback function to display the metabox content
+                    $screen->id, // Post type where it should be displayed (order page)
+                    'side', // Context (position on the screen)
+                    'default', // Priority
+                    ['metaBoxType' => 'payplus']
                 );
             }
         }
     }
 
-    public function display_custom_order_metabox($post, $post_type)
+    public function display_custom_order_metabox($post, $metaBox)
     {
-        WC_PayPlus_Statics::payPlusOrderMetaBox($post);
+        WC_PayPlus_Statics::payPlusOrderMetaBox($post, $metaBox);
+    }
+    public function display_payplus_order_metabox($post, $metaBox)
+    {
+        WC_PayPlus_Statics::payPlusOrderMetaBox($post, $metaBox);
     }
 
 
@@ -166,6 +181,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'httpversion' => '1.0',
             'blocking' => true,
             'headers' => array(
+                'domain' => home_url(),
                 'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
@@ -1777,7 +1793,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     "payplus_invoice" => $isInvoice,
                     "payplus_refund_error" => __('Incorrect amount or amount greater than amount that can be refunded', 'payplus-payment-gateway'),
                     "menu_option" => WC_PayPlus::payplus_get_admin_menu(),
-
                 )
             );
             wp_enqueue_script('payplus-admin-payment');
@@ -1863,11 +1878,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 return;
             }
 
-            if ($amount > $order->get_total()) {
-                $this->payplus_add_log_all($handle, 'Cannot Charge more than original order sum');
-                $order->add_order_note(sprintf(__('Cannot Charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                return false;
-            }
+            // if ($amount > $order->get_total()) {
+            //     $this->payplus_add_log_all($handle, 'Cannot Charge more than original order sum');
+            //     $order->add_order_note(sprintf(__('Cannot Charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+            //     return false;
+            // }
 
             if ($OrderType != "Approval" and $OrderType != "Check") {
                 $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
@@ -1933,15 +1948,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
          */
         public function post_payplus_ws($url, $payload = array(), $method = "post")
         {
-
             $args = array(
                 'body' => $payload,
                 'timeout' => '60',
                 'redirection' => '5',
                 'httpversion' => '1.0',
                 'blocking' => true,
-                'headers' => [],
                 'headers' => array(
+                    'domain' => home_url(),
                     'Content-Type' => 'application/json',
                     'User-Agent' => 'WordPress',
                     'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
