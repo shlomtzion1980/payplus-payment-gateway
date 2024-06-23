@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
 * Tweak  - Css cache is updated according to the version, will refresh on update, no need to manually refresh.
 * Tweak  - Minified all css and js files in use.
 * Add    - Auto activate newly joined payment method (bit,google-pay,apple-pay...) in settings from PayPlus support (Happens only once on joining to service).
+* Add    - Payplus data metabox inside order page.
+* Fix    - Only one payment page per domain.
 
 ##  [6.6.8] - 2024-05-03 - (Eggman)
 
