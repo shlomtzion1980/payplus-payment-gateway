@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 /**
- * Handles and process WC PayPlus Orders Data.
+ * WC PayPlus Form Fields and Admin Settings.
  *
  */
 class WC_PayPlus_Admin_Settings
