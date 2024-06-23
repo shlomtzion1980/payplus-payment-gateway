@@ -146,9 +146,9 @@ class WC_PayPlus_Statics
                     $tokeUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_token_uid', true);
                     $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
                     $amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_credit-card', true);
-                    if (!$amount) {
-                        $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
-                        $responseArray = json_decode($responsePayPlus, true);
+                    $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
+                    $responseArray = json_decode($responsePayPlus, true);
+                    if (!$amount && is_array($responseArray)) {
                         $amount = $responseArray['amount'];
                     }
 
@@ -177,7 +177,9 @@ class WC_PayPlus_Statics
                         $tokeUid,
                         $j5Charge ? $j5Charge : $amount
                     );
-                    echo $box;
+                    if ($responsePayPlus) {
+                        echo $box;
+                    }
                 }
             }
         }
