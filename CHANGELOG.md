@@ -34,6 +34,8 @@ All notable changes to this project will be documented in this file.
 * Add    - Prepare plugin support for Secure3d - with saved cards only.
 * Fix    - Bit payments redirection after successful order purchase from uPay on mobile phones.
 * Tweak  - Database version update - refactored options check and settings to run only when needed.
+* Add    - Payplus data metabox inside order page.
+* Fix    - Only one payment page per domain.
 
 ##  [6.6.7] - 2024-05-29 - (Knuckles)
 
