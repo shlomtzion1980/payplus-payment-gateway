@@ -141,7 +141,8 @@ class WC_PayPlus_Statics
                     $fourDigits = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
                     $expMonth = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_expiry_month', true);
                     $expYear = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_expiry_year', true);
-                    $voucher = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_voucher_id', true);
+                    $voucherNum = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_voucher_num', true);
+                    $voucherId = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_voucher_id', true);
                     $tokeUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_token_uid', true);
                     $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
                     $amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_credit-card', true);
@@ -160,6 +161,7 @@ class WC_PayPlus_Statics
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher #</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
                             <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
@@ -170,7 +172,8 @@ class WC_PayPlus_Statics
                         $number,
                         $fourDigits,
                         $expMonthYear,
-                        $voucher,
+                        $voucherNum,
+                        $voucherId,
                         $tokeUid,
                         $j5Charge ? $j5Charge : $amount
                     );
