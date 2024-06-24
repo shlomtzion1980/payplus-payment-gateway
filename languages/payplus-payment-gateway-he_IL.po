@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-06-24 09:20+0300\n"
-"PO-Revision-Date: 2024-06-24 09:20+0300\n"
+"POT-Creation-Date: 2024-06-24 14:26+0300\n"
+"PO-Revision-Date: 2024-06-24 14:26+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -646,10 +646,9 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:938
 #: includes/admin/class-wc-payplus-admin.php:960
-#, fuzzy
-#| msgid "Payment"
+#: includes/class-wc-payplus-statics.php:165
 msgid "Payments"
-msgstr "ביצוע תשלום"
+msgstr "תשלומים"
 
 #: includes/admin/class-wc-payplus-admin.php:939
 #, fuzzy
@@ -1307,35 +1306,35 @@ msgstr "החזרים"
 msgid "Invoice"
 msgstr "חשבונית"
 
-#: includes/class-wc-payplus-statics.php:161
+#: includes/class-wc-payplus-statics.php:162
 msgid "Transaction#"
 msgstr "עסקה"
 
-#: includes/class-wc-payplus-statics.php:162
+#: includes/class-wc-payplus-statics.php:163
 msgid "Last Digits"
 msgstr "ספרות אחרונות"
 
-#: includes/class-wc-payplus-statics.php:163
+#: includes/class-wc-payplus-statics.php:164
 msgid "Expiry Date"
 msgstr "תאריך תפוגה"
 
-#: includes/class-wc-payplus-statics.php:164
+#: includes/class-wc-payplus-statics.php:166
 msgid "Voucher #"
 msgstr "מס ואוצ'ר "
 
-#: includes/class-wc-payplus-statics.php:165
+#: includes/class-wc-payplus-statics.php:167
 msgid "Voucher ID"
 msgstr "ID ואוצ'ר"
 
-#: includes/class-wc-payplus-statics.php:166
+#: includes/class-wc-payplus-statics.php:168
 msgid "Token"
 msgstr "טוקן"
 
-#: includes/class-wc-payplus-statics.php:167
+#: includes/class-wc-payplus-statics.php:169
 msgid "Total:"
 msgstr "סה\"כ:"
 
-#: includes/class-wc-payplus-statics.php:158
+#: includes/class-wc-payplus-statics.php:159
 msgid ""
 "\n"
 "                    <div style=\"font-weight:600;\">PayPlus "

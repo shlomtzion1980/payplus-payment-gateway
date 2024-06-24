@@ -141,6 +141,7 @@ class WC_PayPlus_Statics
                     $fourDigits = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
                     $expMonth = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_expiry_month', true);
                     $expYear = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_expiry_year', true);
+                    $numOfPayments = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true);
                     $voucherNum = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_voucher_num', true);
                     $voucherId = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_voucher_id', true);
                     $tokeUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_token_uid', true);
@@ -161,6 +162,7 @@ class WC_PayPlus_Statics
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Last Digits', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Expiry Date', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Payments', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Voucher #', 'payplus-payment-gateway') . '</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Voucher ID', 'payplus-payment-gateway') . '</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="vertical-align:top;">' . __('Token', 'payplus-payment-gateway') . '</td><td style="vertical-align:top;">%s</td></tr>
@@ -172,6 +174,7 @@ class WC_PayPlus_Statics
                         $number,
                         $fourDigits,
                         $expMonthYear,
+                        $numOfPayments,
                         $voucherNum,
                         $voucherId,
                         $tokeUid,
