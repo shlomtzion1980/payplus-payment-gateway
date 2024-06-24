@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-06-23 14:33+0300\n"
-"PO-Revision-Date: 2024-06-23 14:52+0300\n"
+"POT-Creation-Date: 2024-06-24 09:20+0300\n"
+"PO-Revision-Date: 2024-06-24 09:20+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -805,7 +805,7 @@ msgstr "בדיקת עסקה"
 
 #: includes/admin/class-wc-payplus-admin.php:1535
 msgid "Payment"
-msgstr "ביצוע תשלום"
+msgstr "תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:1562
 msgid "Show Log Status"
@@ -1307,6 +1307,34 @@ msgstr "החזרים"
 msgid "Invoice"
 msgstr "חשבונית"
 
+#: includes/class-wc-payplus-statics.php:161
+msgid "Transaction#"
+msgstr "עסקה"
+
+#: includes/class-wc-payplus-statics.php:162
+msgid "Last Digits"
+msgstr "ספרות אחרונות"
+
+#: includes/class-wc-payplus-statics.php:163
+msgid "Expiry Date"
+msgstr "תאריך תפוגה"
+
+#: includes/class-wc-payplus-statics.php:164
+msgid "Voucher #"
+msgstr "מס ואוצ'ר "
+
+#: includes/class-wc-payplus-statics.php:165
+msgid "Voucher ID"
+msgstr "ID ואוצ'ר"
+
+#: includes/class-wc-payplus-statics.php:166
+msgid "Token"
+msgstr "טוקן"
+
+#: includes/class-wc-payplus-statics.php:167
+msgid "Total:"
+msgstr "סה\"כ:"
+
 #: includes/class-wc-payplus-statics.php:158
 msgid ""
 "\n"
@@ -1717,6 +1745,17 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Successful"
+#~ msgstr "הצלחה"
+
+#, fuzzy
+#~| msgid "Four Digits"
+#~ msgid "Last Four Digits"
+#~ msgstr "ארבע ספרות אחרונות"
+
+#~ msgid "Last FFF"
+#~ msgstr "ארבע ספרות אחרונות"
 
 #~ msgid "SECRET KEY"
 #~ msgstr "מפתח סודי (Secret Key)"
