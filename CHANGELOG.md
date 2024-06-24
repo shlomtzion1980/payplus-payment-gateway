@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [6.6.9] - 2024-06-22 - (WonderBoy)
+##  [6.6.9] - 2024-06-24 - (WonderBoy)
 
 * Add    - Iframe in the same page in WooCommerce Checkout Blocks.
 * Add    - Iframe popup in WooCommerce Checkout Blocks.

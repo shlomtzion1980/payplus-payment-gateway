@@ -78,7 +78,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 4. After installation click activate.
 5. Select WooCommerce -> Settings -> Payments.
 6. Activate the gateway under the "active" tab and select manage.
-7. Enter the 3 credentials you have received from PayPlus (when you signed up with us).
+7. Enter the 3 credentials (in basic settings) you have received from PayPlus (when you signed up with us).
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
