@@ -106,4 +106,50 @@ class WC_PayPlus_Meta_Data
             return $orderMetaValues;
         }
     }
+
+    public static function updateOrderStatus($order, $transactionUid, $newStatus)
+    {
+        $currentStatus = $order->get_status();
+        $payload['transaction_uid'] = $transactionUid;
+        $payload['more_info_5'] = "$currentStatus => $newStatus";
+        $payload = json_encode($payload);
+        WC_PayPlus_Meta_Data::payplusPost($payload, "post");
+        $order->update_status($newStatus);
+    }
+
+    /**
+     * @param $url
+     * @param $payload
+     * @param $method
+     * @return array|WP_Error
+     */
+    public static function payplusPost($payload = array(), $method = "post")
+    {
+        $options = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode = boolval($options['api_test_mode'] === 'yes');
+        $url = $testMode === true ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
+        $apiKey = $options['api_key'];
+        $secretKey = $options['secret_key'];
+
+        $args = array(
+            'body' => $payload,
+            'timeout' => '60',
+            'redirection' => '5',
+            'httpversion' => '1.0',
+            'blocking' => true,
+            'headers' => array(
+                'domain' => home_url(),
+                'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
+                'Content-Type' => 'application/json',
+                'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+            )
+        );
+        if ($method == "post") {
+            $response = wp_remote_post($url, $args);
+        } else {
+            $response = wp_remote_get($url, $args);
+        }
+
+        return $response;
+    }
 }

@@ -852,8 +852,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
 
             $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
+
             if ($response->data->status == "approved" && $response->data->status_code == "000" && $response->data->transaction_uid) {
                 $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
+                $transactionUid = $response->data->transaction_uid;
 
                 $this->updateMetaData($order_id, (array) $response->data);
                 if ($response->data->type == "Charge") {
@@ -862,10 +864,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
 
                     if ($this->successful_order_status !== 'default-woo') {
-                        $order->update_status($this->successful_order_status);
+                        WC_PayPlus_Meta_Data::updateOrderStatus($order, $transactionUid, $this->successful_order_status);
+                        // $order->update_status($this->successful_order_status);
                     }
                 } else {
-                    $order->update_status('wc-on-hold');
+                    WC_PayPlus_Meta_Data::updateOrderStatus($order, $transactionUid, 'wc-on-hold');
+                    //$order->update_status('wc-on-hold');
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                 // Add payments data to the DB
@@ -1597,7 +1601,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
             "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
             $json_move_token . '}';
-        $payload = str_replace("\n", "", $payload);
+        $payloadArray = json_decode($payload, true);
+        $payloadArray['more_info_4'] = PAYPLUS_VERSION;
+        $payload = json_encode($payloadArray);
         return $payload;
     }
 
