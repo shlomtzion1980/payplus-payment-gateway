@@ -121,27 +121,26 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 add_meta_box(
                     'invoice+_order_metabox', // Unique ID for the metabox
                     __('Invoice+ Docs', 'payplus-payment-gateway'), // Metabox title
-                    [$this, 'display_custom_order_metabox'], // Callback function to display the metabox content
+                    [$this, 'display_invoice_order_metabox'], // Callback function to display the metabox content
                     $screen->id, // Post type where it should be displayed (order page)
                     'side', // Context (position on the screen)
                     'default', // Priority
                     ['metaBoxType' => 'payplusInvoice']
                 );
-
-                add_meta_box(
-                    'payplus_order_metabox', // Unique ID for the metabox
-                    __('PayPlus Data', 'payplus-payment-gateway'), // Metabox title
-                    [$this, 'display_payplus_order_metabox'], // Callback function to display the metabox content
-                    $screen->id, // Post type where it should be displayed (order page)
-                    'side', // Context (position on the screen)
-                    'default', // Priority
-                    ['metaBoxType' => 'payplus']
-                );
             }
+            add_meta_box(
+                'payplus_order_metabox', // Unique ID for the metabox
+                __('PayPlus Data', 'payplus-payment-gateway'), // Metabox title
+                [$this, 'display_payplus_order_metabox'], // Callback function to display the metabox content
+                $screen->id, // Post type where it should be displayed (order page)
+                'side', // Context (position on the screen)
+                'default', // Priority
+                ['metaBoxType' => 'payplus']
+            );
         }
     }
 
-    public function display_custom_order_metabox($post, $metaBox)
+    public function display_invoice_order_metabox($post, $metaBox)
     {
         WC_PayPlus_Statics::payPlusOrderMetaBox($post, $metaBox);
     }
