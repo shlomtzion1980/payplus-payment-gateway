@@ -234,8 +234,9 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-            <div class='payplus_loader_refund'></div>
+<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
+    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+<div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -568,8 +569,7 @@ class PayplusInvoice
     public function ajax_payplus_api_payment_refund()
     {
         if (!empty($_POST)) {
-
-            $order_id = $_POST['order_id'];
+            $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
             $order = wc_get_order($order_id);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
@@ -656,7 +656,7 @@ class PayplusInvoice
             $current_screen->id === "shop_order"
             || $current_screen->id === "woocommerce_page_wc-orders"
         ) {
-            wp_enqueue_style('payplus_invoice-admin-css', PAYPLUS_PLUGIN_URL . 'assets/css/invoice_admin.min.css', __FILE__);
+            wp_enqueue_style('payplus_invoice-admin-css', PAYPLUS_PLUGIN_URL . 'assets/css/invoice_admin.min.css', [], PAYPLUS_VERSION);
         }
     }
 
@@ -991,11 +991,11 @@ class PayplusInvoice
             }
             $sql .= " ) ";
             $resultApps = $wpdb->get_results($sql, OBJECT);
-            $resultApps = $this->payplus_set_object_paymnet($order_id, $resultApps);
+            $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
         return $resultApps;
     }
-    public function payplus_set_object_paymnet($order_id, $resultApps)
+    public function payplus_set_object_payment($order_id, $resultApps)
     {
         $arr = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
@@ -1078,7 +1078,7 @@ class PayplusInvoice
                         if ($res->status === "success") {
                             WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                            $insetData['payplus_invoice_type'] = $_POST['typeDocument'];
+                            $insetData['payplus_invoice_type'] = sanitize_text_field($_POST['typeDocument']);
                             $insetData['payplus_invoice_docUID'] = $res->details->uuid;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_originalDocAddress'] = $res->details->original_doc;
@@ -1191,6 +1191,16 @@ class PayplusInvoice
                             ];
                             $payload['totalAmount'] = $dual * $j5Amount;
                             $payload['payments'][0]['amount'] = $dual * $j5Amount;
+                        } elseif ($j5Amount) {
+                            $totalJ5ItemsAmount = 0;
+                            foreach ($payload['items'] as $item) {
+                                if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
+                                    $totalJ5ItemsAmount += ($item['price'] - $item['discount_value']) * $item['quantity'];
+                                } else {
+                                    $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
+                                }
+                            }
+                            $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
                         }
                     }
 
@@ -1252,8 +1262,8 @@ class PayplusInvoice
             'redirection' => '5',
             'httpversion' => '1.0',
             'blocking' => true,
-            'headers' => [],
             'headers' => array(
+                'domain' => home_url(),
                 'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->payplus_invoice_api_key . '","secret_key":"' . $this->payplus_invoice_secret_key . '"}',
