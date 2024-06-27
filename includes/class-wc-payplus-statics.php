@@ -138,11 +138,12 @@ class WC_PayPlus_Statics
                     $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
                     $responseArray = json_decode($responsePayPlus, true);
                     if (isset($responseArray)) {
+                        $payPlusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
                         $totalAmount = $responseArray['amount'];
                         if (!is_null($totalAmount)) {
                             if (!isset($responseArray['related_transactions'])) {
                                 $amount = $responseArray['amount'];
-                                $type = $responseArray['type'];
+                                $type = $payPlusType ? $payPlusType : $responseArray['type'];
                                 $number = $responseArray['number'];
                                 $fourDigits = $responseArray['four_digits'];
                                 $expMonth = $responseArray['expiry_month'];
