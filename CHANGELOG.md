@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [7.0.0] - 2024-06-27 - (Megaman)
+##  [7.0.1] - 2024-06-27 - (Megaman)
 * Fix    - Small but important J5 fix for invoices with split payments.
 
 ##  [6.6.9] - 2024-06-24 - (WonderBoy)
