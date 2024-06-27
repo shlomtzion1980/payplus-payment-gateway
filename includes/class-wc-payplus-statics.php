@@ -80,6 +80,16 @@ class WC_PayPlus_Statics
             return intval($order_id);
         }
 
+
+        /**
+         *
+         * Choose which metabox we are using and call || display the correct function.
+         *
+         * @param object $post
+         * @param string $metabox
+         * 
+         * @return string
+         */
         public static function payPlusOrderMetaBox($post, $metaBox)
         {
             $boxType = $metaBox['args']['metaBoxType'];
@@ -153,7 +163,7 @@ class WC_PayPlus_Statics
                                 $voucherId = isset($responseArray['voucher_id']) ? $responseArray['voucher_id'] : "";
                                 $tokeUid = $responseArray['token_uid'];
                                 $j5Charge = isset($responseArray['charged_j5_amount']) ? $responseArray['charged_j5_amount'] : "";
-                                WC_PayPlus_Statics::createPayPlusDataBox($amount, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
+                                echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
                                     $amount = $transaction['amount'];
@@ -167,7 +177,7 @@ class WC_PayPlus_Statics
                                     $voucherId = isset($transaction['voucher_id']) ? $transaction['voucher_id'] : "";
                                     $tokeUid = $transaction['token_uid'];
                                     $j5Charge = isset($transaction['charged_j5_amount']) ? $transaction['charged_j5_amount'] : "";
-                                    WC_PayPlus_Statics::createPayPlusDataBox($amount, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
+                                    echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
                                 echo __('Total of payments: ', 'payplus-payment-gateway') . $totalAmount;
@@ -178,6 +188,24 @@ class WC_PayPlus_Statics
             }
         }
 
+        /**
+         *
+         * Create metabox data of PayPlus charges || authorizations and display it.
+         *
+         * @param float $amount
+         * @param string $type
+         * @param int $number
+         * @param int $fourDigits
+         * @param int $expMonth
+         * @param int $expYear
+         * @param int $numOfPayments
+         * @param string $voucherNum
+         * @param string $voucherId
+         * @param string $tokeUid
+         * @param int $j5Charge
+         * 
+         * @return string
+         */
         public static function createPayPlusDataBox($amount, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge)
         {
             $expMonthYear = "$expMonth/$expYear";
@@ -207,6 +235,6 @@ class WC_PayPlus_Statics
                 $tokeUid,
                 $j5Charge ? $j5Charge : $amount
             );
-            echo $box;
+            return $box;
         }
     }

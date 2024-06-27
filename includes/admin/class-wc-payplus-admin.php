@@ -119,22 +119,22 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if ($screen->post_type === 'shop_order') {
             if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
                 add_meta_box(
-                    'invoice+_order_metabox', // Unique ID for the metabox
-                    "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invoice+.svg'>", // Metabox title
-                    [$this, 'display_invoice_order_metabox'], // Callback function to display the metabox content
-                    $screen->id, // Post type where it should be displayed (order page)
-                    'side', // Context (position on the screen)
-                    'default', // Priority
+                    'invoice+_order_metabox',
+                    "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/invoice+.svg'>",
+                    [$this, 'display_invoice_order_metabox'],
+                    $screen->id,
+                    'side',
+                    'default',
                     ['metaBoxType' => 'payplusInvoice']
                 );
             }
             add_meta_box(
-                'payplus_order_metabox', // Unique ID for the metabox
-                "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/PayPlusLogo.svg'>", // Metabox title
-                [$this, 'display_payplus_order_metabox'], // Callback function to display the metabox content
-                $screen->id, // Post type where it should be displayed (order page)
-                'side', // Context (position on the screen)
-                'default', // Priority
+                'payplus_order_metabox',
+                "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "/PayPlusLogo.svg'>",
+                [$this, 'display_payplus_order_metabox'],
+                $screen->id,
+                'side',
+                'default',
                 ['metaBoxType' => 'payplus']
             );
         }
