@@ -47,7 +47,7 @@ class WC_PayPlus_Admin_Settings
         switch ($section) {
             case 'payplus-payment-gateway-setup-wizard':
                 $settings[$section][] = array(
-                    'name' => __('PayPlus Basic Settings', 'payplus-payment-gateway'),
+                    'name' => __('PayPlus Basic Settings', 'payplus-payment-gateway') . ' (' . PAYPLUS_VERSION . ')',
                     'type' => 'title',
                     'desc' => __('Simple setup options - The base plugin options. Setup these and you can start working immediately!', 'payplus-payment-gateway'),
                     'desc_tip' => true,

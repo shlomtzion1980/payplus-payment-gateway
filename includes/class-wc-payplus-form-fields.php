@@ -351,7 +351,7 @@ class WC_PayPlus_Form_Fields
                 'default' => 'no',
             ],
             'hide_identification_id' => [
-                'title' => __('Hide Identification Field In Payment Form', 'payplus-payment-gateway'),
+                'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
                     '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
@@ -359,9 +359,11 @@ class WC_PayPlus_Form_Fields
                     '2' => __('No', 'payplus-payment-gateway'),
                 ],
                 'default' => '0',
+                'description' => __('Hide the identification field in the payment page - ID or Social Security...', 'payplus-payment-gateway'),
+                'desc_tip' => true,
             ],
             'hide_payments_field' => [
-                'title' => __('Hide Payments Number In Payment Form', 'payplus-payment-gateway'),
+                'title' => __('Hide Number Of Payments In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
                     '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
@@ -369,15 +371,20 @@ class WC_PayPlus_Form_Fields
                     '2' => __('No', 'payplus-payment-gateway'),
                 ],
                 'default' => '0',
+                'description' => __('Hide the option to choose more than one payment.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
             ],
             'hide_other_charge_methods' => [
-                'title' => __('Hide other payment types on payment page', 'payplus-payment-gateway'),
+                'title' => __('Hide Other Payment Methods On Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
                     '0' => __('No', 'payplus-payment-gateway'),
                     '1' => __('Yes', 'payplus-payment-gateway'),
                 ],
                 'default' => '1',
+                'description' => __('Hide the other payment methods on the payment page.<br>Example: If you have Google Pay and Credit Cards - 
+                when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
             ],
             'order_status_title' => [
                 'title' => __('Order Settings', 'payplus-payment-gateway'),

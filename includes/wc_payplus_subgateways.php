@@ -105,9 +105,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => 700,
             ],
             'hide_icon' => [
-                'title' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
+                'title' => __('Hide Payment Method Icon In The Checkout Page', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
+                'label' => __('Hide Payment Method Icon In The Checkout Page', 'payplus-payment-gateway'),
                 'default' => 'no'
             ],
             'sub_hide_other_charge_methods' => [
