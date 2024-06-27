@@ -860,16 +860,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->updateMetaData($order_id, (array) $response->data);
                 if ($response->data->type == "Charge") {
                     if ($this->fire_completed) {
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'firePaymentComplete', $transactionUid);
                         $order->payment_complete();
                     }
 
                     if ($this->successful_order_status !== 'default-woo') {
-                        WC_PayPlus_Meta_Data::updateOrderStatus($order, $transactionUid, $this->successful_order_status);
-                        // $order->update_status($this->successful_order_status);
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order, $this->successful_order_status, $transactionUid);
+                        $order->update_status($this->successful_order_status);
                     }
                 } else {
-                    WC_PayPlus_Meta_Data::updateOrderStatus($order, $transactionUid, 'wc-on-hold');
-                    //$order->update_status('wc-on-hold');
+                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
+                    $order->update_status('wc-on-hold');
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                 // Add payments data to the DB

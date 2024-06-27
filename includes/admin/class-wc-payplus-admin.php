@@ -246,13 +246,15 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             ];
             WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
         }
-
+        $transactionUid = $responseBody['data']['transaction_uid'];
         if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {
+            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
             $order->update_status('wc-processing');
             $order->add_order_note(
                 $successNote
             );
         } elseif ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Approval') {
+            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
             $order->update_status('wc-on-hold');
             $order->add_order_note(
                 $successNote

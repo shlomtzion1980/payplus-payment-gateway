@@ -107,14 +107,15 @@ class WC_PayPlus_Meta_Data
         }
     }
 
-    public static function updateOrderStatus($order, $transactionUid, $newStatus)
+    public static function sendMoreInfo($order, $newStatus, $transactionUid = null)
     {
-        $currentStatus = $order->get_status();
-        $payload['transaction_uid'] = $transactionUid;
-        $payload['more_info_5'] = "$currentStatus => $newStatus";
-        $payload = json_encode($payload);
-        WC_PayPlus_Meta_Data::payplusPost($payload, "post");
-        $order->update_status($newStatus);
+        if (!is_null($transactionUid)) {
+            $currentStatus = $order->get_status();
+            $payload['transaction_uid'] = $transactionUid;
+            $payload['more_info_5'] = "$currentStatus => $newStatus";
+            $payload = json_encode($payload);
+            WC_PayPlus_Meta_Data::payplusPost($payload, "post");
+        }
     }
 
     /**
@@ -123,7 +124,7 @@ class WC_PayPlus_Meta_Data
      * @param $method
      * @return array|WP_Error
      */
-    public static function payplusPost($payload = array(), $method = "post")
+    public static function payplusPost($payload = [], $method = "post")
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $testMode = boolval($options['api_test_mode'] === 'yes');
