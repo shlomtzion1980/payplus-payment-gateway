@@ -82,7 +82,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
-
+= 7.0.0 = 
+* Fix    - Small but important J5 fix for invoices with split payments.
 
 = 6.6.9 = 
 * Add    - Iframe in the same page in WooCommerce Checkout Blocks.
