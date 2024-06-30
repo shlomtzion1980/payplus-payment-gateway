@@ -660,8 +660,11 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             if (is_product()) {
                 $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
                 $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
+                echo '<div id="express-checkout" class="express-checkout-product ' . $disabled . '">';
+            } else {
+                echo '<div id="express-checkout" class="express-checkout ' . $disabled . '">';
             }
-            echo '<div id="express-checkout" class="express-checkout ' . $disabled . '">';
+
         ?>
             <input type="hidden" value="<?php echo $priceProductWithTax ?>" id="payplus_pricewt_product">
             <input type="hidden" value="<?php echo $priceProductWithoutTax ?>" id="payplus_pricewithouttax_product">
