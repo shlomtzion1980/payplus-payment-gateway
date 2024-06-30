@@ -76,11 +76,11 @@ a:focus {
   flex-direction: column;
 }
 
-.link-invoice, .link-invoice:hover {
+.link-invoice {
   text-align: center;
   border-radius: 7px;
-  background: #34aa54;
-  color: #fff;
+  border: solid 0.2px;
+  color: #34aa54;
   display: block;
   font-size: 12px;
   padding: 5px;
@@ -88,6 +88,12 @@ a:focus {
   margin: 10px auto;
   font-weight: bold;
 }
+
+.link-invoice:hover {
+  color: rgb(255, 255, 255);
+  background-color:#34aa54;
+}
+
 p.link-invoice-error{
   text-align: center;
   color:red;

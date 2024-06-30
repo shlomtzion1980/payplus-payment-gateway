@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-06-27 13:17+0300\n"
-"PO-Revision-Date: 2024-06-27 13:18+0300\n"
+"POT-Creation-Date: 2024-06-30 07:41+0300\n"
+"PO-Revision-Date: 2024-06-30 07:42+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -133,7 +133,7 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/admin/class-wc-payplus-admin-settings.php:97
 #: includes/class-wc-payplus-form-fields.php:202
 #: includes/class-wc-payplus-statics.php:24
-#: includes/class-wc-payplus-statics.php:95 payplus-payment-gateway.php:332
+#: includes/class-wc-payplus-statics.php:108 payplus-payment-gateway.php:332
 #: payplus-payment-gateway.php:623 payplus-payment-gateway.php:807
 msgid "Charge"
 msgstr "חיוב"
@@ -280,28 +280,28 @@ msgstr "בחירת סוג מסמך"
 #: includes/admin/class-wc-payplus-admin-settings.php:198
 #: includes/admin/class-wc-payplus-admin.php:787
 #: includes/class-wc-payplus-statics.php:29
-#: includes/class-wc-payplus-statics.php:100
+#: includes/class-wc-payplus-statics.php:113
 msgid "Tax Invoice"
 msgstr "חשבונית מס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:199
 #: includes/admin/class-wc-payplus-admin.php:788
 #: includes/class-wc-payplus-statics.php:32
-#: includes/class-wc-payplus-statics.php:103
+#: includes/class-wc-payplus-statics.php:116
 msgid "Tax Invoice Receipt "
 msgstr "חשבונית מס קבלה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:200
 #: includes/admin/class-wc-payplus-admin.php:789
 #: includes/class-wc-payplus-statics.php:35
-#: includes/class-wc-payplus-statics.php:106
+#: includes/class-wc-payplus-statics.php:119
 msgid "Receipt"
 msgstr "קבלה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:201
 #: includes/admin/class-wc-payplus-admin.php:790
 #: includes/class-wc-payplus-statics.php:38
-#: includes/class-wc-payplus-statics.php:109
+#: includes/class-wc-payplus-statics.php:122
 msgid "Donation Reciept"
 msgstr "קבלה על תרומה"
 
@@ -464,14 +464,6 @@ msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 msgid "Select  tax rate"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:123
-msgid "Invoice+ Docs"
-msgstr "מסמכי חשבונית+"
-
-#: includes/admin/class-wc-payplus-admin.php:133
-msgid "PayPlus Data"
-msgstr "מידע פייפלוס"
-
 #: includes/admin/class-wc-payplus-admin.php:198
 msgid ""
 "\n"
@@ -479,7 +471,7 @@ msgid ""
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin.php:321
-#: includes/wc_payplus_gateway.php:601 includes/wc_payplus_invoice.php:458
+#: includes/wc_payplus_gateway.php:601 includes/wc_payplus_invoice.php:457
 msgid "Refund for Order Number: "
 msgstr "זיכוי עבור הזמנה מספר: "
 
@@ -646,7 +638,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:939
 #: includes/admin/class-wc-payplus-admin.php:961
-#: includes/class-wc-payplus-statics.php:187
+#: includes/class-wc-payplus-statics.php:229
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1314,48 +1306,52 @@ msgid "Order status log"
 msgstr "לוג סטטוס של הזמנה"
 
 #: includes/class-wc-payplus-statics.php:25
-#: includes/class-wc-payplus-statics.php:96
+#: includes/class-wc-payplus-statics.php:109
 msgid "Refunds"
 msgstr "החזרים"
 
 #: includes/class-wc-payplus-statics.php:41
-#: includes/class-wc-payplus-statics.php:112
+#: includes/class-wc-payplus-statics.php:125
 msgid "Invoice"
 msgstr "חשבונית"
 
-#: includes/class-wc-payplus-statics.php:171
+#: includes/class-wc-payplus-statics.php:191
 msgid "Total of payments: "
 msgstr "סה\"כ תקבולים: "
 
-#: includes/class-wc-payplus-statics.php:184
+#: includes/class-wc-payplus-statics.php:225
 msgid "Transaction#"
 msgstr "עסקה"
 
-#: includes/class-wc-payplus-statics.php:185
+#: includes/class-wc-payplus-statics.php:226
+msgid "Method"
+msgstr "שיטה"
+
+#: includes/class-wc-payplus-statics.php:227
 msgid "Last Digits"
 msgstr "ספרות אחרונות"
 
-#: includes/class-wc-payplus-statics.php:186
+#: includes/class-wc-payplus-statics.php:228
 msgid "Expiry Date"
 msgstr "תאריך תפוגה"
 
-#: includes/class-wc-payplus-statics.php:188
+#: includes/class-wc-payplus-statics.php:230
 msgid "Voucher #"
 msgstr "מס ואוצ'ר "
 
-#: includes/class-wc-payplus-statics.php:189
+#: includes/class-wc-payplus-statics.php:231
 msgid "Voucher ID"
 msgstr "ID ואוצ'ר"
 
-#: includes/class-wc-payplus-statics.php:190
+#: includes/class-wc-payplus-statics.php:232
 msgid "Token"
 msgstr "טוקן"
 
-#: includes/class-wc-payplus-statics.php:191
+#: includes/class-wc-payplus-statics.php:233
 msgid "Total:"
 msgstr "סה\"כ:"
 
-#: includes/class-wc-payplus-statics.php:181
+#: includes/class-wc-payplus-statics.php:222
 msgid ""
 "\n"
 "                    <div style=\"font-weight:600;\">PayPlus "
@@ -1513,18 +1509,18 @@ msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1361 includes/wc_payplus_invoice.php:883
+#: includes/wc_payplus_gateway.php:1361 includes/wc_payplus_invoice.php:882
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1390 includes/wc_payplus_invoice.php:845
+#: includes/wc_payplus_gateway.php:1390 includes/wc_payplus_invoice.php:844
 msgid "Shipping"
 msgstr "משלוח"
 
 #: includes/wc_payplus_gateway.php:1413 includes/wc_payplus_gateway.php:1414
 #: includes/wc_payplus_gateway.php:1434 includes/wc_payplus_gateway.php:1435
-#: includes/wc_payplus_invoice.php:872 includes/wc_payplus_invoice.php:873
-#: includes/wc_payplus_invoice.php:905 includes/wc_payplus_invoice.php:906
+#: includes/wc_payplus_invoice.php:871 includes/wc_payplus_invoice.php:872
+#: includes/wc_payplus_invoice.php:904 includes/wc_payplus_invoice.php:905
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
@@ -1556,35 +1552,38 @@ msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישו
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
 msgstr "חידוש המנוי בפיי פלוס נכשל<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_invoice.php:238
+#: includes/wc_payplus_invoice.php:237
 msgid "create invoice refund"
 msgstr "יצירת חשבונית החזר"
 
-#: includes/wc_payplus_invoice.php:278
+#: includes/wc_payplus_invoice.php:277
 msgid "General Customer - לקוח כללי"
 msgstr ""
 
-#: includes/wc_payplus_invoice.php:354 includes/wc_payplus_invoice.php:1170
-#: includes/wc_payplus_invoice.php:1188
+#: includes/wc_payplus_invoice.php:353 includes/wc_payplus_invoice.php:1169
+#: includes/wc_payplus_invoice.php:1187
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:393
+#: includes/wc_payplus_invoice.php:392
 #, fuzzy
 #| msgid "Link document"
 msgid "Link Document"
 msgstr "לינק מסמך"
 
-#: includes/wc_payplus_invoice.php:393 includes/wc_payplus_invoice.php:526
+#: includes/wc_payplus_invoice.php:392 includes/wc_payplus_invoice.php:525
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:635 includes/wc_payplus_invoice.php:1090
-#: includes/wc_payplus_invoice.php:1239
+#: includes/wc_payplus_invoice.php:634
+msgid "Invoice+ Documents"
+msgstr "מסמכי חשבונית+"
+
+#: includes/wc_payplus_invoice.php:1089 includes/wc_payplus_invoice.php:1238
 msgid "Link Document  "
 msgstr "לינק מסמך"
 
-#: includes/wc_payplus_invoice.php:1211
+#: includes/wc_payplus_invoice.php:1210
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
@@ -1776,6 +1775,9 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "PayPlus Data"
+#~ msgstr "מידע פייפלוס"
 
 #~ msgid "Hide Payments Number In Payment Form"
 #~ msgstr "הסתר שדה תשלומים בדף הסליקה"

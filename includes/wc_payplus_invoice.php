@@ -234,9 +234,8 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-<button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>"
-    class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
-<div class='payplus_loader_refund'></div>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+            <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -632,7 +631,7 @@ class PayplusInvoice
                 foreach ($columns as $column_name => $column_info) {
                     $new_columns[$column_name] = $column_info;
                     if ('shipping_address' === $column_name) {
-                        $new_columns['order_invoice'] = "<span class='text-center'>" . __('Link Document  ', 'payplus-payment-gateway') . "</span>";
+                        $new_columns['order_invoice'] = "<span class='text-center'>" . __('Invoice+ Documents', 'payplus-payment-gateway') . "</span>";
                     }
                 }
             }
