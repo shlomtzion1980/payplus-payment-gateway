@@ -120,7 +120,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
                 add_meta_box(
                     'invoice+_order_metabox',
-                    "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "invoice+.png'>",
+                    "<img style='height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png'>",
                     [$this, 'display_invoice_order_metabox'],
                     $screen->id,
                     'side',
@@ -130,7 +130,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
             add_meta_box(
                 'payplus_order_metabox',
-                "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'>",
+                "<img style='height: 35px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'>",
                 [$this, 'display_payplus_order_metabox'],
                 $screen->id,
                 'side',
@@ -1268,7 +1268,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             <table data-method="<?php echo (strpos($order->get_payment_method(), 'payplus') !== false) ? true : false ?>" id="payplus-table-payment" style="display: <?php echo $chackAllPaymentTable ?>" class="wc-order-totals payplus-table-payment">
                 <thead>
                     <tr>
-                        <th><img style="display: block;margin:auto" src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "invoice+.png"; ?>'></th>
+                        <th><img style="display: block;margin: auto;padding: 1px 0 2px 0;" src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"; ?>'></th>
                         <th><?php echo __("Sum", "payplus-payment-gateway") ?></th>
                         <th><?php echo __("Details", "payplus-payment-gateway") ?></th>
                         <th><?php echo __("Methods of Payment", "payplus-payment-gateway") ?></th>
@@ -1403,7 +1403,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             ?>
                 <table class="wc-order-totals payplus-table-refund">
                     <tr class="payplus-row">
-                        <th></th>
+                        <th><img style='height: 30px;margin: auto;display: block;padding: 1px 0 2px 0;}' src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"; ?>'></th>
                         <th><?php echo __('Refund amount', 'payplus-payment-gateway'); ?></th>
                         <th><?php echo __('Amount already refunded', 'payplus-payment-gateway'); ?></th>
                         <th><?php echo __('Sum', 'payplus-payment-gateway'); ?></th>
