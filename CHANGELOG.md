@@ -2,7 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.0.2] - 2024-06-30 - (Alucard)
+
+* Change - If Multipass payment is turned on in the payment page it will always show other payment methods (Due to Multipass demand that if there isn't enough balance to cover the order with the voucher customers will always be able to add credit-card payment or else).
+* Add    - Payplus data metabox - Show all transactions - not only the last one - including related transactions with the total of all at the bottom.
+* Add    - Payplus data metabox - Show method of payment in the displayed data.
+* Tweak  - Design changes in settings and metaboxes - logos and colors.
+* Tweak  - On all orders display page - if there is only one invoice+ document it will be shown as a link and if more than one the arrow list will be displayed.
+* Tweak  - Express Checkout - Small design changes for mobile and desktop.
+
 ##  [7.0.1] - 2024-06-27 - (Megaman)
+
 * Fix    - Small but important J5 fix for invoices with split payments.
 
 ##  [6.6.9] - 2024-06-24 - (WonderBoy)

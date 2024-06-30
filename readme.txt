@@ -82,6 +82,15 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.0.2 = 
+* Change - If Multipass payment is turned on in the payment page it will always show other payment methods (Due to Multipass demand that if there isn't enough balance to cover the order with the voucher customers will always be able to add credit-card payment or else).
+* Add    - Payplus data metabox - Show all transactions - not only the last one - including related transactions with the total of all at the bottom.
+* Add    - Payplus data metabox - Show method of payment in the displayed data.
+* Tweak  - Design changes in settings and metaboxes - logos and colors.
+* Tweak  - On all orders display page - if there is only one invoice+ document it will be shown as a link and if more than one the arrow list will be displayed.
+* Tweak  - Express Checkout - Small design changes for mobile and desktop.
+
 = 7.0.1 = 
 * Fix    - Small but important J5 fix for invoices with split payments.
 
@@ -101,56 +110,4 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Payplus data metabox inside order page.
 * Fix    - Only one payment page per domain.
 
-
-= 6.6.8 = 
-* Add    - Display PayPlus Invoice+ charges and refunds in a dedicated metabox in the order page.
-* Add    - Option to hide the Invoice+ links in the order notes in Invoice+ settings.
-* Add    - Display PayPlus Invoice+ docs without activation of Invoice+.
-* Add    - Display PayPlus Invoice+ refunds and invoices in all orders page via show/hide list arrow button. 
-* Fix    - Fire Completed is fired only if not default-woo is selected and not together.
-* Add    - Hide Delete/Update custom fields - with option in the settings to be cancelled - default is yes.
-* Tweak  - Location of plugin credit (bottom of the page in plugin settings).
-* Tweak  - Hide PayPlus loader if "Make Payment" fails because amount is larger than allowed.
-* Change - Disable express checkout functions run if not enabled.
-* Fix    - Check if product variable is a valid product object in express checkout function.
-* Add    - Prepare plugin support for Secure3d - with saved cards only.
-* Fix    - Bit payments redirection after successful order purchase from uPay on mobile phones.
-* Tweak  - Database version update - refactored options check and settings to run only when needed.
-
-
-= 6.6.7 =
-* Tweak - Multiple refunds can now be done in an automatic way as well as manual.
-* Tweak - Some hebrew translations were fixed.
-* Tweak - Added description to fire completed configuration option.
-* Tweak - Added error message when an error occurs on "Make Payment" in admin orders edit.
-* Fix   - "Make Payment" button for J5 payment now allows admin to charge up until original J5 charge. 
-* Fix   - Removed short code usage with payplus error page.
-
-
-= 6.6.5 =
-* Tweak - New apple developer merchantid domain association file.
-* Tweak - Show 0 priced products in invoices.
-* Tweak - "Get PayPlus Data" button now adds all payplus meta fields to the order meta.
-* Fix   - Invoices created with "Get PayPlus Data" button will have correct payment method data.
-
-= 6.6.4 =
-* Fix - Bug preventing save users in admin.
-* Fix - Show correct SKU when invoice with more than one variation product exist.
-* Add - Mark in red - When Invoice+ is enabled shows the user which fields must be set.
-
-= 6.6.3 =
-* Add - Check/Get order - ipn data from payplus in Admin orders via button click.
-* Fix - Create invoice in a non-automatic management interface.
-* Add - "Website code" - Added to Invoice+: Add a unique string for each website if you have more than one website connected to our gateway.
-* Add - Save credit card checkbox in new WooCommerce Checkout Blocks.
-* Add - Refactor for meta data to use High Performance Order Storage - HPOS with support for stores without - will be supported for traditional post meta records - for existing orders and stores that have no current support for HPOS.
-* Add - Legacy post meta support checkbox - Default is checked - In future releases this will be unchecked. (Plugin users that have been using our gateway up until now will be able to view all data that was stored in the post meta fields) - for more information regarding HPOS go to: https://woocommerce.com/document/high-performance-order-storage/
-* Add - Invoice check and update to admin on creation - If an invoice has already been created and for some reason it has not been updated to the admin orders panel, it's link will appear and it's data will be shown without duplicate creation.
-* Add - Notice for customer when they update their billing address. (Regarding saved tokens)
-
-= 6.6.2 =
-* Add - Support for the new WooCommerce Checkout Blocks.
-
-== Upgrade Notice ==
-= 6.6.5 =
-* This update includes some minor patches and a new apple merchantid for domain association. Please update for the latest fixes.
+[See changelog for all versions](https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/CHANGELOG.md).
