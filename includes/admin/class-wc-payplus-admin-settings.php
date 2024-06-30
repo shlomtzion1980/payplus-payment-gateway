@@ -17,15 +17,15 @@ class WC_PayPlus_Admin_Settings
             'payplus-payment-gateway-setup-wizard' => array(
                 'name' => __('Basic Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-settings.svg'>",
+                'img' => "<img style='height: 70%' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payPlusSettings.svg'>",
             ),
             'payplus-payment-gateway' => array(
                 'name' => __('Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'>",
+                'img' => "<img style='height: 70%' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payPlusSettings.svg'>",
             ),
             'payplus-invoice' => array(
-                'name' => __('Invoice+', 'payplus-payment-gateway'),
+                'name' => __('Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "invoice+.png'>",
             ),

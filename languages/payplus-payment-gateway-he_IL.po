@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-06-30 07:41+0300\n"
-"PO-Revision-Date: 2024-06-30 07:42+0300\n"
+"PO-Revision-Date: 2024-06-30 09:33+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -938,7 +938,7 @@ msgstr "ביט"
 #: includes/class-wc-payplus-form-fields.php:97
 #: includes/wc_payplus_subgateways.php:43
 msgid "MULTIPASS"
-msgstr "מולטיפאס "
+msgstr "מולטיפס"
 
 #: includes/class-wc-payplus-form-fields.php:112
 msgid "Tav zahav"
