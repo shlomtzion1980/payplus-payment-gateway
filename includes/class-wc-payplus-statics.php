@@ -150,7 +150,15 @@ class WC_PayPlus_Statics
                 if ($boxType === 'payplus') {
                     $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
                     $responseArray = json_decode($responsePayPlus, true);
-                    if (isset($responseArray)) {
+                    if (json_last_error() !== JSON_ERROR_NONE) {
+                        $error_message = json_last_error_msg();
+                        $fixedJson = WC_PayPlus_Statics::fixMalformedJson($responsePayPlus);
+                        $payPlusFixedJson = ['payplus_response' => $fixedJson];
+                        $order = wc_get_order($order_id);
+                        WC_PayPlus_Meta_Data::update_meta($order, $payPlusFixedJson);
+                        $responseArray = json_decode($fixedJson, true);
+                    }
+                    if (isset($responseArray) && is_array($responseArray)) {
                         $payPlusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
                         $totalAmount = $responseArray['amount'];
                         if (!is_null($totalAmount)) {
@@ -191,6 +199,27 @@ class WC_PayPlus_Statics
                     }
                 }
             }
+        }
+
+        /**
+         *
+         * Fix malformed json that contains " (Double Geresh) in the string data.
+         *
+         * @param string $json
+         * 
+         * @return string
+         */
+        public static function fixMalformedJson($json)
+        {
+            $replacedJson = str_replace('{"', '{#', $json);
+            $replacedJson = str_replace('"}', '#}', $replacedJson);
+            $replacedJson = str_replace('":"', '#:#', $replacedJson);
+            $replacedJson = str_replace('","', '#,#', $replacedJson);
+            $replacedJson = str_replace('":', '#:', $replacedJson);
+            $replacedJson = str_replace(',"', ',#', $replacedJson);
+            $replacedJson = str_replace('"', 'U+2033', $replacedJson);
+            $replacedJson = str_replace('#', '"', $replacedJson);
+            return $replacedJson;
         }
 
         /**
