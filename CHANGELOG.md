@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [7.0.5] - 2024-07-01 - (Belmont)
+##  [7.0.6] - 2024-07-01 - (Belmont)
 
 * Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. 
            Code now handles the missing options correctly.

@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 7.0.5
+Stable tag: 7.0.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -83,7 +83,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.0.5 = 
+= 7.0.6 = 
 * Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. 
            Code now handles the missing options correctly.
 * Fix    - Removed auto create payplus error page.
