@@ -506,9 +506,9 @@ class WC_PayPlus
         $importAapplepayScript = null;
         $isModbile = (wp_is_mobile()) ? true : false;
         if (is_checkout()) {
-
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js';
             if (
+                property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') &&
                 $this->payplus_payment_gateway_settings->import_applepay_script === "yes"
                 && in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe'])
             ) {
@@ -829,10 +829,10 @@ class WC_PayPlus
         $methods[] = 'WC_PayPlus_Gateway_FinitiOne';
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if ($payplus_payment_gateway_settings) {
-            if ($payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
+            if (isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
                 add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
             }
-            if ($payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
+            if (isset($payplus_payment_gateway_settings['disable_menu_side']) && $payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
                 add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 99);
             }
         }

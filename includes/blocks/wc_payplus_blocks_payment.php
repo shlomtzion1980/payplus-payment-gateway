@@ -45,11 +45,11 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     {
         $this->settings = get_option("woocommerce_{$this->name}_settings", []);
         $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
-        $this->displayMode = $this->settings['display_mode'];
-        $this->iFrameHeight = $this->settings['iframe_height'];
-        $this->hideOtherPayments = $this->settings['hide_other_charge_methods'];
+        $this->displayMode = $this->settings['display_mode'] ?? null;
+        $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
+        $this->hideOtherPayments = $this->settings['hide_other_charge_methods'] ?? null;
 
-        $this->secretKey = $this->settings['secret_key'];
+        $this->secretKey = $this->settings['secret_key'] ?? null;
         $gateways = WC()->payment_gateways->payment_gateways();
 
         $this->settings['gateways'] = [];

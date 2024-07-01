@@ -258,8 +258,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->invoice_api = new PayplusInvoice();
         $payplus_invoice_option = get_option('payplus_invoice_option');
         if ($payplus_invoice_option) {
-            $payplus_invoice_api_key = $payplus_invoice_option['payplus_invoice_api_key'];
-            $payplus_invoice_secret_key = $payplus_invoice_option['payplus_invoice_secret_key'];
+            $payplus_invoice_api_key = $payplus_invoice_option['payplus_invoice_api_key'] ?? null;
+            $payplus_invoice_secret_key = $payplus_invoice_option['payplus_invoice_secret_key'] ?? null;
         }
         if (($this->api_key && $payplus_invoice_api_key !== $this->api_key)
             || ($this->secret_key && $payplus_invoice_secret_key !== $this->secret_key)
