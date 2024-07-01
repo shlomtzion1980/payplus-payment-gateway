@@ -956,7 +956,7 @@ class WC_PayPlus
     {
         if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
 
-            require_once 'includes/blocks/wc_payplus_blocks_payment.php';
+            require_once 'includes/blocks/class-wc-payplus-blocks-support.php';
             add_action(
                 'woocommerce_blocks_payment_method_type_registration',
                 function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {

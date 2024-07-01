@@ -184,7 +184,7 @@ function payplusGenerateErrorPage()
             $errorPagePayPlus = wp_insert_post(array(
                 'post_status' => 'publish', 'post_type' => 'page',
                 'post_title' => ucwords('error payment payplus'),
-                "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
+                "post_content" => "The transaction has failed, please contact the seller."
             ));
             update_option('error_page_payplus', $errorPagePayPlus);
         }
@@ -204,7 +204,7 @@ function checkPayPlusErrorPage($errorPageOptions)
     if (strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
         wp_update_post(array(
             'ID' => $error_page_payplus,
-            "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
+            "post_content" => "The transaction has failed, please contact the seller."
         ));
     }
 }
@@ -257,7 +257,7 @@ function checkSetPayPlusOptions()
     ($savePayPlus ?? false) ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
 
     if (!array_key_exists('post-content', $payPlusErrorOptions)) {
-        $payPlusErrorOptions['post-content'] = "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller";
+        $payPlusErrorOptions['post-content'] = "The transaction failed, please contact the seller.";
         update_option('settings_payplus_page_error_option', $payPlusErrorOptions);
     }
 }
