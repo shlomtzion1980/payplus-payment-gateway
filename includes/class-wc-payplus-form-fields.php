@@ -390,6 +390,22 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Order Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'payplus_data_save_order_note' => [
+                'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
+                'label' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('Whenever a transaction is done add the payplus data to the order note.<br>This data also appears in the PayPlus Data metabox.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'show_payplus_data_metabox' => [
+                'title' => __('Show PayPlus Metabox', 'payplus-payment-gateway'),
+                'label' => __('Show the transaction data in the PayPlus dedicated metabox', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'yes',
+                'description' => __('Adds the PayPlus transaction data in a dedicated metabox on the side in the order page.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'successful_order_status' => [
                 'title' => __('Successful Order Status', 'payplus-payment-gateway'),
                 'type' => 'select',

@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ##  [7.0.6] - 2024-07-01 - (Belmont)
 
-* Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. 
-           Code now handles the missing options correctly.
+* Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. Code now handles the missing options correctly.
+* Fix    - Fixed auto create payplus error page function.
+* Fix    - Malformed json received with " inside a string of the json sometimes returns from the PayPlus CRM (in the company name for example), it is now fixed and re-saved as correct json.
 * Change - Blocks file name was changed to the new naming convention - part of code refactoring.
 
 ##  [7.0.2] - 2024-06-30 - (Alucard)
