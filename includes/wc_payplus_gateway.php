@@ -192,7 +192,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->display_mode = $this->get_option('display_mode');
         $this->iframe_height = $this->get_option('iframe_height');
         $this->import_applepay_script = $this->get_option('import_applepay_script') == 'yes' ? true : false;
-        $payplusLinkError = get_permalink(get_option('error_page_payplus'));
+        $payPlusErrorPage = get_option('error_page_payplus');
+        $payplusLinkError = isset($payPlusErrorPage) ? get_permalink($payPlusErrorPage) : null;
 
         $this->payplus_generate_key_dashboard = $this->payplus_generate_key_dashboard();
         $this->response_error_url = $payplusLinkError;
