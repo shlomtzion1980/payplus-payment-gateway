@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 7.0.2
+Stable tag: 7.0.3
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -82,6 +82,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.0.3 = 
+* Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. 
+           Code now handles the missing options correctly.
+* Change - Blocks file name was changed to the new naming convention - part of code refactoring.
 
 = 7.0.2 = 
 * Change - If Multipass payment is turned on in the payment page it will always show other payment methods (Due to Multipass demand that if there isn't enough balance to cover the order with the voucher customers will always be able to add credit-card payment or else).

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.0.3] - 2024-06-30 - (Belmont)
+
+* Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. 
+           Code now handles the missing options correctly.
+* Change - Blocks file name was changed to the new naming convention - part of code refactoring.
+
 ##  [7.0.2] - 2024-06-30 - (Alucard)
 
 * Change - If Multipass payment is turned on in the payment page it will always show other payment methods (Due to Multipass demand that if there isn't enough balance to cover the order with the voucher customers will always be able to add credit-card payment or else).
