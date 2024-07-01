@@ -163,6 +163,52 @@ function check_if_page_exists_by_slug($page_slug)
     $pageId = $page->ID ?? null;
     return $pageId;
 }
+/**
+ * Create the payplus error page
+ * @return void
+ */
+function payplusGenerateErrorPage()
+{
+    $page_slug = 'error-payment-payplus';
+    $errorPageOptions = get_option('settings_payplus_page_error_option');
+    $pageId = check_if_page_exists_by_slug($page_slug);
+    if ($pageId) {
+        checkPayPlusErrorPage($errorPageOptions);
+        update_option('error_page_payplus', $pageId);
+        return;
+    } else {
+        $error_page_payplus = get_option('error_page_payplus');
+        if (!empty($error_page_payplus)) {
+            $errorPagePayPlus = get_post($error_page_payplus);
+        }
+        if (!$errorPagePayPlus) {
+            $errorPagePayPlus = wp_insert_post(array(
+                'post_status' => 'publish', 'post_type' => 'page',
+                'post_title' => ucwords('error payment payplus'),
+                "post_content" => "The transaction has failed, please contact the seller."
+            ));
+            update_option('error_page_payplus', $errorPagePayPlus);
+        }
+    }
+}
+
+/**
+ * To get rid of the shortcodes...
+ * Check if the payplus error page has to shortcode instead of content if so replace it.
+ * 
+ * @return void
+ */
+function checkPayPlusErrorPage($errorPageOptions)
+{
+    $error_page_payplus = get_option('error_page_payplus');
+    $errorPagePayPlus = get_post($error_page_payplus);
+    if (strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
+        wp_update_post(array(
+            'ID' => $error_page_payplus,
+            "post_content" => "The transaction has failed, please contact the seller."
+        ));
+    }
+}
 
 /**
  * Checks if the new options exist and if not adds them // this is version dependant and should be 
