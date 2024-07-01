@@ -176,6 +176,7 @@ function payplusGenerateErrorPage()
     $pageId = check_if_page_exists_by_slug($page_slug);
     if ($pageId) {
         checkPayPlusErrorPage($errorPageOptions);
+        update_option('error_page_payplus', $pageId);
         return;
     } else {
         $error_page_payplus = get_option('error_page_payplus');
