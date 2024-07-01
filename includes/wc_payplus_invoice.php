@@ -38,7 +38,7 @@ class PayplusInvoice
     {
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
-        $this->invoiceDisplayOnly = $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
+        $this->invoiceDisplayOnly = isset($this->payplus_invoice_option['display_only_invoice_docs']) && $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
 
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 
