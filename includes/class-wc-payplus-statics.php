@@ -160,21 +160,22 @@ class WC_PayPlus_Statics
                     }
                     if (isset($responseArray) && is_array($responseArray)) {
                         $payPlusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
-                        $totalAmount = $responseArray['amount'];
+                        $cardDetails = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_google-paycardDetails') ?? null;
+                        $totalAmount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'];
                         if (!is_null($totalAmount)) {
                             if (!isset($responseArray['related_transactions'])) {
-                                $amount = $responseArray['amount'];
-                                $method = $responseArray['method'];
+                                $amount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'];
+                                $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'];
                                 $type = $payPlusType ? $payPlusType : $responseArray['type'];
-                                $number = $responseArray['number'];
-                                $fourDigits = $responseArray['four_digits'];
-                                $expMonth = $responseArray['expiry_month'];
-                                $expYear = $responseArray['expiry_year'];
-                                $numOfPayments = isset($responseArray['number_of_payments']) ? $responseArray['number_of_payments'] : "";
-                                $voucherNum = isset($responseArray['voucher_num']) ? $responseArray['voucher_num'] : "";
-                                $voucherId = isset($responseArray['voucher_id']) ? $responseArray['voucher_id'] : "";
-                                $tokeUid = $responseArray['token_uid'];
-                                $j5Charge = isset($responseArray['charged_j5_amount']) ? $responseArray['charged_j5_amount'] : "";
+                                $number = $responseArray['number'] ?? $responseArray['data']['transaction']['number'];
+                                $fourDigits = $responseArray['four_digits'] ?? $cardDetails;
+                                $expMonth = $responseArray['expiry_month'] ?? $responseArray['data']['data']['card_information']['expiry_month'];
+                                $expYear = $responseArray['expiry_year'] ?? $responseArray['data']['data']['card_information']['expiry_year'];
+                                $numOfPayments = $responseArray['number_of_payments'] ?? $responseArray['data']['transaction']['payments']['number_of_payments'];
+                                $voucherNum = $responseArray['voucher_num'] ?? $responseArray['data']['transaction']['voucher_number'];
+                                $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'];
+                                $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'];
+                                $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
                                 echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
@@ -185,11 +186,11 @@ class WC_PayPlus_Statics
                                     $fourDigits = $transaction['four_digits'];
                                     $expMonth = $transaction['expiry_month'];
                                     $expYear = $transaction['expiry_year'];
-                                    $numOfPayments = isset($transaction['number_of_payments']) ? $transaction['number_of_payments'] : "";
-                                    $voucherNum = isset($transaction['voucher_num']) ? $transaction['voucher_num'] : "";
-                                    $voucherId = isset($transaction['voucher_id']) ? $transaction['voucher_id'] : "";
+                                    $numOfPayments = $transaction['number_of_payments'] ?? null;
+                                    $voucherNum = $transaction['voucher_num'] ?? null;
+                                    $voucherId = $transaction['voucher_id'] ?? null;
                                     $tokeUid = $transaction['token_uid'];
-                                    $j5Charge = isset($transaction['charged_j5_amount']) ? $transaction['charged_j5_amount'] : "";
+                                    $j5Charge = null;
                                     echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
@@ -250,6 +251,7 @@ class WC_PayPlus_Statics
                         <table style="border-collapse:collapse">
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Method', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Type', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Last Digits', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Expiry Date', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Payments', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -263,6 +265,7 @@ class WC_PayPlus_Statics
                 ),
                 $number,
                 $method,
+                $type,
                 $fourDigits,
                 $expMonthYear,
                 $numOfPayments,

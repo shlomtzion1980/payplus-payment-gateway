@@ -160,6 +160,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $taxDiscount = $cart->get_cart_discount_tax_total();
         if (!empty($_POST)) {
             $obj = $_POST['obj'];
+            $paymentInfo = isset($_POST['obj']['cardInfo']['info']) ? $_POST['obj']['cardInfo']['info'] : null;
             $shipping = $obj['shipping'];
             $methodUrl = $obj['method'] == 'google-pay' ? 'GooglePayProcess' : 'ApplePayProcess';
             $url = $WC_PayPlus_Gateway->api_url . "Transactions/" . $methodUrl;
@@ -236,10 +237,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $arrJson['paying_vat'] = isset($obj['paying_vat']) ? $obj['paying_vat'] : $arrJson['paying_vat'];
 
             $payload = json_encode($arrJson);
+
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'New Payment Process Fired (' . $order_id . ')');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', '', 'before-payload');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($payload, true), 'payload');
+
             $response = $WC_PayPlus_Gateway->post_payplus_ws($url, $payload);
+
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($response, true), 'error');
@@ -256,6 +260,11 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                             $inData = array_merge($data, (array) $res->data);
                             $WC_PayPlus_Gateway->payplus_add_order_express_checkout($order_id, $inData);
                             $this->updateMetaDataOneClick($order_id, $inData);
+                            if (!is_null($paymentInfo)) {
+                                !is_null($paymentInfo['cardDetails']) ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] . 'cardDetails' => $paymentInfo['cardDetails'])) : null;
+                                !is_null($paymentInfo['cardNetwork']) ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] . 'cardNetwork' => $paymentInfo['cardNetwork'])) : null;
+                            }
+                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => json_encode($res)));
                             WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] => $order->get_total()));
                             if ($order->get_user_id() > 0) {
                                 update_user_meta($order->get_user_id(), 'cc_token', $inData['data']->card_information->token);
@@ -286,7 +295,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                 ),
                                 $inData['transaction']->number,
                                 $inData['data']->card_information->four_digits,
-                                $inData['data']->card_information->expiry_month . $inData->data->expiry_year,
+                                $inData['data']->card_information->expiry_month . '/' . $inData['data']->card_information->expiry_year,
                                 $inData['transaction']->voucher_number,
                                 $inData['data']->card_information->token,
                                 $order->get_total()
