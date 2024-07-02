@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.0.6] - 2024-07- - (Dracula)
+
+* Add    - PayPlus response json added for express checkout - PayPlus metabox.
+* Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
+* Add    - Option to save the PayPlus transaction data to the order note or not... (appears in the metabox)
+* Fix    - Update order status (on-hold) on callback ipn response for J5 (Approval).
+
 ##  [7.0.6] - 2024-07-01 - (Belmont)
 
 * Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. Code now handles the missing options correctly.

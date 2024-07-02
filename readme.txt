@@ -83,6 +83,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.0.7 = 
+* Add    - PayPlus response json added for express checkout - PayPlus metabox.
+* Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
+* Add    - Option to save the PayPlus transaction data to the order note or not... (appears in the metabox)
+* Fix    - Update order status (on-hold) on callback ipn response for J5 (Approval).
+
 = 7.0.6 = 
 * Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. Code now handles the missing options correctly.
 * Fix    - Fixed auto create payplus error page function.
