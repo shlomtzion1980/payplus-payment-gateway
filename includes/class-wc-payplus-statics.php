@@ -160,21 +160,20 @@ class WC_PayPlus_Statics
                     }
                     if (isset($responseArray) && is_array($responseArray)) {
                         $payPlusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
-                        $cardDetails = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_google-paycardDetails') ?? null;
                         $totalAmount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'];
                         if (!is_null($totalAmount)) {
                             if (!isset($responseArray['related_transactions'])) {
-                                $amount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'];
-                                $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'];
-                                $type = $payPlusType ? $payPlusType : $responseArray['type'];
-                                $number = $responseArray['number'] ?? $responseArray['data']['transaction']['number'];
-                                $fourDigits = $responseArray['four_digits'] ?? $cardDetails;
-                                $expMonth = $responseArray['expiry_month'] ?? $responseArray['data']['data']['card_information']['expiry_month'];
-                                $expYear = $responseArray['expiry_year'] ?? $responseArray['data']['data']['card_information']['expiry_year'];
-                                $numOfPayments = $responseArray['number_of_payments'] ?? $responseArray['data']['transaction']['payments']['number_of_payments'];
-                                $voucherNum = $responseArray['voucher_num'] ?? $responseArray['data']['transaction']['voucher_number'];
-                                $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'];
-                                $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'];
+                                $amount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'] ?? null;
+                                $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'] ?? null;
+                                $type = $payPlusType ? $payPlusType : $responseArray['type'] ?? $responseArray['data']['transaction']['type'] ?? null;
+                                $number = $responseArray['number'] ?? $responseArray['data']['transaction']['number'] ?? null;
+                                $fourDigits = $responseArray['four_digits'] ?? $responseArray['data']['data']['card_information']['four_digits'] ?? null;
+                                $expMonth = $responseArray['expiry_month'] ?? $responseArray['data']['data']['card_information']['expiry_month'] ?? null;
+                                $expYear = $responseArray['expiry_year'] ?? $responseArray['data']['data']['card_information']['expiry_year'] ?? null;
+                                $numOfPayments = $responseArray['number_of_payments'] ?? $responseArray['data']['transaction']['payments']['number_of_payments'] ?? null;
+                                $voucherNum = $responseArray['voucher_num'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
+                                $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
+                                $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
                                 echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
                             } else {
