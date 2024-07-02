@@ -225,9 +225,8 @@ function checkSetPayPlusOptions()
     $newPayPlusOptionsYes = ['hide_custom_fields_buttons'];
     $newPayPlusOptionsNo = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
 
-    $newInvoicOptionsYes = ['dedicated_invoice_metabox'];
+    $newInvoicOptionsYes = ['dedicated_invoice_metabox', 'show_payplus_data_metabox', 'payplus_data_save_order_note'];
     $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
-
 
     foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
