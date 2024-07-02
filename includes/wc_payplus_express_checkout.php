@@ -278,28 +278,31 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                     $WC_PayPlus_Gateway->save_token($dataToken, $userID);
                                 }
                             }
-                            $order->add_order_note(sprintf(
-                                __(
-                                    '
-                            <div style="font-weight:600;">PayPlus Express Checkout Successful</div>
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
-                                    <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
-                                </table>
-                            ',
-                                    'payplus-payment-gateway'
-                                ),
-                                $inData['transaction']->number,
-                                $inData['data']->card_information->four_digits,
-                                $inData['data']->card_information->expiry_month . '/' . $inData['data']->card_information->expiry_year,
-                                $inData['transaction']->voucher_number,
-                                $inData['data']->card_information->token,
-                                $order->get_total()
-                            ));
+                            $saveOrderNote = boolval($this->payPlusGateWaySettings['payplus_data_save_order_note'] === 'yes');
+                            if ($saveOrderNote) {
+                                $order->add_order_note(sprintf(
+                                    __(
+                                        '
+                                <div style="font-weight:600;">PayPlus Express Checkout Successful</div>
+                                    <table style="border-collapse:collapse">
+                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
+                                        <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
+                                    </table>
+                                ',
+                                        'payplus-payment-gateway'
+                                    ),
+                                    $inData['transaction']->number,
+                                    $inData['data']->card_information->four_digits,
+                                    $inData['data']->card_information->expiry_month . '/' . $inData['data']->card_information->expiry_year,
+                                    $inData['transaction']->voucher_number,
+                                    $inData['data']->card_information->token,
+                                    $order->get_total()
+                                ));
+                            }
 
                             if ($WC_PayPlus_Gateway->fire_completed) {
                                 $order->payment_complete();

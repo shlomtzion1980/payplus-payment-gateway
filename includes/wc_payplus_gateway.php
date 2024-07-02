@@ -92,6 +92,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enable_create_user;
     public $log_status;
     public $hide_custom_fields_buttons;
+    public $saveOrderNote;
 
     /**
      *
@@ -177,7 +178,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->recurring_order_set_to_paid = $this->get_option('recurring_order_set_to_paid');
         $this->paying_vat = $this->get_option('paying_vat');
         $this->balance_name = $this->get_option('balance_name') == 'yes' ? true : false;
-
+        $this->saveOrderNote = boolval($this->settings['payplus_data_save_order_note'] === 'yes');
         $this->successful_order_status = $this->get_option('successful_order_status');
         $this->failure_order_status = $this->get_option('failure_order_status');
         $this->callback_addr = $this->get_option('callback_addr');
@@ -2283,7 +2284,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                         }
                                     }
                                     $html .= "</div>";
-                                    $order->add_order_note($html);
+                                    if ($this->saveOrderNote) {
+                                        $order->add_order_note($html);
+                                    }
                                 } else {
                                     if ($res->data->method !== "credit-card") {
                                         if (!empty($res->data->alternative_method_name)) {
@@ -2296,25 +2299,27 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                             $transactionUid = $res->data->transaction_uid;
                                             $insertMeta["payplus_transaction_uid_" . $method] = $transactionUid;
                                         }
-                                        $order->add_order_note(sprintf(
-                                            __(
-                                                '
+                                        if ($this->saveOrderNote) {
+                                            $order->add_order_note(sprintf(
+                                                __(
+                                                    '
                               <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $alternative_method_name . '
                                 <table style="border-collapse:collapse">
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                                 </table></div>
                             ',
-                                                'payplus-payment-gateway'
-                                            ),
-                                            $res->data->number,
-                                            $res->data->amount
-                                        ));
+                                                    'payplus-payment-gateway'
+                                                ),
+                                                $res->data->number,
+                                                $res->data->amount
+                                            ));
+                                        }
                                     } else {
-
-                                        $order->add_order_note(sprintf(
-                                            __(
-                                                '
+                                        if ($this->saveOrderNote) {
+                                            $order->add_order_note(sprintf(
+                                                __(
+                                                    '
                             <div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : $handleLog) . ' Successful</div>
                                 <table style="border-collapse:collapse">
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -2325,16 +2330,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
                                 </table>
                             ',
-                                                'payplus-payment-gateway'
-                                            ),
-                                            $res->data->number,
-                                            $res->data->four_digits,
-                                            $res->data->expiry_month . $res->data->expiry_year,
-                                            $res->data->voucher_num,
-                                            $res->data->token_uid,
-                                            $res->data->amount
+                                                    'payplus-payment-gateway'
+                                                ),
+                                                $res->data->number,
+                                                $res->data->four_digits,
+                                                $res->data->expiry_month . $res->data->expiry_year,
+                                                $res->data->voucher_num,
+                                                $res->data->token_uid,
+                                                $res->data->amount
 
-                                        ));
+                                            ));
+                                        }
                                     }
                                 }
                             }

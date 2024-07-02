@@ -146,6 +146,22 @@ class WC_PayPlus_Admin_Settings
                     'default' => 'yes',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[fire_completed]'
                 ];
+                $settings[$section][] = [
+                    'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
+                    'desc' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => 'no',
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[payplus_data_save_order_note]'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Show PayPlus Metabox', 'payplus-payment-gateway'),
+                    'desc' => __('Show the transaction data in the PayPlus dedicated metabox', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => 'yes',
+                    'desc_tip' => true,
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[show_payplus_data_metabox]'
+                ];
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-setup-wizard');
                 break;
             case 'payplus-error-setting':

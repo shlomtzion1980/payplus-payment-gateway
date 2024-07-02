@@ -20,6 +20,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public $isInvoiceEnable;
     public $useDedicatedMetaBox;
     public $invoiceDisplayOnly;
+    public $saveOrderNote;
+    public $showPayPlusDataMetabox;
+    public $allSettings;
 
     /**
      * @return null
@@ -64,6 +67,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->isInvoiceEnable = isset($payPlusInvoiceOptions['payplus_invoice_enable']) && $payPlusInvoiceOptions['payplus_invoice_enable'] === 'yes' ? true : false;
         $this->useDedicatedMetaBox = isset($payPlusInvoiceOptions['dedicated_invoice_metabox']) && $payPlusInvoiceOptions['dedicated_invoice_metabox'] === 'yes' ? true : false;
         $this->invoiceDisplayOnly = isset($payPlusInvoiceOptions['display_only_invoice_docs']) && $payPlusInvoiceOptions['display_only_invoice_docs'] === 'yes' ? true : false;
+        $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->saveOrderNote = boolval($this->allSettings['payplus_data_save_order_note'] === 'yes');
+        $this->showPayPlusDataMetabox = boolval($this->allSettings['show_payplus_data_metabox'] === 'yes');
 
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);
@@ -85,7 +91,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // Place "Get Order Details" button from PayPlus if the order is marked as unpaid - allows to get the order details from PayPlus if exists and
         // updates the order status to processing if the payment was successful and adds order note!
         add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
-        add_action('add_meta_boxes', [$this, 'add_invoice_plus_metabox']);
+        add_action('add_meta_boxes', [$this, 'payPlusMetaboxes']);
         add_action('admin_head', [$this, 'hide_delete_update_buttons_css']);
 
         // remove query args after error shown
@@ -114,7 +120,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
 
 
-    public function add_invoice_plus_metabox()
+    public function payPlusMetaboxes()
     {
         $screen = get_current_screen();
         if ($screen->post_type === 'shop_order') {
@@ -129,15 +135,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     ['metaBoxType' => 'payplusInvoice']
                 );
             }
-            add_meta_box(
-                'payplus_order_metabox',
-                "<img style='height: 35px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'>",
-                [$this, 'display_payplus_order_metabox'],
-                $screen->id,
-                'side',
-                'default',
-                ['metaBoxType' => 'payplus']
-            );
+            if ($this->showPayPlusDataMetabox) {
+                add_meta_box(
+                    'payplus_order_metabox',
+                    "<img style='height: 35px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'>",
+                    [$this, 'display_payplus_order_metabox'],
+                    $screen->id,
+                    'side',
+                    'default',
+                    ['metaBoxType' => 'payplus']
+                );
+            }
         }
     }
 
@@ -251,15 +259,19 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {
             WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
             $order->update_status('wc-processing');
-            $order->add_order_note(
-                $successNote
-            );
+            if ($this->saveOrderNote) {
+                $order->add_order_note(
+                    $successNote
+                );
+            }
         } elseif ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Approval') {
             WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
             $order->update_status('wc-on-hold');
-            $order->add_order_note(
-                $successNote
-            );
+            if ($this->saveOrderNote) {
+                $order->add_order_note(
+                    $successNote
+                );
+            }
         } else {
             $note = $responseBody['data']['status'] ?: 'Failed/No Data';
             $order->add_order_note('PayPlus IPN: ' . $note);
@@ -725,28 +737,32 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             }
                         }
                         $html .= "</div>";
-                        $order->add_order_note($html);
+                        if ($this->saveOrderNote) {
+                            $order->add_order_note($html);
+                        }
                     } else {
                         if ($res->data->method !== "credit-card") {
-                            $order->add_order_note(sprintf(
-                                __(
-                                    '
+                            if ($this->saveOrderNote) {
+                                $order->add_order_note(sprintf(
+                                    __(
+                                        '
                               <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $res->data->method . '
                                 <table style="border-collapse:collapse">
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                                 </table></div>
                             ',
-                                    'payplus-payment-gateway'
-                                ),
-                                $res->data->number,
-                                $res->data->amount
-                            ));
+                                        'payplus-payment-gateway'
+                                    ),
+                                    $res->data->number,
+                                    $res->data->amount
+                                ));
+                            }
                         } else {
-
-                            $order->add_order_note(sprintf(
-                                __(
-                                    '
+                            if ($this->saveOrderNote) {
+                                $order->add_order_note(sprintf(
+                                    __(
+                                        '
                             <div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : 'Payment') . ' Successful</div>
                                 <table style="border-collapse:collapse">
                                     <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -757,17 +773,18 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                                     <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
                                 </table>
                             ',
-                                    'payplus-payment-gateway'
-                                ),
-                                $res->data->number,
-                                $res->data->four_digits,
-                                $res->data->expiry_month . $res->data->expiry_year,
-                                $res->data->voucher_id,
-                                $res->data->token_uid,
-                                $res->data->amount,
-                                $order->get_total()
+                                        'payplus-payment-gateway'
+                                    ),
+                                    $res->data->number,
+                                    $res->data->four_digits,
+                                    $res->data->expiry_month . $res->data->expiry_year,
+                                    $res->data->voucher_id,
+                                    $res->data->token_uid,
+                                    $res->data->amount,
+                                    $order->get_total()
 
-                            ));
+                                ));
+                            }
                         }
                     }
                 }
