@@ -712,7 +712,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $date = new DateTime();
                 $current_timestamp = $date->getTimestamp();
                 $bi = base64_encode(site_url());
-                echo '<iframe class="' . $disabled . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick . '?var=' . $current_timestamp . '&wb=' . $bi . '" style="width: 100%; height: 40px;" frameborder="0" data-product-id="' . $productId . '"></iframe>';
+                echo '<iframe class="' . $disabled . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick . '?var=' . $current_timestamp . '&wb=' . $bi . '" style="width: 100%; height: 50px; display: block;" frameborder="0" data-product-id="' . $productId . '"></iframe>';
             }
             if ($WC_PayPlus_Gateway->enable_apple_pay) {
                 echo '<button   lang="en" id="applePayButton" data-product-id="' . $productId . '" onclick="handleApplePayClick(event);" class="apple-pay-button apple-pay-button-with-text apple-pay-button-black-with-text ' . $disabled . '" style="padding: 18px;width:100%; display:none"></button>';

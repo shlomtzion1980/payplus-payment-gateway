@@ -2,12 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [7.0.6] - 2024-07- - (Dracula)
+##  [7.0.7] - 2024-07-03 - (Dracula)
 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
 * Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
 * Add    - Option to save the PayPlus transaction data to the order note or not... (appears in the metabox)
 * Fix    - Update order status (on-hold) on callback ipn response for J5 (Approval).
+* Fix    - In WooCommerce Classic Checkout Page: Show only the selected method description and hide the others.
+* Tweak  - Express Checkout button design - corrected height of iframe.
 
 ##  [7.0.6] - 2024-07-01 - (Belmont)
 

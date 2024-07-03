@@ -88,6 +88,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
 * Add    - Option to save the PayPlus transaction data to the order note or not... (appears in the metabox)
 * Fix    - Update order status (on-hold) on callback ipn response for J5 (Approval).
+* Fix    - In WooCommerce Classic Checkout Page: Show only the selected method description and hide the others.
+* Tweak  - Express Checkout button design - corrected height of iframe.
 
 = 7.0.6 = 
 * Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. Code now handles the missing options correctly.
