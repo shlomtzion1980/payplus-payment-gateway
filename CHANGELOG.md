@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [7.0.8] - 2024-07-03 - (Shinobi)
+##  [7.0.8] - 2024-07-04 - (Shinobi)
 
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
 
