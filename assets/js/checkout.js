@@ -154,9 +154,6 @@ jQuery(function ($) {
             target_payment_box.slideDown(230);
           }
         }
-        // $("div.payment_box").show();
-      } else {
-        // $("div.payment_box").show();
       }
 
       if ($(this).data("order_button_text")) {
