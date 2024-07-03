@@ -1,42 +1,112 @@
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type {
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type {
   display: flex;
   order: 2;
   margin-bottom: 1px;
   align-items: center;
 }
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type span {
+
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  span {
   order: 1;
 }
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img {
+
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img {
   order: -1;
   margin-left: 20px;
   max-height: 32px;
   max-width: 64px;
 }
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] .payment-method-description {
+
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  .payment-method-description {
   margin-top: 0;
 }
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] input[type=radio][name=payment_method] ~ .payment_box {
+
+.checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  input[type="radio"][name="payment_method"]
+  ~ .payment_box {
   margin-top: 0.2rem;
 }
-.checkout-payplus input[type=radio][name=payment_method] + label::before, .checkout-payplus input[type=radio][name=payment_method]:checked + label::before {
+
+.checkout-payplus input[type="radio"][name="payment_method"] + label::before,
+.checkout-payplus
+  input[type="radio"][name="payment_method"]:checked
+  + label::before {
   order: -1;
   transform: none;
 }
 
-html[lang=en-US] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img, html[lang=en] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img {
+.show-border {
+  animation: borderChange 0.5s forwards;
+}
+
+@keyframes borderChange {
+  0% {
+    border-color: grey;
+  }
+
+  100% {
+    border-color: green;
+  }
+}
+
+html[lang="en-US"]
+  .checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img,
+html[lang="en"]
+  .checkout-payplus
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+  label:first-of-type
+  img {
   margin-left: 0;
   margin-right: 20px;
 }
 
-.express-checkout {
-  margin-top: 5%;
+.express-checkout-product {
+  margin: 5% auto;
   border-radius: 12px;
-  border: 1px solid #E3E6E9;
+  border: 1px solid #e3e6e9;
   padding: 20px 10px 10px 10px;
   position: relative;
-  display: inline-block;
+  display: block;
   width: 100%;
+}
+
+@media (min-width: 767.98px) {
+  .express-checkout {
+    margin: 5% auto;
+    float: right;
+    border-radius: 12px;
+    border: 1px solid #e3e6e9;
+    padding: 20px 10px 10px 10px;
+    position: relative;
+    display: block;
+    width: 48%;
+  }
+}
+
+
+@media (max-width: 767.98px) {
+  .express-checkout {
+    margin: 5% auto;
+    border-radius: 12px;
+    border: 1px solid #e3e6e9;
+    padding: 20px 10px 10px 10px;
+    position: relative;
+    display: block;
+    width: 92%;
+  }
 }
 
 .express-flex {
@@ -47,9 +117,9 @@ html[lang=en-US] .checkout-payplus li[class*="wc_payment_method payment_method_p
   left: 0px;
 }
 
- body #applePayButton {
+body #applePayButton {
   margin-top: 10px;
-  border-radius: 0px!important;
+  border-radius: 0px !important;
   border: 0px;
 }
 
@@ -77,7 +147,8 @@ html[lang=en-US] .checkout-payplus li[class*="wc_payment_method payment_method_p
   text-align: center;
 }
 
-.express-checkout iframe.disabled, #applePayButton.disabled {
+.express-checkout iframe.disabled,
+#applePayButton.disabled {
   pointer-events: none;
   cursor: not-allowed;
 }
@@ -89,12 +160,15 @@ html[lang=en-US] .checkout-payplus li[class*="wc_payment_method payment_method_p
 .express-checkout p {
   margin: 0px;
 }
-@media screen and (max-width: 568px){
+
+@media screen and (max-width: 568px) {
   body .alertify:not(.ajs-maximized) .ajs-modal {
     padding: 0px 0px;
   }
-  body .alertify .ajs-dialog{
+
+  body .alertify .ajs-dialog {
     margin: 0 auto;
   }
 }
+
 /*# sourceMappingURL=style.css.map */

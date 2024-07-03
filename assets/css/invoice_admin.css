@@ -3,11 +3,84 @@
   max-width: 350px;
 }
 
-.link-invoice, .link-invoice:hover {
+.invoicePlusButtonContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.invoicePlusButtonShow {
+  background-image: url('../images/showDocs+.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  background-color: transparent;
+  height: 60px;
+  width: 120px;
+  transition: transform 0.5s;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.invoicePlusButtonShow.flip {
+  transform: rotateX(180deg);
+}
+
+.invoicePlusButton {
+  display: inline-block;
+  padding: 5px;
+  font-size: 10px;
+  font-weight: bold;
+  color: #999;
+  /* background-color: #007BFF; */
+  text-align: center;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.3s;
+  cursor: pointer;
+  margin: 5px 0 5px 0;
+}
+.invoicePlusButton:hover {
+  /* background-color: #0056b3; */
+  transform: scale(1.05);
+}
+
+a:focus {
+  outline: none;
+  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2); /* Example box-shadow */
+
+}
+
+
+.invoicePlusButton:active {
+  /* background-color: #004080; */
+  transform: scale(1);
+  border: none;
+}
+
+.invoicePlusButtonHidden {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 1s ease, opacity 1s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.invoicePlusButtonVisible {
+  max-height: 500px; /* Adjust based on content size */
+  opacity: 1;
+  transition: max-height 1s ease, opacity 1s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.link-invoice {
   text-align: center;
   border-radius: 7px;
-  background: #34aa54;
-  color: #fff;
+  border: solid 0.2px;
+  color: #34aa54;
   display: block;
   font-size: 12px;
   padding: 5px;
@@ -15,6 +88,12 @@
   margin: 10px auto;
   font-weight: bold;
 }
+
+.link-invoice:hover {
+  color: rgb(255, 255, 255);
+  background-color:#34aa54;
+}
+
 p.link-invoice-error{
   text-align: center;
   color:red;

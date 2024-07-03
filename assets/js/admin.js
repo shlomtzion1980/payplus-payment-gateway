@@ -39,7 +39,7 @@ jQuery(function ($) {
   const number_of_payments = $("#number_of_payments");
   const orderID = document.getElementById("post_ID");
   if (orderID) {
-    payplus_print_paymnets_all();
+    payplus_print_payments_all();
     payplus_set_max_total();
   }
   //==================invoice not automatic  ======================
@@ -266,6 +266,44 @@ jQuery(function ($) {
     toggle_foreign_invoice();
     toggle_invoice_options();
 
+    // Check if the invoice option is enabled if it is check if the type of document is selected,
+    // if not, show an error message and color the border of the select red and the text of the label
+    if (
+      $("#payplus_invoice_option\\[payplus_invoice_enable\\]").prop("checked")
+    ) {
+      let ids = [
+        "#payplus_invoice_option\\[payplus_invoice_type_document_refund\\]",
+        "#payplus_invoice_option\\[payplus_invoice_type_document\\]",
+        "#payplus_invoice_option\\[payplus_invoice_status_order\\]",
+      ];
+      ids.forEach(function (id) {
+        if ($(id).val() === "") {
+          $(id).css("border-color", "red");
+          var parent = $(id).parent().parent();
+          var th = parent.children("th");
+          th.css("color", "red");
+        }
+      });
+
+      $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+        .closest("tr")
+        .hide();
+    }
+
+    $("#payplus_invoice_option\\[payplus_invoice_enable\\]").change(
+      function () {
+        if ($(this).is(":checked")) {
+          $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+            .closest("tr")
+            .hide();
+        } else {
+          $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
+            .closest("tr")
+            .show();
+        }
+      }
+    );
+
     $(document).on(
       "change",
       "select#woocommerce_payplus-payment-gateway_display_mode",
@@ -461,7 +499,7 @@ jQuery(function ($) {
       first_payment.val(0);
     }
   });
-  $(document).on("click", ".payplus-paymnet-button", function (e) {
+  $(document).on("click", ".payplus-payment-button", function (e) {
     e.preventDefault();
     const id = e.target.id;
 
@@ -480,7 +518,7 @@ jQuery(function ($) {
     );
     data = payplus_set_collection(collections);
     if (data["row_id"]) {
-      document.querySelector(`.row-paymnet-${data["row_id"]}`).remove();
+      document.querySelector(`.row-payment-${data["row_id"]}`).remove();
     }
     data["order_id"] = orderID;
     data = Object.assign({}, data);
@@ -504,7 +542,7 @@ jQuery(function ($) {
         JSON.stringify(payments)
       );
       payplus_empty_field();
-      payplus_print_paymnets_all();
+      payplus_print_payments_all();
       payplus_set_max_total();
       document
         .querySelectorAll(".select-type-payment")
@@ -523,13 +561,13 @@ jQuery(function ($) {
     event.preventDefault();
     const value = $(this).val();
     if (value == "inv_receipt" || value == "inv_tax_receipt") {
-      document.getElementById("all-paymnet-invoice").style.display = "block";
+      document.getElementById("all-payment-invoice").style.display = "block";
       document.getElementById("payplus-table-payment").style.display = "table";
-      document.getElementById("payplus_sum_paymnet").style.display = "block";
+      document.getElementById("payplus_sum_payment").style.display = "block";
     } else {
-      document.getElementById("all-paymnet-invoice").style.display = "none";
+      document.getElementById("all-payment-invoice").style.display = "none";
       document.getElementById("payplus-table-payment").style.display = "none";
-      document.getElementById("payplus_sum_paymnet").style.display = "none";
+      document.getElementById("payplus_sum_payment").style.display = "none";
     }
   });
 
@@ -554,6 +592,8 @@ jQuery(function ($) {
     }
 
     $(self).addClass("button-loading");
+    $(self).hide();
+    $(self).next(".payplus_loader_gpp").fadeIn();
     const payments = payplus_get_storage(orderID);
     $.ajax({
       type: "post",
@@ -578,6 +618,22 @@ jQuery(function ($) {
 
     return false;
   });
+
+  $(document).ready(function () {
+    $(".toggle-button").on("click", function (e) {
+      e.preventDefault();
+      var hiddenButtons = $(this).siblings(".hidden-buttons");
+      hiddenButtons.toggleClass(
+        "invoicePlusButtonHidden invoicePlusButtonVisible"
+      );
+      if (hiddenButtons.hasClass("invoicePlusButtonVisible")) {
+        $(this).toggleClass("flip");
+      } else {
+        $(this).toggleClass("flip");
+      }
+    });
+  });
+
   $(document).on("click", "#payplus-create-invoice-refund", function (event) {
     event.preventDefault();
     let orderId = $(this).attr("data-id");
@@ -615,7 +671,7 @@ jQuery(function ($) {
 //==================invoice not automatic  ======================
 function payplus_empty_field() {
   const collections = document.querySelectorAll(
-    "#all-paymnet-invoice input,#all-paymnet-invoice select"
+    "#all-payment-invoice input,#all-payment-invoice select"
   );
   const collectionDate = document.querySelectorAll(".create_at");
   const date = payplus_get_date();
@@ -647,7 +703,7 @@ function payplus_set_max_total(flag = true) {
   const select_type_invoice = document.querySelector(".select-type-invoice");
   if (orderID) {
     if (price && allSum) {
-      let payplus_sum_payment = document.getElementById("payplus_sum_paymnet");
+      let payplus_sum_payment = document.getElementById("payplus_sum_payment");
       let sum = payplus_get_sum_payments().toFixed(2);
 
       sum = allSum.value - sum;
@@ -674,7 +730,7 @@ function payplus_set_max_total(flag = true) {
         select_type_invoice.value == "inv_receipt" ||
         select_type_invoice.value == "inv_tax_receipt"
       ) {
-        document.getElementById("all-paymnet-invoice").style.display = "block";
+        document.getElementById("all-payment-invoice").style.display = "block";
         payplus_sum_payment.style.display = "block";
       }
 
@@ -712,9 +768,9 @@ function payplus_set_payments(nameClass) {
   let m_price = document.querySelector("." + nameClass + ".price");
   m_price = m_price.value;
   if (m_price && m_payment) {
-    const onePaymnet = (m_price / m_payment).toFixed(2);
-    first_payment.value = onePaymnet;
-    subsequent_payments.value = (m_price - onePaymnet).toFixed(2);
+    const onePayment = (m_price / m_payment).toFixed(2);
+    first_payment.value = onePayment;
+    subsequent_payments.value = (m_price - onePayment).toFixed(2);
   }
 }
 function payplus_get_date() {
@@ -733,7 +789,7 @@ function payplus_get_date() {
 
   return currentDate;
 }
-function payplus_print_paymnets(data, index) {
+function payplus_print_payments(data, index) {
   let details = "";
   let detailsAll = [
     "bank_number",
@@ -784,7 +840,7 @@ function payplus_print_paymnets(data, index) {
   let date = data.create_at.split("-");
   date = `${date[2]}-${date[1]}-${date[0]}`;
 
-  let html = `<tr class="row-paymnet-${data.row_id}">
+  let html = `<tr class="row-payment-${data.row_id}">
         <td>
         <a class="link-action" data-id=${
           data.row_id
@@ -813,10 +869,10 @@ function payplus_print_paymnets(data, index) {
     table_payment.append(html);
   }
 }
-function payplus_print_paymnets_all() {
+function payplus_print_payments_all() {
   const orderID = document.getElementById("post_ID");
   table_payment = jQuery(".payplus-table-payment tbody");
-  let payplus_sum_payment = jQuery("#payplus_sum_paymnet");
+  let payplus_sum_payment = jQuery("#payplus_sum_payment");
   if (orderID && table_payment) {
     const payments = JSON.parse(
       localStorage.getItem("payplus_payment_" + orderID.value)
@@ -828,10 +884,10 @@ function payplus_print_paymnets_all() {
           payplus_script_payment.currency_symbol
         }${payplus_get_sum_payments()}  </strong>`;
         for (let index = 0; index < payments.length; index++) {
-          payplus_print_paymnets(payments[index], index);
+          payplus_print_payments(payments[index], index);
         }
         payplus_sum_payment.html(html);
-        payplus_sum_payment.addClass("payplus_sum_paymnet");
+        payplus_sum_payment.addClass("payplus_sum_payment");
       } else {
         payplus_sum_payment.html("");
         /* if(  document.getElementById('payplus-table-payment').getAttribute('data-method')!="1"){
@@ -866,7 +922,7 @@ function payplus_delete_element(index, flag = false) {
         "payplus_payment_" + orderID.value,
         JSON.stringify(payments)
       );
-      payplus_print_paymnets_all();
+      payplus_print_payments_all();
       payplus_set_max_total(!flag);
     }
   }
@@ -883,10 +939,10 @@ function payplus_edit_element(index) {
         item.style.display = "none";
       });
     if (payments[index]) {
-      const objectPaymnet = payments[index];
-      const method_payment = objectPaymnet.method_payment + "-payment-payplus";
+      const objectPayment = payments[index];
+      const method_payment = objectPayment.method_payment + "-payment-payplus";
       const elemnetDisplay = document.querySelector(
-        ".select-type-payment." + objectPaymnet.method_payment
+        ".select-type-payment." + objectPayment.method_payment
       );
       let collection = document.getElementsByClassName(method_payment);
       let collections = Array.prototype.filter.call(
@@ -897,10 +953,10 @@ function payplus_edit_element(index) {
       for (let i = 0; i < collections.length; i++) {
         const classs = collections[i].classList;
         document.querySelector("." + method_payment + "." + classs[2]).value =
-          objectPaymnet[classs[2]];
+          objectPayment[classs[2]];
         if (classs[2] == "price") {
           let sum =
-            allSum.value - payplus_get_sum_payments(objectPaymnet.row_id);
+            allSum.value - payplus_get_sum_payments(objectPayment.row_id);
           sum = sum.toFixed(2);
           document
             .querySelector("." + method_payment + "." + classs[2])
@@ -909,29 +965,30 @@ function payplus_edit_element(index) {
             price[j].value = sum;
           }
           document.querySelector("." + method_payment + "." + classs[2]).value =
-            objectPaymnet["price"];
+            objectPayment["price"];
           for (let j = 0; j < fullAmount.length; j++) {
             fullAmount[j].setAttribute("data-sum", sum);
           }
         }
       }
       if (
-        objectPaymnet.transaction_type == "payments" ||
-        objectPaymnet.transaction_type == "credit"
+        objectPayment.transaction_type == "payments" ||
+        objectPayment.transaction_type == "credit"
       ) {
         document.querySelector(".payplus_payment").style.display = "flex";
       } else {
         document.querySelector(".payplus_payment").style.display = "none";
       }
       jQuery(".type-payment").removeClass("hover");
-      jQuery("." + objectPaymnet.method_payment + ".type-payment").addClass(
+      jQuery("." + objectPayment.method_payment + ".type-payment").addClass(
         "hover"
       );
       elemnetDisplay.style.display = "block";
-      document.getElementById("all-paymnet-invoice").style.display = "block";
+      document.getElementById("all-payment-invoice").style.display = "block";
     }
   }
 }
+
 function payplus_get_storage(orderID) {
   const payments = JSON.parse(
     localStorage.getItem("payplus_payment_" + orderID)

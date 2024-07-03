@@ -154,9 +154,6 @@ jQuery(function ($) {
             target_payment_box.slideDown(230);
           }
         }
-        $("div.payment_box").show();
-      } else {
-        $("div.payment_box").show();
       }
 
       if ($(this).data("order_button_text")) {
@@ -566,12 +563,13 @@ jQuery(function ($) {
         $form.block({
           message: null,
           overlayCSS: {
-            top: 400,
-            height: "80%",
+            top: 0,
+            height: "100%",
             background: "#fff",
             opacity: 0.6,
           },
         });
+        $(".blockUI.blockOverlay").css("position", "fixed");
       }
     },
     submitOrder: function () {

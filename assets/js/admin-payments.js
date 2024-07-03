@@ -106,11 +106,7 @@ jQuery(document).ready(function ($) {
   });
 
   $("#custom-button-get-pp").click(function () {
-    let loaderHTML = '<div class="payplus_loader"></div>';
-
-    $("#order_data").append(loaderHTML);
-
-    let loader = $("#order_data").find(".payplus_loader");
+    let loader = $("#order_data").find(".payplus_loader_gpp");
     let side = "right";
 
     // check if page is rtl or ltr and change the direction of the loader
@@ -118,15 +114,13 @@ jQuery(document).ready(function ($) {
       side = "left";
     }
 
-    loader.css(side, "25%");
+    loader.css(side, "5%");
 
     loader.css({
       position: "absolute",
       top: "5px",
-      color: "red",
-      border: "16px solid green",
     });
-
+    $("#custom-button-get-pp").fadeOut();
     loader.fadeIn();
 
     var data = {
@@ -134,8 +128,6 @@ jQuery(document).ready(function ($) {
       payment_request_uid: $("#custom-button-get-pp").val(),
       order_id: $("#custom-button-get-pp").data("value"),
     };
-
-    alert("Checking order data with PayPlus!");
 
     $.post(ajaxurl, data, function (response) {
       loader.fadeOut();
@@ -213,6 +205,7 @@ jQuery(document).ready(function ($) {
       },
     });
   });
+
   $("#payplus-token-payment").click(function (event) {
     event.preventDefault();
     let payplusChargeAmount = $(this)
@@ -235,6 +228,24 @@ jQuery(document).ready(function ($) {
         payplus_order_id: payplusOrderId,
         payplus_token_payment: true,
       },
+      beforeSend: function () {
+        const targetNode = document.querySelector(".payplus_error");
+        const observer = new MutationObserver((mutationsList, observer) => {
+          for (let mutation of mutationsList) {
+            if (
+              mutation.type === "attributes" &&
+              mutation.attributeName === "style"
+            ) {
+              if (targetNode.style.display !== "none") {
+              } else {
+                $(".payplus_loader").fadeOut();
+              }
+            }
+          }
+        });
+        const config = { attributes: true, attributeFilter: ["style"] };
+        observer.observe(targetNode, config);
+      },
       success: function (response) {
         $(this).closest(".delayed-payment").find(".payplus_loader").fadeOut();
         if (!response.status) {
@@ -252,6 +263,13 @@ jQuery(document).ready(function ($) {
         } else {
           location.href = response.urlredirect;
         }
+      },
+      error: function (xhr, status, error) {
+        let errorMessage = xhr.responseText.split("&error=")[1]
+          ? xhr.responseText.split("&error=")[1]
+          : "Failed, please check the order notes for the failure reason.";
+        alert(errorMessage);
+        location.reload();
       },
     });
   });
@@ -307,6 +325,7 @@ function PayplusdisplayMenuInvoice() {
   const section = urlParams.get("section");
   if (
     section == "payplus-invoice" ||
+    section == "payplus-payment-gateway-setup-wizard" ||
     section == "payplus-express-checkout" ||
     section == "payplus-error-setting"
   ) {
