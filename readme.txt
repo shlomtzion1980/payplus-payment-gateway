@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.5.3
 Requires PHP: 7.2
-Stable tag: 7.0.7
+Stable tag: 7.0.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -83,6 +83,9 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.0.8 =
+* Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
+
 = 7.0.7 = 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
 * Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
@@ -107,21 +110,5 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.0.1 = 
 * Fix    - Small but important J5 fix for invoices with split payments.
-
-= 6.6.9 = 
-* Add    - Iframe in the same page in WooCommerce Checkout Blocks.
-* Add    - Iframe popup in WooCommerce Checkout Blocks.
-* Add    - Error handling in WooCommerce Checkout Blocks.
-* Add    - Basic Settings Tab - Setup the plugin most important settings and start working immediately. This tab holds the main settings to activate the plugin. These are still available in the regular "Settings" Tab also.
-* Fix    - Removed filter: 'acf/settings/remove_wp_meta_box' was supposed to show custom fields on website with ACF, However it caused heavy load times - In future releases a diffrent solution will be offered.
-* Add    - New logos!
-* Tweak  - Code refactoring - Admin fields and settings were moved to their own files and are loaded with static functions for better readability.
-* Fix    - Get meta data for products transaction type and balance_name.
-* Change - PayPlus Error Page - No longer uses a short code - it displays a simple text message - users can edit it or create a different page with the same permlink instead.
-* Tweak  - Css cache is updated according to the version, will refresh on update, no need to manually refresh.
-* Tweak  - Minified all css and js files in use.
-* Add    - Auto activate newly joined payment method (bit,google-pay,apple-pay...) in settings from PayPlus support (Happens only once on joining to service).
-* Add    - Payplus data metabox inside order page.
-* Fix    - Only one payment page per domain.
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/CHANGELOG.md).

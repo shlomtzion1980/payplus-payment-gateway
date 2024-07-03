@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.0.8] - 2024-07-03 - (Shinobi)
+
+* Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
+
 ##  [7.0.7] - 2024-07-03 - (Dracula)
 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
