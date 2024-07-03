@@ -58,7 +58,7 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'checkbox',
                     'label' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
                     'default' => 'yes',
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[enable]'
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[enabled]'
                 ];
                 $settings[$section][] = array(
                     'name' => __('API Key', 'payplus-payment-gateway'),
