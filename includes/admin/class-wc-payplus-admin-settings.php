@@ -150,7 +150,7 @@ class WC_PayPlus_Admin_Settings
                     'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
                     'desc' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
-                    'default' => 'yes',
+                    'default' => 'no',
                     'desc_tip' => true,
                     'id' => 'woocommerce_payplus-payment-gateway_settings[payplus_data_save_order_note]'
                 ];

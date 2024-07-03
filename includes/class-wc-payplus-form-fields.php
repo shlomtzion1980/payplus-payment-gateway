@@ -394,7 +394,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
                 'label' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'default' => 'yes',
+                'default' => 'no',
                 'description' => __('Whenever a transaction is done add the payplus data to the order note.<br>This data also appears in the PayPlus Data metabox.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],

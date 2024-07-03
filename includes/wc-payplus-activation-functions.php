@@ -222,11 +222,11 @@ function checkSetPayPlusOptions()
     $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
     $payPlusErrorOptions = get_option('settings_payplus_page_error_option', []);
 
-    $newPayPlusOptionsYes = ['hide_custom_fields_buttons'];
-    $newPayPlusOptionsNo = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type'];
+    $newPayPlusOptionsYes = ['hide_custom_fields_buttons', 'show_payplus_data_metabox'];
+    $newPayPlusOptionsNo  = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type', 'payplus_data_save_order_note'];
 
-    $newInvoicOptionsYes = ['dedicated_invoice_metabox', 'show_payplus_data_metabox', 'payplus_data_save_order_note'];
-    $newInvoiceOptionsNo = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
+    $newInvoicOptionsYes  = ['dedicated_invoice_metabox'];
+    $newInvoiceOptionsNo  = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
 
     foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
