@@ -85,6 +85,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
+* Fix    - On bit successful transactions through "Meshulam Pay" the redirect to thank you page is now corrected for both mobile and desktop.
 
 = 7.0.7 = 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
