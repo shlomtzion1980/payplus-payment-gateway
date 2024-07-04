@@ -233,7 +233,7 @@ function checkSetPayPlusOptions()
     foreach ($removeOptions as $option) {
         if (array_key_exists($option, $payPlusOptions)) {
             unset($payPlusOptions[$option]);
-            $saveInvoice = true;
+            $savePayPlus = true;
         }
     }
     foreach ($newInvoicOptionsYes as $option) {
