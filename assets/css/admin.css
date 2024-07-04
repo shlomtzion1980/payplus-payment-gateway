@@ -205,6 +205,58 @@ html[lang="en-US"] .payplus-delete-error {
   margin-right: 20px;
 }
 
+.tab-section-payplus {
+  background-color: #eff5f3;
+  border-radius: 10px;
+  padding: 5px;
+  width: 50%;
+  margin: auto;
+  @media screen and (max-width: 1500px) {
+    width: 100%;
+  }
+}
+
+#settingsContainer {
+  display: flex;
+  width: 100%;
+  @media screen and (max-width: 1500px) {
+    flex-direction: column;
+    align-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+.right-tab-section-payplus {
+  width: 40%;
+  background-color: white;
+  margin: 0 auto 0 auto;
+  @media screen and (max-width: 1500px) {
+    width: 100%;
+  }
+}
+
+#payplus-title-section {
+  color: #34aa54;
+}
+
+.woocommerce_page_wc-settings h3.wc-settings-sub-title {
+  font-size: 1.2em;
+  color: #34aa54;
+  position: relative;
+  margin: 10px;
+  left: 10px;
+}
+
+.woocommerce table.form-table {
+  margin: 0;
+  table-layout: fixed;
+  border-radius: 5px;
+  padding: 35px;
+  display: block;
+  background: #fcfffc;
+  border-collapse: separate;
+}
+
 .woocommerce table .form-table fieldset {
   position: relative;
 }

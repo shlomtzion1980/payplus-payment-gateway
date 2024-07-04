@@ -1796,7 +1796,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $currency_symbol = get_woocommerce_currency_symbol();
             }
 
-            wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
+            wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.css', [], PAYPLUS_VERSION);
             wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
             wp_localize_script(
                 'payplus-admin-payment',

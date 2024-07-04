@@ -757,9 +757,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<h3 id='payplus-title-section'>$title</h3>
                     <p>$desc</p>";
 
-        echo "<div class='tab-section-payplus' id='tab-payplus-gateway' >
+        echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table'>$settings</table>
-                    </div>
+                    </div><div class='right-tab-section-payplus'>ss</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>
 
