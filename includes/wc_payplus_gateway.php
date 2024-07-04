@@ -2015,6 +2015,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'Result: ' . print_r($data, true));
 
         if ($data['type'] === 'Approval' && $data['status_code'] === '000') {
+            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transaction_uid);
             $order->update_status('wc-on-hold');
         }
 
