@@ -228,6 +228,14 @@ function checkSetPayPlusOptions()
     $newInvoicOptionsYes  = ['dedicated_invoice_metabox'];
     $newInvoiceOptionsNo  = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
 
+    $removeOptions = ['enable'];
+
+    foreach ($removeOptions as $option) {
+        if (array_key_exists($option, $payPlusOptions)) {
+            unset($payPlusOptions[$option]);
+            $saveInvoice = true;
+        }
+    }
     foreach ($newInvoicOptionsYes as $option) {
         if (!array_key_exists($option, $invoiceOptions)) {
             $invoiceOptions[$option] = 'yes';
