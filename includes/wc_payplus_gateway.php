@@ -757,9 +757,23 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<h3 id='payplus-title-section'>$title</h3>
                     <p>$desc</p>";
 
+        function titleDivs($formFields, $currentSection)
+        {
+            $titles = null;
+            foreach ($formFields as $field) {
+                $titles = isset($field['type']) && $field['type'] === 'title' ? $titles .= '<div class="settingTitle">' . $field['title'] . '</div>' : $titles;
+            }
+            return $titles ?? '<div class="settingTitle">' . $currentSection . 'Go Pro! - Add Invoice+ to your store and send digitally signed Tax Invoices/Receipts and much more!</div>';
+        }
+
+        function hideTable($currentSection)
+        {
+            $hideTable = $currentSection === 'payplus-payment-gateway' ? 'hideTable' : null;
+            return $hideTable;
+        }
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
-                        <table class='form-table'>$settings</table>
-                    </div><div class='right-tab-section-payplus'>ss</div></div>
+                        <table class='form-table " . hideTable($currentSection) . "'>$settings</table>
+                    </div><div class='right-tab-section-payplus'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>
 

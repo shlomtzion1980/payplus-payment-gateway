@@ -381,7 +381,6 @@ class WC_PayPlus_Admin_Settings
                                 <div class="spinner-icon"></div>
                                 </div>',
                 ];
-
                 $settings[$section][] = [
                     'id' => 'woocommerce_payplus-payment-gateway_settings[apple_pay_identifier]',
                     'name' => __('Token Apple Pay', 'payplus-payment-gateway'),

@@ -72,7 +72,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             'enabled' => [
                 'title' => __('Enable/Disable', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
+                'label' => __('Enable ' . $this->method_title_text . ' Payment', 'payplus-payment-gateway'),
                 'default' => 'yes'
             ],
             'title' => [

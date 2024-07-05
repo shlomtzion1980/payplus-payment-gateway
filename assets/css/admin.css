@@ -205,17 +205,6 @@ html[lang="en-US"] .payplus-delete-error {
   margin-right: 20px;
 }
 
-.tab-section-payplus {
-  background-color: #eff5f3;
-  border-radius: 10px;
-  padding: 5px;
-  width: 50%;
-  margin: auto;
-  @media screen and (max-width: 1500px) {
-    width: 100%;
-  }
-}
-
 #settingsContainer {
   display: flex;
   width: 100%;
@@ -224,12 +213,37 @@ html[lang="en-US"] .payplus-delete-error {
     align-content: center;
     flex-wrap: wrap;
   }
+  .hideTable {
+    display: none;
+  }
+  .right-tab-section-payplus {
+    width: 40%;
+    background-color: white;
+    margin: 0 auto 0 auto;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    @media screen and (max-width: 1500px) {
+      width: 100%;
+    }
+    .settingTitle {
+      min-height: 10%;
+      background-color: #eff5f3;
+      display: block;
+      @media screen and (max-width: 1500px) {
+        min-height: 300px;
+        margin: 5% 0 0 0;
+      }
+    }
+  }
 }
 
-.right-tab-section-payplus {
-  width: 40%;
-  background-color: white;
-  margin: 0 auto 0 auto;
+.tab-section-payplus {
+  background-color: #eff5f3;
+  border-radius: 10px;
+  padding: 5px;
+  width: 50%;
+  margin: auto;
   @media screen and (max-width: 1500px) {
     width: 100%;
   }

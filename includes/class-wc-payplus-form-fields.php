@@ -130,6 +130,11 @@ class WC_PayPlus_Form_Fields
         $listOrderStatus = ['default-woo' => __('Default Woo', 'payplus-payment-gateway')];
         $listOrderStatus = array_merge($listOrderStatus, wc_get_order_statuses());
         $formFields = [
+            'plugin_title' => [
+                'title' => __('PayPlus Plugin Settings', 'payplus-payment-gateway'),
+                'type' => 'title',
+                'description' => __('Basic plugin settings - set these and you`r good to go!', 'payplus-payment-gateway'),
+            ],
             'enabled' => [
                 'title' => __('Enable/Disable', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
@@ -147,18 +152,6 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Description', 'payplus-payment-gateway'),
                 'type' => 'textarea',
                 'default' => __('Pay securely by Debit or Credit Card through PayPlus', 'payplus-payment-gateway'),
-            ],
-            'use_old_fields' => [
-                'title' => __('Legacy post meta support', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Slower! (For stores that support HPOS with old fields used)', 'payplus-payment-gateway'),
-                'description' =>  __('Check this to view orders meta data created before HPOS was enabled on your store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce DB queries and are viewing new orders, uncheck this.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-                'default' => 'no',
-            ],
-            'settings_title' => [
-                'title' => __('PayPlus API Settings', 'payplus-payment-gateway'),
-                'type' => 'title',
             ],
             'api_test_mode' => [
                 'title' => __('Test mode', 'payplus-payment-gateway'),
@@ -190,10 +183,6 @@ class WC_PayPlus_Form_Fields
                 'default' => '',
                 'desc_tip' => true,
             ],
-            'params_title' => [
-                'title' => __('PayPlus Payment Options', 'payplus-payment-gateway'),
-                'type' => 'title',
-            ],
             'transaction_type' => [
                 'title' => __('Transactions Type', 'payplus-payment-gateway'),
                 'type' => 'select',
@@ -210,97 +199,10 @@ class WC_PayPlus_Form_Fields
                 'default' => 'yes',
                 // 'custom_attributes' =>$disabled
             ],
-
-            'disable_woocommerce_scheduler' => [
-                'title' => __('Disable woocommerce scheduler', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'default' => 'no',
-            ],
-
-            'invoice_display_title' => [
-                'title' => __('Invoicing & Documents Settings', 'payplus-payment-gateway'),
+            'payment_page_title' => [
+                'title' => __('Payment Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
-            ],
-            'hide_custom_fields_buttons' => [
-                'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
-                'type'    => 'checkbox',
-                'default' => 'yes',
-            ],
-            'is_Local_pickup' => [
-                'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
-                'default' => 'no',
-            ],
-            'paying_vat_all_order' => [
-                'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'default' => 'yes',
-            ],
-
-            'change_vat_in_eilat' => [
-                'title' => __('VAT change in Eilat', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
-                'default' => 'no',
-            ],
-            'keywords_eilat' => [
-                'title' => __('Keywords for deliveries in Eilat', 'payplus-payment-gateway'),
-                'type' => 'text',
-                'default' => 'אילת,איילת,אלת,eilat,elat,EILAT,ELAT',
-                'description' => __('Keywords must be separated with a comma', 'payplus-payment-gateway'),
-            ],
-            'send_products' => [
-                'title' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
-            ],
-            'send_variations' => [
-                'title' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
-                'default' => 'yes',
-            ],
-            'initial_invoice' => [
-                'title' => __('Initial Invoice / Receipt', 'payplus-payment-gateway'),
-                'type' => 'select',
-                'options' => [
-                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
-                    '1' => __('Yes', 'payplus-payment-gateway'),
-                    '2' => __('No', 'payplus-payment-gateway'),
-                ],
-                'default' => '0',
-            ],
-
-            'paying_vat' => [
-                'title' => __('Invoice For Foreign Customers', 'payplus-payment-gateway'),
-                'type' => 'select',
-                'options' => [
-                    '0' => __('Paying VAT', 'payplus-payment-gateway'),
-                    '1' => __('Exempt VAT', 'payplus-payment-gateway'),
-                    '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than...', 'payplus-payment-gateway'),
-                ],
-                'default' => '0',
-            ],
-
-            'paying_vat_iso_code' => [
-                'title' => __('Your Business VAT Registration Country ISO Code', 'payplus-payment-gateway'),
-                'type' => 'text',
-                'default' => 'IL',
-            ],
-            'vat_number_field' => [
-                'title' => __('Custom checkout field name for vat number', 'payplus-payment-gateway'),
-                'type' => 'text',
-                'default' => '',
-            ],
-            'foreign_invoices_lang' => [
-                'title' => __('The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)', 'payplus-payment-gateway'),
-                'type' => 'text',
-                'default' => 'HE',
-            ],
-            'display_title' => [
-                'title' => __('Display Options', 'payplus-payment-gateway'),
-                'type' => 'title',
+                'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
             ],
             'display_mode' => [
                 'title' => __('Display Mode', 'payplus-payment-gateway'),
@@ -312,22 +214,12 @@ class WC_PayPlus_Form_Fields
                     'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
                 ],
                 'default' => 'redirect',
-                'description' => __('Also supported with the new "WooCommerce Checkout Blocks"', 'payplus-payment-gateway'),
+                'description' => __('', 'payplus-payment-gateway'),
             ],
             'iframe_height' => [
                 'title' => __('iFrame Height', 'payplus-payment-gateway'),
                 'type' => 'number',
                 'default' => 700,
-            ],
-            'import_applepay_script' => [
-                'title' => __('Apple Pay', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
-            ],
-            'api_title' => [
-                'title' => __('Payment Page Options', 'payplus-payment-gateway'),
-                'type' => 'title',
-                'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
             ],
             'hide_icon' => [
                 'title' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
@@ -386,25 +278,87 @@ class WC_PayPlus_Form_Fields
                 when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'invoice_display_title' => [
+                'title' => __('Invoicing & Documents Settings', 'payplus-payment-gateway'),
+                'type' => 'title',
+            ],
+            'is_Local_pickup' => [
+                'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('', 'payplus-payment-gateway'),
+                'default' => 'no',
+            ],
+            'paying_vat_all_order' => [
+                'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'yes',
+            ],
+            'change_vat_in_eilat' => [
+                'title' => __('VAT change in Eilat', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('', 'payplus-payment-gateway'),
+                'default' => 'no',
+            ],
+            'keywords_eilat' => [
+                'title' => __('Keywords for deliveries in Eilat', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => 'אילת,איילת,אלת,eilat,elat,EILAT,ELAT',
+                'description' => __('Keywords must be separated with a comma', 'payplus-payment-gateway'),
+            ],
+            'send_products' => [
+                'title' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
+            ],
+            'send_variations' => [
+                'title' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                'default' => 'yes',
+            ],
+            'initial_invoice' => [
+                'title' => __('Initial Invoice / Receipt', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'options' => [
+                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '1' => __('Yes', 'payplus-payment-gateway'),
+                    '2' => __('No', 'payplus-payment-gateway'),
+                ],
+                'default' => '0',
+            ],
+            'paying_vat' => [
+                'title' => __('Invoice For Foreign Customers', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'options' => [
+                    '0' => __('Paying VAT', 'payplus-payment-gateway'),
+                    '1' => __('Exempt VAT', 'payplus-payment-gateway'),
+                    '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than...', 'payplus-payment-gateway'),
+                ],
+                'default' => '0',
+            ],
+            'paying_vat_iso_code' => [
+                'title' => __('Your Business VAT Registration Country ISO Code', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => 'IL',
+            ],
+            'vat_number_field' => [
+                'title' => __('Custom checkout field name for vat number', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => '',
+            ],
+            'foreign_invoices_lang' => [
+                'title' => __('The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => 'HE',
+            ],
+            'import_applepay_script' => [
+                'title' => __('Apple Pay', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
+            ],
             'order_status_title' => [
                 'title' => __('Order Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
-            ],
-            'payplus_data_save_order_note' => [
-                'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
-                'label' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'default' => 'no',
-                'description' => __('Whenever a transaction is done add the payplus data to the order note.<br>This data also appears in the PayPlus Data metabox.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-            ],
-            'show_payplus_data_metabox' => [
-                'title' => __('Show PayPlus Metabox', 'payplus-payment-gateway'),
-                'label' => __('Show the transaction data in the PayPlus dedicated metabox', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'default' => 'yes',
-                'description' => __('Adds the PayPlus transaction data in a dedicated metabox on the side in the order page.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
             ],
             'successful_order_status' => [
                 'title' => __('Successful Order Status', 'payplus-payment-gateway'),
@@ -444,14 +398,6 @@ class WC_PayPlus_Form_Fields
                 ],
                 'default' => '0',
             ],
-            'logging' => [
-                'title' => __('Logging', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Log debug messages', 'payplus-payment-gateway'),
-                'default' => 'yes',
-                'custom_attributes' => array('disabled' => 'disabled'),
-            ],
-
             'callback_addr' => [
                 'title' => __('Callback url', 'payplus-payment-gateway'),
                 'type' => 'url',
@@ -479,7 +425,6 @@ class WC_PayPlus_Form_Fields
                 'description' => __('If this option is selected,
                        the name that will appear on the invoice will be taken from the company name field and not from the personal name field.
                          If no company name is entered, the name that will be written on the invoice will be the first name', 'payplus-payment-gateway'),
-
             ],
             'balance_name' => [
                 'title' => __('Display Balance Name', 'payplus-payment-gateway'),
@@ -487,7 +432,6 @@ class WC_PayPlus_Form_Fields
                 'label' => __('', 'payplus-payment-gateway'),
                 'default' => 'no',
             ],
-
             'block_ip_transactions' => [
                 'title' => __('Block ip transactions', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
@@ -496,41 +440,18 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'description' => __('If the client fails transactions more than the number
                          of times you entered, his IP will be blocked for one hour.', 'payplus-payment-gateway'),
-
             ],
             'block_ip_transactions_hour' => [
                 'title' => __('Number of times per hour to block ip', 'payplus-payment-gateway'),
                 'type' => 'text',
                 'default' => '10',
             ],
-            'menu_plugin' => [
-                'title' => __('Menu plugin', 'payplus-payment-gateway'),
-                'type' => 'title',
-            ],
-            'disable_menu_header' => [
-                'title' => __('Top menu cancellation', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
-
-            ],
-            'disable_menu_side' => [
-                'title' => __('Canceling the side menu', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
-
-            ],
             'menu_plugin_external' => [
-                'title' => __('Enabling external plugins', 'payplus-payment-gateway'),
+                'title' => __('External Plugins', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
             'enable_pickup' => [
                 'title' => __('Enable PickUP', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
-
-            ],
-            'enable_design_checkout' => [
-                'title' => __('Enable design checkout', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('', 'payplus-payment-gateway'),
 
@@ -540,7 +461,68 @@ class WC_PayPlus_Form_Fields
                 'type' => 'checkbox',
                 'label' => __('', 'payplus-payment-gateway'),
                 'default' => 'no',
-
+            ],
+            'advanced_title' => [
+                'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
+                'type' => 'title',
+            ],
+            'payplus_data_save_order_note' => [
+                'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
+                'label' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('Whenever a transaction is done add the payplus data to the order note.<br>This data also appears in the PayPlus Data metabox.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'show_payplus_data_metabox' => [
+                'title' => __('Show PayPlus Metabox', 'payplus-payment-gateway'),
+                'label' => __('Show the transaction data in the PayPlus dedicated metabox', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'yes',
+                'description' => __('Adds the PayPlus transaction data in a dedicated metabox on the side in the order page.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'use_old_fields' => [
+                'title' => __('Legacy post meta support', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Slower! (For stores that support HPOS with old fields used)', 'payplus-payment-gateway'),
+                'description' =>  __('Check this to view orders meta data created before HPOS was enabled on your store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce DB queries and are viewing new orders, uncheck this.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
+            'disable_menu_header' => [
+                'title' => __('Top menu cancellation', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('', 'payplus-payment-gateway'),
+            ],
+            'disable_menu_side' => [
+                'title' => __('Canceling the side menu', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('', 'payplus-payment-gateway'),
+            ],
+            'hide_custom_fields_buttons' => [
+                'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
+                'type'    => 'checkbox',
+                'default' => 'yes',
+            ],
+            'enable_design_checkout' => [
+                'title' => __('Design checkout', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'description' => __('Place the payment icons on the left of the text - relevant for classic checkout page only.', 'payplys-payment-gateway'),
+                'desc_tip' => true,
+                'label' => __('Change icon layout on checkout page.', 'payplus-payment-gateway'),
+            ],
+            'disable_woocommerce_scheduler' => [
+                'title' => __('Disable woocommerce scheduler', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+            ],
+            'logging' => [
+                'title' => __('Logging', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Log debug messages', 'payplus-payment-gateway'),
+                'default' => 'yes',
+                'custom_attributes' => array('disabled' => 'disabled'),
             ],
         ];
         return $formFields;
