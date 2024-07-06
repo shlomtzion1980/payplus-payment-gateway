@@ -187,7 +187,7 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
                     'type' => 'title',
                     'desc' => '',
-                    'id' => 'payplus-invoice'
+                    'id' => 'payplus-invoice+'
                 );
                 $checked = (isset($payplus_invoice_option['payplus_invoice_enable']) && (
                     $payplus_invoice_option['payplus_invoice_enable'] == "on" || $payplus_invoice_option['payplus_invoice_enable'] == "yes")) ? array('checked' => 'checked') : array();
@@ -222,31 +222,34 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[payplus_enable_sandbox]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
+                    'class' => 'payplus-api'
                 );
                 $settings[$section][] = array(
                     'name' => __('API Key', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_api_key]',
-                    'type' => 'text'
+                    'type' => 'text',
+                    'class' => 'payplus-api'
                 );
 
                 $settings[$section][] = array(
                     'name' => __('Secret Key', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_secret_key]',
-                    'type' => 'text'
+                    'type' => 'text',
+                    'class' => 'payplus-api'
                 );
-
                 $settings[$section][] = array(
                     'name' => __("Invoice's Language", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_langrage_invoice]',
                     'type' => 'select',
                     'options' => array('he' => 'he', 'en' => 'en'),
-
+                    'class' => 'payplus-languages-class',
                 );
                 $settings[$section][] = array(
                     'name' => __("Document type for charge transaction", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_type_document]',
                     'type' => 'select',
-                    'options' => $selectTypeDoc
+                    'options' => $selectTypeDoc,
+                    'class' => 'payplus-documents'
                 );
 
                 $settings[$section][] = array(
@@ -258,14 +261,16 @@ class WC_PayPlus_Admin_Settings
                         'inv_refund' => __('Refund Invoice', 'payplus-payment-gateway'),
                         'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
                         'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
-                    )
+                    ),
+                    'class' => 'payplus-documents'
                 );
 
                 $settings[$section][] = array(
                     'name' => __("Order status for issuing an invoice", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_status_order]',
                     'type' => 'select',
-                    'options' => self::payplus_get_statuses()
+                    'options' => self::payplus_get_statuses(),
+                    'class' => 'payplus-documents'
                 );
 
                 $checked = (isset($payplus_invoice_option['payplus_invoice_send_document_email']) &&
@@ -277,6 +282,7 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[payplus_invoice_send_document_email]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
+                    'class' => 'payplus-notifications'
                 );
 
                 $checked = (isset($payplus_invoice_option['payplus_invoice_send_document_sms']) && (
@@ -289,19 +295,22 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[payplus_invoice_send_document_sms]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
+                    'class' => 'payplus-notifications'
                 );
                 $settings[$section][] = array(
-                    'name' => __('If you create an invoice in a non-automatic management interface', 'payplus-payment-gateway'),
+                    'name' => __('Invoice+ Manual Creation', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-manual]',
                     'type' => 'checkbox',
                     'class' => 'create-invoice-manual',
                 );
                 $settings[$section][] = array(
-                    'name' => __('List of documents that can be produced manually', 'payplus-payment-gateway'),
+                    'name' => __('Select the types you want available for docs creation', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[invoice-manual-list]',
                     'type' => 'select',
                     'options' => $selectTypeDoc,
                     'class' => 'invoice-manual-list',
+                    'desc' => __('Choose from mulitple types of documents to be available in the order page.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
                     'custom_attributes' => array('multiple' => 'multiple'),
                 );
                 $settings[$section][] = array(
@@ -315,6 +324,7 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Whether to issue an automatic tax invoice that is paid in cash or by bank transfer', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-automatic]',
                     'type' => 'checkbox',
+                    'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
                     'name' => __("Brand Uid (Note only if you have more than one site you will need to activate the button)", 'payplus-payment-gateway'),
@@ -322,6 +332,7 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'text',
                     'class' => 'payplus_invoice_brand_uid',
                     'desc' => '<span class="arrow-payplus"></span>',
+                    'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
                     'name' => __("Website code", 'payplus-payment-gateway'),
@@ -330,6 +341,7 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus_website_code',
                     'desc' => '<span class="arrow-payplus">' . __("Add a unique string here if you have more than one website
                     connected to the service <br> This will create a unique id for invoices to each site (website code must be different for each site!)", 'payplus-payment-gateway') . '</span>',
+                    'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
                     'name' => __('Logging', 'payplus-payment-gateway'),
@@ -342,13 +354,106 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[dedicated_invoice_metabox]',
                     'type' => 'checkbox',
                     'default' => 'yes',
+                    'class' => 'payplus-display'
                 );
                 $settings[$section][] = array(
                     'name' => __('Don`t add invoice+ links to order notes', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[invoices_notes_no]',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'class' => 'payplus-display'
                 );
+                $settings[$section][] = [
+                    'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[is_Local_pickup]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => 'yes',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat_all_order]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
+                    'title' => __('VAT change in Eilat', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[change_vat_in_eilat]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
+                    'title' => __('Keywords for deliveries in Eilat', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'default' => 'אילת,איילת,אלת,eilat,elat,EILAT,ELAT',
+                    'description' => __('Keywords must be separated with a comma', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[keywords_eilat]',
+                    'class' => 'payplus-vat'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Hide Products To Invoices and Documents', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[send_products]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                    'default' => 'yes',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[send_variations]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Initial Invoice / Receipt', 'payplus-payment-gateway'),
+                    'type' => 'select',
+                    'options' => [
+                        '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                        '1' => __('Yes', 'payplus-payment-gateway'),
+                        '2' => __('No', 'payplus-payment-gateway'),
+                    ],
+                    'default' => '0',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[initial_invoice]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
+                    'title' => __('Invoice For Foreign Customers', 'payplus-payment-gateway'),
+                    'type' => 'select',
+                    'options' => [
+                        '0' => __('Paying VAT', 'payplus-payment-gateway'),
+                        '1' => __('Exempt VAT', 'payplus-payment-gateway'),
+                        '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than...', 'payplus-payment-gateway'),
+                    ],
+                    'default' => '0',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
+                    'title' => __('Your Business VAT Registration Country ISO Code', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'default' => 'IL',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat_iso_code]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
+                    'title' => __('Custom checkout field name for vat number', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'default' => '',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[vat_number_field]',
+                    'class' => 'payplus-vat'
+                ];
+                $settings[$section][] = [
+                    'title' => __('The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'default' => 'HE',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[foreign_invoices_lang]',
+                    'class' => 'payplus-languages-class',
+                ];
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-invoice');
                 break;
             case 'payplus-express-checkout':

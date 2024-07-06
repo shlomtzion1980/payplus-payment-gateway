@@ -208,18 +208,18 @@ html[lang="en-US"] .payplus-delete-error {
 #settingsContainer {
   display: flex;
   width: 100%;
+  background-color: #eff5f3;
   @media screen and (max-width: 1500px) {
     flex-direction: column;
     align-content: center;
     flex-wrap: wrap;
   }
-  .hideTable {
-    display: none;
-  }
+
   .right-tab-section-payplus {
-    width: 40%;
-    background-color: white;
-    margin: 0 auto 0 auto;
+    width: 45%;
+    background-color: gray;
+    margin: 78px 0 5px 0;
+    border-radius: 5px;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
@@ -227,9 +227,12 @@ html[lang="en-US"] .payplus-delete-error {
       width: 100%;
     }
     .settingTitle {
-      min-height: 10%;
-      background-color: #eff5f3;
+      min-height: 9%;
+      background-color: #ffffff;
       display: block;
+      border-radius: 5px;
+      width: 65%;
+      margin: auto;
       @media screen and (max-width: 1500px) {
         min-height: 300px;
         margin: 5% 0 0 0;
@@ -242,11 +245,14 @@ html[lang="en-US"] .payplus-delete-error {
   background-color: #eff5f3;
   border-radius: 10px;
   padding: 5px;
-  width: 50%;
+  width: 100%;
   margin: auto;
-  @media screen and (max-width: 1500px) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* @media screen and (max-width: 1500px) {
     width: 100%;
-  }
+  } */
 }
 
 #payplus-title-section {
@@ -261,6 +267,14 @@ html[lang="en-US"] .payplus-delete-error {
   left: 10px;
 }
 
+&.halfWidth {
+  width: 50%;
+}
+
+.hiddenTitle {
+  display: none;
+}
+
 .woocommerce table.form-table {
   margin: 0;
   table-layout: fixed;
@@ -269,6 +283,14 @@ html[lang="en-US"] .payplus-delete-error {
   display: block;
   background: #fcfffc;
   border-collapse: separate;
+  max-width: 70%;
+  &.fullWidth {
+    width: 100%;
+  }
+}
+
+.hide {
+  display: none !important;
 }
 
 .woocommerce table .form-table fieldset {

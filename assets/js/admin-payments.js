@@ -330,7 +330,66 @@ function PayplusdisplayMenuInvoice() {
     section == "payplus-error-setting"
   ) {
     jQuery(".wrap.woocommerce")
-      .find("h2")
+      .find("h1")
       .before(payplus_script_admin.menu_option);
+    const formTables = jQuery(".wrap.woocommerce").find(".form-table");
+    formTables.each(function () {
+      if (this.innerHTML.trim().length === 0) {
+        this.style.display = "none";
+      }
+    });
+
+    let classes = [
+      ".payplus-api",
+      ".payplus-languages-class",
+      ".payplus-documents",
+      ".payplus-vat",
+      ".payplus-display",
+      ".payplus-notifications",
+    ];
+    let headLines = [];
+    headLines[".payplus-api"] = "Api Settings";
+    headLines[".payplus-languages-class"] = "Language Settings";
+    headLines[".payplus-documents"] = "Documents Settings";
+    headLines[".payplus-vat"] = "Vat Settings";
+    headLines[".payplus-display"] = "Display Settings";
+    headLines[".payplus-notifications"] = "Notifications";
+    // Step 2: Create table header
+
+    console.log(classes);
+    let tables = {};
+    let urlParams = new URLSearchParams(queryString);
+    let sectionValue = urlParams.get("section");
+    console.log(sectionValue);
+
+    if (jQuery.inArray(sectionValue, ["payplus-invoice"]) >= 0) {
+      for (let i = 0; i < classes.length; i++) {
+        let $thead = jQuery("<thead></thead>");
+        let $headerRow = jQuery("<tr></tr>");
+        let $tbody = jQuery("<tbody></tbody>");
+        $headerRow.append("<th>" + headLines[classes[i]] + "</th>");
+        $thead.append($headerRow);
+        let $movableElements = jQuery(classes[i]).parent().parent();
+        $movableElements.each(function (e) {
+          if ($movableElements[e].tagName.toLowerCase() === "fieldset") {
+            $movableElements[e] = jQuery($movableElements[e])
+              .parent()
+              .parent()[0];
+          }
+        });
+
+        $movableElements.detach();
+        let $table = jQuery("<table></table>").addClass("form-table");
+        $table.css("margin-top", "10px");
+        $table.append($thead);
+        $table.append($tbody);
+
+        $movableElements.appendTo($table);
+        jQuery("#mainform").children().last().before($table);
+      }
+    }
+
+    // Step 4: Append the table to the container
+    // jQuery("#mainform").append($table);
   }
 }

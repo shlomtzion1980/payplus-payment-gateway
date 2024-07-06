@@ -763,16 +763,26 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             foreach ($formFields as $field) {
                 $titles = isset($field['type']) && $field['type'] === 'title' ? $titles .= '<div class="settingTitle">' . $field['title'] . '</div>' : $titles;
             }
-            return $titles ?? '<div class="settingTitle">' . $currentSection . 'Go Pro! - Add Invoice+ to your store and send digitally signed Tax Invoices/Receipts and much more!</div>';
+            return $titles ?? '<div class="settingTitle">' . $currentSection . '<div data-v-7e54c696="" data-v-424bec7a="" style="margin: 0px 0px 48px;"><p data-v-7e54c696="" data-v-424bec7a="" class="section-title q-mb-none text-center" style="font-size: 3.25rem; font-family: AlmoniRegular; margin-bottom: 0px;">
+        הירשמו
+        <span data-v-7e54c696="" data-v-424bec7a="" style="font-family: AlmoniDemiBold;">
+          עכשיו
+        </span>
+        וקבלו 57 ימי ניסיון
+        <span data-v-7e54c696="" data-v-424bec7a="" style="font-family: AlmoniDemiBold;">
+          בחינם!
+        </span></p> <a data-v-7e54c696="" href="/signup?inv=true&amp;ref=inv_btn" class="payplus-btn mt-4" data-v-424bec7a="" style="margin: auto;">
+        פתיחת חשבון
+      </a></div></div>';
         }
 
-        function hideTable($currentSection)
+        function hide($currentSection)
         {
-            $hideTable = $currentSection === 'payplus-payment-gateway' ? 'hideTable' : null;
-            return $hideTable;
+            $hide = $currentSection === 'payplus-payment-gateway' ? 'hide' : null;
+            return $hide;
         }
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
-                        <table class='form-table " . hideTable($currentSection) . "'>$settings</table>
+                        <table class='form-table " . hide($currentSection) . " fullWidth'>$settings</table>
                     </div><div class='right-tab-section-payplus'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>
@@ -875,17 +885,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                 $this->updateMetaData($order_id, (array) $response->data);
                 if ($response->data->type == "Charge") {
-                    if ($this->fire_completed) {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'firePaymentComplete', $transactionUid);
+                    if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
                         $order->payment_complete();
                     }
 
                     if ($this->successful_order_status !== 'default-woo') {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order, $this->successful_order_status, $transactionUid);
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
                         $order->update_status($this->successful_order_status);
                     }
                 } else {
-                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
+                    WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
                     $order->update_status('wc-on-hold');
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
@@ -2029,8 +2039,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'Result: ' . print_r($data, true));
 
         if ($data['type'] === 'Approval' && $data['status_code'] === '000') {
-            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transaction_uid);
+            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->wc-on-hold', $transaction_uid);
             $order->update_status('wc-on-hold');
+        } elseif ($data['type'] === 'Charge' && $data['status_code'] === '000') {
+            if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->firePaymentComplete', $transaction_uid);
+                $order->payment_complete();
+            } elseif ($this->successful_order_status !== 'default-woo') {
+                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->' . $this->successful_order_status, $transaction_uid);
+                $order->update_status($this->successful_order_status);
+            }
         }
 
         $payload = [];
