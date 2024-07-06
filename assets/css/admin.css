@@ -280,10 +280,15 @@ html[lang="en-US"] .payplus-delete-error {
   table-layout: fixed;
   border-radius: 5px;
   padding: 35px;
-  display: block;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
   background: #fcfffc;
   border-collapse: separate;
-  max-width: 70%;
+  @media screen and (min-width: 1400px) {
+    max-width: 60%;
+  }
+
   &.fullWidth {
     width: 100%;
   }

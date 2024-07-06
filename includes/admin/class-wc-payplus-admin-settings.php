@@ -197,6 +197,8 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[payplus_invoice_enable]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
+                    'desc' => __('Check this to activate Invoice+', 'payplus-payment-gateway'),
+                    'desc_tip' => true
                 );
                 $settings[$section][] = array(
                     'name' => __('Display Only - Invoice+ Docs', 'payplus-payment-gateway'),
@@ -222,7 +224,9 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[payplus_enable_sandbox]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
-                    'class' => 'payplus-api'
+                    'class' => 'payplus-api',
+                    'desc' => __('Enable test api mode - you need test keys for this!', 'payplus-payment-gateway'),
+                    'desc_tip' => true
                 );
                 $settings[$section][] = array(
                     'name' => __('API Key', 'payplus-payment-gateway'),
@@ -298,10 +302,12 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-notifications'
                 );
                 $settings[$section][] = array(
-                    'name' => __('Invoice+ Manual Creation', 'payplus-payment-gateway'),
+                    'name' => __('Manual Invoices Creation', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-manual]',
                     'type' => 'checkbox',
                     'class' => 'create-invoice-manual',
+                    'desc' => __('Check this if you are creating invoices manually through the admin orders page.', 'payplus-payment-gateway'),
+                    'desc_tip' => true
                 );
                 $settings[$section][] = array(
                     'name' => __('Select the types you want available for docs creation', 'payplus-payment-gateway'),

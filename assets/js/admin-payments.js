@@ -319,6 +319,28 @@ function payPlusSumRefund() {
   }
   return sum.toFixed(2);
 }
+
+var $saveButton = jQuery('button[name="save"]');
+var $specificDiv = jQuery("#settingsContainer");
+
+jQuery(window).on("scroll", function () {
+  var offset = $specificDiv.offset();
+  var scrollTop = jQuery(window).scrollTop();
+
+  if (scrollTop >= offset?.top) {
+    $saveButton.css({
+      position: "fixed",
+      top: "90%",
+      right: "10%",
+    });
+  } else {
+    $saveButton.css({
+      position: "fixed",
+      top: "90%",
+      right: "10%",
+    });
+  }
+});
 function PayplusdisplayMenuInvoice() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
@@ -350,7 +372,7 @@ function PayplusdisplayMenuInvoice() {
     let headLines = [];
     headLines[".payplus-api"] = "Api Settings";
     headLines[".payplus-languages-class"] = "Language Settings";
-    headLines[".payplus-documents"] = "Documents Settings";
+    headLines[".payplus-documents"] = "Document Settings";
     headLines[".payplus-vat"] = "Vat Settings";
     headLines[".payplus-display"] = "Display Settings";
     headLines[".payplus-notifications"] = "Notifications";
@@ -367,7 +389,7 @@ function PayplusdisplayMenuInvoice() {
         let $thead = jQuery("<thead></thead>");
         let $headerRow = jQuery("<tr></tr>");
         let $tbody = jQuery("<tbody></tbody>");
-        $headerRow.append("<th>" + headLines[classes[i]] + "</th>");
+        // $headerRow.append("<th>" + headLines[classes[i]] + "</th>");
         $thead.append($headerRow);
         let $movableElements = jQuery(classes[i]).parent().parent();
         $movableElements.each(function (e) {
@@ -381,12 +403,23 @@ function PayplusdisplayMenuInvoice() {
         $movableElements.detach();
         let $table = jQuery("<table></table>").addClass("form-table");
         $table.css("margin-top", "10px");
+
+        if (jQuery(window).width() > 1400) {
+          console.log("doing");
+          jQuery(".form-table").css("width", "60%");
+        }
         $table.append($thead);
         $table.append($tbody);
 
         $movableElements.appendTo($table);
+
+        jQuery("#mainform")
+          .children()
+          .last()
+          .before("<h2>" + headLines[classes[i]] + "</h2>");
         jQuery("#mainform").children().last().before($table);
       }
+      jQuery("h2").css("color", "#34aa54");
     }
 
     // Step 4: Append the table to the container
