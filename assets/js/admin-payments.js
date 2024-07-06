@@ -326,19 +326,23 @@ var $specificDiv = jQuery("#settingsContainer");
 jQuery(window).on("scroll", function () {
   var offset = $specificDiv.offset();
   var scrollTop = jQuery(window).scrollTop();
+  let side = "right";
+  if (jQuery("body").hasClass("rtl")) {
+    side = "left";
+  }
 
   if (scrollTop >= offset?.top) {
     $saveButton.css({
       position: "fixed",
       top: "90%",
-      right: "10%",
     });
+    $saveButton.css(side, "10%");
   } else {
     $saveButton.css({
       position: "fixed",
       top: "90%",
-      right: "10%",
     });
+    $saveButton.css(side, "10%");
   }
 });
 function PayplusdisplayMenuInvoice() {

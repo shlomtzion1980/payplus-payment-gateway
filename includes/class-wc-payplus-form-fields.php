@@ -18,15 +18,15 @@ class WC_PayPlus_Form_Fields
     public static function adminBarMenu($admin_bar)
     {
 
-        $admin_bar->add_menu(array(
-            'id' => 'PayPlus-toolbar',
-            'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
-            'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard",
-            'meta' => array(
-                'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
-                'target' => '_blank',
-            ),
-        ));
+        // $admin_bar->add_menu(array(
+        //     'id' => 'PayPlus-toolbar',
+        //     'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
+        //     'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard",
+        //     'meta' => array(
+        //         'title' => __('PayPlus Gateway', 'payplus-payment-gateway'),
+        //         'target' => '_blank',
+        //     ),
+        // ));
         $admin_bar->add_menu(array(
             'id' => 'payPlus-toolbar-sub',
             'parent' => 'PayPlus-toolbar',
