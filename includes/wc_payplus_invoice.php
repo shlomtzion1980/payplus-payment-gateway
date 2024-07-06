@@ -84,9 +84,9 @@ class PayplusInvoice
         $this->payplus_create_invoice_manual = (isset($this->payplus_invoice_option['create-invoice-manual']) &&
             $this->payplus_invoice_option['create-invoice-manual'] == "yes") ? true : false;
 
-        $this->payplus_api_url = ($this->payplus_invoice_option
-            && isset($this->payplus_invoice_option['payplus_enable_sandbox'])
-            && ($this->payplus_invoice_option['payplus_enable_sandbox'] === "yes"))
+        $this->payplus_api_url = ($this->payplus_gateway_option
+            && isset($this->payplus_gateway_option['api_test_mode'])
+            && ($this->payplus_gateway_option['api_test_mode'] === "yes"))
             ? PAYPLUS_PAYMENT_URL_DEV : PAYPLUS_PAYMENT_URL_PRODUCTION;
 
         $this->logging = true;

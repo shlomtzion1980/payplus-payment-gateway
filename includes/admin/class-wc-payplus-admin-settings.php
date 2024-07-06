@@ -183,6 +183,8 @@ class WC_PayPlus_Admin_Settings
                 break;
             case 'payplus-invoice':
                 $payplus_invoice_option = get_option('payplus_invoice_option');
+                $payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
+
                 $settings[$section][] = array(
                     'name' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
                     'type' => 'title',
@@ -208,8 +210,9 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'checkbox',
                     'default' => 'no',
                 );
-                $checked = (isset($payplus_invoice_option['payplus_enable_sandbox']) &&
-                    $payplus_invoice_option['payplus_enable_sandbox'] == "on") ? array('checked' => 'checked') : array();
+
+                $checked = (isset($payplus_gateway_option['api_test_mode']) &&
+                    $payplus_gateway_option['api_test_mode'] == "on") ? array('checked' => 'checked') : array();
 
                 $selectTypeDoc = array(
                     '' => __('Type Documents', 'payplus-payment-gateway'),
@@ -221,7 +224,7 @@ class WC_PayPlus_Admin_Settings
 
                 $settings[$section][] = array(
                     'name' => __('Enable Sandbox Mode', 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_enable_sandbox]',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[api_test_mode]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
                     'class' => 'payplus-api',

@@ -380,9 +380,7 @@ function PayplusdisplayMenuInvoice() {
     headLines[".payplus-vat"] = "Vat Settings";
     headLines[".payplus-display"] = "Display Settings";
     headLines[".payplus-notifications"] = "Notifications";
-    // Step 2: Create table header
 
-    console.log(classes);
     let tables = {};
     let urlParams = new URLSearchParams(queryString);
     let sectionValue = urlParams.get("section");
@@ -409,19 +407,19 @@ function PayplusdisplayMenuInvoice() {
         $table.css("margin-top", "10px");
 
         if (jQuery(window).width() > 1400) {
-          console.log("doing");
           jQuery(".form-table").css("width", "60%");
         }
         $table.append($thead);
         $table.append($tbody);
 
         $movableElements.appendTo($table);
-
-        jQuery("#mainform")
-          .children()
-          .last()
-          .before("<h2>" + headLines[classes[i]] + "</h2>");
-        jQuery("#mainform").children().last().before($table);
+        if (classes[i] !== ".payplus-api") {
+          jQuery("#mainform")
+            .children()
+            .last()
+            .before("<h2>" + headLines[classes[i]] + "</h2>");
+          jQuery("#mainform").children().last().before($table);
+        }
       }
       jQuery("h2").css("color", "#34aa54");
     }
