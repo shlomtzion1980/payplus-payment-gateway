@@ -24,10 +24,10 @@ jQuery(function ($) {
     "#woocommerce_payplus-payment-gateway_block_ip_transactions_hour"
   );
   const changeVatInEliat = $(
-    "#woocommerce_payplus-payment-gateway_change_vat_in_eilat"
+    "#woocommerce_payplus-payment-gateway_settings\\[change_vat_in_eilat\\]"
   );
   const keywordsEilat = $(
-    "#woocommerce_payplus-payment-gateway_keywords_eilat"
+    "#woocommerce_payplus-payment-gateway_settings\\[keywords_eilat\\]"
   );
   const deleteError = $(".payplus-delete-error");
   const createInvoiceManual = $(".create-invoice-manual");
@@ -76,6 +76,7 @@ jQuery(function ($) {
   });
   /******     Eliat start **remove***/
   if (!changeVatInEliat.prop("checked")) {
+    console.log("not checked");
     keywordsEilat.closest("tr").fadeOut();
   }
   $(".invoice-manual-list").change(function () {
@@ -313,14 +314,14 @@ jQuery(function ($) {
     );
     $(document).on(
       "change",
-      "select#woocommerce_payplus-payment-gateway_paying_vat",
+      "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]",
       function () {
         toggle_foreign_invoice();
       }
     );
     $(document).on(
       "change",
-      "select#woocommerce_payplus-payment-gateway_initial_invoice",
+      "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]",
       function () {
         toggle_invoice_options();
         toggle_foreign_invoice();
@@ -368,20 +369,28 @@ jQuery(function ($) {
 
     function toggle_foreign_invoice() {
       var invoice_option = $(
-        "select#woocommerce_payplus-payment-gateway_paying_vat"
+        "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]"
       ).val();
       if (invoice_option == "2") {
-        $("input#woocommerce_payplus-payment-gateway_paying_vat_iso_code")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+        )
           .closest("tr")
           .show();
-        $("input#woocommerce_payplus-payment-gateway_foreign_invoices_lang")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+        )
           .closest("tr")
           .show();
       } else {
-        $("input#woocommerce_payplus-payment-gateway_paying_vat_iso_code")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+        )
           .closest("tr")
           .hide();
-        $("input#woocommerce_payplus-payment-gateway_foreign_invoices_lang")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+        )
           .closest("tr")
           .hide();
       }
@@ -389,26 +398,34 @@ jQuery(function ($) {
 
     function toggle_invoice_options() {
       var initial_invoice = $(
-        "select#woocommerce_payplus-payment-gateway_initial_invoice"
+        "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
       ).val();
       if (initial_invoice == "1") {
-        $("select#woocommerce_payplus-payment-gateway_paying_vat")
+        $("select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]")
           .closest("tr")
           .show();
-        $("input#woocommerce_payplus-payment-gateway_paying_vat_iso_code")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+        )
           .closest("tr")
           .show();
-        $("input#woocommerce_payplus-payment-gateway_foreign_invoices_lang")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+        )
           .closest("tr")
           .show();
       } else {
-        $("select#woocommerce_payplus-payment-gateway_paying_vat")
+        $("select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]")
           .closest("tr")
           .hide();
-        $("input#woocommerce_payplus-payment-gateway_paying_vat_iso_code")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+        )
           .closest("tr")
           .hide();
-        $("input#woocommerce_payplus-payment-gateway_foreign_invoices_lang")
+        $(
+          "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+        )
           .closest("tr")
           .hide();
       }

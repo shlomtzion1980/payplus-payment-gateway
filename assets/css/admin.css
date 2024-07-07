@@ -281,8 +281,8 @@ html[lang="en-US"] .payplus-delete-error {
   font-size: 1.2em;
   color: #34aa54;
   position: relative;
-  margin: 10px;
-  left: 10px;
+  /* margin: 10px;
+  left: 10px; */
 }
 
 &.halfWidth {

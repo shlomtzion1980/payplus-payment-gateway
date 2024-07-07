@@ -221,29 +221,6 @@ class WC_PayPlus_Admin_Settings
                     'inv_receipt' => __('Receipt', 'payplus-payment-gateway'),
                     'inv_don_receipt' => __('Donation Reciept', 'payplus-payment-gateway')
                 );
-
-                $settings[$section][] = array(
-                    'name' => __('Enable Sandbox Mode', 'payplus-payment-gateway'),
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[api_test_mode]',
-                    'type' => 'checkbox',
-                    'custom_attributes' => $checked,
-                    'class' => 'payplus-api',
-                    'desc' => __('Enable test api mode - you need test keys for this!', 'payplus-payment-gateway'),
-                    'desc_tip' => true
-                );
-                $settings[$section][] = array(
-                    'name' => __('API Key', 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_invoice_api_key]',
-                    'type' => 'text',
-                    'class' => 'payplus-api'
-                );
-
-                $settings[$section][] = array(
-                    'name' => __('Secret Key', 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_invoice_secret_key]',
-                    'type' => 'text',
-                    'class' => 'payplus-api'
-                );
                 $settings[$section][] = array(
                     'name' => __("Invoice's Language", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_langrage_invoice]',
@@ -258,7 +235,6 @@ class WC_PayPlus_Admin_Settings
                     'options' => $selectTypeDoc,
                     'class' => 'payplus-documents'
                 );
-
                 $settings[$section][] = array(
                     'name' => __("Document type for refund transaction", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_type_document_refund]',
@@ -305,7 +281,7 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-notifications'
                 );
                 $settings[$section][] = array(
-                    'name' => __('Manual Invoices Creation', 'payplus-payment-gateway'),
+                    'name' => __('Invoice Creation: Manual', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-manual]',
                     'type' => 'checkbox',
                     'class' => 'create-invoice-manual',
@@ -419,16 +395,16 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 ];
                 $settings[$section][] = [
-                    'title' => __('Initial Invoice / Receipt', 'payplus-payment-gateway'),
+                    'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [
                         '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
-                        '1' => __('Yes', 'payplus-payment-gateway'),
-                        '2' => __('No', 'payplus-payment-gateway'),
+                        '1' => __('PayPlus', 'payplus-payment-gateway'),
+                        '2' => __('WooCommerce', 'payplus-payment-gateway'),
                     ],
                     'default' => '0',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[initial_invoice]',
-                    'class' => 'payplus-documents'
+                    'class' => 'payplus-vat'
                 ];
                 $settings[$section][] = [
                     'title' => __('Invoice For Foreign Customers', 'payplus-payment-gateway'),

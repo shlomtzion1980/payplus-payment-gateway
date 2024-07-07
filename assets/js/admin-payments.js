@@ -389,23 +389,29 @@ function payplusMenusDisplay() {
       ".payplus-notifications",
     ];
     let headLines = [];
-    headLines[".payplus-api"] = "Api Settings";
-    headLines[".payplus-languages-class"] = "Language Settings";
-    headLines[".payplus-documents"] = "Document Settings";
-    headLines[".payplus-vat"] = "Vat Settings";
-    headLines[".payplus-display"] = "Display Settings";
-    headLines[".payplus-notifications"] = "Notifications";
+    let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
+    headLines[".payplus-api"] =
+      currentLanguage === "he" ? "הגדרות API" : "Api Settings";
+    headLines[".payplus-languages-class"] =
+      currentLanguage === "he" ? "הגדרות שפה" : "Language Settings";
+    headLines[".payplus-documents"] =
+      currentLanguage === "he" ? "הגדרות מסמכים" : "Document Settings";
+    headLines[".payplus-vat"] =
+      currentLanguage === "he" ? 'הגדרות מע"מ' : "VAT Settings";
+    headLines[".payplus-display"] =
+      currentLanguage === "he" ? "הגדרות תצוגה" : "Display Settings";
+    headLines[".payplus-notifications"] =
+      currentLanguage === "he" ? "התראות" : "Notifications";
 
     let tables = {};
     let urlParams = new URLSearchParams(queryString);
     let sectionValue = urlParams.get("section");
     //Create settingsContainer
     let translated = [];
-    let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
+
     translated["iframeHeadline"] = [];
     translated["iframeHeadline"]["he"] = "פייפלוס שאלות ותשובות";
-    translated["iframeHeadline"]["en"] = "Payplus FAQ";
-    console.log(translated);
+    translated["iframeHeadline"]["en"] = "PayPlus FAQ";
 
     const iframeHeadline = translated["iframeHeadline"][currentLanguage];
 

@@ -785,7 +785,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table " . hide($currentSection) . " fullWidth'>$settings</table>
-                    </div><div class='right-tab-section-payplus hide" . ' fullHeight' . "'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
+                    </div><div class='right-tab-section-payplus " . ' fullHeight' . "'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>
 
