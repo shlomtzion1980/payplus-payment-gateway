@@ -176,6 +176,21 @@ class WC_PayPlus_Form_Fields
                 'default' => '',
                 'desc_tip' => true,
             ],
+            'dev_api_key' => [
+                'title' => __('Development API Key', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'description' => __('PayPlus Dev API Key you can find in your account under Settings', 'payplus-payment-gateway'),
+                'default' => '',
+                'desc_tip' => true,
+            ],
+
+            'dev_secret_key' => [
+                'title' => __('Devlopment Secret Key', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'description' => __('PayPlus Dev Secret Key you can find in your account under Settings', 'payplus-payment-gateway'),
+                'default' => '',
+                'desc_tip' => true,
+            ],
             'payment_page_id' => [
                 'title' => __('Payment Page UID', 'payplus-payment-gateway'),
                 'type' => 'text',

@@ -283,9 +283,11 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array(
                     'name' => __('Invoice Creation: Manual', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-manual]',
-                    'type' => 'checkbox',
+                    'type' => 'select',
+                    'options' => ['no' => __('Automatic', 'payplus-payment-gateway'), 'yes' => __('Manual', 'payplus-payment-gateway')],
                     'class' => 'create-invoice-manual',
-                    'desc' => __('Check this if you are creating invoices manually through the admin orders page.', 'payplus-payment-gateway'),
+                    'desc' => __('Invoice creation: Automatic(Default) or Manual', 'payplus-payment-gateway'),
+                    'default' => 'no',
                     'desc_tip' => true
                 );
                 $settings[$section][] = array(

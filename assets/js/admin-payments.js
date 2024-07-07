@@ -323,36 +323,72 @@ function payPlusSumRefund() {
 var $saveButton = jQuery('button[name="save"]');
 var $specificDiv = jQuery("#settingsContainer");
 
-jQuery(window).on("scroll", function () {
-  var offset = $specificDiv.offset();
-  var scrollTop = jQuery(window).scrollTop();
-  let sideAmount = "10%";
-  if (
-    jQuery(".right-tab-section-payplus").length &&
-    jQuery(window).width() > 1400 &&
-    jQuery(".right-tab-section-payplus").css("display") !== "none"
-  ) {
-    sideAmount = "32%";
-  }
-  let side = "right";
-  if (jQuery("body").hasClass("rtl")) {
-    side = "left";
-  }
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const section = urlParams.get("section");
+if (
+  section == "payplus-invoice" ||
+  section == "payplus-payment-gateway-setup-wizard" ||
+  section == "payplus-express-checkout" ||
+  section == "payplus-error-setting" ||
+  section == "payplus-payment-gateway"
+) {
+  jQuery(window).on("scroll", function () {
+    var offset = $specificDiv.offset();
+    var scrollTop = jQuery(window).scrollTop();
+    let sideAmount = "10%";
+    if (
+      jQuery(".right-tab-section-payplus").length &&
+      jQuery(window).width() > 1400 &&
+      jQuery(".right-tab-section-payplus").css("display") !== "none"
+    ) {
+      sideAmount = "32%";
+    }
+    let side = "right";
+    if (jQuery("body").hasClass("rtl")) {
+      side = "left";
+    }
 
-  if (scrollTop >= offset?.top) {
-    $saveButton.css({
-      position: "fixed",
-      top: "80%",
-    });
-    $saveButton.css(side, sideAmount);
+    if (scrollTop >= offset?.top) {
+      $saveButton.css({
+        position: "fixed",
+        top: "80%",
+      });
+      $saveButton.css(side, sideAmount);
+    } else {
+      $saveButton.css({
+        position: "fixed",
+        top: "80%",
+      });
+      $saveButton.css(side, sideAmount);
+    }
+  });
+  if (
+    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").prop("checked")
+  ) {
+    jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
+      .closest("tr")
+      .show();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
+      .closest("tr")
+      .show();
+    jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").hide();
+    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .hide();
   } else {
-    $saveButton.css({
-      position: "fixed",
-      top: "80%",
-    });
-    $saveButton.css(side, sideAmount);
+    jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").show();
+    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .show();
   }
-});
+}
 
 /**
  * Function to create, update, and set the designed admin settings.

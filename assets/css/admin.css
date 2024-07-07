@@ -205,6 +205,10 @@ html[lang="en-US"] .payplus-delete-error {
   margin-right: 20px;
 }
 
+/* #woocommerce_payplus-payment-gateway_dev_api_key,
+#woocommerce_payplus-payment-gateway_dev_secret_key {
+  display: none;
+} */
 #settingsContainer {
   display: flex;
   width: 100%;
@@ -268,10 +272,8 @@ html[lang="en-US"] .payplus-delete-error {
         margin: 5% 0 0 0;
       }
     }
-
   }
 }
-
 
 #payplus-title-section {
   color: #34aa54;

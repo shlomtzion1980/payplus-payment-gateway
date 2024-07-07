@@ -275,4 +275,40 @@ class WC_PayPlus_Statics
             );
             return $box;
         }
+
+        /**
+         * @param $url
+         * @param $payload
+         * @param $method
+         * @return array|WP_Error
+         */
+        public static function payplusPost($payload = [], $method = "post")
+        {
+            $options = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode = boolval($options['api_test_mode'] === 'yes');
+            $url = $testMode === true ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
+            $apiKey = $testMode === true ? $options['dev_api_key'] : $options['api_key'];
+            $secretKey = $testMode === true ? $options['dev_api_secret'] : $options['secret_key'];
+
+            $args = array(
+                'body' => $payload,
+                'timeout' => '60',
+                'redirection' => '5',
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    'domain' => home_url(),
+                    'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
+                    'Content-Type' => 'application/json',
+                    'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+                )
+            );
+            if ($method == "post") {
+                $response = wp_remote_post($url, $args);
+            } else {
+                $response = wp_remote_get($url, $args);
+            }
+
+            return $response;
+        }
     }

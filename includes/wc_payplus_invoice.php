@@ -42,11 +42,8 @@ class PayplusInvoice
 
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 
-        $this->payplus_invoice_api_key = (isset($this->payplus_invoice_option['payplus_invoice_api_key'])) ?
-            $this->payplus_invoice_option['payplus_invoice_api_key'] : EMPTY_STRING_PAYPLUS;
-
-        $this->payplus_invoice_secret_key = (isset($this->payplus_invoice_option['payplus_invoice_secret_key'])) ?
-            $this->payplus_invoice_option['payplus_invoice_secret_key'] : EMPTY_STRING_PAYPLUS;
+        $this->payplus_invoice_api_key = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? $this->payplus_gateway_option['dev_api_key'] : $this->payplus_gateway_option['api_key'];
+        $this->payplus_invoice_secret_key = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? $this->payplus_gateway_option['dev_secret_key'] : $this->payplus_gateway_option['secret_key'];
 
         $this->payplus_invoice_brand_uid = (isset($this->payplus_invoice_option['payplus_invoice_brand_uid'])) ?
             $this->payplus_invoice_option['payplus_invoice_brand_uid'] : EMPTY_STRING_PAYPLUS;
@@ -66,15 +63,7 @@ class PayplusInvoice
             true : false;
 
         $this->payplus_unique_identifier = "";
-        if (empty($this->payplus_invoice_api_key)) {
-            $this->payplus_invoice_api_key =
-                (!empty($this->payplus_gateway_option['api_key'])) ?
-                $this->payplus_gateway_option['api_key'] : EMPTY_STRING_PAYPLUS;
-        }
-        if (empty($this->payplus_invoice_secret_key)) {
-            $this->payplus_invoice_secret_key = (!empty($this->payplus_gateway_option['secret_key'])) ?
-                $this->payplus_gateway_option['secret_key'] : EMPTY_STRING_PAYPLUS;
-        }
+
         $this->payplus_invoice_status_order = "processing";
 
         if (!empty($this->payplus_invoice_option['payplus_invoice_status_order'])) {
