@@ -136,9 +136,9 @@ class WC_PayPlus_Form_Fields
                 'description' => __('Basic plugin settings - set these and you`r good to go!', 'payplus-payment-gateway'),
             ],
             'enabled' => [
-                'title' => __('Enable/Disable', 'payplus-payment-gateway'),
+                'title' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
+                'label' => __('Enable/Disable', 'payplus-payment-gateway'),
                 'default' => 'yes',
             ],
             'title' => [
@@ -154,8 +154,9 @@ class WC_PayPlus_Form_Fields
                 'default' => __('Pay securely by Debit or Credit Card through PayPlus', 'payplus-payment-gateway'),
             ],
             'api_test_mode' => [
-                'title' => __('Test mode', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
+                'title' => __('Plugin Environment', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'options' => ['no' => __('Production Mode', 'payplus-payment-gateway'), 'yes' => __('Sandbox/Test Mode', 'payplus-payment-gateway')],
                 'description' => __('Activate test mode', 'payplus-payment-gateway'),
                 'label' => __('Enable Sandbox Mode', 'payplus-payment-gateway'),
                 'desc_tip' => true,

@@ -195,11 +195,11 @@ class WC_PayPlus_Admin_Settings
                     $payplus_invoice_option['payplus_invoice_enable'] == "on" || $payplus_invoice_option['payplus_invoice_enable'] == "yes")) ? array('checked' => 'checked') : array();
 
                 $settings[$section][] = array(
-                    'name' => __('Enable/Disable', 'payplus-payment-gateway'),
+                    'name' => __('Check this to activate Invoice+', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_enable]',
                     'type' => 'checkbox',
                     'custom_attributes' => $checked,
-                    'desc' => __('Check this to activate Invoice+', 'payplus-payment-gateway'),
+                    'desc' => __('Enable/Disable', 'payplus-payment-gateway'),
                     'desc_tip' => true
                 );
                 $settings[$section][] = array(

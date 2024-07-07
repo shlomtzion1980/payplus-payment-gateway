@@ -326,6 +326,8 @@ var $specificDiv = jQuery("#settingsContainer");
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 const section = urlParams.get("section");
+let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
+
 if (
   section == "payplus-invoice" ||
   section == "payplus-payment-gateway-setup-wizard" ||
@@ -342,7 +344,7 @@ if (
       jQuery(window).width() > 1400 &&
       jQuery(".right-tab-section-payplus").css("display") !== "none"
     ) {
-      sideAmount = "32%";
+      sideAmount = "35%";
     }
     let side = "right";
     if (jQuery("body").hasClass("rtl")) {
@@ -363,20 +365,47 @@ if (
       $saveButton.css(side, sideAmount);
     }
   });
-  if (
-    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").prop("checked")
-  ) {
+  let currentMode;
+  let isTest = Boolean(payplus_script_admin.currentMode === "yes");
+  let modeMessage = [];
+
+  console.log(currentLanguage);
+
+  if (isTest) {
+    modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
+    modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
+    currentMode = jQuery(
+      "<tr><td id='currentMode'>" +
+        modeMessage[currentLanguage] +
+        "</td></tr></tr>"
+    );
     jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
       .closest("tr")
       .show();
     jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
       .closest("tr")
       .show();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+    jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+
     jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").hide();
     jQuery("#woocommerce_payplus-payment-gateway_secret_key")
       .closest("tr")
       .hide();
   } else {
+    modeMessage["en"] = "Current Mode: Production mode";
+    modeMessage["he"] = "מצב נוכחי: מצב ייצור";
+    currentMode = jQuery(
+      "<tr><td id='currentMode'>" +
+        modeMessage[currentLanguage] +
+        "</td></tr></tr>"
+    );
     jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
       .closest("tr")
       .hide();
@@ -387,7 +416,17 @@ if (
     jQuery("#woocommerce_payplus-payment-gateway_secret_key")
       .closest("tr")
       .show();
+    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+    jQuery("#woocommerce_payplus-payment-gateway_api_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
   }
+  var $firstInputWithId = jQuery("#mainform input[id]").first();
+  $firstInputWithId.closest("tr").before(currentMode);
 }
 
 /**
@@ -425,7 +464,7 @@ function payplusMenusDisplay() {
       ".payplus-notifications",
     ];
     let headLines = [];
-    let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
+
     headLines[".payplus-api"] =
       currentLanguage === "he" ? "הגדרות API" : "Api Settings";
     headLines[".payplus-languages-class"] =
@@ -451,10 +490,22 @@ function payplusMenusDisplay() {
 
     const iframeHeadline = translated["iframeHeadline"][currentLanguage];
 
+    const iframes = [];
+    iframes["payplus-invoice"] =
+      '<iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%97%D7%99%D7%91%D7%95%D7%A8-%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA--%D7%9C%D7%97%D7%A0%D7%95%D7%AA-WooCommerce"></iframe>';
+    iframes["payplus-faq"] =
+      '<iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
+
+    let iframeToShow =
+      sectionValue === "payplus-invoice"
+        ? iframes["payplus-invoice"]
+        : iframes["payplus-faq"];
     let $settingsContainer = jQuery(
       '<div id="settingsContainer"><div class="tab-section-payplus" id="tab-payplus-gateway"></div><div class="right-tab-section-payplus"><h2>' +
         iframeHeadline +
-        '</h2><iframe id="stickyFrame" width="500" height="100%" style="min-height: 500px;" src="https://www.payplus.co.il/faq/"</div></div>'
+        "</h2>" +
+        iframeToShow +
+        "</div>"
     );
     //Add all existing tables to .tab-section-payplus
     $settingsContainer
@@ -467,13 +518,18 @@ function payplusMenusDisplay() {
       textAlign: "center",
     });
 
+    if ($settingsContainer.height() < 300) {
+      jQuery(".right-tab-section-payplus").css("display", "none");
+    }
+
     if (jQuery.inArray(sectionValue, ["payplus-invoice"]) >= 0) {
       for (let i = 0; i < classes.length; i++) {
         let $thead = jQuery("<thead></thead>");
         let $headerRow = jQuery("<tr></tr>");
         let $tbody = jQuery("<tbody></tbody>");
-        // $headerRow.append("<th>" + headLines[classes[i]] + "</th>");
+        $tbody.css("width", "100%");
         $thead.append($headerRow);
+
         let $movableElements = jQuery(classes[i]).parent().parent();
         $movableElements.each(function (e) {
           if ($movableElements[e].tagName.toLowerCase() === "fieldset") {
@@ -487,9 +543,9 @@ function payplusMenusDisplay() {
         let $table = jQuery("<table></table>").addClass("form-table");
         $table.css("margin-top", "10px");
 
-        if (jQuery(window).width() > 1400) {
-          jQuery(".form-table").css("width", "60%");
-        }
+        // if (jQuery(window).width() > 1400) {
+        //   jQuery(".form-table").css("width", "60%");
+        // }
         $table.append($thead);
         $table.append($tbody);
 

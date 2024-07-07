@@ -762,8 +762,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         function titleDivs($formFields, $currentSection)
         {
+            if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce"></iframe>';
+            } else {
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
+            }
+
             $titles = null;
-            $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
+
             // $links[] = '<iframe height="1200" width="100%" src="https://www.payplus.co.il/"></iframe>';
 
             // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%92%D7%93%D7%99%D7%A8-%D7%9B%D7%AA%D7%95%D7%91%D7%AA--Callback-URL"></iframe>';

@@ -43,11 +43,12 @@ jQuery(function ($) {
     payplus_set_max_total();
   }
   //==================invoice not automatic  ======================
-  if (createInvoiceManual && createInvoiceManual.prop("checked") === false) {
+  console.log(createInvoiceManual.val());
+  if (createInvoiceManual && createInvoiceManual.val() === "no") {
     invoiceManualList.parents("tr").fadeOut();
   }
   createInvoiceManual.change(function () {
-    if ($(this).prop("checked")) {
+    if ($(this).val() === "yes") {
       invoiceManualList.closest("tr").fadeIn();
     } else {
       invoiceManualList.closest("tr").fadeOut();

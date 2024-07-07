@@ -209,6 +209,11 @@ html[lang="en-US"] .payplus-delete-error {
 #woocommerce_payplus-payment-gateway_dev_secret_key {
   display: none;
 } */
+.woocommerce-save-button {
+  background-color: #34aa54 !important;
+  border-radius: 30px;
+  color: white;
+}
 #settingsContainer {
   display: flex;
   width: 100%;
@@ -224,16 +229,21 @@ html[lang="en-US"] .payplus-delete-error {
     background-color: #eff5f3;
     border-radius: 10px;
     padding: 5px;
-    width: 100%;
+    width: 80%;
     margin: auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    align-content: center;
+    align-content: flex-start;
     flex-wrap: wrap;
     /* @media screen and (max-width: 1500px) {
       width: 100%;
     } */
+  }
+
+  #currentMode {
+    color: #34aa54;
+    border: solid 0.6px;
   }
 
   .right-tab-section-payplus {
@@ -255,6 +265,7 @@ html[lang="en-US"] .payplus-delete-error {
     @media screen and (max-width: 1500px) {
       width: 100%;
       align-content: center;
+      display: none !important;
     }
     .settingTitle {
       min-height: 500px;
@@ -306,7 +317,7 @@ html[lang="en-US"] .payplus-delete-error {
   background: #fcfffc;
   border-collapse: separate;
   @media screen and (min-width: 1400px) {
-    max-width: 60%;
+    max-width: 80%;
   }
 
   &.fullWidth {

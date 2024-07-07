@@ -160,7 +160,7 @@ function payplusUpdateActivate()
                 'Content-Type' => 'application/json',
             )
         );
-        $response = wp_remote_post('https://webhook.site/a277ba42-0722-4541-82f2-735e2a095aa0', $args);
+        // $response = wp_remote_post('https://webhook.site/a277ba42-0722-4541-82f2-735e2a095aa0', $args);
     }
     if (PAYPLUS_VERSION_DB != $dataBaseVersion) {
 
