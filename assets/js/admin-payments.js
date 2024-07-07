@@ -1,6 +1,6 @@
 jQuery(document).ready(function ($) {
   // setFieldReadOnly();
-  PayplusdisplayMenuInvoice();
+  payplusMenusDisplay();
   let changestatus = document.getElementById("payplus-change-status");
 
   if (changestatus) {
@@ -326,6 +326,14 @@ var $specificDiv = jQuery("#settingsContainer");
 jQuery(window).on("scroll", function () {
   var offset = $specificDiv.offset();
   var scrollTop = jQuery(window).scrollTop();
+  let sideAmount = "10%";
+  if (
+    jQuery(".right-tab-section-payplus").length &&
+    jQuery(window).width() > 1400 &&
+    jQuery(".right-tab-section-payplus").css("display") !== "none"
+  ) {
+    sideAmount = "32%";
+  }
   let side = "right";
   if (jQuery("body").hasClass("rtl")) {
     side = "left";
@@ -334,18 +342,25 @@ jQuery(window).on("scroll", function () {
   if (scrollTop >= offset?.top) {
     $saveButton.css({
       position: "fixed",
-      top: "90%",
+      top: "80%",
     });
-    $saveButton.css(side, "10%");
+    $saveButton.css(side, sideAmount);
   } else {
     $saveButton.css({
       position: "fixed",
-      top: "90%",
+      top: "80%",
     });
-    $saveButton.css(side, "10%");
+    $saveButton.css(side, sideAmount);
   }
 });
-function PayplusdisplayMenuInvoice() {
+
+/**
+ * Function to create, update, and set the designed admin settings.
+ *
+ * @param {string} paramName - Description of the parameter.
+ * @returns {void} Description of the return value.
+ */
+function payplusMenusDisplay() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const section = urlParams.get("section");
@@ -384,7 +399,31 @@ function PayplusdisplayMenuInvoice() {
     let tables = {};
     let urlParams = new URLSearchParams(queryString);
     let sectionValue = urlParams.get("section");
-    console.log(sectionValue);
+    //Create settingsContainer
+    let translated = [];
+    let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
+    translated["iframeHeadline"] = [];
+    translated["iframeHeadline"]["he"] = "פייפלוס שאלות ותשובות";
+    translated["iframeHeadline"]["en"] = "Payplus FAQ";
+    console.log(translated);
+
+    const iframeHeadline = translated["iframeHeadline"][currentLanguage];
+
+    let $settingsContainer = jQuery(
+      '<div id="settingsContainer"><div class="tab-section-payplus" id="tab-payplus-gateway"></div><div class="right-tab-section-payplus"><h2>' +
+        iframeHeadline +
+        '</h2><iframe id="stickyFrame" width="500" height="100%" style="min-height: 500px;" src="https://www.payplus.co.il/faq/"</div></div>'
+    );
+    //Add all existing tables to .tab-section-payplus
+    $settingsContainer
+      .find(".tab-section-payplus")
+      .append(jQuery(".form-table"));
+    jQuery("#mainform").children().last().before($settingsContainer);
+    jQuery(".right-tab-section-payplus").css({
+      padding: "0 0 5% 0",
+      display: "block",
+      textAlign: "center",
+    });
 
     if (jQuery.inArray(sectionValue, ["payplus-invoice"]) >= 0) {
       for (let i = 0; i < classes.length; i++) {
@@ -414,17 +453,14 @@ function PayplusdisplayMenuInvoice() {
 
         $movableElements.appendTo($table);
         if (classes[i] !== ".payplus-api") {
-          jQuery("#mainform")
-            .children()
-            .last()
-            .before("<h2>" + headLines[classes[i]] + "</h2>");
-          jQuery("#mainform").children().last().before($table);
+          //add the fixed tables to .tab-section-payplus
+          $settingsContainer
+            .find(".tab-section-payplus")
+            .append("<h2>" + headLines[classes[i]] + "</h2>");
+          $settingsContainer.find(".tab-section-payplus").append($table);
         }
       }
       jQuery("h2").css("color", "#34aa54");
     }
-
-    // Step 4: Append the table to the container
-    // jQuery("#mainform").append($table);
   }
 }

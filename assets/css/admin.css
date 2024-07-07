@@ -213,47 +213,65 @@ html[lang="en-US"] .payplus-delete-error {
     flex-direction: column;
     align-content: center;
     flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tab-section-payplus {
+    background-color: #eff5f3;
+    border-radius: 10px;
+    padding: 5px;
+    width: 100%;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+    /* @media screen and (max-width: 1500px) {
+      width: 100%;
+    } */
   }
 
   .right-tab-section-payplus {
     width: 45%;
-    background-color: gray;
-    margin: 78px 0 5px 0;
+    /* background-color: gray; */
+    /* margin: 78px 0 5px 0; */
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
+    align-items: center;
+    align-content: flex-start;
+    flex-wrap: wrap;
+    padding: 5% 0 5% 0;
+    height: auto;
+    h2 {
+      color: #34aa54;
+    }
     @media screen and (max-width: 1500px) {
       width: 100%;
+      align-content: center;
     }
     .settingTitle {
-      min-height: 9%;
+      min-height: 500px;
       background-color: #ffffff;
       display: block;
       border-radius: 5px;
-      width: 65%;
+      width: 90%;
       margin: auto;
+      text-align: center;
+      &.fullHeight {
+        height: 100%;
+      }
       @media screen and (max-width: 1500px) {
         min-height: 300px;
         margin: 5% 0 0 0;
       }
     }
+
   }
 }
 
-.tab-section-payplus {
-  background-color: #eff5f3;
-  border-radius: 10px;
-  padding: 5px;
-  width: 100%;
-  margin: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  /* @media screen and (max-width: 1500px) {
-    width: 100%;
-  } */
-}
 
 #payplus-title-section {
   color: #34aa54;
@@ -573,7 +591,7 @@ html[lang="en-US"]
 }
 @media screen and (max-width: 700px) {
   #payplus-options {
-    padding: 0 15px;
+    /* padding: 0 15px; */
   }
   .tab-option-payplus a {
     width: 97%;

@@ -760,20 +760,22 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         function titleDivs($formFields, $currentSection)
         {
             $titles = null;
+            $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
+            // $links[] = '<iframe height="1200" width="100%" src="https://www.payplus.co.il/"></iframe>';
+
+            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%92%D7%93%D7%99%D7%A8-%D7%9B%D7%AA%D7%95%D7%91%D7%AA--Callback-URL"></iframe>';
+            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce"></iframe>';
+            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%97%D7%99%D7%91%D7%95%D7%A8-%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA--%D7%9C%D7%97%D7%A0%D7%95%D7%AA-WooCommerce"></iframe>';
+            $count = count($links);
+            $randomIndex = rand(0, $count - 1);
+            $c = 0;
             foreach ($formFields as $field) {
-                $titles = isset($field['type']) && $field['type'] === 'title' ? $titles .= '<div class="settingTitle">' . $field['title'] . '</div>' : $titles;
+                if (isset($field['type']) && $field['type'] === 'title') {
+                    $titles = isset($links[$c]) ? $titles .= '<div class="settingTitle fullHeight">' . $links[$c] . '</div>' : $titles;
+                    ++$c;
+                }
             }
-            return $titles ?? '<div class="settingTitle">' . $currentSection . '<div data-v-7e54c696="" data-v-424bec7a="" style="margin: 0px 0px 48px;"><p data-v-7e54c696="" data-v-424bec7a="" class="section-title q-mb-none text-center" style="font-size: 3.25rem; font-family: AlmoniRegular; margin-bottom: 0px;">
-        הירשמו
-        <span data-v-7e54c696="" data-v-424bec7a="" style="font-family: AlmoniDemiBold;">
-          עכשיו
-        </span>
-        וקבלו 57 ימי ניסיון
-        <span data-v-7e54c696="" data-v-424bec7a="" style="font-family: AlmoniDemiBold;">
-          בחינם!
-        </span></p> <a data-v-7e54c696="" href="/signup?inv=true&amp;ref=inv_btn" class="payplus-btn mt-4" data-v-424bec7a="" style="margin: auto;">
-        פתיחת חשבון
-      </a></div></div>';
+            return $titles ?? '<div class="settingTitle">' . $links[$randomIndex] . '</div>';
         }
 
         function hide($currentSection)
@@ -783,7 +785,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table " . hide($currentSection) . " fullWidth'>$settings</table>
-                    </div><div class='right-tab-section-payplus hide'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
+                    </div><div class='right-tab-section-payplus hide" . ' fullHeight' . "'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>
 
