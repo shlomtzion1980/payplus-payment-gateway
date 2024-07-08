@@ -246,6 +246,12 @@ html[lang="en-US"] .payplus-delete-error {
     border: solid 0.6px;
   }
 
+  #warningMessage {
+      border: .6px solid;
+      color: #ff0000;
+      text-align: center;
+  }
+
   .right-tab-section-payplus {
     width: 45%;
     /* background-color: gray; */

@@ -43,7 +43,6 @@ jQuery(function ($) {
     payplus_set_max_total();
   }
   //==================invoice not automatic  ======================
-  console.log(createInvoiceManual.val());
   if (createInvoiceManual && createInvoiceManual.val() === "no") {
     invoiceManualList.parents("tr").fadeOut();
   }

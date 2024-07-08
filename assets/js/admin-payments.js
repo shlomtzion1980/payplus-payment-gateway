@@ -369,8 +369,6 @@ if (
   let isTest = Boolean(payplus_script_admin.currentMode === "yes");
   let modeMessage = [];
 
-  console.log(currentLanguage);
-
   if (isTest) {
     modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
     modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
@@ -439,6 +437,29 @@ function payplusMenusDisplay() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   const section = urlParams.get("section");
+  const transactionType = payplus_script_admin.payplusTransactionType;
+
+  if (
+    section === "payplus-payment-gateway-multipass" &&
+    Number(transactionType) === 2
+  ) {
+    let message = [];
+    message["en"] =
+      "Authorization Mode On - MULTIPASS will not be displayed on the PayPlus payment page!";
+    message["he"] =
+      "מצב תפיסת מסגרת מופעל - מולטיפס לא יופיע בעמוד החיוב של פייפלוס!";
+
+    let transactionTypeMessage;
+    var $firstInputWithId = jQuery("#mainform input[id]").first();
+
+    transactionTypeMessage = jQuery(
+      "<tr><td id='warningMessage'>" +
+        message[currentLanguage] +
+        "</td></tr></tr>"
+    );
+    $firstInputWithId.closest("tr").before(transactionTypeMessage);
+  }
+
   if (
     section == "payplus-invoice" ||
     section == "payplus-payment-gateway-setup-wizard" ||
@@ -479,8 +500,6 @@ function payplusMenusDisplay() {
       currentLanguage === "he" ? "התראות" : "Notifications";
 
     let tables = {};
-    let urlParams = new URLSearchParams(queryString);
-    let sectionValue = urlParams.get("section");
     //Create settingsContainer
     let translated = [];
 
@@ -497,7 +516,7 @@ function payplusMenusDisplay() {
       '<iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
 
     let iframeToShow =
-      sectionValue === "payplus-invoice"
+      section === "payplus-insvoice"
         ? iframes["payplus-invoice"]
         : iframes["payplus-faq"];
     let $settingsContainer = jQuery(

@@ -85,7 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
-* Fix    - On bit successful transactions through "Meshulam Pay" the redirect to thank you page is now corrected for both mobile and desktop.
+* Fix    - On bit successful transactions through "uPay" the redirect to thank you page is now corrected for both mobile and desktop.
+* Add    - Admin settings visual changes - In an approach to make the plugin setup easier and clearer.
+* Add    - Show current API environment mode.
+* Add    - According to the current API environment mode, display the correct set of keys and hide the other.
+* Add    - In MULTIPASS method settings - Show warning if transaction type is set for "Authorization" - MULTIPASS only works with "Charge".
+* Add    - Iframe display of PayPlus FAQ pages plugin settings.
+
 
 = 7.0.7 = 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
