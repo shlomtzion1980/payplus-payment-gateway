@@ -366,7 +366,10 @@ if (
     }
   });
   let currentMode;
-  let isTest = Boolean(payplus_script_admin.currentMode === "yes");
+  let isTest =
+    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
+    "yes";
+
   let modeMessage = [];
 
   if (isTest) {
