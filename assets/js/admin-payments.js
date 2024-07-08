@@ -541,7 +541,7 @@ function payplusMenusDisplay() {
       jQuery(".right-tab-section-payplus").css("display", "none");
     }
 
-    if (jQuery.inArray(sectionValue, ["payplus-invoice"]) >= 0) {
+    if (jQuery.inArray(section, ["payplus-invoice"]) >= 0) {
       for (let i = 0; i < classes.length; i++) {
         let $thead = jQuery("<thead></thead>");
         let $headerRow = jQuery("<tr></tr>");
