@@ -138,8 +138,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->block_ip_transactions = $this->get_option('block_ip_transactions') == 'yes' ? true : false;
         $this->is_Local_pickup = $this->get_option('is_Local_pickup') == 'yes' ? true : false;
         $this->block_ip_transactions_hour = $this->get_option('block_ip_transactions_hour');
-        $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') : $this->get_option('api_key');
-        $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') : $this->get_option('secret_key');
+        $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
+        $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
         $this->payment_page_id = $this->get_option('payment_page_id');
 
         $this->rounding_decimals = ROUNDING_DECIMALS;
