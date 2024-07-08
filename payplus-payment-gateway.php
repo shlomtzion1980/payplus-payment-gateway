@@ -325,7 +325,12 @@ class WC_PayPlus
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
         if (version_compare($required_php_version, $php_version, '>')) {
-            $message = sprintf(__('Your server is running PHP version %1$s but some features requires at least %2$s.', 'payplus-payment-gateway'), $php_version, $required_php_version);
+            $message = sprintf(
+                /* translators: %1$s: Current PHP version, %2$s: Required PHP version */
+                __('Your server is running PHP version %1$s but some features require at least %2$s.', 'payplus-payment-gateway'),
+                $php_version,
+                $required_php_version
+            );
             $this->add_admin_notice('warning', $message);
         }
 
