@@ -228,14 +228,14 @@ html[lang="en-US"] .payplus-delete-error {
   .tab-section-payplus {
     background-color: #eff5f3;
     border-radius: 10px;
-    padding: 5px;
-    width: 80%;
+    width: 60%;
     margin: auto;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    align-content: flex-start;
+    align-content: center;
     flex-wrap: wrap;
+    position: relative;
     @media screen and (max-width: 1500px) {
       width: 100%;
     }
@@ -250,9 +250,9 @@ html[lang="en-US"] .payplus-delete-error {
   }
 
   #warningMessage {
-      border: .6px solid;
-      color: #ff0000;
-      text-align: center;
+    border: 0.6px solid;
+    color: #ff0000;
+    text-align: center;
   }
 
   .right-tab-section-payplus {
@@ -266,7 +266,7 @@ html[lang="en-US"] .payplus-delete-error {
     align-items: center;
     align-content: flex-start;
     flex-wrap: wrap;
-    padding: 5% 0 5% 0;
+    /* padding: 5% 0 5% 0; */
     height: auto;
     h2 {
       color: #34aa54;
@@ -277,13 +277,14 @@ html[lang="en-US"] .payplus-delete-error {
       display: none !important;
     }
     .settingTitle {
-      min-height: 500px;
-      background-color: #ffffff;
+      min-height: 90%;
+      /* background-color: #ffffff; */
       display: block;
       border-radius: 5px;
       width: 90%;
       margin: auto;
       text-align: center;
+      overflow: hidden;
       &.fullHeight {
         height: 100%;
       }
@@ -325,6 +326,7 @@ html[lang="en-US"] .payplus-delete-error {
   flex-direction: column;
   background: #fcfffc;
   border-collapse: separate;
+  /* max-width: 80%; */
   @media screen and (min-width: 1400px) {
     max-width: 80%;
   }

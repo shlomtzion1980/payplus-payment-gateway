@@ -338,13 +338,13 @@ if (
   jQuery(window).on("scroll", function () {
     var offset = $specificDiv.offset();
     var scrollTop = jQuery(window).scrollTop();
-    let sideAmount = "10%";
+    let sideAmount = "2%";
     if (
       jQuery(".right-tab-section-payplus").length &&
       jQuery(window).width() > 1400 &&
       jQuery(".right-tab-section-payplus").css("display") !== "none"
     ) {
-      sideAmount = "35%";
+      sideAmount = "37.5%";
     }
     let side = "right";
     if (jQuery("body").hasClass("rtl")) {
@@ -561,9 +561,9 @@ function payplusMenusDisplay() {
 
     const iframes = [];
     iframes["payplus-invoice"] =
-      '<iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%97%D7%99%D7%91%D7%95%D7%A8-%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA--%D7%9C%D7%97%D7%A0%D7%95%D7%AA-WooCommerce"></iframe>';
+      '<iframe height="97%" width="80%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%97%D7%99%D7%91%D7%95%D7%A8-%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA--%D7%9C%D7%97%D7%A0%D7%95%D7%AA-WooCommerce"></iframe>';
     iframes["payplus-faq"] =
-      '<iframe height="100%" width="100%" src="https://www.payplus.co.il/faq/"></iframe>';
+      '<iframe height="97%" width="80%" src="https://www.payplus.co.il/faq/"></iframe>';
 
     let iframeToShow =
       section === "payplus-insvoice"
