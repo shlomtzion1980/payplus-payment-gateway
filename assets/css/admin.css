@@ -211,7 +211,7 @@ html[lang="en-US"] .payplus-delete-error {
 } */
 .woocommerce-save-button {
   background-color: #34aa54 !important;
-  border-radius: 30px;
+  border-radius: 30px !important;
   color: white;
 }
 #settingsContainer {
