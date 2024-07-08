@@ -386,6 +386,9 @@ if (
     jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
       .closest("tr")
       .show();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
+      .closest("tr")
+      .show();
     jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
       .closest("tr")
       .find("label")
@@ -394,9 +397,15 @@ if (
       .closest("tr")
       .find("label")
       .css({ color: "#34aa54" });
-
+    jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
     jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").hide();
     jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
       .closest("tr")
       .hide();
   } else {
@@ -413,8 +422,14 @@ if (
     jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
       .closest("tr")
       .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
+      .closest("tr")
+      .hide();
     jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").show();
     jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .show();
+    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
       .closest("tr")
       .show();
     jQuery("#woocommerce_payplus-payment-gateway_secret_key")
@@ -422,6 +437,10 @@ if (
       .find("label")
       .css({ color: "#34aa54" });
     jQuery("#woocommerce_payplus-payment-gateway_api_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
       .closest("tr")
       .find("label")
       .css({ color: "#34aa54" });

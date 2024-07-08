@@ -169,11 +169,17 @@ class WC_PayPlus_Form_Fields
                 'default' => '',
                 'desc_tip' => true,
             ],
-
             'secret_key' => [
                 'title' => __('Secret Key', 'payplus-payment-gateway'),
                 'type' => 'text',
                 'description' => __('PayPlus Secret Key you can find in your account under Settings', 'payplus-payment-gateway'),
+                'default' => '',
+                'desc_tip' => true,
+            ],
+            'payment_page_id' => [
+                'title' => __('Payment Page UID', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'description' => __('Your payment page UID can be found under Payment Pages in your side menu in PayPlus account', 'payplus-payment-gateway'),
                 'default' => '',
                 'desc_tip' => true,
             ],
@@ -192,10 +198,10 @@ class WC_PayPlus_Form_Fields
                 'default' => '',
                 'desc_tip' => true,
             ],
-            'payment_page_id' => [
-                'title' => __('Payment Page UID', 'payplus-payment-gateway'),
+            'dev_payment_page_id' => [
+                'title' => __('Development Payment Page UID', 'payplus-payment-gateway'),
                 'type' => 'text',
-                'description' => __('Your payment page UID can be found under Payment Pages in your side menu in PayPlus account', 'payplus-payment-gateway'),
+                'description' => __('Your Dev payment page UID can be found under Payment Pages in your side menu in PayPlus account', 'payplus-payment-gateway'),
                 'default' => '',
                 'desc_tip' => true,
             ],
@@ -240,9 +246,11 @@ class WC_PayPlus_Form_Fields
                 'default' => 700,
             ],
             'hide_icon' => [
-                'title' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
+                'title' => __('Hide PayPlus Icon', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
+                'description' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
                 'label' => __('Hide PayPlus Icon In The Checkout Page', 'payplus-payment-gateway'),
+                'desc_tip' => true,
                 'default' => 'no',
             ],
             'create_pp_token' => [

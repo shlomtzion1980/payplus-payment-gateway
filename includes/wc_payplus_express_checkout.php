@@ -5,6 +5,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     public $isExpressCheckout;
     public $isAppleEnabled;
     public $isGoogleEnabled;
+    public $paymentPageId;
 
     /**
      *
@@ -15,6 +16,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $this->payPlusGateWaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
         $this->isAppleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_apple_pay']) && $this->payPlusGateWaySettings['enable_apple_pay'] === 'yes');
         $this->isGoogleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_google_pay']) && $this->payPlusGateWaySettings['enable_google_pay'] === 'yes');
+        $this->paymentPageId = isset($this->payPlusGateWaySettings['api_test_mode']) && $this->payPlusGateWaySettings['api_test_mode'] === 'yes' ? $this->payPlusGateWaySettings['dev_payment_page_id'] ?? null : $this->payPlusGateWaySettings['payment_page_id'] ?? null;
 
         if ($this->isAppleEnabled || $this->isGoogleEnabled) {
             add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
@@ -86,7 +88,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $url = $WC_PayPlus_Gateway->api_url . 'ApplePay/PaymentSessionOneClickCheckout';
         $obj = $_POST['obj'];
-        $arr['payment_page_uid'] = $WC_PayPlus_Gateway->payment_page_id;
+        $arr['payment_page_uid'] = $this->paymentPageId;
         $arr['display_name'] = get_bloginfo('name') ? get_bloginfo('name') : site_url();
         $arr['website'] = site_url();
         $arr['identifier_express_checkout'] = $WC_PayPlus_Gateway->token_apple_pay;
@@ -349,7 +351,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $resObj = null;
         if (!empty($_POST)) {
 
-            $payload['payment_page_uid'] = $WC_PayPlus_Gateway->payment_page_id;
+            $payload['payment_page_uid'] = $this->paymentPageId;
             $payload['method'] = $_POST['method'];
             $payload['domain'] = site_url();
             $method = $_POST['method'];

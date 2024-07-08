@@ -134,13 +134,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $this->title = $this->get_option('title');
         $this->description = $this->get_option('description');
-        $this->api_test_mode = $this->get_option('api_test_mode') == 'yes' ? true : false;
+        $this->api_test_mode = $this->get_option('api_test_mode') === 'yes' ? true : false;
         $this->block_ip_transactions = $this->get_option('block_ip_transactions') == 'yes' ? true : false;
         $this->is_Local_pickup = $this->get_option('is_Local_pickup') == 'yes' ? true : false;
         $this->block_ip_transactions_hour = $this->get_option('block_ip_transactions_hour');
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
-        $this->payment_page_id = $this->get_option('payment_page_id');
+        $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
 
         $this->rounding_decimals = ROUNDING_DECIMALS;
         $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
@@ -1611,7 +1611,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
 
         $payload = '{
-            "payment_page_uid": "' . $this->settings['payment_page_id'] . '",
+            "payment_page_uid": "' . $this->payment_page_id . '",
             ' . $addChargeLine . '
             "expiry_datetime": "30",
             "hide_other_charge_methods": ' . $hideOtherChargeMethods . ',
@@ -2616,7 +2616,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $langCode = explode("_", get_locale());
         $payload = '{
-            "payment_page_uid": "' . $this->settings['payment_page_id'] . '",
+            "payment_page_uid": "' . $this->payment_page_id . '",
             "charge_method": 5,
             "language_code": "' . $langCode[0] . '",
             "expiry_datetime": "30",
