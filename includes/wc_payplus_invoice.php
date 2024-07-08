@@ -352,7 +352,7 @@ class PayplusInvoice
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  ) ');
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
-        $payload = json_encode($payload);
+        $payload = wp_json_encode($payload);
 
         $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $typeDocument, $payload);
 
@@ -368,7 +368,7 @@ class PayplusInvoice
                 $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
                 $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
                 $refundsArray[$res->details->number]['type'] = $nameRefund;
-                $insetData["payplus_refunds"] = json_encode($refundsArray);
+                $insetData["payplus_refunds"] = wp_json_encode($refundsArray);
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
@@ -483,7 +483,7 @@ class PayplusInvoice
     public function createRefundInvoice($order_id, $documentType, $payload, $nameDocment)
     {
         $order = wc_get_order($order_id);
-        $payload = json_encode($payload);
+        $payload = wp_json_encode($payload);
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');
@@ -501,7 +501,7 @@ class PayplusInvoice
                 $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
                 $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
                 $refundsArray[$res->details->number]['type'] = $nameDocment;
-                $insetData["payplus_refunds"] = json_encode($refundsArray);
+                $insetData["payplus_refunds"] = wp_json_encode($refundsArray);
                 $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
                 $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
                 $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
@@ -565,11 +565,11 @@ class PayplusInvoice
                 $resultinvoice = $this->payplus_create_dcoment($order_id, 'inv_refund', '', REFUND_INVOICE);
                 $resultReceipt = $this->payplus_create_dcoment($order_id, "inv_refund_receipt", '', REFUND_RECEIPT);
                 if ($resultinvoice && $resultReceipt) {
-                    echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refund' => true));
                     wp_die();
                 } else {
-                    echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
                     wp_die();
                 }
             } else {
@@ -577,11 +577,11 @@ class PayplusInvoice
                 $resultinvoice = $this->payplus_create_dcoment($order_id, $payplus_document_type, '', $nameRefund);
 
                 if ($resultinvoice) {
-                    echo json_encode(array("urlredirect" => $urlEdit, "status" => true));
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refund' => true));
                     wp_die();
                 } else {
-                    echo json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
                     wp_die();
                 }
             }
@@ -1200,7 +1200,7 @@ class PayplusInvoice
                         }
                     }
 
-                    $payload = json_encode($payload);
+                    $payload = wp_json_encode($payload);
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 

@@ -11,7 +11,7 @@
  * Author: PayPlus LTD
  * Author URI: https://www.payplus.co.il/
  * License: GPLv2 or later
- * Text Domain: PayPlus Payment Gateway Plugin
+ * Text Domain: payplus-payment-gateway
  */
 
 defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if accessed directly
@@ -88,7 +88,7 @@ class WC_PayPlus
         foreach ($customerTokens as $customerToken) {
             $theTokens[] = $customerToken->get_token();
         };
-        echo json_encode($theTokens);
+        echo wp_json_encode($theTokens);
         wp_die();
     }
 
@@ -128,7 +128,8 @@ class WC_PayPlus
             $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
             $sql = $wpdb->prepare(
-                'SELECT id as rowId, count(*) as rowCount, count_process FROM ' . $tblname . ' WHERE order_id = %d AND ( status_code = %d )',
+                'SELECT id as rowId, count(*) as rowCount, count_process FROM %s WHERE order_id = %d AND ( status_code = %d )',
+                $tblname,
                 $order_id,
                 $status_code
             );

@@ -93,20 +93,20 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $arr['website'] = site_url();
         $arr['identifier_express_checkout'] = $WC_PayPlus_Gateway->token_apple_pay;
         $arr['url_validation'] = $obj['urlValidation'];
-        $arr = json_encode($arr);
+        $arr = wp_json_encode($arr);
         $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($arr, true), 'payload');
         $resp = $WC_PayPlus_Gateway->post_payplus_ws($url, $arr);
         $res = json_decode(wp_remote_retrieve_body($resp));
         $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($res, true), 'completed');
         if ($res) {
-            echo json_encode(array("payment_response" => $res, "status" => true));
+            echo wp_json_encode(array("payment_response" => $res, "status" => true));
             wp_die();
         } else {
             $resError = array('results' => array(
                 'description' => __('Cannot process the transaction. Contact your merchant. Error during validate merchant', 'payplus-payment-gateway'),
                 'code' => '-1'
             ));
-            echo json_encode(array("payment_response" => $resError, "status" => false));
+            echo wp_json_encode(array("payment_response" => $resError, "status" => false));
             wp_die();
         }
     }
@@ -238,7 +238,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $arrJson = array_merge($arrJson, $payload);
             $arrJson['paying_vat'] = isset($obj['paying_vat']) ? $obj['paying_vat'] : $arrJson['paying_vat'];
 
-            $payload = json_encode($arrJson);
+            $payload = wp_json_encode($arrJson);
 
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'New Payment Process Fired (' . $order_id . ')');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', '', 'before-payload');
@@ -266,7 +266,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                 !is_null($paymentInfo['cardDetails']) ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] . 'cardDetails' => $paymentInfo['cardDetails'])) : null;
                                 !is_null($paymentInfo['cardNetwork']) ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] . 'cardNetwork' => $paymentInfo['cardNetwork'])) : null;
                             }
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => json_encode($res)));
+                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => wp_json_encode($res)));
                             WC_PayPlus_Meta_Data::update_meta($order, array('payplus_' . $obj['method'] => $order->get_total()));
                             if ($order->get_user_id() > 0) {
                                 update_user_meta($order->get_user_id(), 'cc_token', $inData['data']->card_information->token);
@@ -315,20 +315,20 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                             }
                             $return_url = $WC_PayPlus_Gateway->get_return_url($order);
                         }
-                        echo json_encode(array("link" => $return_url, "status" => true));
+                        echo wp_json_encode(array("link" => $return_url, "status" => true));
                     } else {
-                        echo json_encode(array("payment_response" => $res, "status" => false));
+                        echo wp_json_encode(array("payment_response" => $res, "status" => false));
                     }
                 } else {
                     if (empty($res)) {
                         $res = $resError;
                     }
-                    echo json_encode(array("payment_response" => $res, "status" => false));
+                    echo wp_json_encode(array("payment_response" => $res, "status" => false));
                 }
                 wp_die();
             }
         }
-        echo json_encode(array("payment_response" => "", "status" => false));
+        echo wp_json_encode(array("payment_response" => "", "status" => false));
         wp_die();
     }
 
@@ -366,12 +366,12 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         ),
                         'code' => '-1'
                     ));
-                    echo json_encode(array("response_initialized" => $res, "status" => false));
+                    echo wp_json_encode(array("response_initialized" => $res, "status" => false));
                     wp_die();
                 }
             }
 
-            $payload = json_encode($payload);
+            $payload = wp_json_encode($payload);
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', '', 'before-payload');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', print_r($payload, true), 'payload');
             $response = $WC_PayPlus_Gateway->post_payplus_ws($url, $payload);
@@ -393,14 +393,14 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         $payplus_payment_gateway_settings['enable_apple_pay'] = "yes";
                     }
                     update_option('woocommerce_payplus-payment-gateway_settings', $payplus_payment_gateway_settings);
-                    echo json_encode(array("response_initialized" => $resObj, "status" => true));
+                    echo wp_json_encode(array("response_initialized" => $resObj, "status" => true));
                 } else {
-                    echo json_encode(array("response_initialized" => $res, "status" => false));
+                    echo wp_json_encode(array("response_initialized" => $res, "status" => false));
                 }
                 wp_die();
             }
         }
-        echo json_encode(array("response_initialized" => $res, "status" => false));
+        echo wp_json_encode(array("response_initialized" => $res, "status" => false));
         wp_die();
     }
 
@@ -431,7 +431,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 }
             }
         }
-        echo json_encode(array("paying_vat" => $paying_vat));
+        echo wp_json_encode(array("paying_vat" => $paying_vat));
         wp_die();
     }
 
@@ -514,7 +514,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $taxGlobal = round(WC()->cart->get_total_tax() - WC()->cart->get_shipping_tax(), ROUNDING_DECIMALS);
             $error = $totalAll['total'] == 0;
 
-            echo json_encode(array("error" => $error, "total" => $totalAll['total'], "products" => $products, "total_without_tax" => $subTotalAll, 'discountPrice' => $discountPrice ? $discountPrice : 0, "taxGlobal" => $taxGlobal));
+            echo wp_json_encode(array("error" => $error, "total" => $totalAll['total'], "products" => $products, "total_without_tax" => $subTotalAll, 'discountPrice' => $discountPrice ? $discountPrice : 0, "taxGlobal" => $taxGlobal));
         }
         wp_die();
     }
@@ -879,7 +879,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         if (!count($all_shipping_costs)) {
             return false;
         }
-        return json_encode($all_shipping_costs);
+        return wp_json_encode($all_shipping_costs);
     }
 }
 new WC_PayPlus_Express_Checkout();

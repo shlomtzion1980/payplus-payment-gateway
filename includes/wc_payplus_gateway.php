@@ -338,7 +338,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Retrieve the signature from the headers
         $signature = isset($_SERVER['HTTP_X_SIGNATURE']) ? $_SERVER['HTTP_X_SIGNATURE'] : '';
         // Retrieve the request body
-        $body = json_encode(json_decode(file_get_contents('php://input')));
+        $body = wp_json_encode(json_decode(file_get_contents('php://input')));
         // Generate the expected signature
         $expected_signature = hash_hmac('sha256', $body, $shared_secret);
         // Verify the signature
@@ -609,7 +609,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $payload['initial_invoice'] = false;
             }
 
-            $payload = json_encode($payload);
+            $payload = wp_json_encode($payload);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
             $response = $this->post_payplus_ws($this->refund_url, $payload);
 
@@ -911,7 +911,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 }
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                 // Add payments data to the DB
-                $inData = json_decode(json_encode($response->data), true);
+                $inData = json_decode(wp_json_encode($response->data), true);
                 $this->payplus_add_order($order_id, $inData);
             } else {
                 if ($this->display_mode !== 'iframe') {
@@ -1058,7 +1058,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $external_recurring_payment['external_recurring_range'] = $billing_interval * 12;
         }
 
-        return json_encode($external_recurring_payment);
+        return wp_json_encode($external_recurring_payment);
     }
 
     /**
@@ -1386,7 +1386,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
                 }
                 if ($productPrice) {
-                    $productsItems[] = ($json) ? json_encode($itemDetails) : $itemDetails;
+                    $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
                 }
             }
         }
@@ -1401,7 +1401,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'is_summary_item' => true,
 
             ];
-            $productsItems[] = ($json) ? json_encode($itemDetails) : (object) $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : (object) $itemDetails;
             $totalCartAmount += $productPrice;
         }
         $shipping_methods = $order->get_shipping_methods();
@@ -1430,7 +1430,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'quantity' => 1,
                     'price' => $productPrice,
                 ];
-                $productsItems[] = ($json) ? json_encode($itemDetails) : $itemDetails;
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
                 $totalCartAmount += $productPrice;
             }
             // }
@@ -1452,7 +1452,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'quantity' => 1,
                 'price' => round($productCouponPrice, $this->rounding_decimals),
             ];
-            $productsItems[] = ($json) ? json_encode($itemDetails) : $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
         }
 
         $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');
@@ -1473,7 +1473,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'quantity' => 1,
                 'price' => $priceGift,
             ];
-            $productsItems[] = ($json) ? json_encode($itemDetails) : $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
             $totalCartAmount += $priceGift;
         }
         $totalCartAmount = round($totalCartAmount, $this->rounding_decimals);
@@ -1520,7 +1520,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         }
 
-        $customer = (count($customer)) ? '"customer":' . json_encode($customer) . "," : "";
+        $customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
         $redriectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard : $this->response_url . "&success_order_id=$order_id";
         $setInvoice = '';
         $payingVat = '';
@@ -1642,7 +1642,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $json_move_token . '}';
         $payloadArray = json_decode($payload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
-        $payload = json_encode($payloadArray);
+        $payload = wp_json_encode($payloadArray);
         return $payload;
     }
 
@@ -1947,7 +1947,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $payload['more_info'] = $order_id;
                     }
                     $payload['related_transaction'] = true;
-                    $payload = json_encode($payload);
+                    $payload = wp_json_encode($payload);
                     $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
                     $this->requestPayPlusIpn($payload, $inData, 1, $handle);
                 }
@@ -2072,7 +2072,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $payload['related_transaction'] = true;
 
-        $payload = json_encode($payload);
+        $payload = wp_json_encode($payload);
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
         $flag = $this->requestPayPlusIpn($payload, $data);
@@ -2530,7 +2530,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $insertMeta['payplus_' . $appVars[$i]] = wc_clean($value);
         }
         $insertMeta['payplus_refunded'] = $order->get_total();
-        $insertMeta['payplus_response'] = json_encode($response, true);
+        $insertMeta['payplus_response'] = wp_json_encode($response, true);
         WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
     }
 
@@ -2612,7 +2612,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $customerBilling['country_iso'] = $customer->get_billing_country();
         $customerBilling['customer_external_number'] = $current_user->ID;
 
-        $customerData = json_encode($customerBilling);
+        $customerData = wp_json_encode($customerBilling);
 
         $langCode = explode("_", get_locale());
         $payload = '{
@@ -2851,7 +2851,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'type_payment' => $dataRow['transaction']->type,
             'token_uid' => (!empty($dataRow['data']->card_information->token)) ? $dataRow['data']->card_information->token : '',
             'price' => floatval($dataRow['transaction']->amount) * 100,
-            'payplus_response' => json_encode($dataRow),
+            'payplus_response' => wp_json_encode($dataRow),
             'related_transactions' => 0,
             'status_code' => $dataRow['transaction']->status_code,
             'delete_at' => 0,
@@ -2900,7 +2900,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'type_payment' => $dataRow['type'],
                 'token_uid' => (!empty($dataRow['token_uid'])) ? $dataRow['token_uid'] : '',
                 'price' => floatval($dataRow['amount']) * 100,
-                'payplus_response' => json_encode($dataRow),
+                'payplus_response' => wp_json_encode($dataRow),
                 'related_transactions' => ($is_multiple_transaction) ? 1 : 0,
                 'status_code' => $dataRow['status_code'],
                 'delete_at' => 0,
@@ -2937,7 +2937,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'type_payment' => $dataRow['type'],
                         'token_uid' => (!empty($dataRow['token_uid'])) ? $dataRow['token_uid'] : '',
                         'price' => floatval($dataRow['amount']) * 100,
-                        'payplus_response' => json_encode($dataRow),
+                        'payplus_response' => wp_json_encode($dataRow),
                         'delete_at' => 0,
                     );
                     $wpdb->insert(

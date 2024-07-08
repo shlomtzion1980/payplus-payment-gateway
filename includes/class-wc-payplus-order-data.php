@@ -113,7 +113,7 @@ class WC_PayPlus_Meta_Data
             $currentStatus = $order->get_status();
             $payload['transaction_uid'] = $transactionUid;
             $payload['more_info_5'] = "$currentStatus => $newStatus";
-            $payload = json_encode($payload);
+            $payload = wp_json_encode($payload);
             WC_PayPlus_Statics::payplusPost($payload, "post");
         }
     }
