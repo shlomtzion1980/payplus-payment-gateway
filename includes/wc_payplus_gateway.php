@@ -1743,7 +1743,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->get_payment_page($dataLink->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
-                echo __('Something went wrong with the payment page') . '<hr /><b>Error:</b> ' . print_r((is_array($response) ? $response['body'] : $response->body), true);
+                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_htm(print_r((is_array($response) ? $response['body'] : $response->body), true));
             }
         }
     }
@@ -2640,7 +2640,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (is_wp_error($response)) {
             $this->payplus_add_log_all($handle, print_r($response, true), 'error');
-            echo __('Something went wrong with the payment page') . '<hr /><b>Error:</b> ' . print_r(($response), true);
+            echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r(($response), true));
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
@@ -2648,7 +2648,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->get_payment_page($res->data->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, print_r($res, true), 'error');
-                echo __('Something went wrong with the payment page') . '<hr /><b>Error:</b> ' . print_r((is_array($response) ? $response['body'] : $response->body), true);
+                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r((is_array($response) ? $response['body'] : $response->body), true));
             }
         }
     }

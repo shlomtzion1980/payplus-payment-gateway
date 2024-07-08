@@ -405,6 +405,7 @@ function payplus_check_table_exist_db($nameTable)
 {
 
     global $wpdb;
+    $nameTable = esc_sql($nameTable);
     if ($wpdb->get_var("show tables like '$nameTable'") != $nameTable) {
         return false;
     }

@@ -56,7 +56,6 @@ class WC_PayPlus
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('woocommerce_order_status_changed', [$this, 'payplus_order_status_changed_action'], 50, 4);
         add_action('wp_ajax_payplus-check-tokens', [$this, 'ajax_payplus_check_tokens']);
-        add_action('wp_ajax_payplus-delete-token', [$this, 'ajax_payplus_delete_token']);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -90,55 +89,6 @@ class WC_PayPlus
             $theTokens[] = $customerToken->get_token();
         };
         echo json_encode($theTokens);
-        wp_die();
-    }
-
-    /**
-     * @param int $order_id
-     * @param int $meta_key
-     * @return void
-     */
-    public function removeOrderMetaField($order_id, $meta_key)
-    {
-        global $wpdb;
-        $tblname = $wpdb->prefix . 'wc_orders_meta';
-        //$meta_key = 'payplus_token_uid';
-
-        // Prepare the SQL query to delete the meta field
-        $sql = $wpdb->prepare(
-            "
-    DELETE FROM $tblname
-    WHERE order_id = %d
-    AND meta_key = %s
-    ",
-            $order_id,
-            $meta_key
-        );
-        // Execute the query
-        $result = $wpdb->query($sql);
-
-        if (false === $result) {
-            // There was an error executing the query
-            // echo "Error deleting meta field.";
-        } else {
-            // Meta field deleted successfully
-            // echo "Meta field deleted successfully.";
-        }
-    }
-
-    /**
-     * Deletes the token from the order meta
-     * @param int $order_id
-     * @param string $status
-     * @param string $old_status
-     * @param WC_Order $order
-     * @return void
-     */
-    public function ajax_payplus_delete_token()
-    {
-        $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
-        delete_post_meta($order_id, 'payplus_token_uid');
-        $this->removeOrderMetaField($order_id, 'payplus_token_uid');
         wp_die();
     }
 
@@ -259,8 +209,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -571,8 +521,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
 <?php
         $html = ob_get_clean();
         echo $html;
@@ -907,10 +857,18 @@ class WC_PayPlus
         if (count($adminTabs)) {
             echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($adminTabs as $key => $arrValue) {
+                $allowed_html = array(
+                    'img' => array(
+                        'src' => true,
+                        'alt' => true,
+                        // Add other allowed attributes as needed
+                    ),
+                );
+                $img_html = wp_kses($arrValue['img'], $allowed_html);
                 $selected = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $selected . "' >
-                               " . $arrValue['img'] .
-                    $arrValue['name'] .
+                echo "<a href='" . esc_url($arrValue['link']) . "'  class='nav-tab " . $selected . "' >
+                               " . $img_html .
+                    esc_html($arrValue['name']) .
                     "</a>";
             }
             echo "</nav>";
