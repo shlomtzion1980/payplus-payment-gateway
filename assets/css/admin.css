@@ -236,9 +236,9 @@ html[lang="en-US"] .payplus-delete-error {
     align-items: flex-start;
     align-content: flex-start;
     flex-wrap: wrap;
-    /* @media screen and (max-width: 1500px) {
+    @media screen and (max-width: 1500px) {
       width: 100%;
-    } */
+    }
   }
 
   #currentMode {
