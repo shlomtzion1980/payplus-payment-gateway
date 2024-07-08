@@ -76,7 +76,6 @@ jQuery(function ($) {
   });
   /******     Eliat start **remove***/
   if (!changeVatInEliat.prop("checked")) {
-    console.log("not checked");
     keywordsEilat.closest("tr").fadeOut();
   }
   $(".invoice-manual-list").change(function () {

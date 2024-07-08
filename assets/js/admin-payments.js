@@ -365,23 +365,8 @@ if (
       $saveButton.css(side, sideAmount);
     }
   });
-  let currentMode;
-  let isTest =
-    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
-    "yes";
-  let modeMessage = [];
 
-  if (
-    isTest &&
-    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() === "yes"
-  ) {
-    modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
-    modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
-    currentMode = jQuery(
-      "<tr><td id='currentMode'>" +
-        modeMessage[currentLanguage] +
-        "</td></tr></tr>"
-    );
+  function showDevs() {
     jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
       .closest("tr")
       .show();
@@ -410,6 +395,69 @@ if (
     jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
       .closest("tr")
       .hide();
+  }
+
+  function showProds() {
+    jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
+      .closest("tr")
+      .hide();
+    jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").show();
+    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .show();
+    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+      .closest("tr")
+      .show();
+    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+    jQuery("#woocommerce_payplus-payment-gateway_api_key")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+      .closest("tr")
+      .find("label")
+      .css({ color: "#34aa54" });
+  }
+
+  jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").change(
+    function () {
+      if (
+        jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
+        "yes"
+      ) {
+        showDevs();
+      } else if (
+        jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
+        "no"
+      ) {
+        showProds();
+      }
+    }
+  );
+
+  let currentMode;
+  let modeMessage = [];
+
+  if (
+    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() === "yes"
+  ) {
+    modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
+    modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
+    currentMode = jQuery(
+      "<tr><td id='currentMode'>" +
+        modeMessage[currentLanguage] +
+        "</td></tr></tr>"
+    );
+    showDevs();
   } else {
     if (
       jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
@@ -422,36 +470,7 @@ if (
           modeMessage[currentLanguage] +
           "</td></tr></tr>"
       );
-      jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
-        .closest("tr")
-        .hide();
-      jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
-        .closest("tr")
-        .hide();
-      jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
-        .closest("tr")
-        .hide();
-      jQuery("#woocommerce_payplus-payment-gateway_api_key")
-        .closest("tr")
-        .show();
-      jQuery("#woocommerce_payplus-payment-gateway_secret_key")
-        .closest("tr")
-        .show();
-      jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
-        .closest("tr")
-        .show();
-      jQuery("#woocommerce_payplus-payment-gateway_secret_key")
-        .closest("tr")
-        .find("label")
-        .css({ color: "#34aa54" });
-      jQuery("#woocommerce_payplus-payment-gateway_api_key")
-        .closest("tr")
-        .find("label")
-        .css({ color: "#34aa54" });
-      jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
-        .closest("tr")
-        .find("label")
-        .css({ color: "#34aa54" });
+      showProds();
     }
   }
   var $firstInputWithId = jQuery("#mainform input[id]").first();
