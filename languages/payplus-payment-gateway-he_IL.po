@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-07-08 08:55+0300\n"
-"PO-Revision-Date: 2024-07-08 08:55+0300\n"
+"POT-Creation-Date: 2024-07-08 11:04+0300\n"
+"PO-Revision-Date: 2024-07-08 11:05+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -1744,10 +1744,8 @@ msgstr "הצג את דף הסליקה באתר שלך באמצעות (IFrame)"
 
 #: includes/wc_payplus_subgateways.php:109
 #: includes/wc_payplus_subgateways.php:111
-#, fuzzy
-#| msgid "Hide PayPlus Icon In The Checkout Page"
 msgid "Hide Payment Method Icon In The Checkout Page"
-msgstr "הסתר אייקון של פיי פלוס בסל קניות"
+msgstr "הסתר אייקון של שיטת התשלום בעמוד התשלום (של ווקומרס)"
 
 #: includes/wc_payplus_subgateways.php:115
 msgid "Hide other payment types on payment page"
