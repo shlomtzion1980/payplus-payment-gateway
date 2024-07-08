@@ -242,8 +242,11 @@ html[lang="en-US"] .payplus-delete-error {
   }
 
   #currentMode {
+    border: 0.6px solid;
     color: #34aa54;
-    border: solid 0.6px;
+    display: block;
+    width: 100%;
+    text-align: center;
   }
 
   #warningMessage {

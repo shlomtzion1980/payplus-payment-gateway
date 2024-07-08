@@ -369,10 +369,12 @@ if (
   let isTest =
     jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
     "yes";
-
   let modeMessage = [];
 
-  if (isTest) {
+  if (
+    isTest &&
+    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() === "yes"
+  ) {
     modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
     modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
     currentMode = jQuery(
@@ -409,41 +411,48 @@ if (
       .closest("tr")
       .hide();
   } else {
-    modeMessage["en"] = "Current Mode: Production mode";
-    modeMessage["he"] = "מצב נוכחי: מצב ייצור";
-    currentMode = jQuery(
-      "<tr><td id='currentMode'>" +
-        modeMessage[currentLanguage] +
-        "</td></tr></tr>"
-    );
-    jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
-      .closest("tr")
-      .hide();
-    jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
-      .closest("tr")
-      .hide();
-    jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
-      .closest("tr")
-      .hide();
-    jQuery("#woocommerce_payplus-payment-gateway_api_key").closest("tr").show();
-    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
-      .closest("tr")
-      .show();
-    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
-      .closest("tr")
-      .show();
-    jQuery("#woocommerce_payplus-payment-gateway_secret_key")
-      .closest("tr")
-      .find("label")
-      .css({ color: "#34aa54" });
-    jQuery("#woocommerce_payplus-payment-gateway_api_key")
-      .closest("tr")
-      .find("label")
-      .css({ color: "#34aa54" });
-    jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
-      .closest("tr")
-      .find("label")
-      .css({ color: "#34aa54" });
+    if (
+      jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
+      "no"
+    ) {
+      modeMessage["en"] = "Current Mode: Production mode";
+      modeMessage["he"] = "מצב נוכחי: מצב ייצור";
+      currentMode = jQuery(
+        "<tr><td id='currentMode'>" +
+          modeMessage[currentLanguage] +
+          "</td></tr></tr>"
+      );
+      jQuery("#woocommerce_payplus-payment-gateway_dev_api_key")
+        .closest("tr")
+        .hide();
+      jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
+        .closest("tr")
+        .hide();
+      jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
+        .closest("tr")
+        .hide();
+      jQuery("#woocommerce_payplus-payment-gateway_api_key")
+        .closest("tr")
+        .show();
+      jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+        .closest("tr")
+        .show();
+      jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+        .closest("tr")
+        .show();
+      jQuery("#woocommerce_payplus-payment-gateway_secret_key")
+        .closest("tr")
+        .find("label")
+        .css({ color: "#34aa54" });
+      jQuery("#woocommerce_payplus-payment-gateway_api_key")
+        .closest("tr")
+        .find("label")
+        .css({ color: "#34aa54" });
+      jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+        .closest("tr")
+        .find("label")
+        .css({ color: "#34aa54" });
+    }
   }
   var $firstInputWithId = jQuery("#mainform input[id]").first();
   $firstInputWithId.closest("tr").before(currentMode);

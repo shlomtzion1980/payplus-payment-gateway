@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-07-08 12:09+0300\n"
-"PO-Revision-Date: 2024-07-08 12:16+0300\n"
+"POT-Creation-Date: 2024-07-08 12:46+0300\n"
+"PO-Revision-Date: 2024-07-08 12:47+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -364,9 +364,8 @@ msgid ""
 msgstr "שלח חשבונית ללקוח באמצעות SMS (רק אם רכשת חבילת SMS מ-PayPlus)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:284
-#: includes/admin/stash.php:3
-msgid "Invoice Creation: Manual"
-msgstr "הפקת חשבוניות בצורה ידנית"
+msgid "Invoice Creation Mode:"
+msgstr "מצב הפקת חשבונית:"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:287
 #: includes/admin/stash.php:6
@@ -1023,6 +1022,10 @@ msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בד
 #: includes/admin/class-wc-payplus-admin.php:2025
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
+
+#: includes/admin/stash.php:3
+msgid "Invoice Creation: Manual"
+msgstr "מצב הפקת חשבונית:"
 
 #: includes/class-wc-payplus-form-fields.php:23
 #: includes/class-wc-payplus-form-fields.php:26

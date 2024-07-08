@@ -281,7 +281,7 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-notifications'
                 );
                 $settings[$section][] = array(
-                    'name' => __('Invoice Creation: Manual', 'payplus-payment-gateway'),
+                    'name' => __('Invoice Creation Mode:', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-manual]',
                     'type' => 'select',
                     'options' => ['no' => __('Automatic', 'payplus-payment-gateway'), 'yes' => __('Manual', 'payplus-payment-gateway')],
