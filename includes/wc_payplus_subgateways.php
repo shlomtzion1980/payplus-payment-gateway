@@ -130,7 +130,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     public function admin_options()
     {
         parent::admin_options();
-        echo __("Before enabling this option, please ensure you have proper PayPlus credentials and authorization", 'payplus-payment-gateway');
+        echo esc_html__("Before enabling this option, please ensure you have proper PayPlus credentials and authorization", 'payplus-payment-gateway');
     }
 
     /**

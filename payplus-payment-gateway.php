@@ -103,13 +103,13 @@ class WC_PayPlus
         if ($this->payplus_gateway->api_test_mode) {
             echo '<div
     style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">
-    ' . __('Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when
+    ' . esc_html__('Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when
     finishing testing', 'payplus-payment-gateway') . '</div>';
         }
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             echo '<div style="background: #d23d3d; border-right: 8px #b33434 solid; border-radius: 4px; color: #FFF; padding: 5px;margin: 5px 0px">'
-                . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
+                . esc_html__('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency
     settings', 'payplus-payment-gateway') . '</div>';
         }
     }
@@ -255,7 +255,7 @@ class WC_PayPlus
             $payplusFourDigits = WC_PayPlus_Meta_Data::get_meta($order->get_id(), "payplus_four_digits", true);
             if ($payplusFourDigits) {
                 $payplusFourDigits = __("Four last digits", "payplus-payment-gateway") . " : " . $payplusFourDigits;
-                echo '<p class="email-upsell-p">' . $payplusFourDigits . '</p>';
+                echo '<p class="email-upsell-p">' . esc_html($payplusFourDigits) . '</p>';
             }
         }
     }
@@ -285,7 +285,7 @@ class WC_PayPlus
             );
             $payplusTransactionType = WC_PayPlus_Meta_Data::get_meta($post_id, 'payplus_transaction_type', true);
             if (!empty($payplusTransactionType)) {
-                echo '<p>' . $transactionTypes[$payplusTransactionType] . "</p>";
+                echo '<p>' . esc_html($transactionTypes[$payplusTransactionType]) . "</p>";
             }
         }
     }
@@ -335,7 +335,7 @@ class WC_PayPlus
         }
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
-            $message = '<b>' . __('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency setting', 'payplus-payment-gateway') . '</b>';
+            $message = '<b>' . esc_html__('Please change the "Number of decimal digits" to 2 or 0 in your WooCommerce settings>General>Currency setting', 'payplus-payment-gateway') . '</b>';
             $this->add_admin_notice('warning', $message);
         }
     }
@@ -359,13 +359,15 @@ class WC_PayPlus
     public function admin_notices()
     {
         $output = '';
-        $title = __('PayPlus Payment Gateway', 'payplus-payment-gateway');
+        $title = esc_html__('PayPlus Payment Gateway', 'payplus-payment-gateway');
         if (count($this->notices)) {
             foreach ($this->notices as $notice) {
-                $output .= "<div class='$notice[class]'><p><b>$title:</b> $notice[message]</p></div>";
+                $class = esc_attr($notice['class']);
+                $message = esc_html($notice['message']);
+                $output .= "<div class='$class'><p><b>$title:</b> $message</p></div>";
             }
         }
-        echo $output;
+        echo wp_kses_post($output);
     }
 
     /**
@@ -375,7 +377,7 @@ class WC_PayPlus
     public static function plugin_action_links($links)
     {
         $action_links = [
-            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . __('View PayPlus Settings', 'payplus-payment-gateway') . '">' . __('Settings') . '</a>',
+            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . esc_html__('View PayPlus Settings', 'payplus-payment-gateway') . '">' . esc_html__('Settings') . '</a>',
         ];
         $links = array_merge($action_links, $links);
 
@@ -523,15 +525,14 @@ class WC_PayPlus
      */
     public function payplus_view_iframe_payment()
     {
-
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
         <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo $height ?>"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
-        echo $html;
+        echo wp_kses_post($html);
     }
 
     /**
@@ -581,15 +582,15 @@ class WC_PayPlus
         );
         if (count($transactionTypes)) {
             echo "<select id='payplus_transaction_type' name='payplus_transaction_type'>";
-            echo "<option value=''>" . __('Transactions Type', 'payplus-payment-gateway') . "</option>";
+            echo "<option value=''>" . esc_html__('Transactions Type', 'payplus-payment-gateway') . "</option>";
 
             foreach ($transactionTypes as $key => $transactionType) {
                 $selected = ($transactionTypeValue == $key) ? "selected" : "";
-                echo "<option " . $selected . " value='" . $key . "'>" . $transactionType . "</option>";
+                echo '<option ' . esc_attr($selected) . ' value="' . esc_attr($key) . '">' . esc_html($transactionType) . '</option>';
             }
             echo "</select>";
         }
-        echo ob_get_clean();
+        echo wp_kses_post(ob_get_clean());
     }
 
     /**
@@ -605,7 +606,7 @@ class WC_PayPlus
                 $new_columns[$column_name] = $column_info;
                 if ('shipping_address' === $column_name && $this->payplus_gateway->enabled === "yes") {
 
-                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . __('Transaction Type ', 'payplus-payment-gateway') . "</span>";
+                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
                 }
             }
         }
@@ -624,7 +625,7 @@ class WC_PayPlus
             foreach ($columns as $column_name => $column_info) {
                 $new_columns[$column_name] = $column_info;
                 if ('price' === $column_name && $this->payplus_gateway->enabled === "yes") {
-                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . __('Transaction Type ', 'payplus-payment-gateway') . "</span>";
+                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
                 }
             }
         }
@@ -680,11 +681,12 @@ class WC_PayPlus
     public function payplus_meta_box_product_balance_name($post)
     {
         ob_start();
-        wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
+        wp_nonce_field('payplus_notice_product_nonce', 'payplus_notice_product_nonce');
         $balanceName = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_balance_name', true);
 
-        printf('<input maxlength="20"   value="' . $balanceName . '" placeholder ="' . __('Balance Name', 'payplus-payment-gateway') . '"   type="text" id="payplus_balance_name" name="payplus_balance_name" />');
-        echo ob_get_clean();
+        printf('<input maxlength="20" value="%s" placeholder="%s" type="text" id="payplus_balance_name" name="payplus_balance_name" />', esc_attr($balanceName), esc_attr__('Balance Name', 'payplus-payment-gateway'));
+
+        echo wp_kses_post(ob_get_clean());
     }
     /*
     ===  End Section  field "balance_name" ==
@@ -763,7 +765,9 @@ class WC_PayPlus
                     '1' => __('Charge', 'payplus-payment-gateway'),
                     '2' => __('Authorization', 'payplus-payment-gateway'),
                 );
-                echo $transactionTypes[$payplusTransactionType];
+                if (isset($transactionTypes[$payplusTransactionType])) {
+                    echo esc_html($transactionTypes[$payplusTransactionType]);
+                }
             }
         }
     }
@@ -801,7 +805,7 @@ class WC_PayPlus
      */
     public function __clone()
     {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
+        _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
     }
 
     /**
@@ -809,7 +813,7 @@ class WC_PayPlus
      */
     public function __wakeup()
     {
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
+        _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
     }
 
     /**
@@ -823,7 +827,7 @@ class WC_PayPlus
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
-            $errors->add('error', __('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
+            $errors->add('error', esc_html__('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
         }
         if ($this->payplus_gateway->payplus_check_blocked_ip()) {
             $errors->add(
@@ -857,11 +861,11 @@ class WC_PayPlus
     public static function payplus_get_admin_menu()
     {
         ob_start();
-        $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         echo "<div id='payplus-options'>";
         if (count($adminTabs)) {
-            echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
+            echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($adminTabs as $key => $arrValue) {
                 $allowed_html = array(
                     'img' => array(
@@ -870,12 +874,11 @@ class WC_PayPlus
                         // Add other allowed attributes as needed
                     ),
                 );
-                $img_html = wp_kses($arrValue['img'], $allowed_html);
                 $selected = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo "<a href='" . esc_url($arrValue['link']) . "'  class='nav-tab " . $selected . "' >
-                               " . $img_html .
+                echo '<a href="' . esc_url($arrValue['link']) . '" class="nav-tab ' . esc_attr($selected) . '">' .
+                    wp_kses($arrValue['img'], $allowed_html) .
                     esc_html($arrValue['name']) .
-                    "</a>";
+                    '</a>';
             }
             echo "</nav>";
         }

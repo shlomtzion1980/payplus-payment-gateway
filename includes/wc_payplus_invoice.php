@@ -223,13 +223,13 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo $orderId ?>" class="button item-refund"><?php echo __("create invoice refund", "payplus-payment-gateway") ?></button>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
             <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
         $output = ob_get_clean();
-        echo $output;
+        echo wp_kses_post($output);
     }
 
     /**

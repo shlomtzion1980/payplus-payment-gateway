@@ -45,24 +45,27 @@ class WC_PayPlus_Statics
         <div class="invoicePlusButtonContainer">
             <?php
             if (strlen($invDoc) > 0 && !is_array($refundsArray)) {
-            ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
+            ?>
+                <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>">
+                    <?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)
+                </a>
             <?php
             } elseif (strlen($invDoc) > 0 && is_array($refundsArray)) { ?>
                 <button class="toggle-button invoicePlusButtonShow"></button>
                 <div class="hidden-buttons invoicePlusButtonHidden">
 
                     <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-                            <?php echo $chargeText; ?></h4><?php } ?>
-                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
+                            <?php echo esc_html($chargeText); ?></h4><?php } ?>
+                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)</a>
 
                     <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-                            <?php echo $refundsText; ?></h4><?php } ?>
+                            <?php echo esc_html($refundsText); ?></h4><?php } ?>
                     <?php
                     if (is_array($refundsArray)) {
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
                             $docText = __($doc['type'], 'payplus-payment-gateway');
-                    ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
+                    ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
                     <?php
                         }
                     }
@@ -72,7 +75,7 @@ class WC_PayPlus_Statics
     <?php
             } elseif ($errorInvoice) { ?>
         <p class='link-invoice-error'>
-            <?php echo $errorInvoice; ?>
+            <?php echo esc_html($errorInvoice); ?>
         </p><?php
             }
         }
@@ -125,21 +128,21 @@ class WC_PayPlus_Statics
                     }
                     if (strlen($invDoc) > 0) { ?>
                 <div>
-                    <h4><?php echo $chargeText; ?></h4>
-                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $invDoc; ?>"><?php echo $docType; ?> (<?php echo $invDocNumber; ?>)</a>
+                    <h4><?php echo esc_html($chargeText); ?></h4>
+                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)</a>
                 </div>
             <?php
                     }
                     if (is_array($refundsArray)) {
             ?>
                 <div>
-                    <h4><?php echo $refundsText; ?></h4>
+                    <h4><?php echo esc_html($refundsText); ?></h4>
                     <?php
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
                             $docText = __($doc['type'], 'payplus-payment-gateway');
                     ?>
-                        <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo $docLink; ?>"><?php echo "$docText ($docNumber)"; ?></a>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
                     <?php
                         }
                     ?>
@@ -175,7 +178,7 @@ class WC_PayPlus_Statics
                                 $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
-                                echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
+                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
                                     $amount = $transaction['amount'];
@@ -190,10 +193,10 @@ class WC_PayPlus_Statics
                                     $voucherId = $transaction['voucher_id'] ?? null;
                                     $tokeUid = $transaction['token_uid'];
                                     $j5Charge = null;
-                                    echo WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge);
+                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
-                                echo __('Total of payments: ', 'payplus-payment-gateway') . $totalAmount;
+                                echo esc_html(__('Total of payments: ', 'payplus-payment-gateway')) . esc_html($totalAmount);
                             }
                         }
                     }
