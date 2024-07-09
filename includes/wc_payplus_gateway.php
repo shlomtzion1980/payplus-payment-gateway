@@ -90,7 +90,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enable_apple_pay;
     public $enable_product;
     public $enable_create_user;
-    public $log_status;
     public $hide_custom_fields_buttons;
     public $saveOrderNote;
     public $currentApiKey;
@@ -226,7 +225,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->enable_apple_pay = $this->get_option('enable_apple_pay') == 'yes' ? true : false;
         $this->enable_product = $this->get_option('enable_product') == 'yes' ? true : false;
         $this->enable_create_user = $this->get_option('enable_create_user') == 'yes' ? true : false;
-        $this->log_status = $this->get_option('log_status') == 'yes' ? true : false;
         /****** VARIBLES END ******/
 
         $this->init_form_fields();
@@ -1345,22 +1343,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_get_posts_id($post_id = "", $fields = array())
     {
         global $wpdb;
-        $sql = "SELECT *  FROM " . $wpdb->posts;
+
+        $sql = "SELECT * FROM {$wpdb->posts}";
+
         $where = "";
-        if ($post_id || count($fields)) {
+
+        if ($post_id || !empty($fields)) {
             if ($post_id) {
-                $where .= " ID=" . $post_id;
+                $where .= $wpdb->prepare(" ID = %d", $post_id);
             }
-            if (count($fields)) {
+            if (!empty($fields)) {
                 foreach ($fields as $key => $value) {
-                    $where .= ($where) ? " And " . $key . "='" . $value . "'" : $key . "='" . $value . "'";
+                    $where .= $wpdb->prepare(" AND %s = %s", $key, $value);
                 }
             }
         }
+
         if ($where) {
-            $sql .= " where " . $where;
+            $sql .= " WHERE" . $where;
         }
+
         $posts = $wpdb->get_results($sql);
+
         return $posts;
     }
 

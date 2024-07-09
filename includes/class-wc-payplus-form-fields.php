@@ -409,12 +409,6 @@ class WC_PayPlus_Form_Fields
                 'label' => '',
 
             ],
-            'log_status' => [
-                'title' => __('Order status log', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => '',
-                'default' => 'no',
-            ],
             'advanced_title' => [
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',

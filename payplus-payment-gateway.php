@@ -54,7 +54,6 @@ class WC_PayPlus
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
-        add_action('woocommerce_order_status_changed', [$this, 'payplus_order_status_changed_action'], 50, 4);
         add_action('wp_ajax_payplus-check-tokens', [$this, 'ajax_payplus_check_tokens']);
 
         //FILTER
@@ -222,8 +221,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -540,8 +539,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
@@ -602,7 +601,7 @@ class WC_PayPlus
             }
             echo "</select>";
         }
-        echo wp_kses_post(ob_get_clean());
+        echo ob_get_clean();
     }
 
     /**
@@ -899,50 +898,6 @@ class WC_PayPlus
         return ob_get_clean();
     }
 
-    /**
-     * Function for `woocommerce_order_status_changed` action-hook.
-     *
-     * @param  $id
-     * @param  $status_transition_from
-     * @param  $status_transition_to
-     * @param  $that
-     *
-     * @return void
-     */
-    public function payplus_order_status_changed_action($order_id, $status_transition_from, $status_transition_to, $order)
-    {
-
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'payplus_order_log';
-        $debug_backtrace = debug_backtrace();
-        $log = "";
-        foreach ($debug_backtrace as $key => $debug) {
-            $class = (isset($debug['class'])) ? $debug['class'] . "=>" : '';
-            $log .= $debug['file'] . "=>" . $class . $debug['function'] . "=>" . $debug['line'] . "\n";
-        }
-        $data = array(
-            'action_name' => 'change-status',
-            'order_id' => intval($order_id),
-            'status_transition_from' => sanitize_text_field($status_transition_from),
-            'status_transition_to' => sanitize_text_field($status_transition_to),
-            'log' => sanitize_textarea_field($log),
-        );
-        $wpdb->insert(
-            $table_name,
-            $data,
-            array(
-                '%s',
-                '%d',
-                '%s',
-                '%s',
-                '%s'
-            )
-        );
-
-        if ($wpdb->last_error) {
-            payplus_Add_log_payplus($wpdb->last_error);
-        }
-    }
     public function woocommerce_payplus_woocommerce_block_support()
     {
         if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
@@ -971,7 +926,7 @@ require_once PAYPLUS_PLUGIN_DIR . '/includes/wc-payplus-activation-functions.php
 
 register_activation_hook(__FILE__, 'payplus_create_table_order');
 register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
-register_activation_hook(__FILE__, 'payplus_create_table_log');
+// register_activation_hook(__FILE__, 'payplus_create_table_log');
 register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
 register_activation_hook(__FILE__, 'checkSetPayPlusOptions');

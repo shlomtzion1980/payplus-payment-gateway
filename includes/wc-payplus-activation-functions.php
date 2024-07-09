@@ -166,7 +166,7 @@ function payplusUpdateActivate()
 
         payplus_create_table_order();
         payplus_create_table_change_status_order();
-        payplus_create_table_log();
+        // payplus_create_table_log();
         payplus_create_table_payment_session();
         payplus_create_table_process();
         checkSetPayPlusOptions();
@@ -372,31 +372,6 @@ function payplus_create_table_change_status_order()
     }
 }
 
-function payplus_create_table_log()
-{
-
-    global $wpdb;
-    $charset_collate = $wpdb->get_charset_collate();
-
-    $table_name = $wpdb->prefix . 'payplus_order_log';
-
-    $sql = "CREATE TABLE " . $table_name . " (
-                id  int(11) NOT NULL AUTO_INCREMENT,
-                order_id BIGINT NOT NULL,
-                create_at timestamp  default CURRENT_TIMESTAMP,
-                action_name varchar(255)  DEFAULT NULL ,
-                status_transition_from varchar(255)  DEFAULT NULL ,
-                status_transition_to varchar(255)  DEFAULT NULL ,
-                log  text  DEFAULT NULL ,
-                PRIMARY KEY  (id)
-                ) $charset_collate;";
-
-    require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-    dbDelta($sql);
-    if ($wpdb->last_error) {
-        payplus_Add_log_payplus($wpdb->last_error);
-    }
-}
 /**
  * @return void
  */
