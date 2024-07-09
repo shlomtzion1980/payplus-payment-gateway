@@ -866,8 +866,9 @@ class WC_PayPlus
     public static function payplus_check_exists_table($table = 'payplus_order')
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . $wpdb->esc_like($table);
-        $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name) ? true : false;
+        $table_name = $wpdb->prefix . $table;
+        $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
+        $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $like_table_name)) != $table_name) ? true : false;
         return $flag;
     }
     public static function payplus_get_admin_menu()
