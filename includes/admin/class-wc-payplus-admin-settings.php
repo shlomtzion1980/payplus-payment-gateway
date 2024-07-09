@@ -301,7 +301,7 @@ class WC_PayPlus_Admin_Settings
                     'custom_attributes' => array('multiple' => 'multiple'),
                 );
                 $settings[$section][] = array(
-                    'name' => __('', 'payplus-payment-gateway'),
+                    'name' => '',
                     'id' => 'payplus_invoice_option[list-hidden]',
                     'type' => 'text',
                     'class' => 'list-hidden',
@@ -353,7 +353,7 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = [
                     'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
-                    'label' => __('', 'payplus-payment-gateway'),
+                    'label' => '',
                     'default' => 'no',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[is_Local_pickup]',
                     'class' => 'payplus-documents'
@@ -368,7 +368,7 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = [
                     'title' => __('VAT change in Eilat', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
-                    'label' => __('', 'payplus-payment-gateway'),
+                    'label' => '',
                     'default' => 'no',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[change_vat_in_eilat]',
                     'class' => 'payplus-vat',
@@ -496,7 +496,7 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Shipping according to woocommerce', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'class' => 'shipping_woo',
-                    'label' => __('', 'payplus-payment-gateway'),
+                    'label' => '',
 
                 );
                 $settings[$section][] =
@@ -513,8 +513,8 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Global shipping Tax', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => array(
-                        'taxable' => __('Taxable', 'woocommerce'),
-                        'none' => __('None', 'Tax status', 'woocommerce'),
+                        'taxable' => __('Taxable', 'payplus-payment-gateway'),
+                        'none' => __('None', 'payplus-payment-gateway'),
                     ),
                     'class' => 'global_shipping_tax',
                     'default' => 'none'

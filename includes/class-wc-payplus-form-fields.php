@@ -238,7 +238,7 @@ class WC_PayPlus_Form_Fields
                     'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
                 ],
                 'default' => 'redirect',
-                'description' => __('', 'payplus-payment-gateway'),
+                'description' => '',
             ],
             'iframe_height' => [
                 'title' => __('iFrame Height', 'payplus-payment-gateway'),
@@ -360,19 +360,19 @@ class WC_PayPlus_Form_Fields
             'recurring_order_set_to_paid' => [
                 'title' => __('Mark as "paid" successfully created subscription orders', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'no',
             ],
             'add_product_field_transaction_type' => [
                 'title' => __('Add Product Field Transaction Type', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'no',
             ],
             'exist_company' => [
                 'title' => __('Display company name on the invoice', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'no',
                 'desc_tip' => true,
                 'description' => __('If this option is selected,
@@ -382,13 +382,13 @@ class WC_PayPlus_Form_Fields
             'balance_name' => [
                 'title' => __('Display Balance Name', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'no',
             ],
             'block_ip_transactions' => [
                 'title' => __('Block ip transactions', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'yes',
                 'desc_tip' => true,
                 'description' => __('If the client fails transactions more than the number
@@ -406,13 +406,13 @@ class WC_PayPlus_Form_Fields
             'enable_pickup' => [
                 'title' => __('Enable PickUP', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
 
             ],
             'log_status' => [
                 'title' => __('Order status log', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
                 'default' => 'no',
             ],
             'advanced_title' => [
@@ -446,12 +446,12 @@ class WC_PayPlus_Form_Fields
             'disable_menu_header' => [
                 'title' => __('Top menu cancellation', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
             ],
             'disable_menu_side' => [
                 'title' => __('Canceling the side menu', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('', 'payplus-payment-gateway'),
+                'label' => '',
             ],
             'hide_custom_fields_buttons' => [
                 'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),

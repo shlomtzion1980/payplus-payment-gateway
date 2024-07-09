@@ -127,13 +127,12 @@ class WC_PayPlus
         if (!empty($REQUEST['more_info'])) {
             $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
-            $sql = $wpdb->prepare(
+            $result = $wpdb->get_results($wpdb->prepare(
                 'SELECT id as rowId, count(*) as rowCount, count_process FROM %s WHERE order_id = %d AND ( status_code = %d )',
                 $tblname,
                 $order_id,
                 $status_code
-            );
-            $result = $wpdb->get_results($sql);
+            ));
             $result = $result[0] ?? null;
             if (!$result->rowCount) {
                 $wpdb->insert(

@@ -570,11 +570,9 @@ function payplusMenusDisplay() {
         ? iframes["payplus-invoice"]
         : iframes["payplus-faq"];
     let $settingsContainer = jQuery(
-      '<div id="settingsContainer"><div class="tab-section-payplus" id="tab-payplus-gateway"></div><div class="right-tab-section-payplus"><h2>' +
+      '<div id="settingsContainer"><div class="tab-section-payplus" id="tab-payplus-gateway"></div><div class="right-tab-section-payplus hideIt"><h2>' +
         iframeHeadline +
-        "</h2>" +
-        iframeToShow +
-        "</div>"
+        "</h2></div>"
     );
     //Add all existing tables to .tab-section-payplus
     $settingsContainer

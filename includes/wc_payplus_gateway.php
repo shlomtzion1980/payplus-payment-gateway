@@ -797,11 +797,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
                 $faq_url = 'https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce';
                 $faq_embedded_url = esc_url($faq_url);
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '"></iframe>';
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '" sandbox="allow-same-origin allow-scripts"></iframe>';
             } else {
                 $faq_url = 'https://www.payplus.co.il/faq/';
                 $faq_embedded_url = esc_url($faq_url);
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '"></iframe>';
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . ' sandbox="allow-same-origin allow-scripts""></iframe>';
             }
 
             $titles = null;
@@ -819,13 +819,317 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         function hide($currentSection)
         {
-            $hide = $currentSection === 'payplus-payment-gateway' ? 'hide' : null;
+            $hide = $currentSection === 'payplus-payment-gateway' ? 'hideIt' : null;
             return $hide;
         }
 
+        $allowed_tags = array(
+            'div' => array(
+                'style' => array(),
+                'class' => array(),
+                'id' => array(),
+            ),
+            'table' => array(
+                'class' => array(),
+                'style' => array(),
+            ),
+            'tr' => array(),
+            'td' => array(
+                'style' => array(),
+                'class' => array(),
+                'colspan' => array(),
+                'rowspan' => array(),
+                'align' => array(),
+                'valign' => array(),
+            ),
+            'a' => array(
+                'href' => array(),
+                'target' => array(),
+                'style' => array(),
+                'class' => array(),
+            ),
+            'span' => array(
+                'style' => array(),
+                'class' => array(),
+            ),
+            'label' => array(
+                'for' => array(),
+                'style' => array(),
+                'class' => array(),
+            ),
+            'input' => array(
+                'type' => array(),
+                'name' => array(),
+                'value' => array(),
+                'class' => array(),
+                'style' => array(),
+                'placeholder' => array(),
+                'checked' => array(),
+                'id' => array(),
+            ),
+            'textarea' => array(
+                'name' => array(),
+                'class' => array(),
+                'style' => array(),
+                'id' => array(),
+                'rows' => array(),
+                'cols' => array(),
+                'placeholder' => array(),
+            ),
+            'select' => array(
+                'name' => array(),
+                'class' => array(),
+                'style' => array(),
+                'id' => array(),
+            ),
+            'option' => array(
+                'value' => array(),
+                'selected' => array(),
+            ),
+            'fieldset' => array(),
+            'legend' => array(),
+            'br' => array(),
+            'ul' => array(
+                'style' => array(),
+                'class' => array(),
+            ),
+            'li' => array(
+                'style' => array(),
+                'class' => array(),
+            ),
+            'p' => array(
+                'style' => array(),
+                'class' => array(),
+            ),
+            'strong' => array(),
+            'em' => array(),
+            'blockquote' => array(),
+            'hr' => array(),
+            'h1' => array(),
+            'h2' => array(),
+            'h3' => array(),
+            'h4' => array(),
+            'h5' => array(),
+            'h6' => array(),
+            'img' => array(
+                'src' => array(),
+                'alt' => array(),
+                'class' => array(),
+                'style' => array(),
+            ),
+            'abbr' => array(
+                'title' => array(),
+            ),
+            'code' => array(),
+            'pre' => array(),
+            'iframe' => array(
+                'src' => array(),
+                'width' => array(),
+                'height' => array(),
+                'frameborder' => array(),
+                'allowfullscreen' => array(),
+                'style' => array(),
+                'class' => array(),
+            ),
+            'a' => array(
+                'href' => true,
+                'target' => true,
+                'class' => true,
+                'id' => true,
+                'style' => true,
+                'title' => true,
+            ),
+            'abbr' => array(
+                'title' => true,
+            ),
+            'b' => array(),
+            'blockquote' => array(
+                'cite' => true,
+            ),
+            'cite' => array(),
+            'code' => array(),
+            'del' => array(
+                'datetime' => true,
+            ),
+            'dd' => array(),
+            'div' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'dl' => array(),
+            'dt' => array(),
+            'em' => array(),
+            'h1' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'h2' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'h3' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'h4' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'h5' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'h6' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'hr' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'i' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'img' => array(
+                'alt' => true,
+                'class' => true,
+                'height' => true,
+                'src' => true,
+                'style' => true,
+                'width' => true,
+            ),
+            'input' => array(
+                'class' => true,
+                'id' => true,
+                'name' => true,
+                'style' => true,
+                'type' => true,
+                'value' => true,
+                'checked' => true,
+            ),
+            'label' => array(
+                'for' => true,
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'legend' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'li' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'ol' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'p' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'pre' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'span' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'strong' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'table' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'tbody' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'td' => array(
+                'class' => true,
+                'colspan' => true,
+                'id' => true,
+                'rowspan' => true,
+                'style' => true,
+            ),
+            'textarea' => array(
+                'class' => true,
+                'cols' => true,
+                'id' => true,
+                'name' => true,
+                'rows' => true,
+                'style' => true,
+            ),
+            'tfoot' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'th' => array(
+                'class' => true,
+                'colspan' => true,
+                'id' => true,
+                'rowspan' => true,
+                'scope' => true,
+                'style' => true,
+            ),
+            'thead' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+            'tr' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+                'valign' => true,
+            ),
+            'ul' => array(
+                'class' => true,
+                'id' => true,
+                'style' => true,
+            ),
+        );
+
+        // Allow data attributes for tooltips
+        $allowed_tags = array_merge_recursive($allowed_tags, array(
+            'div' => array(
+                'data-tip' => array(),
+            ),
+            'span' => array(
+                'data-tip' => array(),
+            ),
+            'label' => array(
+                'data-tip' => array(),
+            ),
+        ));
+
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
-                        <table class='form-table " . esc_html(hide($currentSection)) . " fullWidth'>" . $settings . "</table>
-                    </div><div class='right-tab-section-payplus " . ' fullHeight' . "'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
+                        <table class='form-table " . esc_attr(hide($currentSection)) . " fullWidth'>" . wp_kses($settings, $allowed_tags) . "</table>
+                    </div><div class='right-tab-section-payplus fullHeight hideIt'></div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
                 </div>";
     }
