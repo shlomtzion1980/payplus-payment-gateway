@@ -149,26 +149,27 @@ class WC_PayPlus
                 if ($wpdb->last_error) {
                     payplus_Add_log_payplus($wpdb->last_error);
                 }
+
                 $data = [
-                    'transaction_uid' => $REQUEST['transaction_uid'] ?? null,
-                    'page_request_uid' => $REQUEST['page_request_uid'] ?? null,
-                    'voucher_id' => $REQUEST['voucher_num'] ?? null,
-                    'token_uid' => $REQUEST['token_uid'] ?? null,
-                    'type' => $REQUEST['type'] ?? null,
-                    'order_id' => $REQUEST['more_info'] ?? null,
-                    'status_code' => $REQUEST['status_code'] ?? null,
-                    'number' => $REQUEST['number'] ?? null,
-                    'expiry_year' => $REQUEST['expiry_year'] ?? null,
-                    'expiry_month' => $REQUEST['expiry_month'] ?? null,
-                    'four_digits' => $REQUEST['four_digits'] ?? null,
-                    'brand_id' => $REQUEST['brand_id'] ?? null,
+                    'transaction_uid' => isset($_REQUEST['transaction_uid']) ? sanitize_text_field($_REQUEST['transaction_uid']) : null,
+                    'page_request_uid' => isset($_REQUEST['page_request_uid']) ? sanitize_text_field($_REQUEST['page_request_uid']) : null,
+                    'voucher_id' => isset($_REQUEST['voucher_num']) ? sanitize_text_field($_REQUEST['voucher_num']) : null,
+                    'token_uid' => isset($_REQUEST['token_uid']) ? sanitize_text_field($_REQUEST['token_uid']) : null,
+                    'type' => isset($_REQUEST['type']) ? sanitize_text_field($_REQUEST['type']) : null,
+                    'order_id' => isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : null,
+                    'status_code' => isset($_REQUEST['status_code']) ? intval($_REQUEST['status_code']) : null,
+                    'number' => isset($_REQUEST['number']) ? sanitize_text_field($_REQUEST['number']) : null,
+                    'expiry_year' => isset($_REQUEST['expiry_year']) ? sanitize_text_field($_REQUEST['expiry_year']) : null,
+                    'expiry_month' => isset($_REQUEST['expiry_month']) ? sanitize_text_field($_REQUEST['expiry_month']) : null,
+                    'four_digits' => isset($_REQUEST['four_digits']) ? sanitize_text_field($_REQUEST['four_digits']) : null,
+                    'brand_id' => isset($_REQUEST['brand_id']) ? sanitize_text_field($_REQUEST['brand_id']) : null,
                 ];
 
                 $order = $this->payplus_gateway->validateOrder($data);
 
                 $linkRedirect = $this->payplus_gateway->get_return_url($order);
 
-                if (!empty($REQUEST['paymentPayPlusDashboard'])) {
+                if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
                     $order_id = $REQUEST['more_info'];
                     $order = wc_get_order($order_id);
                     $paymentPayPlusDashboard = $REQUEST['paymentPayPlusDashboard'];
