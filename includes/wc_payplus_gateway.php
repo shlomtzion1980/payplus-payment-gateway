@@ -694,14 +694,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 )
             )
         );
-        $credit = wp_kses(
-            __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway'),
-            array(
-                'a' => array(
-                    'href' => array()
-                )
-            )
-        );
+        $credit = __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway');
         ob_start();
 
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
@@ -1130,7 +1123,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
                         <table class='form-table " . esc_attr(hide($currentSection)) . " fullWidth'>" . wp_kses($settings, $allowed_tags) . "</table>
                     </div><div class='right-tab-section-payplus fullHeight hideIt'></div></div>
-                    <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
+                    <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>" . wp_kses(
+            $credit,
+            array(
+                'a' => array(
+                    'href' => array()
+                )
+            )
+        ) . "</div>
                 </div>";
     }
 
