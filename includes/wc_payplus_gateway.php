@@ -662,26 +662,46 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         if (count($adminTabs)) {
-            echo "<nav  class='nav-tab-wrapper tab-option-payplus'>";
+            echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
             foreach ($adminTabs as $key => $arrValue) {
                 $selected = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo "<a href='" . $arrValue['link'] . "'  class='nav-tab " . $selected . "' >
-                           " . $arrValue['img'] .
-                    $arrValue['name'] .
-                    "</a>";
+                $name = esc_html($arrValue['name']); // Ensure this is appropriate for the content
+                echo "<a href='" . esc_url($arrValue['link']) . "' class='nav-tab  " . esc_html($selected) . "'>
+                           " . wp_kses($arrValue['img'], array(
+                    'img' => array(
+                        'src' => true,
+                        'alt' => true,
+                    ),
+                )) . esc_html($name) . "</a>";
             }
             echo "</nav>";
         }
     }
+
 
     /**
      * @return void
      */
     public function admin_options()
     {
-        $title = __('PayPlus', 'payplus-payment-gateway') . " ( " . PAYPLUS_VERSION . " )";
-        $desc = __('For more information about PayPlus and Plugin versions <a href="https://www.payplus.co.il/wordpress" target="_blank">www.payplus.co.il/wordpress</a>', 'payplus-payment-gateway');
-        $credit = __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway');
+        $title = esc_html(__('PayPlus', 'payplus-payment-gateway') . " ( " . PAYPLUS_VERSION . " )");
+        $desc = wp_kses(
+            __('For more information about PayPlus and Plugin versions <a href="https://www.payplus.co.il/wordpress" target="_blank">www.payplus.co.il/wordpress</a>', 'payplus-payment-gateway'),
+            array(
+                'a' => array(
+                    'href' => array(),
+                    'target' => array()
+                )
+            )
+        );
+        $credit = wp_kses(
+            __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway'),
+            array(
+                'a' => array(
+                    'href' => array()
+                )
+            )
+        );
         ob_start();
 
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
@@ -750,31 +770,41 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if ($currentSection == $value['section']) {
                     $title = __($key, 'payplus-payment-gateway');
                 }
-                echo "<a data-tab='payplus-blank' href='" . $value['link'] . "'  class='nav-tab " . $selected . "'>
-                                <img  style='" . $iconStyle . "' src ='" . $value['icon'] . "' alt='" . __($key, 'payplus-payment-gateway') . "'>"
-                    . __($key, 'payplus-payment-gateway') . "</a>";
+                $allowed_html = array(
+                    'img' => array(
+                        'src' => true,
+                        'alt' => true,
+                        'style' => true,
+                    ),
+                );
+
+                echo "<a data-tab='payplus-blank' href='" . esc_url($value['link']) . "' class='nav-tab " . esc_attr($selected) . "'>" .
+                    wp_kses(
+                        "<img style='" . esc_attr($iconStyle) . "' src='" . esc_url($value['icon']) . "' alt='" . esc_attr(__($key, 'payplus-payment-gateway')) . "'>",
+                        $allowed_html
+                    ) .
+                    esc_html(__($key, 'payplus-payment-gateway')) .
+                    "</a>";
             }
             echo "</nav>";
         }
 
-        echo "<h3 id='payplus-title-section'>$title</h3>
-                    <p>$desc</p>";
+        echo "<h3 id='payplus-title-section'>" . esc_html($title) . "</h3>
+                    <p>" . wp_kses_post($desc) . "</p>";
 
         function titleDivs($formFields, $currentSection)
         {
             if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width=80%" src="https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce"></iframe>';
+                $faq_url = 'https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce';
+                $faq_embedded_url = esc_url($faq_url);
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '"></iframe>';
             } else {
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="https://www.payplus.co.il/faq/"></iframe>';
+                $faq_url = 'https://www.payplus.co.il/faq/';
+                $faq_embedded_url = esc_url($faq_url);
+                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '"></iframe>';
             }
 
             $titles = null;
-
-            // $links[] = '<iframe height="1200" width="100%" src="https://www.payplus.co.il/"></iframe>';
-
-            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%92%D7%93%D7%99%D7%A8-%D7%9B%D7%AA%D7%95%D7%91%D7%AA--Callback-URL"></iframe>';
-            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce"></iframe>';
-            // $links[] = '<iframe height="600" width="100%" src="https://www.payplus.co.il/faq/%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA-/%D7%94%D7%AA%D7%9E%D7%9E%D7%A9%D7%A7%D7%95%D7%AA-%D7%9C%D7%97%D7%A0%D7%95%D7%99%D7%95%D7%AA-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%95%D7%AA/%D7%97%D7%99%D7%91%D7%95%D7%A8-%D7%97%D7%A9%D7%91%D7%95%D7%A0%D7%99%D7%AA--%D7%9C%D7%97%D7%A0%D7%95%D7%AA-WooCommerce"></iframe>';
             $count = count($links);
             $randomIndex = rand(0, $count - 1);
             $c = 0;
@@ -792,13 +822,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $hide = $currentSection === 'payplus-payment-gateway' ? 'hide' : null;
             return $hide;
         }
+
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
-                        <table class='form-table " . hide($currentSection) . " fullWidth'>$settings</table>
+                        <table class='form-table " . esc_html(hide($currentSection)) . " fullWidth'>" . $settings . "</table>
                     </div><div class='right-tab-section-payplus " . ' fullHeight' . "'>" . titleDivs($this->form_fields, $currentSection) . "</div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>$credit</div>
-                </div>
-
-                ";
+                </div>";
     }
 
     /**
@@ -822,7 +851,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $html = '<div class="payplus-option-description-area">';
         if ($this->description) {
-            $html .= '<p class="form-row payment-method-description">' . $this->description . '</p>';
+            $html .= '<p class="form-row payment-method-description">' . esc_html($this->description) . '</p>';
         }
         if ($this->create_pp_token && $this->id) {
             $html .= sprintf(
@@ -1743,7 +1772,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->get_payment_page($dataLink->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
-                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_htm(print_r((is_array($response) ? $response['body'] : $response->body), true));
+                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r((is_array($response) ? $response['body'] : $response->body), true));
             }
         }
     }
@@ -1762,13 +1791,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->iframe_height = ($this->iframe_height ?: 700);
         }
         if ($this->display_mode == 'iframe') {
-            echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . $res . "'></form>";
-            echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . $this->iframe_height . "px; border: 0;'></iframe>";
+            echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
+            echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($this->iframe_height) . "px; border: 0;'></iframe>";
             if ($this->import_applepay_script) {
                 echo '<script src="https://payments' . ($this->api_test_mode ? 'dev' : '') . '.payplus.co.il/statics/applePay/script.js" type="text/javascript"></script>';
             }
         } else {
-            echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . $res . "'></form>";
+            echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
         echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
     }
@@ -1873,10 +1902,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function callback_response_hash()
     {
-
         $json = file_get_contents('php://input');
         $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
-        die($payplusGenHash);
+        die(esc_html($payplusGenHash));
     }
     /**
      * @return false|void
