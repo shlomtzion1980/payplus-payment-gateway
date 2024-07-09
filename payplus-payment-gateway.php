@@ -134,15 +134,19 @@ class WC_PayPlus
                 $status_code
             );
             $result = $wpdb->get_results($sql);
-            $result = $result[$indexRow] ?? null;
+            $result = $result[0] ?? null;
             if (!$result->rowCount) {
+                $wpdb->insert(
+                    $tblname,
+                    array(
+                        'order_id' => $order_id,
+                        'function_begin' => 'ipn_response',
+                        'status_code' => $status_code,
+                        'count_process' => 1,
+                    ),
+                    array('%d', '%s', '%d', '%d')  // Data types for each column: order_id (integer), function_begin (string), status_code (integer), count_process (integer)
+                );
 
-                $wpdb->insert($tblname, array(
-                    'order_id' => $order_id,
-                    'function_begin' => 'ipn_response',
-                    'status_code' => $status_code,
-                    'count_process' => 1,
-                ));
                 if ($wpdb->last_error) {
                     payplus_Add_log_payplus($wpdb->last_error);
                 }
@@ -178,9 +182,17 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
             } else {
-                $wpdb->update($tblname, array(
-                    'count_process' => $result->count_process + 1,
-                ), array('id' => $result->rowId));
+                $wpdb->update(
+                    $tblname,
+                    array(
+                        'count_process' => $result->count_process + 1,
+                    ),
+                    array(
+                        'id' => $result->rowId,
+                    ),
+                    array('%d'),
+                    array('%d')
+                );
                 if ($wpdb->last_error) {
                     payplus_Add_log_payplus($wpdb->last_error);
                 }
@@ -854,8 +866,8 @@ class WC_PayPlus
     public static function payplus_check_exists_table($table = 'payplus_order')
     {
         global $wpdb;
-        $table_name = $wpdb->prefix . $table;
-        $flag = ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) ? true : false;
+        $table_name = $wpdb->prefix . $wpdb->esc_like($table);
+        $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name) ? true : false;
         return $flag;
     }
     public static function payplus_get_admin_menu()
@@ -909,12 +921,23 @@ class WC_PayPlus
         }
         $data = array(
             'action_name' => 'change-status',
-            'order_id' => $order_id,
-            'status_transition_from' => $status_transition_from,
-            'status_transition_to' => $status_transition_to,
-            "log" => $log,
+            'order_id' => intval($order_id),
+            'status_transition_from' => sanitize_text_field($status_transition_from),
+            'status_transition_to' => sanitize_text_field($status_transition_to),
+            'log' => sanitize_textarea_field($log),
         );
-        $wpdb->insert($table_name, $data);
+        $wpdb->insert(
+            $table_name,
+            $data,
+            array(
+                '%s',
+                '%d',
+                '%s',
+                '%s',
+                '%s'
+            )
+        );
+
         if ($wpdb->last_error) {
             payplus_Add_log_payplus($wpdb->last_error);
         }
