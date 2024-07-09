@@ -51,8 +51,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
                 }
 
-                let isGoogleEnable = '<?php echo $WC_PayPlus_Gateway->enable_google_pay ?>';
-                let isAppleEnable = '<?php echo $WC_PayPlus_Gateway->enable_apple_pay ?>';
+                let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
+                let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
                 let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
                 let removeGooglePay = isFacebookApp();
                 let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
@@ -674,18 +674,18 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             if (is_product()) {
                 $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
                 $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
-                echo '<div id="express-checkout" class="express-checkout-product ' . $disabled . '">';
+                echo '<div id="express-checkout" class="express-checkout-product ' . esc_attr($disabled) . '">';
             } else {
-                echo '<div id="express-checkout" class="express-checkout ' . $disabled . '">';
+                echo '<div id="express-checkout" class="express-checkout ' . esc_attr($disabled) . '">';
             }
 
         ?>
-            <input type="hidden" value="<?php echo $priceProductWithTax ?>" id="payplus_pricewt_product">
-            <input type="hidden" value="<?php echo $priceProductWithoutTax ?>" id="payplus_pricewithouttax_product">
-            <input type="hidden" value="<?php echo $productName ?>" id="payplus_product_name">
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
+            <input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
             <input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
-            <input type="hidden" value="<?php echo get_woocommerce_currency() ?>" id="payplus_currency_code">
-            <input type="hidden" value="<?php echo $shippingWoo ?>" id="payplus_shipping_woo">
+            <input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
+            <input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
             <?php
             if ($shippingWoo === "false") {
                 $globalShippingPriceTax = $globalShipping;
@@ -696,16 +696,16 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
                 }
             ?>
-                <input type="hidden" value="<?php echo $globalShipping ?>" id="payplus_price_shipping">
-                <input type="hidden" value="<?php echo $globalShippingPriceTax ?>" id="payplus_pricewt_shipping">
-                <input type="hidden" value="<?php echo $globalShipping ?>" id="payplus_pricewithouttax_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
 <?php
             }
             echo '<div class="express-flex" >';
             echo "<div class='line-express-left'>
              <span></span>
             </div>";
-            echo '<p class="title-express-checkout"><span>' . __('Express Checkout', 'payplus-payment-gateway') . '</span></p>';
+            echo '<p class="title-express-checkout"><span>' . esc_html__('Express Checkout', 'payplus-payment-gateway') . '</span></p>';
             echo "<div class='line-express-right'>
                 <span></span>
             </div>";
@@ -714,10 +714,10 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $date = new DateTime();
                 $current_timestamp = $date->getTimestamp();
                 $bi = base64_encode(site_url());
-                echo '<iframe class="' . $disabled . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick . '?var=' . $current_timestamp . '&wb=' . $bi . '" style="width: 100%; height: 50px; display: block;" frameborder="0" data-product-id="' . $productId . '"></iframe>';
+                echo '<iframe class="' . esc_attr($disabled) . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . esc_attr($WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick) . '?var=' . esc_attr($current_timestamp) . '&wb=' . esc_attr($bi) . '" style="width: 100%; height: 50px; display: block;" frameborder="0" data-product-id="' . esc_attr($productId) . '"></iframe>';
             }
             if ($WC_PayPlus_Gateway->enable_apple_pay) {
-                echo '<button   lang="en" id="applePayButton" data-product-id="' . $productId . '" onclick="handleApplePayClick(event);" class="apple-pay-button apple-pay-button-with-text apple-pay-button-black-with-text ' . $disabled . '" style="padding: 18px;width:100%; display:none"></button>';
+                echo '<button   lang="en" id="applePayButton" data-product-id="' . esc_attr($productId) . '" onclick="handleApplePayClick(event);" class="apple-pay-button apple-pay-button-with-text apple-pay-button-black-with-text ' . esc_attr($disabled) . '" style="padding: 18px;width:100%; display:none"></button>';
             }
             echo '<div id="error-api-payplus"></div>';
             echo '</div>';
