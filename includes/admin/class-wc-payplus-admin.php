@@ -876,36 +876,36 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             });
             $installed_payment_methods[] = 'pay-box';
         ?>
-            <input id="all-sum" type="hidden" value="<?php echo $order->get_total() ?>">
-            <div id="all-payment-invoice" style="display: <?php echo $chackAllPayment ?>">
+            <input id="all-sum" type="hidden" value="<?php echo esc_attr($order->get_total()); ?>">
+            <div id="all-payment-invoice" style="display: <?php echo esc_attr($chackAllPayment); ?>">
 
                 <div class="flex-row">
-                    <h2><strong><?php echo __("Payment details", "payplus-payment-gateway") ?> </strong></h2>
+                    <h2><strong><?php esc_html(__("Payment details", "payplus-payment-gateway")) ?> </strong></h2>
                 </div>
                 <div class="flex-row">
                     <div class="flex-item">
-                        <button id="" data-type="credit-card" class=" credit-card type-payment"><?php echo __("Credit Card", "payplus-payment-gateway") ?></button>
+                        <button id="" data-type="<?php echo esc_attr('credit-card') ?>" class="credit-card type-payment"><?php echo esc_html__("Credit Card", "payplus-payment-gateway"); ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="cash" class="cash type-payment"><?php echo __("Cash", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('cash'); ?>" class="cash type-payment"><?php echo esc_html__("Cash", "payplus-payment-gateway"); ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="payment-check" class="payment-check  type-payment"><?php echo __("Check", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('payment-check'); ?>" class="payment-check  type-payment"><?php echo esc_html__("Check", "payplus-payment-gateway") ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="bank-transfer" class="bank-transfer  type-payment"><?php echo __("Bank Transfer", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('bank-transfer'); ?>" class="bank-transfer  type-payment"><?php echo esc_html__("Bank Transfer", "payplus-payment-gateway") ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="payment-app" class="payment-app  type-payment"><?php echo __("Payment App", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('payment-app'); ?>" class="payment-app  type-payment"><?php echo esc_html__("Payment App", "payplus-payment-gateway") ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="paypal" class="paypal  type-payment"><?php echo __("PayPal", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('paypal'); ?>" class="paypal  type-payment"><?php echo esc_html__("PayPal", "payplus-payment-gateway") ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="withholding-tax" class="withholding-tax  type-payment"><?php echo __("Withholding Tax", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('withholding-tax'); ?>" class="withholding-tax  type-payment"><?php echo esc_html__("Withholding Tax", "payplus-payment-gateway") ?></button>
                     </div>
                     <div class="flex-item">
-                        <button data-type="other" class="other  type-payment"><?php echo __("Other", "payplus-payment-gateway") ?></button>
+                        <button data-type="<?php echo esc_attr('other'); ?>" class="other  type-payment"><?php echo esc_html__("Other", "payplus-payment-gateway") ?></button>
                     </div>
 
 
@@ -916,65 +916,65 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     <input class="credit-card-payment-payplus input-change  method_payment" type="hidden" value="credit-card">
                     <div class="flex-row">
                         <div class="flex-item">
-                            <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                            <input value="<?php echo date("Y-m-d") ?>" required class="credit-card-payment-payplus input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="credit-card-payment-payplus input-change create_at" type="date" placeholder="<?php esc_attr__("Date", "payplus-payment-gateway") ?>">
                         </div>
                         <div class="flex-item">
-                            <label> <?php echo __("Credit card number", "payplus-payment-gateway") ?></label>
-                            <input class="credit-card-payment-payplus input-change four_digits" type="number" onkeypress="if (value.length == 4) return false;" placeholder="<?php echo __("Four Digits", "payplus-payment-gateway") ?>">
+                            <label> <?php echo esc_html__("Credit card number", "payplus-payment-gateway") ?></label>
+                            <input class="credit-card-payment-payplus input-change four_digits" type="number" onkeypress="if (value.length == 4) return false;" placeholder="<?php esc_attr__("Four Digits", "payplus-payment-gateway") ?>">
                         </div>
                         <div class="flex-item">
-                            <label> <?php echo __("Card Type", "payplus-payment-gateway") ?></label>
+                            <label> <?php echo esc_html__("Card Type", "payplus-payment-gateway") ?></label>
                             <select class="credit-card-payment-payplus input-change brand_name">
                                 <option value="">
-                                    <?php echo __("Card Type", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Card Type", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="mastercard">
-                                    <?php echo __("Mastercard", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Mastercard", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="american-express">
-                                    <?php echo __("American Express", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("American Express", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="american-express">
-                                    <?php echo __("Discover", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Discover", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="visa">
-                                    <?php echo __("Visa", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Visa", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="diners">
-                                    <?php echo __("Diners", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Diners", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="jcb">
-                                    <?php echo __("Jcb", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Jcb", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="maestro">
-                                    <?php echo __("Maestro", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Maestro", "payplus-payment-gateway") ?>
                                 </option>
                                 <option value="other">
-                                    <?php echo __("Other", "payplus-payment-gateway") ?>
+                                    <?php echo esc_html__("Other", "payplus-payment-gateway") ?>
                                 </option>
 
                             </select>
                         </div>
                         <div class="flex-item">
-                            <label><?php echo __("Transaction type", "payplus-payment-gateway") ?></label>
+                            <label><?php echo esc_html__("Transaction type", "payplus-payment-gateway") ?></label>
                             <div class="flex-row">
                                 <select class="credit-card-payment-payplus input-change transaction_type" id="transaction_type" name="transaction_type">
-                                    <option value=""><?php echo __("Transaction type", "payplus-payment-gateway") ?></option>
-                                    <option value="normal"> <?php echo __("Normal", "payplus-payment-gateway") ?></option>
-                                    <option value="payments"> <?php echo __("Payments", "payplus-payment-gateway") ?></option>
-                                    <option value="credit"> <?php echo __("Credit", "payplus-payment-gateway") ?></option>
-                                    <option value="delayed"> <?php echo __("Delayed", "payplus-payment-gateway") ?></option>
-                                    <option value="other"> <?php echo __("Other", "payplus-payment-gateway") ?></option>
+                                    <option value=""><?php echo esc_html__("Transaction type", "payplus-payment-gateway") ?></option>
+                                    <option value="normal"><?php echo esc_html__("Normal", "payplus-payment-gateway") ?></option>
+                                    <option value="payments"><?php echo esc_html__("Payments", "payplus-payment-gateway") ?></option>
+                                    <option value="credit"><?php echo esc_html__("Credit", "payplus-payment-gateway") ?></option>
+                                    <option value="delayed"><?php echo esc_html__("Delayed", "payplus-payment-gateway") ?></option>
+                                    <option value="other"><?php echo esc_html__("Other", "payplus-payment-gateway") ?></option>
                                 </select>
                             </div>
                         </div>
                         <div class="flex-item full-amount">
-                            <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
                             <div class="flex-row">
-                                <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="credit-card-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount credit-card-payment-payplus">
-                                    <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="credit-card-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount credit-card-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
                             </div>
                         </div>
                     </div>
@@ -984,14 +984,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         $payment = $sum / 2;
                         ?>
                         <div class="flex-item">
-                            <label> <?php echo __("Payments", "payplus-payment-gateway") ?></label>
+                            <label> <?php echo esc_html__("Payments", "payplus-payment-gateway") ?></label>
                             <select class="credit-card-payment-payplus input-change number_of_payments" id="number_of_payments" name="number_of_payments">
                                 <?php
                                 for ($i = 2; $i <= 99; $i++) :
                                     $selected = ($i == 2) ? "selected='selected'" : "";
                                 ?>
-                                    <option <?php echo $selected ?> value="<?php echo $i ?>">
-                                        <?php echo $i ?>
+                                    <option <?php echo esc_attr($selected) ?> value="<?php echo esc_attr($i) ?>">
+                                        <?php echo esc_html($i) ?>
                                     </option>
                                 <?php
 
@@ -1000,19 +1000,19 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             </select>
                         </div>
                         <div class="flex-item">
-                            <label> <?php echo __("First Payment", "payplus-payment-gateway") ?></label>
-                            <input name="first_payment" id="first_payment" readonly value="" placeholder="<?php echo __("First Payment", "payplus-payment-gateway") ?>" type="number" class="credit-card-payment-payplus input-change first_payment">
+                            <label> <?php echo esc_html__("First Payment", "payplus-payment-gateway") ?></label>
+                            <input name="first_payment" id="first_payment" readonly value="" placeholder="<?php echo esc_attr__("First Payment", "payplus-payment-gateway") ?>" type="number" class="credit-card-payment-payplus input-change first_payment">
                         </div>
                         <div class="flex-item">
-                            <label> <?php echo __("Additional payments", "payplus-payment-gateway") ?></label>
-                            <input name="subsequent_payments" id="subsequent_payments" readonly value="" placeholder="<?php echo __("Additional payments", "payplus-payment-gateway") ?>" type="number" class="credit-card-payment-payplus input-change subsequent_payments">
+                            <label> <?php echo esc_html__("Additional payments", "payplus-payment-gateway") ?></label>
+                            <input name="subsequent_payments" id="subsequent_payments" readonly value="" placeholder="<?php echo esc_attr__("Additional payments", "payplus-payment-gateway") ?>" type="number" class="credit-card-payment-payplus input-change subsequent_payments">
 
                         </div>
                     </div>
                     <div class="flex-row flex-row-reverse">
                         <div class="flex-item">
                             <button id="credit-card-payment-payplus" class="payplus-payment-button">
-                                <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
                         </div>
                     </div>
                 </div>
@@ -1023,264 +1023,264 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     <input class="cash-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="cash">
                     <div class="flex-row">
                         <div class="flex-item">
-                            <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                            <input value="<?php echo date("Y-m-d") ?>" required class="cash-payment-payplus input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="cash-payment-payplus input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
                         </div>
                         <div class="flex-item full-amount">
-                            <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
                             <div class="flex-row">
-                                <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="cash-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount cash-payment-payplus""> <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="cash-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount cash-payment-payplus"> <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
                             </div>
 
                         </div>
                         <div class=" flex-item">
-                                    <label> <?php echo __("Notes", "payplus-payment-gateway") ?></label>
-                                    <input value="" placeholder="<?php echo __("Notes", "payplus-payment-gateway") ?>" type="text" class="cash-payment-payplus input-change notes">
-                            </div>
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="cash-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
+                            <label> <?php echo esc_html__("Notes", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Notes", "payplus-payment-gateway") ?>" type="text" class="cash-payment-payplus input-change notes">
                         </div>
                     </div>
-                    <div class="select-type-payment payment-check">
-                        <input class="payment-check-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="payment-check-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="payment-check">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="payment-check-payment-payplus  input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="payment-check-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount payment-check-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Bank number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Bank number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change bank_number">
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Branch number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Branch number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change branch_number">
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Account number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Account number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change account_number">
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Check number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Check number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change check_number">
-                            </div>
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="payment-check-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="select-type-payment bank-transfer">
-                        <input class="bank-transfer-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="bank-transfer-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="bank-transfer">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="bank-transfer-payment-payplus  input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="bank-transfer-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?> " class="payplus-full-amount bank-transfer-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Bank number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Bank number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change bank_number">
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Branch number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Branch number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change branch_number">
-
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Account number", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Account number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change account_number">
-                            </div>
-
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="bank-transfer-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="select-type-payment payment-app">
-                        <input class="payment-app-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="payment-app-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="payment-app">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="payment-app-payment-payplus input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="payment-app-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount payment-app-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Type", "payplus-payment-gateway") ?></label>
-                                <select class="payment-app-payment-payplus input-change payment_app">
-                                    <option value="">
-                                        <?php echo __("Type", "payplus-payment-gateway") ?>
-                                    </option>
-                                    <?php
-                                    foreach ($installed_payment_methods as $installed_payment_method) : ?>
-                                        <option value="<?php echo $installed_payment_method ?>"><?php echo $installed_payment_method ?>
-                                        </option>
-                                    <?php
-                                    endforeach;
-                                    ?>
-                                </select>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Transaction id", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Transaction id", "payplus-payment-gateway") ?>" type="text" class="payment-app-payment-payplus input-change transaction_id">
-                            </div>
-
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="payment-app-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="select-type-payment paypal">
-                        <input class="paypal-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="paypal-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="paypal">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="paypal-payment-payplus  input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="paypal-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount paypal-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Payer account", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Payer account", "payplus-payment-gateway") ?>" type="text" class="paypal-payment-payplus input-change payer_account">
-                            </div>
-
-                            <div class="flex-item">
-                                <label> <?php echo __("Transaction id", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Transaction id", "payplus-payment-gateway") ?>" type="text" class="paypal-payment-payplus input-change transaction_id">
-                            </div>
-
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="paypal-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="select-type-payment withholding-tax">
-                        <input class="withholding-tax-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="withholding-tax-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="withholding-tax">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="withholding-tax-payment-payplus input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="withholding-tax-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount withholding-tax-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-
-                            </div>
-
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="withholding-tax-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="select-type-payment other">
-                        <input class="other-payment-payplus input-change  row_id" type="hidden" value="">
-                        <input class="other-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="other">
-                        <div class="flex-row">
-                            <div class="flex-item">
-                                <label> <?php echo __("Date", "payplus-payment-gateway") ?></label>
-                                <input value="<?php echo date("Y-m-d") ?>" required class="other-payment-payplus  input-change create_at" type="date" placeholder="<?php echo __("Date", "payplus-payment-gateway") ?>">
-                            </div>
-                            <div class="flex-item full-amount">
-                                <label><?php echo __("Sum", "payplus-payment-gateway") ?></label>
-                                <div class="flex-row">
-                                    <input data-sum="<?php echo $order->get_total() ?>" step="0.01" min="1" max="<?php echo $order->get_total() ?>" class="other-payment-payplus input-change price" type="number" placeholder="<?php echo __("Sum", "payplus-payment-gateway") ?>" value="<?php echo floatval($order->get_total()) ?>">
-                                    <button data-sum="<?php echo $order->get_total() ?>" class="payplus-full-amount other-payment-payplus">
-                                        <?php echo __("Full Amount", "payplus-payment-gateway") ?> </button>
-                                </div>
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Transaction id", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Transaction id", "payplus-payment-gateway") ?>" type="text" class="other-payment-payplus input-change transaction_id">
-
-                            </div>
-                            <div class="flex-item">
-                                <label> <?php echo __("Notes", "payplus-payment-gateway") ?></label>
-                                <input value="" placeholder="<?php echo __("Notes", "payplus-payment-gateway") ?>" type="text" class="other-payment-payplus input-change notes">
-                            </div>
-                        </div>
-                        <div class="flex-row flex-row-reverse">
-                            <div class="flex-item">
-                                <button id="other-payment-payplus" class="payplus-payment-button">
-                                    <?php echo __("Save payment", "payplus-payment-gateway") ?> </button>
-                            </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="cash-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
                         </div>
                     </div>
                 </div>
-            <?php
+                <div class="select-type-payment payment-check">
+                    <input class="payment-check-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="payment-check-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="payment-check">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="payment-check-payment-payplus  input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="payment-check-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount payment-check-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Bank number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Bank number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change bank_number">
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Branch number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Branch number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change branch_number">
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Account number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Account number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change account_number">
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Check number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Check number", "payplus-payment-gateway") ?>" type="text" class="payment-check-payment-payplus input-change check_number">
+                        </div>
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="payment-check-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-type-payment bank-transfer">
+                    <input class="bank-transfer-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="bank-transfer-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="bank-transfer">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="bank-transfer-payment-payplus  input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="bank-transfer-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?> " class="payplus-full-amount bank-transfer-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Bank number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Bank number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change bank_number">
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Branch number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Branch number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change branch_number">
+
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Account number", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Account number", "payplus-payment-gateway") ?>" type="text" class="bank-transfer-payment-payplus input-change account_number">
+                        </div>
+
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="bank-transfer-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-type-payment payment-app">
+                    <input class="payment-app-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="payment-app-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="payment-app">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="payment-app-payment-payplus input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="payment-app-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount payment-app-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Type", "payplus-payment-gateway") ?></label>
+                            <select class="payment-app-payment-payplus input-change payment_app">
+                                <option value="">
+                                    <?php echo esc_html__("Type", "payplus-payment-gateway") ?>
+                                </option>
+                                <?php
+                                foreach ($installed_payment_methods as $installed_payment_method) : ?>
+                                    <option value="<?php echo esc_attr($installed_payment_method) ?>"><?php echo esc_html($installed_payment_method) ?>
+                                    </option>
+                                <?php
+                                endforeach;
+                                ?>
+                            </select>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Transaction id", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Transaction id", "payplus-payment-gateway") ?>" type="text" class="payment-app-payment-payplus input-change transaction_id">
+                        </div>
+
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="payment-app-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-type-payment paypal">
+                    <input class="paypal-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="paypal-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="paypal">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="paypal-payment-payplus  input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="paypal-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount paypal-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Payer account", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Payer account", "payplus-payment-gateway") ?>" type="text" class="paypal-payment-payplus input-change payer_account">
+                        </div>
+
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Transaction id", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Transaction id", "payplus-payment-gateway") ?>" type="text" class="paypal-payment-payplus input-change transaction_id">
+                        </div>
+
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="paypal-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-type-payment withholding-tax">
+                    <input class="withholding-tax-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="withholding-tax-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="withholding-tax">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="withholding-tax-payment-payplus input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="withholding-tax-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount withholding-tax-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="withholding-tax-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-type-payment other">
+                    <input class="other-payment-payplus input-change  row_id" type="hidden" value="">
+                    <input class="other-payment-payplus input-change  method_payment" type="hidden" id="method_payment" name="method_payment" value="other">
+                    <div class="flex-row">
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                            <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required class="other-payment-payplus  input-change create_at" type="date" placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+                        </div>
+                        <div class="flex-item full-amount">
+                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                            <div class="flex-row">
+                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1" max="<?php echo esc_attr($order->get_total()) ?>" class="other-payment-payplus input-change price" type="number" placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>" value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>" class="payplus-full-amount other-payment-payplus">
+                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                            </div>
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Transaction id", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Transaction id", "payplus-payment-gateway") ?>" type="text" class="other-payment-payplus input-change transaction_id">
+
+                        </div>
+                        <div class="flex-item">
+                            <label> <?php echo esc_html__("Notes", "payplus-payment-gateway") ?></label>
+                            <input value="" placeholder="<?php echo esc_attr__("Notes", "payplus-payment-gateway") ?>" type="text" class="other-payment-payplus input-change notes">
+                        </div>
+                    </div>
+                    <div class="flex-row flex-row-reverse">
+                        <div class="flex-item">
+                            <button id="other-payment-payplus" class="payplus-payment-button">
+                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php
 
         }
         $this->payplus_get_table_paypment($orderId, $currentStatus, $payments);
         if (empty($checkInvoiceSend)) :
-            ?>
-                <div class="flex-row">
-                    <div class="flex-item payplus-create-invoice">
-                        <button id="payplus-create-invoice" data-id="<?php echo $orderId ?>" class="button  button-primary"><span class="refund_text"><?php echo __("Create Invoice", "payplus-payment-gateway") ?></span></button>
-                        <div class='payplus_loader_gpp'>
-                            <div class='loader'>
-                                <div class='loader-background'>
-                                    <div class='text'></div>
-                                </div>
+        ?>
+            <div class="flex-row">
+                <div class="flex-item payplus-create-invoice">
+                    <button id="payplus-create-invoice" data-id="<?php echo esc_attr($orderId) ?>" class="button  button-primary"><span class="refund_text"><?php echo esc_html__("Create Invoice", "payplus-payment-gateway") ?></span></button>
+                    <div class='payplus_loader_gpp'>
+                        <div class='loader'>
+                            <div class='loader-background'>
+                                <div class='text'></div>
                             </div>
                         </div>
                     </div>
                 </div>
-            <?php
+            </div>
+        <?php
         endif;
     }
 
@@ -1290,416 +1290,415 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
         $chackAllPaymentTable = in_array($currentStatus, $chackStatus) ? "table" : 'none';
 
-            ?>
-            <table data-method="<?php echo (strpos($order->get_payment_method(), 'payplus') !== false) ? true : false ?>" id="payplus-table-payment" style="display: <?php echo $chackAllPaymentTable ?>" class="wc-order-totals payplus-table-payment">
-                <thead>
+        ?>
+        <table data-method="<?php echo esc_attr((strpos($order->get_payment_method(), 'payplus') !== false)) ? true : false ?>" id="payplus-table-payment" style="display: <?php echo esc_attr($chackAllPaymentTable) ?>" class="wc-order-totals payplus-table-payment">
+            <thead>
+                <tr>
+                    <th><img style="display: block; margin: auto; padding: 1px 0 2px 0;" src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"); ?>'></th>
+                    <th><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__("Details", "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__("Methods of Payment", "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__("Date", "payplus-payment-gateway") ?></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+
+                $detailsAll = [
+                    'bank_number', 'account_number', 'branch_number', 'check_number',
+                    'four_digits', 'brand_name', 'transaction_type', 'number_of_payments', 'first_payment', 'subsequent_payments',
+                    'payment_app', 'transaction_id', 'payer_account', 'notes'
+                ];
+                foreach ($payments as $key => $payment) {
+                    $create_at = explode(' ', $payment->create_at);
+                    $create_at = explode('-', $create_at[0]);
+                    $create_at = $create_at[2] . "-" . $create_at[1] . "-" . $create_at[0];
+                    $orderAmount = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) ? WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) : $payment->price / 100;
+                    $currency_code = $order->get_currency();
+                    // Get the currency symbol based on the currency code
+                    $currency_symbol = get_woocommerce_currency_symbol($currency_code);
+
+                ?>
                     <tr>
-                        <th><img style="display: block;margin: auto;padding: 1px 0 2px 0;" src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"; ?>'></th>
-                        <th><?php echo __("Sum", "payplus-payment-gateway") ?></th>
-                        <th><?php echo __("Details", "payplus-payment-gateway") ?></th>
-                        <th><?php echo __("Methods of Payment", "payplus-payment-gateway") ?></th>
-                        <th><?php echo __("Date", "payplus-payment-gateway") ?></th>
+                        <td><img style="display: block; margin: auto;" src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg"); ?>'></td>
+                        <td>
+                            <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">
+                                        <?php echo esc_html($currency_symbol) ?></span><?php echo esc_html($orderAmount) ?></bdi></span>
+                        </td>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
+                        <td>
+                            <?php
+                            foreach ($payment as $key => $value) {
+                                if (in_array($key, $detailsAll)) :
 
-                    $detailsAll = [
-                        'bank_number', 'account_number', 'branch_number', 'check_number',
-                        'four_digits', 'brand_name', 'transaction_type', 'number_of_payments', 'first_payment', 'subsequent_payments',
-                        'payment_app', 'transaction_id', 'payer_account', 'notes'
-                    ];
-                    foreach ($payments as $key => $payment) {
-                        $create_at = explode(' ', $payment->create_at);
-                        $create_at = explode('-', $create_at[0]);
-                        $create_at = $create_at[2] . "-" . $create_at[1] . "-" . $create_at[0];
-                        $orderAmount = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) ? WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) : $payment->price / 100;
-                        $currency_code = $order->get_currency();
-                        // Get the currency symbol based on the currency code
-                        $currency_symbol = get_woocommerce_currency_symbol($currency_code);
-
-                    ?>
-                        <tr>
-                            <td><img style="display: block;margin:auto" src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg"; ?>'></td>
-                            <td>
-                                <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">
-                                            <?php echo $currency_symbol ?></span><?php echo $orderAmount ?></bdi></span>
-                            </td>
-
-                            <td>
-                                <?php
-                                foreach ($payment as $key => $value) {
-                                    if (in_array($key, $detailsAll)) :
-
-                                        if ($value) :
-                                            if ($key == "first_payment" || $key == 'subsequent_payments') :
-                                                $value /= 100;
-                                            endif;
-                                            $keyCurrent = str_replace("_", " ", ucfirst($key));
-                                ?>
-                                            <p> <strong> <?php echo $keyCurrent ?> </strong> : <?php echo $value ?> </p>
-                                <?php
+                                    if ($value) :
+                                        if ($key == "first_payment" || $key == 'subsequent_payments') :
+                                            $value /= 100;
                                         endif;
+                                        $keyCurrent = str_replace("_", " ", ucfirst($key));
+                            ?>
+                                        <p> <strong> <?php echo esc_html($keyCurrent) ?> </strong> : <?php echo esc_html($value) ?> </p>
+                            <?php
                                     endif;
-                                }
-                                ?>
+                                endif;
+                            }
+                            ?>
 
-                            </td>
-                            <td> <?php echo str_replace("-", ' ', $payment->method_payment) ?></td>
-                            <td> <?php echo $create_at ?></td>
-                        </tr>
+                        </td>
+                        <td> <?php echo esc_html(str_replace("-", ' ', $payment->method_payment)) ?></td>
+                        <td> <?php echo esc_html($create_at) ?></td>
+                    </tr>
 
-                    <?php
-                    }
+                <?php
+                }
 
-                    ?>
-                </tbody>
-            </table>
-            <div id="payplus_sum_payment"></div>
-            <?php
-        }
+                ?>
+            </tbody>
+        </table>
+        <div id="payplus_sum_payment"></div>
+        <?php
+    }
 
-        /**
-         * @param $order
-         * @return void
-         */
-        public function add_custom_button_to_order($order)
-        {
-            if ($order->get_status() == 'pending') {
-                $payplusResponse = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_response', true);
-                $pageRequestUid = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_page_request_uid', true);
-                if ($payplusResponse !== "" || $pageRequestUid !== "") {
-                    $payplusResponse = json_decode($payplusResponse, true);
+    /**
+     * @param $order
+     * @return void
+     */
+    public function add_custom_button_to_order($order)
+    {
+        if ($order->get_status() == 'pending') {
+            $payplusResponse = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_response', true);
+            $pageRequestUid = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_page_request_uid', true);
+            if ($payplusResponse !== "" || $pageRequestUid !== "") {
+                $payplusResponse = json_decode($payplusResponse, true);
 
-                    if (isset($payplusResponse['page_request_uid'])) {
-                        $pageRequestUid = $payplusResponse['page_request_uid'];
-                    }
-                    // check if is rtl or ltr
-                    $rtl = is_rtl() ? 'left' : 'right';
-                    // show button only if pageRequestUid is not empty
-                    if (!empty($pageRequestUid)) {
-                        echo '<button type="button" data-value="' . $order->get_id() . '" value="' . $pageRequestUid . '" class="button" id="custom-button-get-pp" style="position: absolute;' . $rtl . ': 5px;top:0px;margin: 10px 0 0 0;color: white;background-color: green">Get PayPlus Data</button>';
-                        echo "<div class='payplus_loader_gpp'>
+                if (isset($payplusResponse['page_request_uid'])) {
+                    $pageRequestUid = $payplusResponse['page_request_uid'];
+                }
+                // check if is rtl or ltr
+                $rtl = is_rtl() ? 'left' : 'right';
+                // show button only if pageRequestUid is not empty
+                if (!empty($pageRequestUid)) {
+                    echo '<button type="button" data-value="' . esc_attr($order->get_id()) . '" value="' . esc_attr($pageRequestUid) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: green">Get PayPlus Data</button>';
+                    echo "<div class='payplus_loader_gpp'>
                         <div class='loader'>
                           <div class='loader-background'><div class='text'></div></div>
                         </div>
                       </div>";
-                    }
                 }
             }
         }
+    }
 
-        /**
-         * @param $orderId
-         * @return void
-         */
-        public function payplus_woocommerce_admin_order_totals_after_total($orderId)
-        {
+    /**
+     * @param $orderId
+     * @return void
+     */
+    public function payplus_woocommerce_admin_order_totals_after_total($orderId)
+    {
 
-            global $wpdb;
-            $this->isInitiated();
-            $order = wc_get_order($orderId);
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-            $transaction_uid = $order->get_meta('payplus_transaction_uid');
-            $order_validated = $order->get_meta('order_validated');
-            $order_validated_error = $order->get_meta('order_validated_error');
+        global $wpdb;
+        $this->isInitiated();
+        $order = wc_get_order($orderId);
+        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $transaction_uid = $order->get_meta('payplus_transaction_uid');
+        $order_validated = $order->get_meta('order_validated');
+        $order_validated_error = $order->get_meta('order_validated_error');
 
-            $invoice_manual = $this->payPlusInvoice->payplus_get_create_invoice_manual();
-            $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
-            $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
-            $checkInvoiceRefundSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_send_refund', true);
-            $sum = 0;
-            $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
-                return $sum + $item->invoice_refund;
-            });
+        $invoice_manual = $this->payPlusInvoice->payplus_get_create_invoice_manual();
+        $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
+        $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
+        $checkInvoiceRefundSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_send_refund', true);
+        $sum = 0;
+        $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
+            return $sum + $item->invoice_refund;
+        });
 
-            $total = floatval($order->get_total());
-            $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_related_transactions', true);
-            $payplus_response = json_decode(WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_response', true));
-            $payplus_response = (array) $payplus_response;
-            $selectInvoiceRefund = array(
-                '' => __('Type Documents Refund', 'payplus-payment-gateway'),
-                'inv_refund' => __('Refund Invoice', 'payplus-payment-gateway'),
-                'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
-                'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
-            );
-            ob_start();
-            if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table()) {
-            ?>
-                <table class="wc-order-totals payplus-table-refund">
-                    <tr class="payplus-row">
-                        <th><img style='height: 30px;margin: auto;display: block;padding: 1px 0 2px 0;}' src='<?php echo PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"; ?>'></th>
-                        <th><?php echo __('Refund amount', 'payplus-payment-gateway'); ?></th>
-                        <th><?php echo __('Amount already refunded', 'payplus-payment-gateway'); ?></th>
-                        <th><?php echo __('Sum', 'payplus-payment-gateway'); ?></th>
-                        <th><?php echo __('Methods of Payment', 'payplus-payment-gateway'); ?></th>
-                    </tr>
-                    <?php
-                    $result = $this->payplus_get_order_payment($orderId);
-                    if (!count($result)) {
-                        if (count($payplus_response)) {
+        $total = floatval($order->get_total());
+        $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_related_transactions', true);
+        $payplus_response = json_decode(WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_response', true));
+        $payplus_response = (array) $payplus_response;
+        $selectInvoiceRefund = array(
+            '' => __('Type Documents Refund', 'payplus-payment-gateway'),
+            'inv_refund' => __('Refund Invoice', 'payplus-payment-gateway'),
+            'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
+            'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
+        );
+        ob_start();
+        if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table()) {
+        ?>
+            <table class="wc-order-totals payplus-table-refund">
+                <tr class="payplus-row">
+                    <th><img style="height: 30px; margin: auto; display: block; padding: 1px 0 2px 0;" src="<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"); ?>"></th>
+                    <th><?php echo esc_html__('Refund amount', 'payplus-payment-gateway'); ?></th>
+                    <th><?php echo esc_html__('Amount already refunded', 'payplus-payment-gateway'); ?></th>
+                    <th><?php echo esc_html__('Sum', 'payplus-payment-gateway'); ?></th>
+                    <th><?php echo esc_html__('Methods of Payment', 'payplus-payment-gateway'); ?></th>
+                </tr>
+                <?php
+                $result = $this->payplus_get_order_payment($orderId);
+                if (!count($result)) {
+                    if (count($payplus_response)) {
+                    } else {
+                        $transaction_uid = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_transaction_uid', true);
+
+                        if (!empty($transaction_uid)) {
+                            $payload['transaction_uid'] = $transaction_uid;
                         } else {
-                            $transaction_uid = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_transaction_uid', true);
-
-                            if (!empty($transaction_uid)) {
-                                $payload['transaction_uid'] = $transaction_uid;
-                            } else {
-                                $payload['more_info'] = $orderId;
-                            }
-                            $payload['related_transaction'] = true;
-                            $payload = wp_json_encode($payload);
-                            $data['order_id'] = $orderId;
-                            $res = $this->requestPayPlusIpn($payload, $data, 1, 'payplus_process_payment', true);
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => wp_json_encode($res->data, true)));
+                            $payload['more_info'] = $orderId;
                         }
-                        $result = $this->payplus_get_order_payment($orderId);
+                        $payload['related_transaction'] = true;
+                        $payload = wp_json_encode($payload);
+                        $data['order_id'] = $orderId;
+                        $res = $this->requestPayPlusIpn($payload, $data, 1, 'payplus_process_payment', true);
+                        WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => wp_json_encode($res->data, true)));
                     }
-                    if (count($result)) :
-                        foreach ($result as $key => $values) :
-                            if (!empty($values->method_payment)) :
-                                $refund = ($values->price / 100) - ($values->refund / 100);
+                    $result = $this->payplus_get_order_payment($orderId);
+                }
+                if (count($result)) :
+                    foreach ($result as $key => $values) :
+                        if (!empty($values->method_payment)) :
+                            $refund = ($values->price / 100) - ($values->refund / 100);
 
-                    ?>
+                ?>
 
-                                <tr class="payplus-row coupon-<?php echo $values->id ?>">
+                            <tr class="payplus-row coupon-<?php echo esc_attr($values->id) ?>">
 
-                                    <td>
-                                        <?php
+                                <td>
+                                    <?php
 
-                                        if ($refund) : ?>
-                                            <button data-refund="<?php echo $refund ?>" data-method='<?php echo $values->method_payment ?>' data-id="<?php echo $values->id ?>" data-transaction-uid="<?php echo $values->transaction_uid ?>" class="button button-primary width-100 do-api-refund-payplus">
-                                                <span class="refund_text"> <?php echo __('Refund', 'payplus-payment-gateway') ?> </span></button>
-                                        <?php endif; ?>
+                                    if ($refund) : ?>
+                                        <button data-refund="<?php echo esc_attr($refund) ?>" data-method='<?php echo esc_attr($values->method_payment) ?>' data-id="<?php echo esc_attr($values->id) ?>" data-transaction-uid="<?php echo esc_attr($values->transaction_uid) ?>" class="button button-primary width-100 do-api-refund-payplus">
+                                            <span class="refund_text"><?php echo esc_html__('Refund', 'payplus-payment-gateway'); ?></span></button>
+                                    <?php endif; ?>
 
-                                    </td>
+                                </td>
 
-                                    <td>
-                                        <?php
-                                        if ($refund) : ?>
-                                            <input class="width-100 sum-coupon-<?php echo $values->id ?>" type="number" step="0.1" min="0" max="<?php echo $refund ?>" value="0" />
-                                        <?php endif; ?>
-                                    </td>
-                                    <td>
-                                        <bdi><?php echo $values->refund / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi>
-                                    </td>
-                                    <td>
-                                        <span class="woocommerce-Price-amount amount"><bdi><?php echo $values->price / 100 ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi></span>
-                                    </td>
-                                    <td class="label label-highlight"><?php echo __($values->method_payment, 'payplus-payment-gateway') ?></td>
-                                </tr>
-                    <?php
-                            endif;
-                        endforeach;
-                    endif;
-                    ?>
-                </table>
-            <?php
-
-            }
-
-            if (
-                $order->get_status() != 'auto-draft' && $order->get_status() != 'on-hold' && $total && $this->payPlusInvoice->payplus_get_invoice_enable()
-                && $invoice_manual
-            ) {
-
-                if (empty($checkInvoiceSend)) :
-                    $this->payplus_get_section_invoice_not_automatic($orderId);
+                                <td>
+                                    <?php
+                                    if ($refund) : ?>
+                                        <input class="width-100 sum-coupon-<?php echo esc_attr($values->id) ?>" type="number" step="0.1" min="0" max="<?php echo esc_attr($refund) ?>" value="0" />
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <bdi><?php echo esc_html($values->refund / 100) ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi>
+                                </td>
+                                <td>
+                                    <span class="woocommerce-Price-amount amount"><bdi><?php echo esc_html($values->price / 100) ?>&nbsp;<span class="woocommerce-Price-currencySymbol">₪</span></bdi></span>
+                                </td>
+                                <td class="label label-highlight"><?php echo esc_html__($values->method_payment, 'payplus-payment-gateway') ?></td>
+                            </tr>
+                <?php
+                        endif;
+                    endforeach;
                 endif;
-            }
+                ?>
+            </table>
+        <?php
 
-            if (
-                $total && $this->payPlusInvoice->payplus_get_invoice_enable()
-                && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
-            ) {
-            ?>
-                <div class="payment-order-ajax  payment-invoice" style="margin:20px 0px">
-                    <input type="hidden" name="amount-refund-<?php echo $orderId ?>" id="amount-refund-<?php echo $orderId ?>" value="<?php echo $sumTransactionRefund / 100 ?>">
-                    <select id="select-type-invoice-refund-<?php echo $orderId ?>" name="select-type-invoice-refund-<?php echo $orderId ?>">
-                        <?php
+        }
 
-                        foreach ($selectInvoiceRefund as $key => $value) :
-                            $flag = true;
-                            if ($flag) :
-                                $selected = ($this->payPlusInvoice->payplus_get_invoice_type_document_refund() == $key) ?
-                                    'selected' : '';
-                        ?>
-                                <option <?php echo $selected ?> value="<?php echo $key ?>"><?php echo $value ?> </option>
-                        <?php
-                            endif;
-                        endforeach;
-                        ?>
-                    </select>
-                    <button id="payplus-create-invoice-refund" data-id="<?php echo $orderId ?>" class="button  button-primary"><span class="refund_text"><?php echo __("Create Invoice refund", "payplus-payment-gateway") ?></span></button>
+        if (
+            $order->get_status() != 'auto-draft' && $order->get_status() != 'on-hold' && $total && $this->payPlusInvoice->payplus_get_invoice_enable()
+            && $invoice_manual
+        ) {
 
-                </div>
-            <?php
-            }
-            if (($order->get_type() === "shop_subscription" && $order->get_status() === "on-hold")
-                || $order_validated_error === "1"
-            ) {
-            ?>
-                <div class="payment-order-ajax">
-                    <button id="payment-payplus-transaction" data-id="<?php echo $orderId ?>" class="button  button-primary"><?php echo __("Transaction review", "payplus-payment-gateway") ?></button>
-                    <div class="payplus_loader">
-                        <div class="loader">
-                            <div class="loader-background">
-                                <div class="text"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            if (empty($checkInvoiceSend)) :
+                $this->payplus_get_section_invoice_not_automatic($orderId);
+            endif;
+        }
 
-            <?php
-            }
-            $flagPayment = !floatval($order->get_total()) || !empty($transaction_uid) || $order_validated === "1" || $this->enabled === "no" || $order->get_status() !== "pending";
-
-            if (!$flagPayment && !$order_validated_error && empty($checkInvoiceSend)) {
-            ?>
-                <div class="payment-order-ajax">
-                    <button id="payment-payplus-dashboard" data-id="<?php echo $orderId ?>" class="button  button-primary"><?php echo __("Payment", "payplus-payment-gateway") ?></button>
-                    <div class="payplus_loader">
-                        <div class="loader">
-                            <div class="loader-background">
-                                <div class="text"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="box-payplus-payment" style="display: none">
-                    <iframe scrolling="no" src="" style="width: 100%;height: 900px"></iframe>
-                </div>
-
-            <?php
-            }
-
-            $table = $wpdb->prefix . 'payplus_order_log';
-            $logs = $wpdb->get_results(' SELECT  *  FROM  ' . $table . ' WHERE order_id= ' . $orderId . ' AND action_name ="change-status"');
-
-            if ($this->log_status && count($logs)) : ?>
-                <div class="flex">
-
-                </div>
-
-                <table class="payplus-change-status wc-order-totals">
-                    <tr>
-                        <td colspan="4" class="payplus-no-border">
-                            <button id="payplus-change-status" class="button button-primary"><?php echo __('Show Log Status', "payplus-payment-gateway") ?></button>
-                        </td>
-                    </tr>
-                    <tr class="payplus-row">
-                        <th><?php echo __('Log', "payplus-payment-gateway") ?></th>
-                        <th> <?php echo __('Status Transition To', "payplus-payment-gateway") ?></th>
-                        <th> <?php echo __('Status Transition From', "payplus-payment-gateway") ?></th>
-                        <th><?php echo __("Create At", "payplus-payment-gateway") ?></th>
-                    </tr>
+        if (
+            $total && $this->payPlusInvoice->payplus_get_invoice_enable()
+            && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
+        ) {
+        ?>
+            <div class="payment-order-ajax  payment-invoice" style="margin:20px 0px">
+                <input type="hidden" name="amount-refund-<?php echo esc_attr($orderId) ?>" id="amount-refund-<?php echo esc_attr($orderId) ?>" value="<?php echo esc_attr($sumTransactionRefund / 100) ?>">
+                <select id="select-type-invoice-refund-<?php echo esc_attr($orderId) ?>" name="select-type-invoice-refund-<?php echo esc_attr($orderId) ?>">
                     <?php
-                    foreach ($logs as $key => $log) :
-                        $tempLogs = explode("\n", $log->log);
 
-                        $dateTime = explode(" ", $log->create_at);
-                        $date = explode("-", $dateTime[0]);
-                        $date = $date[2] . "-" . $date[1] . "-" . $date[0];
-                        $time = $dateTime[1];
-                        $dateTime = $date . " " . $time;
+                    foreach ($selectInvoiceRefund as $key => $value) :
+                        $flag = true;
+                        if ($flag) :
+                            $selected = ($this->payPlusInvoice->payplus_get_invoice_type_document_refund() == $key) ?
+                                'selected' : '';
                     ?>
-                        <tr class="payplus-row">
-                            <td class="log-row">
-                                <?php
-                                foreach ($tempLogs as $key1 => $tempLog) :
-                                    if (!empty($tempLog)) :
-                                ?>
-                                        <p class="log"><?php echo ($key1 + 1) . " ) " . $tempLog ?></p>
-                                <?php
-                                    endif;
-                                endforeach;
-                                ?>
-                            </td>
-                            <td style="text-align: center">
-                                <p><?php echo $log->status_transition_to ?></p>
-                            </td>
-                            <td style="text-align: center">
-                                <p><?php echo $log->status_transition_from ?></p>
-                            </td>
-
-                            <td style="text-align: center"><?php echo $dateTime ?></td>
-                        </tr>
+                            <option <?php echo esc_attr($selected) ?> value="<?php echo esc_attr($key) ?>"><?php echo esc_html($value) ?> </option>
                     <?php
+                        endif;
                     endforeach;
                     ?>
-                </table>
-    <?php
-            endif;
-            $output = ob_get_clean();
-            echo $output;
+                </select>
+                <button id="payplus-create-invoice-refund" data-id="<?php echo esc_attr($orderId) ?>" class="button  button-primary"><span class="refund_text"><?php echo esc_html__("Create Invoice refund", "payplus-payment-gateway") ?></span></button>
+
+            </div>
+        <?php
+        }
+        if (($order->get_type() === "shop_subscription" && $order->get_status() === "on-hold")
+            || $order_validated_error === "1"
+        ) {
+        ?>
+            <div class="payment-order-ajax">
+                <button id="payment-payplus-transaction" data-id="<?php echo esc_attr($orderId) ?>" class="button  button-primary"><?php echo esc_html__("Transaction review", "payplus-payment-gateway") ?></button>
+                <div class="payplus_loader">
+                    <div class="loader">
+                        <div class="loader-background">
+                            <div class="text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <?php
+        }
+        $flagPayment = !floatval($order->get_total()) || !empty($transaction_uid) || $order_validated === "1" || $this->enabled === "no" || $order->get_status() !== "pending";
+
+        if (!$flagPayment && !$order_validated_error && empty($checkInvoiceSend)) {
+        ?>
+            <div class="payment-order-ajax">
+                <button id="payment-payplus-dashboard" data-id="<?php echo esc_attr($orderId) ?>" class="button  button-primary"><?php echo esc_html__("Payment", "payplus-payment-gateway") ?></button>
+                <div class="payplus_loader">
+                    <div class="loader">
+                        <div class="loader-background">
+                            <div class="text"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="box-payplus-payment" style="display: none">
+                <iframe scrolling="no" src="" style="width: 100%;height: 900px"></iframe>
+            </div>
+
+        <?php
         }
 
-        /**
-         * @return void
-         */
-        public function ajax_payplus_token_payment()
-        {
+        $table = $wpdb->prefix . 'payplus_order_log';
+        $logs = $wpdb->get_results(' SELECT  *  FROM  ' . $table . ' WHERE order_id= ' . $orderId . ' AND action_name ="change-status"');
 
-            $totalCartAmount = 0;
-            $handle = 'payplus_process_j5_payment';
-            $urlEdit = site_url();
-            if (!empty($_POST)) {
-                $postPayPlus = $_POST;
-                $this->isInitiated();
-                // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-                $order_id = $postPayPlus['payplus_order_id'];
-                $payplusTokenPayment = $postPayPlus['payplus_token_payment'];
-                $payplusChargeAmount = $postPayPlus['payplus_charge_amount'];
-                $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
-                if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
+        if ($this->log_status && count($logs)) : ?>
+            <div class="flex">
 
-                if (!($payplusTokenPayment) || !$payplusChargeAmount) {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
-                $order = wc_get_order($order_id);
-                $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
+            </div>
 
-                if ($charged_amount) {
-                    return;
-                }
+            <table class="payplus-change-status wc-order-totals">
+                <tr>
+                    <td colspan="4" class="payplus-no-border">
+                        <button id="payplus-change-status" class="button button-primary"><?php echo esc_html__('Show Log Status', "payplus-payment-gateway") ?></button>
+                    </td>
+                </tr>
+                <tr class="payplus-row">
+                    <th><?php echo esc_html__('Log', "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__('Status Transition To', "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__('Status Transition From', "payplus-payment-gateway") ?></th>
+                    <th><?php echo esc_html__("Create At", "payplus-payment-gateway") ?></th>
+                </tr>
+                <?php
+                foreach ($logs as $key => $log) :
+                    $tempLogs = explode("\n", $log->log);
 
-                $OrderType = $order->get_meta('payplus_type');
+                    $dateTime = explode(" ", $log->create_at);
+                    $date = explode("-", $dateTime[0]);
+                    $date = $date[2] . "-" . $date[1] . "-" . $date[0];
+                    $time = $dateTime[1];
+                    $dateTime = $date . " " . $time;
+                ?>
+                    <tr class="payplus-row">
+                        <td class="log-row">
+                            <?php
+                            foreach ($tempLogs as $key1 => $tempLog) :
+                                if (!empty($tempLog)) :
+                            ?>
+                                    <p class="log"><?php echo esc_html(($key1 + 1) . " ) " . $tempLog); ?></p>
+                            <?php
+                                endif;
+                            endforeach;
+                            ?>
+                        </td>
+                        <td style="text-align: center">
+                            <p><?php echo esc_html($log->status_transition_to) ?></p>
+                        </td>
+                        <td style="text-align: center">
+                            <p><?php echo esc_html($log->status_transition_from) ?></p>
+                        </td>
+                        <td style="text-align: center"><?php echo esc_html($dateTime) ?></td>
+                    </tr>
+                <?php
+                endforeach;
+                ?>
+            </table>
+<?php
+        endif;
+        $output = ob_get_clean();
+        echo $output;
+    }
 
-                $chargeByItems = false;
-                $amount = round((float) $payplusChargeAmount, 2);
-                $transaction_uid = $order->get_meta('payplus_transaction_uid');
-                if ($OrderType == "Charge") {
-                    echo $urlEdit;
-                    wp_die();
-                }
+    /**
+     * @return void
+     */
+    public function ajax_payplus_token_payment()
+    {
 
-                if ($OrderType != "Approval" and $OrderType != "Check") {
-                    $order->add_order_note(sprintf(__('The charge in PayPlus already made. Please check your PayPlus account<br />Amount: %s %s', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
+        $totalCartAmount = 0;
+        $handle = 'payplus_process_j5_payment';
+        $urlEdit = site_url();
+        if (!empty($_POST)) {
+            $postPayPlus = $_POST;
+            $this->isInitiated();
+            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+            $order_id = $postPayPlus['payplus_order_id'];
+            $payplusTokenPayment = $postPayPlus['payplus_token_payment'];
+            $payplusChargeAmount = $postPayPlus['payplus_charge_amount'];
+            $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
+            if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            }
 
-                if ($OrderType != "Approval" and $OrderType != "Check") {
-                    $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
+            if (!($payplusTokenPayment) || !$payplusChargeAmount) {
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            }
+            $order = wc_get_order($order_id);
+            $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
 
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
-                if ($amount == $order->get_total() and $charged_amount == 0) {
-                    $chargeByItems = true;
-                    $objectProducts = $this->payplus_get_products_by_order_id($order_id, true);
-                }
-                $totalCartAmount = $objectProducts->amount;
-                $payplusRefunded = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunded', true);
-                if (!$payplusRefunded) {
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refunded' => $order->get_total()));
-                }
+            if ($charged_amount) {
+                return;
+            }
 
-                $payload = '{
+            $OrderType = $order->get_meta('payplus_type');
+
+            $chargeByItems = false;
+            $amount = round((float) $payplusChargeAmount, 2);
+            $transaction_uid = $order->get_meta('payplus_transaction_uid');
+            if ($OrderType == "Charge") {
+                echo esc_url($urlEdit);
+                wp_die();
+            }
+
+            if ($OrderType != "Approval" and $OrderType != "Check") {
+                $order->add_order_note(sprintf(__('The charge in PayPlus already made. Please check your PayPlus account<br />Amount: %s %s', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            }
+
+            if ($OrderType != "Approval" and $OrderType != "Check") {
+                $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
+
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            }
+            if ($amount == $order->get_total() and $charged_amount == 0) {
+                $chargeByItems = true;
+                $objectProducts = $this->payplus_get_products_by_order_id($order_id, true);
+            }
+            $totalCartAmount = $objectProducts->amount;
+            $payplusRefunded = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunded', true);
+            if (!$payplusRefunded) {
+                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refunded' => $order->get_total()));
+            }
+
+            $payload = '{
                         "transaction_uid": "' . $transaction_uid . '",
                         ' . ($this->send_add_data ? '"add_data": "' . $order_id . '",' : '') . '
                         "amount": "' . ($chargeByItems ? $totalCartAmount : $amount) . '",
@@ -1710,163 +1709,163 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         "more_info": "' . __('Charge for Order Number: ', 'payplus-payment-gateway') . $order_id . '"
                         }';
 
-                $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
-                $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+            $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
+            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
-                $response = $this->post_payplus_ws($this->api_url . 'Transactions/ChargeByTransactionUID', $payload);
+            $response = $this->post_payplus_ws($this->api_url . 'Transactions/ChargeByTransactionUID', $payload);
 
-                if (is_wp_error($response)) {
-                    $this->payplus_add_log_all($handle, print_r($response, true), 'error');
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+            if (is_wp_error($response)) {
+                $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            } else {
+                $insertMeta = array();
+                $res = json_decode(wp_remote_retrieve_body($response));
+
+                if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
+                    $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
+                    if ($this->payplus_check_all_product($order, "1")) {
+                        $insertMeta['payplus_transaction_type'] = "1";
+                    }
+                    if ($this->payplus_check_all_product($order, "2")) {
+                        $insertMeta['payplus_transaction_type'] = "2";
+                    }
+                    $insertMeta['payplus_charged_j5_amount'] = $amount;
+
+                    $keyMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true);
+                    if (empty($keyMethod)) {
+                        $keyMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true);
+                    }
+                    $insertMeta['payplus_' . $keyMethod] = $amount;
+                    $insertMeta['payplus_type'] = 'Charge';
+                    $insertMeta['payplus_number'] = $res->data->transaction->number;
+                    $insertMeta['payplus_transaction_uid'] = $res->data->transaction->uid;
+                    $insertMeta['payplus_status_code'] = $res->data->transaction->status_code;
+                    $insertMeta['payplus_number_of_payments'] = $res->data->transaction->payments->number_of_payments;
+                    $insertMeta['payplus_first_payment_amount'] = $res->data->transaction->payments->first_payment_amount;
+                    $insertMeta['payplus_payments_rest_payments_amount'] = $res->data->transaction->payments->rest_payments_amount;
+                    $insertMeta['payplus_auth_num'] = $res->data->transaction->approval_number;
+                    if (property_exists($res->data->transaction, 'voucher_number')) {
+                        $insertMeta['payplus_voucher_num'] = trim($res->data->transaction->voucher_number);
+                    }
+                    if (property_exists($res->data->transaction, 'alternative_method_name')) {
+                        $insertMeta['payplus_alternative_method_name'] = trim($res->data->transaction->alternative_method_name);
+                    }
+                    $order->add_order_note(sprintf(__('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', 'payplus-payment-gateway'), $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
+                    WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
+                    $_POST['order_status'] = $order->needs_processing() ? 'wc-processing' : 'wc-completed';
+                    $order->payment_complete();
+
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     wp_die();
                 } else {
-                    $insertMeta = array();
-                    $res = json_decode(wp_remote_retrieve_body($response));
-
-                    if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
-                        $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
-                        if ($this->payplus_check_all_product($order, "1")) {
-                            $insertMeta['payplus_transaction_type'] = "1";
-                        }
-                        if ($this->payplus_check_all_product($order, "2")) {
-                            $insertMeta['payplus_transaction_type'] = "2";
-                        }
-                        $insertMeta['payplus_charged_j5_amount'] = $amount;
-
-                        $keyMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true);
-                        if (empty($keyMethod)) {
-                            $keyMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true);
-                        }
-                        $insertMeta['payplus_' . $keyMethod] = $amount;
-                        $insertMeta['payplus_type'] = 'Charge';
-                        $insertMeta['payplus_number'] = $res->data->transaction->number;
-                        $insertMeta['payplus_transaction_uid'] = $res->data->transaction->uid;
-                        $insertMeta['payplus_status_code'] = $res->data->transaction->status_code;
-                        $insertMeta['payplus_number_of_payments'] = $res->data->transaction->payments->number_of_payments;
-                        $insertMeta['payplus_first_payment_amount'] = $res->data->transaction->payments->first_payment_amount;
-                        $insertMeta['payplus_payments_rest_payments_amount'] = $res->data->transaction->payments->rest_payments_amount;
-                        $insertMeta['payplus_auth_num'] = $res->data->transaction->approval_number;
-                        if (property_exists($res->data->transaction, 'voucher_number')) {
-                            $insertMeta['payplus_voucher_num'] = trim($res->data->transaction->voucher_number);
-                        }
-                        if (property_exists($res->data->transaction, 'alternative_method_name')) {
-                            $insertMeta['payplus_alternative_method_name'] = trim($res->data->transaction->alternative_method_name);
-                        }
-                        $order->add_order_note(sprintf(__('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', 'payplus-payment-gateway'), $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
-                        WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
-                        $_POST['order_status'] = $order->needs_processing() ? 'wc-processing' : 'wc-completed';
-                        $order->payment_complete();
-
-                        echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
-                        wp_die();
-                    } else {
-                        $this->payplus_add_log_all($handle, print_r($response, true), 'error');
-                        $order->add_order_note(sprintf(__('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', 'payplus-payment-gateway'), $res->results->status, $res->results->description));
-                        $this->error_msg = 2;
-                        echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                        wp_die();
-                    }
+                    $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                    $order->add_order_note(sprintf(__('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', 'payplus-payment-gateway'), $res->results->status, $res->results->description));
+                    $this->error_msg = 2;
+                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                    wp_die();
                 }
-                add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
             }
-            echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-            wp_die();
+            add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
+        }
+        echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+        wp_die();
+    }
+
+    /**
+     * @return void
+     */
+    public function load_admin_assets()
+    {
+
+        $enabled = false;
+        $isInvoice = false;
+        if (!empty($_GET) && !empty($_GET['section'])) {
+            $currentSection = $_GET['section'];
+            $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
+            $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
+            $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
         }
 
-        /**
-         * @return void
-         */
-        public function load_admin_assets()
-        {
-
-            $enabled = false;
-            $isInvoice = false;
-            if (!empty($_GET) && !empty($_GET['section'])) {
-                $currentSection = $_GET['section'];
-                $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
-                $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
-                $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
-            }
-
-            if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
-                $order_id = intval($_GET['post']);
-            }
-
-            if (!empty($order_id)) {
-                $order = wc_get_order($order_id);
-                // Get the currency code
-                $currency_code = $order->get_currency();
-                // Get the currency symbol based on the currency code
-                $currency_symbol = get_woocommerce_currency_symbol($currency_code);
-            } else {
-                $currency_symbol = get_woocommerce_currency_symbol();
-            }
-
-            $current_language = get_locale();
-
-            wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
-            wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
-            wp_localize_script(
-                'payplus-admin-payment',
-                'payplus_script_admin',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'error_payment' => __('Cannot charge more than original order sum!', 'payplus-payment-gateway'),
-                    "payplus_title_tab" => array(
-                        "tab-payplus-error-page" => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
-                        "tab-invoice-payplus" => __('Invoice+ (PayPlus)', 'payplus-payment-gateway')
-                    ),
-                    "currentLanguage" => $current_language,
-                    'currentMode' => $this->get_option('api_test_mode'),
-                    "payplus_enabled_payment" => $enabled,
-                    "payplusTransactionType" => $this->transactionType,
-                    "payplus_invoice" => $isInvoice,
-                    "payplus_refund_error" => __('Incorrect amount or amount greater than amount that can be refunded', 'payplus-payment-gateway'),
-                    "menu_option" => WC_PayPlus::payplus_get_admin_menu(),
-                )
-            );
-            wp_enqueue_script('payplus-admin-payment');
-            wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
-            wp_localize_script(
-                'wc-payplus-gateway-admin',
-                'payplus_script_payment',
-                array(
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'error_payment_sum' => __('Total payment amounts are not equal to the order sum', 'payplus-payment-gateway'),
-                    'error_payment_sum_withholding_tax' => __('The amount of receipts is not equal to the amount of withholding tax clearance', 'payplus-payment-gateway'),
-                    'error_payment_select_doc' => __('No document type selected', 'payplus-payment-gateway'),
-                    'btn_edit' => __('Edit', 'payplus-payment-gateway'),
-                    'btn_delete' => __('Delete', 'payplus-payment-gateway'),
-                    'error_price' => __('The payment item cannot be 0', 'payplus-payment-gateway'),
-                    'currency_symbol' => $currency_symbol,
-                    'payplus_sum' => __('Total payments', 'payplus-payment-gateway'),
-                    'delete_confim' => __('Are you sure you want to delete this payment method?', 'payplus-payment-gateway'),
-                )
-            );
-            wp_enqueue_script('wc-payplus-gateway-admin');
+        if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
+            $order_id = intval($_GET['post']);
         }
 
-        /**
-         * @param $post_id
-         * @return void
-         */
-        public function make_payment_button($post_id)
-        {
-            $this->isInitiated();
+        if (!empty($order_id)) {
+            $order = wc_get_order($order_id);
+            // Get the currency code
+            $currency_code = $order->get_currency();
+            // Get the currency symbol based on the currency code
+            $currency_symbol = get_woocommerce_currency_symbol($currency_code);
+        } else {
+            $currency_symbol = get_woocommerce_currency_symbol();
+        }
 
-            if (!in_array(WC_PayPlus_Meta_Data::get_meta($post_id, 'payplus_type', true), ["Approval", "Check"])) {
-                return;
-            }
+        $current_language = get_locale();
 
-            $order = wc_get_order($post_id);
-            $total = $order->get_total();
+        wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
+        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
+        wp_localize_script(
+            'payplus-admin-payment',
+            'payplus_script_admin',
+            array(
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'error_payment' => __('Cannot charge more than original order sum!', 'payplus-payment-gateway'),
+                "payplus_title_tab" => array(
+                    "tab-payplus-error-page" => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
+                    "tab-invoice-payplus" => __('Invoice+ (PayPlus)', 'payplus-payment-gateway')
+                ),
+                "currentLanguage" => $current_language,
+                'currentMode' => $this->get_option('api_test_mode'),
+                "payplus_enabled_payment" => $enabled,
+                "payplusTransactionType" => $this->transactionType,
+                "payplus_invoice" => $isInvoice,
+                "payplus_refund_error" => __('Incorrect amount or amount greater than amount that can be refunded', 'payplus-payment-gateway'),
+                "menu_option" => WC_PayPlus::payplus_get_admin_menu(),
+            )
+        );
+        wp_enqueue_script('payplus-admin-payment');
+        wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
+        wp_localize_script(
+            'wc-payplus-gateway-admin',
+            'payplus_script_payment',
+            array(
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'error_payment_sum' => __('Total payment amounts are not equal to the order sum', 'payplus-payment-gateway'),
+                'error_payment_sum_withholding_tax' => __('The amount of receipts is not equal to the amount of withholding tax clearance', 'payplus-payment-gateway'),
+                'error_payment_select_doc' => __('No document type selected', 'payplus-payment-gateway'),
+                'btn_edit' => __('Edit', 'payplus-payment-gateway'),
+                'btn_delete' => __('Delete', 'payplus-payment-gateway'),
+                'error_price' => __('The payment item cannot be 0', 'payplus-payment-gateway'),
+                'currency_symbol' => $currency_symbol,
+                'payplus_sum' => __('Total payments', 'payplus-payment-gateway'),
+                'delete_confim' => __('Are you sure you want to delete this payment method?', 'payplus-payment-gateway'),
+            )
+        );
+        wp_enqueue_script('wc-payplus-gateway-admin');
+    }
 
-            $class = ($this->check_amount_authorization) ? 'payplus-visibility' : '';
-            echo "<li class='wide delayed-payment'>
-                    <h3>" . __('Charge Order Using PayPlus', 'payplus-payment-gateway') . "</h3>
-                        <input class='" . $class . "'  data-amount='" . $total . "'  type='number' id='payplus_charge_amount' name='payplus_charge_amount' value='" . $total . "' min='0' max='" . $total . "' step='0.01' required />
-                        <input type='hidden' id='payplus_order_id' name='payplus_order_id' value='" . $post_id . "'>
-                        <button id='payplus-token-payment' type='button' name='payplus-token-payment' class='button button-primary'><span class='dashicons dashicons-cart'></span> " . __('Make Payment', 'payplus-payment-gateway') . "</button>
+    /**
+     * @param $post_id
+     * @return void
+     */
+    public function make_payment_button($post_id)
+    {
+        $this->isInitiated();
+
+        if (!in_array(WC_PayPlus_Meta_Data::get_meta($post_id, 'payplus_type', true), ["Approval", "Check"])) {
+            return;
+        }
+
+        $order = wc_get_order($post_id);
+        $total = $order->get_total();
+
+        $class = ($this->check_amount_authorization) ? 'payplus-visibility' : '';
+        echo "<li class='wide delayed-payment'>
+                    <h3>" . esc_html__('Charge Order Using PayPlus', 'payplus-payment-gateway') . "</h3>
+                        <input class='" . esc_attr($class) . "'  data-amount='" . esc_attr($total) . "'  type='number' id='payplus_charge_amount' name='payplus_charge_amount' value='" . esc_attr($total) . "' min='0' max='" . esc_attr($total) . "' step='0.01' required />
+                        <input type='hidden' id='payplus_order_id' name='payplus_order_id' value='" . esc_attr($post_id) . "'>
+                        <button id='payplus-token-payment' type='button' name='payplus-token-payment' class='button button-primary'><span class='dashicons dashicons-cart'></span> " . esc_html__('Make Payment', 'payplus-payment-gateway') . "</button>
                 <div class='payplus_error'></div>
                      <div class='payplus_loader'>
       <div class='loader'>
@@ -1874,57 +1873,57 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
       </div>
     </div>
                 </li>";
+    }
+
+    /**
+     * @param int $order_id
+     * @return false|void
+     */
+    public function process_make_payment($order_id)
+    {
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return;
         }
 
-        /**
-         * @param int $order_id
-         * @return false|void
-         */
-        public function process_make_payment($order_id)
-        {
-            if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-                return;
-            }
+        if (!isset($_POST['payplus-token-payment'])) {
+            return;
+        }
 
-            if (!isset($_POST['payplus-token-payment'])) {
-                return;
-            }
+        $order = wc_get_order($order_id);
+        $handle = 'payplus_process_j5_payment';
+        $this->isInitiated();
+        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $charged_amount = 0;
+        $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
+        if ($charged_amount) {
+            return;
+        }
 
-            $order = wc_get_order($order_id);
-            $handle = 'payplus_process_j5_payment';
-            $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-            $charged_amount = 0;
-            $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
-            if ($charged_amount) {
-                return;
-            }
+        $OrderType = $order->get_meta('payplus_type');
+        $chargeByItems = false;
+        $amount = round((float) $_POST['payplus_charge_amount'], 2);
+        $transaction_uid = $order->get_meta('payplus_transaction_uid');
+        if ($OrderType == "Charge") {
+            return;
+        }
 
-            $OrderType = $order->get_meta('payplus_type');
-            $chargeByItems = false;
-            $amount = round((float) $_POST['payplus_charge_amount'], 2);
-            $transaction_uid = $order->get_meta('payplus_transaction_uid');
-            if ($OrderType == "Charge") {
-                return;
-            }
+        // if ($amount > $order->get_total()) {
+        //     $this->payplus_add_log_all($handle, 'Cannot Charge more than original order sum');
+        //     $order->add_order_note(sprintf(__('Cannot Charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+        //     return false;
+        // }
 
-            // if ($amount > $order->get_total()) {
-            //     $this->payplus_add_log_all($handle, 'Cannot Charge more than original order sum');
-            //     $order->add_order_note(sprintf(__('Cannot Charge more than original order sum', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-            //     return false;
-            // }
-
-            if ($OrderType != "Approval" and $OrderType != "Check") {
-                $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
-                $order->add_order_note(sprintf(__('The charge in PayPlus already made. Please check your PayPlus account<br />Amount: %s %s', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
-                return false;
-            }
-            if ($amount == $order->get_total() and $charged_amount == 0) {
-                $chargeByItems = true;
-                $objectProducts = $this->payplus_get_products_by_order_id($order_id);
-            }
-            $totalCartAmount = round($objectProducts->amount, $this->rounding_decimals);
-            $payload = '{
+        if ($OrderType != "Approval" and $OrderType != "Check") {
+            $this->payplus_add_log_all($handle, 'Transaction Not J5 Or Changed to J4 After Charge');
+            $order->add_order_note(sprintf(__('The charge in PayPlus already made. Please check your PayPlus account<br />Amount: %s %s', 'payplus-payment-gateway'), $charged_amount, $order->get_currency()));
+            return false;
+        }
+        if ($amount == $order->get_total() and $charged_amount == 0) {
+            $chargeByItems = true;
+            $objectProducts = $this->payplus_get_products_by_order_id($order_id);
+        }
+        $totalCartAmount = round($objectProducts->amount, $this->rounding_decimals);
+        $payload = '{
                         "transaction_uid": "' . $transaction_uid . '",
                         ' . ($this->send_add_data ? '"add_data": "' . $order_id . '",' : '') . '
                         "amount": "' . ($chargeByItems ? $totalCartAmount : $amount) . '",
@@ -1935,186 +1934,186 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         "more_info": "' . __('Charge for Order Number: ', 'payplus-payment-gateway') . $order_id . '"
                         ') . '
                         }';
-            if ($this->api_test_mode) {
-                $apiURL = 'https://restapidev.payplus.co.il/api/v1.0/';
-            } else {
-                $apiURL = 'https://restapi.payplus.co.il/api/v1.0/';
+        if ($this->api_test_mode) {
+            $apiURL = 'https://restapidev.payplus.co.il/api/v1.0/';
+        } else {
+            $apiURL = 'https://restapi.payplus.co.il/api/v1.0/';
+        }
+
+        $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+        $response = $this->post_payplus_ws($apiURL . 'Transactions/ChargeByTransactionUID', $payload);
+        $res = json_decode(wp_remote_retrieve_body($response));
+        if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
+            delete_post_meta($order_id, 'payplus_type');
+            $insertMeta['payplus_charged_j5_amount'] = $amount;
+            $insertMeta['payplus_type'] = 'Charge';
+            $insertMeta['payplus_number'] = $res->data->transaction->number;
+            $insertMeta['payplus_transaction_uid'] = $res->data->transaction->uid;
+            $insertMeta['payplus_status_code'] = $res->data->transaction->status_code;
+            $insertMeta['payplus_number_of_payments'] = $res->data->transaction->payments->number_of_payments;
+            $insertMeta['payplus_first_payment_amount'] = $res->data->transaction->payments->first_payment_amount;
+            $insertMeta['payplus_payments_rest_payments_amount'] = $res->data->transaction->payments->rest_payments_amount;
+            $insertMeta['payplus_auth_num'] = trim($res->data->transaction->approval_number);
+            $insertMeta['payplus_voucher_num'] = trim($res->data->transaction->voucher_number);
+            WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
+
+            $order->add_order_note(sprintf(__('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', 'payplus-payment-gateway'), $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
+            $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
+            $_POST['order_status'] = $order->needs_processing() ? 'wc-processing' : 'wc-completed';
+            $order->payment_complete();
+        } else {
+            $order->add_order_note(sprintf(__('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', 'payplus-payment-gateway'), $res->results->status, $res->results->description));
+            $this->payplus_add_log_all($handle, print_r($res, true), 'error');
+            $this->error_msg = 2;
+        }
+        add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
+    }
+
+    /**
+     * @param $url
+     * @param $payload
+     * @param $method
+     * @return array|WP_Error
+     */
+    public function post_payplus_ws($url, $payload = array(), $method = "post")
+    {
+        $args = array(
+            'body' => $payload,
+            'timeout' => '60',
+            'redirection' => '5',
+            'httpversion' => '1.0',
+            'blocking' => true,
+            'headers' => array(
+                'domain' => home_url(),
+                'Content-Type' => 'application/json',
+                'User-Agent' => 'WordPress',
+                'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
+            )
+        );
+        $response = wp_remote_post($url, $args);
+        return $response;
+    }
+
+    /**
+     * @param $location
+     * @return string
+     */
+    public function add_notice_query_var($location)
+    {
+        remove_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
+
+        return add_query_arg(['error_msg' => $this->error_msg], $location);
+    }
+
+    /**
+     * @return void
+     */
+    public function admin_notices()
+    {
+        if (!isset($_GET['error_msg'])) {
+            return;
+        }
+
+        $title = __('PayPlus Payment Gateway', 'payplus-payment-gateway');
+        $class = 'notice-error';
+        switch ($_GET['error_msg']) {
+            case 1:
+                $message = esc_html__('user or other, please contact payplus support', 'payplus-payment-gateway');
+                break;
+            case 2:
+                $message = esc_html__('Credit card company declined, check credit card details and credit line', 'payplus-payment-gateway');
+                break;
+            default:
+                $message = esc_html__('PayPlus Payment Successful', 'payplus-payment-gateway');
+                $class = 'notice-success';
+        }
+        $output = "<div class='notice " . esc_attr($class) . " is-dismissible'><p><b>" . esc_html($title) . ":</b>" . esc_html($message) . "</p></div>";
+
+        echo $output;
+    }
+
+    /**
+     * @param $args
+     * @return mixed
+     */
+    public function add_removable_arg($args)
+    {
+        $args[] = 'error_msg';
+
+        return $args;
+    }
+
+    /**
+     * @param $order_id
+     * @param $id
+     * @return array|object|stdClass[]|null
+     */
+    public function payplus_get_order_payment($order_id = null, $id = null)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'payplus_order';
+        if ($id) {
+            $result = $wpdb->get_results('SELECT  * FROM ' . $table . ' WHERE id= ' . $id);
+        } else {
+            $result = $wpdb->get_results('SELECT * FROM ' . $table . ' WHERE order_id= ' . $order_id);
+        }
+        return $result;
+    }
+
+    /**
+     * @param $order_id
+     * @param $amount
+     * @return bool|int|mysqli_result|null
+     */
+    public function payplus_update_order_payment($id, $amount)
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'payplus_order';
+        $result = $this->payplus_get_order_payment(false, $id);
+        $refund = $result[0]->refund + ($amount * 100);
+        $invoice_refund = $result[0]->invoice_refund + ($amount * 100);
+        $result = $wpdb->update($table, array('refund' => $refund, 'invoice_refund' => $invoice_refund), array('id' => $id));
+
+        return $result;
+    }
+
+    /**
+     * @param int $order_id
+     * @param int $refund_id
+     * @return void
+     */
+    public function payplus_after_refund($order_id, $refund_id)
+    {
+
+        $refund = new WC_Order_Refund($refund_id);
+        $amount = $refund->get_amount();
+        $order = $this->payplus_get_order_payment($order_id);
+        $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
+        if (empty($payplus_related_transactions)) {
+            if (count($order)) {
+                $this->payplus_update_order_payment($order[0]->id, $amount);
             }
-
-            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-            $response = $this->post_payplus_ws($apiURL . 'Transactions/ChargeByTransactionUID', $payload);
-            $res = json_decode(wp_remote_retrieve_body($response));
-            if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
-                delete_post_meta($order_id, 'payplus_type');
-                $insertMeta['payplus_charged_j5_amount'] = $amount;
-                $insertMeta['payplus_type'] = 'Charge';
-                $insertMeta['payplus_number'] = $res->data->transaction->number;
-                $insertMeta['payplus_transaction_uid'] = $res->data->transaction->uid;
-                $insertMeta['payplus_status_code'] = $res->data->transaction->status_code;
-                $insertMeta['payplus_number_of_payments'] = $res->data->transaction->payments->number_of_payments;
-                $insertMeta['payplus_first_payment_amount'] = $res->data->transaction->payments->first_payment_amount;
-                $insertMeta['payplus_payments_rest_payments_amount'] = $res->data->transaction->payments->rest_payments_amount;
-                $insertMeta['payplus_auth_num'] = trim($res->data->transaction->approval_number);
-                $insertMeta['payplus_voucher_num'] = trim($res->data->transaction->voucher_number);
-                WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
-
-                $order->add_order_note(sprintf(__('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', 'payplus-payment-gateway'), $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
-                $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                $_POST['order_status'] = $order->needs_processing() ? 'wc-processing' : 'wc-completed';
-                $order->payment_complete();
-            } else {
-                $order->add_order_note(sprintf(__('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', 'payplus-payment-gateway'), $res->results->status, $res->results->description));
-                $this->payplus_add_log_all($handle, print_r($res, true), 'error');
-                $this->error_msg = 2;
-            }
-            add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
         }
+        $order = wc_get_order($order_id);
+        $payment_method = $order->get_payment_method();
+        if (
+            $payment_method != ""
+            && strpos($payment_method, 'payplus') === false
+        ) {
 
-        /**
-         * @param $url
-         * @param $payload
-         * @param $method
-         * @return array|WP_Error
-         */
-        public function post_payplus_ws($url, $payload = array(), $method = "post")
-        {
-            $args = array(
-                'body' => $payload,
-                'timeout' => '60',
-                'redirection' => '5',
-                'httpversion' => '1.0',
-                'blocking' => true,
-                'headers' => array(
-                    'domain' => home_url(),
-                    'Content-Type' => 'application/json',
-                    'User-Agent' => 'WordPress',
-                    'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
-                )
-            );
-            $response = wp_remote_post($url, $args);
-            return $response;
-        }
-
-        /**
-         * @param $location
-         * @return string
-         */
-        public function add_notice_query_var($location)
-        {
-            remove_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
-
-            return add_query_arg(['error_msg' => $this->error_msg], $location);
-        }
-
-        /**
-         * @return void
-         */
-        public function admin_notices()
-        {
-            if (!isset($_GET['error_msg'])) {
-                return;
-            }
-
-            $title = __('PayPlus Payment Gateway', 'payplus-payment-gateway');
-            $class = 'notice-error';
-            switch ($_GET['error_msg']) {
-                case 1:
-                    $message = __('user or other, please contact payplus support', 'payplus-payment-gateway');
-                    break;
-                case 2:
-                    $message = __('Credit card company declined, check credit card details and credit line', 'payplus-payment-gateway');
-                    break;
-                default:
-                    $message = __('PayPlus Payment Successful', 'payplus-payment-gateway');
-                    $class = 'notice-success';
-            }
-            $output = "<div class='notice $class is-dismissible'><p><b>$title:</b> $message</p></div>";
-
-            echo $output;
-        }
-
-        /**
-         * @param $args
-         * @return mixed
-         */
-        public function add_removable_arg($args)
-        {
-            $args[] = 'error_msg';
-
-            return $args;
-        }
-
-        /**
-         * @param $order_id
-         * @param $id
-         * @return array|object|stdClass[]|null
-         */
-        public function payplus_get_order_payment($order_id = null, $id = null)
-        {
-            global $wpdb;
-            $table = $wpdb->prefix . 'payplus_order';
-            if ($id) {
-                $result = $wpdb->get_results('SELECT  * FROM ' . $table . ' WHERE id= ' . $id);
-            } else {
-                $result = $wpdb->get_results('SELECT * FROM ' . $table . ' WHERE order_id= ' . $order_id);
-            }
-            return $result;
-        }
-
-        /**
-         * @param $order_id
-         * @param $amount
-         * @return bool|int|mysqli_result|null
-         */
-        public function payplus_update_order_payment($id, $amount)
-        {
-            global $wpdb;
-            $table = $wpdb->prefix . 'payplus_order';
-            $result = $this->payplus_get_order_payment(false, $id);
-            $refund = $result[0]->refund + ($amount * 100);
-            $invoice_refund = $result[0]->invoice_refund + ($amount * 100);
-            $result = $wpdb->update($table, array('refund' => $refund, 'invoice_refund' => $invoice_refund), array('id' => $id));
-
-            return $result;
-        }
-
-        /**
-         * @param int $order_id
-         * @param int $refund_id
-         * @return void
-         */
-        public function payplus_after_refund($order_id, $refund_id)
-        {
-
-            $refund = new WC_Order_Refund($refund_id);
-            $amount = $refund->get_amount();
-            $order = $this->payplus_get_order_payment($order_id);
-            $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
-            if (empty($payplus_related_transactions)) {
-                if (count($order)) {
-                    $this->payplus_update_order_payment($order[0]->id, $amount);
-                }
-            }
-            $order = wc_get_order($order_id);
-            $payment_method = $order->get_payment_method();
             if (
-                $payment_method != ""
-                && strpos($payment_method, 'payplus') === false
+                !$this->payPlusInvoice->payplus_get_create_invoice_manual()
+                && floatval($amount)
             ) {
-
-                if (
-                    !$this->payPlusInvoice->payplus_get_create_invoice_manual()
-                    && floatval($amount)
-                ) {
-                    $this->payPlusInvoice->payplus_create_document_dashboard(
-                        $order_id,
-                        $this->payPlusInvoice->payplus_get_invoice_type_document_refund(),
-                        array(),
-                        $amount,
-                        'payplus_order_refund' . $order_id
-                    );
-                }
+                $this->payPlusInvoice->payplus_create_document_dashboard(
+                    $order_id,
+                    $this->payPlusInvoice->payplus_get_invoice_type_document_refund(),
+                    array(),
+                    $amount,
+                    'payplus_order_refund' . $order_id
+                );
             }
         }
     }
-    WC_PayPlus_Admin_Payments::get_instance();
+}
+WC_PayPlus_Admin_Payments::get_instance();
