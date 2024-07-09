@@ -46,7 +46,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Valuecard', 'payplus-payment-gateway'),
             __('finitiOne', 'payplus-payment-gateway')
         );
-        $this->method_title = __($this->method_title_text, 'payplus-payment-gateway');
+
+        $this->method_title = $this->method_title_text;
         $this->description = $this->get_option('description');
 
         $this->default_charge_method = $this->payplus_default_charge_method;
@@ -67,10 +68,39 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
      */
     public function init_form_fields()
     {
-
+        $methodTitleText = "";
+        switch ($this->method_title_text) {
+            case 'PayPlus - bit':
+                $methodTitleText = esc_html__('PayPlus - bit', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Google Pay':
+                $methodTitleText = esc_html__('PayPlus - Google Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Apple Pay':
+                $methodTitleText = esc_html__('PayPlus - Apple Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - MULTIPASS':
+                $methodTitleText = esc_html__('PayPlus - MULTIPASS', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Tav Zahav':
+                $methodTitleText = esc_html__('PayPlus - Tav Zahav', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - finitiOne':
+                $methodTitleText = esc_html__('PayPlus - finitiOne', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Valuecard':
+                $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
+                break;
+        }
         $this->form_fields = [
             'enabled' => [
-                'title' => __(str_replace('PayPlus - ', '', $this->method_title_text), 'payplus-payment-gateway'),
+                'title' => $methodTitleText,
                 'type' => 'select',
                 'options' => ['yes' => __('Enable', 'payplus-payment-gateway'), 'no' => __('Disable', 'payplus-payment-gateway')],
                 'label' => __('Enable/Disable', 'payplus-payment-gateway'),
@@ -264,7 +294,7 @@ class WC_PayPlus_Gateway_TavZahav extends WC_PayPlus_Subgateway
 class WC_PayPlus_Gateway_Valuecard extends WC_PayPlus_Subgateway
 {
     public $id = 'payplus-payment-gateway-valuecard';
-    public $method_title_text = 'PayPlus - Valuecard ';
+    public $method_title_text = 'PayPlus - Valuecard';
     public $default_description_settings_text = 'Valuecard  payment via PayPlus';
     public $method_descrition_text = 'Pay with Valuecard via PayPlus';
     public $payplus_default_charge_method = 'valuecard';
@@ -275,7 +305,7 @@ class WC_PayPlus_Gateway_Valuecard extends WC_PayPlus_Subgateway
 class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
 {
     public $id = 'payplus-payment-gateway-finitione';
-    public $method_title_text = 'PayPlus - finitiOne ';
+    public $method_title_text = 'PayPlus - finitiOne';
     public $default_description_settings_text = 'finitiOne  payment via PayPlus';
     public $method_descrition_text = 'Pay with finitiOne via PayPlus';
     public $payplus_default_charge_method = 'finitione';
