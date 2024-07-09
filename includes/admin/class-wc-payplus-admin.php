@@ -393,29 +393,45 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function payplus_add_payments($order_id, $payments)
     {
-
         global $wpdb;
         $table = $wpdb->prefix . 'payplus_order';
-        $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
+
+        // Update existing rows for the order
+        $wpdb->update(
+            $table,
+            array('delete_at' => 1),
+            array('order_id' => $order_id),
+            array('%d'), // Data format for delete_at (integer)
+            array('%d')  // Data format for order_id (integer)
+        );
+
+        // Insert new payments
         foreach ($payments as $key => $payment) {
             $payment['parent_id'] = 0;
             $payment['delete_at'] = 0;
             $payment['price'] = floatval($payment['price']) * 100;
-            unset($payment['row_id']);
-            if (isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal') {
-                $payment['number_of_payments'] = 1;
-            } else {
-                if (isset($payment['first_payment']) || isset($payment['subsequent_payments'])) {
-                    $payment['first_payment'] = floatval($payment['first_payment']) * 100;
-                    $payment['subsequent_payments'] = floatval($payment['subsequent_payments']) * 100;
-                }
-            }
+
+            // Sanitize and validate input data
+            $payment = array(
+                'order_id' => intval($order_id), // Ensure order_id is an integer
+                'parent_id' => intval($payment['parent_id']),
+                'delete_at' => intval($payment['delete_at']),
+                'price' => floatval($payment['price']),
+                'transaction_type' => isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal' ? 'normal' : '',
+                'number_of_payments' => isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal' ? 1 : 0,
+                'first_payment' => isset($payment['first_payment']) ? floatval($payment['first_payment']) * 100 : 0,
+                'subsequent_payments' => isset($payment['subsequent_payments']) ? floatval($payment['subsequent_payments']) * 100 : 0,
+            );
+
+            // Insert sanitized data into the database
             $wpdb->insert(
                 $table,
-                $payment
+                $payment,
+                array('%d', '%d', '%d', '%f', '%s', '%d', '%f', '%f') // Data format for each column
             );
         }
     }
+
     /**
      * @return void
      */
@@ -1638,7 +1654,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_token_payment()
     {
-
         $totalCartAmount = 0;
         $handle = 'payplus_process_j5_payment';
         $urlEdit = site_url();

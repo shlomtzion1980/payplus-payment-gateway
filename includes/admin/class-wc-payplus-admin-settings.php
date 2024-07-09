@@ -580,16 +580,22 @@ class WC_PayPlus_Admin_Settings
      */
     public static function getTaxStandards()
     {
-        global $wpdb;
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        $countryDefault = get_option('woocommerce_default_country');
         $options = array();
-        $rates = $wpdb->get_results($wpdb->prepare("SELECT tax_rate ,tax_rate_name FROM {$wpdb->prefix}woocommerce_tax_rates WHERE tax_rate_country = '%s'", $countryDefault));
-        if (count($rates)) {
-            $options[0] = __('Select  tax rate', 'payplus-payment-gateway');
-            foreach ($rates as $key => $valueRate) {
-                $taxRate = round($valueRate->tax_rate, $WC_PayPlus_Gateway->rounding_decimals);
-                $options[$taxRate] = $valueRate->tax_rate_name . ' ( ' . $taxRate . ' ) ';
+
+        $countryDefault = sanitize_text_field(get_option('woocommerce_default_country'));
+
+        $tax = new WC_Tax();
+        $tax_classes = $tax->get_tax_classes();
+        $tax_rates = $tax->get_rates($countryDefault);
+
+        if ($tax_rates) {
+            $options[0] = esc_html__('Select tax rate', 'payplus-payment-gateway');
+
+            foreach ($tax_rates as $tax_rate) {
+                $taxRate = round(floatval($tax_rate['rate']), 2); // Adjust rounding as needed
+                $taxRateName = sanitize_text_field($tax_rate['label']);
+
+                $options[$taxRate] = sprintf('%s ( %d )', $taxRateName, $taxRate);
             }
         }
         return $options;

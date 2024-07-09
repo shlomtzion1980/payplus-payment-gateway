@@ -3000,20 +3000,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function payplus_crud($order_id, $data = null, $where = null, $operation = 'select')
     {
-        global $wpdb;
-        $table = $wpdb->prefix . 'payplus_order_status';
-        switch ($operation) {
+        // global $wpdb;
+        // $table = $wpdb->prefix . 'payplus_order_status';
+        // switch ($operation) {
 
-            case 'select':
-                $result = $wpdb->get_results('SELECT * FROM ' . $table . ' WHERE order_id=' . $order_id);
-                return $result;
-            case 'update':
-                $wpdb->update($table, $data, $where);
-                break;
-            case 'insert':
-                $wpdb->insert($table, $data);
-                break;
-        }
+        //     case 'select':
+        //         $result = $wpdb->get_results('SELECT * FROM ' . $table . ' WHERE order_id=' . $order_id);
+        //         return $result;
+        //     case 'update':
+        //         $wpdb->update($table, $data, $where);
+        //         break;
+        //     case 'insert':
+        //         $wpdb->insert($table, $data);
+        //         break;
+        // }
     }
 
     public function pauplus_get_current_date()
