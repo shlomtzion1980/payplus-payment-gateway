@@ -54,7 +54,6 @@ class WC_PayPlus
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
-        add_action('wp_ajax_payplus-check-tokens', [$this, 'ajax_payplus_check_tokens']);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -73,22 +72,6 @@ class WC_PayPlus
         }
         $this->payplus_gateway = new WC_PayPlus_Gateway();
         return $this->payplus_gateway;
-    }
-
-    /**
-     * @return void
-     */
-    public function ajax_payplus_check_tokens()
-    {
-        $userId = isset($_POST['userId']) ? intval($_POST['userId']) : 0;
-        $customerTokens = WC_Payment_Tokens::get_customer_tokens($userId);
-        $theTokens = [];
-
-        foreach ($customerTokens as $customerToken) {
-            $theTokens[] = $customerToken->get_token();
-        };
-        echo wp_json_encode($theTokens);
-        wp_die();
     }
 
 
@@ -221,8 +204,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -539,8 +522,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
