@@ -375,17 +375,20 @@ function payplus_create_table_change_status_order()
 /**
  * @return void
  */
-
 function payplus_check_table_exist_db($nameTable)
 {
-
     global $wpdb;
+
     $nameTable = esc_sql($nameTable);
-    if ($wpdb->get_var("show tables like '$nameTable'") != $nameTable) {
+    $query = $wpdb->prepare("SHOW TABLES LIKE %s", $nameTable);
+    $result = $wpdb->get_var($query);
+    if ($result !== $nameTable) {
         return false;
     }
+
     return true;
 }
+
 function payplus_create_table_payment_session()
 {
     global $wpdb;

@@ -223,9 +223,8 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-<button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>"
-    class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
-<div class='payplus_loader_refund'></div>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
+            <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -962,37 +961,42 @@ class PayplusInvoice
     public function payplus_get_payments($order_id, $notPayment = '')
     {
         global $wpdb;
+
+        $order_id = intval($order_id);
+        $notPayment = sanitize_text_field($notPayment);
+
         if (!WC_PayPlus::payplus_check_exists_table()) {
             $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
-            if (empty($notPayment)) {
-                $sql = "SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =" . $order_id . " AND delete_at =0 ";
 
-                if ($payplus_related_transactions) {
-                    $sql .= " AND related_transactions=0 ";
-                }
-            } else {
-                $sql = "SELECT *  FROM {$wpdb->prefix}payplus_order WHERE order_id =" . $order_id . " AND delete_at =0";
+            $sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}payplus_order WHERE order_id = %d AND delete_at = 0", $order_id);
+
+            if (empty($notPayment) && $payplus_related_transactions) {
+                $sql .= " AND related_transactions = 0";
             }
+
             $resultApps = $wpdb->get_results($sql, OBJECT);
         } else {
-            $sql = "SELECT * FROM {$wpdb->prefix}postmeta WHERE post_id = " . $order_id . " AND (";
+            $sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}postmeta WHERE post_id = %d AND (", $order_id);
+            $clauses = [];
 
             foreach ($this->payment_method as $key => $value) {
-                $operator = ($key) ? ' OR ' : '';
-                $sql .= $operator . " meta_key LIKE '%payplus_" . $value . "%'";
+                $clauses[] = $wpdb->prepare("meta_key LIKE %s", '%payplus_' . $value . '%');
             }
+
             if (empty($notPayment)) {
                 foreach ($this->payment_method_club as $key => $value) {
-                    $operator = ' OR ';
-                    $sql .= $operator . " meta_key LIKE '%payplus_" . $value . "%'";
+                    $clauses[] = $wpdb->prepare("meta_key LIKE %s", '%payplus_' . $value . '%');
                 }
             }
-            $sql .= " ) ";
+
+            $sql .= implode(' OR ', $clauses) . ")";
+
             $resultApps = $wpdb->get_results($sql, OBJECT);
             $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
         return $resultApps;
     }
+
     public function payplus_set_object_payment($order_id, $resultApps)
     {
         $arr = array();
