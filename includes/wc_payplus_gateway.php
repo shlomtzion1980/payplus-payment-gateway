@@ -617,9 +617,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $res = json_decode(wp_remote_retrieve_body($response));
 
                 if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
-                    /*$rowOrder =  $wpdb->get_results(' SELECT  invoice_refund FROM ' .$table_name ." WHERE parent_id=0 AND order_id=" .$order_id);
-                    $invoice_refund =intval($rowOrder[0]->invoice_refund );
-                    $wpdb->update($table_name,array('invoice_refund'=>$invoice_refund +($amount*100)),array('order_id'=>$order_id,'parent_id'=>0));*/
 
                     if ($this->invoice_api->payplus_get_invoice_enable() && !$invoice_manual) {
                         $resultApps = $this->invoice_api->payplus_get_payments($order_id, 'otherClub');
@@ -1422,9 +1419,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_insert_session_ip($insertArr)
     {
         global $wpdb;
+
+        $insertArr['payplus_date'] = sanitize_text_field($insertArr['payplus_date']);
+        $insertArr['payplus_update'] = sanitize_text_field($insertArr['payplus_update']);
+        $insertArr['payplus_created'] = sanitize_text_field($insertArr['payplus_created']);
+        $insertArr['payplus_ip'] = sanitize_text_field($insertArr['payplus_ip']);
+        $insertArr['payplus_amount'] = floatval($insertArr['payplus_amount']);
+
         $wpdb->insert(
             $wpdb->prefix . 'payplus_payment_session',
-            $insertArr
+            $insertArr,
+            array('%s', '%s', '%s', '%s', '%f')
         );
     }
 
@@ -3205,84 +3210,85 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_add_order($order_id, $dataRow)
     {
-
         global $wpdb;
+
+        // Check if the custom table exists
         if (!WC_PayPlus::payplus_check_exists_table()) {
-            $is_multiple_transaction = $dataRow['is_multiple_transaction'];
+            // Sanitize each field before inserting into the database
+            $is_multiple_transaction = isset($dataRow['is_multiple_transaction']) ? (bool) $dataRow['is_multiple_transaction'] : false;
             $parent_id = 0;
             $table = $wpdb->prefix . 'payplus_order';
+
+            // Retrieve existing row orders
             $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
+            // Update existing orders if any
             if (count($rowOrder)) {
-                $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
+                $wpdb->update($table, ['delete_at' => 1], ['order_id' => $order_id]);
             }
 
-            if (!empty($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay'))) {
+            // Set method based on alternative_method_name
+            if (!empty($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], ['google-pay', 'apple-pay'])) {
                 $dataRow['method'] = $dataRow['alternative_method_name'];
             }
-            /* parent payment */
-            $data = array(
+
+            // Parent payment data
+            $data = [
                 'order_id' => $order_id,
                 'parent_id' => $parent_id,
-                'transaction_uid' => $dataRow['transaction_uid'],
-                'method_payment' => ($is_multiple_transaction) ? "" : strtolower($dataRow['method']),
-                'page_request_uid' => $dataRow['page_request_uid'],
-                'four_digits' => (!empty($dataRow['four_digits'])) ? $dataRow['four_digits'] : '',
-                'number_of_payments' => (!empty($dataRow['number_of_payments'])) ? $dataRow['number_of_payments'] : 0,
-                'brand_name' => (!empty($dataRow['brand_name'])) ? $dataRow['brand_name'] : '',
-                'approval_num' => (!empty($dataRow['approval_num'])) ? $dataRow['approval_num'] : '',
-                'alternative_method_name' => (!empty($dataRow['alternative_method_name'])) ? $dataRow['alternative_method_name'] : '',
-                'type_payment' => $dataRow['type'],
-                'token_uid' => (!empty($dataRow['token_uid'])) ? $dataRow['token_uid'] : '',
+                'transaction_uid' => sanitize_text_field($dataRow['transaction_uid']),
+                'method_payment' => $is_multiple_transaction ? strtolower(sanitize_text_field($dataRow['method'])) : '',
+                'page_request_uid' => sanitize_text_field($dataRow['page_request_uid']),
+                'four_digits' => !empty($dataRow['four_digits']) ? sanitize_text_field($dataRow['four_digits']) : '',
+                'number_of_payments' => !empty($dataRow['number_of_payments']) ? intval($dataRow['number_of_payments']) : 0,
+                'brand_name' => !empty($dataRow['brand_name']) ? sanitize_text_field($dataRow['brand_name']) : '',
+                'approval_num' => !empty($dataRow['approval_num']) ? sanitize_text_field($dataRow['approval_num']) : '',
+                'alternative_method_name' => !empty($dataRow['alternative_method_name']) ? sanitize_text_field($dataRow['alternative_method_name']) : '',
+                'type_payment' => sanitize_text_field($dataRow['type']),
+                'token_uid' => !empty($dataRow['token_uid']) ? sanitize_text_field($dataRow['token_uid']) : '',
                 'price' => floatval($dataRow['amount']) * 100,
                 'payplus_response' => wp_json_encode($dataRow),
-                'related_transactions' => ($is_multiple_transaction) ? 1 : 0,
-                'status_code' => $dataRow['status_code'],
+                'related_transactions' => $is_multiple_transaction ? 1 : 0,
+                'status_code' => sanitize_text_field($dataRow['status_code']),
                 'delete_at' => 0,
-            );
+            ];
 
-            $wpdb->insert(
-                $table,
-                $data
-            );
+            $wpdb->insert($table, $data);
 
             $parent_id = $wpdb->insert_id;
-            /* end parent payment */
 
-            /*related transactions*/
-            if ($is_multiple_transaction) {
+            if ($is_multiple_transaction && !empty($dataRow['related_transactions']) && is_array($dataRow['related_transactions'])) {
+                foreach ($dataRow['related_transactions'] as $related_transaction) {
+                    $related_transaction = (array) $related_transaction;
 
-                $dataMultiples = $dataRow['related_transactions'];
-                for ($i = 0; $i < count($dataMultiples); $i++) {
-                    $dataRow = (array) $dataMultiples[$i];
-                    if (isset($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay'))) {
-                        $dataRow['method'] = $dataRow['alternative_method_name'];
+                    if (isset($related_transaction['alternative_method_name']) && in_array($related_transaction['alternative_method_name'], ['google-pay', 'apple-pay'])) {
+                        $related_transaction['method'] = $related_transaction['alternative_method_name'];
                     }
-                    $data = array(
+
+                    $data = [
                         'order_id' => $order_id,
                         'parent_id' => $parent_id,
-                        'transaction_uid' => $dataRow['transaction_uid'],
-                        'method_payment' => (!$is_multiple_transaction) ? "" : strtolower($dataRow['method']),
-                        'page_request_uid' => $dataRow['page_request_uid'],
-                        'four_digits' => $dataRow['four_digits'],
-                        'number_of_payments' => (!empty($dataRow['number_of_payments'])) ? $dataRow['number_of_payments'] : 0,
-                        'brand_name' => (!empty($dataRow['brand_name'])) ? $dataRow['brand_name'] : '',
-                        'approval_num' => (!empty($dataRow['approval_num'])) ? $dataRow['approval_num'] : '',
-                        'alternative_method_name' => (!empty($dataRow['alternative_method_name'])) ? $dataRow['alternative_method_name'] : '',
-                        'type_payment' => $dataRow['type'],
-                        'token_uid' => (!empty($dataRow['token_uid'])) ? $dataRow['token_uid'] : '',
-                        'price' => floatval($dataRow['amount']) * 100,
-                        'payplus_response' => wp_json_encode($dataRow),
+                        'transaction_uid' => sanitize_text_field($related_transaction['transaction_uid']),
+                        'method_payment' => strtolower(sanitize_text_field($related_transaction['method'])),
+                        'page_request_uid' => sanitize_text_field($related_transaction['page_request_uid']),
+                        'four_digits' => sanitize_text_field($related_transaction['four_digits']),
+                        'number_of_payments' => !empty($related_transaction['number_of_payments']) ? intval($related_transaction['number_of_payments']) : 0,
+                        'brand_name' => !empty($related_transaction['brand_name']) ? sanitize_text_field($related_transaction['brand_name']) : '',
+                        'approval_num' => !empty($related_transaction['approval_num']) ? sanitize_text_field($related_transaction['approval_num']) : '',
+                        'alternative_method_name' => !empty($related_transaction['alternative_method_name']) ? sanitize_text_field($related_transaction['alternative_method_name']) : '',
+                        'type_payment' => sanitize_text_field($related_transaction['type']),
+                        'token_uid' => !empty($related_transaction['token_uid']) ? sanitize_text_field($related_transaction['token_uid']) : '',
+                        'price' => floatval($related_transaction['amount']) * 100,
+                        'payplus_response' => wp_json_encode($related_transaction),
                         'delete_at' => 0,
-                    );
-                    $wpdb->insert(
-                        $table,
-                        $data
-                    );
+                    ];
+
+                    $wpdb->insert($table, $data);
                 }
             }
         }
     }
+
 
     /**
      * @param $metas
