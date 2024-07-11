@@ -37,6 +37,10 @@ jQuery(document).ready(function ($) {
     data.append("transactionUid", transactionUid);
     data.append("method", method);
     data.append("orderID", orderID);
+    data.append(
+      "_ajax_nonce",
+      payplus_script_payment["payplus-refund-club-amount"]
+    );
     data.append("id", id);
     fetch(payplus_script_admin.ajax_url, {
       method: "post",

@@ -2018,7 +2018,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function receipt_page($order_id, $token = null, $subscription = false, $custom_more_info = '', $subscription_amount = 0, $inline = false, $move_token = false)
     {
-
         $order = wc_get_order($order_id);
         $handle = 'payplus_process_payment';
         $handle .= ($subscription) ? '_subscription' : '';

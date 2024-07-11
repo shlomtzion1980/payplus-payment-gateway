@@ -620,8 +620,13 @@ jQuery(function ($) {
         order_id: orderID,
         payments: payments,
         typeDocument: typeDocument,
+        _ajax_nonce: payplus_script_payment.create_invoice_nonce,
       },
       success: function (response) {
+        if (response.success === false) {
+          alert(response.data);
+          location.reload();
+        }
         $(self).removeClass("button-loading");
         $("#payment-payplus-dashboard,.payplus_loader").fadeOut();
         if (response.status) {
@@ -629,6 +634,10 @@ jQuery(function ($) {
 
           location.href = response.urlredirect;
         }
+      },
+      error: function (xhr, status, error) {
+        alert("Error: Either you do not have permission or unknown error.");
+        location.reload();
       },
     });
 
@@ -665,6 +674,10 @@ jQuery(function ($) {
     data.append("order_id", orderId);
     data.append("amount", amount);
     data.append("type_document", typeDocument);
+    data.append(
+      "_ajax_nonce",
+      payplus_script_payment.create_invoice_refund_nonce
+    );
     $(self).addClass("button-loading");
     fetch(payplus_script_admin.ajax_url, {
       method: "post",
