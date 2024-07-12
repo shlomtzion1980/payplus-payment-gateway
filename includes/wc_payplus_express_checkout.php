@@ -45,38 +45,38 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         if ($this->payplus_chkeck_one_click_visible()) {
 ?>
-            <script>
-                function isFacebookApp() {
-                    var ua = navigator.userAgent || navigator.vendor || window.opera;
-                    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
-                }
+<script>
+function isFacebookApp() {
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
+}
 
-                let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
-                let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
-                let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
-                let removeGooglePay = isFacebookApp();
-                let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
-                let expresscheckouts = document.querySelectorAll(".express-checkout");
-                if (!showExpress) {
-                    expresscheckouts.forEach(e => e.remove());
-                } else {
-                    if (expresscheckouts.length > 1) {
-                        expresscheckouts.forEach((element, index) => {
-                            if (index) {
-                                expresscheckouts[index].remove();
-                            }
-                        });
-                    }
-                }
-                if (removeGooglePay) {
-                    let googlePayButton = document.getElementById('googlePayButton');
-                    if (googlePayButton) {
-                        googlePayButton.remove();
-                    }
+let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
+let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
+let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
+let removeGooglePay = isFacebookApp();
+let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
+let expresscheckouts = document.querySelectorAll(".express-checkout");
+if (!showExpress) {
+    expresscheckouts.forEach(e => e.remove());
+} else {
+    if (expresscheckouts.length > 1) {
+        expresscheckouts.forEach((element, index) => {
+            if (index) {
+                expresscheckouts[index].remove();
+            }
+        });
+    }
+}
+if (removeGooglePay) {
+    let googlePayButton = document.getElementById('googlePayButton');
+    if (googlePayButton) {
+        googlePayButton.remove();
+    }
 
-                }
-            </script>
-        <?php
+}
+</script>
+<?php
         }
     }
 
@@ -85,6 +85,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function ajax_payplus_apple_onvalidate_merchant()
     {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $url = $WC_PayPlus_Gateway->api_url . 'ApplePay/PaymentSessionOneClickCheckout';
         $obj = $_POST['obj'];
@@ -151,6 +152,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function ajax_payplus_process_payment_oneclick()
     {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
         global $post_id;
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $resError = array('results' => array(
@@ -337,6 +339,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function ajax_payplus_express_checkout_initialized()
     {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         $url = $WC_PayPlus_Gateway->api_url . 'Transactions/ExpressCheckoutInitialized';
@@ -409,6 +412,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function ajax_payplus_check_customer_vat_oc()
     {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
         $paying_vat = false;
         $obj = $_POST['obj'];
         global $woocommerce;
@@ -441,6 +445,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function ajax_payplus_get_total_cart()
     {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
         global $woocommerce;
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $discountPrice = 0;
@@ -680,13 +685,13 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
 
         ?>
-            <input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
-            <input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
-            <input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
-            <input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
-            <input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
-            <input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
-            <?php
+<input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
+<input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
+<input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
+<input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
+<input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
+<input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
+<?php
             if ($shippingWoo === "false") {
                 $globalShippingPriceTax = $globalShipping;
                 if ($globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
@@ -696,9 +701,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
                 }
             ?>
-                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
-                <input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
-                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
+<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
+<input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
+<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
 <?php
             }
             echo '<div class="express-flex" >';

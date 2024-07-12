@@ -2479,17 +2479,25 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
+
         if (payplus_check_table_exist_db($tblname)) {
-            $sql = 'SELECT *   FROM ' . $tblname . ' WHERE  order_id=' . $order_id;
+            // Sanitize the order ID before using it in the query
+            $order_id = absint($order_id);
+
+            // Prepare the SQL query
+            $sql = $wpdb->prepare('SELECT * FROM ' . $tblname . ' WHERE order_id = %d', $order_id);
             $result = $wpdb->get_results($sql);
+
             if ($wpdb->last_error) {
                 payplus_Add_log_payplus($wpdb->last_error);
             }
+
             if ($result) {
                 return $result[0];
             }
         }
     }
+
     public function updateOrderPayplus($order_id, $functionCurrent)
     {
         global $wpdb;
@@ -3187,7 +3195,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         global $wpdb;
         $table = $wpdb->prefix . 'payplus_order';
 
-        // Sanitize each piece of data before inserting
         $order_id = absint($order_id);
         $transaction_uid = sanitize_text_field($dataRow['transaction']->uid);
         $four_digits = (!empty($dataRow['data']->card_information->four_digits)) ? sanitize_text_field($dataRow['data']->card_information->four_digits) : '';
@@ -3219,11 +3226,33 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'delete_at' => 0,
         );
 
+        $format = array(
+            '%d',   // order_id
+            '%d',   // parent_id
+            '%s',   // transaction_uid
+            '%s',   // method_payment
+            '%s',   // page_request_uid
+            '%s',   // four_digits
+            '%d',   // number_of_payments
+            '%s',   // brand_name
+            '%s',   // approval_num
+            '%s',   // alternative_method_name
+            '%s',   // type_payment
+            '%s',   // token_uid
+            '%f',   // price
+            '%s',   // payplus_response
+            '%d',   // related_transactions
+            '%s',   // status_code
+            '%d',   // delete_at
+        );
+
         $wpdb->insert(
             $table,
-            $data
+            $data,
+            $format
         );
     }
+
 
 
 

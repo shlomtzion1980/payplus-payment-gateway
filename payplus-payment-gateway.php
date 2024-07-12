@@ -49,7 +49,6 @@ class WC_PayPlus
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
         add_action('wp_head', [$this, 'payplus_no_index_page_error']);
-        //this is a custom callback hook that runs when the wc-api=payplus_gateway is returned in the url!
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         //end custom hook
 
@@ -488,11 +487,15 @@ class WC_PayPlus
 
                 if ($isEnableOneClick) {
                     $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
-                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.min.js', [], PAYPLUS_VERSION, true);
+                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.js', [], PAYPLUS_VERSION, true);
                     wp_localize_script(
                         'payplus-front-js',
                         'payplus_script',
-                        array("payment_url_google_pay_iframe" => $payment_url_google_pay_iframe, 'ajax_url' => admin_url('admin-ajax.php'))
+                        [
+                            "payment_url_google_pay_iframe" => $payment_url_google_pay_iframe,
+                            'ajax_url' => admin_url('admin-ajax.php'),
+                            'frontNonce' => wp_create_nonce('frontNonce'),
+                        ]
                     );
                     wp_enqueue_script('payplus-front-js');
                 }

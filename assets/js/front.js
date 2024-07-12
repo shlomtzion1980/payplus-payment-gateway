@@ -106,6 +106,7 @@ async function onValidateMerchant(event, session) {
       data: {
         action: "apple-onvalidate-merchant",
         obj: additionalData,
+        _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
         data = response;
@@ -130,6 +131,7 @@ function updatePayingVat(contact) {
       data: {
         action: "check-customer-vat-oc",
         obj: contact,
+        _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
         paying_vat = response.paying_vat;
@@ -315,6 +317,7 @@ async function onPaymentAuthorized(event, session) {
       data: {
         action: "process-payment-oneclick",
         obj: additionalData,
+        _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
         if (response.status) {
@@ -462,6 +465,7 @@ async function getTotalPriceCart() {
       data: {
         formData,
         action: "payplus-get-total-cart",
+        _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
         resolve(response);
@@ -587,6 +591,7 @@ window.addEventListener("message", async function (event) {
         data: {
           action: "process-payment-oneclick",
           obj: additionalData,
+          _ajax_nonce: payplus_script.frontNonce,
         },
         success: function (response) {
           if (response.status === true) {
@@ -694,6 +699,7 @@ window.addEventListener("message", async function (event) {
         data: {
           action: "check-customer-vat-oc",
           obj: contact,
+          _ajax_nonce: payplus_script.frontNonce,
         },
         success: function (response) {
           const paying_vat = response.paying_vat;
