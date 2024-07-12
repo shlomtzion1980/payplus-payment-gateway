@@ -2293,9 +2293,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 }
             }
         } else {
-            $wpdb->update($tblname, array(
-                'count_process' => $result->count_process + 1,
-            ), array('id' => $result->rowId));
+            $countProcess = intval($result->count_process);
+            $rowId = intval($result->rowId);
+            $wpdb->update(
+                $tblname,
+                array(
+                    'count_process' => $countProcess + 1,
+                ),
+                array(
+                    'id' => $rowId,
+                ),
+                array('%d'),
+                array('%d')
+            );
         }
     }
 
