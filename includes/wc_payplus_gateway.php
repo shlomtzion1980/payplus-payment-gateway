@@ -3174,26 +3174,38 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_add_order_express_checkout($order_id, $dataRow)
     {
-
         global $wpdb;
         $table = $wpdb->prefix . 'payplus_order';
+
+        // Sanitize each piece of data before inserting
+        $order_id = absint($order_id);
+        $transaction_uid = sanitize_text_field($dataRow['transaction']->uid);
+        $four_digits = (!empty($dataRow['data']->card_information->four_digits)) ? sanitize_text_field($dataRow['data']->card_information->four_digits) : '';
+        $number_of_payments = (!empty($dataRow['transaction']->payments->number_of_payments)) ? absint($dataRow['transaction']->payments->number_of_payments) : 0;
+        $alternative_method_name = (!empty($dataRow['transaction']->alternative_method_name)) ? sanitize_text_field($dataRow['transaction']->alternative_method_name) : '';
+        $type_payment = sanitize_text_field($dataRow['transaction']->type);
+        $token_uid = (!empty($dataRow['data']->card_information->token)) ? sanitize_text_field($dataRow['data']->card_information->token) : '';
+        $price = floatval($dataRow['transaction']->amount) * 100;
+        $payplus_response = wp_json_encode($dataRow);
+        $status_code = sanitize_text_field($dataRow['transaction']->status_code);
+
         $data = array(
             'order_id' => $order_id,
             'parent_id' => 0,
-            'transaction_uid' => $dataRow['transaction']->uid,
+            'transaction_uid' => $transaction_uid,
             'method_payment' => 'credit-card',
             'page_request_uid' => '',
-            'four_digits' => (!empty($dataRow['data']->card_information->four_digits)) ? $dataRow['data']->card_information->four_digits : '',
-            'number_of_payments' => (!empty($dataRow['transaction']->payments->number_of_payments)) ? $dataRow['transaction']->payments->number_of_payments : 0,
+            'four_digits' => $four_digits,
+            'number_of_payments' => $number_of_payments,
             'brand_name' => '',
             'approval_num' => '',
-            'alternative_method_name' => (!empty($dataRow['transaction']->alternative_method_name)) ? $dataRow['transaction']->alternative_method_name : '',
-            'type_payment' => $dataRow['transaction']->type,
-            'token_uid' => (!empty($dataRow['data']->card_information->token)) ? $dataRow['data']->card_information->token : '',
-            'price' => floatval($dataRow['transaction']->amount) * 100,
-            'payplus_response' => wp_json_encode($dataRow),
+            'alternative_method_name' => $alternative_method_name,
+            'type_payment' => $type_payment,
+            'token_uid' => $token_uid,
+            'price' => $price,
+            'payplus_response' => $payplus_response,
             'related_transactions' => 0,
-            'status_code' => $dataRow['transaction']->status_code,
+            'status_code' => $status_code,
             'delete_at' => 0,
         );
 
@@ -3202,6 +3214,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $data
         );
     }
+
+
 
     /**
      * @param $order_id

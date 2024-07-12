@@ -290,6 +290,15 @@ class WC_PayPlus_Admin_Settings
                     'default' => 'no',
                     'desc_tip' => true
                 );
+                $settings[$section][] = [
+                    'name' => __('Allow amount change', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => 'yes',
+                    'desc_tip' => true,
+                    'label' => __('Transaction amount change', 'payplus-payment-gateway'),
+                    'desc' => __('Choose this to be able to charge a different amount higher/lower than the order total (A number field will appear beside the "Make Paymet" button)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[check_amount_authorization]',
+                ];
                 $settings[$section][] = array(
                     'name' => __('Select the types you want available for docs creation', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[invoice-manual-list]',

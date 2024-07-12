@@ -11,11 +11,11 @@ jQuery(function ($) {
   const enableGooglePay = $(".enable_google_pay");
   const enableApplePay = $(".enable_apple_pay");
   const tokenApplePay = $(".apple_pay_identifier");
-  const transactionType = $(
-    "#woocommerce_payplus-payment-gateway_transaction_type"
-  );
+  const transactionType = payplus_script_payment.transactionType;
+
+  console.log(transactionType);
   const checkAmountAuthorization = $(
-    "#woocommerce_payplus-payment-gateway_check_amount_authorization"
+    "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
   );
   const blockIpTransactions = $(
     "#woocommerce_payplus-payment-gateway_block_ip_transactions"
@@ -104,16 +104,16 @@ jQuery(function ($) {
   /******    block  end ******/
 
   /******    transaction Type  start ******/
-  if (transactionType.val() != 2) {
+  if (transactionType != 2) {
     checkAmountAuthorization.closest("tr").fadeOut();
   }
-  transactionType.change(function () {
-    if ($(this).val() == 2) {
-      checkAmountAuthorization.closest("tr").fadeIn();
-    } else {
-      checkAmountAuthorization.closest("tr").fadeOut();
-    }
-  });
+  // transactionType.change(function () {
+  //   if ($(this).val() == 2) {
+  //     checkAmountAuthorization.closest("tr").fadeIn();
+  //   } else {
+  //     checkAmountAuthorization.closest("tr").fadeOut();
+  //   }
+  // });
   /******    transaction type  end ******/
 
   if (enableApplePay && enableApplePay.prop("checked") === false) {
