@@ -125,20 +125,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->orderId = $context->order->id;
         $order = wc_get_order($this->orderId);
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
-        $result->set_payment_details('');
-        if ($main_gateway->block_ip_transactions) {
-            $client_ip = $_SERVER['REMOTE_ADDR'];
-            $counts = array_count_values($main_gateway->get_payment_ips());
-            $howMany = $counts[$client_ip];
-            if (in_array($client_ip, $main_gateway->get_payment_ips()) && $howMany >= $main_gateway->block_ip_transactions_hour) {
-                $payment_details['errorMessage'] = __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway');
-                $result->set_payment_details($payment_details);
-                wp_die(esc_html__('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway'));
-            }
-        }
         $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments]);
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
+        $result->set_payment_details('');
         $payment_details = $result->payment_details;
         $payment_details['order_id'] = $this->orderId;
         $payment_details['secret_key'] = $this->secretKey;
@@ -183,7 +173,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
 
         $script_asset = array(
             'dependencies' => array(),
