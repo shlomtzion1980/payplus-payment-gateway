@@ -210,8 +210,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -532,8 +532,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
@@ -838,7 +838,7 @@ class WC_PayPlus
             $client_ip = $_SERVER['REMOTE_ADDR'];
             $counts = array_count_values($this->payplus_gateway->get_payment_ips());
             $howMany = $counts[$client_ip];
-            if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= 10) {
+            if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= $this->payplus_gateway->block_ip_transactions_hour) {
                 $errors->add(
                     'error',
                     __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
