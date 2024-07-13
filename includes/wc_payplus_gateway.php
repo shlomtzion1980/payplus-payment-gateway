@@ -2119,7 +2119,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $response = json_decode($json, true);
         $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
         $tblname = $wpdb->prefix . 'payplus_payment_process';
-
+        $handle = 'payplus_callback_begin';
+        $this->payplus_add_log_all($handle, 'shlomo  ' . $response);
         $payplusHash = sanitize_text_field($_SERVER['HTTP_HASH']);
         $order_id = intval($response['transaction']['more_info']);
         $status_code = sanitize_text_field($response['transaction']['status_code']);
