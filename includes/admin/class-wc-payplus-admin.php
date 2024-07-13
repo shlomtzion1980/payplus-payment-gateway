@@ -375,7 +375,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         if ($payments[$indexRow]->price > round($amount, $this->rounding_decimals)) {
                             $payments[$indexRow]->price = $amount * 100;
                         }
-                        $rand = rand(0, intval($orderID));
+                        $rand = wp_rand(0, intval($orderID));
                         $this->invoice_api->payplus_create_document_dashboard(
                             $orderID,
                             $this->invoice_api->payplus_get_invoice_type_document_refund(),
@@ -530,7 +530,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $type_document,
                     $resultApps,
                     round($amount, $this->rounding_decimals),
-                    'payplus_order_refund' . $order_id . "_" . rand(1, 1000)
+                    'payplus_order_refund' . $order_id . "_" . wp_rand(1, 1000)
                 );
 
                 $wpdb->update(
@@ -962,7 +962,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="credit-card-payment-payplus input-change create_at" type="date"
                     placeholder="<?php esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1087,7 +1087,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="cash-payment-payplus input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1125,7 +1125,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="payment-check-payment-payplus  input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1177,7 +1177,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="bank-transfer-payment-payplus  input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1226,7 +1226,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="payment-app-payment-payplus input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1280,7 +1280,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="paypal-payment-payplus  input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1324,7 +1324,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="withholding-tax-payment-payplus input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>
@@ -1358,7 +1358,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="flex-row">
             <div class="flex-item">
                 <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                <input value="<?php echo esc_attr(date("Y-m-d")) ?>" required
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
                     class="other-payment-payplus  input-change create_at" type="date"
                     placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
             </div>

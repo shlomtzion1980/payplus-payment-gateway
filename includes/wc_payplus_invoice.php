@@ -967,14 +967,13 @@ class PayplusInvoice
 
         if (!WC_PayPlus::payplus_check_exists_table()) {
             $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
-
-            $sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}payplus_order WHERE order_id = %d AND delete_at = 0", $order_id);
+            $endSql = "";
 
             if (empty($notPayment) && $payplus_related_transactions) {
-                $sql .= " AND related_transactions = 0";
+                $endSql .= " AND related_transactions = 0";
             }
 
-            $resultApps = $wpdb->get_results($sql, OBJECT);
+            $resultApps = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}payplus_order WHERE order_id = %d AND delete_at = 0 {$endSql}", $order_id), OBJECT);
         } else {
             $sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}postmeta WHERE post_id = %d AND (", $order_id);
             $clauses = [];

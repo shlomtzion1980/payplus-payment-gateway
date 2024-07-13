@@ -794,7 +794,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             $titles = null;
             $count = count($links);
-            $randomIndex = rand(0, $count - 1);
+            $randomIndex = wp_rand(0, $count - 1);
             $c = 0;
             foreach ($formFields as $field) {
                 if (isset($field['type']) && $field['type'] === 'title') {
@@ -1275,15 +1275,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             return false;
         }
 
-        if ($token->get_expiry_year() > date("Y")) {
+        if ($token->get_expiry_year() > gmdate("Y")) {
             return true;
         }
 
-        if ($token->get_expiry_year() < date("Y")) {
+        if ($token->get_expiry_year() < gmdate("Y")) {
             return false;
         }
 
-        if ($token->get_expiry_month() >= date("m")) {
+        if ($token->get_expiry_month() >= gmdate("m")) {
             return true;
         }
     }
@@ -2279,7 +2279,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $dataInsert = array(
                     'order_id' => $order_id,
                     'status' => sanitize_text_field($order->get_status()),
-                    'create_at_refURL_callback' => $this->pauplus_get_current_date(),
+                    'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
                 );
                 $handle = 'payplus_callback';
                 $data = $this->set_arrangement_callback($response);
@@ -2398,7 +2398,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $dataInsert = array(
             'order_id' => $order_id,
             'status' => $order->get_status(),
-            'create_at_refURL_success' => $this->pauplus_get_current_date(),
+            'create_at_refURL_success' => current_time('Y-m-d H:i:s'),
         );
         $this->logOrderBegin($order_id);
         if ($this->checkOrderBeginData($order_id, $data)) {
@@ -2459,7 +2459,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function updateOrderStatus($order_id, $type, $res = null)
     {
-        date_default_timezone_set('Asia/Jerusalem');
         $indexRow = 0;
         $order = wc_get_order($order_id);
         if (isset($res->data->recurring_type)) {
@@ -2484,7 +2483,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $order->save();
             }
 
-            $data = array('status' => $order->get_status(), 'update_at' => $this->pauplus_get_current_date());
+            $data = array('status' => $order->get_status(), 'update_at' => current_time('Y-m-d H:i:s'));
             $where = array('order_id' => $order_id);
             return $order;
         }
@@ -2996,7 +2995,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             "refURL_failure": "' . wc_get_endpoint_url('add-payment-method') . '",
             "refURL_callback": null,
             "customer": ' . $customerData . ',
-            "amount": ' . rand(1, 9) . ',
+            "amount": ' . wp_rand(1, 9) . ',
             "currency_code": "' . get_woocommerce_currency() . '",
             "sendEmailApproval": false,
             "sendEmailFailure": false,
@@ -3380,7 +3379,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function pauplus_get_current_date()
     {
-        date_default_timezone_set('Asia/Jerusalem');
+
         $dateNow = new DateTime();
         $dateNow = $dateNow->format('Y-m-d H:i:s');
         return $dateNow;
