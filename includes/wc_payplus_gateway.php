@@ -1123,6 +1123,33 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this);
     }
 
+    public function get_payment_ips()
+    {
+        $ips = get_transient('payment_ips');
+        return $ips === false ? array() : $ips; // Return an empty array if the transient does not exist
+    }
+
+    public function store_payment_ip()
+    {
+        $client_ip = $_SERVER['REMOTE_ADDR'];
+
+        // Retrieve the current IPs from the transient
+        $ips = get_transient('payment_ips');
+        if ($ips === false) {
+            $ips = array();
+        }
+
+        // Add the new IP to the beginning of the array
+        array_unshift($ips, $client_ip);
+
+        // Keep only the last 10 IPs
+        $ips = array_slice($ips, 0, 200);
+
+        // Store the updated array in the transient with a 30-minute expiration
+        set_transient('payment_ips', $ips, 1800); // 1800 seconds = 30 minutes
+    }
+
+
     /**
      * @param int $order_id
      * @return array|void
@@ -1132,6 +1159,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
             wp_die('Not allowed!');
         }
+
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
         $objectLogging = new stdClass();
@@ -1167,7 +1195,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
                 do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), $order);
                 $order->update_status('failed');
-
+                $this->store_payment_ip();
                 return [
                     'result'   => 'fail',
                     'redirect' => '',
@@ -1298,7 +1326,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_get_posts_id($post_id = "", $fields = array())
     {
         global $wpdb;
-
+        $post_id = !empty($post_id) ? intval($post_id) : null;
         $sql = "SELECT * FROM {$wpdb->posts}";
 
         $where = "";
@@ -1309,6 +1337,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             if (!empty($fields)) {
                 foreach ($fields as $key => $value) {
+                    $value = sanitize_text_field($value);
                     $where .= $wpdb->prepare(" AND %s = %s", $key, $value);
                 }
             }
@@ -1368,118 +1397,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
         return $shipping_method_data;
-    }
-
-    /**
-     * @param $insertArr
-     * @return void
-     */
-    public function payplus_insert_session_ip($insertArr)
-    {
-        global $wpdb;
-
-        $insertArr['payplus_date'] = sanitize_text_field($insertArr['payplus_date']);
-        $insertArr['payplus_update'] = sanitize_text_field($insertArr['payplus_update']);
-        $insertArr['payplus_created'] = sanitize_text_field($insertArr['payplus_created']);
-        $insertArr['payplus_ip'] = sanitize_text_field($insertArr['payplus_ip']);
-        $insertArr['payplus_amount'] = floatval($insertArr['payplus_amount']);
-
-        $wpdb->insert(
-            $wpdb->prefix . 'payplus_payment_session',
-            $insertArr,
-            array('%s', '%s', '%s', '%s', '%f')
-        );
-    }
-
-    /**
-     * @param $updateArr
-     * @param $whereId
-     * @return void
-     */
-    public function payplus_update_session_ip($updateArr, $whereId)
-    {
-        global $wpdb;
-        $wpdb->update(
-            $wpdb->prefix . 'payplus_payment_session',
-            $updateArr,
-            $whereId
-        );
-    }
-
-    /**
-     * @return bool
-     * @throws Exception
-     */
-    public function payplus_check_blocked_ip()
-    {
-        global $wpdb;
-        $date = new DateTime();
-        $payplusCreated = $date->format('Y-m-d');
-        $exceptpayplus = $this->get_option('exceptpayplus');
-        $exceptpayplus = str_replace(7, ".", $exceptpayplus);
-        $clientIp = $this->payplus_ip();
-
-        if ($this->block_ip_transactions && $clientIp != $exceptpayplus) {
-
-            $payplusClientIps = $wpdb->get_results('SELECT * FROM '
-                . $wpdb->prefix . 'payplus_payment_session WHERE
-                        payplus_ip="' . $clientIp . '" AND payplus_date= "' . $payplusCreated . '" AND payplus_status=1');
-
-            $insert = true;
-
-            $payplusAmount = 1;
-            if ($payplusClientIps) {
-
-                foreach ($payplusClientIps as $key => $payplusClientIp) {
-                    $dateLink = new DateTime($payplusClientIp->payplus_created);
-                    $interval = $dateLink->diff($date);
-
-                    if ($interval->i < 60 && $interval->h == 0) {
-
-                        $payplusAmount = $payplusClientIp->payplus_amount + 1;
-                        $this->payplus_update_session_ip(
-                            array(
-                                'payplus_update' => $date->format('Y-m-d H:i'),
-                                'payplus_ip' => sanitize_text_field($clientIp),
-                                'payplus_amount' => $payplusAmount,
-                            ),
-                            array('id' => $payplusClientIp->id)
-                        );
-                        $insert = false;
-                    } else {
-                        $insert = true;
-                        $this->payplus_update_session_ip(
-                            array('payplus_status' => 0),
-                            array('id' => $payplusClientIp->id)
-                        );
-                    }
-                }
-
-                if ($payplusAmount > intval($this->block_ip_transactions_hour)) {
-                    $this->payplus_update_session_ip(
-                        array(
-                            'payplus_update' => $date->format('Y-m-d H:i'),
-                            'payplus_ip' => sanitize_text_field($clientIp),
-                            'payplus_amount' => $payplusAmount,
-                        ),
-                        array('id' => $payplusClientIp->id)
-                    );
-
-                    return true;
-                }
-            }
-
-            if ($insert) {
-                $this->payplus_insert_session_ip(array(
-                    'payplus_date' => $date->format('Y-m-d'),
-                    'payplus_update' => $date->format('Y-m-d H:i'),
-                    'payplus_created' => $date->format('Y-m-d H:i'),
-                    'payplus_ip' => sanitize_text_field($clientIp),
-                    'payplus_amount' => $payplusAmount,
-                ));
-            }
-        }
-        return false;
     }
 
     /**

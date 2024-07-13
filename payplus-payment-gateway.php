@@ -21,7 +21,6 @@ define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
 define('PAYPLUS_VERSION', '7.0.8');
 define('PAYPLUS_VERSION_DB', 'payplus_2_6');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
-define('PAYPLUS_TABLE_SESSION', 'payplus_payment_session');
 class WC_PayPlus
 {
     protected static $instance = null;
@@ -110,6 +109,9 @@ class WC_PayPlus
         $indexRow = 0;
         if (!empty($REQUEST['more_info'])) {
             $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
+            if ($status_code !== '000') {
+                $this->payplus_gateway->store_payment_ip();
+            }
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
             $result = $wpdb->get_results($wpdb->prepare(
                 'SELECT id as rowId, count(*) as rowCount, count_process FROM %s WHERE order_id = %d AND ( status_code = %d )',
@@ -826,16 +828,22 @@ class WC_PayPlus
     public function payplus_validation_cart_checkout($fields, $errors)
     {
         $this->payplus_gateway = $this->get_main_payplus_gateway();
+
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
         if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
             $errors->add('error', esc_html__('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
         }
-        if ($this->payplus_gateway->payplus_check_blocked_ip()) {
-            $errors->add(
-                'error',
-                __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
-            );
+        if ($this->payplus_gateway->block_ip_transactions) {
+            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $counts = array_count_values($this->payplus_gateway->get_payment_ips());
+            $howMany = $counts[$client_ip];
+            if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= 10) {
+                $errors->add(
+                    'error',
+                    __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
+                );
+            }
         }
     }
 

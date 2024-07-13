@@ -131,6 +131,7 @@ jQuery(document).ready(function ($) {
       action: "custom_action",
       payment_request_uid: $("#custom-button-get-pp").val(),
       order_id: $("#custom-button-get-pp").data("value"),
+      _ajax_nonce: payplus_script_admin.payplusCustomAction,
     };
 
     $.post(ajaxurl, data, function (response) {
@@ -150,6 +151,7 @@ jQuery(document).ready(function ($) {
       data: {
         action: "payment-payplus-transaction-review",
         order_id: orderId,
+        _ajax_nonce: payplus_script_admin.payplusTransactionReview,
       },
       success: function (response) {
         $("#payment-payplus-dashboard,.payplus_loader").fadeOut();
@@ -172,6 +174,7 @@ jQuery(document).ready(function ($) {
       data: {
         action: "generate-link-payment",
         order_id: orderId,
+        _ajax_nonce: payplus_script_admin.payplusGenerateLinkPayment,
       },
       success: function (response) {
         $("#box-payplus-payment").fadeIn();
@@ -200,6 +203,7 @@ jQuery(document).ready(function ($) {
       data: {
         action: "payplus-api-payment",
         order_id: orderId,
+        _ajax_nonce: payplus_script_admin.payplusApiPayment,
       },
       success: function (response) {
         $(".payplus_loader").fadeOut();

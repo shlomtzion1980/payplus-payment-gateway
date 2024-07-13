@@ -225,9 +225,8 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-<button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>"
-    class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
-<div class='payplus_loader_refund'></div>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
+            <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -983,11 +982,13 @@ class PayplusInvoice
             $clauses = [];
 
             foreach ($this->payment_method as $key => $value) {
+                $value = sanitize_text_field($value);
                 $clauses[] = $wpdb->prepare("meta_key LIKE %s", '%payplus_' . $value . '%');
             }
 
             if (empty($notPayment)) {
                 foreach ($this->payment_method_club as $key => $value) {
+                    $value = sanitize_text_field($value);
                     $clauses[] = $wpdb->prepare("meta_key LIKE %s", '%payplus_' . $value . '%');
                 }
             }

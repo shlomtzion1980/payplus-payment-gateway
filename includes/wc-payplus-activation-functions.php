@@ -167,7 +167,7 @@ function payplusUpdateActivate()
         payplus_create_table_order();
         // payplus_create_table_change_status_order();
         // payplus_create_table_log();
-        payplus_create_table_payment_session();
+        // payplus_create_table_payment_session();
         payplus_create_table_process();
         checkSetPayPlusOptions();
         update_option('payplus_db_version', PAYPLUS_VERSION_DB);
@@ -388,31 +388,6 @@ function payplus_check_table_exist_db($nameTable)
     return true;
 }
 
-function payplus_create_table_payment_session()
-{
-    global $wpdb;
-    $tblname = $wpdb->prefix . PAYPLUS_TABLE_SESSION;
-    $charset_collate = $wpdb->get_charset_collate();
-    if (!payplus_check_table_exist_db($tblname)) {
-
-        $sql = "CREATE TABLE $tblname (
-                  id int(11) NOT NULL AUTO_INCREMENT,
-                  payplus_date date NOT NULL,
-                  payplus_created datetime NOT NULL,
-                  payplus_update datetime NOT NULL,
-                  payplus_ip text NOT NULL,
-                  payplus_order int(11) NULL,
-                  payplus_amount int(11) NULL,
-                   payplus_status int(11) DEFAULT  1,
-                  PRIMARY KEY (id)
-                ) $charset_collate;";
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta($sql);
-        if ($wpdb->last_error) {
-            payplus_Add_log_payplus($wpdb->last_error);
-        }
-    }
-}
 /**
  * @return void
  */
