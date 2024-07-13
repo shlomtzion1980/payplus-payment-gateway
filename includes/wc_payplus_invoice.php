@@ -30,12 +30,14 @@ class PayplusInvoice
     private $payplus_unique_identifier;
     private $invoice_notes_no;
     private $invoiceDisplayOnly;
+    private $_wpnonce;
 
     /**
      *
      */
     public function __construct()
     {
+        $this->_wpnonce = wp_create_nonce('PayPlusGateWayInvoiceNonce');
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->invoiceDisplayOnly = isset($this->payplus_invoice_option['display_only_invoice_docs']) && $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
@@ -223,8 +225,9 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
-            <div class='payplus_loader_refund'></div>
+<button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>"
+    class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
+<div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -556,6 +559,7 @@ class PayplusInvoice
      */
     public function ajax_payplus_api_payment_refund()
     {
+        check_ajax_referer('payplus_api_payment_refund', '_ajax_nonce');
         if (!empty($_POST)) {
             $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
             $order = wc_get_order($order_id);
@@ -1053,6 +1057,9 @@ class PayplusInvoice
      */
     public function payplus_invoice_create_order($order_id, $typeInvoice = false)
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
+            wp_die('Not allowed!');
+        }
         $payload = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $handle = 'payplus_process_invoice';

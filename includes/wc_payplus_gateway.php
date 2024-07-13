@@ -94,6 +94,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $saveOrderNote;
     public $currentApiKey;
     public $currentSecret;
+    private $_wpnonce;
 
     /**
      *
@@ -130,7 +131,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->disable_menu_side = $this->get_option('disable_menu_side') == 'yes' ? false : true;
         $this->enable_pickup = $this->get_option('enable_pickup') == 'yes' ? true : false;
         $this->check_amount_authorization = $this->get_option('check_amount_authorization') == 'yes' ? false : true;
-
+        $this->_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
         $this->title = $this->get_option('title');
         $this->description = $this->get_option('description');
         $this->api_test_mode = $this->get_option('api_test_mode') === 'yes' ? true : false;
@@ -238,11 +239,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
         add_action('woocommerce_receipt_' . $this->id, [$this, 'receipt_page']);
         add_action('woocommerce_api_payplus_add_payment', [$this, 'add_payment_ipn_response']);
-        add_action('admin_init', [$this, 'payplus_hide_editor']);
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
         add_action('woocommerce_api_update_payplus_payment_method', [$this, 'updatePaymentMethodHook']);
-        add_action('woocommerce_api_get_order_meta', [$this, 'getOrderMeta']);
-        add_action('update_option', [$this, 'settingsSave'], 10, 1);
 
         /****** ACTION END ******/
 
@@ -271,15 +269,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_invoice_option['payplus_invoice_secret_key'] = $this->secret_key;
             update_option('payplus_invoice_option', $payplus_invoice_option);
         }
-    }
-
-    public function getOrderMeta()
-    {
-        $orderId = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
-        $paymentPageLink = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_payment_page_link');
-        $json = '{"paymentPageLink":"' . $paymentPageLink . '"}';
-        print_r($json);
-        exit;
     }
 
     /**
@@ -443,25 +432,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     }
 
     /**
-     * @return void
-     */
-    public function payplus_hide_editor()
-    {
-
-        $post_error_page = get_option('error_page_payplus');
-        $post_id = (!empty($_GET['post'])) ? $_GET['post'] : "";
-        if (!isset($post_id)) {
-            return;
-        }
-
-        if ($post_id == $post_error_page) {
-            remove_post_type_support('page', 'editor');
-            remove_post_type_support('page', 'thumbnail');
-            remove_post_type_support('page', 'page-attributes');
-        }
-    }
-
-    /**
      * Adds a notice for customer when they update their billing address.
      *
      * @since 4.1.0
@@ -500,26 +470,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         return $allcaps;
     }
 
-    /**
-     * This function runs every time the settings are saved on the admin panel.
-     * @param $option
-     * @return void
-     */
-    public function settingsSave($option)
-    {
-        //Update PayPlus error-payment-payplus page content
-        if (isset($_GET['section']) && $_GET['section'] === 'payplus-error-setting') {
-            $error_page_payplus = get_option('error_page_payplus');
-            $errorPagePayPlus = get_post($error_page_payplus);
-            $errorPageOptions = get_option('settings_payplus_page_error_option');
-            if ($errorPageOptions['post-content'] !== $errorPagePayPlus->post_content) {
-                wp_update_post(array(
-                    'ID' => $error_page_payplus,
-                    "post_content" => __($errorPageOptions['post-content'], "payplus-payment-gateway")
-                ));
-            }
-        }
-    }
 
     /**
      * @return false|mixed|void
@@ -654,6 +604,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_get_nav_option()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         if (count($adminTabs)) {
@@ -679,6 +632,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function admin_options()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         $title = esc_html(__('PayPlus', 'payplus-payment-gateway') . " ( " . PAYPLUS_VERSION . " )");
         $desc = wp_kses(
             __('For more information about PayPlus and Plugin versions <a href="https://www.payplus.co.il/wordpress" target="_blank">www.payplus.co.il/wordpress</a>', 'payplus-payment-gateway'),
@@ -780,30 +736,30 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<h3 id='payplus-title-section'>" . esc_html($title) . "</h3>
                     <p>" . wp_kses_post($desc) . "</p>";
 
-        function titleDivs($formFields, $currentSection)
-        {
-            if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
-                $faq_url = 'https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce';
-                $faq_embedded_url = esc_url($faq_url);
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '" sandbox="allow-same-origin allow-scripts"></iframe>';
-            } else {
-                $faq_url = 'https://www.payplus.co.il/faq/';
-                $faq_embedded_url = esc_url($faq_url);
-                $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . ' sandbox="allow-same-origin allow-scripts""></iframe>';
-            }
+        // function titleDivs($formFields, $currentSection)
+        // {
+        //     if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
+        //         $faq_url = 'https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce';
+        //         $faq_embedded_url = esc_url($faq_url);
+        //         $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '" sandbox="allow-same-origin allow-scripts"></iframe>';
+        //     } else {
+        //         $faq_url = 'https://www.payplus.co.il/faq/';
+        //         $faq_embedded_url = esc_url($faq_url);
+        //         $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . ' sandbox="allow-same-origin allow-scripts""></iframe>';
+        //     }
 
-            $titles = null;
-            $count = count($links);
-            $randomIndex = wp_rand(0, $count - 1);
-            $c = 0;
-            foreach ($formFields as $field) {
-                if (isset($field['type']) && $field['type'] === 'title') {
-                    $titles = isset($links[$c]) ? $titles .= '<div class="settingTitle fullHeight">' . $links[$c] . '</div>' : $titles;
-                    ++$c;
-                }
-            }
-            return $titles ?? '<div class="settingTitle">' . $links[$randomIndex] . '</div>';
-        }
+        //     $titles = null;
+        //     $count = count($links);
+        //     $randomIndex = wp_rand(0, $count - 1);
+        //     $c = 0;
+        //     foreach ($formFields as $field) {
+        //         if (isset($field['type']) && $field['type'] === 'title') {
+        //             $titles = isset($links[$c]) ? $titles .= '<div class="settingTitle fullHeight">' . $links[$c] . '</div>' : $titles;
+        //             ++$c;
+        //         }
+        //     }
+        //     return $titles ?? '<div class="settingTitle">' . $links[$randomIndex] . '</div>';
+        // }
 
         function hide($currentSection)
         {
@@ -1173,7 +1129,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function process_payment($order_id)
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
         $objectLogging = new stdClass();
@@ -3030,6 +2988,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function add_payment_ipn_response()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         $handle = 'payplus_add_payment_ipn';
         $this->payplus_add_log_all($handle, 'New Token Has Been Generated');
 

@@ -636,7 +636,7 @@ jQuery(function ($) {
       },
       error: function (xhr, status, error) {
         alert("Error: Either you do not have permission or unknown error.");
-        location.reload();
+        //  location.reload();
       },
     });
 

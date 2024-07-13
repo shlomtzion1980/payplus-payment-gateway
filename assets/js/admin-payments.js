@@ -98,6 +98,7 @@ jQuery(document).ready(function ($) {
       data: {
         action: "payplus-api-payment-refund",
         order_id: orderId,
+        _ajax_nonce: payplus_script_admin.payplusApiPaymentRefund,
       },
       success: function (response) {
         $(".payplus_loader_refund").fadeOut();

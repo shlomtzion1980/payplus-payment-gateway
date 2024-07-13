@@ -34,11 +34,11 @@ class WC_PayPlus_Admin_Settings
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "express.svg'>",
             ),
-            'payplus-error-setting' => array(
-                'name' => __('Error Page', 'payplus-payment-gateway'),
-                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
-                'img' => "",
-            ),
+            // 'payplus-error-setting' => array(
+            //     'name' => __('Error Page', 'payplus-payment-gateway'),
+            //     'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
+            //     'img' => "",
+            // ),
         );
     }
 
@@ -165,20 +165,20 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-setup-wizard');
                 break;
             case 'payplus-error-setting':
-                $settings[$section][] = array(
-                    'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
-                    'type' => 'title',
-                    'desc' => '',
-                    'id' => 'payplus-error-setting'
-                );
-                $settings[$section][] = array(
-                    'name' => __('Content of the page', 'payplus-payment-gateway') . ":",
-                    'id' => 'settings_payplus_page_error_option[post-content]',
-                    'type' => 'textarea',
-                    'desc' => __('Edit the error page content', 'payplus-payment-gateway'),
-                    'desc_tip' => true,
-                    'default' => "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller"
-                );
+                // $settings[$section][] = array(
+                //     'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
+                //     'type' => 'title',
+                //     'desc' => '',
+                //     'id' => 'payplus-error-setting'
+                // );
+                // $settings[$section][] = array(
+                //     'name' => __('Content of the page', 'payplus-payment-gateway') . ":",
+                //     'id' => 'settings_payplus_page_error_option[post-content]',
+                //     'type' => 'textarea',
+                //     'desc' => __('Edit the error page content', 'payplus-payment-gateway'),
+                //     'desc_tip' => true,
+                //     'default' => "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller"
+                // );
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-error-setting');
                 break;
             case 'payplus-invoice':

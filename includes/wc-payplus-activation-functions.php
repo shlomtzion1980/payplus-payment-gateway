@@ -380,8 +380,7 @@ function payplus_check_table_exist_db($nameTable)
     global $wpdb;
 
     $nameTable = esc_sql($nameTable);
-    $query = $wpdb->prepare("SHOW TABLES LIKE %s", $nameTable);
-    $result = $wpdb->get_var($query);
+    $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $nameTable));
     if ($result !== $nameTable) {
         return false;
     }
@@ -445,30 +444,37 @@ function payplus_create_table_process()
  */
 function payplus_add_file_ApplePay()
 {
-
     $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
     $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
 
-    if (!file_exists($destinationFile)) {
-        if (file_exists($sourceFile)) {
-            if (!is_dir(PAYPLUS_DEST_FILE_APPLE)) {
-                wp_mkdir_p(PAYPLUS_DEST_FILE_APPLE);
-                chmod(PAYPLUS_DEST_FILE_APPLE, 0777);
-            }
-            if (!file_exists($destinationFile)) {
-                if (copy($sourceFile, $destinationFile)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        } else {
-            return false;
+    // Check if destination file exists
+    if (file_exists($destinationFile)) {
+        return true; // File already exists, nothing to do
+    }
+
+    // Ensure source file exists
+    if (!file_exists($sourceFile)) {
+        return false; // Source file does not exist
+    }
+
+    // Ensure destination directory exists
+    WP_Filesystem();
+    global $wp_filesystem;
+
+    if (!$wp_filesystem->is_dir(PAYPLUS_DEST_FILE_APPLE)) {
+        if (!$wp_filesystem->mkdir(PAYPLUS_DEST_FILE_APPLE, 0777)) {
+            return false; // Failed to create destination directory
         }
+    }
+
+    // Copy the file using WordPress filesystem API
+    if ($wp_filesystem->copy($sourceFile, $destinationFile, true)) {
+        return true; // File copied successfully
     } else {
-        return true;
+        return false; // Failed to copy the file
     }
 }
+
 
 function payplus_Add_log_payplus($last_error)
 {
@@ -507,9 +513,19 @@ function payplus_order_admin_custom_fields($fields)
     return $fields;
 }
 
+add_action('woocommerce_after_checkout_billing', 'add_vat_number_nonce_field');
+function add_vat_number_nonce_field()
+{
+    wp_nonce_field('vat_number_nonce_action', 'vat_number_nonce');
+}
+
+
 add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
 function payplus_checkout_field_update_order_meta($order_id)
 {
+    if (!isset($_POST['vat_number_nonce']) || !wp_verify_nonce($_POST['vat_number_nonce'], 'vat_number_nonce_action')) {
+        return;
+    }
 
     if (isset($_POST['_billing_vat_number'])) {
         update_post_meta($order_id, '_billing_vat_number', sanitize_text_field($_POST['_billing_vat_number']));

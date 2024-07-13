@@ -24,6 +24,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public $showPayPlusDataMetabox;
     public $allSettings;
     public $transactionType;
+    private $_wpnonce;
 
     /**
      * @return null
@@ -40,6 +41,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     private function __construct()
     {
+        $this->_wpnonce = wp_create_nonce('PayPlusGateWayAdminNonce');
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         global $pagenow;
         $postKey = array_key_exists('post', $_GET) ? 'post' : 'id';
 
@@ -176,6 +181,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function custom_action_callback()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $payment_request_uid = $_POST['payment_request_uid'];
 
@@ -284,7 +292,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function payplus_admin_classes($classes)
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         if (isset($_GET['section']) && $_GET['section'] === 'payplus-error-setting') {
             $classes .= "payplus-error-setting";
         }
@@ -447,7 +457,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_create_invoice()
     {
-
         check_ajax_referer('create_invoice_nonce', '_ajax_nonce');
 
         if (!current_user_can('edit_shop_orders') && !is_admin()) {
@@ -471,8 +480,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     return $value;
                 }
 
-                $payments = array_map('set_payment_payplus', $payments);
-                $this->payplus_add_payments($order_id, $payments);
+                // $payments = array_map('set_payment_payplus', $payments);
+                // $this->payplus_add_payments($order_id, $payments);
             }
 
             $this->payPlusInvoice->payplus_invoice_create_order($order_id, $type_document);
@@ -555,6 +564,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payment_payplus_transaction_review()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             $handle = "payplus_process_payment";
             $this->isInitiated();
@@ -632,7 +644,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_generate_link_payment()
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         $response = array("payment_response" => "", "status" => false);
 
         if (!empty($_POST)) {
@@ -674,7 +688,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_payment_api()
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         if (!empty($_POST)) {
             $this->isInitiated();
             // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
@@ -1736,6 +1752,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_token_payment()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         $totalCartAmount = 0;
         $handle = 'payplus_process_j5_payment';
         $urlEdit = site_url();
@@ -1874,7 +1893,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function load_admin_assets()
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         $enabled = false;
         $isInvoice = false;
         if (!empty($_GET) && !empty($_GET['section'])) {
@@ -1921,6 +1942,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplus_refund_error" => __('Incorrect amount or amount greater than amount that can be refunded', 'payplus-payment-gateway'),
                 "menu_option" => WC_PayPlus::payplus_get_admin_menu(wp_create_nonce('menu_option')),
                 "payplus_refund_club_amount" => wp_create_nonce('payplus_refund_club_amount'),
+                "payplusApiPaymentRefund" => wp_create_nonce('payplus_api_payment_refund'),
             )
         );
         wp_enqueue_script('payplus-admin-payment');
@@ -1983,6 +2005,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function process_make_payment($order_id)
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
             return;
         }
@@ -2112,6 +2137,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function admin_notices()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            wp_die('Not allowed!');
+        }
         if (!isset($_GET['error_msg'])) {
             return;
         }
