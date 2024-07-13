@@ -170,16 +170,23 @@ if (isCheckout || hasOrder) {
             pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
             pp_iframe.style.borderRadius = "25px";
             pp_iframe.innerHTML =
-              getPaymentResult.paymentDetails.errorMessage +
-              "<br>" +
-              "Click this to close.";
+              getPaymentResult.paymentDetails.errorMessage !== undefined
+                ? getPaymentResult.paymentDetails.errorMessage +
+                  "<br>" +
+                  "Click this to close."
+                : getPaymentResult.message + "<br>" + "Click this to close.";
             pp_iframe.addEventListener("click", (e) => {
               e.preventDefault();
               pp_iframe.style.display = "none";
               location.reload();
             });
             console.log(getPaymentResult.paymentDetails.errorMessage);
-            alert(getPaymentResult.paymentDetails.errorMessage);
+            if (getPaymentResult.paymentDetails.errorMessage !== undefined) {
+              alert(getPaymentResult.paymentDetails.errorMessage);
+            } else {
+              alert(getPaymentResult.message);
+            }
+
             observer.disconnect();
           } catch (error) {
             // Handle the error here
