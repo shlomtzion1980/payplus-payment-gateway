@@ -468,20 +468,20 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order_id = intval($_POST['order_id']);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $type_document = esc_html($_POST['typeDocument']);
-            $payments = esc_html($_POST['payments']);
+            $payments = isset($_POST['payments']) ? $_POST['payments'] : null;
 
             if (!empty($payments)) {
                 function set_payment_payplus($value)
                 {
                     if ($value['method_payment'] == "payment-app") {
-                        $value['method_payment'] = $value['payment_app'];
+                        $value['method_payment'] = sanitize_text_field($value['payment_app']);
                         unset($value['payment_app']);
                     }
                     return $value;
                 }
 
-                // $payments = array_map('set_payment_payplus', $payments);
-                // $this->payplus_add_payments($order_id, $payments);
+                $payments = array_map('set_payment_payplus', $payments);
+                $this->payplus_add_payments($order_id, $payments);
             }
 
             $this->payPlusInvoice->payplus_invoice_create_order($order_id, $type_document);
@@ -1752,9 +1752,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_token_payment()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            wp_die('Not allowed!');
-        }
+
+        check_ajax_referer('payplus_token_payment', '_ajax_nonce');
         $totalCartAmount = 0;
         $handle = 'payplus_process_j5_payment';
         $urlEdit = site_url();
@@ -1943,6 +1942,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "menu_option" => WC_PayPlus::payplus_get_admin_menu(wp_create_nonce('menu_option')),
                 "payplus_refund_club_amount" => wp_create_nonce('payplus_refund_club_amount'),
                 "payplusApiPaymentRefund" => wp_create_nonce('payplus_api_payment_refund'),
+                "payplusTokenPayment" => wp_create_nonce('payplus_token_payment'),
             )
         );
         wp_enqueue_script('payplus-admin-payment');

@@ -231,6 +231,7 @@ jQuery(document).ready(function ($) {
         payplus_charge_amount: payplusChargeAmount,
         payplus_order_id: payplusOrderId,
         payplus_token_payment: true,
+        _ajax_nonce: payplus_script_admin.payplusTokenPayment,
       },
       beforeSend: function () {
         const targetNode = document.querySelector(".payplus_error");
@@ -273,7 +274,7 @@ jQuery(document).ready(function ($) {
           ? xhr.responseText.split("&error=")[1]
           : "Failed, please check the order notes for the failure reason.";
         alert(errorMessage);
-        location.reload();
+        // location.reload();
       },
     });
   });
