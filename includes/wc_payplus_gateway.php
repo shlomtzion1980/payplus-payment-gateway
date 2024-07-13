@@ -2398,6 +2398,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function updateOrderPayplus($order_id, $functionCurrent)
     {
         global $wpdb;
+        $order_id = intval($order_id);
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
         if (payplus_check_table_exist_db($tblname)) {
             $wpdb->update($tblname, array(
@@ -3164,7 +3165,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_add_order($order_id, $dataRow)
     {
         global $wpdb;
-
+        $order_id = intval($order_id);
         // Check if the custom table exists
         if (!WC_PayPlus::payplus_check_exists_table()) {
             // Sanitize each field before inserting into the database
@@ -3182,13 +3183,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             // Set method based on alternative_method_name
             if (!empty($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], ['google-pay', 'apple-pay'])) {
-                $dataRow['method'] = $dataRow['alternative_method_name'];
+                $dataRow['method'] = sanitize_text_field($dataRow['alternative_method_name']);
             }
 
-            // Parent payment data
             $data = [
-                'order_id' => $order_id,
-                'parent_id' => $parent_id,
+                'order_id' => intval($order_id),
+                'parent_id' => intval($parent_id),
                 'transaction_uid' => sanitize_text_field($dataRow['transaction_uid']),
                 'method_payment' => $is_multiple_transaction ? strtolower(sanitize_text_field($dataRow['method'])) : '',
                 'page_request_uid' => sanitize_text_field($dataRow['page_request_uid']),
@@ -3206,9 +3206,29 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'delete_at' => 0,
             ];
 
-            $wpdb->insert($table, $data);
+            $format = [
+                '%d',
+                '%d',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%d',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%s',
+                '%f',
+                '%s',
+                '%d',
+                '%s',
+                '%d',
+            ];
 
-            $parent_id = $wpdb->insert_id;
+            $wpdb->insert($table, $data, $format);
+
+            $parent_id = intval($wpdb->insert_id);
 
             if ($is_multiple_transaction && !empty($dataRow['related_transactions']) && is_array($dataRow['related_transactions'])) {
                 foreach ($dataRow['related_transactions'] as $related_transaction) {
@@ -3219,8 +3239,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
 
                     $data = [
-                        'order_id' => $order_id,
-                        'parent_id' => $parent_id,
+                        'order_id' => intval($order_id),
+                        'parent_id' => intval($parent_id),
                         'transaction_uid' => sanitize_text_field($related_transaction['transaction_uid']),
                         'method_payment' => strtolower(sanitize_text_field($related_transaction['method'])),
                         'page_request_uid' => sanitize_text_field($related_transaction['page_request_uid']),
@@ -3236,7 +3256,27 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'delete_at' => 0,
                     ];
 
-                    $wpdb->insert($table, $data);
+                    // Define the format array
+                    $format = [
+                        '%d', // order_id
+                        '%d', // parent_id
+                        '%s', // transaction_uid
+                        '%s', // method_payment
+                        '%s', // page_request_uid
+                        '%s', // four_digits
+                        '%d', // number_of_payments
+                        '%s', // brand_name
+                        '%s', // approval_num
+                        '%s', // alternative_method_name
+                        '%s', // type_payment
+                        '%s', // token_uid
+                        '%f', // price
+                        '%s', // payplus_response
+                        '%d', // delete_at
+                    ];
+
+                    // Insert data using $wpdb->insert()
+                    $wpdb->insert($table, $data, $format);
                 }
             }
         }
