@@ -83,8 +83,11 @@ class WC_PayPlus_Statics
             }
         }
 
-        public static function getId()
+        public static function getId($nonce)
         {
+            if (!wp_verify_nonce($nonce, 'getIdNonce')) {
+                return null;
+            }
             $order_id = isset($_GET['id']) ? intval($_GET['id']) : (isset($_GET['post']) ? intval($_GET['post']) : null);
             return intval($order_id);
         }
@@ -101,8 +104,9 @@ class WC_PayPlus_Statics
          */
         public static function payPlusOrderMetaBox($post, $metaBox)
         {
+            $nonce = wp_create_nonce('getIdNonce');
             $boxType = $metaBox['args']['metaBoxType'];
-            $order_id = property_exists($post, 'id') === true ? $post->get_id() : WC_PayPlus_Statics::getId();
+            $order_id = property_exists($post, 'id') === true ? $post->get_id() : WC_PayPlus_Statics::getId($nonce);
             if (!empty($order_id)) {
                 if ($boxType === 'payplusInvoice') {
                     $refundsJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunds', true);

@@ -309,8 +309,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function ajax_payplus_refund_club_amount()
     {
-
-        check_ajax_referer('ajax_payplus_refund_club_amount', '_ajax_nonce');
+        check_ajax_referer('payplus_refund_club_amount', '_ajax_nonce');
 
         if (!current_user_can('edit_shop_orders') && !is_admin()) {
             wp_send_json_error('You do not have permission to edit orders.');
@@ -1920,7 +1919,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplusTransactionType" => $this->transactionType,
                 "payplus_invoice" => $isInvoice,
                 "payplus_refund_error" => __('Incorrect amount or amount greater than amount that can be refunded', 'payplus-payment-gateway'),
-                "menu_option" => WC_PayPlus::payplus_get_admin_menu(),
+                "menu_option" => WC_PayPlus::payplus_get_admin_menu(wp_create_nonce('menu_option')),
                 "payplus_refund_club_amount" => wp_create_nonce('payplus_refund_club_amount'),
             )
         );

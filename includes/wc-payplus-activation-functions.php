@@ -165,7 +165,7 @@ function payplusUpdateActivate()
     if (PAYPLUS_VERSION_DB != $dataBaseVersion) {
 
         payplus_create_table_order();
-        payplus_create_table_change_status_order();
+        // payplus_create_table_change_status_order();
         // payplus_create_table_log();
         payplus_create_table_payment_session();
         payplus_create_table_process();

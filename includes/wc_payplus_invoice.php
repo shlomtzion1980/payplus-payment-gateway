@@ -731,7 +731,7 @@ class PayplusInvoice
             $dataArr = $item_data->get_data();
 
             $item_name = $item_data['name'];
-            $name = str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_data['name']));
+            $name = str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_data['name']));
             $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $WC_PayPlus_Gateway->rounding_decimals) : '1');
             $meta_html = wc_display_item_meta($item_data, array(
                 'before' => '', 'after' => '',
@@ -792,7 +792,7 @@ class PayplusInvoice
                 }
 
                 $itemDetails = [
-                    'name' => str_replace(["'", '"', "\n", "\\", '”'], '', strip_tags($item_name)),
+                    'name' => str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_name)),
                     'barcode' => (string) $productSKU,
                     'quantity' => ($quantity ? $quantity : '1'),
                     'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
@@ -806,7 +806,7 @@ class PayplusInvoice
                 }
 
                 if (!empty($meta_html) && $WC_PayPlus_Gateway->send_variations) {
-                    $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', strip_tags($meta_html));
+                    $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
                 }
 
                 if ($item_data->get_tax_status() == 'none' || !$wc_tax_enabled) {

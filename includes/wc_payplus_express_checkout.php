@@ -739,32 +739,44 @@ if (removeGooglePay) {
     /**
      * @return bool|void
      */
-    public function payplus_add_file_ApplePay()
-    {
+public function payplus_add_file_ApplePay()
+{
+    global $wp_filesystem;
 
-        $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
-        $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
+    // Initialize the WordPress filesystem
+    if ( ! function_exists( 'WP_Filesystem' ) ) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
 
-        if (!file_exists($destinationFile)) {
-            if (file_exists($sourceFile)) {
-                if (!is_dir(PAYPLUS_DEST_FILE_APPLE)) {
-                    wp_mkdir_p(PAYPLUS_DEST_FILE_APPLE);
-                    chmod(PAYPLUS_DEST_FILE_APPLE, 0777);
+    // Setup the filesystem if it's not already initialized
+    if ( ! WP_Filesystem() ) {
+        return false;
+    }
+
+    $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
+    $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
+
+    if ( ! $wp_filesystem->exists( $destinationFile ) ) {
+        if ( $wp_filesystem->exists( $sourceFile ) ) {
+            if ( ! $wp_filesystem->is_dir( PAYPLUS_DEST_FILE_APPLE ) ) {
+                $wp_filesystem->mkdir( PAYPLUS_DEST_FILE_APPLE );
+                $wp_filesystem->chmod( PAYPLUS_DEST_FILE_APPLE, 0777 );
+            }
+            if ( ! $wp_filesystem->exists( $destinationFile ) ) {
+                if ( $wp_filesystem->copy( $sourceFile, $destinationFile, true ) ) {
+                    return true;
+                } else {
+                    return false;
                 }
-                if (!file_exists($destinationFile)) {
-                    if (copy($sourceFile, $destinationFile)) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                return false;
             }
         } else {
-            return true;
+            return false;
         }
+    } else {
+        return true;
     }
+}
+
 
     /**
      * @param $country_code

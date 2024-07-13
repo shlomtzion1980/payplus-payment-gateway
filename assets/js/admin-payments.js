@@ -14,6 +14,7 @@ jQuery(document).ready(function ($) {
       });
     });
   }
+
   $(".do-api-refund-payplus").click(async function (event) {
     event.preventDefault();
     $(this).addClass("button-loading");
@@ -31,16 +32,14 @@ jQuery(document).ready(function ($) {
       alert(payplus_script_admin.payplus_refund_error);
       return false;
     }
+
     const data = new FormData();
     data.append("action", "payplus-refund-club-amount");
     data.append("amount", amount);
     data.append("transactionUid", transactionUid);
     data.append("method", method);
     data.append("orderID", orderID);
-    data.append(
-      "_ajax_nonce",
-      payplus_script_payment["payplus-refund-club-amount"]
-    );
+    data.append("_ajax_nonce", payplus_script_admin.payplus_refund_club_amount);
     data.append("id", id);
     fetch(payplus_script_admin.ajax_url, {
       method: "post",

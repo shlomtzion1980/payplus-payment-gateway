@@ -13,7 +13,6 @@ jQuery(function ($) {
   const tokenApplePay = $(".apple_pay_identifier");
   const transactionType = payplus_script_payment.transactionType;
 
-  console.log(transactionType);
   const checkAmountAuthorization = $(
     "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
   );
