@@ -1165,7 +1165,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $howMany = $counts[$client_ip];
             if (in_array($client_ip, $this->get_payment_ips()) && $howMany >= $this->block_ip_transactions_hour) {
                 wp_die(
-                    __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
+                    esc_html__('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
                 );
             }
         }
