@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-07-10 00:46+0300\n"
-"PO-Revision-Date: 2024-07-10 00:51+0300\n"
+"PO-Revision-Date: 2024-07-14 11:05+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -1697,10 +1697,8 @@ msgid "Pay with Valuecard via PayPlus"
 msgstr "שלם באמצעות פייפאל"
 
 #: includes/wc_payplus_subgateways.php:36
-#, fuzzy
-#| msgid "Pay with bit via PayPlus"
 msgid "Pay with finitiOne via PayPlus"
-msgstr "שלם באמצעות ביט"
+msgstr "שלם באמצעות פיניטי אוון"
 
 #: includes/wc_payplus_subgateways.php:46
 msgid "Valuecard"

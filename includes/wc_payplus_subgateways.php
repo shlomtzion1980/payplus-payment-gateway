@@ -7,7 +7,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     public $payplus_default_charge_method;
     public $iconURL;
     public $method_title_text;
-    public $method_descrition_text;
+    public $method_description_text;
     public $pay_with_text;
     public $default_description_settings_text;
     public $hide_other_charge_methods;
@@ -98,6 +98,33 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
                 break;
         }
+        $payWithText = '';
+        switch ($this->pay_with_text) {
+            case 'Pay with bit':
+                $payWithText = esc_html__('Pay with bit', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Google Pay':
+                $payWithText = esc_html__('Pay with Google Pay', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Apple Pay':
+                $payWithText = esc_html__('Pay with Apple Pay', 'payplus-payment-gateway');
+                break;
+            case 'Pay with MULTIPASS':
+                $payWithText = esc_html__('Pay with MULTIPASS', 'payplus-payment-gateway');
+                break;
+            case 'Pay with PayPal':
+                $payWithText = esc_html__('Pay with PayPal', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Tav Zahav':
+                $payWithText = esc_html__('Pay with Tav Zahav', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Valuecard':
+                $payWithText = esc_html__('Pay with Valuecard', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Tav finitiOne':
+                $payWithText = esc_html__('Pay with Tav finitiOne', 'payplus-payment-gateway');
+                break;
+        }
         $this->form_fields = [
             'enabled' => [
                 'title' => $methodTitleText,
@@ -110,13 +137,13 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'title' => __('Title', 'payplus-payment-gateway'),
                 'type' => 'text',
                 'description' => __('This controls the title which the user sees during checkout', 'payplus-payment-gateway'),
-                'default' => __($this->pay_with_text, 'payplus-payment-gateway'),
+                'default' => $payWithText,
                 'desc_tip' => true,
             ],
             'description' => [
                 'title' => __('Description', 'payplus-payment-gateway'),
                 'type' => 'text',
-                'default' => __($this->default_description_settings_text, 'payplus-payment-gateway')
+                'default' => $this->default_description_settings_text,
             ],
             'display_mode' => [
                 'title' => __('Display Mode', 'payplus-payment-gateway'),
@@ -178,12 +205,40 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             'hide_other_charge_methods' => '1',
         ];
 
+        $methodDescriptionText = "";
+        switch ($this->method_description_text) {
+            case 'Pay with bit via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with bit via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Google Pay via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with Google Pay via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Apple Pay via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with Apple Pay via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay With MULTIPASS via PayPlus':
+                $methodDescriptionText = esc_html__('Pay With MULTIPASS via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with PayPal via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with PayPal via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Tav Zahav via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with Tav Zahav via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Valuecard via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with Valuecard via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with finitiOne via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with finitiOne via PayPlus', 'payplus-payment-gateway');
+                break;
+        }
+
         $subOptionsettings = get_option($this->get_option_key(), $defaultOptions);
         $this->settings = get_option('woocommerce_payplus-payment-gateway_settings', $defaultOptions);
 
         $this->enabled = $this->settings['enabled'] = $subOptionsettings['enabled'];
         $this->settings['description'] = $subOptionsettings['description'];
-        $this->settings['title'] = (!empty($subOptionsettings['title'])) ? $subOptionsettings['title'] : __($this->method_descrition_text, 'payplus-payment-gateway');
+        $this->settings['title'] = (!empty($subOptionsettings['title'])) ? $subOptionsettings['title'] : $methodDescriptionText;
         $this->settings['display_mode'] = $subOptionsettings['display_mode'];
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
@@ -230,7 +285,7 @@ class WC_PayPlus_Gateway_Bit extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-bit';
     public $method_title_text = 'PayPlus - bit';
     public $default_description_settings_text = 'Bit payment via PayPlus';
-    public $method_descrition_text = 'Pay with bit via PayPlus';
+    public $method_description_text = 'Pay with bit via PayPlus';
     public $payplus_default_charge_method = 'bit';
     public $iconURL = 'assets/images/bitLogo.png';
     public $pay_with_text = 'Pay with bit';
@@ -241,7 +296,7 @@ class WC_PayPlus_Gateway_GooglePay extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-googlepay';
     public $method_title_text = 'PayPlus - Google Pay';
     public $default_description_settings_text = 'Google Pay payment via PayPlus';
-    public $method_descrition_text = 'Pay with Google Pay via PayPlus';
+    public $method_description_text = 'Pay with Google Pay via PayPlus';
     public $payplus_default_charge_method = 'google-pay';
     public $iconURL = 'assets/images/google-payLogo.png';
     public $pay_with_text = 'Pay with Google Pay';
@@ -252,7 +307,7 @@ class WC_PayPlus_Gateway_ApplePay extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-applepay';
     public $method_title_text = 'PayPlus - Apple Pay';
     public $default_description_settings_text = 'Apple1 Pay payment via PayPlus';
-    public $method_descrition_text = 'Pay with Apple Pay via PayPlus';
+    public $method_description_text = 'Pay with Apple Pay via PayPlus';
     public $payplus_default_charge_method = 'apple-pay';
     public $iconURL = 'assets/images/apple-payLogo.png';
     public $pay_with_text = 'Pay with Apple Pay';
@@ -263,7 +318,7 @@ class WC_PayPlus_Gateway_Multipass extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-multipass';
     public $method_title_text = 'PayPlus - MULTIPASS';
     public $default_description_settings_text = 'BUYME payment via PayPlus';
-    public $method_descrition_text = 'Pay With MULTIPASS via PayPlus';
+    public $method_description_text = 'Pay With MULTIPASS via PayPlus';
     public $payplus_default_charge_method = 'multipass';
     public $iconURL = 'assets/images/multipassLogo.png';
     public $pay_with_text = 'Pay with MULTIPASS';
@@ -274,7 +329,7 @@ class WC_PayPlus_Gateway_Paypal extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-paypal';
     public $method_title_text = 'PayPlus - PayPal';
     public $default_description_settings_text = 'PayPal payment via PayPlus';
-    public $method_descrition_text = 'Pay with PayPal via PayPlus';
+    public $method_description_text = 'Pay with PayPal via PayPlus';
     public $payplus_default_charge_method = 'paypal';
     public $iconURL = 'assets/images/paypalLogo.png';
     public $pay_with_text = 'Pay with PayPal';
@@ -285,7 +340,7 @@ class WC_PayPlus_Gateway_TavZahav extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-tavzahav';
     public $method_title_text = 'PayPlus - Tav Zahav';
     public $default_description_settings_text = 'Tav Zahav payment via PayPlus';
-    public $method_descrition_text = 'Pay with Tav Zahav via PayPlus';
+    public $method_description_text = 'Pay with Tav Zahav via PayPlus';
     public $payplus_default_charge_method = 'tav-zahav';
     public $iconURL = 'assets/images/verifoneLogo.png';
     public $pay_with_text = 'Pay with Tav Zahav';
@@ -296,7 +351,7 @@ class WC_PayPlus_Gateway_Valuecard extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-valuecard';
     public $method_title_text = 'PayPlus - Valuecard';
     public $default_description_settings_text = 'Valuecard  payment via PayPlus';
-    public $method_descrition_text = 'Pay with Valuecard via PayPlus';
+    public $method_description_text = 'Pay with Valuecard via PayPlus';
     public $payplus_default_charge_method = 'valuecard';
     public $iconURL = 'assets/images/valuecardLogo.png';
     public $pay_with_text = 'Pay with  Valuecard ';
@@ -307,7 +362,7 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-finitione';
     public $method_title_text = 'PayPlus - finitiOne';
     public $default_description_settings_text = 'finitiOne  payment via PayPlus';
-    public $method_descrition_text = 'Pay with finitiOne via PayPlus';
+    public $method_description_text = 'Pay with finitiOne via PayPlus';
     public $payplus_default_charge_method = 'finitione';
     public $iconURL = 'assets/images/finitioneLogo.png';
     public $pay_with_text = 'Pay with Tav finitiOne';
