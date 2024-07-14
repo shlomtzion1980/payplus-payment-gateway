@@ -590,9 +590,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'payplus_total_refunded_amount' => round($refunded_amount + $amount, 2),
                     );
                     WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
-                    /* translators: %1$s is the refund transaction number, %2$s is the amount, %3$s is the currency, %4$s is the reason */
                     $order->add_order_note(sprintf(
-                        __('PayPlus Refund is Successful<br />Refund Transaction Number: %1$s<br />Amount: %2$s %3$s<br />Reason: %4$s', 'payplus-payment-gateway'),
+                        'PayPlus Refund is Successful<br />Refund Transaction Number: %1$s<br />Amount: %2$s %3$s<br />Reason: %4$s',
                         $res->data->transaction->number,
                         $res->data->transaction->amount,
                         $order->get_currency(),
@@ -603,7 +602,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 } else {
                     /* translators: %1$s is the status, %2$s is the description */
                     $order->add_order_note(sprintf(
-                        __('PayPlus Refund is Failed<br />Status: %1$s<br />Description: %2$s', 'payplus-payment-gateway'),
+                        'PayPlus Refund is Failed<br />Status: %1$s<br />Description: %2$s',
                         $res->results->status,
                         $res->results->description
                     ));
@@ -753,8 +752,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $translatedKey = esc_html__('finitiOne', 'payplus-payment-gateway');
                         break;
                 }
-                if ($currentSection == $value['section']) {
-                    $title = __($key, 'payplus-payment-gateway');
+                if ($currentSection === $value['section']) {
+                    $title = $translatedKey;
                 }
                 $allowed_html = array(
                     'img' => array(
@@ -766,10 +765,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                 echo "<a data-tab='payplus-blank' href='" . esc_url($value['link']) . "' class='nav-tab " . esc_attr($selected) . "'>" .
                     wp_kses(
-                        "<img style='" . esc_attr($iconStyle) . "' src='" . esc_url($value['icon']) . "' alt='" . esc_attr(__($key, 'payplus-payment-gateway')) . "'>",
+                        "<img style='" . esc_attr($iconStyle) . "' src='" . esc_url($value['icon']) . "' alt='" . esc_attr($translatedKey) . "'>",
                         $allowed_html
                     ) .
-                    esc_html(__($key, 'payplus-payment-gateway')) .
+                    esc_html($translatedKey) .
                     "</a>";
             }
             echo "</nav>";
@@ -777,31 +776,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         echo "<h3 id='payplus-title-section'>" . esc_html($title) . "</h3>
                     <p>" . wp_kses_post($desc) . "</p>";
-
-        // function titleDivs($formFields, $currentSection)
-        // {
-        //     if (strpos($currentSection, 'payplus-payment-gateway-') === 0) {
-        //         $faq_url = 'https://www.payplus.co.il/faq/%D7%A1%D7%9C%D7%99%D7%A7%D7%94-%D7%90%D7%99%D7%A0%D7%98%D7%A8%D7%A0%D7%98%D7%99%D7%AA/WordPress---WooCommerce/%D7%9C%D7%90%D7%97%D7%A8-%D7%94%D7%A6%D7%98%D7%A8%D7%A4%D7%95%D7%AA---%D7%90%D7%99%D7%9A-%D7%9C%D7%94%D7%95%D7%A1%D7%99%D7%A3-%D7%9B%D7%A4%D7%AA%D7%95%D7%A8%D7%99-%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-%D7%A9%D7%9C-%D7%90%D7%A8%D7%A0%D7%A7%D7%99%D7%9D-%D7%93%D7%99%D7%92%D7%99%D7%98%D7%9C%D7%99%D7%99%D7%9D-%D7%91%D7%93%D7%A3-%D7%94%D7%AA%D7%A9%D7%9C%D7%95%D7%9D-WooCommerce';
-        //         $faq_embedded_url = esc_url($faq_url);
-        //         $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . '" sandbox="allow-same-origin allow-scripts"></iframe>';
-        //     } else {
-        //         $faq_url = 'https://www.payplus.co.il/faq/';
-        //         $faq_embedded_url = esc_url($faq_url);
-        //         $links[] = '<h2>' . __('PayPlus FAQ', 'payplus-payment-gateway') . '</h2><iframe height="97%" width="80%" src="' . $faq_embedded_url . ' sandbox="allow-same-origin allow-scripts""></iframe>';
-        //     }
-
-        //     $titles = null;
-        //     $count = count($links);
-        //     $randomIndex = wp_rand(0, $count - 1);
-        //     $c = 0;
-        //     foreach ($formFields as $field) {
-        //         if (isset($field['type']) && $field['type'] === 'title') {
-        //             $titles = isset($links[$c]) ? $titles .= '<div class="settingTitle fullHeight">' . $links[$c] . '</div>' : $titles;
-        //             ++$c;
-        //         }
-        //     }
-        //     return $titles ?? '<div class="settingTitle">' . $links[$randomIndex] . '</div>';
-        // }
 
         function hide($currentSection)
         {
@@ -1243,7 +1217,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (property_exists($response, 'results') && $response->results->status === "error" && $response->results->code === 1) {
                 // Customize the error message here
                 $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
+                // Translators: %s will be replaced with the error message received from the payment gateway.
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
+                // Translators: %s will be replaced with the error message received from the payment gateway.
                 do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), $order);
                 $order->update_status('failed');
                 $this->store_payment_ip();
@@ -1274,16 +1250,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
                     $order->update_status('wc-on-hold');
                 }
+                // Translators: %s will be replaced with the transaction number received from the payment gateway.
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                 // Add payments data to the DB
                 $inData = json_decode(wp_json_encode($response->data), true);
                 $this->payplus_add_order($order_id, $inData);
             } else {
                 if ($this->display_mode !== 'iframe') {
+                    // Translators: %s will be replaced with the transaction number received from the payment gateway.
                     $order->add_order_note(sprintf(__('PayPlus Token Payment Failed<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                     if ($this->failure_order_status !== 'default-woo') {
                         $order->update_status($this->failure_order_status);
                     }
+                    // Translators: %s will be replaced with the status description of the error received from the payment gateway.
                     wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response->data->status_description, true)), 'error');
                     return;
                 }
@@ -1388,9 +1367,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             if (!empty($fields)) {
                 foreach ($fields as $key => $value) {
-                    $value = sanitize_text_field($value);
-                    $key = sanitize_text_field($key);
-                    $where .= $where ? $wpdb->prepare(" AND %s = %s", $key, $value) : $wpdb->prepare(" %s = %s ", $key, $value);
+                    $where .= $where ? $wpdb->prepare(" AND %s = %s", sanitize_key($key), sanitize_text_field($value)) : $wpdb->prepare(" %s = %s ", $key, $value);
                 }
             }
         }
@@ -2165,19 +2142,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $response = json_decode($json, true);
         $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
         $tblname = $wpdb->prefix . 'payplus_payment_process';
+        $tblname = esc_sql($tblname);
         $handle = 'payplus_callback_begin';
 
         $payplusHash = sanitize_text_field($_SERVER['HTTP_HASH']);
         $order_id = intval($response['transaction']['more_info']);
         $status_code = sanitize_text_field($response['transaction']['status_code']);
 
-        $sql = $wpdb->prepare(
-            'SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM ' . $tblname . ' WHERE order_id = %d AND status_code = %s',
+        $result = $wpdb->get_results($wpdb->prepare(
+            "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
             $order_id,
             $status_code
-        );
-
-        $result = $wpdb->get_results($sql);
+        ));
         $result = $result[$indexRow];
         if (!$result->rowCount) {
             $wpdb->insert(
@@ -2425,12 +2401,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
         $tblname = esc_sql($tblname);
         if (payplus_check_table_exist_db($tblname)) {
-            // Sanitize the order ID before using it in the query
+
             $order_id = intval($order_id);
 
-            // Prepare the SQL query
-            $sql = $wpdb->prepare("SELECT * FROM {$tblname} WHERE order_id = %d", $order_id);
-            $result = $wpdb->get_results($sql);
+            $result = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d", $order_id));
 
             if ($wpdb->last_error) {
                 payplus_Add_log_payplus($wpdb->last_error);
@@ -2525,6 +2499,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if ($this->failure_order_status !== 'default-woo') {
                             $order->update_status($this->failure_order_status);
                         }
+                        // Translators: %s will be replaced with the transaction UID received from the payment gateway.
                         $order->add_order_note(sprintf(__('PayPlus IPN Failed<br/>Transaction UID: %s', 'payplus-payment-gateway'), $transaction_uid));
                         break;
                     } else {
@@ -3018,6 +2993,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $insertMeta['payplus_brand_name'] = $payplusBrandName;
                         $insertMeta['payplus_number_of_payments'] = $payplusNumberOfPayments;
                     }
+                    // Translators: %s will be replaced with the transaction number received from the payment gateway.
                     $order->add_order_note(sprintf(__('PayPlus Subscription Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $result->data->number));
                     $insertMeta['payplus_type'] = $result->data->type;
                     $insertMeta['payplus_transaction_uid'] = $result->data->transaction_uid;
@@ -3045,11 +3021,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
                             $this->scheduled_subscription_payment($amount_to_charge, $order, true);
                         } else {
+                            // Translators: %s will be replaced with the error description received from the payment gateway.
                             $order->add_order_note(sprintf(__('PayPlus Subscription Payment Failure<br/>error : %s', 'payplus-payment-gateway'), $result->results->description));
                             delete_post_meta($order->get_id(), 'payplus_error_sub');
                         }
                         return ["success" => false, "msg" => "Authorization error: " . $result->results->code];
                     } else {
+                        // Translators: %s will be replaced with the error description received from the payment gateway.
                         $order->add_order_note(sprintf(__('PayPlus Subscription Payment Failure<br/>error : %s', 'payplus-payment-gateway'), $result->data->status_description));
                     }
                     return ["success" => false, "msg" => "Authorization error: "];

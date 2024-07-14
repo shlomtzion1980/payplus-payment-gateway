@@ -5,7 +5,7 @@
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
  * Version: 7.0.8
- * Tested up to: 6.5.3
+ * Tested up to: 6.5.5
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
  * Author: PayPlus LTD
@@ -115,7 +115,7 @@ class WC_PayPlus
             }
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
             $result = $wpdb->get_results($wpdb->prepare(
-                "SELECT id as rowId, count(*) as rowCount, count_process FROM {$tblname} WHERE order_id = %d AND ( status_code = %d )",
+                "SELECT id as rowId, count(*) as rowCount, count_process FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND ( status_code = %d )",
                 $order_id,
                 $status_code
             ));
@@ -210,8 +210,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -532,8 +532,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
