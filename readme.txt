@@ -86,6 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
 * Fix    - On bit successful transactions through "uPay" the redirect to thank you page is now corrected for both mobile and desktop.
+* Fix    - Major security code refactor and updates.
 * Add    - Admin settings visual changes - In an approach to make the plugin setup easier and clearer.
 * Add    - Show current API environment mode.
 * Add    - According to the current API environment mode, display the correct set of keys and hide the other.

@@ -460,7 +460,7 @@ class WC_PayPlus
      */
     public function load_checkout_assets()
     {
-
+        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.js');
         $importAapplepayScript = null;
         $isModbile = (wp_is_mobile()) ? true : false;
         if (is_checkout()) {
@@ -488,11 +488,11 @@ class WC_PayPlus
             ) {
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 add_filter('body_class', [$this, 'payplus_body_classes']);
-                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], PAYPLUS_VERSION);
+                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $script_version);
 
                 if ($isEnableOneClick) {
                     $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
-                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.js', [], PAYPLUS_VERSION, true);
+                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.js', [], $script_version, true);
                     wp_localize_script(
                         'payplus-front-js',
                         'payplus_script',
