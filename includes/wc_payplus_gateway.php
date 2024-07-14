@@ -295,7 +295,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $postBody = file_get_contents('php://input');
         $postData = json_decode($postBody, true);
-        $methodType = $postData['method_type'];
+        $methodType = sanitize_text_field($postData['method_type']);
 
         if (!$verified) {
             $message = "Webhook received for $methodType with action: {$postData['action']} but failed X-Signature verification.";
@@ -305,17 +305,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (json_last_error() === JSON_ERROR_NONE) {
             // Handle the data...
-            $methodOptions = get_option($methodsOptions[$methodType]);
+            $methodOptions = get_option(sanitize_text_field($methodsOptions[$methodType]));
             $action = $postData['action'] === 'enable' ? 'yes' : 'no';
             $methodOptions['enabled'] = $action;
-            update_option($methodsOptions[$methodType], $methodOptions);
+            update_option(sanitize_text_field($methodsOptions[$methodType]), $methodOptions);
             $result = 'success';
-            $message = "Webhook received for $methodType successfully with action: {$postData['action']}";
+            $postDataAction = esc_html($postData['action']);
+            $methodReceived = esc_html($methodType);
+            $message = esc_html("Webhook received for $methodReceived successfully with action: $postDataAction");
             wp_send_json_success($message);
         } else {
             wp_send_json_error('Invalid JSON', 400);
         }
-
+        $postData = esc_html(json_encode($postData));
         error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true) . " - " . print_r($message, true));
     }
 
