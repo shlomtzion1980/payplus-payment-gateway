@@ -2423,13 +2423,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
-
+        $tblname = esc_sql($tblname);
         if (payplus_check_table_exist_db($tblname)) {
             // Sanitize the order ID before using it in the query
-            $order_id = absint($order_id);
+            $order_id = intval($order_id);
 
             // Prepare the SQL query
-            $sql = $wpdb->prepare('SELECT * FROM ' . $tblname . ' WHERE order_id = %d', $order_id);
+            $sql = $wpdb->prepare("SELECT * FROM {$tblname} WHERE order_id = %d", $order_id);
             $result = $wpdb->get_results($sql);
 
             if ($wpdb->last_error) {

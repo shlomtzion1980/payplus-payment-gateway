@@ -106,6 +106,7 @@ class WC_PayPlus
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST);
         $tblname = $wpdb->prefix . 'payplus_payment_process';
+        $tblname = esc_sql($tblname);
         $indexRow = 0;
         if (!empty($REQUEST['more_info'])) {
             $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
