@@ -225,9 +225,8 @@ class PayplusInvoice
             && $payplusType !== "Check"
         ) :
 ?>
-<button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>"
-    class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
-<div class='payplus_loader_refund'></div>
+            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
+            <div class='payplus_loader_refund'></div>
 
 <?php
         endif;
@@ -973,8 +972,8 @@ class PayplusInvoice
 
         if (!WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'))) {
             $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
-
             $endSql = "";
+
             if (empty($notPayment) && $payplus_related_transactions) {
                 $endSql = " AND related_transactions = 0";
             }
