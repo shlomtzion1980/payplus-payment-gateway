@@ -360,13 +360,8 @@ function payplus_check_table_exist_db($nameTable)
 {
     global $wpdb;
 
-    $nameTable = esc_sql($nameTable);
-    $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $nameTable));
-    if ($result !== $nameTable) {
-        return false;
-    }
-
-    return true;
+    $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
+    return ($result == $nameTable);
 }
 
 /**

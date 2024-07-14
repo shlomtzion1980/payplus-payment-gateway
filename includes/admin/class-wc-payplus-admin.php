@@ -2047,11 +2047,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         global $wpdb;
         $order_id = intval($order_id);
         $table = $wpdb->prefix . 'payplus_order';
+        $table = esc_sql($table);
 
         if ($id) {
-            $result = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE id = %d", $id));
+            $id = intval($id);
+            $result = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE id = %d", $id));
         } else {
-            $result = $wpdb->get_results($wpdb->prepare("SELECT * FROM $table WHERE order_id = %d", $order_id));
+            $result = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$table} WHERE order_id = %d", $order_id));
         }
 
         return $result;

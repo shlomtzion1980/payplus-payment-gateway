@@ -2446,16 +2446,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         global $wpdb;
         $order_id = intval($order_id);
-        $tblname = $wpdb->prefix . PAYPLUS_TABLE_PROCESS;
+        $tblname = esc_sql($wpdb->prefix . PAYPLUS_TABLE_PROCESS);
         if (payplus_check_table_exist_db($tblname)) {
-            $wpdb->update($tblname, array(
-                'function_end' => $functionCurrent,
-            ), array('order_id' => $order_id));
+            $result = $wpdb->update(
+                $tblname,
+                array(
+                    'function_end' => sanitize_text_field($functionCurrent),
+                ),
+                array('order_id' => $order_id)
+            );
             if ($wpdb->last_error) {
                 payplus_Add_log_payplus($wpdb->last_error);
             }
         }
     }
+
     /**
      * @param $payload
      * @param $data
@@ -2464,7 +2469,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function requestPayPlusIpn($payload, $data, $countLoop = 1, $handle = 'payplus_process_payment', $inline = false)
     {
-
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         $order_id = isset($data['order_id']) ? trim($data['order_id']) : '';
         $flagPayplus = true;
         $flagProcess = true;
