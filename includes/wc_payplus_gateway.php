@@ -1347,7 +1347,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (!empty($fields)) {
                 foreach ($fields as $key => $value) {
                     $value = sanitize_text_field($value);
-                    $where .= $wpdb->prepare(" AND %s = %s", $key, $value);
+                    $key = sanitize_text_field($key);
+                    $where .= $where ? $wpdb->prepare(" AND %s = %s", $key, $value) : $wpdb->prepare(" %s = %s ", $key, $value);
                 }
             }
         }
@@ -1355,7 +1356,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($where) {
             $sql .= " WHERE" . $where;
         }
-
         $posts = $wpdb->get_results($sql);
 
         return $posts;
