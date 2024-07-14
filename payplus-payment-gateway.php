@@ -114,8 +114,7 @@ class WC_PayPlus
             }
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
             $result = $wpdb->get_results($wpdb->prepare(
-                'SELECT id as rowId, count(*) as rowCount, count_process FROM %s WHERE order_id = %d AND ( status_code = %d )',
-                $tblname,
+                "SELECT id as rowId, count(*) as rowCount, count_process FROM {$tblname} WHERE order_id = %d AND ( status_code = %d )",
                 $order_id,
                 $status_code
             ));

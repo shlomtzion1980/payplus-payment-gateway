@@ -963,8 +963,10 @@ class PayplusInvoice
      */
     public function payplus_get_payments($order_id, $notPayment = '')
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
+            wp_die('Not allowed!');
+        }
         global $wpdb;
-
         $order_id = intval($order_id);
         $notPayment = sanitize_text_field($notPayment);
 
