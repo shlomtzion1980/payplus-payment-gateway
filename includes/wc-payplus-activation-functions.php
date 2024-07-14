@@ -22,13 +22,15 @@ add_action('init', 'payplus_register_order_statuses');
  */
 function payplus_register_order_statuses()
 {
+    /* translators: Order status label for recurring subscriptions */
+    $messageOrderStatuses = _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'woocommerce');
     register_post_status('wc-recsubc', array(
         'label' => _x('Recurring subscription created', 'Order status', 'woocommerce'),
         'public' => true,
         'exclude_from_search' => false,
         'show_in_admin_all_list' => true,
         'show_in_admin_status_list' => true,
-        'label_count' => _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'woocommerce'),
+        'label_count' => $messageOrderStatuses,
     ));
 }
 add_filter('wc_order_statuses', 'payplus_wc_order_statuses');

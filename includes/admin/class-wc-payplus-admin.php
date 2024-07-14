@@ -752,40 +752,31 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             $relatedTransaction = $relatedTransactions[$i];
                             if ($relatedTransaction->method == "credit-card") {
                                 $html .= sprintf(
-                                    __(
-                                        '
-                            <div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : 'Payment') . ' Successful
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                        'payplus-payment-gateway'
-                                    ),
+                                    '<div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : 'Payment') . ' Successful
+                                        <table style="border-collapse:collapse">
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        </table></div>
+                                    ',
                                     $relatedTransaction->number,
                                     $relatedTransaction->four_digits,
                                     $relatedTransaction->expiry_month . $relatedTransaction->expiry_year,
                                     $relatedTransaction->voucher_id,
                                     $relatedTransaction->token_uid,
                                     $relatedTransaction->amount
-
                                 );
                             } else {
                                 $html .= sprintf(
-                                    __(
-                                        '
-                              <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $relatedTransaction->method . '
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                        'payplus-payment-gateway'
-                                    ),
+                                    '<div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $relatedTransaction->method . '
+                                        <table style="border-collapse:collapse">
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        </table></div>
+                                    ',
                                     $relatedTransaction->number,
                                     $relatedTransaction->amount
                                 );
@@ -799,16 +790,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         if ($res->data->method !== "credit-card") {
                             if ($this->saveOrderNote) {
                                 $order->add_order_note(sprintf(
-                                    __(
-                                        '
-                              <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $res->data->method . '
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                        'payplus-payment-gateway'
-                                    ),
+                                    '<div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $res->data->method . '
+                                        <table style="border-collapse:collapse">
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                        </table></div>
+                                    ',
                                     $res->data->number,
                                     $res->data->amount
                                 ));
@@ -816,20 +803,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         } else {
                             if ($this->saveOrderNote) {
                                 $order->add_order_note(sprintf(
-                                    __(
-                                        '
-                            <div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : 'Payment') . ' Successful</div>
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
-                                    <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
-                                </table>
-                            ',
-                                        'payplus-payment-gateway'
-                                    ),
+                                    '<div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : 'Payment') . ' Successful</div>
+                                        <table style="border-collapse:collapse">
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                            <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
+                                            <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
+                                        </table>
+                                    ',
                                     $res->data->number,
                                     $res->data->four_digits,
                                     $res->data->expiry_month . $res->data->expiry_year,
@@ -837,7 +820,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                                     $res->data->token_uid,
                                     $res->data->amount,
                                     $order->get_total()
-
                                 ));
                             }
                         }

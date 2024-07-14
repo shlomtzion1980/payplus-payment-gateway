@@ -45,38 +45,38 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         if ($this->payplus_chkeck_one_click_visible()) {
 ?>
-<script>
-function isFacebookApp() {
-    var ua = navigator.userAgent || navigator.vendor || window.opera;
-    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
-}
+            <script>
+                function isFacebookApp() {
+                    var ua = navigator.userAgent || navigator.vendor || window.opera;
+                    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
+                }
 
-let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
-let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
-let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
-let removeGooglePay = isFacebookApp();
-let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
-let expresscheckouts = document.querySelectorAll(".express-checkout");
-if (!showExpress) {
-    expresscheckouts.forEach(e => e.remove());
-} else {
-    if (expresscheckouts.length > 1) {
-        expresscheckouts.forEach((element, index) => {
-            if (index) {
-                expresscheckouts[index].remove();
-            }
-        });
-    }
-}
-if (removeGooglePay) {
-    let googlePayButton = document.getElementById('googlePayButton');
-    if (googlePayButton) {
-        googlePayButton.remove();
-    }
+                let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
+                let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
+                let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
+                let removeGooglePay = isFacebookApp();
+                let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
+                let expresscheckouts = document.querySelectorAll(".express-checkout");
+                if (!showExpress) {
+                    expresscheckouts.forEach(e => e.remove());
+                } else {
+                    if (expresscheckouts.length > 1) {
+                        expresscheckouts.forEach((element, index) => {
+                            if (index) {
+                                expresscheckouts[index].remove();
+                            }
+                        });
+                    }
+                }
+                if (removeGooglePay) {
+                    let googlePayButton = document.getElementById('googlePayButton');
+                    if (googlePayButton) {
+                        googlePayButton.remove();
+                    }
 
-}
-</script>
-<?php
+                }
+            </script>
+        <?php
         }
     }
 
@@ -285,9 +285,7 @@ if (removeGooglePay) {
                             $saveOrderNote = boolval($this->payPlusGateWaySettings['payplus_data_save_order_note'] === 'yes');
                             if ($saveOrderNote) {
                                 $order->add_order_note(sprintf(
-                                    __(
-                                        '
-                                <div style="font-weight:600;">PayPlus Express Checkout Successful</div>
+                                    '<div style="font-weight:600;">PayPlus Express Checkout Successful</div>
                                     <table style="border-collapse:collapse">
                                         <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                                         <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -297,8 +295,6 @@ if (removeGooglePay) {
                                         <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
                                     </table>
                                 ',
-                                        'payplus-payment-gateway'
-                                    ),
                                     $inData['transaction']->number,
                                     $inData['data']->card_information->four_digits,
                                     $inData['data']->card_information->expiry_month . '/' . $inData['data']->card_information->expiry_year,
@@ -685,13 +681,13 @@ if (removeGooglePay) {
             }
 
         ?>
-<input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
-<input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
-<input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
-<input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
-<input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
-<input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
-<?php
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
+            <input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
+            <input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
+            <input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
+            <input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
+            <?php
             if ($shippingWoo === "false") {
                 $globalShippingPriceTax = $globalShipping;
                 if ($globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
@@ -701,9 +697,9 @@ if (removeGooglePay) {
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
                 }
             ?>
-<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
-<input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
-<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
 <?php
             }
             echo '<div class="express-flex" >';
@@ -739,43 +735,43 @@ if (removeGooglePay) {
     /**
      * @return bool|void
      */
-public function payplus_add_file_ApplePay()
-{
-    global $wp_filesystem;
+    public function payplus_add_file_ApplePay()
+    {
+        global $wp_filesystem;
 
-    // Initialize the WordPress filesystem
-    if ( ! function_exists( 'WP_Filesystem' ) ) {
-        require_once ABSPATH . 'wp-admin/includes/file.php';
-    }
+        // Initialize the WordPress filesystem
+        if (!function_exists('WP_Filesystem')) {
+            require_once ABSPATH . 'wp-admin/includes/file.php';
+        }
 
-    // Setup the filesystem if it's not already initialized
-    if ( ! WP_Filesystem() ) {
-        return false;
-    }
-
-    $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
-    $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
-
-    if ( ! $wp_filesystem->exists( $destinationFile ) ) {
-        if ( $wp_filesystem->exists( $sourceFile ) ) {
-            if ( ! $wp_filesystem->is_dir( PAYPLUS_DEST_FILE_APPLE ) ) {
-                $wp_filesystem->mkdir( PAYPLUS_DEST_FILE_APPLE );
-                $wp_filesystem->chmod( PAYPLUS_DEST_FILE_APPLE, 0777 );
-            }
-            if ( ! $wp_filesystem->exists( $destinationFile ) ) {
-                if ( $wp_filesystem->copy( $sourceFile, $destinationFile, true ) ) {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        } else {
+        // Setup the filesystem if it's not already initialized
+        if (!WP_Filesystem()) {
             return false;
         }
-    } else {
-        return true;
+
+        $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
+        $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
+
+        if (!$wp_filesystem->exists($destinationFile)) {
+            if ($wp_filesystem->exists($sourceFile)) {
+                if (!$wp_filesystem->is_dir(PAYPLUS_DEST_FILE_APPLE)) {
+                    $wp_filesystem->mkdir(PAYPLUS_DEST_FILE_APPLE);
+                    $wp_filesystem->chmod(PAYPLUS_DEST_FILE_APPLE, 0777);
+                }
+                if (!$wp_filesystem->exists($destinationFile)) {
+                    if ($wp_filesystem->copy($sourceFile, $destinationFile, true)) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
-}
 
 
     /**

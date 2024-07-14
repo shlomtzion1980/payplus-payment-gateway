@@ -317,7 +317,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             wp_send_json_error('Invalid JSON', 400);
         }
-        $postData = esc_html(json_encode($postData));
+        $postData = esc_html(wp_json_encode($postData));
         error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true) . " - " . print_r($message, true));
     }
 
@@ -535,12 +535,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $transaction_uid = $order->get_meta('payplus_transaction_uid');
         if ($order->get_meta('payplus_type') != "Charge") {
             $this->payplus_add_log_all($handle, 'Already Charged or Original Transaction Are Not J5', 'error');
-            $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund transaction that not charged. Current Transaction Type Status: %s'), $order->get_meta('payplus_type')));
+            /* translators: %s is the current transaction type status */
+            $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund transaction that not charged. Current Transaction Type Status: %s', 'payplus-payment-gateway'), $order->get_meta('payplus_type')));
             return false;
         }
         if (round((float) $refunded_amount, ROUNDING_DECIMALS) >= round((float) $order->get_total(), ROUNDING_DECIMALS)) {
             $this->payplus_add_log_all($handle, 'You Cannot charge more then the original transaction amount', 'error');
-            $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %s %s'), $refunded_amount, $order->get_currency()));
+            /* translators: %1$s is the refunded amount, %2$s is the currency */
+            $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %1$s %2$s', 'payplus-payment-gateway'), $refunded_amount, $order->get_currency()));
             return false;
         }
         $payplusRrelatedTransactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
@@ -588,11 +590,23 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'payplus_total_refunded_amount' => round($refunded_amount + $amount, 2),
                     );
                     WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
-                    $order->add_order_note(sprintf(__('PayPlus Refund is Successful<br />Refund Transaction Number: %s<br />Amount: %s %s<br />Reason: %s', 'payplus-payment-gateway'), $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency(), $reason));
+                    /* translators: %1$s is the refund transaction number, %2$s is the amount, %3$s is the currency, %4$s is the reason */
+                    $order->add_order_note(sprintf(
+                        __('PayPlus Refund is Successful<br />Refund Transaction Number: %1$s<br />Amount: %2$s %3$s<br />Reason: %4$s', 'payplus-payment-gateway'),
+                        $res->data->transaction->number,
+                        $res->data->transaction->amount,
+                        $order->get_currency(),
+                        $reason
+                    ));
                     $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
                     $flag = true;
                 } else {
-                    $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />Status: %s<br />Description: %s', 'payplus-payment-gateway'), $res->results->status, $res->results->description));
+                    /* translators: %1$s is the status, %2$s is the description */
+                    $order->add_order_note(sprintf(
+                        __('PayPlus Refund is Failed<br />Status: %1$s<br />Description: %2$s', 'payplus-payment-gateway'),
+                        $res->results->status,
+                        $res->results->description
+                    ));
                     $this->payplus_add_log_all($handle, print_r($res, true), 'error');
                     $flag = false;
                 }
@@ -712,7 +726,33 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             foreach ($arrOtherPayment as $key => $value) {
                 $iconStyle = isset($value['style']) ? $value['style'] : '';
                 $selected = ($currentSection == $value['section']) ? "nav-tab-active" : "";
-
+                $translatedKey = "";
+                switch ($key) {
+                    case 'bit':
+                        $translatedKey = esc_html__('bit', 'payplus-payment-gateway');
+                        break;
+                    case 'Google Pay':
+                        $translatedKey = esc_html__('Google Pay', 'payplus-payment-gateway');
+                        break;
+                    case 'Apple Pay':
+                        $translatedKey = esc_html__('Apple Pay', 'payplus-payment-gateway');
+                        break;
+                    case 'MULTIPASS':
+                        $translatedKey = esc_html__('MULTIPASS', 'payplus-payment-gateway');
+                        break;
+                    case 'PayPal':
+                        $translatedKey = esc_html__('PayPal', 'payplus-payment-gateway');
+                        break;
+                    case 'Tav Zahav':
+                        $translatedKey = esc_html__('Tav Zahav', 'payplus-payment-gateway');
+                        break;
+                    case 'Valuecard':
+                        $translatedKey = esc_html__('Valuecard', 'payplus-payment-gateway');
+                        break;
+                    case 'finitiOne':
+                        $translatedKey = esc_html__('finitiOne', 'payplus-payment-gateway');
+                        break;
+                }
                 if ($currentSection == $value['section']) {
                     $title = __($key, 'payplus-payment-gateway');
                 }
@@ -1188,8 +1228,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             if (!$this->checkValidateCard($token)) {
                 $this->payplus_add_log_all($handle, 'Token Expired: ' . $token, 'error');
-                wc_add_notice(__('Error: user or other, please contact PayPlus support', $this->id), 'error');
-                do_action('wc_gateway_payplus_process_payment_error', __('Error: user or other, please contact PayPlus support', $this->id), $order);
+                wc_add_notice(__('Error: user or other, please contact PayPlus support', 'payplus-payment-gateway'), 'error');
+                do_action('wc_gateway_payplus_process_payment_error', __('Error: user or other, please contact PayPlus support', 'payplus-payment-gateway'), $order);
                 $order->update_status('failed');
 
                 return [
@@ -2551,20 +2591,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                         if ($alternative_method_name == "credit-card") {
 
                                             $html .= sprintf(
-                                                __(
-                                                    '
-                            <div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : $handleLog) . ' Successful
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                                    'payplus-payment-gateway'
-                                                ),
+                                                '<div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : $handleLog) . ' Successful
+                                                    <table style="border-collapse:collapse">
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                    <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                    </table></div>
+                                                ',
                                                 $relatedTransaction->number,
                                                 $relatedTransaction->four_digits,
                                                 $relatedTransaction->expiry_month . $relatedTransaction->expiry_year,
@@ -2575,16 +2611,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                             );
                                         } else {
                                             $html .= sprintf(
-                                                __(
-                                                    '
-                              <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $alternative_method_name . '
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                                    'payplus-payment-gateway'
-                                                ),
+                                                '<div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $alternative_method_name . '
+                                                    <table style="border-collapse:collapse">
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                    </table></div>
+                                                ',
                                                 $relatedTransaction->number,
                                                 $relatedTransaction->amount
                                             );
@@ -2608,16 +2640,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                         }
                                         if ($this->saveOrderNote) {
                                             $order->add_order_note(sprintf(
-                                                __(
-                                                    '
-                              <div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $alternative_method_name . '
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                </table></div>
-                            ',
-                                                    'payplus-payment-gateway'
-                                                ),
+                                                '<div class="row" style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">PayPlus  Successful ' . $alternative_method_name . '
+                                                    <table style="border-collapse:collapse">
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Total</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                    </table></div>
+                                                ',
                                                 $res->data->number,
                                                 $res->data->amount
                                             ));
@@ -2625,27 +2653,22 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     } else {
                                         if ($this->saveOrderNote) {
                                             $order->add_order_note(sprintf(
-                                                __(
-                                                    '
-                            <div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : $handleLog) . ' Successful</div>
-                                <table style="border-collapse:collapse">
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
-                                    <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
-                                    <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
-                                </table>
-                            ',
-                                                    'payplus-payment-gateway'
-                                                ),
+                                                '<div style="font-weight:600;">PayPlus ' . (($type == "Approval" || $type == "Check") ? 'Pre-Authorization' : $handleLog) . ' Successful</div>
+                                                    <table style="border-collapse:collapse">
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Expiry date</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Voucher ID</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                                                        <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;"><a style="font-weight: bold;color:#000" class="copytoken" href="#"> %s</a></td></tr>
+                                                        <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
+                                                    </table>
+                                                ',
                                                 $res->data->number,
                                                 $res->data->four_digits,
                                                 $res->data->expiry_month . $res->data->expiry_year,
                                                 $res->data->voucher_num,
                                                 $res->data->token_uid,
                                                 $res->data->amount
-
                                             ));
                                         }
                                     }
