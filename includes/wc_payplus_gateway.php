@@ -1814,7 +1814,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $hideOtherChargeMethods = isset($options['hideOtherPayments']) ? $options['hideOtherPayments'] : $hideOtherChargeMethods;
         $hideOtherChargeMethods = $this->default_charge_method === 'multipass' ? 'false' : $hideOtherChargeMethods;
 
-        $callback = get_site_url(null, '/?wc-api=callback_response');
+        $callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
         if ($this->api_test_mode === true && $this->callback_addr) {
             $callback = $this->callback_addr;
         }
@@ -2113,6 +2113,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function callback_response()
     {
+        if (!isset($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'PayPlusGateWayNonce')) {
+            wp_die('Invalid nonce', 'Error', array('response' => 403));
+        }
+
         global $wpdb;
         $indexRow = 0;
         $json = file_get_contents('php://input');
@@ -2120,7 +2124,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $handle = 'payplus_callback_begin';
-        $this->payplus_add_log_all($handle, 'shlomo  ' . $response);
+
         $payplusHash = sanitize_text_field($_SERVER['HTTP_HASH']);
         $order_id = intval($response['transaction']['more_info']);
         $status_code = sanitize_text_field($response['transaction']['status_code']);
