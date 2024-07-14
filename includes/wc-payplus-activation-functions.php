@@ -147,29 +147,8 @@ function payplus_woocommerce_get_tax_rates($order)
 function payplusUpdateActivate()
 {
     $dataBaseVersion = get_option('payplus_db_version');
-    if (!$dataBaseVersion) {
-        $today = sanitize_text_field(date_i18n('d/m/Y H:i:s ') . home_url());
-        add_option('payplus_plugin_installed', $today);
-        $args = array(
-            'body' => '{"payplus-version-' . PAYPLUS_VERSION . '-installed": "' . $today . '"}',
-            'timeout' => '60',
-            'redirection' => '5',
-            'httpversion' => '1.0',
-            'blocking' => true,
-            'headers' => array(
-                'domain' => home_url(),
-                'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
-                'Content-Type' => 'application/json',
-            )
-        );
-        // $response = wp_remote_post('https://webhook.site/a277ba42-0722-4541-82f2-735e2a095aa0', $args);
-    }
     if (PAYPLUS_VERSION_DB != $dataBaseVersion) {
-
         payplus_create_table_order();
-        // payplus_create_table_change_status_order();
-        // payplus_create_table_log();
-        // payplus_create_table_payment_session();
         payplus_create_table_process();
         checkSetPayPlusOptions();
         update_option('payplus_db_version', PAYPLUS_VERSION_DB);

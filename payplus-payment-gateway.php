@@ -210,8 +210,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -532,8 +532,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
@@ -861,8 +861,11 @@ class WC_PayPlus
     /**
      * @return bool
      */
-    public static function payplus_check_exists_table($table = 'payplus_order')
+    public static function payplus_check_exists_table($wpnonce, $table = 'payplus_order')
     {
+        if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         global $wpdb;
         $table_name = $wpdb->prefix . $table;
         $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
@@ -928,8 +931,6 @@ require_once PAYPLUS_PLUGIN_DIR . '/includes/wc-payplus-activation-functions.php
 
 register_activation_hook(__FILE__, 'payplus_create_table_order');
 register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
-// register_activation_hook(__FILE__, 'payplus_create_table_log');
-register_activation_hook(__FILE__, 'payplus_create_table_payment_session');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
 register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
 register_activation_hook(__FILE__, 'payplusGenerateErrorPage');

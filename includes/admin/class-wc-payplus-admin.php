@@ -1456,7 +1456,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
         );
         ob_start();
-        if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table()) {
+        if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'))) {
         ?>
             <table class="wc-order-totals payplus-table-refund">
                 <tr class="payplus-row">

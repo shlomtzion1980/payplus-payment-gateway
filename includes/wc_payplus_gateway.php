@@ -3194,10 +3194,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_add_order($order_id, $dataRow)
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed!');
+        }
         global $wpdb;
         $order_id = intval($order_id);
         // Check if the custom table exists
-        if (!WC_PayPlus::payplus_check_exists_table()) {
+        if (!WC_PayPlus::payplus_check_exists_table($this->_wpnonce)) {
             // Sanitize each field before inserting into the database
             $is_multiple_transaction = isset($dataRow['is_multiple_transaction']) ? (bool) $dataRow['is_multiple_transaction'] : false;
             $parent_id = 0;

@@ -102,7 +102,7 @@ class PayplusInvoice
         //filters
         add_filter('manage_edit-shop_order_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
-        $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table();
+        $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'));
     }
     /**
      * @return mixed
@@ -968,7 +968,7 @@ class PayplusInvoice
         $order_id = intval($order_id);
         $notPayment = sanitize_text_field($notPayment);
 
-        if (!WC_PayPlus::payplus_check_exists_table()) {
+        if (!WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'))) {
             $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
             $endSql = "";
 
