@@ -16,7 +16,7 @@ if (isCheckout || hasOrder) {
   console.log("has order?", hasOrder);
 
   const customerId = store.getCustomerId();
-  const additinalFields = store.getAdditionalFields();
+  const additionalFields = store.getAdditionalFields();
   const orderId = store.getOrderId();
   const payPlusGateWay = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
