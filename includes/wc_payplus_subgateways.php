@@ -179,6 +179,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => '1',
             ],
         ];
+        if ($this->id === 'payplus-payment-gateway-multipass') {
+            unset($this->form_fields['sub_hide_other_charge_methods']);
+        }
     }
 
     /**
