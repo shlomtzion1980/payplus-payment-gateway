@@ -408,34 +408,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
-    // public function payplus_add_payments($order_id, $payments)
-    // {
-
-    //     global $wpdb;
-    //     $table = $wpdb->prefix . 'payplus_order';
-    //     $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
-    //     foreach ($payments as $key => $payment) {
-    //         $payment['parent_id'] = 0;
-    //         $payment['delete_at'] = 0;
-    //         $payment['price'] = floatval($payment['price']) * 100;
-    //         unset($payment['row_id']);
-    //         if (isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal') {
-    //             $payment['number_of_payments'] = 1;
-    //         } else {
-    //             if (isset($payment['first_payment']) || isset($payment['subsequent_payments'])) {
-    //                 $payment['first_payment'] = floatval($payment['first_payment']) * 100;
-    //                 $payment['subsequent_payments'] = floatval($payment['subsequent_payments']) * 100;
-    //             }
-    //         }
-    //         print_r($payment);
-    //         die;
-    //         $wpdb->insert(
-    //             $table,
-    //             $payment
-    //         );
-    //     }
-    // }
-
     public function payplus_add_payments($order_id, $payments)
     {
         global $wpdb;
