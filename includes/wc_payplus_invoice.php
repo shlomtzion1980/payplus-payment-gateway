@@ -559,6 +559,10 @@ class PayplusInvoice
     public function ajax_payplus_api_payment_refund()
     {
         check_ajax_referer('payplus_api_payment_refund', '_ajax_nonce');
+        if (!current_user_can('edit_shop_orders') && !is_admin()) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
         if (!empty($_POST)) {
             $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
             $order = wc_get_order($order_id);

@@ -182,6 +182,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function custom_action_callback()
     {
         check_ajax_referer('payplus_custom_action', '_ajax_nonce');
+
+        if (!current_user_can('edit_shop_orders') && !is_admin()) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
+
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $payment_request_uid = $_POST['payment_request_uid'];
 
@@ -231,8 +237,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             esc_html($responseBody['data']['amount']),
             esc_html($order->get_total())
         );
-
-        //$payplusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
 
         if (!empty($responseBody['data'])) {
             $responseArray = [
@@ -509,7 +513,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $amount = floatval($_POST['amount']);
             $urlEdit = get_edit_post_link($order_id);
             $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $type_document = sanitize_text_field($_POST['type_document']);
 
             $resultApps = $this->payPlusInvoice->payplus_get_payments($order_id);
@@ -566,7 +569,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             $handle = "payplus_process_payment";
             $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $order_id = intval($_POST['order_id']);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $order = wc_get_order($order_id);
@@ -641,11 +643,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function ajax_payplus_generate_link_payment()
     {
         check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
+
+        if (!current_user_can('edit_shop_orders') && !is_admin()) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
+
         $response = array("payment_response" => "", "status" => false);
 
         if (!empty($_POST)) {
             $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $handle = "payplus_process_payment";
             $date = new DateTime();
             $dateNow = $date->format('Y-m-d H:i');
@@ -683,9 +690,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function ajax_payplus_payment_api()
     {
         check_ajax_referer('payplus_api_payment', '_ajax_nonce');
+
+        if (!current_user_can('edit_shop_orders') && !is_admin()) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
+
         if (!empty($_POST)) {
             $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $order_id = intval($_POST['order_id']);
             $order = wc_get_order($order_id);
             $handle = "payplus_process_payment";
@@ -835,7 +847,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function payplus_get_section_invoice_not_automatic($orderId)
     {
         $this->isInitiated();
-        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $order = wc_get_order($orderId);
         $selectInvoice = array(
             'inv_tax' => __('Tax Invoice', 'payplus-payment-gateway'),
@@ -1430,7 +1441,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         global $wpdb;
         $this->isInitiated();
         $order = wc_get_order($orderId);
-        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $transaction_uid = $order->get_meta('payplus_transaction_uid');
         $order_validated = $order->get_meta('order_validated');
         $order_validated_error = $order->get_meta('order_validated_error');
@@ -1613,15 +1623,19 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_token_payment()
     {
-
         check_ajax_referer('payplus_token_payment', '_ajax_nonce');
+
+        if (!current_user_can('edit_shop_orders') && !is_admin()) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
+
         $totalCartAmount = 0;
         $handle = 'payplus_process_j5_payment';
         $urlEdit = site_url();
         if (!empty($_POST)) {
             $postPayPlus = $_POST;
             $this->isInitiated();
-            // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
             $order_id = $postPayPlus['payplus_order_id'];
             $payplusTokenPayment = $postPayPlus['payplus_token_payment'];
             $payplusChargeAmount = $postPayPlus['payplus_charge_amount'];
@@ -1884,7 +1898,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $order = wc_get_order($order_id);
         $handle = 'payplus_process_j5_payment';
         $this->isInitiated();
-        // $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $charged_amount = 0;
         $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
         if ($charged_amount) {
