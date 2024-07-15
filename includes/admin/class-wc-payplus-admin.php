@@ -408,6 +408,34 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
+    // public function payplus_add_payments($order_id, $payments)
+    // {
+
+    //     global $wpdb;
+    //     $table = $wpdb->prefix . 'payplus_order';
+    //     $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
+    //     foreach ($payments as $key => $payment) {
+    //         $payment['parent_id'] = 0;
+    //         $payment['delete_at'] = 0;
+    //         $payment['price'] = floatval($payment['price']) * 100;
+    //         unset($payment['row_id']);
+    //         if (isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal') {
+    //             $payment['number_of_payments'] = 1;
+    //         } else {
+    //             if (isset($payment['first_payment']) || isset($payment['subsequent_payments'])) {
+    //                 $payment['first_payment'] = floatval($payment['first_payment']) * 100;
+    //                 $payment['subsequent_payments'] = floatval($payment['subsequent_payments']) * 100;
+    //             }
+    //         }
+    //         print_r($payment);
+    //         die;
+    //         $wpdb->insert(
+    //             $table,
+    //             $payment
+    //         );
+    //     }
+    // }
+
     public function payplus_add_payments($order_id, $payments)
     {
         global $wpdb;
@@ -428,24 +456,58 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payment['parent_id'] = 0;
             $payment['delete_at'] = 0;
             $payment['price'] = floatval($payment['price']) * 100;
+            unset($payment['row_id']);
+            if (isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal') {
+                $payment['number_of_payments'] = 1;
+            } else {
+                if (isset($payment['first_payment']) || isset($payment['subsequent_payments'])) {
+                    $payment['first_payment'] = floatval($payment['first_payment']) * 100;
+                    $payment['subsequent_payments'] = floatval($payment['subsequent_payments']) * 100;
+                }
+            }
 
-            // Sanitize and validate input data
-            $payment = array(
-                'order_id' => intval($order_id), // Ensure order_id is an integer
-                'parent_id' => intval($payment['parent_id']),
-                'delete_at' => intval($payment['delete_at']),
-                'price' => floatval($payment['price']),
-                'transaction_type' => isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal' ? 'normal' : '',
-                'number_of_payments' => isset($payment['transaction_type']) && $payment['transaction_type'] == 'normal' ? 1 : 0,
-                'first_payment' => isset($payment['first_payment']) ? floatval($payment['first_payment']) * 100 : 0,
-                'subsequent_payments' => isset($payment['subsequent_payments']) ? floatval($payment['subsequent_payments']) * 100 : 0,
-            );
+            $date_string = $payment['create_at'];
+
+            // Validate and sanitize the date
+            $date = DateTime::createFromFormat('Y-m-d', $date_string);
+
+            if ($date && $date->format('Y-m-d') === $date_string) {
+                // Date is valid and sanitized
+                $sanitized_date = $date->format('Y-m-d');
+            }
+
+            $payment['method_payment'] = sanitize_text_field($payment['method_payment']);
+            $payment['create_at'] = $sanitized_date;
+
+            $dataTypes = [];
+            foreach ($payment as $key => $val) {
+                if (in_array($key, [
+                    'method_payment', 'create_at',
+                    'bank_number', 'transaction_id', 'account_number', 'branch_number', 'check_number',
+                    'four_digits', 'brand_name', 'transaction_type', 'payment_app', 'transaction_id', 'payer_account', 'notes'
+                ])) {
+                    $payment[$key] = sanitize_text_field($payment[$key]);
+                    $dataTypes[] = '%s';
+                }
+                if (in_array($key, ['number_of_payments', 'order_id', 'parent_id', 'delete_at'])) {
+                    $payment[$key] = intval($payment[$key]);
+                    $dataTypes[] = '%d';
+                }
+                if (in_array($key, ['subsequent_payments', 'first_payment'])) {
+                    $payment[$key] = floatval($payment[$key])  * 100;
+                    $dataTypes[] = '%f';
+                }
+                if ($key === 'price') {
+                    $payment[$key] = floatval($payment[$key]);
+                    $dataTypes[] = '%f';
+                }
+            }
 
             // Insert sanitized data into the database
             $wpdb->insert(
                 $table,
                 $payment,
-                array('%d', '%d', '%d', '%f', '%s', '%d', '%f', '%f') // Data format for each column
+                $dataTypes // Data format for each column
             );
         }
     }
