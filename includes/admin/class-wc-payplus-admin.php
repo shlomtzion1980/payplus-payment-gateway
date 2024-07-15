@@ -469,7 +469,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             $order_id = intval($_POST['order_id']);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
-            $type_document = esc_html($_POST['typeDocument']);
+            $type_document = sanitize_text_field($_POST['typeDocument']);
             $payments = isset($_POST['payments']) ? $_POST['payments'] : null;
 
             if (!empty($payments)) {
