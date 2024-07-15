@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-##  [7.0.8] - 2024-07-04 - (Shinobi)
+##  [7.0.8] - 2024-07-15 - (Shinobi)
 
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
 * Fix    - On bit successful transactions through "uPay" the redirect to thank you page is now corrected for both mobile and desktop.
