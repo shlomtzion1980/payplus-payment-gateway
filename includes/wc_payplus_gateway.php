@@ -3268,26 +3268,25 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'payplus_response' => wp_json_encode($dataRow),
                         'delete_at' => 0,
                     );
-                    // Define the format array
+
                     $format = [
-                        '%d', // order_id
-                        '%d', // parent_id
-                        '%s', // transaction_uid
-                        '%s', // method_payment
-                        '%s', // page_request_uid
-                        '%s', // four_digits
-                        '%d', // number_of_payments
-                        '%s', // brand_name
-                        '%s', // approval_num
-                        '%s', // alternative_method_name
-                        '%s', // type_payment
-                        '%s', // token_uid
-                        '%f', // price
-                        '%s', // payplus_response
-                        '%d', // delete_at
+                        '%d',
+                        '%d',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%d',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%s',
+                        '%f',
+                        '%s',
+                        '%d',
                     ];
 
-                    // Insert data using $wpdb->insert()
                     $wpdb->insert($table, $data, $format);
                 }
             }
