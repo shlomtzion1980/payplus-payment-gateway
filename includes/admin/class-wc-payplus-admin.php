@@ -474,7 +474,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $dataTypes[] = '%f';
                 }
             }
-
+            $order = wc_get_order($order_id);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_order_payments' => wp_json_encode($payment)]);
             // Insert sanitized data into the database
             $wpdb->insert(
                 $table,
