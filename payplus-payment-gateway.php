@@ -162,7 +162,7 @@ class WC_PayPlus
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
                         $order->set_payment_method('payplus-payment-gateway');
                         $order->set_payment_method_title('Pay with Debit or Credit Card');
-                        $linkRedirect = esc_url(get_admin_url() . "post.php?post=" . $order_id . "&action=edit");
+                        $linkRedirect = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
                     }
                 }
                 WC()->session->__unset('save_payment_method');
