@@ -566,7 +566,7 @@ class PayplusInvoice
         if (!empty($_POST)) {
             $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
             $order = wc_get_order($order_id);
-            $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
+            $urlEdit = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
             $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
             if ($payplus_document_type == "inv_refund_receipt_invoice") {
                 $resultinvoice = $this->payplus_create_dcoment($order_id, 'inv_refund', '', REFUND_INVOICE);
