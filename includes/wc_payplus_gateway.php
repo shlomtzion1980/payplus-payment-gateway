@@ -22,7 +22,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $add_product_field_transaction_type;
     public $disable_menu_side;
     public $disable_menu_header;
-    public $enable_pickup;
     public $invoice_api;
     public $check_amount_authorization;
     public $api_test_mode;
@@ -129,7 +128,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // menu
         $this->disable_menu_header = $this->get_option('disable_menu_header') == 'yes' ? false : true;
         $this->disable_menu_side = $this->get_option('disable_menu_side') == 'yes' ? false : true;
-        $this->enable_pickup = $this->get_option('enable_pickup') == 'yes' ? true : false;
         $this->check_amount_authorization = $this->get_option('check_amount_authorization') == 'yes' ? false : true;
         $this->_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
         $this->title = $this->get_option('title');
@@ -1652,10 +1650,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 }
                 $productPrice = $shipping_total + $shipping_tax;
                 $productPrice = round($productPrice, $this->rounding_decimals);
-                /*  if ($shipping_method_data['method_id'] === "free_shipping"
-                || ($shipping_method_data['method_id'] === "woo-ups-pickups" && $this->enable_pickup)
-                || ($shipping_method_data['method_id'] === "local_pickup" && $this->is_Local_pickup)
-                ) {*/
+
                 $description = "";
                 if ($shipping_method_data['method_id'] === "woo-ups-pickups") {
                     $description = $this->getDiscrptionUpPickup($order_id);
