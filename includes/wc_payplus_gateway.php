@@ -1665,7 +1665,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
                 $totalCartAmount += $productPrice;
             }
-            // }
         }
         // coupons
 
