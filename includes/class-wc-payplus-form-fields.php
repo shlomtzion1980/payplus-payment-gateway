@@ -391,16 +391,6 @@ class WC_PayPlus_Form_Fields
                 'type' => 'text',
                 'default' => '10',
             ],
-            'menu_plugin_external' => [
-                'title' => __('External Plugins', 'payplus-payment-gateway'),
-                'type' => 'title',
-            ],
-            'enable_pickup' => [
-                'title' => __('Enable PickUP', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => '',
-
-            ],
             'advanced_title' => [
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
