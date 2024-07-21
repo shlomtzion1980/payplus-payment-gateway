@@ -836,11 +836,6 @@ class PayplusInvoice
             }
             $productPrice = ($shipping_total + $shipping_tax) * $dual;
 
-            /*   if (
-            || $shipping_method_data['method_id'] === "free_shipping"
-            || ($shipping_method_data['method_id'] === "woo-ups-pickups" && $WC_PayPlus_Gateway->enable_pickup)
-            || ($shipping_method_data['method_id'] === "local_pickup" && $WC_PayPlus_Gateway->is_Local_pickup)
-            ) {*/
             $description = "";
             if ($shipping_method_data['method_id'] === "woo-ups-pickups") {
                 $description = $WC_PayPlus_Gateway->getDiscrptionUpPickup($order_id);
