@@ -1879,6 +1879,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'delete_confim' => __('Are you sure you want to delete this payment method?', 'payplus-payment-gateway'),
                 'create_invoice_refund_nonce' => wp_create_nonce('create_invoice_refund_nonce'),
                 'create_invoice_nonce' => wp_create_nonce('create_invoice_nonce'),
+                "frontNonce" => wp_create_nonce('frontNonce'),
             )
         );
         wp_enqueue_script('wc-payplus-gateway-admin');
