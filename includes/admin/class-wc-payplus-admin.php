@@ -1857,6 +1857,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplusTransactionReview" => wp_create_nonce('payplus_transaction_review'),
                 "payplusGenerateLinkPayment" => wp_create_nonce('payplus_generate_link_payment'),
                 "payplusCustomAction" => wp_create_nonce('payplus_custom_action'),
+                "frontNonce" => wp_create_nonce('frontNonce'),
             )
         );
         wp_enqueue_script('payplus-admin-payment');
