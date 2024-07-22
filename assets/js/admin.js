@@ -2,6 +2,7 @@ const price = document.querySelectorAll(".price");
 const fullAmount = document.querySelectorAll(".payplus-full-amount");
 let table_payment = null;
 const allSum = document.getElementById("all-sum");
+console.log(payplus_script_payment);
 
 jQuery(function ($) {
   const globalShipping = $(".global_shipping");
@@ -188,7 +189,7 @@ jQuery(function ($) {
         data: {
           action: "payplus-express-checkout-initialized",
           method: "google-pay",
-          _ajax_nonce: payplus_script_admin.frontNonce,
+          _ajax_nonce: payplus_script_payment.frontNonce,
         },
         success: function (response) {
           elementFieldset.find(".loading-express").fadeOut();
@@ -219,7 +220,7 @@ jQuery(function ($) {
         data: {
           action: "payplus-express-checkout-initialized",
           method: "apple-pay",
-          _ajax_nonce: payplus_script_admin.frontNonce,
+          _ajax_nonce: payplus_script_payment.frontNonce,
         },
         success: function (response) {
           elementFieldset.find(".loading-express").fadeOut();
