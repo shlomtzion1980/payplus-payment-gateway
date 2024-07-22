@@ -18,22 +18,20 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $this->isGoogleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_google_pay']) && $this->payPlusGateWaySettings['enable_google_pay'] === 'yes');
         $this->paymentPageId = isset($this->payPlusGateWaySettings['api_test_mode']) && $this->payPlusGateWaySettings['api_test_mode'] === 'yes' ? $this->payPlusGateWaySettings['dev_payment_page_id'] ?? null : $this->payPlusGateWaySettings['payment_page_id'] ?? null;
 
-        if ($this->isAppleEnabled || $this->isGoogleEnabled) {
-            add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
-            add_action('wp_ajax_nopriv_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
-            add_action('wp_ajax_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
-            add_action('wp_ajax_nopriv_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
-            add_action('wp_ajax_payplus-express-checkout-initialized', [$this, 'ajax_payplus_express_checkout_initialized']);
-            add_action('wp_ajax_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
-            add_action('wp_ajax_nopriv_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
-            add_action('wp_ajax_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
-            add_action('wp_ajax_nopriv_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
-            add_action('woocommerce_after_add_to_cart_form', [$this, 'payplus_extra_button_on_product_page'], 30);
-            add_action('woocommerce_before_checkout_form', [$this, 'payplus_extra_button_on_product_page'], 30);
-            add_action('woocommerce_before_cart', [$this, 'payplus_extra_button_on_product_page'], 20);
-            add_action('wp_footer', [$this, 'payplus_set_code_footer']);
-            add_shortcode('payplus-extra-express-checkout', [$this, 'payplus_extra_button_short_code']);
-        }
+        add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
+        add_action('wp_ajax_nopriv_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
+        add_action('wp_ajax_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
+        add_action('wp_ajax_nopriv_process-payment-oneclick', [$this, 'ajax_payplus_process_payment_oneclick']);
+        add_action('wp_ajax_payplus-express-checkout-initialized', [$this, 'ajax_payplus_express_checkout_initialized']);
+        add_action('wp_ajax_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
+        add_action('wp_ajax_nopriv_check-customer-vat-oc', [$this, 'ajax_payplus_check_customer_vat_oc']);
+        add_action('wp_ajax_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
+        add_action('wp_ajax_nopriv_payplus-get-total-cart', [$this, 'ajax_payplus_get_total_cart']);
+        add_action('woocommerce_after_add_to_cart_form', [$this, 'payplus_extra_button_on_product_page'], 30);
+        add_action('woocommerce_before_checkout_form', [$this, 'payplus_extra_button_on_product_page'], 30);
+        add_action('woocommerce_before_cart', [$this, 'payplus_extra_button_on_product_page'], 20);
+        add_action('wp_footer', [$this, 'payplus_set_code_footer']);
+        add_shortcode('payplus-extra-express-checkout', [$this, 'payplus_extra_button_short_code']);
     }
 
 
