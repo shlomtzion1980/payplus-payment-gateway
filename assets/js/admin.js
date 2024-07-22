@@ -188,6 +188,7 @@ jQuery(function ($) {
         data: {
           action: "payplus-express-checkout-initialized",
           method: "google-pay",
+          _ajax_nonce: payplus_script_admin.frontNonce,
         },
         success: function (response) {
           elementFieldset.find(".loading-express").fadeOut();
@@ -218,6 +219,7 @@ jQuery(function ($) {
         data: {
           action: "payplus-express-checkout-initialized",
           method: "apple-pay",
+          _ajax_nonce: payplus_script_admin.frontNonce,
         },
         success: function (response) {
           elementFieldset.find(".loading-express").fadeOut();
