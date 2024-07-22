@@ -420,14 +420,18 @@ class WC_PayPlus_Form_Fields
                 'default' => 'no',
             ],
             'disable_menu_header' => [
-                'title' => __('Top menu cancellation', 'payplus-payment-gateway'),
+                'title' => __('Hide the top menu', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => '',
+                'description' =>  __('Hide the PayPlus top menu', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'label' => __('Hide the PayPlus top menu', 'payplus-payment-gateway'),
             ],
             'disable_menu_side' => [
-                'title' => __('Canceling the side menu', 'payplus-payment-gateway'),
+                'title' => __('Hide the side menu', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => '',
+                'description' =>  __('Hide the PayPlus side menu', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'label' => __('Hide the PayPlus side menu', 'payplus-payment-gateway'),
             ],
             'hide_custom_fields_buttons' => [
                 'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
