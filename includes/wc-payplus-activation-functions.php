@@ -116,7 +116,7 @@ function change_payment_gateway_title($title, $payment_id)
                 label.htmlFor.search(`payment_method_payplus-payment-gateway`) !== -1 ? label.style.top = "9px" : label.style.top = "0px";
             };
         </script>';
-        $title = "<span>&nbsp;&nbsp;" . $title . "</span>";
+        //$title = "<span>&nbsp;&nbsp;" . $title . "</span>";
     }
     return $title;
 }
