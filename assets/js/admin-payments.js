@@ -523,11 +523,16 @@ function payplusMenusDisplay() {
     section == "payplus-invoice" ||
     section == "payplus-payment-gateway-setup-wizard" ||
     section == "payplus-express-checkout" ||
-    section == "payplus-error-setting"
+    section == "payplus-error-setting" ||
+    section == "payplus-payment-gateway-multipass"
   ) {
-    jQuery(".wrap.woocommerce")
-      .find("h1")
-      .before(payplus_script_admin.menu_option);
+    //don't display on multipass but use the other display settings ...:)
+    if (section !== "payplus-payment-gateway-multipass") {
+      jQuery(".wrap.woocommerce")
+        .find("h1")
+        .before(payplus_script_admin.menu_option);
+    }
+
     const formTables = jQuery(".wrap.woocommerce").find(".form-table");
     formTables.each(function () {
       if (this.innerHTML.trim().length === 0) {
