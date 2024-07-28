@@ -165,21 +165,47 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-setup-wizard');
                 break;
             case 'payplus-error-setting':
-                // $settings[$section][] = array(
-                //     'name' => __('PayPlus Page Error - Settings', 'payplus-payment-gateway'),
-                //     'type' => 'title',
-                //     'desc' => '',
-                //     'id' => 'payplus-error-setting'
-                // );
-                // $settings[$section][] = array(
-                //     'name' => __('Content of the page', 'payplus-payment-gateway') . ":",
-                //     'id' => 'settings_payplus_page_error_option[post-content]',
-                //     'type' => 'textarea',
-                //     'desc' => __('Edit the error page content', 'payplus-payment-gateway'),
-                //     'desc_tip' => true,
-                //     'default' => "העיסקה נכשלה, נא ליצור קשר עם בית העסק\nThe transaction failed, please contact the seller"
-                // );
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-error-setting');
+                break;
+            case 'payplus-payment-gateway-multipass':
+                $settings[$section][] = array(
+                    'name' => '',
+                    'type' => 'title',
+                    'id' => 'payplus-payment-gateway-multipass[clubsTitle]'
+                );
+                $settings[$section][] = array(
+                    'name' => esc_html__('Select your clubs:', 'payplus-payment-gateway'),
+                    'id' => 'payplus-payment-gateway-multipass[clubs]',
+                    'desc' => esc_html__('Choose clubs to show their icon on the checkout page - This is for display only.', 'payplus-payment-gateway'),
+                    'type' => 'multiselect',
+                    'class' => 'myClubs',
+                    'options' => [
+                        'buyme' => esc_html__('BuyMe', 'payplus-payment-gateway'),
+                        'rami-levy' => esc_html__('Rami Levy', 'payplus-payment-gateway'),
+                        'yenot-bitan' => esc_html__('Yenot Bitan', 'payplus-payment-gateway'),
+                        'hitech-zone' => esc_html__('Hitechzone', 'payplus-payment-gateway'),
+                        'jd-club' => esc_html__('JD Club', 'payplus-payment-gateway'),
+                        'club-911' => esc_html__('911 Club', 'payplus-payment-gateway'),
+                        'forever-21' => esc_html__('Forever 21', 'payplus-payment-gateway'),
+                        'dolce-vita' => esc_html__('Dolce Vita', 'payplus-payment-gateway'),
+                        'dolce-vita-moadon-shelra' => esc_html__('Dolce Vita - Shelra', 'payplus-payment-gateway'),
+                        'payis-plus-moadon-mifal-hapayis' => esc_html__('Mifal Hapayis', 'payplus-payment-gateway'),
+                        'gold-tsafon' => esc_html__('Gold Tsafon', 'payplus-payment-gateway'),
+                        'dolce-vita-i-student' => esc_html__('iStudent', 'payplus-payment-gateway'),
+                        'yerushalmi' => esc_html__('Yerushalmi', 'payplus-payment-gateway'),
+                        'dolce-vita-cal' => esc_html__('Dolce Vita - Cal', 'payplus-payment-gateway'),
+                        'extra-bonus-tapuznet' => esc_html__('Extra Bonus', 'payplus-payment-gateway'),
+                        'bituah-yashir' => esc_html__('Dolce Vita - Bituah Yashir', 'payplus-payment-gateway'),
+                        'nofshonit' => esc_html__('Nofshonit', 'payplus-payment-gateway'),
+                        'ksharim-plus' => esc_html__('Happy Gift', 'payplus-payment-gateway'),
+                        'swagg' => esc_html__('Swagg', 'payplus-payment-gateway'),
+                        'raayonit' => esc_html__('Raayonit', 'payplus-payment-gateway'),
+                        'share-spa' => esc_html__('Share Spa', 'payplus-payment-gateway'),
+                        'gifta' => esc_html__('Gifta', 'payplus-payment-gateway'),
+                        'mega-lean' => esc_html__('MegaLean', 'payplus-payment-gateway'),
+                    ],
+                );
+                $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-multipass');
                 break;
             case 'payplus-invoice':
                 $payplus_invoice_option = get_option('payplus_invoice_option');
