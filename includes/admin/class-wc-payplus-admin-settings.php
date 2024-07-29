@@ -176,7 +176,7 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array(
                     'name' => esc_html__('Select your clubs:', 'payplus-payment-gateway'),
                     'id' => 'payplus-payment-gateway-multipass[clubs]',
-                    'desc' => __("Choose clubs to show their icon on the checkout page<br>Currently supported only in the new Woocommerce checkout.", 'payplus-payment-gateway'),
+                    'desc' => __("Choose clubs to show their icon on the checkout page.", 'payplus-payment-gateway'),
                     'type' => 'multiselect',
                     'class' => 'myClubs',
                     'options' => [
