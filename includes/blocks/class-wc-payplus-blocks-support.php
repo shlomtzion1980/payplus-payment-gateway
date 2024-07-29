@@ -221,6 +221,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'showSaveOption' => $this->settings['create_pp_token'] == 'yes' ? true : false,
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
+            'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',

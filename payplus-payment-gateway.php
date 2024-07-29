@@ -389,6 +389,7 @@ class WC_PayPlus
      */
     public function init()
     {
+
         load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages');
         if (class_exists("WooCommerce")) {
 
@@ -463,8 +464,9 @@ class WC_PayPlus
         $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.js');
         $importAapplepayScript = null;
         $isModbile = (wp_is_mobile()) ? true : false;
+        $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
         if (is_checkout()) {
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js';
+            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js';
             if (
                 property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') &&
                 $this->payplus_payment_gateway_settings->import_applepay_script === "yes"
@@ -475,7 +477,7 @@ class WC_PayPlus
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
-                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile)
+                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons)
             );
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));

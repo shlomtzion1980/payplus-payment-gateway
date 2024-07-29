@@ -332,4 +332,44 @@ class WC_PayPlus_Statics
 
             return $response;
         }
+
+        public static function getMultiPassIcons()
+        {
+            $iconsArray = [
+                'buyme' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/buyme.png",
+                'rami-levy' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/rami-levy.png",
+                'yenot-bitan' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/yenot-bitan.png",
+                'hitech-zone' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/hitech-zone.png",
+                'jd-club' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/jd-club.png",
+                'club-911' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/club-911.png",
+                'forever-21' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/forever-21.png",
+                'dolce-vita' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/dolce-vita.png",
+                'dolce-vita-moadon-shelra' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/dolce-vita-moadon-shelra.png",
+                'payis-plus-moadon-mifal-hapayis' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/payis-plus-moadon-mifal-hapayis.png",
+                'gold-tsafon' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/gold-tsafon.png",
+                'dolce-vita-i-student' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/dolce-vita-i-student.png",
+                'yerushalmi' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/yerushalmi.png",
+                'dolce-vita-cal' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/dolce-vita-cal.png",
+                'extra-bonus-tapuznet' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/extra-bonus-tapuznet.png",
+                'bituah-yashir' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/bituah-yashir.png",
+                'nofshonit' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/nofshonit.png",
+                'ksharim-plus' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/ksharim-plus.png",
+                'swagg' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/swagg.png",
+                'raayonit' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/raayonit.png",
+                'share-spa' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/share-spa.png",
+                'gifta' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/gifta.png",
+                'mega-lean' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "multipass-fading-icons/mega-lean.png",
+            ];
+
+            $options = get_option('payplus-payment-gateway-multipass', []);
+            $iconsReturn = [];
+            if (isset($options['clubs'])) {
+                foreach ($options['clubs'] as $club) {
+                    if (array_key_exists($club, $iconsArray)) {
+                        $iconsReturn[$club] = $iconsArray[$club];
+                    }
+                }
+            }
+            return $iconsReturn;
+        }
     }
