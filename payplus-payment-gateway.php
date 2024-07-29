@@ -466,7 +466,7 @@ class WC_PayPlus
         $isModbile = (wp_is_mobile()) ? true : false;
         $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
         if (is_checkout()) {
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js';
+            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
             if (
                 property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') &&
                 $this->payplus_payment_gateway_settings->import_applepay_script === "yes"
