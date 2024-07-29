@@ -112,6 +112,88 @@ if (isCheckout || hasOrder) {
     function startObserving() {
       console.log("observer started");
 
+      /* Check if multipass method is available and if so check for clubs and replace icons! */
+      const isMultiPass = wcSettings.paymentMethodSortOrder.includes(
+        "payplus-payment-gateway-multipass"
+      );
+      if (
+        isMultiPass &&
+        Object.keys(
+          wcSettings.paymentMethodData["payplus-payment-gateway"].multiPassIcons
+        ).length > 0
+      ) {
+        console.log("isMultiPass");
+        const multiPassIcons =
+          wcSettings.paymentMethodData["payplus-payment-gateway"]
+            .multiPassIcons;
+
+        // Get the specific element
+        let element = document.querySelector(
+          "#radio-control-wc-payment-method-options-payplus-payment-gateway-multipass"
+        );
+
+        // Function to find the closest image element
+        function findClosestImage(el) {
+          let closestImage = null;
+
+          // Traverse the ancestors
+          let parent = el.parentElement;
+          while (parent) {
+            closestImage = parent.querySelector("img");
+            if (closestImage) {
+              return closestImage;
+            }
+            parent = parent.parentElement;
+          }
+
+          // Traverse siblings
+          let sibling = el;
+          while (sibling) {
+            if (sibling.tagName === "IMG") {
+              return sibling;
+            }
+            sibling =
+              sibling.nextElementSibling || sibling.previousElementSibling;
+          }
+
+          return null;
+        }
+
+        // Function to replace the image source with fade effect
+        function replaceImageSourceWithFade(image, newSrc) {
+          if (image && newSrc) {
+            image.style.transition = "opacity 0.5s";
+            image.style.opacity = 0;
+
+            setTimeout(() => {
+              image.src = newSrc;
+              image.style.opacity = 1;
+            }, 500);
+          }
+        }
+
+        let closestImage = findClosestImage(element);
+        if (closestImage) {
+          let originalSrc = closestImage.src;
+          let imageIndex = 0;
+          const imageKeys = Object.keys(multiPassIcons);
+          const sources = [
+            ...imageKeys.map((key) => multiPassIcons[key]),
+            originalSrc,
+          ];
+
+          function loopReplaceImageSource() {
+            const newSrc = sources[imageIndex];
+            replaceImageSourceWithFade(closestImage, newSrc);
+            imageIndex = (imageIndex + 1) % sources.length;
+            setTimeout(loopReplaceImageSource, 2000); // Change image every 3 seconds
+          }
+
+          loopReplaceImageSource();
+        }
+      }
+      /* finished multipass image replace */
+
       const overlay = document.createElement("div");
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
       overlay.id = "overlay";
