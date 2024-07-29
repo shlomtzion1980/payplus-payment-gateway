@@ -1067,7 +1067,11 @@ jQuery(function ($) {
             const newSrc = sources[imageIndex];
             replaceImageSourceWithFade(imageToChange, newSrc);
             imageIndex = (imageIndex + 1) % sources.length;
-            setTimeout(loopReplaceImageSource, 2000); // Change image every 3 seconds
+            if (
+              Object.keys(payplus_script_checkout.multiPassIcons).length > 1
+            ) {
+              setTimeout(loopReplaceImageSource, 2000); // Change image every 3 seconds
+            }
           }
 
           loopReplaceImageSource();
