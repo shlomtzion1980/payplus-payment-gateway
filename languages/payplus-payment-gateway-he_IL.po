@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-07-28 11:34+0300\n"
-"PO-Revision-Date: 2024-07-28 12:56+0300\n"
+"POT-Creation-Date: 2024-07-29 11:51+0300\n"
+"PO-Revision-Date: 2024-07-29 11:52+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -102,7 +102,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:93
 #: includes/class-wc-payplus-form-fields.php:209
-#: payplus-payment-gateway.php:589
+#: payplus-payment-gateway.php:591
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -118,14 +118,14 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/class-wc-payplus-form-fields.php:213
 #: includes/class-wc-payplus-statics.php:24
 #: includes/class-wc-payplus-statics.php:122 payplus-payment-gateway.php:283
-#: payplus-payment-gateway.php:584 payplus-payment-gateway.php:769
+#: payplus-payment-gateway.php:586 payplus-payment-gateway.php:771
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:98
 #: includes/class-wc-payplus-form-fields.php:214
-#: payplus-payment-gateway.php:284 payplus-payment-gateway.php:585
-#: payplus-payment-gateway.php:770
+#: payplus-payment-gateway.php:284 payplus-payment-gateway.php:587
+#: payplus-payment-gateway.php:772
 msgid "Authorization"
 msgstr "תפיסת מסגרת "
 
@@ -251,9 +251,11 @@ msgstr "בחירת מועדונים:"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:179
 msgid ""
-"Choose clubs to show their icon on the checkout page - This is for display "
-"only."
-msgstr "בחירת מועדונים לתצוגת סמליהם בעמוד התשלום."
+"Choose clubs to show their icon on the checkout page<br>Currently supported "
+"only in the new Woocommerce checkout."
+msgstr ""
+"בחירת מועדונים לתצוגת סמליהם בעמוד התשלום. <br>\n"
+"נתמך רק בעמוד התשלום החדש של ווקומרס."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:183
 msgid "BuyMe"
@@ -1037,7 +1039,7 @@ msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:135
 #: includes/blocks/class-wc-payplus-blocks-support.php:137
-#: includes/wc_payplus_gateway.php:1182 payplus-payment-gateway.php:844
+#: includes/wc_payplus_gateway.php:1182 payplus-payment-gateway.php:846
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1891,25 +1893,25 @@ msgstr ""
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:613 payplus-payment-gateway.php:632
+#: payplus-payment-gateway.php:615 payplus-payment-gateway.php:634
 msgid "Transaction Type "
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:651
+#: payplus-payment-gateway.php:653
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:674 payplus-payment-gateway.php:691
+#: payplus-payment-gateway.php:676 payplus-payment-gateway.php:693
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:812 payplus-payment-gateway.php:820
+#: payplus-payment-gateway.php:814 payplus-payment-gateway.php:822
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:835
+#: payplus-payment-gateway.php:837
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
