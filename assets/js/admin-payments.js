@@ -462,7 +462,7 @@ if (
     modeMessage["en"] = "Current Mode: Sandbox(Development) mode";
     modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
     currentMode = jQuery(
-      "<tr><td id='currentMode'>" +
+      "<tr><td style='color: red;' id='currentMode'>" +
         modeMessage[currentLanguage] +
         "</td></tr></tr>"
     );
