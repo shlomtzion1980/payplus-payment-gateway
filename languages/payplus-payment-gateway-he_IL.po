@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-07-29 11:51+0300\n"
-"PO-Revision-Date: 2024-07-29 11:52+0300\n"
+"POT-Creation-Date: 2024-07-29 13:45+0300\n"
+"PO-Revision-Date: 2024-07-29 13:46+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -250,12 +250,8 @@ msgid "Select your clubs:"
 msgstr "בחירת מועדונים:"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:179
-msgid ""
-"Choose clubs to show their icon on the checkout page<br>Currently supported "
-"only in the new Woocommerce checkout."
-msgstr ""
-"בחירת מועדונים לתצוגת סמליהם בעמוד התשלום. <br>\n"
-"נתמך רק בעמוד התשלום החדש של ווקומרס."
+msgid "Choose clubs to show their icon on the checkout page."
+msgstr "בחירת מועדונים לתצוגת סמליהם בעמוד התשלום."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:183
 msgid "BuyMe"

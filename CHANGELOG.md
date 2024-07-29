@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.0.9] - 2024-07-15 - (Street Fighter)
+
+* Fix    - Missing nonce in express checkout.
+* Fix    - Express checkout activation.
+* Add    - Multipass icons will change with fade in and out on the checkout page according to Multipass clubs settings in admin.
+
+
 ##  [7.0.8] - 2024-07-15 - (Shinobi)
 
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
