@@ -86,7 +86,7 @@ jQuery(function ($) {
       this.$checkout_form
         .find("#ship-to-different-address input")
         .trigger("change");
-      this.init_payment_methods();
+      // this.init_payment_methods();
 
       // Update on page load
       if (wc_checkout_params.is_checkout === "1") {
@@ -331,6 +331,8 @@ jQuery(function ($) {
         "5",
         args
       );
+      let loopImages = true;
+      multiPassIcons(loopImages);
     },
     update_checkout_action: function (args) {
       if (wc_checkout_form.xhr) {
@@ -465,7 +467,7 @@ jQuery(function ($) {
                 !wc_checkout_form.fragments ||
                 wc_checkout_form.fragments[key] !== value
               ) {
-                $(key).replaceWith(value);
+                // $(key).replaceWith(value);
               }
               $(key).unblock();
             });
@@ -1006,5 +1008,73 @@ jQuery(function ($) {
       });
     }
     alertify.popupIframePaymentPage(src);
+  }
+  function multiPassIcons(loopImages) {
+    /* Check if multipass method is available and if so check for clubs and replace icons! */
+
+    const element = document.querySelector(
+      "#payment_method_payplus-payment-gateway-multipass"
+    );
+
+    if (
+      element &&
+      Object.keys(payplus_script_checkout.multiPassIcons).length > 0
+    ) {
+      console.log("isMultiPass");
+      const multiPassIcons = payplus_script_checkout.multiPassIcons;
+
+      // Function to find an image by its src attribute
+      function findImageBySrc(src) {
+        // Find all images within the document
+        let images = document.querySelectorAll("img");
+        // Loop through images to find the one with the matching src
+        for (let img of images) {
+          if (img.src.includes(src)) {
+            return img;
+          }
+        }
+        return null;
+      }
+
+      // Function to replace the image source with fade effect
+      function replaceImageSourceWithFade(image, newSrc) {
+        if (image && newSrc) {
+          image.style.height = "32px";
+          image.style.width = "32px";
+          image.style.transition = "opacity 0.5s";
+          image.style.opacity = 0;
+
+          setTimeout(() => {
+            image.src = newSrc;
+            image.style.opacity = 1;
+          }, 500);
+        } else {
+          console.log("Image or new source not found.");
+        }
+      }
+
+      // Example usage
+      if (element) {
+        // Find the image with the specific src
+        let imageToChange = findImageBySrc("multipassLogo.png");
+        if (imageToChange) {
+          let originalSrc = imageToChange.src;
+          let imageIndex = 0;
+          const imageKeys = Object.keys(multiPassIcons);
+          const sources = imageKeys.map((key) => multiPassIcons[key]);
+
+          function loopReplaceImageSource() {
+            const newSrc = sources[imageIndex];
+            replaceImageSourceWithFade(imageToChange, newSrc);
+            imageIndex = (imageIndex + 1) % sources.length;
+            setTimeout(loopReplaceImageSource, 2000); // Change image every 3 seconds
+          }
+
+          loopReplaceImageSource();
+          loopImages = false;
+        }
+      }
+    }
+    /* finished multipass image replace */
   }
 });
