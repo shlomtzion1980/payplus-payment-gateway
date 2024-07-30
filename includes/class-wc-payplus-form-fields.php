@@ -299,7 +299,9 @@ class WC_PayPlus_Form_Fields
             'import_applepay_script' => [
                 'title' => __('Apple Pay', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
+                'label' => __('Add Apple Pay Script to iframe', 'payplus-payment-gateway'),
+                'description' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
             ],
             'order_status_title' => [
                 'title' => __('Order Settings', 'payplus-payment-gateway'),
