@@ -86,7 +86,7 @@ jQuery(function ($) {
       this.$checkout_form
         .find("#ship-to-different-address input")
         .trigger("change");
-      // this.init_payment_methods();
+      this.init_payment_methods();
 
       // Update on page load
       if (wc_checkout_params.is_checkout === "1") {
