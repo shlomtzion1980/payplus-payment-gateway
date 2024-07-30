@@ -2,7 +2,6 @@ const price = document.querySelectorAll(".price");
 const fullAmount = document.querySelectorAll(".payplus-full-amount");
 let table_payment = null;
 const allSum = document.getElementById("all-sum");
-console.log(payplus_script_payment);
 
 jQuery(function ($) {
   const globalShipping = $(".global_shipping");
