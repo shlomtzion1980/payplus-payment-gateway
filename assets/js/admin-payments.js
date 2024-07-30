@@ -580,7 +580,7 @@ function payplusMenusDisplay() {
       '<iframe height="97%" width="80%" src="https://www.payplus.co.il/faq/"></iframe>';
 
     let iframeToShow =
-      section === "payplus-insvoice"
+      section === "payplus-invoice"
         ? iframes["payplus-invoice"]
         : iframes["payplus-faq"];
     let $settingsContainer = jQuery(
@@ -598,6 +598,11 @@ function payplusMenusDisplay() {
       display: "block",
       textAlign: "center",
     });
+
+    if (section === "payplus-invoice") {
+      var headline = "<h2>General Settings</h2>";
+      jQuery(".tab-section-payplus").prepend(headline);
+    }
 
     if ($settingsContainer.height() < 300) {
       jQuery(".right-tab-section-payplus").css("display", "none");
