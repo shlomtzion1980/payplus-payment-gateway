@@ -11,9 +11,6 @@ jQuery(function ($) {
   const enableGooglePay = $(".enable_google_pay");
   const enableApplePay = $(".enable_apple_pay");
   const tokenApplePay = $(".apple_pay_identifier");
-  const transactionType = $(
-    "#woocommerce_payplus-payment-gateway_transaction_type"
-  );
 
   const checkAmountAuthorization = $(
     "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
@@ -105,9 +102,13 @@ jQuery(function ($) {
   /******    block  end ******/
 
   /******    transaction Type  start ******/
-  if (transactionType != 2) {
-    checkAmountAuthorization.closest("tr").fadeOut();
+  if (typeof payplus_script_payment !== "undefined") {
+    const transactionType = payplus_script_payment.transactionType;
+    if (transactionType != 2) {
+      checkAmountAuthorization.closest("tr").fadeOut();
+    }
   }
+
   // transactionType.change(function () {
   //   if ($(this).val() == 2) {
   //     checkAmountAuthorization.closest("tr").fadeIn();
