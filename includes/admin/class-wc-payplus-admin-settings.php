@@ -340,7 +340,6 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[list-hidden]',
                     'type' => 'text',
                     'class' => 'list-hidden',
-
                 );
                 $settings[$section][] = array(
                     'name' => __('Whether to issue an automatic tax invoice that is paid in cash or by bank transfer', 'payplus-payment-gateway'),
@@ -349,11 +348,12 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
-                    'name' => __("Brand Uid (Note only if you have more than one site you will need to activate the button)", 'payplus-payment-gateway'),
+                    'name' => __("Brand UID", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_brand_uid]',
                     'type' => 'text',
                     'class' => 'payplus_invoice_brand_uid',
-                    'desc' => '<span class="arrow-payplus"></span>',
+                    'desc' => __('Set brand UID from which the system will issue the documents (Leave blank if you only have one brand)', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
                     'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(

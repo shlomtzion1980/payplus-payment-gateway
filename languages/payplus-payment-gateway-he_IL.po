@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-07-30 07:21+0300\n"
-"PO-Revision-Date: 2024-07-30 07:21+0300\n"
+"POT-Creation-Date: 2024-07-31 14:16+0300\n"
+"PO-Revision-Date: 2024-07-31 14:17+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -491,17 +491,23 @@ msgid ""
 "Choose from mulitple types of documents to be available in the order page."
 msgstr "בחירת סוג המסמכים האפשריים לחשבונית שיופיעו בעמוד ההזמנה"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:346
+#: includes/admin/class-wc-payplus-admin-settings.php:345
 msgid ""
 "Whether to issue an automatic tax invoice that is paid in cash or by bank "
 "transfer"
 msgstr "האם להוציא חשבונית מס אוטומטית המשולמת במזומן או בהעברה בנקאית?"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:352
+#: includes/admin/class-wc-payplus-admin-settings.php:351
+msgid "Brand UID"
+msgstr "מזהה מותג"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:355
 msgid ""
-"Brand Uid (Note only if you have more than one site you will need to "
-"activate the button)"
-msgstr "קוד מותג (רלוונטי במידה ויש יותר מפעילות חשבונאית תחת החברה)"
+"Set brand UID from which the system will issue the documents (Leave blank if "
+"you only have one brand)"
+msgstr ""
+"יש להזין את מזהה המותג ממנו המערכת תפיק את המסמכים (להשאיר ריק אם יש רק מותג "
+"אחד)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:360
 msgid "Website code"
@@ -1942,6 +1948,16 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Use this only if you have more than one brand."
+#~ msgstr ""
+#~ "יש להזין את מזהה המותג ממנו המערכת תפיק את המסמכים (להשאיר ריק אם יש רק "
+#~ "מותג אחד)"
+
+#~ msgid ""
+#~ "Brand Uid (Note only if you have more than one site you will need to "
+#~ "activate the button)"
+#~ msgstr "קוד מותג (רלוונטי במידה ויש יותר מפעילות חשבונאית תחת החברה)"
 
 #~ msgid ""
 #~ "Before enabling this option, please ensure you have proper PayPlus "
