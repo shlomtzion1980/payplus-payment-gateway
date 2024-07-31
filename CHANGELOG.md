@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express checkout activation.
-* Add    - Multipass icons will change with fade in and out on the checkout page according to Multipass clubs settings in admin.
+* Add    - Multipass icons will change with fade in and out on the checkout page.
+* Add    - Multipass select clubs settings in plugin settings.
 
 
 ##  [7.0.8] - 2024-07-15 - (Shinobi)

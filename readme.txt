@@ -2,7 +2,7 @@
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 3.0.1
-Tested up to: 6.6
+Tested up to: 6.6.1
 Requires PHP: 7.2
 Stable tag: 7.0.9
 PlugIn URL: https://www.payplus.co.il/wordpress
@@ -86,7 +86,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 = 7.0.9 = 
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express checkout activation.
-* Add    - Multipass icons will change with fade in and out on the checkout page according to Multipass clubs settings in admin.
+* Add    - Multipass icons will change with fade in and out on the checkout page.
+* Add    - Multipass select clubs settings in plugin settings.
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
