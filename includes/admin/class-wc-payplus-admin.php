@@ -1846,7 +1846,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     "tab-invoice-payplus" => __('Invoice+ (PayPlus)', 'payplus-payment-gateway')
                 ),
                 "currentLanguage" => $current_language,
-                'currentMode' => $this->get_option('api_test_mode'),
                 "payplus_enabled_payment" => $enabled,
                 "payplusTransactionType" => $this->transactionType,
                 "payplus_invoice" => $isInvoice,
