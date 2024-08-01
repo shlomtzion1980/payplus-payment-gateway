@@ -88,6 +88,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Fix    - Express checkout activation.
 * Add    - Multipass icons will change with fade in and out on the checkout page.
 * Add    - Multipass select clubs settings in plugin settings.
+* Add    - Brand UID for Sandbox/Development mode.
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.

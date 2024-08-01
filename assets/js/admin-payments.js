@@ -437,6 +437,19 @@ if (
       .css({ color: "#34aa54" });
   }
 
+  var brandUidParentTr = jQuery(
+    "#payplus_invoice_option\\[payplus_invoice_brand_uid\\]"
+  ).closest("tr");
+  var brandUidDevParentTr = jQuery(
+    "#payplus_invoice_option\\[payplus_invoice_brand_uid_sandbox\\]"
+  ).closest("tr");
+
+  if (payplus_script_admin.testMode === "yes") {
+    brandUidParentTr.hide();
+  } else {
+    brandUidDevParentTr.hide();
+  }
+
   jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").change(
     function () {
       if (
