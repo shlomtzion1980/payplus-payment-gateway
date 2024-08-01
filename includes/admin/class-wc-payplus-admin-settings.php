@@ -255,6 +255,24 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-languages-class',
                 );
                 $settings[$section][] = array(
+                    'name' => __("Brand UID", 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[payplus_invoice_brand_uid]',
+                    'type' => 'text',
+                    'class' => 'payplus_invoice_brand_uid',
+                    'desc' => __('Set brand UID from which the system will issue the documents (Leave blank if you only have one brand)', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'class' => 'payplus-documents'
+                );
+                $settings[$section][] = array(
+                    'name' => __("Brand UID - Development/Sandbox", 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[payplus_invoice_brand_uid_sandbox]',
+                    'type' => 'text',
+                    'class' => 'payplus_invoice_brand_uid',
+                    'desc' => __('Set development - brand UID from which the system will issue the documents (Leave blank if you only have one brand)', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'class' => 'payplus-documents'
+                );
+                $settings[$section][] = array(
                     'name' => __("Document type for charge transaction", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_type_document]',
                     'type' => 'select',
@@ -345,24 +363,6 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Whether to issue an automatic tax invoice that is paid in cash or by bank transfer', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-automatic]',
                     'type' => 'checkbox',
-                    'class' => 'payplus-documents'
-                );
-                $settings[$section][] = array(
-                    'name' => __("Brand UID", 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_invoice_brand_uid]',
-                    'type' => 'text',
-                    'class' => 'payplus_invoice_brand_uid',
-                    'desc' => __('Set brand UID from which the system will issue the documents (Leave blank if you only have one brand)', 'payplus-payment-gateway'),
-                    'desc_tip' => true,
-                    'class' => 'payplus-documents'
-                );
-                $settings[$section][] = array(
-                    'name' => __("Brand UID - Development/Sandbox", 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_invoice_brand_uid_sandbox]',
-                    'type' => 'text',
-                    'class' => 'payplus_invoice_brand_uid',
-                    'desc' => __('Set development - brand UID from which the system will issue the documents (Leave blank if you only have one brand)', 'payplus-payment-gateway'),
-                    'desc_tip' => true,
                     'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
