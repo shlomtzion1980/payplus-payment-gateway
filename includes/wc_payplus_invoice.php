@@ -50,7 +50,7 @@ class PayplusInvoice
         $this->payplus_invoice_brand_uid = (isset($this->payplus_invoice_option['payplus_invoice_brand_uid'])) ?
             $this->payplus_invoice_option['payplus_invoice_brand_uid'] : EMPTY_STRING_PAYPLUS;
 
-        $this->payplus_invoice_brand_uid = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? $this->payplus_invoice_option['payplus_invoice_brand_uid_sandbox'] : $this->payplus_invoice_brand_uid;
+        $this->payplus_invoice_brand_uid = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? (isset($this->payplus_invoice_option['payplus_invoice_brand_uid_sandbox']) ? $this->payplus_invoice_option['payplus_invoice_brand_uid_sandbox'] : null) : $this->payplus_invoice_brand_uid;
 
         $this->payplus_create_invoice_automatic = (isset($this->payplus_invoice_option['create-invoice-automatic'])
             && $this->payplus_invoice_option['create-invoice-automatic'] == "yes") ?
