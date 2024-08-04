@@ -206,7 +206,7 @@ class WC_PayPlus_Statics
                                     $amount = $transaction['amount'];
                                     $method = $transaction['method'];
                                     $brand = $transaction['brand_name'];
-                                    $issuer = $transaction['clearing_name'];
+                                    $issuer = $transaction['issuer_name'];
                                     $type = $transaction['type'];
                                     $number = $transaction['number'];
                                     $fourDigits = $transaction['four_digits'];
