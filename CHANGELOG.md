@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express checkout activation.
 * Add    - Multipass icons will change with fade in and out on the checkout page.
-* Add    - Multipass select clubs settings in plugin settings.
+* Add    - Multipass clubs select in plugin settings.
 * Add    - Brand UID for Sandbox/Development mode.
 
 

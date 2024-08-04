@@ -255,6 +255,16 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-languages-class',
                 );
                 $settings[$section][] = array(
+                    'name' => __("Website code", 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[payplus_website_code]',
+                    'type' => 'text',
+                    'class' => 'payplus_website_code',
+                    'desc' => '<span class="arrow-payplus">' . __("Add a unique string here if you have more than one website
+                    connected to the service <br> This will create a unique id for invoices to each site (website code must be different for each site!)", 'payplus-payment-gateway') . '</span>',
+                    'desc_tip' => true,
+                    'class' => 'payplus-documents'
+                );
+                $settings[$section][] = array(
                     'name' => __("Brand UID", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_brand_uid]',
                     'type' => 'text',
@@ -366,15 +376,6 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 );
                 $settings[$section][] = array(
-                    'name' => __("Website code", 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[payplus_website_code]',
-                    'type' => 'text',
-                    'class' => 'payplus_website_code',
-                    'desc' => '<span class="arrow-payplus">' . __("Add a unique string here if you have more than one website
-                    connected to the service <br> This will create a unique id for invoices to each site (website code must be different for each site!)", 'payplus-payment-gateway') . '</span>',
-                    'class' => 'payplus-documents'
-                );
-                $settings[$section][] = array(
                     'name' => __('Logging', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_invoice_enable_logging_mode]',
                     'type' => 'checkbox',
@@ -394,14 +395,14 @@ class WC_PayPlus_Admin_Settings
                     'default' => 'no',
                     'class' => 'payplus-display'
                 );
-                $settings[$section][] = [
-                    'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
-                    'type' => 'checkbox',
-                    'label' => '',
-                    'default' => 'no',
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[is_Local_pickup]',
-                    'class' => 'payplus-documents'
-                ];
+                // $settings[$section][] = [
+                //     'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
+                //     'type' => 'checkbox',
+                //     'label' => '',
+                //     'default' => 'no',
+                //     'id' => 'woocommerce_payplus-payment-gateway_settings[is_Local_pickup]',
+                //     'class' => 'payplus-documents'
+                // ];
                 $settings[$section][] = [
                     'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
@@ -433,10 +434,11 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 ];
                 $settings[$section][] = [
-                    'title' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                    'title' => __('Add product variations data to the invoice', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
-                    'label' => __('Send product variations among with products (for invoices)', 'payplus-payment-gateway'),
+                    'desc' => __('Display product variations metadata (If applicable) in a new line.', 'payplus-payment-gateway'),
                     'default' => 'yes',
+                    'desc_tip' => true,
                     'id' => 'woocommerce_payplus-payment-gateway_settings[send_variations]',
                     'class' => 'payplus-documents'
                 ];

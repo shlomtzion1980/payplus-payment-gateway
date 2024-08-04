@@ -87,7 +87,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express checkout activation.
 * Add    - Multipass icons will change with fade in and out on the checkout page.
-* Add    - Multipass select clubs settings in plugin settings.
+* Add    - Multipass clubs select in plugin settings.
 * Add    - Brand UID for Sandbox/Development mode.
 
 = 7.0.8 =
@@ -99,7 +99,6 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - According to the current API environment mode, display the correct set of keys and hide the other.
 * Add    - In MULTIPASS method settings - Show warning if transaction type is set for "Authorization" - MULTIPASS only works with "Charge".
 * Add    - Iframe display of PayPlus FAQ pages plugin settings.
-
 
 = 7.0.7 = 
 * Add    - PayPlus response json added for express checkout - PayPlus metabox.
