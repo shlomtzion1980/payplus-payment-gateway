@@ -1189,7 +1189,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
         $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;
-        WC_PayPlus_Meta_Data::update_meta($order, array('save_new_token' => isset($_POST['wc-' . $this->id . '-new-payment-method']) && $_POST['wc-' . $this->id . '-new-payment-method'] ? '1' : '0', 'save_payment_method' => isset($_POST['wc-' . $this->id . '-new-payment-method']) ? '1' : '0'));
+        $saveToken = $_POST['wc-' . $this->id . '-new-payment-method'];
+        if ($saveToken) {
+            WC_PayPlus_Meta_Data::update_meta($order, array('save_payment_method' => true));
+        }
         $order->save_meta_data();
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
