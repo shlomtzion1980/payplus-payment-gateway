@@ -188,6 +188,8 @@ class WC_PayPlus_Statics
                             if (!isset($responseArray['related_transactions'])) {
                                 $amount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'] ?? null;
                                 $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'] ?? null;
+                                $brand = $responseArray['brand_name'] ?? $responseArray['data']['data']['card_information']['brand_id'] ?? null;
+                                $issuer = $responseArray['issuer_name'] ?? $responseArray['data']['data']['card_information']['clearing_id'] ?? null;
                                 $type = $payPlusType ? $payPlusType : $responseArray['type'] ?? $responseArray['data']['transaction']['type'] ?? null;
                                 $number = $responseArray['number'] ?? $responseArray['data']['transaction']['number'] ?? null;
                                 $fourDigits = $responseArray['four_digits'] ?? $responseArray['data']['data']['card_information']['four_digits'] ?? null;
@@ -198,11 +200,13 @@ class WC_PayPlus_Statics
                                 $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
-                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
                                     $amount = $transaction['amount'];
                                     $method = $transaction['method'];
+                                    $brand = $transaction['brand_name'];
+                                    $issuer = $transaction['clearing_name'];
                                     $type = $transaction['type'];
                                     $number = $transaction['number'];
                                     $fourDigits = $transaction['four_digits'];
@@ -213,7 +217,7 @@ class WC_PayPlus_Statics
                                     $voucherId = $transaction['voucher_id'] ?? null;
                                     $tokeUid = $transaction['token_uid'];
                                     $j5Charge = null;
-                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
                                 echo esc_html(__('Total of payments: ', 'payplus-payment-gateway')) . esc_html($totalAmount);
@@ -263,7 +267,7 @@ class WC_PayPlus_Statics
          * 
          * @return string
          */
-        public static function createPayPlusDataBox($amount, $method, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge)
+        public static function createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge)
         {
             $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
             $expMonthYear = "$expMonth/$expYear";
@@ -272,6 +276,8 @@ class WC_PayPlus_Statics
                         <table style="border-collapse:collapse">
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Method', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Brand', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Issuer', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Type', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Last Digits', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Expiry Date', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -285,6 +291,8 @@ class WC_PayPlus_Statics
                 $type_text,
                 $number,
                 $method,
+                $brand,
+                $issuer,
                 $type,
                 $fourDigits,
                 $expMonthYear,

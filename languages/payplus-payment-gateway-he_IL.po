@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-08-04 13:17+0300\n"
-"PO-Revision-Date: 2024-08-04 13:18+0300\n"
+"POT-Creation-Date: 2024-08-04 13:45+0300\n"
+"PO-Revision-Date: 2024-08-04 13:46+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -563,22 +563,6 @@ msgstr "מילות מפתח למשלוחים באילת"
 msgid "Keywords must be separated with a comma"
 msgstr "יש להפריד בין מילות המפתח באמצעות פסיק"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:430
-msgid "Use \"General Product\" invoice+ documents"
-msgstr "שימוש ב\"מוצר כללי\" במסמכי חשבונית+"
-
-#: includes/admin/class-wc-payplus-admin-settings.php:432
-#, fuzzy
-#| msgid "Use \"General Product\""
-msgid "Show \"General Product\""
-msgstr "שימוש ב\"מוצר כללי\""
-
-#: includes/admin/class-wc-payplus-admin-settings.php:433
-msgid "Send all items as: \"General Product\" in Invoice+ document creation."
-msgstr ""
-"יצירת מסמך חשבונית+  ללא מידע מוצרים (יופיע רק מוצר כללי אחד עבור כל "
-"החשבונית)"
-
 #: includes/admin/class-wc-payplus-admin-settings.php:439
 msgid "Add product variations data to the invoice"
 msgstr "הוספת מידע (סוג) מוצר ומטה דאטה למסמך"
@@ -691,7 +675,7 @@ msgid "Language of the page"
 msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:222
-#: includes/class-wc-payplus-statics.php:268
+#: includes/class-wc-payplus-statics.php:272
 #, fuzzy
 #| msgid "Authorization"
 msgid "Pre-Authorization"
@@ -699,7 +683,7 @@ msgstr "תפיסת מסגרת "
 
 #: includes/admin/class-wc-payplus-admin.php:222
 #: includes/admin/class-wc-payplus-admin.php:1639
-#: includes/class-wc-payplus-statics.php:268
+#: includes/class-wc-payplus-statics.php:272
 msgid "Payment"
 msgstr "תשלום"
 
@@ -825,7 +809,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1040
 #: includes/admin/class-wc-payplus-admin.php:1063
-#: includes/class-wc-payplus-statics.php:278
+#: includes/class-wc-payplus-statics.php:284
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -931,7 +915,7 @@ msgstr "מספק צק"
 
 #: includes/admin/class-wc-payplus-admin.php:1221
 #: includes/admin/class-wc-payplus-admin.php:1224
-#: includes/class-wc-payplus-statics.php:275
+#: includes/class-wc-payplus-statics.php:281
 msgid "Type"
 msgstr "סוג"
 
@@ -1472,39 +1456,47 @@ msgstr "החזרים"
 msgid "Invoice"
 msgstr "חשבונית"
 
-#: includes/class-wc-payplus-statics.php:219
+#: includes/class-wc-payplus-statics.php:223
 msgid "Total of payments: "
 msgstr "סה\"כ תקבולים: "
 
-#: includes/class-wc-payplus-statics.php:273
+#: includes/class-wc-payplus-statics.php:277
 msgid "Transaction#"
 msgstr "עסקה"
 
-#: includes/class-wc-payplus-statics.php:274
+#: includes/class-wc-payplus-statics.php:278
 msgid "Method"
 msgstr "שיטה"
 
-#: includes/class-wc-payplus-statics.php:276
+#: includes/class-wc-payplus-statics.php:279
+msgid "Brand"
+msgstr "חברה"
+
+#: includes/class-wc-payplus-statics.php:280
+msgid "Issuer"
+msgstr "מנפיק"
+
+#: includes/class-wc-payplus-statics.php:282
 msgid "Last Digits"
 msgstr "ספרות אחרונות"
 
-#: includes/class-wc-payplus-statics.php:277
+#: includes/class-wc-payplus-statics.php:283
 msgid "Expiry Date"
 msgstr "תאריך תפוגה"
 
-#: includes/class-wc-payplus-statics.php:279
+#: includes/class-wc-payplus-statics.php:285
 msgid "Voucher #"
 msgstr "מס ואוצ'ר "
 
-#: includes/class-wc-payplus-statics.php:280
+#: includes/class-wc-payplus-statics.php:286
 msgid "Voucher ID"
 msgstr "ID ואוצ'ר"
 
-#: includes/class-wc-payplus-statics.php:281
+#: includes/class-wc-payplus-statics.php:287
 msgid "Token"
 msgstr "טוקן"
 
-#: includes/class-wc-payplus-statics.php:282
+#: includes/class-wc-payplus-statics.php:288
 msgid "Total:"
 msgstr "סה\"כ:"
 
@@ -1990,6 +1982,20 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Use \"General Product\" invoice+ documents"
+#~ msgstr "שימוש ב\"מוצר כללי\" במסמכי חשבונית+"
+
+#, fuzzy
+#~| msgid "Use \"General Product\""
+#~ msgid "Show \"General Product\""
+#~ msgstr "שימוש ב\"מוצר כללי\""
+
+#~ msgid ""
+#~ "Send all items as: \"General Product\" in Invoice+ document creation."
+#~ msgstr ""
+#~ "יצירת מסמך חשבונית+  ללא מידע מוצרים (יופיע רק מוצר כללי אחד עבור כל "
+#~ "החשבונית)"
 
 #~ msgid "Hide products from Invoice+ data"
 #~ msgstr "\"מוצר כללי\" עבור חשבונית+"
