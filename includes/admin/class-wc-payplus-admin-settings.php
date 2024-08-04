@@ -251,7 +251,7 @@ class WC_PayPlus_Admin_Settings
                     'name' => __("Invoice's Language", 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[payplus_langrage_invoice]',
                     'type' => 'select',
-                    'options' => array('he' => 'he', 'en' => 'en'),
+                    'options' => array('he' => 'HE', 'en' => 'EN'),
                     'class' => 'payplus-languages-class',
                 );
                 $settings[$section][] = array(
