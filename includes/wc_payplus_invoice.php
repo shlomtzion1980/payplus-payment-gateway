@@ -6,6 +6,7 @@ define("COUNT_BALANCE_NAME", 1);
 
 class PayplusInvoice
 {
+    public $send_products_to_invoice;
     private $payplus_invoice_option;
     private $payplus_gateway_option;
     private $payplus_invoice_api_key;
@@ -41,6 +42,8 @@ class PayplusInvoice
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->invoiceDisplayOnly = isset($this->payplus_invoice_option['display_only_invoice_docs']) && $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
+
+        $this->send_products_to_invoice = isset($this->payplus_gateway_option['send_products_to_invoice']) ? boolval($this->payplus_gateway_option['send_products_to_invoice'] === 'yes') : null;
 
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 

@@ -257,7 +257,9 @@ class WC_PayPlus_Form_Fields
             'send_add_data' => [
                 'title' => __('Add Data Parameter', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Send Add Data Parameter When Payment Created', 'payplus-payment-gateway'),
+                'description' => __('Relevant only if the clearing company demands "add_data" or "x" parameters', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'label' => __('Send add data parameter on transaction', 'payplus-payment-gateway'),
                 'default' => 'no',
             ],
             'hide_identification_id' => [
@@ -350,6 +352,14 @@ class WC_PayPlus_Form_Fields
                 'type' => 'url',
                 'description' => __('To receive transaction information you need a web address', 'payplus-payment-gateway'),
                 'default' => '',
+            ],
+            'send_products' => [
+                'title' => __('Hide products from transaction data', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Use "General Product"', 'payplus-payment-gateway'),
+                'description' => __('Send all items as: "General Product" in PayPlus transaction data.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'class' => 'payplus-documents'
             ],
             'recurring_order_set_to_paid' => [
                 'title' => __('Mark as "paid" successfully created subscription orders', 'payplus-payment-gateway'),
