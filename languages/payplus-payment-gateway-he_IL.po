@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-08-04 13:45+0300\n"
-"PO-Revision-Date: 2024-08-04 13:46+0300\n"
+"POT-Creation-Date: 2024-08-05 08:03+0300\n"
+"PO-Revision-Date: 2024-08-05 08:04+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -563,6 +563,20 @@ msgstr "מילות מפתח למשלוחים באילת"
 msgid "Keywords must be separated with a comma"
 msgstr "יש להפריד בין מילות המפתח באמצעות פסיק"
 
+#: includes/admin/class-wc-payplus-admin-settings.php:430
+msgid "Hide products from Invoice+ docs"
+msgstr "הסתרת מוצרים במסמכי חשבונית+"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:432
+msgid "Use \"General Product\" invoice+ documents"
+msgstr "שימוש ב\"מוצר כללי\" במסמכי חשבונית+"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:433
+msgid "Send all items as: \"General Product\" in Invoice+ document creation."
+msgstr ""
+"יצירת מסמך חשבונית+  ללא מידע מוצרים (יופיע רק מוצר כללי אחד עבור כל "
+"החשבונית)"
+
 #: includes/admin/class-wc-payplus-admin-settings.php:439
 msgid "Add product variations data to the invoice"
 msgstr "הוספת מידע (סוג) מוצר ומטה דאטה למסמך"
@@ -688,7 +702,7 @@ msgid "Payment"
 msgstr "תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:357
-#: includes/wc_payplus_gateway.php:556 includes/wc_payplus_invoice.php:453
+#: includes/wc_payplus_gateway.php:556 includes/wc_payplus_invoice.php:465
 msgid "Refund for Order Number: "
 msgstr "זיכוי עבור הזמנה מספר: "
 
@@ -1309,13 +1323,9 @@ msgid "Hide products from transaction data"
 msgstr "הסתרת של המוצרים בביצוע עסקה"
 
 #: includes/class-wc-payplus-form-fields.php:359
-msgid "Use \"General Product\""
-msgstr "שימוש ב\"מוצר כללי\""
-
 #: includes/class-wc-payplus-form-fields.php:360
 msgid "Send all items as: \"General Product\" in PayPlus transaction data."
-msgstr ""
-"יצירת עסקה בפייפלוס ללא מידע מוצרים (יופיע רק מוצר כללי אחד עבור כל החשבונית)"
+msgstr "יצירת עסקה בפייפלוס ללא מידע מוצרים (יופיע רק מוצר כללי במידע העסקה)"
 
 #: includes/class-wc-payplus-form-fields.php:365
 msgid "Mark as \"paid\" successfully created subscription orders"
@@ -1634,18 +1644,18 @@ msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1636 includes/wc_payplus_invoice.php:887
+#: includes/wc_payplus_gateway.php:1636 includes/wc_payplus_invoice.php:899
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1662 includes/wc_payplus_invoice.php:849
+#: includes/wc_payplus_gateway.php:1662 includes/wc_payplus_invoice.php:861
 msgid "Shipping"
 msgstr "משלוח"
 
 #: includes/wc_payplus_gateway.php:1684 includes/wc_payplus_gateway.php:1685
 #: includes/wc_payplus_gateway.php:1705 includes/wc_payplus_gateway.php:1706
-#: includes/wc_payplus_invoice.php:876 includes/wc_payplus_invoice.php:877
-#: includes/wc_payplus_invoice.php:909 includes/wc_payplus_invoice.php:910
+#: includes/wc_payplus_invoice.php:888 includes/wc_payplus_invoice.php:889
+#: includes/wc_payplus_invoice.php:921 includes/wc_payplus_invoice.php:922
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
@@ -1692,30 +1702,30 @@ msgstr "יצירת חשבונית החזר"
 msgid "General Customer - לקוח כללי"
 msgstr ""
 
-#: includes/wc_payplus_invoice.php:349 includes/wc_payplus_invoice.php:1184
-#: includes/wc_payplus_invoice.php:1202
+#: includes/wc_payplus_invoice.php:348 includes/wc_payplus_invoice.php:359
+#: includes/wc_payplus_invoice.php:1196 includes/wc_payplus_invoice.php:1214
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:388
+#: includes/wc_payplus_invoice.php:400
 #, fuzzy
 #| msgid "Link document"
 msgid "Link Document"
 msgstr "לינק מסמך"
 
-#: includes/wc_payplus_invoice.php:388 includes/wc_payplus_invoice.php:521
+#: includes/wc_payplus_invoice.php:400 includes/wc_payplus_invoice.php:533
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:635
+#: includes/wc_payplus_invoice.php:647
 msgid "Invoice+ Documents"
 msgstr "מסמכי חשבונית+"
 
-#: includes/wc_payplus_invoice.php:1104 includes/wc_payplus_invoice.php:1253
+#: includes/wc_payplus_invoice.php:1116 includes/wc_payplus_invoice.php:1265
 msgid "Link Document  "
 msgstr "לינק מסמך"
 
-#: includes/wc_payplus_invoice.php:1225
+#: includes/wc_payplus_invoice.php:1237
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
@@ -1983,22 +1993,13 @@ msgstr "פיי פלוס"
 msgid "https://www.payplus.co.il/"
 msgstr ""
 
-#~ msgid "Use \"General Product\" invoice+ documents"
-#~ msgstr "שימוש ב\"מוצר כללי\" במסמכי חשבונית+"
+#~ msgid "Use \"General Product\""
+#~ msgstr "שימוש ב\"מוצר כללי\""
 
 #, fuzzy
 #~| msgid "Use \"General Product\""
 #~ msgid "Show \"General Product\""
 #~ msgstr "שימוש ב\"מוצר כללי\""
-
-#~ msgid ""
-#~ "Send all items as: \"General Product\" in Invoice+ document creation."
-#~ msgstr ""
-#~ "יצירת מסמך חשבונית+  ללא מידע מוצרים (יופיע רק מוצר כללי אחד עבור כל "
-#~ "החשבונית)"
-
-#~ msgid "Hide products from Invoice+ data"
-#~ msgstr "\"מוצר כללי\" עבור חשבונית+"
 
 #~ msgid "Hide Products To Invoices and Documents"
 #~ msgstr "הסתר רשימת מוצרים לחשבוניות ומסמכים"

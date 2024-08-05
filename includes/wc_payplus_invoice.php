@@ -6,7 +6,7 @@ define("COUNT_BALANCE_NAME", 1);
 
 class PayplusInvoice
 {
-    public $send_products_to_invoice;
+    public $hide_products_invoice;
     private $payplus_invoice_option;
     private $payplus_gateway_option;
     private $payplus_invoice_api_key;
@@ -43,7 +43,7 @@ class PayplusInvoice
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->invoiceDisplayOnly = isset($this->payplus_invoice_option['display_only_invoice_docs']) && $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
 
-        $this->send_products_to_invoice = isset($this->payplus_gateway_option['send_products_to_invoice']) ? boolval($this->payplus_gateway_option['send_products_to_invoice'] === 'yes') : null;
+        $this->hide_products_invoice = isset($this->payplus_invoice_option['hide_products_invoice']) ? boolval($this->payplus_invoice_option['hide_products_invoice'] === 'yes') : null;
 
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 
@@ -341,17 +341,28 @@ class PayplusInvoice
             $resultApps[] = $objectInvoicePaymentNoPayplus;
         }
         $sumPayment = floatval($this->payplus_sum_payment($resultApps));
-        if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total()) {
-            $payload['items'] = $productsItems;
-            $payload['totalAmount'] = $dual * $totallCart;
-        } else {
+
+        if ($this->hide_products_invoice) {
             $payload['items'][] = [
                 'name' => __('General product', 'payplus-payment-gateway'),
                 'quantity' => 1,
                 'price' => $sumPayment,
             ];
             $payload['totalAmount'] = $sumPayment;
+        } else {
+            if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total()) {
+                $payload['items'] = $productsItems;
+                $payload['totalAmount'] = $dual * $totallCart;
+            } else {
+                $payload['items'][] = [
+                    'name' => __('General product', 'payplus-payment-gateway'),
+                    'quantity' => 1,
+                    'price' => $sumPayment,
+                ];
+                $payload['totalAmount'] = $sumPayment;
+            }
         }
+
         $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
         $handle = 'payplus_process_invoice';
         $handle .= ($typePayment == "charge") ? "" : "_refund";
@@ -434,27 +445,31 @@ class PayplusInvoice
         }
         $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
         $payplusBalanceNames = $objectProducts->balanceNames;
+
         if ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
             $productsItems = $objectProducts->productsItems;
             $sum = $objectProducts->amount;
         }
+
         $payload['currency_code'] = $order->get_currency();
         $payload['autocalculate_rate'] = true;
         $payload['totalAmount'] = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
         $payload['language'] = $payplus_invoice_option['payplus_langrage_invoice'];
         $payload['more_info'] = $order_id;
-        if (count($productsItems)) {
+
+        if (count($productsItems) && !$this->hide_products_invoice) {
             $payload['items'] = $productsItems;
         } else {
             $sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
-            $payload['totalAmount'] = $sum;
+            $payload['totalAmount'] = $sum * $dual;
             $payload['items'][] = array(
                 'name' => __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id,
-                'price' => $sum,
+                'price' => $sum * $dual,
                 "quantity" => 1,
             );
         }
+
         $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
         $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 
@@ -472,6 +487,7 @@ class PayplusInvoice
             $resultApps[] = $objectInvoicePaymentNoPayplus;
         }
         $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
+
         if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
             if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
                 $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
@@ -1216,6 +1232,17 @@ class PayplusInvoice
                             }
                             $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
                         }
+                    }
+
+                    if ($this->hide_products_invoice) {
+                        $payload['items'] = [];
+                        $payload['items'][] = [
+                            'name' => __('General product', 'payplus-payment-gateway'),
+                            'quantity' => 1,
+                            'price' => $dual * $order->get_total(),
+                        ];
+                        $payload['totalAmount'] = $dual * $order->get_total();
+                        $payload['payments'][0]['amount'] = $dual * $order->get_total();
                     }
 
                     if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {

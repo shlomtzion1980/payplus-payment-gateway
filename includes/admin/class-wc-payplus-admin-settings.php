@@ -426,15 +426,15 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'woocommerce_payplus-payment-gateway_settings[keywords_eilat]',
                     'class' => 'payplus-vat'
                 ];
-                // $settings[$section][] = [
-                //     'title' => __('Use "General Product" invoice+ documents', 'payplus-payment-gateway'),
-                //     'type' => 'checkbox',
-                //     'label' => __('Show "General Product"', 'payplus-payment-gateway'),
-                //     'desc' => __('Send all items as: "General Product" in Invoice+ document creation.', 'payplus-payment-gateway'),
-                //     'desc_tip' => true,
-                //     'id' => 'payplus_invoice_option[send_products_invoice]',
-                //     'class' => 'payplus-documents'
-                // ];
+                $settings[$section][] = [
+                    'title' => __('Hide products from Invoice+ docs', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Use "General Product" invoice+ documents', 'payplus-payment-gateway'),
+                    'desc' => __('Send all items as: "General Product" in Invoice+ document creation.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'id' => 'payplus_invoice_option[hide_products_invoice]',
+                    'class' => 'payplus-documents'
+                ];
                 $settings[$section][] = [
                     'title' => __('Add product variations data to the invoice', 'payplus-payment-gateway'),
                     'type' => 'checkbox',

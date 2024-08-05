@@ -356,7 +356,7 @@ class WC_PayPlus_Form_Fields
             'send_products' => [
                 'title' => __('Hide products from transaction data', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Use "General Product"', 'payplus-payment-gateway'),
+                'label' => __('Send all items as: "General Product" in PayPlus transaction data.', 'payplus-payment-gateway'),
                 'description' => __('Send all items as: "General Product" in PayPlus transaction data.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
                 'class' => 'payplus-documents'
