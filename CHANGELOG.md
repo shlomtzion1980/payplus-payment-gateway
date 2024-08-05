@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ##  [7.0.9] - 2024-07-15 - (Street Fighter)
 
-* Fix    - Missing nonce in express checkout.
-* Fix    - Express checkout activation.
 * Add    - Multipass icons will change with fade in and out on the checkout page.
 * Add    - Multipass clubs select in plugin settings.
 * Add    - Brand UID for Sandbox/Development mode.
+* Add    - Hide products in Invoice+ documents - Option to use "General Product".
+* Add    - Transaction CC Issuer and Brand name added to PayPlus metabox.
+* Change - Invoice+ admin settings language selector in capital letters.
+* Tweak  - Sandbox/Development mode displayed in RED color in plugin settings.
+* Fix    - Missing nonce in express checkout.
+* Fix    - Express Checkout activation.
+* Fix    - Code Refactor for creation of refunds, invoices and receipts.
 
 
 ##  [7.0.8] - 2024-07-15 - (Shinobi)
