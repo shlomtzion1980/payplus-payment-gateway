@@ -569,7 +569,7 @@ class PayplusInvoice
             wp_die();
         }
         if (!empty($_POST)) {
-            $order_id = isset($_POST['orderId']) ? intval($_POST['orderId']) : 0;
+            $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
             $order = wc_get_order($order_id);
             $urlEdit = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
             $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
