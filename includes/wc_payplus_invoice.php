@@ -317,7 +317,7 @@ class PayplusInvoice
         if (count($productsItems) && !$this->hide_products_invoice) {
             $payload['items'] = $productsItems;
         } else {
-            $sum = $sum * $dual;
+            //$sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
             $payload['totalAmount'] = $sum * $dual;
             $payload['items'][] = array(
