@@ -420,7 +420,7 @@ class WC_PayPlus
             $this->invoice_api = new PayplusInvoice();
             add_action('manage_shop_order_posts_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
             add_action('woocommerce_shop_order_list_table_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
-            add_action('woocommerce_order_item_add_action_buttons', [$this->invoice_api, 'payplus_order_item_add_action_buttons_callback'], 100, 1);
+            // add_action('woocommerce_order_item_add_action_buttons', [$this->invoice_api, 'payplus_order_item_add_action_buttons_callback'], 100, 1);
 
             if ($this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
 
