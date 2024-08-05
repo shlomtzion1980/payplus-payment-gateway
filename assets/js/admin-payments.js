@@ -87,27 +87,6 @@ jQuery(document).ready(function ($) {
     var copyText = $(".copytoken");
     navigator.clipboard.writeText(copyText.text());
   });
-  $("#order-payment-payplus-refund").click(function () {
-    event.preventDefault();
-    let orderId = $(this).attr("data-id");
-    $(".payplus_loader_refund").fadeIn();
-    $.ajax({
-      type: "post",
-      dataType: "json",
-      url: payplus_script_admin.ajax_url,
-      data: {
-        action: "payplus-api-payment-refund",
-        order_id: orderId,
-        _ajax_nonce: payplus_script_admin.payplusApiPaymentRefund,
-      },
-      success: function (response) {
-        $(".payplus_loader_refund").fadeOut();
-        if (response.status) {
-          location.href = response.urlredirect;
-        }
-      },
-    });
-  });
 
   $("#custom-button-get-pp").click(function () {
     let loader = $("#order_data").find(".payplus_loader_gpp");

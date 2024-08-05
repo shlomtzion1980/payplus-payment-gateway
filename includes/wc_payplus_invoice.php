@@ -101,7 +101,6 @@ class PayplusInvoice
 
         //actions
         add_action('admin_enqueue_scripts', [$this, 'payplus_invoice_css_admin']);
-        add_action('wp_ajax_payplus-api-payment-refund', [$this, 'ajax_payplus_api_payment_refund']);
         add_action('admin_head', [$this, 'payplus_menu_css']);
 
         //filters
@@ -211,33 +210,6 @@ class PayplusInvoice
               </style>';
     }
 
-    /**
-     * @param $order
-     * @return void
-     */
-    public function payplus_order_item_add_action_buttons_callback($order)
-    {
-        ob_start();
-        $orderId = (payplus_check_woocommerce_custom_orders_table_enabled()) ? $order->get_id() : $order;
-        $payplusInvoiceOriginalDocAddressRefund = WC_PayPlus_Meta_Data::get_meta($orderId, "payplus_refund", true);
-        $payplusType = WC_PayPlus_Meta_Data::get_meta($orderId, "payplus_type", true);
-        $optionPaypluspaymentgGteway = (object) get_option('woocommerce_payplus-payment-gateway_settings');
-
-        if (
-            $this->payplus_get_invoice_enable() && $optionPaypluspaymentgGteway->enabled == "no"
-            && !$payplusInvoiceOriginalDocAddressRefund
-            && $payplusType !== "Approval"
-            && $payplusType !== "Check"
-        ) :
-?>
-            <button type="button" id="order-payment-payplus-refund" data-id="<?php echo esc_attr($orderId); ?>" class="button item-refund"><?php echo esc_html__("Create Invoice Refund", "payplus-payment-gateway"); ?></button>
-            <div class='payplus_loader_refund'></div>
-
-<?php
-        endif;
-        $output = ob_get_clean();
-        echo wp_kses_post($output);
-    }
 
     /**
      * @param $order_id
@@ -294,121 +266,6 @@ class PayplusInvoice
         return $customer;
     }
 
-    /**
-     * @param $order_id
-     * @param $typeDocument
-     * @param $typePayment
-     * @param $nameRefund
-     * @return bool
-     */
-    public function payplus_create_dcoment($order_id, $typeDocument, $typePayment = "", $nameRefund = "")
-    {
-
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
-        $order = wc_get_order($order_id);
-        $payplus_invoice_option = get_option('payplus_invoice_option');
-
-        $payplusTransactionUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid', true);
-        $payplusApprovalNum = WC_PayPlus_Meta_Data::get_meta($order_id, "payplus_approval_num", true);
-        $payplusApprovalNumPaypl = $order->get_transaction_id();
-        $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
-        $dual = 1;
-        $resultApps = $this->payplus_get_payments($order_id);
-        if ($typeDocument === "inv_refund_receipt") {
-            $dual = -1;
-            $typeDocument = "inv_receipt";
-        }
-        $payload = array();
-        $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
-        $totalCartAmount = 0;
-        $totallCart = floatval($order->get_total());
-        $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
-        $productsItems = $objectProducts->productsItems;
-        $payload['currency_code'] = $order->get_currency();
-        $payload['autocalculate_rate'] = true;
-        $payload['totalAmount'] = $dual * $totallCart;
-        $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
-        $payload['more_info'] = $order_id;
-        $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
-        $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
-
-        if (!empty($payplusTransactionUid)) {
-            $payload['transaction_uuid'] = $payplusTransactionUid;
-        }
-        if (!count($resultApps)) {
-            $objectInvoicePaymentNoPayplus = array('meta_key' => 'other', 'price' => $dual * $totallCart * 100);
-            $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
-            $resultApps[] = $objectInvoicePaymentNoPayplus;
-        }
-        $sumPayment = floatval($this->payplus_sum_payment($resultApps));
-
-        if ($this->hide_products_invoice) {
-            $payload['items'][] = [
-                'name' => __('General product', 'payplus-payment-gateway'),
-                'quantity' => 1,
-                'price' => $sumPayment,
-            ];
-            $payload['totalAmount'] = $sumPayment;
-        } else {
-            if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total()) {
-                $payload['items'] = $productsItems;
-                $payload['totalAmount'] = $dual * $totallCart;
-            } else {
-                $payload['items'][] = [
-                    'name' => __('General product', 'payplus-payment-gateway'),
-                    'quantity' => 1,
-                    'price' => $sumPayment,
-                ];
-                $payload['totalAmount'] = $sumPayment;
-            }
-        }
-
-        $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
-        $handle = 'payplus_process_invoice';
-        $handle .= ($typePayment == "charge") ? "" : "_refund";
-
-        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  ) ');
-        $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-
-        $payload = wp_json_encode($payload);
-
-        $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $typeDocument, $payload);
-
-        if (is_wp_error($response)) {
-            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
-            return false;
-        } else {
-            $res = json_decode(wp_remote_retrieve_body($response));
-            if ($res->status === "success") {
-                $responeType = ($typePayment == "charge") ? "" : "_refund_";
-                $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");
-                $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
-                $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
-                $refundsArray[$res->details->number]['type'] = $nameRefund;
-                $insetData["payplus_refunds"] = wp_json_encode($refundsArray);
-                $insetData["payplus_invoice_docUID_refund_" . $responeType] = $res->details->docUID;
-                $insetData["payplus_invoice_numberD_refund_" . $responeType] = $res->details->number;
-                $insetData["payplus_invoice_originalDocAddress_refund_" . $responeType] = $res->details->originalDocAddress;
-                $insetData["payplus_invoice_copyDocAddress" . $responeType] = $res->details->copyDocAddress;
-                $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
-                $insetData["payplus_check_invoice_send_refund"] = 1;
-                WC_PayPlus_Meta_Data::update_meta($order, $insetData);
-                if (!$this->invoice_notes_no) {
-                    $titleNote = ($typePayment == "charge") ? "PayPlus Document" : "PayPlus Document " . $nameRefund;
-                    $link = ($typePayment == "charge") ? __('Link Document', 'payplus-payment-gateway') : __('Link Document Refund', 'payplus-payment-gateway');
-                    $order->add_order_note('<div style="font-weight:600">' . $titleNote . '</div>
-                     <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . $link . '</a>');
-                }
-
-                return true;
-            } else {
-                $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
-                $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
-                return false;
-            }
-        }
-    }
 
     /**
      * @param $order_id
@@ -572,49 +429,6 @@ class PayplusInvoice
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
-    }
-
-    /**
-     * @return void
-     */
-    public function ajax_payplus_api_payment_refund()
-    {
-        check_ajax_referer('payplus_api_payment_refund', '_ajax_nonce');
-        if (!current_user_can('edit_shop_orders')) {
-            wp_send_json_error('You do not have permission to edit orders.');
-            wp_die();
-        }
-        if (!empty($_POST)) {
-            $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
-            $order = wc_get_order($order_id);
-            $urlEdit = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
-            $payplus_document_type = $this->payplus_invoice_option['payplus_invoice_type_document_refund'];
-            if ($payplus_document_type == "inv_refund_receipt_invoice") {
-                $resultinvoice = $this->payplus_create_dcoment($order_id, 'inv_refund', '', REFUND_INVOICE);
-                $resultReceipt = $this->payplus_create_dcoment($order_id, "inv_refund_receipt", '', REFUND_RECEIPT);
-                if ($resultinvoice && $resultReceipt) {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refund' => true));
-                    wp_die();
-                } else {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
-            } else {
-                $nameRefund = ($payplus_document_type == "inv_refund") ? REFUND_INVOICE : REFUND_RECEIPT;
-                $resultinvoice = $this->payplus_create_dcoment($order_id, $payplus_document_type, '', $nameRefund);
-
-                if ($resultinvoice) {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refund' => true));
-                    wp_die();
-                } else {
-                    echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
-                    wp_die();
-                }
-            }
-        }
-        wp_die();
     }
 
     /**
