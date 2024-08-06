@@ -2451,9 +2451,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function requestPayPlusIpn($payload, $data, $countLoop = 1, $handle = 'payplus_process_payment', $inline = false)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
-        }
         $order_id = isset($data['order_id']) ? trim($data['order_id']) : '';
         $flagPayplus = true;
         $flagProcess = true;
@@ -3186,9 +3183,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_add_order($order_id, $dataRow)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
-        }
         global $wpdb;
         if (!WC_PayPlus::payplus_check_exists_table($this->_wpnonce)) {
             $is_multiple_transaction = $dataRow['is_multiple_transaction'];
