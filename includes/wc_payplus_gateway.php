@@ -2133,7 +2133,30 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($payplusGenHash === $payplusHash) {
             $order_id = intval($response['transaction']['more_info']);
+            $order = wc_get_order($order_id);
+            $orderStatus = $order->get_status();
+            $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status! - callback will end.' : $orderStatus;
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "
+                Order: $order_id
+                HTTP_HASH: {$_SERVER['HTTP_HASH']}
+                PayPlus Generated Hash: $payplusGenHash
+                Order Status: $orderStatusNote
+                PayPlus Transaction Callback: $json
+                "
+            );
+            if ($orderStatus === 'processing') {
+                return;
+            }
+
             $status_code = sanitize_text_field($response['transaction']['status_code']);
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "
+                Callback continues: $order_id - doing database query now, status_code: $status_code
+                "
+            );
 
             $result = $wpdb->get_results($wpdb->prepare(
                 "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
@@ -2157,7 +2180,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         '%d', // count_process
                     )
                 );
-                $order = wc_get_order($order_id);
                 $handle = 'payplus_callback_begin';
                 $this->logOrderBegin($order_id, 'callback');
                 $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
@@ -2806,8 +2828,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         };
 
         if (!in_array($res['token_uid'], $theTokens)) {
-            $handle = 'payplus_save_token';
-            $this->payplus_add_log_all($handle, 'tarting Saving Token');
+            $this->payplus_add_log_all('payplus_save_tokens', 'Saving Token');
 
             $token_num = wc_clean($res['token_uid']);
             $brand = $this->payplus_get_brands_list($res['brand_id']);
@@ -2827,7 +2848,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $token->set_user_id($user_id ?: get_current_user_id());
             $token->save();
 
-            $this->payplus_add_log_all($handle, 'Saved And Finished: ' . print_r($token, true));
+            $this->payplus_add_log_all('payplus_save_tokens', 'Saved And Finished: ' . sanitize_text_field($token));
         }
     }
 

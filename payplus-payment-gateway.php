@@ -8,6 +8,7 @@
  * Tested up to: 6.6.1
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
+ * Requires PHP: 7.4
  * Author: PayPlus LTD
  * Author URI: https://www.payplus.co.il/
  * License: GPLv2 or later
