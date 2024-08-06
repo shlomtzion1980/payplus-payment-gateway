@@ -317,12 +317,13 @@ class PayplusInvoice
         if (count($productsItems) && !$this->hide_products_invoice) {
             $payload['items'] = $productsItems;
         } else {
-            //$sum = $sum * $dual;
+            $sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
-            $payload['totalAmount'] = $sum * $dual;
+            $sum = $payplus_invoice_type_document_refund === "inv_refund_receipt" ? -abs($sum) : $sum;
+            $payload['totalAmount'] = $sum;
             $payload['items'][] = array(
                 'name' => __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id,
-                'price' => $sum * $dual,
+                'price' => $sum,
                 "quantity" => 1,
             );
         }

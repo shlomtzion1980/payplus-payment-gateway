@@ -395,6 +395,18 @@ function payplus_create_table_process()
  */
 function payplus_add_file_ApplePay()
 {
+    global $wp_filesystem;
+
+    // Initialize the WordPress filesystem
+    if (!function_exists('WP_Filesystem')) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+    }
+
+    // Setup the filesystem if it's not already initialized
+    if (!WP_Filesystem()) {
+        return false;
+    }
+
     $sourceFile = PAYPLUS_SRC_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
     $destinationFile = PAYPLUS_DEST_FILE_APPLE . '/' . PAYPLUS_APPLE_FILE;
 
