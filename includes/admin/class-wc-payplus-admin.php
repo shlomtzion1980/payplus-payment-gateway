@@ -78,8 +78,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->useDedicatedMetaBox = isset($payPlusInvoiceOptions['dedicated_invoice_metabox']) && $payPlusInvoiceOptions['dedicated_invoice_metabox'] === 'yes' ? true : false;
         $this->invoiceDisplayOnly = isset($payPlusInvoiceOptions['display_only_invoice_docs']) && $payPlusInvoiceOptions['display_only_invoice_docs'] === 'yes' ? true : false;
         $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
-        $this->saveOrderNote = boolval($this->allSettings['payplus_data_save_order_note'] === 'yes');
-        $this->showPayPlusDataMetabox = boolval($this->allSettings['show_payplus_data_metabox'] === 'yes');
+        $this->saveOrderNote = isset($this->settings['payplus_data_save_order_note']) ? boolval($this->settings['payplus_data_save_order_note'] === 'yes') : null;
+        $this->showPayPlusDataMetabox = isset($this->allSettings['show_payplus_data_metabox']) ? boolval($this->allSettings['show_payplus_data_metabox'] === 'yes') : null;
 
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);

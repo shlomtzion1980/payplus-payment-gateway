@@ -179,7 +179,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->recurring_order_set_to_paid = $this->get_option('recurring_order_set_to_paid');
         $this->paying_vat = $this->get_option('paying_vat');
         $this->balance_name = $this->get_option('balance_name') == 'yes' ? true : false;
-        $this->saveOrderNote = boolval($this->settings['payplus_data_save_order_note'] === 'yes');
+        $this->saveOrderNote = isset($this->settings['payplus_data_save_order_note']) ? boolval($this->settings['payplus_data_save_order_note'] === 'yes') : null;
         $this->successful_order_status = $this->get_option('successful_order_status');
         $this->failure_order_status = $this->get_option('failure_order_status');
         $this->callback_addr = $this->get_option('callback_addr');
