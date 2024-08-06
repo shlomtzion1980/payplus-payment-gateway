@@ -2121,10 +2121,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function callback_response()
     {
-        if (!isset($_REQUEST['_wpnonce']) || !wp_verify_nonce($_REQUEST['_wpnonce'], 'PayPlusGateWayNonce')) {
-            wp_die('Invalid nonce', 'Error', array('response' => 403));
-        }
-
         global $wpdb;
         $indexRow = 0;
         $json = file_get_contents('php://input');
@@ -2133,57 +2129,58 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
         $handle = 'payplus_callback_begin';
-
         $payplusHash = sanitize_text_field($_SERVER['HTTP_HASH']);
-        $order_id = intval($response['transaction']['more_info']);
-        $status_code = sanitize_text_field($response['transaction']['status_code']);
 
-        $result = $wpdb->get_results($wpdb->prepare(
-            "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
-            $order_id,
-            $status_code
-        ));
-        $result = $result[$indexRow];
-        if (!$result->rowCount) {
-            $wpdb->insert(
-                $tblname,
-                array(
-                    'order_id' => $order_id,
-                    'function_begin' => 'callback_response',
-                    'status_code' => $status_code,
-                    'count_process' => 1,
-                ),
-                array(
-                    '%d', // order_id
-                    '%s', // function_begin
-                    '%s', // status_code
-                    '%d', // count_process
-                )
-            );
-            $order = wc_get_order($order_id);
-            $handle = 'payplus_callback_begin';
-            $this->logOrderBegin($order_id, 'callback');
-            $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
+        if ($payplusGenHash === $payplusHash) {
+            $order_id = intval($response['transaction']['more_info']);
+            $status_code = sanitize_text_field($response['transaction']['status_code']);
 
-            if ($this->get_check_user_agent() || (count($rowOrder) && $rowOrder[0]->status_code == $status_code)) {
-                $this->payplus_add_log_all($handle, 'payplus_end_proces-' . $order_id);
-                $this->payplus_add_log_all($handle, '', 'space');
-                return false;
-            }
-
-            if ($order) {
-                $dataInsert = array(
-                    'order_id' => $order_id,
-                    'status' => sanitize_text_field($order->get_status()),
-                    'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
+            $result = $wpdb->get_results($wpdb->prepare(
+                "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
+                $order_id,
+                $status_code
+            ));
+            $result = $result[$indexRow];
+            if (!$result->rowCount) {
+                $wpdb->insert(
+                    $tblname,
+                    array(
+                        'order_id' => $order_id,
+                        'function_begin' => 'callback_response',
+                        'status_code' => $status_code,
+                        'count_process' => 1,
+                    ),
+                    array(
+                        '%d', // order_id
+                        '%s', // function_begin
+                        '%s', // status_code
+                        '%d', // count_process
+                    )
                 );
-                $handle = 'payplus_callback';
-                $data = $this->set_arrangement_callback($response);
-                $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
-                $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($data['order_id']));
-                $this->payplus_add_log_all($handle, print_r($response, true), 'before-payload');
+                $order = wc_get_order($order_id);
+                $handle = 'payplus_callback_begin';
+                $this->logOrderBegin($order_id, 'callback');
+                $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
-                if ($payplusGenHash == $payplusHash) {
+                if ($this->get_check_user_agent() || (count($rowOrder) && $rowOrder[0]->status_code == $status_code)) {
+                    $this->payplus_add_log_all($handle, 'payplus_end_proces-' . $order_id);
+                    $this->payplus_add_log_all($handle, '', 'space');
+                    return false;
+                }
+
+                if ($order) {
+                    $dataInsert = array(
+                        'order_id' => $order_id,
+                        'status' => sanitize_text_field($order->get_status()),
+                        'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
+                    );
+                    $handle = 'payplus_callback';
+                    $data = $this->set_arrangement_callback($response);
+                    $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
+                    $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($data['order_id']));
+                    $this->payplus_add_log_all($handle, print_r($response, true), 'before-payload');
+
+
                     $inData = array_merge($data, $response);
                     $this->payplus_add_log_all($handle, print_r($inData, true), 'completed');
                     $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($inData['order_id']));
@@ -2202,21 +2199,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
                     $this->requestPayPlusIpn($payload, $inData, 1, $handle);
                 }
+            } else {
+                $countProcess = intval($result->count_process);
+                $rowId = intval($result->rowId);
+                $wpdb->update(
+                    $tblname,
+                    array(
+                        'count_process' => $countProcess + 1,
+                    ),
+                    array(
+                        'id' => $rowId,
+                    ),
+                    array('%d'),
+                    array('%d')
+                );
             }
-        } else {
-            $countProcess = intval($result->count_process);
-            $rowId = intval($result->rowId);
-            $wpdb->update(
-                $tblname,
-                array(
-                    'count_process' => $countProcess + 1,
-                ),
-                array(
-                    'id' => $rowId,
-                ),
-                array('%d'),
-                array('%d')
-            );
         }
     }
 
