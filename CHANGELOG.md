@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express Checkout activation.
 * Fix    - Code Refactor for creation of refunds, invoices and receipts.
+* Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
+* Fix    - WP_Filesystem() function check before usage.
 
 
 ##  [7.0.8] - 2024-07-15 - (Shinobi)

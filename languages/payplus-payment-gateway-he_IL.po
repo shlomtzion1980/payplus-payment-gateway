@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-08-05 08:03+0300\n"
-"PO-Revision-Date: 2024-08-05 08:04+0300\n"
+"POT-Creation-Date: 2024-08-06 09:27+0300\n"
+"PO-Revision-Date: 2024-08-06 09:29+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -102,7 +102,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:93
 #: includes/class-wc-payplus-form-fields.php:209
-#: payplus-payment-gateway.php:591
+#: payplus-payment-gateway.php:590
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -118,14 +118,14 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/class-wc-payplus-form-fields.php:213
 #: includes/class-wc-payplus-statics.php:24
 #: includes/class-wc-payplus-statics.php:122 payplus-payment-gateway.php:283
-#: payplus-payment-gateway.php:586 payplus-payment-gateway.php:771
+#: payplus-payment-gateway.php:585 payplus-payment-gateway.php:770
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:98
 #: includes/class-wc-payplus-form-fields.php:214
-#: payplus-payment-gateway.php:284 payplus-payment-gateway.php:587
-#: payplus-payment-gateway.php:772
+#: payplus-payment-gateway.php:284 payplus-payment-gateway.php:586
+#: payplus-payment-gateway.php:771
 msgid "Authorization"
 msgstr "תפיסת מסגרת "
 
@@ -702,7 +702,7 @@ msgid "Payment"
 msgstr "תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:357
-#: includes/wc_payplus_gateway.php:556 includes/wc_payplus_invoice.php:465
+#: includes/wc_payplus_gateway.php:556 includes/wc_payplus_invoice.php:325
 msgid "Refund for Order Number: "
 msgstr "זיכוי עבור הזמנה מספר: "
 
@@ -1061,7 +1061,7 @@ msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:135
 #: includes/blocks/class-wc-payplus-blocks-support.php:137
-#: includes/wc_payplus_gateway.php:1182 payplus-payment-gateway.php:846
+#: includes/wc_payplus_gateway.php:1182 payplus-payment-gateway.php:845
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1320,7 +1320,7 @@ msgstr "כדי לקבל מידע עסקה אתה צריך כתובת אינטר�
 
 #: includes/class-wc-payplus-form-fields.php:357
 msgid "Hide products from transaction data"
-msgstr "הסתרת של המוצרים בביצוע עסקה"
+msgstr "הסתרת מוצרים בביצוע עסקה בפייפלוס"
 
 #: includes/class-wc-payplus-form-fields.php:359
 #: includes/class-wc-payplus-form-fields.php:360
@@ -1528,7 +1528,7 @@ msgctxt "Order status"
 msgid "Recurring subscription created"
 msgstr ""
 
-#: includes/wc-payplus-activation-functions.php:451
+#: includes/wc-payplus-activation-functions.php:463
 msgid "ID \\ VAT Number"
 msgstr "ת.ז / ע.מ / ח.פ"
 
@@ -1644,18 +1644,18 @@ msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1636 includes/wc_payplus_invoice.php:899
+#: includes/wc_payplus_gateway.php:1636 includes/wc_payplus_invoice.php:718
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1662 includes/wc_payplus_invoice.php:861
+#: includes/wc_payplus_gateway.php:1662 includes/wc_payplus_invoice.php:680
 msgid "Shipping"
 msgstr "משלוח"
 
 #: includes/wc_payplus_gateway.php:1684 includes/wc_payplus_gateway.php:1685
 #: includes/wc_payplus_gateway.php:1705 includes/wc_payplus_gateway.php:1706
-#: includes/wc_payplus_invoice.php:888 includes/wc_payplus_invoice.php:889
-#: includes/wc_payplus_invoice.php:921 includes/wc_payplus_invoice.php:922
+#: includes/wc_payplus_invoice.php:707 includes/wc_payplus_invoice.php:708
+#: includes/wc_payplus_invoice.php:740 includes/wc_payplus_invoice.php:741
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
@@ -1692,40 +1692,28 @@ msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישו
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
 msgstr "חידוש המנוי בפיי פלוס נכשל<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_invoice.php:233
-#, fuzzy
-#| msgid "Create Invoice refund"
-msgid "Create Invoice Refund"
-msgstr "יצירת חשבונית החזר"
-
-#: includes/wc_payplus_invoice.php:273
+#: includes/wc_payplus_invoice.php:245
 msgid "General Customer - לקוח כללי"
 msgstr ""
 
-#: includes/wc_payplus_invoice.php:348 includes/wc_payplus_invoice.php:359
-#: includes/wc_payplus_invoice.php:1196 includes/wc_payplus_invoice.php:1214
-msgid "General product"
-msgstr "מוצר כללי"
-
-#: includes/wc_payplus_invoice.php:400
-#, fuzzy
-#| msgid "Link document"
-msgid "Link Document"
-msgstr "לינק מסמך"
-
-#: includes/wc_payplus_invoice.php:400 includes/wc_payplus_invoice.php:533
+#: includes/wc_payplus_invoice.php:395
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:647
+#: includes/wc_payplus_invoice.php:466
 msgid "Invoice+ Documents"
 msgstr "מסמכי חשבונית+"
 
-#: includes/wc_payplus_invoice.php:1116 includes/wc_payplus_invoice.php:1265
+#: includes/wc_payplus_invoice.php:935 includes/wc_payplus_invoice.php:1095
 msgid "Link Document  "
 msgstr "לינק מסמך"
 
-#: includes/wc_payplus_invoice.php:1237
+#: includes/wc_payplus_invoice.php:1015 includes/wc_payplus_invoice.php:1033
+#: includes/wc_payplus_invoice.php:1055
+msgid "General product"
+msgstr "מוצר כללי"
+
+#: includes/wc_payplus_invoice.php:1067
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
@@ -1943,25 +1931,25 @@ msgstr ""
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:615 payplus-payment-gateway.php:634
+#: payplus-payment-gateway.php:614 payplus-payment-gateway.php:633
 msgid "Transaction Type "
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:653
+#: payplus-payment-gateway.php:652
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:676 payplus-payment-gateway.php:693
+#: payplus-payment-gateway.php:675 payplus-payment-gateway.php:692
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:814 payplus-payment-gateway.php:822
+#: payplus-payment-gateway.php:813 payplus-payment-gateway.php:821
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:837
+#: payplus-payment-gateway.php:836
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
@@ -1992,6 +1980,16 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#, fuzzy
+#~| msgid "Create Invoice refund"
+#~ msgid "Create Invoice Refund"
+#~ msgstr "יצירת חשבונית החזר"
+
+#, fuzzy
+#~| msgid "Link document"
+#~ msgid "Link Document"
+#~ msgstr "לינק מסמך"
 
 #~ msgid "Use \"General Product\""
 #~ msgstr "שימוש ב\"מוצר כללי\""

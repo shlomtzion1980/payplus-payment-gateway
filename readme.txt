@@ -94,7 +94,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express Checkout activation.
 * Fix    - Code Refactor for creation of refunds, invoices and receipts.
-
+* Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
+* Fix    - WP_Filesystem() function check before usage.
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
