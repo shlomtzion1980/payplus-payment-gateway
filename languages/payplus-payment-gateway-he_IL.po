@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-08-07 17:40+0300\n"
-"PO-Revision-Date: 2024-08-07 17:41+0300\n"
+"PO-Revision-Date: 2024-08-07 21:45+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -127,7 +127,7 @@ msgstr "חיוב"
 #: payplus-payment-gateway.php:285 payplus-payment-gateway.php:587
 #: payplus-payment-gateway.php:772
 msgid "Authorization"
-msgstr "תפיסת מסגרת "
+msgstr "תפיסת מסגרת"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:104
 #: includes/class-wc-payplus-form-fields.php:224
@@ -383,7 +383,7 @@ msgstr "חשבונית מס"
 #: includes/class-wc-payplus-statics.php:32
 #: includes/class-wc-payplus-statics.php:130
 msgid "Tax Invoice Receipt "
-msgstr "חשבונית מס קבלה"
+msgstr "חשבונית מס קבלה "
 
 #: includes/admin/class-wc-payplus-admin-settings.php:247
 #: includes/admin/class-wc-payplus-admin.php:890
@@ -526,13 +526,13 @@ msgstr "בחירת סוג מסמכי חשבונית+ אפשריים"
 #: includes/admin/class-wc-payplus-admin-settings.php:362
 msgid ""
 "Choose from mulitple types of documents to be available in the order page."
-msgstr "בחירת סוג המסמכים האפשריים לחשבונית שיופיעו בעמוד ההזמנה"
+msgstr "בחירת סוג המסמכים האפשריים לחשבונית שיופיעו בעמוד ההזמנה."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:373
 msgid ""
 "Whether to issue an automatic tax invoice that is paid in cash or by bank "
 "transfer"
-msgstr "האם להוציא חשבונית מס אוטומטית המשולמת במזומן או בהעברה בנקאית?"
+msgstr "אם להוציא חשבונית מס אוטומטית המשולמת במזומן או בהעברה בנקאית"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:379
 #: includes/class-wc-payplus-form-fields.php:466
@@ -549,7 +549,7 @@ msgstr "לא להוסיף קישורים למסמכי חשבונית+ בהערו
 
 #: includes/admin/class-wc-payplus-admin-settings.php:407
 msgid "Every order is subject to VAT"
-msgstr "הוספת מע\"מ להזמנות "
+msgstr "הוספת מע\"מ להזמנות"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:414
 msgid "VAT change in Eilat"
@@ -583,7 +583,7 @@ msgstr "הוספת מידע (סוג) מוצר ומטה דאטה למסמך"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:441
 msgid "Display product variations metadata (If applicable) in a new line."
-msgstr " (במידה וקיים) הצגת מידע סוג (וריאנט) מוצר במסמך בשורה נפרדת."
+msgstr "(במידה וקיים) הצגת מידע סוג (וריאנט) מוצר במסמך בשורה נפרדת."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:448
 msgid "Calculate VAT According to:"
@@ -620,7 +620,7 @@ msgstr "המדינה שהעסק שלך רשום ומשלם מע\"מ היא"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:479
 msgid "Custom checkout field name for vat number"
-msgstr "שם שדה למספר מע\"מ או ת.ז "
+msgstr "שם שדה למספר מע\"מ או ת.ז"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:486
 msgid ""
@@ -635,7 +635,7 @@ msgstr ""
 #: includes/class-wc-payplus-form-fields.php:80
 #: includes/wc_payplus_gateway.php:732 includes/wc_payplus_subgateways.php:41
 msgid "Google Pay"
-msgstr "גוגל פיי "
+msgstr "גוגל פיי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:515
 #: includes/class-wc-payplus-form-fields.php:87
@@ -716,7 +716,7 @@ msgstr "פירוט תקבולים"
 
 #: includes/admin/class-wc-payplus-admin.php:960
 msgid "Credit Card"
-msgstr " כרטיסי אשראי"
+msgstr "כרטיסי אשראי"
 
 #: includes/admin/class-wc-payplus-admin.php:963
 msgid "Cash"
@@ -1088,7 +1088,7 @@ msgstr "מולטיפס"
 
 #: includes/class-wc-payplus-form-fields.php:112
 msgid "Tav zahav"
-msgstr " תו הזהב"
+msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:113
 #: includes/wc_payplus_gateway.php:744 includes/wc_payplus_subgateways.php:45
@@ -1390,7 +1390,7 @@ msgid ""
 "order page."
 msgstr ""
 "מידע אודות העסקאות שנעשו דרך פייפלוס יופיע בתיבה ייעודית של פייפלוס בעמוד "
-"ההזמנה ויתעדכן בצורה דינמית"
+"ההזמנה ויתעדכן בצורה דינמית."
 
 #: includes/class-wc-payplus-form-fields.php:427
 msgid "Legacy post meta support"
@@ -1496,7 +1496,7 @@ msgstr "תאריך תפוגה"
 
 #: includes/class-wc-payplus-statics.php:285
 msgid "Voucher #"
-msgstr "מס ואוצ'ר "
+msgstr "מס ואוצ'ר"
 
 #: includes/class-wc-payplus-statics.php:286
 msgid "Voucher ID"
@@ -1717,7 +1717,7 @@ msgstr "מסמכי חשבונית+"
 
 #: includes/wc_payplus_invoice.php:932 includes/wc_payplus_invoice.php:1092
 msgid "Link Document  "
-msgstr "לינק מסמך"
+msgstr "לינק מסמך "
 
 #: includes/wc_payplus_invoice.php:1012 includes/wc_payplus_invoice.php:1030
 #: includes/wc_payplus_invoice.php:1052
@@ -1749,7 +1749,7 @@ msgstr "שלם באמצעות  אפל פיי"
 #: includes/wc_payplus_subgateways.php:32
 #: includes/wc_payplus_subgateways.php:224
 msgid "Pay With MULTIPASS via PayPlus"
-msgstr "שלם באמצעות מולטיפאס "
+msgstr "תשלום באמצעות מולטיפאס"
 
 #: includes/wc_payplus_subgateways.php:33
 #: includes/wc_payplus_subgateways.php:227
@@ -1944,7 +1944,7 @@ msgstr "הגדרות פיי פלוס"
 
 #: payplus-payment-gateway.php:615 payplus-payment-gateway.php:634
 msgid "Transaction Type "
-msgstr "סוג עסקה"
+msgstr "סוג עסקה "
 
 #: payplus-payment-gateway.php:653
 #, fuzzy
