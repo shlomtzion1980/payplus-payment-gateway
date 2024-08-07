@@ -1506,7 +1506,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         ?>
             <table class="wc-order-totals payplus-table-refund">
                 <tr class="payplus-row">
-                    <th><img style="height: 30px; margin: auto; display: block; padding: 1px 0 2px 0;" src="<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"); ?>"></th>
+                    <th><img style="height: 30px; margin: auto; display: block; padding: 1px 0 2px 0;" src="<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg"); ?>"></th>
                     <th><?php echo esc_html__('Refund amount', 'payplus-payment-gateway'); ?></th>
                     <th><?php echo esc_html__('Amount already refunded', 'payplus-payment-gateway'); ?></th>
                     <th><?php echo esc_html__('Sum', 'payplus-payment-gateway'); ?></th>

@@ -376,7 +376,13 @@ label:has(> .enable_checkout) {
 #woocommerce-order-items .wc-order-totals tr.payplus-row th,
 #woocommerce-order-items .wc-order-totals tr.payplus-row td {
   text-align: center;
-  border: 1px solid #000;
+  border: none;
+  background-color: #34aa5414;
+  border-radius: 10px;
+  .button-primary {
+    background-color: #35aa53;
+    border-radius: 10px;
+  }
 }
 
 /* button refund */
@@ -451,6 +457,9 @@ label:has(> .enable_checkout) {
 .button-primary#payplus-create-invoice-refund {
   display: inline-block;
   position: relative;
+  background: #35aa53;
+  border-color: #2271b1;
+  border-radius: 15px;
 }
 
 html[lang="en-US"]
@@ -464,16 +473,20 @@ html[lang="en-US"]
   width: 100%;
 }
 #woocommerce-order-items .wc-order-totals.payplus-table-payment thead {
-  background: #ababab;
+  /* background: #ababab; */
 }
 #woocommerce-order-items .wc-order-totals.payplus-table-payment thead th {
   text-align: center;
-  color: #fff;
+  color: #373737;
+  background-color: #80808024;
   width: 20%;
+  border-radius: 10px;
 }
 #woocommerce-order-items .wc-order-totals.payplus-table-payment tbody td {
   text-align: center;
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
+  background-color: #34aa5414;
+  border-radius: 22px;
   padding: 10px;
 }
 #woocommerce-order-items
@@ -514,7 +527,7 @@ html[lang="en-US"] .flex-item {
 
 .type-payment,
 .payplus-payment-button {
-  border: 1.5px solid #595555;
+  border: 1.5px solid #59555530;
   text-align: center;
   border-radius: 43px;
   padding: 12px 18px;
@@ -542,14 +555,22 @@ html[lang="en-US"] .payplus_sum_payment {
   display: none;
 }
 
+.inside {
+  .select-type-invoice ,input, select {
+    border-color: #8c8f9447;
+    border-radius: 10px;
+  }
+}
+
+
 .type-payment:hover,
 .payplus-payment-button:hover {
-  background: #2271b1;
+  background: #70cd84;
   color: #fff;
 }
 
 .hover {
-  background: #2271b1;
+  background: #70cd84;
   color: #fff;
 }
 
