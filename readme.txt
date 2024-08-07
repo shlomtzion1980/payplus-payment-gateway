@@ -90,12 +90,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Hide products in Invoice+ documents - Option to use "General Product".
 * Add    - Transaction CC Issuer and Brand name added to PayPlus metabox.
 * Change - Invoice+ admin settings language selector in capital letters.
+* Change - Design changes for orders: Manual invoice creation tables,manual refunds creation tables and manual payments creaion tables.
 * Tweak  - Sandbox/Development mode displayed in RED color in plugin settings.
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express Checkout activation.
 * Fix    - Code Refactor for creation of refunds, invoices and receipts.
 * Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
 * Fix    - WP_Filesystem() function check before usage.
+* Fix    - Corrected redirect link after order refund action via admin (This occured mainly on sites with order edit links like : /wp-admin/post.php?post=167&action=edit...).
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
