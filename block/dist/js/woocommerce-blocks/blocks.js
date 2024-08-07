@@ -146,12 +146,19 @@ if (isCheckout || hasOrder) {
               payment.getPaymentResult().paymentDetails.paymentPageLink
             );
             // Call the function to handle the target element
-            startIframe(
-              payment.getPaymentResult().paymentDetails.paymentPageLink,
-              overlay
-            );
-            // Disconnect the observer to stop observing further changes
-            observer.disconnect();
+            if (payment.getPaymentResult().paymentDetails.paymentPageLink) {
+              startIframe(
+                payment.getPaymentResult().paymentDetails.paymentPageLink,
+                overlay
+              );
+              // Disconnect the observer to stop observing further changes
+              observer.disconnect();
+            } else {
+              alert(
+                "Error: Something went wrong while trying to load the payment page - please check your page uid settings and domain."
+              );
+              location.reload();
+            }
           }
         } else if (store.hasError()) {
           try {
