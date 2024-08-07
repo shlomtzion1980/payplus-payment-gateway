@@ -534,7 +534,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_create_invoice_refund()
     {
-
         check_ajax_referer('create_invoice_refund_nonce', '_ajax_nonce');
 
         if (!current_user_can('edit_shop_orders')) {
@@ -548,7 +547,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order_id = intval($_POST['order_id']);
             $order = wc_get_order($order_id);
             $amount = floatval($_POST['amount']);
-            $urlEdit = get_edit_post_link($order_id);
+            $urlEdit = html_entity_decode(esc_url(get_edit_post_link($order_id)));
             $this->isInitiated();
             $type_document = sanitize_text_field($_POST['type_document']);
 
