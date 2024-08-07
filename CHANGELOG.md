@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 * Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
 * Fix    - WP_Filesystem() function check before usage.
 * Fix    - Corrected redirect link after order refund action via admin (This occured mainly on sites with order edit links like : /wp-admin/post.php?post=167&action=edit...).
-
+* Fix    - Callbacks were blocked for some clients because of imporper nonce handling.
 
 ##  [7.0.8] - 2024-07-15 - (Shinobi)
 
