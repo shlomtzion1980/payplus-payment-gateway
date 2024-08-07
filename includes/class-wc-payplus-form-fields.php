@@ -133,7 +133,7 @@ class WC_PayPlus_Form_Fields
             'plugin_title' => [
                 'title' => __('PayPlus Plugin Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
-                'description' => __('Basic plugin settings - set these and you`r good to go!', 'payplus-payment-gateway'),
+                'description' => __('Basic plugin settings - set these and you`re good to go!', 'payplus-payment-gateway'),
             ],
             'enabled' => [
                 'title' => __('Enable PayPlus+ Payment', 'payplus-payment-gateway'),
