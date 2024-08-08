@@ -1176,9 +1176,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function process_payment($order_id)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
-        }
         if ($this->block_ip_transactions) {
             $client_ip = $_SERVER['REMOTE_ADDR'];
             $counts = array_count_values($this->get_payment_ips());
@@ -1194,8 +1191,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $objectLogging = new stdClass();
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
-        $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;
-        $saveToken = $_POST['wc-' . $this->id . '-new-payment-method'];
+        $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;  // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $saveToken = $_POST['wc-' . $this->id . '-new-payment-method'];  // phpcs:ignore WordPress.Security.NonceVerification.Missing
         if ($saveToken) {
             WC_PayPlus_Meta_Data::update_meta($order, array('save_payment_method' => true));
         }
@@ -1204,7 +1201,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($is_token) {
 
-            $token_id = wc_clean($_POST['wc-' . $this->id . '-payment-token']);
+            $token_id = wc_clean($_POST['wc-' . $this->id . '-payment-token']);  // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $token = WC_Payment_Tokens::get($token_id);
 
             if (!$this->checkValidateCard($token)) {
@@ -1547,8 +1544,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $dataArr = $item_data->get_data();
             $name = str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_data['name']));
             $metaAll = wc_display_item_meta($item_data, array(
-                'before' => '', 'after' => '',
-                'separator' => ' | ', 'echo' => false, 'autop' => false
+                'before' => '',
+                'after' => '',
+                'separator' => ' | ',
+                'echo' => false,
+                'autop' => false
             ));
             $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $this->rounding_decimals) : '1');
 
@@ -2760,10 +2760,36 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $order = wc_get_order($order_id);
         $insertMeta = array();
         $appVars = array(
-            'type', 'method', 'number', 'status', 'status_code',
-            'status_description', 'currency', 'four_digits', 'expiry_month', 'expiry_year',
-            'number_of_payments', 'first_payment_amount', 'rest_payments_amount', 'voucher_id', 'voucher_num', 'approval_num', 'transaction_uid', 'token_uid', 'more_info', 'alternative_method_id', 'add_data', 'customer_name', 'identification_number', 'brand_name', 'clearing_name', 'alternative_method_name', 'credit_terms', 'secure3D_tracking',
-            'issuer_id', 'issuer_name'
+            'type',
+            'method',
+            'number',
+            'status',
+            'status_code',
+            'status_description',
+            'currency',
+            'four_digits',
+            'expiry_month',
+            'expiry_year',
+            'number_of_payments',
+            'first_payment_amount',
+            'rest_payments_amount',
+            'voucher_id',
+            'voucher_num',
+            'approval_num',
+            'transaction_uid',
+            'token_uid',
+            'more_info',
+            'alternative_method_id',
+            'add_data',
+            'customer_name',
+            'identification_number',
+            'brand_name',
+            'clearing_name',
+            'alternative_method_name',
+            'credit_terms',
+            'secure3D_tracking',
+            'issuer_id',
+            'issuer_name'
         );
 
         if (!empty($response['related_transactions'])) {
