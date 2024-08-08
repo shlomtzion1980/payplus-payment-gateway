@@ -322,7 +322,7 @@ class WC_PayPlus
             return;
         }
         $php_version = phpversion();
-        $required_php_version = '7.2';
+        $required_php_version = '7.4';
         $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
 
         if (version_compare($required_php_version, $php_version, '>')) {
