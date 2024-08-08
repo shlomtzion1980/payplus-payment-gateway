@@ -136,29 +136,42 @@ if (isCheckout || hasOrder) {
           multiPassIcons(loopImages, element);
         }
         if (store.isComplete()) {
+          const activePaymentMethod = payment.getActivePaymentMethod();
+          const gateWaySettings =
+            window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
+              activePaymentMethod + "-settings"
+            ];
+          const isIframe =
+            ["samePageIframe", "popupIframe"].indexOf(
+              gateWaySettings.displayMode
+            ) !== -1;
+          console.log("isIframe?", isIframe);
           if (
             gateways.indexOf(payment.getActivePaymentMethod()) !== -1 &&
             payment.getActiveSavedToken().length === 0
           ) {
             console.log("isComplete: " + store.isComplete());
-            console.log(
-              "paymentPageLink",
-              payment.getPaymentResult().paymentDetails.paymentPageLink
-            );
             // Call the function to handle the target element
-            if (payment.getPaymentResult().paymentDetails.paymentPageLink) {
-              startIframe(
-                payment.getPaymentResult().paymentDetails.paymentPageLink,
-                overlay
-              );
-              // Disconnect the observer to stop observing further changes
-              observer.disconnect();
-            } else {
-              alert(
-                "Error: Something went wrong while trying to load the payment page - please check your page uid settings and domain."
-              );
-              location.reload();
+            if (isIframe) {
+              if (
+                payment.getPaymentResult().paymentDetails.paymentPageLink
+                  ?.length > 0
+              ) {
+                console.log(
+                  "paymentPageLink",
+                  payment.getPaymentResult().paymentDetails.paymentPageLink
+                );
+                startIframe(
+                  payment.getPaymentResult().paymentDetails.paymentPageLink,
+                  overlay
+                );
+                // Disconnect the observer to stop observing further changes
+              } else {
+                alert("Error: the payment page failed to load.");
+                location.reload();
+              }
             }
+            observer.disconnect();
           }
         } else if (store.hasError()) {
           try {
