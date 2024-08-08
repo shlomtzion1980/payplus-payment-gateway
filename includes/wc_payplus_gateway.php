@@ -94,6 +94,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $currentApiKey;
     public $currentSecret;
     private $_wpnonce;
+    private $current_time;
 
     /**
      *
@@ -139,7 +140,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
         $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
-
+        $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'));
         $this->rounding_decimals = ROUNDING_DECIMALS;
         $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
 
@@ -317,6 +318,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $postData = esc_html(wp_json_encode($postData));
         error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true) . " - " . print_r($message, true));
+    }
+
+    public function get_current_time()
+    {
+        return $this->current_time;
     }
 
     public function verify_request()
@@ -2152,6 +2158,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->payplus_add_log_all(
                 'payplus_callback_secured',
                 "
+                Time: $this->current_time
                 Order: $order_id
                 HTTP_HASH: {$_SERVER['HTTP_HASH']}
                 PayPlus Generated Hash: $payplusGenHash
