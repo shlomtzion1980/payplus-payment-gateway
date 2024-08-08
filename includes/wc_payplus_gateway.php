@@ -1969,7 +1969,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $error_message = sprintf(__('An error occurred: %s', 'text-domain'), $e->getMessage());
                     $wp_error = new WP_Error('payplus_update_meta_error', $error_message);
                     // Display or log the error as needed
-                    wp_die($wp_error);
+                    wp_die(esc_html($wp_error));
                 }
             } else {
                 wc_add_notice(__('Error: The payment page failed to load - please check your page uid and domain settings.', 'payplus-payment-gateway'), 'error');
