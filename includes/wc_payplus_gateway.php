@@ -624,7 +624,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_get_nav_option()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - payplus_get_nav_option');
         }
         $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
@@ -652,7 +652,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function admin_options()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - admin_options');
         }
         $title = esc_html(__('PayPlus', 'payplus-payment-gateway') . " ( " . PAYPLUS_VERSION . " )");
         $desc = wp_kses(
@@ -2978,7 +2978,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function add_payment_ipn_response()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - add_payment_ipn_response');
         }
         $handle = 'payplus_add_payment_ipn';
         $this->payplus_add_log_all($handle, 'New Token Has Been Generated');

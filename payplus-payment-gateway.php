@@ -102,7 +102,7 @@ class WC_PayPlus
     public function ipn_response()
     {
         if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplus')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - ipn_response');
         }
         global $wpdb;
         $this->payplus_gateway = $this->get_main_payplus_gateway();
@@ -212,8 +212,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -535,8 +535,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
@@ -869,7 +869,7 @@ class WC_PayPlus
     public static function payplus_check_exists_table($wpnonce, $table = 'payplus_order')
     {
         if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - payplus_check_exists_table');
         }
         global $wpdb;
         $table_name = $wpdb->prefix . $table;
@@ -880,7 +880,7 @@ class WC_PayPlus
     public static function payplus_get_admin_menu($nonce)
     {
         if (!wp_verify_nonce(sanitize_key($nonce), 'menu_option')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - payplus_get_admin_menu');
         }
         ob_start();
         $currentSection = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : "";

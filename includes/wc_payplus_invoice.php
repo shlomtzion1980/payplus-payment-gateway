@@ -577,8 +577,11 @@ class PayplusInvoice
             $name = str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_data['name']));
             $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $WC_PayPlus_Gateway->rounding_decimals) : '1');
             $meta_html = wc_display_item_meta($item_data, array(
-                'before' => '', 'after' => '',
-                'separator' => ' | ', 'echo' => false, 'autop' => false
+                'before' => '',
+                'after' => '',
+                'separator' => ' | ',
+                'echo' => false,
+                'autop' => false
             ));
 
             if ($item_data['type'] == "coupon") {
@@ -892,7 +895,7 @@ class PayplusInvoice
     public function payplus_invoice_create_order($order_id, $typeInvoice = false)
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
-            wp_die('Not allowed!');
+            wp_die('Not allowed! - payplus_invoice_create_order');
         }
         $payload = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();

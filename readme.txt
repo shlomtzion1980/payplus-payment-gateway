@@ -99,7 +99,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Fix    - WP_Filesystem() function check before usage.
 * Fix    - Corrected redirect link after order refund action via admin (This occured mainly on sites with order edit links like : /wp-admin/post.php?post=167&action=edit...).
 * Fix    - Callbacks were blocked for some clients. (Nonce issue)
-* Fix    - New user creation on checkout process. (Nonce issue)
+* Fix    - New user creation on checkout process. (Works with classic checkout fully and with New Blocks Checkout in iFrame popup and in iFrame on the same page) (Nonce issue)
+* Fix    - ipn_response() blocked for some because of nonce issue. (Nonce issue)
 
 = 7.0.8 =
 * Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
