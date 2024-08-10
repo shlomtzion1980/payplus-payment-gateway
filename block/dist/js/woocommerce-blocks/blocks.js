@@ -25,7 +25,7 @@ if (isCheckout || hasOrder) {
   const gateways = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
   ).gateways;
-
+  var iconHide = true;
   (() => {
     ("use strict");
     const e = window.React,
@@ -42,18 +42,28 @@ if (isCheckout || hasOrder) {
           { className: "payplus-method", style: { width: "100%" } },
           (0, e.createElement)(a, {
             text: t.text,
-            icon: t.icon
-              ? (0, e.createElement)("img", {
-                  style: {
-                    width: "64px",
-                    height: "32px",
-                    maxHeight: "100%",
-                    margin: "0px 10px",
-                    objectPosition: "center",
-                  },
-                  src: t.icon,
-                })
-              : "",
+            icon:
+              iconHide === true && t.icon.search("PayPlusLogo.svg") > 0
+                ? (0, e.createElement)("img", {
+                    style: {
+                      width: "64px",
+                      height: "32px",
+                      maxHeight: "100%",
+                      margin: "0px 10px",
+                      objectPosition: "center",
+                    },
+                    src: t.icon,
+                  })
+                : (0, e.createElement)("img", {
+                    style: {
+                      width: "64px",
+                      height: "32px",
+                      maxHeight: "100%",
+                      margin: "0px 10px",
+                      objectPosition: "center",
+                    },
+                    src: t.icon,
+                  }),
           }),
           (0, e.createElement)(
             "div",
@@ -74,7 +84,12 @@ if (isCheckout || hasOrder) {
               },
               "x"
             )
-          )
+          ),
+          t.icon.search("PayPlusLogo.svg") > 0
+            ? (0, e.createElement)("img", {
+                src: "https://wppayplus.test/wp-content/plugins/payplus-payment-gateway/assets/images/multipass-fading-icons/buyme.png",
+              })
+            : null
         );
       };
     (() => {
