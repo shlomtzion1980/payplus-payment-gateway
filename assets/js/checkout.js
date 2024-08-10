@@ -1009,6 +1009,25 @@ jQuery(function ($) {
     }
     alertify.popupIframePaymentPage(src);
   }
+
+  // Add custom icons field if exists under cc method description
+  if (payplus_script_checkout.customIcons.length > 0) {
+    var $newDiv = $("<div></div>", {
+      class: "payplus-checkout-image-container", // Optional: Add a class to the div
+      id: "payplus-checkout-image-div", // Optional: Add an ID to the div
+      style: "display: flex;justify-content: space-around;",
+    });
+    $.each(payplus_script_checkout.customIcons, function (index, value) {
+      var $img = $("<img>", {
+        src: value,
+        alt: "Image " + (index + 1), // Optional: Set alt text for accessibility
+        style: "max-width: 100%; height: auto;", // Optional: Set inline styles
+      });
+      $newDiv.append($img);
+    });
+    $("div.payment_method_payplus-payment-gateway").prepend($newDiv);
+  }
+
   function multiPassIcons(loopImages) {
     /* Check if multipass method is available and if so check for clubs and replace icons! */
 

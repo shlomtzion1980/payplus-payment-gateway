@@ -466,6 +466,17 @@ class WC_PayPlus
         $importAapplepayScript = null;
         $isModbile = (wp_is_mobile()) ? true : false;
         $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
+        $custom_icons = property_exists($this->payplus_payment_gateway_settings, 'custom_icons') ? $this->payplus_payment_gateway_settings->custom_icons : false;
+        $customIcons = [];
+        if (strpos($custom_icons, ';') > 0) {
+            $custom_icons = explode(";", $custom_icons);
+            foreach ($custom_icons as $icon) {
+                $customIcons[] = esc_url($icon);
+            }
+        } else {
+            $customIcons[] = esc_url($custom_icons);
+        }
+
         if (is_checkout()) {
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
             if (
@@ -478,7 +489,7 @@ class WC_PayPlus
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
-                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons)
+                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons)
             );
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));

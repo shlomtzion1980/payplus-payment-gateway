@@ -148,6 +148,13 @@ class WC_PayPlus_Form_Fields
                 'default' => __('Pay with Debit or Credit Card', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'custom_icons' => [
+                'title' => __('Custom icons', 'payplus-payment-gateway'),
+                'type' => 'textarea',
+                'default' => '',
+                'description' => __('Paste images url here divied by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'description' => [
                 'title' => __('Description', 'payplus-payment-gateway'),
                 'type' => 'textarea',
