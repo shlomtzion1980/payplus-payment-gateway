@@ -88,6 +88,36 @@ jQuery(document).ready(function ($) {
     navigator.clipboard.writeText(copyText.text());
   });
 
+  $("#makeTokenPayment").click(function (event) {
+    event.preventDefault();
+    let orderId = $(this).attr("data-id");
+    let token = $("#ccToken").val();
+    let typeDocument = $(".select-type-invoice").val();
+    // let sum = $(".token-payment-payplus.input-change.price").val();
+
+    $(".payplus_loader").fadeIn();
+    $.ajax({
+      type: "post",
+      dataType: "json",
+      url: payplus_script_admin.ajax_url,
+      data: {
+        action: "make-token-payment",
+        order_id: orderId,
+        token: token,
+        // paymentSum: sum,
+        typeDocument: typeDocument,
+        _ajax_nonce: payplus_script_admin.payplusTokenPayment,
+      },
+      success: function (response) {
+        console.log(response);
+        $(".payplus_loader").fadeOut();
+        if (response === 0) {
+          location.reload();
+        }
+      },
+    });
+  });
+
   $("#custom-button-get-pp").click(function () {
     let loader = $("#order_data").find(".payplus_loader_gpp");
     let side = "right";

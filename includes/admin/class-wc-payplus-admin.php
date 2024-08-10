@@ -96,6 +96,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('wp_ajax_payplus-refund-club-amount', [$this, 'ajax_payplus_refund_club_amount']);
         // adds the callback js query action of the "Get order details" from PayPlus custom button.
         add_action('wp_ajax_custom_action', [$this, 'custom_action_callback']);
+        add_action('wp_ajax_make-token-payment', [$this, 'makeTokenPayment']);
 
         add_action('woocommerce_admin_order_totals_after_total', [$this, 'payplus_woocommerce_admin_order_totals_after_total'], 10, 1);
         // Place "Get Order Details" button from PayPlus if the order is marked as unpaid - allows to get the order details from PayPlus if exists and
@@ -113,6 +114,35 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if ($this->payPlusInvoice->payplus_get_invoice_enable()) {
             add_action('woocommerce_order_refunded', [$this, 'payplus_after_refund'], 10, 2);
         }
+    }
+
+
+    public function makeTokenPayment()
+    {
+        check_ajax_referer('payplus_token_payment', '_ajax_nonce');
+
+        $this->isInitiated();
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : wp_die('No order id received.');
+        $order = wc_get_order($order_id);
+        $user_id = $order->get_user_id();
+        $token = sanitize_text_field($_POST['token']);
+
+        $payload = $this->generatePayloadLink($order_id, true, $token);
+
+        $response = $this->post_payplus_ws($this->payment_url, $payload);
+        $response = json_decode(wp_remote_retrieve_body($response));
+
+        if ($response->data->status_code === "000") {
+            $updateData = [
+                'payplus_page_request_uid' => $response->data->page_request_uid,
+                'payplus_transaction_uid' => $response->data->transaction_uid,
+            ];
+            WC_PayPlus_Meta_Data::update_meta($order, $updateData);
+        }
+
+        $this->custom_action_callback();
+        $this->invoice_api = new PayplusInvoice();
+        $this->invoice_api->payplus_invoice_create_order($order_id, sanitize_text_field($_POST['typeDocument']));
     }
 
     /**
@@ -183,7 +213,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function custom_action_callback()
     {
-        check_ajax_referer('payplus_custom_action', '_ajax_nonce');
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
+            check_ajax_referer('payplus_custom_action', '_ajax_nonce');
+        }
 
         if (!current_user_can('edit_shop_orders')) {
             wp_send_json_error('You do not have permission to edit orders.');
@@ -191,7 +223,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
 
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
-        $payment_request_uid = $_POST['payment_request_uid'];
+        $order = wc_get_order($order_id);
+        $payment_request_uid = isset($_POST['payment_request_uid']) ? $_POST['payment_request_uid'] : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
         $this->isInitiated();
 
@@ -963,7 +996,19 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         ?>
 <input id="all-sum" type="hidden" value="<?php echo esc_attr($order->get_total()); ?>">
 <div id="all-payment-invoice" style="display: <?php echo esc_attr($chackAllPayment); ?>">
+    <?php
+                $order = wc_get_order($orderId);
+                $user_id = $order->get_user_id();
 
+                $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
+                $status = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_status_code');
+                $theTokens = [];
+
+                foreach ($customerTokens as $customerToken) {
+                    $theTokens[$customerToken->get_last4()]['token'] = $customerToken->get_token();
+                    $theTokens[$customerToken->get_last4()]['type'] = $customerToken->get_card_type();
+                };
+                ?>
     <div class="flex-row">
         <h2><strong><?php esc_html(__("Payment details", "payplus-payment-gateway")) ?> </strong></h2>
     </div>
@@ -1000,8 +1045,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             <button data-type="<?php echo esc_attr('other'); ?>"
                 class="other  type-payment"><?php echo esc_html__("Other", "payplus-payment-gateway") ?></button>
         </div>
-
-
+        <div class="flex-item">
+            <button data-type="<?php echo esc_attr('token'); ?>"
+                class="token  type-payment"><?php echo esc_html__("Token", "payplus-payment-gateway") ?></button>
+        </div>
     </div>
     <!-- Credit Card -->
     <div class="select-type-payment credit-card">
@@ -1441,6 +1488,65 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
             </div>
         </div>
+    </div>
+    <div class="select-type-payment token">
+        <input class="token-payment-payplus input-change  row_id" type="hidden" value="">
+        <input class="token-payment-payplus input-change  method_payment" type="hidden" id="method_payment"
+            name="method_payment" value="token">
+        <div class="flex-row">
+            <div class="flex-item">
+                <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
+                <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
+                    class="token-payment-payplus  input-change create_at" type="date"
+                    placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
+            </div>
+            <div class="flex-item full-amount">
+                <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
+                <div class="flex-row">
+                    <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1"
+                        max="<?php echo esc_attr($order->get_total()) ?>"
+                        class="token-payment-payplus input-change price" type="number"
+                        placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>"
+                        value="<?php echo esc_attr(floatval($order->get_total())) ?>">
+                    <button data-sum="<?php echo esc_attr($order->get_total()) ?>"
+                        class="payplus-full-amount token-payment-payplus">
+                        <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
+                </div>
+            </div>
+            <div class="flex-item">
+                <label> <?php echo esc_html__("Notes", "payplus-payment-gateway") ?></label>
+                <input value="" placeholder="<?php echo esc_attr__("Notes", "payplus-payment-gateway") ?>" type="text"
+                    class="token-payment-payplus input-change notes">
+            </div>
+        </div>
+        <div class="flex-row flex-row-reverse">
+            <div class="flex-item">
+                <button id="token-payment-payplus" class="payplus-payment-button">
+                    <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
+            </div>
+        </div>
+        <div class="flex-row">
+            <?php
+                        if (!empty($theTokens)) {
+                        ?>
+            <select type="select" id="ccToken">
+                <?php
+                                foreach ($theTokens as $key => $token) {
+                                ?>
+                <option id="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($token['token']); ?>">
+                    <?php echo esc_attr($key); ?></option>
+                <?php
+                                }
+                                ?>
+            </select>
+            <?php
+                        }
+                        ?>
+        </div>
+        <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
+            data-id="<?php echo esc_attr((int)$orderId); ?>">
+            Pay With Token
+        </button>
     </div>
 </div>
 <?php
@@ -1968,7 +2074,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $transactionType = $this->get_option('transaction_type');
 
         wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
-        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
+        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.js', ['jquery'], time(), true);
         wp_localize_script(
             'payplus-admin-payment',
             'payplus_script_admin',
