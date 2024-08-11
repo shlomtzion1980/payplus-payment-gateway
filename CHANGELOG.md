@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 * Add    - Hide products in Invoice+ documents - Option to use "General Product".
 * Add    - Transaction CC Issuer and Brand name added to PayPlus metabox.
 * Change - Invoice+ admin settings language selector in capital letters.
-* Change - Design changes for orders: Manual invoice creation tables,manual refunds creation tables and manual payments creaion tables.
+* Change - Design changes for orders: Manual invoice creation tables,manual refunds creation tables and manual payments creation tables.
 * Tweak  - Sandbox/Development mode displayed in RED color in plugin settings.
 * Fix    - Missing nonce in express checkout.
 * Fix    - Express Checkout activation.
@@ -18,7 +18,9 @@ All notable changes to this project will be documented in this file.
 * Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
 * Fix    - WP_Filesystem() function check before usage.
 * Fix    - Corrected redirect link after order refund action via admin (This occured mainly on sites with order edit links like : /wp-admin/post.php?post=167&action=edit...).
-* Fix    - Callbacks were blocked for some clients because of imporper nonce handling.
+* Fix    - Callbacks were blocked for some clients. (Nonce issue)
+* Fix    - New user creation on checkout process. (Works with classic checkout fully and with New Blocks Checkout in iFrame popup and in iFrame on the same page) (Nonce issue)
+* Fix    - ipn_response() blocked for some because of nonce issue. (Nonce issue)
 
 ##  [7.0.8] - 2024-07-15 - (Shinobi)
 
