@@ -1966,6 +1966,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         WC_PayPlus_Meta_Data::update_meta($order, $pageRequestUid);
                     }
                 } catch (Exception $e) {
+                    // Translators: %s is the error message retrieved from the exception.
                     $error_message = sprintf(__('An error occurred: %s', 'text-domain'), $e->getMessage());
                     $wp_error = new WP_Error('payplus_update_meta_error', $error_message);
                     // Display or log the error as needed
