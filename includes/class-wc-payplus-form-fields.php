@@ -148,13 +148,6 @@ class WC_PayPlus_Form_Fields
                 'default' => __('Pay with Debit or Credit Card', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
-            'custom_icons' => [
-                'title' => __('Custom icons', 'payplus-payment-gateway'),
-                'type' => 'textarea',
-                'default' => '',
-                'description' => __('Paste images url here divied by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-            ],
             'description' => [
                 'title' => __('Description', 'payplus-payment-gateway'),
                 'type' => 'textarea',
@@ -167,7 +160,6 @@ class WC_PayPlus_Form_Fields
                 'description' => __('Activate test mode', 'payplus-payment-gateway'),
                 'label' => __('Enable Sandbox Mode', 'payplus-payment-gateway'),
                 'desc_tip' => true,
-
             ],
             'api_key' => [
                 'title' => __('API Key', 'payplus-payment-gateway'),
@@ -222,8 +214,8 @@ class WC_PayPlus_Form_Fields
                 ],
                 'default' => '1',
             ],
-            'payment_page_title' => [
-                'title' => __('Payment Page Options', 'payplus-payment-gateway'),
+            'checkout_page_title' => [
+                'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
                 'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
             ],
@@ -252,6 +244,13 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'no',
             ],
+            'custom_icons' => [
+                'title' => __('Custom Checkout Icons', 'payplus-payment-gateway'),
+                'type' => 'textarea',
+                'default' => '',
+                'description' => __('Paste images url here divied by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'create_pp_token' => [
                 'title' => __('Saved Credit Cards', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
@@ -268,6 +267,18 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'label' => __('Send add data parameter on transaction', 'payplus-payment-gateway'),
                 'default' => 'no',
+            ],
+            'import_applepay_script' => [
+                'title' => __('Apple Pay', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Add Apple Pay Script to iframe', 'payplus-payment-gateway'),
+                'description' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'payment_page_title' => [
+                'title' => __('Payment Page Options', 'payplus-payment-gateway'),
+                'type' => 'title',
+                'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
             ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
@@ -303,13 +314,6 @@ class WC_PayPlus_Form_Fields
                 'default' => '1',
                 'description' => __('Hide the other payment methods on the payment page.<br>Example: If you have Google Pay and Credit Cards - 
                 when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-            ],
-            'import_applepay_script' => [
-                'title' => __('Apple Pay', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Add Apple Pay Script to iframe', 'payplus-payment-gateway'),
-                'description' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'order_status_title' => [

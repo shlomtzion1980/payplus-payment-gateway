@@ -25,7 +25,33 @@ if (isCheckout || hasOrder) {
   const gateways = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
   ).gateways;
-  var iconHide = true;
+
+  let customIcons = [];
+
+  const w = window.React;
+
+  for (let c = 0; c < payPlusGateWay.customIcons.length; c++) {
+    customIcons[c] = (0, w.createElement)("img", {
+      src: payPlusGateWay.customIcons[c],
+      style: { maxHeight: "65px", height: "45px" },
+    });
+  }
+
+  const divCustomIcons = (0, w.createElement)(
+    "div",
+    {
+      className: "payplus-icons",
+      style: {
+        display: "flex",
+        width: "100%",
+        // justifyContent: "space-around",
+      },
+    },
+    customIcons
+  );
+
+  let isCustomeIcons = !!payPlusGateWay.customIcons[0].length;
+
   (() => {
     ("use strict");
     const e = window.React,
@@ -43,7 +69,7 @@ if (isCheckout || hasOrder) {
           (0, e.createElement)(a, {
             text: t.text,
             icon:
-              iconHide === true && t.icon.search("PayPlusLogo.svg") > 0
+              t.icon !== ""
                 ? (0, e.createElement)("img", {
                     style: {
                       width: "64px",
@@ -54,16 +80,7 @@ if (isCheckout || hasOrder) {
                     },
                     src: t.icon,
                   })
-                : (0, e.createElement)("img", {
-                    style: {
-                      width: "64px",
-                      height: "32px",
-                      maxHeight: "100%",
-                      margin: "0px 10px",
-                      objectPosition: "center",
-                    },
-                    src: t.icon,
-                  }),
+                : divCustomIcons,
           }),
           (0, e.createElement)(
             "div",
@@ -85,10 +102,8 @@ if (isCheckout || hasOrder) {
               "x"
             )
           ),
-          t.icon.search("PayPlusLogo.svg") > 0
-            ? (0, e.createElement)("img", {
-                src: "https://wppayplus.test/wp-content/plugins/payplus-payment-gateway/assets/images/multipass-fading-icons/buyme.png",
-              })
+          t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
+            ? divCustomIcons
             : null
         );
       };

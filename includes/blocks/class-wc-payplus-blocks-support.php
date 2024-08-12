@@ -27,7 +27,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $iFrameHeight;
     public $hideOtherPayments;
     public $payPlusSettings;
-    public $hideIcon;
+    public $customIcons;
 
 
     /**
@@ -50,7 +50,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
         $this->hideOtherPayments = $this->settings['hide_other_charge_methods'] ?? null;
 
-        $this->hideIcon = boolval($this->settings['hide_icon'] === 'yes');
+        $this->customIcons = explode(";", $this->settings['custom_icons']);
 
         $this->secretKey = $this->settings['secret_key'] ?? null;
         $gateways = WC()->payment_gateways->payment_gateways();
@@ -189,7 +189,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
 
         $script_asset = array(
             'dependencies' => array(),
@@ -232,6 +232,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'hideOtherPayments' => $this->hideOtherPayments,
             ],
             'gateways' => $this->settings['gateways'],
+            'customIcons' => $this->customIcons,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
         ];
     }
@@ -253,7 +254,6 @@ final class WC_Gateway_Payplus_ApplePay_Block extends WC_Gateway_Payplus_Payment
 {
     protected $name = 'payplus-payment-gateway-applepay';
 }
-
 final class WC_Gateway_Payplus_Multipas_Block extends WC_Gateway_Payplus_Payment_Block
 {
     protected $name = 'payplus-payment-gateway-multipass';

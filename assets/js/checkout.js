@@ -1011,17 +1011,17 @@ jQuery(function ($) {
   }
 
   // Add custom icons field if exists under cc method description
-  if (payplus_script_checkout.customIcons.length > 0) {
+  if (payplus_script_checkout.customIcons[0].length > 0) {
     var $newDiv = $("<div></div>", {
       class: "payplus-checkout-image-container", // Optional: Add a class to the div
       id: "payplus-checkout-image-div", // Optional: Add an ID to the div
-      style: "display: flex;justify-content: space-around;",
+      style: "display: flex;",
     });
     $.each(payplus_script_checkout.customIcons, function (index, value) {
       var $img = $("<img>", {
         src: value,
         alt: "Image " + (index + 1), // Optional: Set alt text for accessibility
-        style: "max-width: 100%; height: auto;", // Optional: Set inline styles
+        style: "max-width: 100%; max-height:65px;object-fit: contain;", // Optional: Set inline styles
       });
       $newDiv.append($img);
     });

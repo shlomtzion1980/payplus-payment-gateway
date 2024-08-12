@@ -468,14 +468,11 @@ class WC_PayPlus
         $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
         $custom_icons = property_exists($this->payplus_payment_gateway_settings, 'custom_icons') ? $this->payplus_payment_gateway_settings->custom_icons : false;
         $customIcons = [];
-        if (strpos($custom_icons, ';') > 0) {
-            $custom_icons = explode(";", $custom_icons);
-            foreach ($custom_icons as $icon) {
-                $customIcons[] = esc_url($icon);
-            }
-        } else {
-            $customIcons[] = esc_url($custom_icons);
+        $custom_icons = explode(";", $custom_icons);
+        foreach ($custom_icons as $icon) {
+            $customIcons[] = esc_url($icon);
         }
+
 
         if (is_checkout()) {
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
