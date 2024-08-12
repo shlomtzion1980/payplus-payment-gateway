@@ -400,6 +400,7 @@ class WC_PayPlus
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-invoice.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
@@ -475,6 +476,9 @@ class WC_PayPlus
 
 
         if (is_checkout()) {
+            $ppInvoice = new WC_PayPlus_Invoice;
+            $order_id = 1;
+            $ppInvoice->payplusInvoiceCreator($order_id);
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
             if (
                 property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') &&

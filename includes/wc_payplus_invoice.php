@@ -7,7 +7,7 @@ define("COUNT_BALANCE_NAME", 1);
 class PayplusInvoice
 {
     public $hide_products_invoice;
-    private $payplus_invoice_option;
+    public $payplus_invoice_option;
     private $payplus_gateway_option;
     private $payplus_invoice_api_key;
     private $payplus_invoice_secret_key;
