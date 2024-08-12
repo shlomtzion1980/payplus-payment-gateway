@@ -95,7 +95,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('wp_ajax_payplus-create-invoice-refund', [$this, 'ajax_payplus_create_invoice_refund']);
         add_action('wp_ajax_payplus-refund-club-amount', [$this, 'ajax_payplus_refund_club_amount']);
         // adds the callback js query action of the "Get order details" from PayPlus custom button.
-        add_action('wp_ajax_custom_action', [$this, 'custom_action_callback']);
+        add_action('wp_ajax_custom_action', [$this, 'payplusIpn']);
         add_action('wp_ajax_make-token-payment', [$this, 'makeTokenPayment']);
 
         add_action('woocommerce_admin_order_totals_after_total', [$this, 'payplus_woocommerce_admin_order_totals_after_total'], 10, 1);
@@ -129,6 +129,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $payload = $this->generatePayloadLink($order_id, true, $token);
 
+        $order->set_payment_method('payplus-payment-gateway');
+        $order->set_payment_method_title('Pay with Debit or Credit Card');
+
         $response = $this->post_payplus_ws($this->payment_url, $payload);
         $response = json_decode(wp_remote_retrieve_body($response));
 
@@ -140,9 +143,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             WC_PayPlus_Meta_Data::update_meta($order, $updateData);
         }
 
-        $this->custom_action_callback();
-        $this->invoice_api = new PayplusInvoice();
-        $this->invoice_api->payplus_invoice_create_order($order_id, sanitize_text_field($_POST['typeDocument']));
+        $this->payplusIpn();
+        // $this->invoice_api = new PayplusInvoice();
+        // $this->invoice_api->payplus_invoice_create_order($order_id, sanitize_text_field($_POST['typeDocument']));
     }
 
     /**
@@ -211,7 +214,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      * @param $order
      * @return void
      */
-    public function custom_action_callback()
+    public function payplusIpn()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
             check_ajax_referer('payplus_custom_action', '_ajax_nonce');
@@ -738,6 +741,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $dateNow = $date->format('Y-m-d H:i');
             $order_id = intval($_POST['order_id']);
             $order = wc_get_order($order_id);
+            $order->set_payment_method('payplus-payment-gateway');
+            $order->set_payment_method_title('Pay with Debit or Credit Card');
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $payload = $this->generatePayloadLink($order_id, true);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
@@ -924,7 +929,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
-    public function payplus_get_section_invoice_not_automatic($orderId)
+    public function payplus_get_section_invoice_not_automatic($orderId, $theTokens)
     {
         $this->isInitiated();
         $order = wc_get_order($orderId);
@@ -996,19 +1001,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         ?>
             <input id="all-sum" type="hidden" value="<?php echo esc_attr($order->get_total()); ?>">
             <div id="all-payment-invoice" style="display: <?php echo esc_attr($chackAllPayment); ?>">
-                <?php
-                $order = wc_get_order($orderId);
-                $user_id = $order->get_user_id();
-
-                $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
-                $status = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_status_code');
-                $theTokens = [];
-
-                foreach ($customerTokens as $customerToken) {
-                    $theTokens[$customerToken->get_last4()]['token'] = $customerToken->get_token();
-                    $theTokens[$customerToken->get_last4()]['type'] = $customerToken->get_card_type();
-                };
-                ?>
                 <div class="flex-row">
                     <h2><strong><?php esc_html(__("Payment details", "payplus-payment-gateway")) ?> </strong></h2>
                 </div>
@@ -1489,6 +1481,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                     </div>
                 </div>
+                <?php
+                /*
                 <div class="select-type-payment token">
                     <input class="token-payment-payplus input-change  row_id" type="hidden" value="">
                     <input class="token-payment-payplus input-change  method_payment" type="hidden" id="method_payment"
@@ -1547,7 +1541,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         data-id="<?php echo esc_attr((int)$orderId); ?>">
                         Pay With Token
                     </button>
-                </div>
+                </div> */ ?>
             </div>
         <?php
 
@@ -1727,7 +1721,43 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'inv_refund_receipt' => __('Refund Receipt', 'payplus-payment-gateway'),
             'inv_refund_receipt_invoice' => __('Refund Invoice + Refund Receipt', 'payplus-payment-gateway')
         );
+
+        $order = wc_get_order($orderId);
+        $user_id = $order->get_user_id();
+
         ob_start();
+        if ($order->get_status() === "pending" && $user_id > 0 && empty($payplus_response)) {
+            $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
+            $status = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_status_code');
+            $theTokens = [];
+
+            foreach ($customerTokens as $customerToken) {
+                $theTokens[$customerToken->get_last4()]['token'] = $customerToken->get_token();
+                $theTokens[$customerToken->get_last4()]['type'] = $customerToken->get_card_type();
+            };
+
+            if (!empty($theTokens)) {
+        ?>
+                <select type="select" id="ccToken">
+                    <?php
+                    foreach ($theTokens as $key => $token) {
+                    ?>
+                        <option id="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($token['token']); ?>">
+                            <?php echo esc_attr($key); ?></option>
+                    <?php
+                    }
+                    ?>
+                </select>
+            <?php
+            }
+            ?>
+            <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
+                data-id="<?php echo esc_attr((int)$orderId); ?>">
+                Pay With Token
+            </button>
+        <?php
+        }
+
         if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'))) {
         ?>
             <table class="wc-order-totals payplus-table-refund">
@@ -1816,7 +1846,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         ) {
 
             if (empty($checkInvoiceSend)) :
-                $this->payplus_get_section_invoice_not_automatic($orderId);
+                $this->payplus_get_section_invoice_not_automatic($orderId, $theTokens = []);
             endif;
         }
 
@@ -2074,7 +2104,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $transactionType = $this->get_option('transaction_type');
 
         wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
-        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
+        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.js', ['jquery'], time(), true);
         wp_localize_script(
             'payplus-admin-payment',
             'payplus_script_admin',
