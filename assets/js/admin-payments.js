@@ -104,7 +104,7 @@ jQuery(document).ready(function ($) {
         action: "make-token-payment",
         order_id: orderId,
         token: token,
-        paymentSum: sum,
+        // paymentSum: sum,
         typeDocument: typeDocument,
         _ajax_nonce: payplus_script_admin.payplusTokenPayment,
       },
