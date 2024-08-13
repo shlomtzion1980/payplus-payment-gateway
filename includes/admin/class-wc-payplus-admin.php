@@ -95,7 +95,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('wp_ajax_payplus-create-invoice-refund', [$this, 'ajax_payplus_create_invoice_refund']);
         add_action('wp_ajax_payplus-refund-club-amount', [$this, 'ajax_payplus_refund_club_amount']);
         // adds the callback js query action of the "Get order details" from PayPlus custom button.
-        add_action('wp_ajax_custom_action', [$this, 'payplusIpn']);
+        add_action('wp_ajax_payplus_ipn', [$this, 'payplusIpn']);
         add_action('wp_ajax_make-token-payment', [$this, 'makeTokenPayment']);
 
         add_action('woocommerce_admin_order_totals_after_total', [$this, 'payplus_woocommerce_admin_order_totals_after_total'], 10, 1);
@@ -217,7 +217,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function payplusIpn()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            check_ajax_referer('payplus_custom_action', '_ajax_nonce');
+            check_ajax_referer('payplus_payplus_ipn', '_ajax_nonce');
         }
 
         if (!current_user_can('edit_shop_orders')) {
@@ -2098,7 +2098,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplusApiPayment" => wp_create_nonce('payplus_api_payment'),
                 "payplusTransactionReview" => wp_create_nonce('payplus_transaction_review'),
                 "payplusGenerateLinkPayment" => wp_create_nonce('payplus_generate_link_payment'),
-                "payplusCustomAction" => wp_create_nonce('payplus_custom_action'),
+                "payplusCustomAction" => wp_create_nonce('payplus_payplus_ipn'),
                 "frontNonce" => wp_create_nonce('frontNonce'),
             )
         );

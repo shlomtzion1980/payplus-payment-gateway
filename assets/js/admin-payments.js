@@ -137,7 +137,7 @@ jQuery(document).ready(function ($) {
     loader.fadeIn();
 
     var data = {
-      action: "custom_action",
+      action: "payplus_ipn",
       payment_request_uid: $("#custom-button-get-pp").val(),
       order_id: $("#custom-button-get-pp").data("value"),
       _ajax_nonce: payplus_script_admin.payplusCustomAction,
