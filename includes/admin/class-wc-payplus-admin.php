@@ -1820,17 +1820,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $this->payplus_get_section_invoice_not_automatic($orderId, $theTokens = []);
             endif;
         }
-        // echo '<pre>';
-        // print_r('total: ' . $total);
-        // echo "\n";
-        // print_r("get invoice enable : " . $this->payPlusInvoice->payplus_get_invoice_enable());
-        // echo "\n";
-        // print_r("sumTransaction Refund: " . $sumTransactionRefund);
-        // echo "\n";
-        // print_r("Invoice manual: " . $invoice_manual);
-        // echo "\n";
-        // print_r("checkInvoiceRefundSend: " . $checkInvoiceRefundSend);
-        // die;
         if (
             $total && $this->payPlusInvoice->payplus_get_invoice_enable()
             && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
