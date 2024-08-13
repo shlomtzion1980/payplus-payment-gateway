@@ -217,24 +217,7 @@ class WC_PayPlus_Form_Fields
             'checkout_page_title' => [
                 'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
-                'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
-            ],
-            'display_mode' => [
-                'title' => __('Display Mode', 'payplus-payment-gateway'),
-                'type' => 'select',
-                'options' => [
-                    'redirect' => __('Redirect', 'payplus-payment-gateway'),
-                    'iframe' => __('iFrame on the next page', 'payplus-payment-gateway'),
-                    'samePageIframe' => __('iFrame on the same page', 'payplus-payment-gateway'),
-                    'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
-                ],
-                'default' => 'redirect',
-                'description' => '',
-            ],
-            'iframe_height' => [
-                'title' => __('iFrame Height', 'payplus-payment-gateway'),
-                'type' => 'number',
-                'default' => 700,
+                'description' => __('Setup for the wordpress checkout page.', 'payplus-payment-gateway'),
             ],
             'hide_icon' => [
                 'title' => __('Hide PayPlus Icon', 'payplus-payment-gateway'),
@@ -278,7 +261,25 @@ class WC_PayPlus_Form_Fields
             'payment_page_title' => [
                 'title' => __('Payment Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
-                'description' => __('You can set your payment pages as you like to', 'payplus-payment-gateway'),
+                'description' => __('Setup for the PayPlus Payment Page.', 'payplus-payment-gateway'),
+            ],
+            'display_mode' => [
+                'title' => __('Display Mode', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'description' => __('Set the way the PayPlus Payment Page will be loaded in/from the wordpress checkout page.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'options' => [
+                    'redirect' => __('Redirect', 'payplus-payment-gateway'),
+                    'iframe' => __('iFrame on the next page', 'payplus-payment-gateway'),
+                    'samePageIframe' => __('iFrame on the same page', 'payplus-payment-gateway'),
+                    'popupIframe' => __('iFrame in a Popup', 'payplus-payment-gateway'),
+                ],
+                'default' => 'redirect',
+            ],
+            'iframe_height' => [
+                'title' => __('iFrame Height', 'payplus-payment-gateway'),
+                'type' => 'number',
+                'default' => 700,
             ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
