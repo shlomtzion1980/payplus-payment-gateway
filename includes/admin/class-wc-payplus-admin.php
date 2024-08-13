@@ -581,12 +581,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_create_invoice_refund()
     {
+
         check_ajax_referer('create_invoice_refund_nonce', '_ajax_nonce');
 
         if (!current_user_can('edit_shop_orders')) {
             wp_send_json_error('You do not have permission to edit orders.');
             wp_die();
         }
+
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             global $wpdb;
             $table_name = $wpdb->prefix . 'payplus_order';
@@ -597,15 +599,29 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $urlEdit = html_entity_decode(esc_url(get_edit_post_link($order_id)));
             $this->isInitiated();
             $type_document = sanitize_text_field($_POST['type_document']);
-
             $resultApps = $this->payPlusInvoice->payplus_get_payments($order_id);
 
-            $sum = 0;
-            $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
-                return $sum + ($item->price / 100);
-            });
-            if (floatval($sumTransactionRefund) != floatval($amount)) {
+            if (empty($resultApps)) {
+                $resultApps = [];
+                $payplusResponse = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response'), true);
+                $resultApps[$indexRow]['method_payment'] = $payplusResponse['method'];
+                $resultApps[$indexRow]['price'] = $payplusResponse['amount'] * 100;
+                $resultApps[$indexRow]['transaction_uid'] = $payplusResponse['transaction_uid'];
+                $resultApps[$indexRow]['page_request_uid'] = $payplusResponse['page_request_uid'];
+                $resultApps[$indexRow]['four_digits'] = $payplusResponse['four_digits'];
+                $resultApps[$indexRow]['number_of_payments'] = $payplusResponse['number_of_payments'];
+                $resultApps[$indexRow]['brand_name'] = $payplusResponse['brand_name'];
+                $resultApps[$indexRow]['type_payment'] = $payplusResponse['type'];
+                $resultApps[$indexRow]['token_uid'] = $payplusResponse['token_uid'];
+                $resultApps[$indexRow]['refund'] = $payplusResponse['amount'] * 100;
+                $resultApps[$indexRow]['invoice_refund'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_total_refunded_amount') * 100;
+                $resultApps[$indexRow] = (object) $resultApps[$indexRow];
+            }
 
+            $sum = 0;
+            $sumTransactionRefund = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_total_refunded_amount', true) * 100;
+
+            if (floatval($sumTransactionRefund) != floatval($amount)) {
                 if (count($resultApps) > 1) {
                     $resultApps = array();
                     $objectInvoicePaymentNoPayplus = array('method_payment' => 'other', 'price' => $amount * 100);
@@ -617,7 +633,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             if (count($resultApps)) {
-
                 $this->payPlusInvoice->payplus_create_document_dashboard(
                     $order_id,
                     $type_document,
@@ -944,12 +959,26 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $currentStatus = $this->payPlusInvoice->payplus_get_invoice_type_document();
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
         $chackAllPayment = in_array($currentStatus, $chackStatus) ? "block" : 'none';
-        $payments = $this->invoice_api->payplus_get_payments($orderId);
+        $payments = count($this->invoice_api->payplus_get_payments($orderId)) ? $this->invoice_api->payplus_get_payments($orderId) : WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_response');
         $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_check_invoice_send', true);
         if ($invoiceManualList) {
             $invoiceManualList = explode(",", $invoiceManualList);
             if (count($invoiceManualList) == 1 && $invoiceManualList[0] == "") {
                 $invoiceManualList = array();
+            }
+        }
+
+        function is_json($string)
+        {
+            json_decode($string);
+            return (json_last_error() === JSON_ERROR_NONE);
+        }
+
+        if (!is_array($payments)) {
+            if (is_json($payments)) {
+                $array = [];
+                $array[] = json_decode($payments);
+                $payments = $array;
             }
         }
 
@@ -983,7 +1012,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         <?php
 
-        if (!count($payments)) {
+        if (empty($payments) || !count($payments)) {
 
             $installed_payment_methods = WC()->payment_gateways()->payment_gateways();
             function get_payment_payplus($key, $value)
@@ -1036,10 +1065,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     <div class="flex-item">
                         <button data-type="<?php echo esc_attr('other'); ?>"
                             class="other  type-payment"><?php echo esc_html__("Other", "payplus-payment-gateway") ?></button>
-                    </div>
-                    <div class="flex-item">
-                        <button data-type="<?php echo esc_attr('token'); ?>"
-                            class="token  type-payment"><?php echo esc_html__("Token", "payplus-payment-gateway") ?></button>
                     </div>
                 </div>
                 <!-- Credit Card -->
@@ -1481,67 +1506,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                     </div>
                 </div>
-                <?php
-                /*
-                <div class="select-type-payment token">
-                    <input class="token-payment-payplus input-change  row_id" type="hidden" value="">
-                    <input class="token-payment-payplus input-change  method_payment" type="hidden" id="method_payment"
-                        name="method_payment" value="token">
-                    <div class="flex-row">
-                        <div class="flex-item">
-                            <label> <?php echo esc_html__("Date", "payplus-payment-gateway") ?></label>
-                            <input value="<?php echo esc_attr(gmdate("Y-m-d")) ?>" required
-                                class="token-payment-payplus  input-change create_at" type="date"
-                                placeholder="<?php echo esc_attr__("Date", "payplus-payment-gateway") ?>">
-                        </div>
-                        <div class="flex-item full-amount">
-                            <label><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></label>
-                            <div class="flex-row">
-                                <input data-sum="<?php echo esc_attr($order->get_total()) ?>" step="0.01" min="1"
-                                    max="<?php echo esc_attr($order->get_total()) ?>"
-                                    class="token-payment-payplus input-change price" type="number"
-                                    placeholder="<?php echo esc_attr__("Sum", "payplus-payment-gateway") ?>"
-                                    value="<?php echo esc_attr(floatval($order->get_total())) ?>">
-                                <button data-sum="<?php echo esc_attr($order->get_total()) ?>"
-                                    class="payplus-full-amount token-payment-payplus">
-                                    <?php echo esc_html__("Full Amount", "payplus-payment-gateway") ?> </button>
-                            </div>
-                        </div>
-                        <div class="flex-item">
-                            <label> <?php echo esc_html__("Notes", "payplus-payment-gateway") ?></label>
-                            <input value="" placeholder="<?php echo esc_attr__("Notes", "payplus-payment-gateway") ?>" type="text"
-                                class="token-payment-payplus input-change notes">
-                        </div>
-                    </div>
-                    <div class="flex-row flex-row-reverse">
-                        <div class="flex-item">
-                            <button id="token-payment-payplus" class="payplus-payment-button">
-                                <?php echo esc_html__("Save payment", "payplus-payment-gateway") ?> </button>
-                        </div>
-                    </div>
-                    <div class="flex-row">
-                        <?php
-                        if (!empty($theTokens)) {
-                        ?>
-                            <select type="select" id="ccToken">
-                                <?php
-                                foreach ($theTokens as $key => $token) {
-                                ?>
-                                    <option id="<?php echo esc_attr($key); ?>" value="<?php echo esc_attr($token['token']); ?>">
-                                        <?php echo esc_attr($key); ?></option>
-                                <?php
-                                }
-                                ?>
-                            </select>
-                        <?php
-                        }
-                        ?>
-                    </div>
-                    <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
-                        data-id="<?php echo esc_attr((int)$orderId); ?>">
-                        Pay With Token
-                    </button>
-                </div> */ ?>
             </div>
         <?php
 
@@ -1572,7 +1536,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $order = wc_get_order($orderId);
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');
         $chackAllPaymentTable = in_array($currentStatus, $chackStatus) ? "table" : 'none';
-
         ?>
         <table data-method="<?php echo esc_attr((strpos($order->get_payment_method(), 'payplus') !== false)) ? true : false ?>"
             id="payplus-table-payment" style="display: <?php echo esc_attr($chackAllPaymentTable) ?>"
@@ -1607,49 +1570,56 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     'payer_account',
                     'notes'
                 ];
-                foreach ($payments as $key => $payment) {
-                    $create_at = explode(' ', $payment->create_at);
-                    $create_at = explode('-', $create_at[0]);
-                    $create_at = $create_at[2] . "-" . $create_at[1] . "-" . $create_at[0];
-                    $orderAmount = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) ? WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) : $payment->price / 100;
-                    $currency_code = $order->get_currency();
-                    // Get the currency symbol based on the currency code
-                    $currency_symbol = get_woocommerce_currency_symbol($currency_code);
+
+                if (is_array($payments)) {
+                    foreach ($payments as $key => $payment) {
+                        $payment->method_payment = property_exists($payment, 'method_payment') ? $payment->method_payment : $payment->method;
+                        $payment->create_at = property_exists($payment, 'create_at') ? $payment->create_at : $payment->date;
+                        $payment->price = property_exists($payment, 'price') ? $payment->price : $payment->amount * 100;
+                        $create_at = explode(' ', $payment->create_at);
+                        $create_at = explode('-', $create_at[0]);
+                        $create_at = $create_at[2] . "-" . $create_at[1] . "-" . $create_at[0];
+                        $orderAmount = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) ? WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_charged_j5_amount', true) : $payment->price / 100;
+                        $currency_code = $order->get_currency();
+                        // Get the currency symbol based on the currency code
+                        $currency_symbol = get_woocommerce_currency_symbol($currency_code);
 
                 ?>
-                    <tr>
-                        <td><img style="display: block; margin: auto;"
-                                src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg"); ?>'></td>
-                        <td>
-                            <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">
-                                        <?php echo esc_html($currency_symbol) ?></span><?php echo esc_html($orderAmount) ?></bdi></span>
-                        </td>
+                        <tr>
+                            <td><img style="display: block; margin: auto;"
+                                    src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg"); ?>'></td>
+                            <td>
+                                <span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">
+                                            <?php echo esc_html($currency_symbol) ?></span><?php echo esc_html($orderAmount) ?></bdi></span>
+                            </td>
 
-                        <td>
-                            <?php
-                            foreach ($payment as $key => $value) {
-                                if (in_array($key, $detailsAll)) :
+                            <td>
+                                <?php
+                                foreach ($payment as $key => $value) {
+                                    if (in_array($key, $detailsAll)) :
 
-                                    if ($value) :
-                                        if ($key == "first_payment" || $key == 'subsequent_payments') :
-                                            $value /= 100;
+                                        if ($value) :
+                                            if ($key == "first_payment" || $key == 'subsequent_payments') :
+                                                $value /= 100;
+                                            endif;
+                                            $keyCurrent = str_replace("_", " ", ucfirst($key));
+                                ?>
+                                            <p> <strong> <?php echo esc_html($keyCurrent) ?> </strong> : <?php echo esc_html($value) ?> </p>
+                                <?php
                                         endif;
-                                        $keyCurrent = str_replace("_", " ", ucfirst($key));
-                            ?>
-                                        <p> <strong> <?php echo esc_html($keyCurrent) ?> </strong> : <?php echo esc_html($value) ?> </p>
-                            <?php
                                     endif;
-                                endif;
-                            }
-                            ?>
+                                }
+                                ?>
 
-                        </td>
-                        <td> <?php echo esc_html(str_replace("-", ' ', $payment->method_payment)) ?></td>
-                        <td> <?php echo esc_html($create_at) ?></td>
-                    </tr>
+                            </td>
+                            <td> <?php echo esc_html(str_replace("-", ' ', $payment->method_payment)) ?></td>
+                            <td> <?php echo esc_html($create_at) ?></td>
+                        </tr>
 
                 <?php
+                    }
                 }
+
 
                 ?>
             </tbody>
@@ -1707,9 +1677,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
         $checkInvoiceRefundSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_send_refund', true);
         $sum = 0;
-        $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
-            return $sum + $item->invoice_refund;
-        });
+        // $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
+        //     return $sum + $item->invoice_refund;
+        // });
+        $sumTransactionRefund = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_total_refunded_amount', true) * 100;
+        // print_r($resultApps);
+        // print_r($sumTransactionRefund);
+        // die;
 
         $total = floatval($order->get_total());
         $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_related_transactions', true);
@@ -1735,8 +1709,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $theTokens[$customerToken->get_last4()]['token'] = $customerToken->get_token();
                 $theTokens[$customerToken->get_last4()]['type'] = $customerToken->get_card_type();
             };
-
-            if (!empty($theTokens)) {
+            $payplusOrderPayments = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_order_payments');
+            if (!empty($theTokens) && !$payplusOrderPayments) {
+                // $payplusOrderPayments = json_decode($payplusOrderPayments, true);
+                // $ppOPPrice = (float)$payplusOrderPayments['price'] / 100;
+                // $orderTotal = (float)$order->get_total();
+                // if ($ppOPPrice !== $orderTotal) {
         ?>
                 <select type="select" id="ccToken">
                     <?php
@@ -1748,18 +1726,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                     ?>
                 </select>
+                <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
+                    data-id="<?php echo esc_attr((int)$orderId); ?>">
+                    Pay With Token
+                </button>
             <?php
+                // }
             }
-            ?>
-            <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
-                data-id="<?php echo esc_attr((int)$orderId); ?>">
-                Pay With Token
-            </button>
-        <?php
         }
 
         if (!empty($payplus_related_transactions) && !WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'))) {
-        ?>
+            ?>
             <table class="wc-order-totals payplus-table-refund">
                 <tr class="payplus-row">
                     <th><img style="height: 30px; margin: auto; display: block; padding: 1px 0 2px 0;"
@@ -1849,7 +1826,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $this->payplus_get_section_invoice_not_automatic($orderId, $theTokens = []);
             endif;
         }
-
+        // echo '<pre>';
+        // print_r('total: ' . $total);
+        // echo "\n";
+        // print_r("get invoice enable : " . $this->payPlusInvoice->payplus_get_invoice_enable());
+        // echo "\n";
+        // print_r("sumTransaction Refund: " . $sumTransactionRefund);
+        // echo "\n";
+        // print_r("Invoice manual: " . $invoice_manual);
+        // echo "\n";
+        // print_r("checkInvoiceRefundSend: " . $checkInvoiceRefundSend);
+        // die;
         if (
             $total && $this->payPlusInvoice->payplus_get_invoice_enable()
             && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
