@@ -1677,13 +1677,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
         $checkInvoiceRefundSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_send_refund', true);
         $sum = 0;
-        // $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
-        //     return $sum + $item->invoice_refund;
-        // });
-        $sumTransactionRefund = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_total_refunded_amount', true) * 100;
-        // print_r($resultApps);
-        // print_r($sumTransactionRefund);
-        // die;
+
+        $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
+            return $sum + $item->invoice_refund;
+        });
+
+        $sumTransactionRefund = $sumTransactionRefund !== null ? $sumTransactionRefund : WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_total_refunded_amount', true) * 100;
 
         $total = floatval($order->get_total());
         $payplus_related_transactions = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_related_transactions', true);
@@ -1711,10 +1710,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             };
             $payplusOrderPayments = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_order_payments');
             if (!empty($theTokens) && !$payplusOrderPayments) {
-                // $payplusOrderPayments = json_decode($payplusOrderPayments, true);
-                // $ppOPPrice = (float)$payplusOrderPayments['price'] / 100;
-                // $orderTotal = (float)$order->get_total();
-                // if ($ppOPPrice !== $orderTotal) {
         ?>
                 <select type="select" id="ccToken">
                     <?php
@@ -1731,7 +1726,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     Pay With Token
                 </button>
             <?php
-                // }
             }
         }
 
