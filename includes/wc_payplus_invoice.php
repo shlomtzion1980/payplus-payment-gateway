@@ -934,8 +934,22 @@ class PayplusInvoice
                     } else {
                         $res = json_decode(wp_remote_retrieve_body($invoiceVerify));
                         if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
+                            $payPlusInvoiceTypes[sanitize_text_field($_POST['typeDocument'])][$res->details->number] = $res->details->original_doc;
+                            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes)) {
+                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                            } else {
+                                $exists = 0;
+                                $keys = ['inv_receipt', 'inv_tax'];
+                                foreach ($payPlusInvoiceTypes as $key => $value) {
+                                    if (in_array($key, $keys)) {
+                                        $exists++;
+                                    }
+                                }
+                                $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                            }
+                            $insetData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
                             $insetData['payplus_invoice_type'] = sanitize_text_field($_POST['typeDocument']);
                             $insetData['payplus_invoice_docUID'] = $res->details->uuid;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
@@ -1093,11 +1107,24 @@ class PayplusInvoice
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
+                            $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
+                            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes)) {
+                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                            } else {
+                                $exists = 0;
+                                $keys = ['inv_receipt', 'inv_tax'];
+                                foreach ($payPlusInvoiceTypes as $key => $value) {
+                                    if (in_array($key, $keys)) {
+                                        $exists++;
+                                    }
+                                }
+                                $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                            }
+                            $insetData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
                             $insetData['payplus_invoice_type'] = $payplus_document_type;
                             $insetData['payplus_invoice_docUID'] = $res->details->docUID;
-                            $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_originalDocAddress'] = $res->details->originalDocAddress;
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
