@@ -467,7 +467,9 @@ jQuery(function ($) {
                 !wc_checkout_form.fragments ||
                 wc_checkout_form.fragments[key] !== value
               ) {
-                // $(key).replaceWith(value);
+                if (key !== ".woocommerce-checkout-payment") {
+                  $(key).replaceWith(value);
+                }
               }
               $(key).unblock();
             });
