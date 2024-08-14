@@ -1821,7 +1821,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             endif;
         }
 
-        $orderRefunded = boolval($order->get_total_refunded() === $total);
+        $orderRefunded = boolval($order->get_total_refunded() === $total && $sumTransactionRefund === "");
 
         if (
             $total && $this->payPlusInvoice->payplus_get_invoice_enable()
