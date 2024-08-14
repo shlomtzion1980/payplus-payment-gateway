@@ -334,16 +334,27 @@ class PayplusInvoice
         if (!empty($unique_identifier)) {
             $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
         }
+
         if (!count($resultApps)) {
-            $method_payment = 'other';
-            $otherMethod = strtolower($order->get_payment_method_title());
-            if (strpos($otherMethod, 'paypal') !== false) {
-                $method_payment = 'paypal';
+            $method_payment = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true) == "" ? 'other' : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true);
+            if ($method_payment == 'credit-card') {
+                $paymentArray['method_payment'] = 'credit-card';
+                $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
+                $paymentArray['brand_name'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
+                $paymentArray['price'] = ($dual * $sum) * 100;
+                $resultApps[] = (object) $paymentArray;
+            } else {
+                $method_payment = 'other';
+                $otherMethod = strtolower($order->get_payment_method_title());
+                if (strpos($otherMethod, 'paypal') !== false) {
+                    $method_payment = 'paypal';
+                }
+                $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
+                $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
+                $resultApps[] = $objectInvoicePaymentNoPayplus;
             }
-            $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
-            $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
-            $resultApps[] = $objectInvoicePaymentNoPayplus;
         }
+
         $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
         if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
@@ -351,6 +362,7 @@ class PayplusInvoice
                 $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
             }
         }
+
         return $payload;
     }
 
