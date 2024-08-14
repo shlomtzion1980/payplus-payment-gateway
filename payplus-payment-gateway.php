@@ -155,7 +155,7 @@ class WC_PayPlus
 
                 $order = $this->payplus_gateway->validateOrder($data);
 
-                $linkRedirect = esc_url($this->payplus_gateway->get_return_url($order));
+                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 
                 if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
                     $order_id = $REQUEST['more_info'];
@@ -187,7 +187,7 @@ class WC_PayPlus
                     payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $order = wc_get_order($order_id);
-                $linkRedirect = esc_url($this->payplus_gateway->get_return_url($order));
+                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
             }
@@ -195,7 +195,7 @@ class WC_PayPlus
             $order_id = isset($_GET['success_order_id']) ? intval($_GET['success_order_id']) : 0;
             $order = wc_get_order($order_id);
             if ($order) {
-                $linkRedirect = esc_url($this->payplus_gateway->get_return_url($order));
+                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
             }
