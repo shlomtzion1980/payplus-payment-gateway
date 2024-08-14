@@ -389,6 +389,7 @@ class PayplusInvoice
                 $insetData["payplus_invoice_copyDocAddress" . $responeType] = $res->details->copyDocAddress;
                 $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
                 $insetData["payplus_check_invoice_send_refund"] = 1;
+                $insetData["payplus_total_refunded_amount"] = null;
                 WC_PayPlus_Meta_Data::update_meta($order, $insetData);
                 if (!$this->invoice_notes_no) {
                     $titleNote = "PayPlus Document " . $nameDocment;

@@ -1820,9 +1820,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $this->payplus_get_section_invoice_not_automatic($orderId, $theTokens = []);
             endif;
         }
+
+        $orderRefunded = boolval($order->get_total_refunded() === $total);
+
         if (
             $total && $this->payPlusInvoice->payplus_get_invoice_enable()
-            && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend
+            && $invoice_manual && $sumTransactionRefund && !$checkInvoiceRefundSend && !$orderRefunded
         ) {
         ?>
             <div class="payment-order-ajax  payment-invoice" style="margin:20px 0px">
