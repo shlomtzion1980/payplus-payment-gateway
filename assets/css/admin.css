@@ -539,6 +539,20 @@ html[lang="en-US"] .flex-item {
   font-size: 12px;
 }
 
+.wc-order-items-editable {
+  #ccToken {
+    margin: 10px;
+  }
+  #makeTokenPayment {
+    background-color: #35aa53;
+    border: none;
+    color: white;
+    border-radius: 20px;
+    padding: 10px;
+    cursor: pointer;
+  }
+}
+
 .payplus_sum_payment {
   text-align: left;
   color: #000;
