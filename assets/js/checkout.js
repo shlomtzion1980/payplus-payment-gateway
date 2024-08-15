@@ -331,8 +331,6 @@ jQuery(function ($) {
         "5",
         args
       );
-      let loopImages = true;
-      multiPassIcons(loopImages);
     },
     update_checkout_action: function (args) {
       if (wc_checkout_form.xhr) {
@@ -467,9 +465,9 @@ jQuery(function ($) {
                 !wc_checkout_form.fragments ||
                 wc_checkout_form.fragments[key] !== value
               ) {
-                if (key !== ".woocommerce-checkout-payment") {
-                  $(key).replaceWith(value);
-                }
+                $(key).replaceWith(value);
+                let loopImages = true;
+                multiPassIcons(loopImages);
               }
               $(key).unblock();
             });
