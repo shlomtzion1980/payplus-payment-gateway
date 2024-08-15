@@ -570,9 +570,11 @@ html[lang="en-US"] .payplus_sum_payment {
 }
 
 .inside {
-  .select-type-invoice ,input, select {
-    border-color: #8c8f9447;
-    border-radius: 10px;
+  .wc-order-items-editable {
+    .select-type-invoice ,input, select {
+      border-color: #8c8f9447;
+      border-radius: 10px;
+    }
   }
 }
 
