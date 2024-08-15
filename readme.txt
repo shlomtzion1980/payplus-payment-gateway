@@ -83,6 +83,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.1.0 =
+* Fix    - Classic checkout fields didn't update correctly (display issue only) - because of multipass icons logic - fixed. 
+* Fix    - CSS for order admin page - was missing a class and caught too many ... 
+
 = 7.0.9 = 
 * Add    - Multipass icons will change with fade in and out on the checkout page.
 * Add    - Multipass clubs select in plugin settings.
