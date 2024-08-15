@@ -921,36 +921,12 @@ class PayplusInvoice
         $invoice_manual = $this->payplus_get_create_invoice_manual();
 
         $order = wc_get_order($order_id);
+
         if ($payplusErrorInvoice !== "unique-identifier-exists") {
             if (!$checkInvoiceSend && $this->payplus_get_invoice_enable()) {
 
                 $payplusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
-                $payplusUniqueIdentifier = "payplus_order_" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
-
-                if ($invoice_manual) {
-                    $invoiceVerify = $this->post_payplus_ws($this->url_payplus_get_invoice . $payplusUniqueIdentifier, null, 'GET');
-                    if (is_wp_error($invoiceVerify)) {
-                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($invoiceVerify, true), 'error');
-                    } else {
-                        $res = json_decode(wp_remote_retrieve_body($invoiceVerify));
-                        if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
-                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
-                            $insetData['payplus_invoice_type'] = sanitize_text_field($_POST['typeDocument']);
-                            $insetData['payplus_invoice_docUID'] = $res->details->uuid;
-                            $insetData['payplus_invoice_numberD'] = $res->details->number;
-                            $insetData['payplus_invoice_originalDocAddress'] = $res->details->original_doc;
-                            $insetData['payplus_invoice_copyDocAddress'] = $res->details->true_copy_doc;
-                            $insetData['payplus_invoice_customer_uuid'] = $res->details->customer->uuid;
-                            WC_PayPlus_Meta_Data::update_meta($order, $insetData);
-                            if (!$this->invoice_notes_no) {
-                                $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
-                                <a class="link-invoice" target="_blank" href="' . $res->details->original_doc . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
-                            }
-                            return;
-                        }
-                    }
-                }
+                $payplusUniqueIdentifier = "payplus_order_$typeInvoice" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
 
                 $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
 
@@ -1093,8 +1069,22 @@ class PayplusInvoice
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
+                            $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
+                            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
+                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                            } else {
+                                $exists = 0;
+                                $keys = ['inv_receipt', 'inv_tax'];
+                                foreach ($payPlusInvoiceTypes as $key => $value) {
+                                    if (in_array($key, $keys)) {
+                                        $exists++;
+                                    }
+                                }
+                                $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                            }
+                            $insetData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
                             $insetData['payplus_invoice_type'] = $payplus_document_type;
                             $insetData['payplus_invoice_docUID'] = $res->details->docUID;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;

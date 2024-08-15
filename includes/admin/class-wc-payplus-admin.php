@@ -955,6 +955,18 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'inv_don_receipt' => __('Donation Reciept', 'payplus-payment-gateway')
         );
 
+        $payPlusInvoiceDocs = json_decode(WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_invoice_plus_docs', true), true);
+        if (is_array($payPlusInvoiceDocs)) {
+            $payPlusInvoiceDocs = array_keys($payPlusInvoiceDocs);
+            $selectInvoice = array_diff_key($selectInvoice, array_flip($payPlusInvoiceDocs));
+            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceDocs) || array_key_exists('inv_don_receipt', $payPlusInvoiceDocs)) {
+                return;
+            } elseif (array_key_exists('inv_tax', $selectInvoice) || array_key_exists('inv_receipt', $selectInvoice)) {
+                unset($selectInvoice['inv_tax_receipt']);
+                unset($selectInvoice['inv_don_receipt']);
+            }
+        }
+
         $invoiceManualList = $this->payPlusInvoice->payplus_get_invoice_manual_list();
         $currentStatus = $this->payPlusInvoice->payplus_get_invoice_type_document();
         $chackStatus = array('inv_receipt', 'inv_tax_receipt');

@@ -56,7 +56,8 @@ class WC_PayPlus_Statics
 
                     <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
                             <?php echo esc_html($chargeText); ?></h4><?php } ?>
-                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                        href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
                         (<?php echo esc_html($invDocNumber); ?>)</a>
 
                     <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
@@ -73,7 +74,8 @@ class WC_PayPlus_Statics
                                     $docText = __('Refund Receipt', 'payplus-payment-gateway');
                                     break;
                             }
-                    ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                    ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                                href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
                     <?php
                         }
                     }
@@ -119,35 +121,68 @@ class WC_PayPlus_Statics
                     $invDoc = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_originalDocAddress', true);
                     $invDocType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_type', true);
                     $invDocNumber = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD', true);
+                    $payPlusInvoiceDocs = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_plus_docs', true), true);
+
                     $chargeText = __('Charge', 'payplus-payment-gateway');
                     $refundsText = __('Refunds', 'payplus-payment-gateway');
 
-                    switch ($invDocType) {
-                        case 'inv_tax':
-                            $docType = __('Tax Invoice', 'payplus-payment-gateway');
-                            break;
-                        case 'inv_tax_receipt':
-                            $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
-                            break;
-                        case 'inv_receipt':
-                            $docType = __('Receipt', 'payplus-payment-gateway');
-                            break;
-                        case 'inv_don_receipt':
-                            $docType = __('Donation Reciept', 'payplus-payment-gateway');
-                            break;
-                        default:
-                            $docType = __('Invoice', 'payplus-payment-gateway');
+                    function switchInvDocType($invDocType)
+                    {
+                        switch ($invDocType) {
+                            case 'inv_tax':
+                                $docType = __('Tax Invoice', 'payplus-payment-gateway');
+                                break;
+                            case 'inv_tax_receipt':
+                                $docType = __('Tax Invoice Receipt ', 'payplus-payment-gateway');
+                                break;
+                            case 'inv_receipt':
+                                $docType = __('Receipt', 'payplus-payment-gateway');
+                                break;
+                            case 'inv_don_receipt':
+                                $docType = __('Donation Reciept', 'payplus-payment-gateway');
+                                break;
+                            default:
+                                $docType = __('Invoice', 'payplus-payment-gateway');
+                        }
+                        return $docType;
                     }
-                    if (strlen($invDoc) > 0) { ?>
+
+                    if (is_array($payPlusInvoiceDocs)) { ?>
                 <div>
                     <h4><?php echo esc_html($chargeText); ?></h4>
-                    <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-                        (<?php echo esc_html($invDocNumber); ?>)</a>
+                    <?php
+                        foreach ($payPlusInvoiceDocs as $invDocType => $inv) {
+                            $docType = switchInvDocType($invDocType);
+                            $invDocNumber = array_key_first($inv);
+                            $invDocUrl = reset($inv);
+                            if (strlen($invDocUrl) > 0) { ?>
+
+                            <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                                href="<?php echo esc_url($invDocUrl); ?>"><?php echo esc_html($docType); ?>
+                                (<?php echo esc_html($invDocNumber); ?>)</a>
+
+                    <?php
+                            }
+                        }
+                    ?>
                 </div>
-            <?php
+                <?php
+                    } else {
+                        if (strlen($invDoc) > 0) {
+                            $docType = switchInvDocType($invDocType);
+                ?>
+                    <div>
+                        <h4><?php echo esc_html($chargeText); ?></h4>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                            (<?php echo esc_html($invDocNumber); ?>)</a>
+                    </div>
+                <?php
+                        }
                     }
+
                     if (is_array($refundsArray)) {
-            ?>
+                ?>
                 <div>
                     <h4><?php echo esc_html($refundsText); ?></h4>
                     <?php
@@ -162,7 +197,8 @@ class WC_PayPlus_Statics
                                     break;
                             }
                     ?>
-                        <a class="link-invoice" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
                     <?php
                         }
                     ?>
