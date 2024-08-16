@@ -40,7 +40,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     /**
      *
      */
-    private function __construct()
+    public function __construct()
     {
         $this->_wpnonce = wp_create_nonce('PayPlusGateWayAdminNonce');
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
@@ -214,22 +214,29 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      * @param $order
      * @return void
      */
-    public function payplusIpn()
+    public function payplusIpn($order_id = null, $_wpnonce = null)
     {
+        // return;
+        $this->isInitiated();
+        $this->payplus_add_log_all('payplus-ipn', $order_id, 'default');
+
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
             check_ajax_referer('payplus_payplus_ipn', '_ajax_nonce');
         }
 
-        if (!current_user_can('edit_shop_orders')) {
-            wp_send_json_error('You do not have permission to edit orders.');
+        if (!current_user_can('edit_shop_orders') && !wp_verify_nonce($_wpnonce, '_wp_payplusIpn')) {
+            wp_send_json_error('You do not have permission to edit orders. - paplusIpn');
             wp_die();
         }
 
-        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN started:', 'payload');
+        $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
+        $this->payplus_add_log_all('payplus-ipn', 'Begin"' . $order_id, 'payload');
         $order = wc_get_order($order_id);
         $payment_request_uid = isset($_POST['payment_request_uid']) ? $_POST['payment_request_uid'] : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
-        $this->isInitiated();
+
 
         $url = $this->ipn_url;
 

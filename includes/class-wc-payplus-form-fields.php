@@ -419,6 +419,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'payplus_cron_service' => [
+                'title' => __('Activate PayPlus cron', 'payplus-payment-gateway'),
+                'label' => __('Add PayPlus orders cron checker.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('This checks all orders created withing the last half an hour and are in "pending" status and verifies the PayPlus IPN Process.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'payplus_data_save_order_note' => [
                 'title' => __('Transaction data in order notes', 'payplus-payment-gateway'),
                 'label' => __('Save PayPlus transaction data to the order notes', 'payplus-payment-gateway'),

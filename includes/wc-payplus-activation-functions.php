@@ -181,7 +181,8 @@ function payplusGenerateErrorPage()
         }
         if (!$errorPagePayPlus) {
             $errorPagePayPlus = wp_insert_post(array(
-                'post_status' => 'publish', 'post_type' => 'page',
+                'post_status' => 'publish',
+                'post_type' => 'page',
                 'post_title' => ucwords('error payment payplus'),
                 "post_content" => "The transaction has failed, please contact the seller."
             ));
@@ -446,7 +447,6 @@ function payplus_Add_log_payplus($last_error)
     $logger->add('error-db-payplus', $beforeMsg . "\n" . $last_error . "\n" . str_repeat("=", 232));
 }
 
-
 add_filter('woocommerce_price_trim_zeros', '__return_true');
 add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
 
@@ -492,5 +492,13 @@ function payplus_checkout_field_update_order_meta($order_id)
 
     if (isset($_POST['_billing_vat_number'])) {
         update_post_meta($order_id, '_billing_vat_number', sanitize_text_field($_POST['_billing_vat_number']));
+    }
+}
+
+function payplus_cron_deactivate()
+{
+    $timestamp = wp_next_scheduled('payplus_hourly_cron_job');
+    if ($timestamp) {
+        wp_unschedule_event($timestamp, 'payplus_hourly_cron_job');
     }
 }

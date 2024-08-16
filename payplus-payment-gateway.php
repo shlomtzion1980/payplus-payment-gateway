@@ -58,8 +58,62 @@ class WC_PayPlus
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
+        if (isset($this->payplus_payment_gateway_settings->payplus_cron_service) && boolval($this->payplus_payment_gateway_settings->payplus_cron_service === 'yes')) {
+            $this->payPlusCronActivate();
+            add_action('payplus_hourly_cron_job', [$this, 'getPayplusCron']);
+        } else {
+            $this->payPlusCronDeactivate();
+        }
     }
 
+    public function payPlusCronDeactivate()
+    {
+        $timestamp = wp_next_scheduled('payplus_hourly_cron_job');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'payplus_hourly_cron_job');
+        }
+    }
+
+    public function payPlusCronActivate()
+    {
+        if (!wp_next_scheduled('payplus_hourly_cron_job')) {
+            wp_schedule_event(time(), 'hourly', 'payplus_hourly_cron_job');
+        }
+    }
+
+    public function getPayplusCron()
+    {
+        $current_time = current_time('Y-m-d H:i:s');
+
+        // Extract the current hour and minute
+        $current_hour = gmdate('H', strtotime($current_time));
+        $current_minute = gmdate('i', strtotime($current_time));
+
+        $args = array(
+            'status' => 'pending',
+            'date_created' => $current_time,
+            'return' => 'ids', // Just return IDs to save memory
+        );
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+
+        $orders = wc_get_orders($args);
+        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started: ' . wp_json_encode($orders), 'default');
+        foreach ($orders as $order_id) {
+            $order = wc_get_order($order_id);
+            $hour = $order->get_date_created()->date('H');
+            $min = $order->get_date_created()->date('i');
+            $calc = $current_minute - $min;
+            if ($current_hour === $hour && $calc <= 30) {
+                $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                if ($paymentPageUid) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created less than 30 minutes ago: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                }
+            }
+        }
+    }
     /**
      * Returns the main PayPlus payment gateway class instance.
      *
@@ -947,3 +1001,5 @@ register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
 register_activation_hook(__FILE__, 'payplus_create_table_process');
 register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
 register_activation_hook(__FILE__, 'payplusGenerateErrorPage');
+// register_activation_hook(__FILE__, 'cron_activate');
+register_deactivation_hook(__FILE__, 'payplus_cron_deactivate');
