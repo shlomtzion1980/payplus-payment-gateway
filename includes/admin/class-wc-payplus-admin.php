@@ -142,10 +142,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             ];
             WC_PayPlus_Meta_Data::update_meta($order, $updateData);
         }
-
         $this->payplusIpn();
-        // $this->invoice_api = new PayplusInvoice();
-        // $this->invoice_api->payplus_invoice_create_order($order_id, sanitize_text_field($_POST['typeDocument']));
     }
 
     /**
@@ -229,10 +226,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_die();
         }
 
-        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN started:', 'payload');
+        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN started:', 'default');
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
-        $this->payplus_add_log_all('payplus-ipn', 'Begin"' . $order_id, 'payload');
+        $this->payplus_add_log_all('payplus-ipn', 'Begin"' . $order_id, 'default');
         $order = wc_get_order($order_id);
         $payment_request_uid = isset($_POST['payment_request_uid']) ? $_POST['payment_request_uid'] : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
@@ -1718,7 +1715,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $user_id = $order->get_user_id();
 
         ob_start();
-        if ($order->get_status() === "pending" && $user_id > 0 && empty($payplus_response)) {
+        $tokenOrderPayment = boolval(isset($this->allSettings['token_order_payment']) && $this->allSettings['token_order_payment'] === 'yes');
+        if ($order->get_status() === "pending" && $user_id > 0 && empty($payplus_response) && $tokenOrderPayment && $total !== 0.0) {
             $customerTokens = WC_Payment_Tokens::get_customer_tokens($user_id);
             $status = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_status_code');
             $theTokens = [];

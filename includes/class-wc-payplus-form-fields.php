@@ -419,6 +419,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'token_order_payment' => [
+                'title' => __('Enable/Disable token payment', 'payplus-payment-gateway'),
+                'label' => __('Applicable for users that can edit orders.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('If the user can edit orders, and there are saved tokens in the customer account. A token select and "Pay With Token" button will be shown.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'payplus_cron_service' => [
                 'title' => __('Activate PayPlus cron', 'payplus-payment-gateway'),
                 'label' => __('Add PayPlus orders cron checker.', 'payplus-payment-gateway'),
