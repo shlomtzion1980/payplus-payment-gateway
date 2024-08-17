@@ -42,27 +42,27 @@ class WC_PayPlus_Statics
         }
 
 ?>
-<div class="invoicePlusButtonContainer">
-    <?php
+        <div class="invoicePlusButtonContainer">
+            <?php
             if (strlen($invDoc) > 0 && !is_array($refundsArray)) {
             ?>
-    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>">
-        <?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)
-    </a>
-    <?php
+                <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>">
+                    <?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)
+                </a>
+            <?php
             } elseif (strlen($invDoc) > 0 && is_array($refundsArray)) { ?>
-    <button class="toggle-button invoicePlusButtonShow"></button>
-    <div class="hidden-buttons invoicePlusButtonHidden">
+                <button class="toggle-button invoicePlusButtonShow"></button>
+                <div class="hidden-buttons invoicePlusButtonHidden">
 
-        <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-            <?php echo esc_html($chargeText); ?></h4><?php } ?>
-        <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-            (<?php echo esc_html($invDocNumber); ?>)</a>
+                    <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
+                            <?php echo esc_html($chargeText); ?></h4><?php } ?>
+                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                        href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                        (<?php echo esc_html($invDocNumber); ?>)</a>
 
-        <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-            <?php echo esc_html($refundsText); ?></h4><?php } ?>
-        <?php
+                    <?php if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
+                            <?php echo esc_html($refundsText); ?></h4><?php } ?>
+                    <?php
                     if (is_array($refundsArray)) {
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
@@ -75,18 +75,18 @@ class WC_PayPlus_Statics
                                     break;
                             }
                     ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-            href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
-        <?php
+                                href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                    <?php
                         }
                     }
                     ?>
-    </div>
-</div>
-<?php
+                </div>
+        </div>
+    <?php
             } elseif ($errorInvoice) { ?>
-<p class='link-invoice-error'>
-    <?php echo esc_html($errorInvoice); ?>
-</p><?php
+        <p class='link-invoice-error'>
+            <?php echo esc_html($errorInvoice); ?>
+        </p><?php
             }
         }
 
@@ -148,44 +148,44 @@ class WC_PayPlus_Statics
                     }
 
                     if (is_array($payPlusInvoiceDocs)) { ?>
-<div>
-    <h4><?php echo esc_html($chargeText); ?></h4>
-    <?php
+                <div>
+                    <h4><?php echo esc_html($chargeText); ?></h4>
+                    <?php
                         foreach ($payPlusInvoiceDocs as $invDocType => $inv) {
                             $docType = switchInvDocType($invDocType);
                             $invDocNumber = array_key_first($inv);
                             $invDocUrl = reset($inv);
                             if (strlen($invDocUrl) > 0) { ?>
 
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($invDocUrl); ?>"><?php echo esc_html($docType); ?>
-        (<?php echo esc_html($invDocNumber); ?>)</a>
+                            <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                                href="<?php echo esc_url($invDocUrl); ?>"><?php echo esc_html($docType); ?>
+                                (<?php echo esc_html($invDocNumber); ?>)</a>
 
-    <?php
+                    <?php
                             }
                         }
                     ?>
-</div>
-<?php
+                </div>
+                <?php
                     } else {
                         if (strlen($invDoc) > 0) {
                             $docType = switchInvDocType($invDocType);
                 ?>
-<div>
-    <h4><?php echo esc_html($chargeText); ?></h4>
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-        (<?php echo esc_html($invDocNumber); ?>)</a>
-</div>
-<?php
+                    <div>
+                        <h4><?php echo esc_html($chargeText); ?></h4>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                            (<?php echo esc_html($invDocNumber); ?>)</a>
+                    </div>
+                <?php
                         }
                     }
 
                     if (is_array($refundsArray)) {
                 ?>
-<div>
-    <h4><?php echo esc_html($refundsText); ?></h4>
-    <?php
+                <div>
+                    <h4><?php echo esc_html($refundsText); ?></h4>
+                    <?php
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
                             switch ($doc['type']) {
@@ -197,12 +197,12 @@ class WC_PayPlus_Statics
                                     break;
                             }
                     ?>
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
-    <?php
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                    <?php
                         }
                     ?>
-</div>
+                </div>
 <?php
                     }
                 }
@@ -352,8 +352,8 @@ class WC_PayPlus_Statics
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
             $testMode = boolval($options['api_test_mode'] === 'yes');
             $url = $testMode === true ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
-            $apiKey = $testMode === true ? $options['dev_secret_key'] : $options['api_key'];
-            $secretKey = $testMode === true ? $options['dev_api_secret'] : $options['secret_key'];
+            $apiKey = $testMode === true ? $options['dev_api_key'] : $options['api_key'];
+            $secretKey = $testMode === true ? $options['dev_secret_key'] : $options['secret_key'];
 
             $args = array(
                 'body' => $payload,

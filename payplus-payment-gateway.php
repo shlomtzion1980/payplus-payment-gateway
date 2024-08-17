@@ -77,7 +77,7 @@ class WC_PayPlus
     public function payPlusCronActivate()
     {
         if (!wp_next_scheduled('payplus_hourly_cron_job')) {
-            wp_schedule_event(time(), 'hourly', 'payplus_hourly_cron_job');
+            wp_schedule_event(current_time('timestamp'), 'hourly', 'payplus_hourly_cron_job');
         }
     }
 
@@ -96,17 +96,17 @@ class WC_PayPlus
         );
         $this->payplus_gateway = $this->get_main_payplus_gateway();
 
-        $orders = wc_get_orders($args);
+        $orders = array_reverse(wc_get_orders($args));
         $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started: ' . wp_json_encode($orders), 'default');
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
             $hour = $order->get_date_created()->date('H');
             $min = $order->get_date_created()->date('i');
             $calc = $current_minute - $min;
-            if ($current_hour === $hour && $calc <= 30) {
+            if ($current_hour >= $hour - 2) {
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 if ($paymentPageUid) {
-                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created less than 30 minutes ago: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
+                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
