@@ -30,7 +30,7 @@ if (isCheckout || hasOrder) {
 
   const w = window.React;
 
-  for (let c = 0; c < payPlusGateWay.customIcons.length; c++) {
+  for (let c = 0; c < payPlusGateWay.customIcons?.length; c++) {
     customIcons[c] = (0, w.createElement)("img", {
       src: payPlusGateWay.customIcons[c],
       style: { maxHeight: "65px", height: "45px" },
@@ -50,7 +50,7 @@ if (isCheckout || hasOrder) {
     customIcons
   );
 
-  let isCustomeIcons = !!payPlusGateWay.customIcons[0].length;
+  let isCustomeIcons = !!payPlusGateWay.customIcons[0]?.length;
 
   (() => {
     ("use strict");

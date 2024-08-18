@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 7.1.0
+Stable tag: 7.1.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -83,16 +83,16 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.1.0 =
-* Fix    - Classic checkout fields didn't update correctly (display issue only) - because of multipass icons logic - fixed. 
-* Fix    - CSS for order admin page - was missing a class.
-* Fix    - Thank you page redirect - fixed for users with certain plugins (sanitized url with ampersand was corrected to work).
-* Fix    - JS Refresh payment method fields and totals in classic checkout wasn't refreshing because of commented line.
-* Fix    - Invoice+ auto created for token payment on certain flows was created with "other" instead of correct details.
-* Add    - Make token payment for store manager or admin, through edit orders.
-* Add    - PayPlus cron checker - If activated, runs every hour and checks for orders created in the last two hours with "pending" status and if they have a payment page request uid - runs ipn.
-* Add    - Settings for token payment and for PayPlus cron checker.
-* Add    - Option to add custom icons under or instead of the PayPluys default icon (Checkout Page Options).
+= 7.1.1 =
+* Fix    - Resolved an issue where classic checkout fields were not displaying correctly due to multipass icons logic.
+* Fix    - Corrected missing CSS class on the order admin page.
+* Fix    - Fixed a redirect issue on the "Thank You" page for users with specific plugins by sanitizing URLs with ampersands.
+* Fix    - Addressed a bug where JS was not refreshing payment method fields and totals in classic checkout due to a commented line.
+* Fix    - Fixed an issue where invoices generated for token payments in certain flows were incorrectly labeled as “other” instead of displaying the correct details.
+* Add    - Added the ability for store managers or admins to make token payments through the edit orders page.
+* Add    - Introduced a PayPlus cron checker that, if activated, runs every hour. It checks for orders created in the last two hours with a “pending” status and processes IPNs if a payment page request UID is present.
+* Add    - Added new settings for token payments and the PayPlus cron checker.
+* Add    - Introduced an option to add custom icons below or instead of the default PayPlus icon in the Checkout Page Options.
 
 = 7.0.9 = 
 * Add    - Multipass icons will change with fade in and out on the checkout page.

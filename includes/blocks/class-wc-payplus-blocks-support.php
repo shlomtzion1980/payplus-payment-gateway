@@ -50,7 +50,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
         $this->hideOtherPayments = $this->settings['hide_other_charge_methods'] ?? null;
 
-        $this->customIcons = explode(";", $this->settings['custom_icons']);
+        if (isset($this->settings['custom_icons']) && strlen($this->settings['custom_icons']) > 0) {
+            $this->customIcons = explode(";", $this->settings['custom_icons']);
+        } else {
+            $this->customIcons = [];
+        }
+
 
         $this->secretKey = $this->settings['secret_key'] ?? null;
         $gateways = WC()->payment_gateways->payment_gateways();
