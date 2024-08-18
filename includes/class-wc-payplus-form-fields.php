@@ -231,7 +231,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Custom Checkout Icons', 'payplus-payment-gateway'),
                 'type' => 'textarea',
                 'default' => '',
-                'description' => __('Paste images url here divied by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
+                'description' => __('Paste images urls here divided by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'create_pp_token' => [
@@ -420,7 +420,7 @@ class WC_PayPlus_Form_Fields
                 'type' => 'title',
             ],
             'token_order_payment' => [
-                'title' => __('Enable/Disable token payment', 'payplus-payment-gateway'),
+                'title' => __('Enable/Disable token payment (Through Admin)', 'payplus-payment-gateway'),
                 'label' => __('Applicable for users that can edit orders.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
@@ -432,7 +432,7 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Add PayPlus orders cron checker.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
-                'description' => __('This checks all orders created withing the last half an hour and are in "pending" status and verifies the PayPlus IPN Process.', 'payplus-payment-gateway'),
+                'description' => __('This checks all orders created within the last 2 hours and are in "pending" status and verifies the PayPlus IPN Process.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'payplus_data_save_order_note' => [

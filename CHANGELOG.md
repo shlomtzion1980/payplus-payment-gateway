@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+##  [7.1.0] - 2024-07-18 - (The Doctor)
+
+* Fix    - Classic checkout fields didn't update correctly (display issue only) - because of multipass icons logic - fixed. 
+* Fix    - CSS for order admin page - was missing a class.
+* Fix    - Thank you page redirect - fixed for users with certain plugins (sanitized url with ampersand was corrected to work).
+* Fix    - JS Refresh payment method fields and totals in classic checkout wasn't refreshing because of commented line.
+* Fix    - Invoice+ auto created for token payment on certain flows was created with "other" instead of correct details.
+* Add    - Make token payment for store manager or admin, through edit orders.
+* Add    - PayPlus cron checker - If activated, runs every hour and checks for orders created in the last two hours with "pending" status and if they have a payment page request uid - runs ipn.
+* Add    - Settings for token payment and for PayPlus cron checker.
+* Add    - Option to add custom icons under or instead of the PayPluys default icon (Checkout Page Options).
+
 ##  [7.0.9] - 2024-07-15 - (Street Fighter)
 
 * Add    - Multipass icons will change with fade in and out on the checkout page.

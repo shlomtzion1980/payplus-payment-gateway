@@ -213,9 +213,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function payplusIpn($order_id = null, $_wpnonce = null)
     {
-        // return;
+
         $this->isInitiated();
-        $this->payplus_add_log_all('payplus-ipn', $order_id, 'default');
 
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
             check_ajax_referer('payplus_payplus_ipn', '_ajax_nonce');
@@ -226,11 +225,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_die();
         }
 
-        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN started:', 'default');
+        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN started.', 'default');
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
-        $this->payplus_add_log_all('payplus-ipn', 'Begin"' . $order_id, 'default');
         $order = wc_get_order($order_id);
+
+        $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         $payment_request_uid = isset($_POST['payment_request_uid']) ? $_POST['payment_request_uid'] : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
 
@@ -253,7 +253,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             ),
         );
 
-        $order = wc_get_order($order_id);
         $response = wp_remote_post($url, $args);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
 
