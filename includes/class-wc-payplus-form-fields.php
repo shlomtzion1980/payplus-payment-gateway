@@ -227,6 +227,13 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'no',
             ],
+            'enable_design_checkout' => [
+                'title' => __('Design checkout', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'description' => __('Place the payment icons on the left of the text - relevant for classic checkout page only.', 'payplys-payment-gateway'),
+                'desc_tip' => true,
+                'label' => __('Change icon layout on checkout page.', 'payplus-payment-gateway'),
+            ],
             'custom_icons' => [
                 'title' => __('Custom Checkout Icons', 'payplus-payment-gateway'),
                 'type' => 'textarea',
@@ -477,13 +484,6 @@ class WC_PayPlus_Form_Fields
                 'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
                 'type'    => 'checkbox',
                 'default' => 'yes',
-            ],
-            'enable_design_checkout' => [
-                'title' => __('Design checkout', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'description' => __('Place the payment icons on the left of the text - relevant for classic checkout page only.', 'payplys-payment-gateway'),
-                'desc_tip' => true,
-                'label' => __('Change icon layout on checkout page.', 'payplus-payment-gateway'),
             ],
             'disable_woocommerce_scheduler' => [
                 'title' => __('Disable woocommerce scheduler', 'payplus-payment-gateway'),

@@ -1532,7 +1532,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 <div class="flex-item payplus-create-invoice">
                     <button id="payplus-create-invoice" data-id="<?php echo esc_attr($orderId) ?>"
                         class="button  button-primary"><span
-                            class="refund_text"><?php echo esc_html__("Create Invoice", "payplus-payment-gateway") ?></span></button>
+                            class="refund_text"><?php echo esc_html__("Create Document", "payplus-payment-gateway") ?></span></button>
                     <div class='payplus_loader_gpp'>
                         <div class='loader'>
                             <div class='loader-background'>
@@ -1739,7 +1739,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 </select>
                 <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
                     data-id="<?php echo esc_attr((int)$orderId); ?>">
-                    Pay With Token
+                    <?php echo __('Pay With Token', 'payplus-payment-gateway'); ?>
                 </button>
             <?php
             }
@@ -1866,7 +1866,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 </select>
                 <button id="payplus-create-invoice-refund" data-id="<?php echo esc_attr($orderId) ?>"
                     class="button  button-primary"><span
-                        class="refund_text"><?php echo esc_html__("Create Invoice refund", "payplus-payment-gateway") ?></span></button>
+                        class="refund_text"><?php echo esc_html__("Create Refund Document", "payplus-payment-gateway") ?></span></button>
 
             </div>
         <?php
