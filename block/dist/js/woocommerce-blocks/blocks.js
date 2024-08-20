@@ -305,7 +305,7 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           break;
         case "popupIframe":
-          pp_iframe.style.width = "55%";
+          pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           pp_iframe.style.position = "fixed";
           pp_iframe.style.top = "50%";
