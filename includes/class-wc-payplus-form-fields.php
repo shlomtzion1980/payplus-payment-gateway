@@ -56,6 +56,7 @@ class WC_PayPlus_Form_Fields
     {
         global $submenu;
         $parent_slug = 'payplus-payment-gateway';
+        $nonce = wp_create_nonce('payPlusOrderChecker');
 
         add_menu_page(
             __('PayPlus Gateway', 'payplus-payment-gateway'),
@@ -65,14 +66,12 @@ class WC_PayPlus_Form_Fields
             ['WC_PayPlus_Form_Fields', 'getGateway'],
             PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-icon.svg"
         );
-
         add_submenu_page(
             'payplus-payment-gateway',
             __('bit', 'payplus-payment-gateway'),
             __('bit', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
-
         );
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
@@ -80,7 +79,6 @@ class WC_PayPlus_Form_Fields
             __('Google Pay', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay' //Page slug
-
         );
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
@@ -88,16 +86,13 @@ class WC_PayPlus_Form_Fields
             __('Apple Pay', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay' //Page slug
-
         );
-
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
             __('MULTIPASS', 'payplus-payment-gateway'),
             __('MULTIPASS', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass' //Page slug
-
         );
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
@@ -105,7 +100,6 @@ class WC_PayPlus_Form_Fields
             __('PayPal', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal' //Page slug
-
         );
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
@@ -113,7 +107,6 @@ class WC_PayPlus_Form_Fields
             __('Tav Zahav', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav' //Page slug
-
         );
         add_submenu_page(
             'payplus-payment-gateway', //Page Title
@@ -121,9 +114,37 @@ class WC_PayPlus_Form_Fields
             __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice' //Page slug
-
+        );
+        add_submenu_page(
+            'payplus-payment-gateway', //Page Title
+            __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
+            __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
+            'edit_shop_orders', //Capability
+            'runPayPlusOrdersChecker?_wpnonce=' . $nonce, //Page slug
+            [__CLASS__, 'runPayPlusOrdersChecker']
         );
     }
+
+    public static function runPayPlusOrdersChecker()
+    {
+        if (isset($_GET['page'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $pageSlug = sanitize_text_field($_GET['page']); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $nonce = explode("?_wpnonce=", $pageSlug)[1];
+            if (!wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
+                wp_die('Sorry this page is not allowed! - runPayPlusOrdersChecker');
+            }
+        }
+        // The function that runs when the button is clicked
+        if (current_user_can('edit_shop_orders')) {
+            // Perform your custom action here
+            echo 'Running PayPlus Order checker... - check your logs!';
+            $payPlusGateway = new WC_PayPlus_Gateway;
+            $payPlusGateway->payPlusOrdersCheck();
+        } else {
+            wp_die('You do not have permission to perform this action.');
+        }
+    }
+
 
     public static function getFormFields()
     {

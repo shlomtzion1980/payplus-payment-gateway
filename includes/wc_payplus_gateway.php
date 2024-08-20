@@ -270,6 +270,51 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
+
+    public function payPlusOrdersCheck()
+    {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce') && !current_user_can('edit_shop_orders')) {
+            wp_die('Sorry this page is not allowed! - payPlusOrdersCheck');
+        }
+
+        $current_time = current_time('Y-m-d H:i:s');
+
+        // Extract the current hour and minute
+        $current_hour = gmdate('H', strtotime($current_time));
+        $current_minute = gmdate('i', strtotime($current_time));
+
+        $args = array(
+            'status' => 'pending',
+            'date_created' => $current_time,
+            'return' => 'ids', // Just return IDs to save memory
+        );
+
+        $orders = array_reverse(wc_get_orders($args));
+        echo '<pre>';
+        echo "The following orders were created today and are in pending status: <br>";
+        echo "(This will not cancel the scheduled cron event)<br><br>";
+        echo "Orders: ";
+        print_r(implode(",", $orders) . "<br></br>");
+        $this->payplus_add_log_all('payplus-cron-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
+        foreach ($orders as $order_id) {
+            $order = wc_get_order($order_id);
+            $hour = $order->get_date_created()->date('H');
+            $min = $order->get_date_created()->date('i');
+            $calc = $current_minute - $min;
+            if ($current_hour >= $hour - 2) {
+                $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                if ($paymentPageUid) {
+                    echo esc_html("Order # $order_id contains payment page uid - running ipn!");
+                    echo "<br>";
+                    $this->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                }
+            }
+        }
+    }
+
     /**
      * The hook function callback that handles the post of update settings from PayPlus crm from endpoint
      * ?wc-api=update_payplus_payment_method
