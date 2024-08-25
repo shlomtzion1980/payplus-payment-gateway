@@ -43,8 +43,7 @@ if (isCheckout || hasOrder) {
       className: "payplus-icons",
       style: {
         display: "flex",
-        width: "100%",
-        // justifyContent: "space-around",
+        width: "95%",
       },
     },
     customIcons
@@ -93,6 +92,7 @@ if (isCheckout || hasOrder) {
                 right: "20px",
                 width: "25px",
                 height: "25px",
+                cursor: "pointer",
                 fontSize: "15px",
                 border: "solid 0.1px black",
                 borderRadius: "15px",
