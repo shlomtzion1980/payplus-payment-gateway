@@ -83,25 +83,27 @@ if (isCheckout || hasOrder) {
                 : divCustomIcons,
           }),
           (0, e.createElement)(
-            "div",
-            { className: "pp_iframe" },
-            (0, e.createElement)(
-              "button",
-              {
-                className: "closeFrame",
-                id: "closeFrame",
-                style: {
-                  position: "absolute",
-                  top: "10px",
-                  right: "20px",
-                  border: "none",
-                  backgroundColor: "transparent",
-                  display: "none",
-                },
+            "button",
+            {
+              className: "closeFrame",
+              id: "closeFrame",
+              style: {
+                position: "fixed",
+                bottom: "3%",
+                right: "20px",
+                width: "25px",
+                height: "25px",
+                fontSize: "15px",
+                border: "solid 0.1px black",
+                borderRadius: "15px",
+                zIndex: "1000000",
+                backgroundColor: "white",
+                display: "none",
               },
-              "x"
-            )
+            },
+            "x"
           ),
+          (0, e.createElement)("div", { className: "pp_iframe" }),
           t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
             ? divCustomIcons
             : null
@@ -326,11 +328,12 @@ if (isCheckout || hasOrder) {
       pp_iframe.style.overflow = "scroll";
       pp_iframe.style.msOverflowStyle = "none"; // For Internet Explorer 10+
       pp_iframe.style.scrollbarWidth = "none"; // For Firefox
-      pp_iframe.firstElementChild.style.display = "block";
-      pp_iframe.firstElementChild.style.cursor = "pointer";
-      pp_iframe.firstElementChild.addEventListener("click", (e) => {
+      let closeFrame = document.getElementById("closeFrame");
+      closeFrame.style.display = "block";
+      closeFrame.addEventListener("click", (e) => {
         e.preventDefault();
         pp_iframe.style.display = "none";
+        closeFrame.style.display = "none";
         location.reload();
       });
       pp_iframe.appendChild(iframe);
