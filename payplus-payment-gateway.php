@@ -904,7 +904,7 @@ class WC_PayPlus
         if ($this->payplus_gateway->block_ip_transactions) {
             $client_ip = $_SERVER['REMOTE_ADDR'];
             $counts = array_count_values($this->payplus_gateway->get_payment_ips());
-            $howMany = $counts[$client_ip];
+            $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= $this->payplus_gateway->block_ip_transactions_hour) {
                 $errors->add(
                     'error',

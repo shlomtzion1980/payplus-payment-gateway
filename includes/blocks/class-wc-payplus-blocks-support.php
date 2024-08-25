@@ -137,7 +137,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if ($main_gateway->block_ip_transactions) {
             $client_ip = $_SERVER['REMOTE_ADDR'];
             $counts = array_count_values($main_gateway->get_payment_ips());
-            $howMany = $counts[$client_ip];
+            $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $main_gateway->get_payment_ips()) && $howMany >= $main_gateway->block_ip_transactions_hour) {
                 $result->set_payment_details('');
                 $payment_details['errorMessage'] = __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway');
