@@ -220,7 +220,7 @@ if (isCheckout || hasOrder) {
             // Process the result here
             console.log("Payment result:", getPaymentResult);
             let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
-            pp_iframe.style.width = "40%";
+            pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
             pp_iframe.style.height = "200px";
             pp_iframe.style.position = "fixed";
             pp_iframe.style.backgroundColor = "white";
