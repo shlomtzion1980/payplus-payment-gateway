@@ -102,7 +102,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             wp_die();
         } else {
             $resError = array('results' => array(
-                'description' => __('Cannot process the transaction. Contact your merchant. Error during validate merchant', 'payplus-payment-gateway'),
+                'description' => __('Cannot process the transaction. Contact your merchant. Error during validate merchant.', 'payplus-payment-gateway'),
                 'code' => '-1'
             ));
             echo wp_json_encode(array("payment_response" => $resError, "status" => false));
