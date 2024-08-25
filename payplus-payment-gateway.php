@@ -572,8 +572,8 @@ class WC_PayPlus
             }
         }
 
-        wp_enqueue_style('alertifycss', '//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css', array(), false, 'all');
-        wp_register_script('alertifyjs', '//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js', array('jquery'), false, true);
+        wp_enqueue_style('alertifycss', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css', array(), false, 'all');
+        wp_register_script('alertifyjs', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js', array('jquery'), false, true);
         wp_enqueue_script('alertifyjs');
     }
 
