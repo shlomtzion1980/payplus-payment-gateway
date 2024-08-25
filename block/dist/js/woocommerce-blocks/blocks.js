@@ -82,28 +82,30 @@ if (isCheckout || hasOrder) {
                 : divCustomIcons,
           }),
           (0, e.createElement)(
-            "button",
-            {
-              className: "closeFrame",
-              id: "closeFrame",
-              style: {
-                position: "fixed",
-                bottom: "3%",
-                right: "20px",
-                width: "25px",
-                height: "25px",
-                cursor: "pointer",
-                fontSize: "15px",
-                border: "solid 0.1px black",
-                borderRadius: "15px",
-                zIndex: "1000000",
-                backgroundColor: "white",
-                display: "none",
+            "div",
+            { className: "wrapper" },
+            (0, e.createElement)(
+              "button",
+              {
+                className: "closeFrame",
+                id: "closeFrame",
+                style: {
+                  position: "fixed",
+                  top: "5px",
+                  right: "5px",
+                  cursor: "pointer",
+                  fontSize: "15px",
+                  border: "solid 0.1px black",
+                  borderRadius: "15px",
+                  zIndex: "1000000",
+                  backgroundColor: "white",
+                  display: "none",
+                },
               },
-            },
-            "x"
+              "x"
+            ),
+            (0, e.createElement)("div", { className: "pp_iframe" })
           ),
-          (0, e.createElement)("div", { className: "pp_iframe" }),
           t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
             ? divCustomIcons
             : null
@@ -220,7 +222,7 @@ if (isCheckout || hasOrder) {
             // Process the result here
             console.log("Payment result:", getPaymentResult);
             let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
-            pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
+            pp_iframe.style.width = window.innerWidth <= 768 ? "90%" : "55%";
             pp_iframe.style.height = "200px";
             pp_iframe.style.position = "fixed";
             pp_iframe.style.backgroundColor = "white";
