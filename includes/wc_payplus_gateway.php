@@ -2057,7 +2057,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!$this->display_mode || $this->display_mode == 'default') {
             $mainPluginOptions = get_option('woocommerce_payplus-payment-gateway_settings');
             $this->display_mode = ($mainPluginOptions['display_mode'] ?: 'redirect');
-            $this->iframe_height = ($this->iframe_height ?: 700);
+            $this->iframe_height = ($this->iframe_height ?: 600);
         }
         if ($this->display_mode == 'iframe') {
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";

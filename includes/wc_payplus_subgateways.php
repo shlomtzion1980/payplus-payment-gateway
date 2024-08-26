@@ -160,7 +160,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             'iframe_height' => [
                 'title' => __('iFrame Height', 'payplus-payment-gateway'),
                 'type' => 'number',
-                'default' => 700,
+                'default' => 600,
             ],
             'hide_icon' => [
                 'title' => __('Hide Payment Method Icon In The Checkout Page', 'payplus-payment-gateway'),
@@ -204,7 +204,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             'title' => '',
             'description' => '',
             'display_mode' => 'default',
-            'iframe_height' => 700,
+            'iframe_height' => 600,
             'hide_icon' => 'no',
             'hide_other_charge_methods' => '1',
         ];
@@ -272,16 +272,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     /**
      * @return void
      */
-    public function save_payment_method_checkbox()
-    {
-    }
+    public function save_payment_method_checkbox() {}
 
     /**
      * @return void
      */
-    public function msg_checkout_code()
-    {
-    }
+    public function msg_checkout_code() {}
 }
 
 class WC_PayPlus_Gateway_Bit extends WC_PayPlus_Subgateway

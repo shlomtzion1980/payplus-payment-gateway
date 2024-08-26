@@ -307,7 +307,7 @@ class WC_PayPlus_Form_Fields
             'iframe_height' => [
                 'title' => __('iFrame Height', 'payplus-payment-gateway'),
                 'type' => 'number',
-                'default' => 700,
+                'default' => 600,
             ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
