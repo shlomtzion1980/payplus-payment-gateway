@@ -306,7 +306,6 @@ if (isCheckout || hasOrder) {
         gateWaySettings.displayMode === "samePageIframe"
           ? "popupIframe"
           : gateWaySettings.displayMode;
-      console.log("this: ", gateWaySettings.displayMode);
       switch (gateWaySettings.displayMode) {
         case "samePageIframe":
           pp_iframe.style.position = "relative";
