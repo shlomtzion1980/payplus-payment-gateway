@@ -91,7 +91,7 @@ if (isCheckout || hasOrder) {
                 id: "closeFrame",
                 style: {
                   position: "absolute",
-                  top: "0px",
+                  top: "15px",
                   fontSize: "20px",
                   right: "0px",
                   border: "none",
@@ -278,6 +278,8 @@ if (isCheckout || hasOrder) {
     iframe.width = "95%";
     iframe.height = "100%";
     iframe.style.border = "0";
+    iframe.style.display = "block";
+    iframe.style.margin = "auto";
 
     iframe.src = paymentPageLink;
     let pp_iframes = document.querySelectorAll(".pp_iframe");
@@ -299,18 +301,24 @@ if (isCheckout || hasOrder) {
           }
         }
       }
+      gateWaySettings.displayMode =
+        window.innerWidth <= 768 &&
+        gateWaySettings.displayMode === "samePageIframe"
+          ? "popupIframe"
+          : gateWaySettings.displayMode;
+      console.log("this: ", gateWaySettings.displayMode);
       switch (gateWaySettings.displayMode) {
         case "samePageIframe":
           pp_iframe.style.position = "relative";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           break;
         case "popupIframe":
-          pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
+          pp_iframe.style.width = window.innerWidth <= 768 ? "85%" : "55%";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           pp_iframe.style.position = "fixed";
           pp_iframe.style.top = "50%";
           pp_iframe.style.left = "50%";
-          pp_iframe.style.padding = "10px";
+          pp_iframe.style.padding = window.innerWidth <= 768 ? "20px" : "10px";
           pp_iframe.style.backgroundColor = "white";
           pp_iframe.style.transform = "translate(-50%, -50%)";
           pp_iframe.style.zIndex = 100000;
