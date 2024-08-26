@@ -83,28 +83,24 @@ if (isCheckout || hasOrder) {
           }),
           (0, e.createElement)(
             "div",
-            { className: "wrapper" },
+            { className: "pp_iframe" },
             (0, e.createElement)(
               "button",
               {
                 className: "closeFrame",
                 id: "closeFrame",
                 style: {
-                  position: "fixed",
-                  top: "5px",
-                  right: "5px",
-                  cursor: "pointer",
-                  fontSize: "15px",
-                  border: "solid 0.1px black",
-                  borderRadius: "15px",
-                  zIndex: "1000000",
-                  backgroundColor: "white",
+                  position: "absolute",
+                  top: "0px",
+                  fontSize: "20px",
+                  right: "0px",
+                  border: "none",
+                  backgroundColor: "transparent",
                   display: "none",
                 },
               },
               "x"
-            ),
-            (0, e.createElement)("div", { className: "pp_iframe" })
+            )
           ),
           t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
             ? divCustomIcons
@@ -222,7 +218,7 @@ if (isCheckout || hasOrder) {
             // Process the result here
             console.log("Payment result:", getPaymentResult);
             let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
-            pp_iframe.style.width = window.innerWidth <= 768 ? "90%" : "55%";
+            pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
             pp_iframe.style.height = "200px";
             pp_iframe.style.position = "fixed";
             pp_iframe.style.backgroundColor = "white";
@@ -279,7 +275,7 @@ if (isCheckout || hasOrder) {
     var iframe = document.createElement("iframe");
 
     // Set the attributes for the iframe
-    iframe.width = "100%";
+    iframe.width = "95%";
     iframe.height = "100%";
     iframe.style.border = "0";
 
@@ -314,6 +310,8 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.position = "fixed";
           pp_iframe.style.top = "50%";
           pp_iframe.style.left = "50%";
+          pp_iframe.style.padding = "10px";
+          pp_iframe.style.backgroundColor = "white";
           pp_iframe.style.transform = "translate(-50%, -50%)";
           pp_iframe.style.zIndex = 100000;
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
@@ -330,12 +328,11 @@ if (isCheckout || hasOrder) {
       pp_iframe.style.overflow = "scroll";
       pp_iframe.style.msOverflowStyle = "none"; // For Internet Explorer 10+
       pp_iframe.style.scrollbarWidth = "none"; // For Firefox
-      let closeFrame = document.getElementById("closeFrame");
-      closeFrame.style.display = "block";
-      closeFrame.addEventListener("click", (e) => {
+      pp_iframe.firstElementChild.style.display = "block";
+      pp_iframe.firstElementChild.style.cursor = "pointer";
+      pp_iframe.firstElementChild.addEventListener("click", (e) => {
         e.preventDefault();
         pp_iframe.style.display = "none";
-        closeFrame.style.display = "none";
         location.reload();
       });
       pp_iframe.appendChild(iframe);
