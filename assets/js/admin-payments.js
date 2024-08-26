@@ -346,6 +346,10 @@ const urlParams = new URLSearchParams(queryString);
 const section = urlParams.get("section");
 let currentLanguage = payplus_script_admin.currentLanguage.substring(0, 2);
 
+if (currentLanguage !== "en" && currentLanguage !== "he") {
+  currentLanguage = "en";
+}
+
 if (
   section == "payplus-invoice" ||
   section == "payplus-payment-gateway-setup-wizard" ||
