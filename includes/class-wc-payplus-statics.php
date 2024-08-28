@@ -40,6 +40,12 @@ class WC_PayPlus_Statics
         return $docType;
     }
 
+    public static function pp_is_json($string)
+    {
+        json_decode($string);
+        return (json_last_error() === JSON_ERROR_NONE);
+    }
+
     public static function returnInvDocs($invoicesArray)
     {
         if (is_array($invoicesArray)) {
