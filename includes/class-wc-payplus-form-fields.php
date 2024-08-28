@@ -30,10 +30,10 @@ class WC_PayPlus_Form_Fields
         $admin_bar->add_menu(array(
             'id' => 'payPlus-toolbar-sub',
             'parent' => 'PayPlus-toolbar',
-            'title' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+            'title' => __('PayPlus Invoice+', 'payplus-payment-gateway'),
             'href' => get_admin_url() . "admin.php?page=wc-settings&tab=checkout&section=payplus-invoice",
             'meta' => array(
-                'title' => __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+                'title' => __('PayPlus Invoice+', 'payplus-payment-gateway'),
                 'target' => '_blank',
                 'class' => 'my_menu_item_class',
             ),
@@ -57,6 +57,9 @@ class WC_PayPlus_Form_Fields
         global $submenu;
         $parent_slug = 'payplus-payment-gateway';
         $nonce = wp_create_nonce('payPlusOrderChecker');
+        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $showOrdersButton = boolval(isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
+        $showSubGatewaysOnSide = boolval(isset($payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu']) && $payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu'] === 'yes');
 
         add_menu_page(
             __('PayPlus Gateway', 'payplus-payment-gateway'),
@@ -67,62 +70,66 @@ class WC_PayPlus_Form_Fields
             PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-icon.svg"
         );
         add_submenu_page(
-            'payplus-payment-gateway',
-            __('bit', 'payplus-payment-gateway'),
-            __('bit', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
-        );
-        add_submenu_page(
             'payplus-payment-gateway', //Page Title
-            __('Google Pay', 'payplus-payment-gateway'),
-            __('Google Pay', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay' //Page slug
-        );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('Apple Pay', 'payplus-payment-gateway'),
-            __('Apple Pay', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay' //Page slug
-        );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('MULTIPASS', 'payplus-payment-gateway'),
-            __('MULTIPASS', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass' //Page slug
-        );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('PayPal', 'payplus-payment-gateway'),
-            __('PayPal', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal' //Page slug
-        );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('Tav zahav', 'payplus-payment-gateway'),
-            __('Tav Zahav', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav' //Page slug
-        );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
-            __('Invoice+ (PayPlus)', 'payplus-payment-gateway'),
+            __('PayPlus Invoice+', 'payplus-payment-gateway'),
+            __('PayPlus Invoice+', 'payplus-payment-gateway'),
             'administrator', //Capability
             'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice' //Page slug
         );
-        add_submenu_page(
-            'payplus-payment-gateway', //Page Title
-            __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
-            __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
-            'edit_shop_orders', //Capability
-            'runPayPlusOrdersChecker?_wpnonce=' . $nonce, //Page slug
-            [__CLASS__, 'runPayPlusOrdersChecker']
-        );
+        if ($showSubGatewaysOnSide) {
+            add_submenu_page(
+                'payplus-payment-gateway',
+                __('bit', 'payplus-payment-gateway'),
+                __('bit', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
+            );
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('Google Pay', 'payplus-payment-gateway'),
+                __('Google Pay', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay' //Page slug
+            );
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('Apple Pay', 'payplus-payment-gateway'),
+                __('Apple Pay', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay' //Page slug
+            );
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('MULTIPASS', 'payplus-payment-gateway'),
+                __('MULTIPASS', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass' //Page slug
+            );
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('PayPal', 'payplus-payment-gateway'),
+                __('PayPal', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal' //Page slug
+            );
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('Tav zahav', 'payplus-payment-gateway'),
+                __('Tav Zahav', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav' //Page slug
+            );
+        }
+        if ($showOrdersButton) {
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
+                __('Run PayPlus Orders Check', 'payplus-payment-gateway'),
+                'edit_shop_orders', //Capability
+                'runPayPlusOrdersChecker?_wpnonce=' . $nonce, //Page slug
+                [__CLASS__, 'runPayPlusOrdersChecker']
+            );
+        }
     }
 
     public static function runPayPlusOrdersChecker()
@@ -137,7 +144,8 @@ class WC_PayPlus_Form_Fields
         // The function that runs when the button is clicked
         if (current_user_can('edit_shop_orders')) {
             // Perform your custom action here
-            echo 'Running PayPlus Order checker... - check your logs!';
+            echo '<pre>';
+            echo 'Running PayPlus Order checker... - you can check : payplus-cron-log and payplus-ipn log for more information.';
             $payPlusGateway = new WC_PayPlus_Gateway;
             $payPlusGateway->payPlusOrdersCheck();
         } else {
@@ -457,10 +465,26 @@ class WC_PayPlus_Form_Fields
             ],
             'payplus_cron_service' => [
                 'title' => __('Activate PayPlus cron', 'payplus-payment-gateway'),
-                'label' => __('Add PayPlus orders cron checker.', 'payplus-payment-gateway'),
+                'label' => __('Enable PayPlus orders cron service.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
                 'description' => __('This checks all orders created within the last 2 hours and are in "pending" status and verifies the PayPlus IPN Process.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'payplus_orders_check_button' => [
+                'title' => __('Display PayPlus "Orders Check Button"', 'payplus-payment-gateway'),
+                'label' => __('Show PayPlus "Orders Check Button" on the side menu.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('The "PayPlus Orders Check" button checks all orders created within the last day are in "pending" status and contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'payplus_show_sub_gateways_side_menu' => [
+                'title' => __('Display PayPlus Subgateways on the side menu', 'payplus-payment-gateway'),
+                'label' => __('Show all subgatways on the side menu.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('If the side menu is displayed and this is enabled the subgateways will also be displayed.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'payplus_data_save_order_note' => [

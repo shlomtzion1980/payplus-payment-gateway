@@ -290,29 +290,35 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         );
 
         $orders = array_reverse(wc_get_orders($args));
-        echo '<pre>';
-        echo "The following orders were created today and are in pending status: <br>";
-        echo "(This will not cancel the scheduled cron event)<br><br>";
-        echo "Orders: ";
-        print_r(implode(",", $orders) . "<br></br>");
-        $this->payplus_add_log_all('payplus-cron-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
-        foreach ($orders as $order_id) {
-            $order = wc_get_order($order_id);
-            $hour = $order->get_date_created()->date('H');
-            $min = $order->get_date_created()->date('i');
-            $calc = $current_minute - $min;
-            if ($current_hour >= $hour - 2) {
-                $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
-                if ($paymentPageUid) {
-                    echo esc_html("Order # $order_id contains payment page uid - running ipn!");
-                    echo "<br>";
-                    $this->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
-                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+        if (count($orders)) {
+            echo '<pre>';
+            echo "The following orders were created today and are in pending status: <br>";
+            echo "(This will not cancel the scheduled cron event)<br><br>";
+            echo "Orders: ";
+            print_r(implode(",", $orders) . "<br></br>");
+            $this->payplus_add_log_all('payplus-cron-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
+            foreach ($orders as $order_id) {
+                $order = wc_get_order($order_id);
+                $hour = $order->get_date_created()->date('H');
+                $min = $order->get_date_created()->date('i');
+                $calc = $current_minute - $min;
+                if ($current_hour >= $hour - 2) {
+                    $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                    if ($paymentPageUid) {
+                        echo esc_html("Order # $order_id contains payment page uid - running ipn! - check order notes and status for results!");
+                        echo "<br>";
+                        $this->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc\n");
+                        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                    }
                 }
             }
+        } else {
+            echo "<pre>";
+            wp_die('No orders matching the criteria were found.');
         }
+        wp_die();
     }
 
     /**
