@@ -256,11 +256,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $response = wp_remote_post($url, $args);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
 
-        $type = $responseBody['data']['type'];
+        if (!empty($responseBody['data'])) {
+            $type = $responseBody['data']['type'];
 
-        $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
-        $successNote = sprintf(
-            '<div style="font-weight:600;">PayPlus %s Successful</div>
+            $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
+            $successNote = sprintf(
+                '<div style="font-weight:600;">PayPlus %s Successful</div>
             <table style="border-collapse:collapse">
                 <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Transaction#</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                 <tr><td style="border-bottom:1px solid #000;vertical-align:top;">Last digits</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -269,17 +270,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 <tr><td style="vertical-align:top;">Token</td><td style="vertical-align:top;">%s</td></tr>
                 <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
             </table>',
-            esc_html($type_text),
-            esc_html($responseBody['data']['number']),
-            esc_html($responseBody['data']['four_digits']),
-            esc_html($responseBody['data']['expiry_month'] . "/" . $responseBody['data']['expiry_year']),
-            esc_html($responseBody['data']['voucher_num']),
-            esc_html($responseBody['data']['token_uid']),
-            esc_html($responseBody['data']['amount']),
-            esc_html($order->get_total())
-        );
+                esc_html($type_text),
+                esc_html($responseBody['data']['number']),
+                esc_html($responseBody['data']['four_digits']),
+                esc_html($responseBody['data']['expiry_month'] . "/" . $responseBody['data']['expiry_year']),
+                esc_html($responseBody['data']['voucher_num']),
+                esc_html($responseBody['data']['token_uid']),
+                esc_html($responseBody['data']['amount']),
+                esc_html($order->get_total())
+            );
 
-        if (!empty($responseBody['data'])) {
             $responseArray = [
                 'payplus_response' => wp_json_encode($responseBody['data']),
                 'payplus_type' => esc_html($responseBody['data']['type']),
@@ -304,27 +304,29 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'payplus_token_uid' => esc_html($responseBody['data']['token_uid']),
                 'payplus_voucher_num' => esc_html($responseBody['data']['voucher_num'])
             ];
+
             WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
-        }
-        $transactionUid = $responseBody['data']['transaction_uid'];
-        if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {
-            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
-            $order->update_status('wc-processing');
-            if ($this->saveOrderNote) {
-                $order->add_order_note(
-                    $successNote
-                );
-            }
-        } elseif ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Approval') {
-            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
-            $order->update_status('wc-on-hold');
-            if ($this->saveOrderNote) {
-                $order->add_order_note(
-                    $successNote
-                );
+            $transactionUid = $responseBody['data']['transaction_uid'];
+
+            if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {
+                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
+                $order->update_status('wc-processing');
+                if ($this->saveOrderNote) {
+                    $order->add_order_note(
+                        $successNote
+                    );
+                }
+            } elseif ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Approval') {
+                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
+                $order->update_status('wc-on-hold');
+                if ($this->saveOrderNote) {
+                    $order->add_order_note(
+                        $successNote
+                    );
+                }
             }
         } else {
-            $note = $responseBody['data']['status'] ?: $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing.';
+            $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
             $order->add_order_note('PayPlus IPN: ' . $note);
         }
     }
