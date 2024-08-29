@@ -2090,7 +2090,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'payplus-applepay-script',
                     'https://payments' . ($this->api_test_mode ? 'dev' : '') . '.payplus.co.il/statics/applePay/script.js',
                     array(),
-                    null,
+                    PAYPLUS_VERSION,
                     true
                 );
             }
