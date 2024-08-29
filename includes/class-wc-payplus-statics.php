@@ -396,7 +396,7 @@ class WC_PayPlus_Statics
                 'blocking' => true,
                 'headers' => array(
                     'domain' => home_url(),
-                    'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
+                    'User-Agent' => 'WordPress ' . isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "",
                     'Content-Type' => 'application/json',
                     'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
                 )

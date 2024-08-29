@@ -165,11 +165,11 @@ class WC_PayPlus
         $tblname = esc_sql($tblname);
         $indexRow = 0;
         if (!empty($REQUEST['more_info'])) {
-            $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field($_REQUEST['status_code']) : '';
+            $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field(wp_unslash($_REQUEST['status_code'])) : '';
             if ($status_code !== '000') {
                 $this->payplus_gateway->store_payment_ip();
             }
-            $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : '';
+            $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : '';
             $result = $wpdb->get_results($wpdb->prepare(
                 "SELECT id as rowId, count(*) as rowCount, count_process FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND ( status_code = %d )",
                 $order_id,
@@ -193,18 +193,18 @@ class WC_PayPlus
                 }
 
                 $data = [
-                    'transaction_uid' => isset($_REQUEST['transaction_uid']) ? sanitize_text_field($_REQUEST['transaction_uid']) : null,
-                    'page_request_uid' => isset($_REQUEST['page_request_uid']) ? sanitize_text_field($_REQUEST['page_request_uid']) : null,
-                    'voucher_id' => isset($_REQUEST['voucher_num']) ? sanitize_text_field($_REQUEST['voucher_num']) : null,
-                    'token_uid' => isset($_REQUEST['token_uid']) ? sanitize_text_field($_REQUEST['token_uid']) : null,
-                    'type' => isset($_REQUEST['type']) ? sanitize_text_field($_REQUEST['type']) : null,
-                    'order_id' => isset($_REQUEST['more_info']) ? sanitize_text_field($_REQUEST['more_info']) : null,
+                    'transaction_uid' => isset($_REQUEST['transaction_uid']) ? sanitize_text_field(wp_unslash($_REQUEST['transaction_uid'])) : null,
+                    'page_request_uid' => isset($_REQUEST['page_request_uid']) ? sanitize_text_field(wp_unslash($_REQUEST['page_request_uid'])) : null,
+                    'voucher_id' => isset($_REQUEST['voucher_num']) ? sanitize_text_field(wp_unslash($_REQUEST['voucher_num'])) : null,
+                    'token_uid' => isset($_REQUEST['token_uid']) ? sanitize_text_field(wp_unslash($_REQUEST['token_uid'])) : null,
+                    'type' => isset($_REQUEST['type']) ? sanitize_text_field(wp_unslash($_REQUEST['type'])) : null,
+                    'order_id' => isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : null,
                     'status_code' => isset($_REQUEST['status_code']) ? intval($_REQUEST['status_code']) : null,
-                    'number' => isset($_REQUEST['number']) ? sanitize_text_field($_REQUEST['number']) : null,
-                    'expiry_year' => isset($_REQUEST['expiry_year']) ? sanitize_text_field($_REQUEST['expiry_year']) : null,
-                    'expiry_month' => isset($_REQUEST['expiry_month']) ? sanitize_text_field($_REQUEST['expiry_month']) : null,
-                    'four_digits' => isset($_REQUEST['four_digits']) ? sanitize_text_field($_REQUEST['four_digits']) : null,
-                    'brand_id' => isset($_REQUEST['brand_id']) ? sanitize_text_field($_REQUEST['brand_id']) : null,
+                    'number' => isset($_REQUEST['number']) ? sanitize_text_field(wp_unslash($_REQUEST['number'])) : null,
+                    'expiry_year' => isset($_REQUEST['expiry_year']) ? sanitize_text_field(wp_unslash($_REQUEST['expiry_year'])) : null,
+                    'expiry_month' => isset($_REQUEST['expiry_month']) ? sanitize_text_field(wp_unslash($_REQUEST['expiry_month'])) : null,
+                    'four_digits' => isset($_REQUEST['four_digits']) ? sanitize_text_field(wp_unslash($_REQUEST['four_digits'])) : null,
+                    'brand_id' => isset($_REQUEST['brand_id']) ? sanitize_text_field(wp_unslash($_REQUEST['brand_id'])) : null,
                 ];
 
                 $order = $this->payplus_gateway->validateOrder($data);
@@ -612,8 +612,8 @@ class WC_PayPlus
     {
         $currency = strtolower(get_woocommerce_currency());
         if (
-            isset($available_gateways['payplus-payment-gateway-applepay']) && !is_admin() &&
-            !preg_match('/Mac|iPad|iPod|iPhone/', $_SERVER['HTTP_USER_AGENT'])
+            isset($available_gateways['payplus-payment-gateway-applepay']) && !is_admin() && isset($_SERVER['HTTP_USER_AGENT']) &&
+            !preg_match('/Mac|iPad|iPod|iPhone/', sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])))
         ) {
             unset($available_gateways['payplus-payment-gateway-applepay']);
         }
@@ -773,7 +773,7 @@ class WC_PayPlus
             return;
         }
         // Verify that the nonce is valid.
-        if (!wp_verify_nonce($_POST['payplus_notice_proudct_nonce'], 'payplus_notice_proudct_nonce')) {
+        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['payplus_notice_proudct_nonce'])), 'payplus_notice_proudct_nonce')) {
             return;
         }
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -793,12 +793,12 @@ class WC_PayPlus
 
         if (isset($_POST['payplus_transaction_type'])) {
 
-            $transaction_type = sanitize_text_field($_POST['payplus_transaction_type']);
+            $transaction_type = sanitize_text_field(wp_unslash($_POST['payplus_transaction_type']));
             update_post_meta($post_id, 'payplus_transaction_type', $transaction_type);
         }
         if (isset($_POST['payplus_balance_name'])) {
 
-            $payplus_balance_name = sanitize_text_field($_POST['payplus_balance_name']);
+            $payplus_balance_name = sanitize_text_field(wp_unslash($_POST['payplus_balance_name']));
             update_post_meta($post_id, 'payplus_balance_name', $payplus_balance_name);
         }
     }
@@ -902,7 +902,10 @@ class WC_PayPlus
             $errors->add('error', esc_html__('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
         }
         if ($this->payplus_gateway->block_ip_transactions) {
-            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
+            if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
+                $client_ip = ""; // Handle invalid IP scenario if necessary
+            }
             $counts = array_count_values($this->payplus_gateway->get_payment_ips());
             $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= $this->payplus_gateway->block_ip_transactions_hour) {
@@ -945,7 +948,7 @@ class WC_PayPlus
             wp_die('Not allowed! - payplus_get_admin_menu');
         }
         ob_start();
-        $currentSection = isset($_GET['section']) ? sanitize_text_field($_GET['section']) : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         echo "<div id='payplus-options'>";
         if (count($adminTabs)) {

@@ -135,7 +135,7 @@ class WC_PayPlus_Form_Fields
     public static function runPayPlusOrdersChecker()
     {
         if (isset($_GET['page'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            $pageSlug = sanitize_text_field($_GET['page']); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $pageSlug = sanitize_text_field(wp_unslash($_GET['page'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $nonce = explode("?_wpnonce=", $pageSlug)[1];
             if (!wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
                 wp_die('Sorry this page is not allowed! - runPayPlusOrdersChecker');

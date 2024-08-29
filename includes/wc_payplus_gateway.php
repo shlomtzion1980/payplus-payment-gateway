@@ -397,7 +397,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $shared_secret = $this->secret_key;
         // Retrieve the signature from the headers
-        $signature = isset($_SERVER['HTTP_X_SIGNATURE']) ? $_SERVER['HTTP_X_SIGNATURE'] : '';
+        $signature = isset($_SERVER['HTTP_X_SIGNATURE']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_SIGNATURE'])) : '';
         // Retrieve the request body
         $body = wp_json_encode(json_decode(file_get_contents('php://input')));
         // Generate the expected signature
@@ -694,7 +694,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
             wp_die('Not allowed! - payplus_get_nav_option');
         }
-        $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         if (count($adminTabs)) {
             echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
@@ -735,7 +735,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $credit = __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway');
         ob_start();
 
-        $currentSection = isset($_GET['section']) ? $_GET['section'] : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
         $this->generate_settings_html();
         $settings = ob_get_clean();
 
@@ -1219,7 +1219,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function store_payment_ip()
     {
-        $client_ip = $_SERVER['REMOTE_ADDR'];
+        $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
 
         // Retrieve the current IPs from the transient
         $ips = get_transient('payment_ips');
@@ -1245,7 +1245,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function process_payment($order_id)
     {
         if ($this->block_ip_transactions) {
-            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
+            if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
+                $client_ip = ""; // Handle invalid IP scenario if necessary
+            }
             $counts = array_count_values($this->get_payment_ips());
             $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $this->get_payment_ips()) && $howMany >= $this->block_ip_transactions_hour) {
@@ -1260,7 +1263,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
         $is_token = (isset($_POST['wc-' . $this->id . '-payment-token']) && $_POST['wc-' . $this->id . '-payment-token'] !== 'new') ? true : false;  // phpcs:ignore WordPress.Security.NonceVerification.Missing
-        $saveToken = $_POST['wc-' . $this->id . '-new-payment-method'];  // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $saveToken = isset($_POST['wc-' . $this->id . '-new-payment-method']) ? sanitize_text_field(wp_unslash($_POST['wc-' . $this->id . '-new-payment-method'])) : false;  // phpcs:ignore WordPress.Security.NonceVerification.Missing
         if ($saveToken) {
             WC_PayPlus_Meta_Data::update_meta($order, array('save_payment_method' => true));
         }
@@ -1269,7 +1272,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($is_token) {
 
-            $token_id = wc_clean($_POST['wc-' . $this->id . '-payment-token']);  // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $token_id = wc_clean(sanitize_text_field(wp_unslash($_POST['wc-' . $this->id . '-payment-token'])));  // phpcs:ignore WordPress.Security.NonceVerification.Missing
             $token = WC_Payment_Tokens::get($token_id);
 
             if (!$this->checkValidateCard($token)) {
@@ -2129,7 +2132,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'blocking' => true,
             'headers' => array(
                 'domain' => home_url(),
-                'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
+                'User-Agent' => 'WordPress ' . isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "",
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
             )
@@ -2188,8 +2191,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function get_check_user_agent($userAgent = 'PayPlus')
     {
         $handle = 'payplus_callback';
-        if ($_SERVER['HTTP_USER_AGENT'] != $userAgent) {
-            $this->payplus_add_log_all($handle, $_SERVER['HTTP_USER_AGENT'], 'error');
+        if (isset($_SERVER['HTTP_USER_AGENT']) && sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) != $userAgent) {
+            $this->payplus_add_log_all($handle, sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])), 'error');
             return true;
         }
         return false;
@@ -2217,7 +2220,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
         $handle = 'payplus_callback_begin';
-        $payplusHash = sanitize_text_field($_SERVER['HTTP_HASH']);
+        $payplusHash = isset($_SERVER['HTTP_HASH']) ? sanitize_text_field($_SERVER['HTTP_HASH']) : ""; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
         if ($payplusGenHash === $payplusHash) {
             $order_id = intval($response['transaction']['more_info']);
@@ -2229,7 +2232,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 "
                 Time: $this->current_time
                 Order: $order_id
-                HTTP_HASH: {$_SERVER['HTTP_HASH']}
+                HTTP_HASH: $payplusHash
                 PayPlus Generated Hash: $payplusGenHash
                 Order Status: $orderStatusNote
                 PayPlus Transaction Callback: $json

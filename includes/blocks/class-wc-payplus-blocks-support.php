@@ -135,7 +135,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
 
         if ($main_gateway->block_ip_transactions) {
-            $client_ip = $_SERVER['REMOTE_ADDR'];
+            $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
+            if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
+                $client_ip = ""; // Handle invalid IP scenario if necessary
+            }
             $counts = array_count_values($main_gateway->get_payment_ips());
             $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $main_gateway->get_payment_ips()) && $howMany >= $main_gateway->block_ip_transactions_hour) {
