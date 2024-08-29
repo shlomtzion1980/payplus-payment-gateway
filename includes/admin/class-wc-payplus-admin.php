@@ -1664,7 +1664,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $rtl = is_rtl() ? 'left' : 'right';
                 // show button only if pageRequestUid is not empty
                 if (!empty($pageRequestUid)) {
-                    echo '<button type="button" data-value="' . esc_attr($order->get_id()) . '" value="' . esc_attr($pageRequestUid) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: green">Get PayPlus Data</button>';
+                    echo '<button type="button" data-value="' . esc_attr($order->get_id()) . '" value="' . esc_attr($pageRequestUid) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
                     echo "<div class='payplus_loader_gpp'>
                         <div class='loader'>
                           <div class='loader-background'><div class='text'></div></div>
