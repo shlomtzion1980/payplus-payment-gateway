@@ -271,10 +271,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     }
 
 
-    public function payPlusOrdersCheck()
+    public function payPlusOrdersCheck($nonce)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce') && !current_user_can('edit_shop_orders')) {
+        if (!wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
             wp_die('Sorry this page is not allowed! - payPlusOrdersCheck');
+        }
+
+        if (!current_user_can('edit_shop_orders')) {
+            wp_die('Sorry this page is not allowed! - payPlusOrdersCheck user privileges.');
         }
 
         $current_time = current_time('Y-m-d H:i:s');
@@ -335,7 +339,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "<pre>";
             wp_die('No orders matching the criteria were found.');
         }
-        wp_die();
     }
 
     /**

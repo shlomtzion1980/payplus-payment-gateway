@@ -56,7 +56,6 @@ class WC_PayPlus_Form_Fields
     {
         global $submenu;
         $parent_slug = 'payplus-payment-gateway';
-        $nonce = wp_create_nonce('payPlusOrderChecker');
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         $showOrdersButton = boolval(isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
         $showSubGatewaysOnSide = boolval(isset($payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu']) && $payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu'] === 'yes');
@@ -126,7 +125,7 @@ class WC_PayPlus_Form_Fields
                 __('Run PayPlus orders validator', 'payplus-payment-gateway'),
                 __('Run PayPlus orders validator', 'payplus-payment-gateway'),
                 'administrator', //Capability
-                'runPayPlusOrdersChecker?_wpnonce=' . $nonce, //Page slug
+                'runPayPlusOrdersChecker', //Page slug
                 [__CLASS__, 'runPayPlusOrdersChecker']
             );
         }
@@ -134,20 +133,20 @@ class WC_PayPlus_Form_Fields
 
     public static function runPayPlusOrdersChecker()
     {
-        if (isset($_GET['page'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            $pageSlug = sanitize_text_field(wp_unslash($_GET['page'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            $nonce = explode("?_wpnonce=", $pageSlug)[1];
-            if (!wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
-                wp_die('Sorry this page is not allowed! - runPayPlusOrdersChecker');
-            }
-        }
-        // The function that runs when the button is clicked
         if (current_user_can('edit_shop_orders')) {
-            // Perform your custom action here
-            echo '<pre>';
-            echo 'Running PayPlus Order checker... - you can check : payplus-cron-log and payplus-ipn log for more information.';
-            $payPlusGateway = new WC_PayPlus_Gateway;
-            $payPlusGateway->payPlusOrdersCheck();
+            $nonce = wp_create_nonce('payPlusOrderChecker');
+?>
+<form method="post" action="">
+    <button name="verifyPayPlusOrders" value="<?php echo $nonce; ?>">Run PayPlus orders verifier</button>
+</form>
+<?php
+            if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+                $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+                echo '<pre>';
+                echo 'Running PayPlus Order checker... - you can check : payplus-orders-verify-log and payplus-ipn log for more information.';
+                $payPlusGateway = new WC_PayPlus_Gateway;
+                $payPlusGateway->payPlusOrdersCheck($nonce);
+            }
         } else {
             wp_die('You do not have permission to perform this action.');
         }
