@@ -737,6 +737,10 @@ jQuery(function ($) {
     },
   };
 
+  $('input[name="payment_method"][value="payplus-payment-gateway"]')
+    .prop("checked", true)
+    .trigger("change");
+
   var wc_checkout_coupons = {
     init: function () {
       $(document.body).on("click", "a.showcoupon", this.show_coupon_form);

@@ -1185,6 +1185,30 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             $this->save_payment_method_checkbox();
         }
+        // Add custom input fields
+        echo '<div id="custom_payment_fields">';
+
+        echo '<p class="form-row form-row-wide">
+            <label for="custom_field_1">Credit Card Number<span class="required">*</span></label>
+            <input type="text" class="input-text" name="custom_field_1" id="custom_field_1" placeholder="Enter something" />
+          </p>';
+
+        echo '<p class="form-row form-row-wide">
+            <label for="custom_field_2">Month<span class="required">*</span></label>
+            <input type="text" class="input-text" name="custom_field_2" id="custom_field_2" placeholder="Enter something" />
+          </p>';
+
+        echo '<p class="form-row form-row-wide">
+            <label for="custom_field_3">Year<span class="required">*</span></label>
+            <input type="text" class="input-text" name="custom_field_3" id="custom_field_3" placeholder="Enter something" />
+          </p>';
+
+        echo '<p class="form-row form-row-wide">
+            <label for="custom_field_4">CVV<span class="required">*</span></label>
+            <input type="text" class="input-text" name="custom_field_4" id="custom_field_4" placeholder="Enter something" />
+          </p>';
+
+        echo '</div>';
     }
 
     /**
