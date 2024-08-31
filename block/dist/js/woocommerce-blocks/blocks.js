@@ -91,7 +91,7 @@ if (isCheckout || hasOrder) {
                 id: "closeFrame",
                 style: {
                   position: "absolute",
-                  top: "15px",
+                  top: "0px",
                   fontSize: "20px",
                   right: "0px",
                   border: "none",
@@ -312,17 +312,20 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           break;
         case "popupIframe":
-          pp_iframe.style.width = window.innerWidth <= 768 ? "85%" : "55%";
+          pp_iframe.style.width = window.innerWidth <= 768 ? "98%" : "55%";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
           pp_iframe.style.position = "fixed";
           pp_iframe.style.top = "50%";
           pp_iframe.style.left = "50%";
-          pp_iframe.style.padding = window.innerWidth <= 768 ? "20px" : "10px";
+          pp_iframe.style.paddingBottom =
+            window.innerWidth <= 768 ? "20px" : "10px";
+          pp_iframe.style.paddingTop =
+            window.innerWidth <= 768 ? "20px" : "10px";
           pp_iframe.style.backgroundColor = "white";
           pp_iframe.style.transform = "translate(-50%, -50%)";
           pp_iframe.style.zIndex = 100000;
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
-          pp_iframe.style.borderRadius = "15px";
+          pp_iframe.style.borderRadius = "5px";
           document.body.appendChild(overlay);
           document.body.style.overflow = "hidden";
           break;
