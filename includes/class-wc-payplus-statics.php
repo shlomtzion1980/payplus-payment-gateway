@@ -399,6 +399,15 @@ class WC_PayPlus_Statics
         }
 
 
+        public static function sanitize_recursive($value)
+        {
+            if (is_array($value)) {
+                return array_map([self::class, 'sanitize_recursive'], $value);
+            } else {
+                return sanitize_text_field($value);
+            }
+        }
+
 
         /**
          * @param $url

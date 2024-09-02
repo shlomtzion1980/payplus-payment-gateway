@@ -558,7 +558,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order_id = intval($_POST['order_id']);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
             $type_document = isset($_POST['typeDocument']) ? sanitize_text_field(wp_unslash($_POST['typeDocument'])) : false;
-            $payments = !empty($_POST['payments']) ? array_map('sanitize_text_field', wp_unslash($_POST['payments'])) : [];
+            $payments = !empty($_POST['payments']) ? WC_PayPlus_Statics::sanitize_recursive(wp_unslash($_POST['payments'])) : [];
 
             if (!empty($payments)) {
                 function set_payment_payplus($value)
@@ -569,7 +569,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                     return $value;
                 }
-
                 $payments = array_map('set_payment_payplus', $payments);
                 $this->payplus_add_payments($order_id, $payments);
             }
