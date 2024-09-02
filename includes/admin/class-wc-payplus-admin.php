@@ -50,10 +50,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $postKey = array_key_exists('post', $_GET) ? 'post' : 'id';
 
         $isPageOrder = ('post.php' === $pagenow || 'admin.php' === $pagenow) && isset($_GET[$postKey]) &&
-            ('shop_order' === get_post_type($_GET[$postKey])
-                || 'shop_subscription' === get_post_type($_GET[$postKey])
-                || 'shop_order_placehold' === get_post_type($_GET[$postKey])
-            );
+            ('shop_order' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
+                || 'shop_subscription' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
+                || 'shop_order_placehold' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey]))));
 
         $sections = $this->arrPayment;
         $sections[] = 'payplus-payment-gateway-setup-wizard';
@@ -125,7 +124,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : wp_die('No order id received.');
         $order = wc_get_order($order_id);
         $user_id = $order->get_user_id();
-        $token = sanitize_text_field($_POST['token']);
+        $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : null;
 
         $payload = $this->generatePayloadLink($order_id, true, $token);
 
@@ -231,7 +230,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $order = wc_get_order($order_id);
 
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
-        $payment_request_uid = isset($_POST['payment_request_uid']) ? $_POST['payment_request_uid'] : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
+        $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
 
 
@@ -247,7 +246,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'blocking' => true,
             'headers' => array(
                 'domain' => home_url(),
-                'User-Agent' => 'WordPress ' . $_SERVER['HTTP_USER_AGENT'],
+                'User-Agent' => 'WordPress ' . isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "",
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
             ),
@@ -382,8 +381,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             // Sanitize input data
             $amount = floatval($_POST['amount']);
-            $method = sanitize_text_field($_POST['method']);
-            $transactionUid = sanitize_text_field($_POST['transactionUid']);
+            $method = sanitize_text_field(wp_unslash($_POST['method']));
+            $transactionUid = sanitize_text_field(wp_unslash($_POST['transactionUid']));
             $orderID = intval($_POST['orderID']);
             $id = intval($_POST['id']);
 
@@ -558,8 +557,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             $order_id = intval($_POST['order_id']);
             $urlEdit = get_admin_url() . "post.php?post=" . $order_id . "&action=edit";
-            $type_document = sanitize_text_field($_POST['typeDocument']);
-            $payments = isset($_POST['payments']) ? $_POST['payments'] : null;
+            $type_document = isset($_POST['typeDocument']) ? sanitize_text_field(wp_unslash($_POST['typeDocument'])) : false;
+            $payments = isset($_POST['payments']) ? array_map('sanitize_text_field', wp_unslash($_POST['payments'])) : null;
 
             if (!empty($payments)) {
                 function set_payment_payplus($value)
@@ -600,10 +599,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $indexRow = 0;
             $order_id = intval($_POST['order_id']);
             $order = wc_get_order($order_id);
-            $amount = floatval($_POST['amount']);
+            $amount = isset($_POST['amount']) ? floatval($_POST['amount']) : null;
             $urlEdit = html_entity_decode(esc_url(get_edit_post_link($order_id)));
             $this->isInitiated();
-            $type_document = sanitize_text_field($_POST['type_document']);
+            $type_document = isset($_POST['type_document']) ? sanitize_text_field(wp_unslash(($_POST['type_document']))) : null;
             $resultApps = $this->payPlusInvoice->payplus_get_payments($order_id);
 
             if (empty($resultApps)) {
@@ -759,7 +758,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $handle = "payplus_process_payment";
             $date = new DateTime();
             $dateNow = $date->format('Y-m-d H:i');
-            $order_id = intval($_POST['order_id']);
+            $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : null;
             $order = wc_get_order($order_id);
             $order->set_payment_method('payplus-payment-gateway');
             $order->set_payment_method_title('Pay with Debit or Credit Card');
@@ -803,7 +802,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         if (!empty($_POST)) {
             $this->isInitiated();
-            $order_id = intval($_POST['order_id']);
+            $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : null;
             $order = wc_get_order($order_id);
             $handle = "payplus_process_payment";
             $transaction_uid = $order->get_meta('payplus_transaction_uid');
@@ -2071,7 +2070,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $enabled = false;
         $isInvoice = false;
         if (!empty($_GET) && !empty($_GET['section'])) {
-            $currentSection = $_GET['section'];
+            $currentSection = sanitize_text_field(wp_unslash($_GET['section']));
             $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
             $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
             $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
@@ -2205,7 +2204,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $OrderType = $order->get_meta('payplus_type');
         $chargeByItems = false;
 
-        $amount = round((float) $_POST['payplus_charge_amount'], 2); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        $amount = isset($_POST['payplus_charge_amount']) ? round((float) $_POST['payplus_charge_amount'], 2) : null; // phpcs:ignore WordPress.Security.NonceVerification.Missing
         $transaction_uid = $order->get_meta('payplus_transaction_uid');
         if ($OrderType == "Charge") {
             return;

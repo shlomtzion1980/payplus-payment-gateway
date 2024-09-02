@@ -486,12 +486,12 @@ function add_vat_number_nonce_field()
 add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
 function payplus_checkout_field_update_order_meta($order_id)
 {
-    if (!isset($_POST['vat_number_nonce']) || !wp_verify_nonce($_POST['vat_number_nonce'], 'vat_number_nonce_action')) {
+    if (!isset($_POST['vat_number_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['vat_number_nonce'])), 'vat_number_nonce_action')) {
         return;
     }
 
     if (isset($_POST['_billing_vat_number'])) {
-        update_post_meta($order_id, '_billing_vat_number', sanitize_text_field($_POST['_billing_vat_number']));
+        update_post_meta($order_id, '_billing_vat_number', sanitize_text_field(wp_unslash($_POST['_billing_vat_number'])));
     }
 }
 

@@ -3058,20 +3058,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $handle = 'payplus_add_payment_ipn';
         $this->payplus_add_log_all($handle, 'New Token Has Been Generated');
 
-        if (wc_clean($_REQUEST['type']) != "token" || wc_clean($_REQUEST['method']) != "credit-card") {
+        if (isset($_REQUEST['type']) && sanitize_text_field(wp_unslash($_REQUEST['type'])) != "token" || isset($_REQUEST['method']) && sanitize_text_field(wp_unslash($_REQUEST['method'])) != "credit-card") {
             $this->payplus_add_log_all($handle, 'WS Error, No Token Type or Credit Card Method In Response', 'error');
             return;
         }
 
-        if (wc_clean($_REQUEST['status']) == "approved" && wc_clean($_REQUEST['status_code']) == "000" && wc_clean($_REQUEST['token_uid'])) {
+        if (isset($_REQUEST['status']) && sanitize_text_field(wp_unslash(($_REQUEST['status']))) == "approved" && isset($_REQUEST['status_code']) && sanitize_text_field(wp_unslash($_REQUEST['status_code'])) == "000" && isset($_REQUEST['token_uid']) && sanitize_text_field(wp_unslash($_REQUEST['token_uid']))) {
             wc_add_notice(__('Your new payment method has been added', 'payplus-payment-gateway'));
             $this->payplus_add_log_all($handle, print_r($this->arr_clean($_REQUEST), 'completed'));
             $user_id = get_current_user_id();
             if (isset($_REQUEST['more_info'])) {
-                $user_id = explode("_", $_REQUEST['more_info']);
+                $user_id = explode("_", sanitize_text_field(wp_unslash($_REQUEST['more_info'])));
                 $user_id = $user_id[2];
             }
-            update_user_meta($user_id, 'cc_token', $_REQUEST['token_uid']);
+            update_user_meta($user_id, 'cc_token', sanitize_text_field(wp_unslash($_REQUEST['token_uid'])));
             $this->save_token($_REQUEST, $user_id);
         } else {
             wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
@@ -3173,26 +3173,26 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         return $REQUEST;
     }
 
-    /**
-     * @return string|void
-     */
-    public function payplus_ip()
-    {
+    // /**
+    //  * @return string|void
+    //  */
+    // public function payplus_ip()
+    // {
 
-        foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
+    //     foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
 
-            if (array_key_exists($key, $_SERVER) === true) {
+    //         if (array_key_exists($key, $_SERVER) === true) {
 
-                foreach (explode(',', $_SERVER[$key]) as $ip) {
+    //             foreach (explode(',', $_SERVER[$key]) as $ip) {
 
-                    if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
+    //                 if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
 
-                        return $ip;
-                    }
-                }
-            }
-        }
-    }
+    //                     return $ip;
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     /**
      * @param $handle

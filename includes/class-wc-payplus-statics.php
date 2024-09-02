@@ -374,6 +374,32 @@ class WC_PayPlus_Statics
             return $box;
         }
 
+        public static function sanitize_postal_code($postal_code)
+        {
+            // Allow only alphanumeric characters and spaces (common in postal codes)
+            return preg_replace('/[^A-Za-z0-9 ]/', '', sanitize_text_field($postal_code));
+        }
+
+        public static function sanitize_object($object)
+        {
+            if (is_object($object)) {
+                foreach ($object as $property => $value) {
+                    if ($property === 'postal_code') {
+                        $object->$property = WC_PayPlus_Statics::sanitize_postal_code($value);
+                    } elseif (is_string($value)) {
+                        $object->$property = sanitize_text_field($value);
+                    } elseif (is_array($value)) {
+                        $object->$property = array_map('sanitize_text_field', wp_unslash($value));
+                    } elseif (is_object($value)) {
+                        $object->$property = WC_PayPlus_Statics::sanitize_object($value);
+                    }
+                }
+            }
+            return $object;
+        }
+
+
+
         /**
          * @param $url
          * @param $payload
