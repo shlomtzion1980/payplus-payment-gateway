@@ -1696,8 +1696,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($metaAll));
                 }
 
-                $itemDetails['vat_type'] = $this->paying_vat_all_order === "yes" ? 0 : $itemDetails['vat_type'];
                 $itemDetails['vat_type'] = $item_data->get_tax_status() == 'none' || !$wc_tax_enabled ? 2 : 0;
+                $itemDetails['vat_type'] = $this->paying_vat_all_order === "yes" ? 0 : $itemDetails['vat_type'];
 
                 if ($this->change_vat_in_eilat) {
                     $itemDetails['vat_type'] = $this->payplus_check_is_vat_eilat($order_id) ? 2 : 0;
