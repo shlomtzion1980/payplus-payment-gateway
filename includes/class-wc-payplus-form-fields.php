@@ -136,9 +136,9 @@ class WC_PayPlus_Form_Fields
         if (current_user_can('edit_shop_orders')) {
             $nonce = wp_create_nonce('payPlusOrderChecker');
 ?>
-<form method="post" action="">
-    <button name="verifyPayPlusOrders" value="<?php echo $nonce; ?>">Run PayPlus orders verifier</button>
-</form>
+            <form method="post" action="">
+                <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+            </form>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
