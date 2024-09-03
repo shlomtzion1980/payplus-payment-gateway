@@ -137,7 +137,8 @@ class WC_PayPlus_Statics
                 foreach ($refundsArray as $docNumber => $doc) {
                     $docLink = $doc['link'];
                     $docText = WC_PayPlus_Statics::translateInvoiceType($doc['type']);
-            ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+            ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                    href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
             <?php
                 }
                 if (count($refundsArray) > 1) { ?>
@@ -411,7 +412,9 @@ class WC_PayPlus_Statics
                     } elseif (is_string($value)) {
                         $object->$property = sanitize_text_field($value);
                     } elseif (is_array($value)) {
-                        $object->$property = array_map('sanitize_text_field', wp_unslash($value));
+                        $object->$property = array_map(function ($item) {
+                            return is_object($item) ? WC_PayPlus_Statics::sanitize_object($item) : sanitize_text_field($item);
+                        }, wp_unslash($value));
                     } elseif (is_object($value)) {
                         $object->$property = WC_PayPlus_Statics::sanitize_object($value);
                     }
