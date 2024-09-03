@@ -371,7 +371,11 @@ label:has(> .enable_checkout) {
   border-left-color: #00c8b1;
   border-radius: 50%;
 }
-
+#payplus_order_metabox {
+  .payPlusMetaBox {
+    min-width: 85%;
+  }
+}
 /* total table */
 #woocommerce-order-items .wc-order-totals tr.payplus-row th,
 #woocommerce-order-items .wc-order-totals tr.payplus-row td {

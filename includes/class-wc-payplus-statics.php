@@ -364,7 +364,7 @@ class WC_PayPlus_Statics
             $expMonthYear = "$expMonth/$expYear";
             $box = sprintf(
                 '<div style="font-weight:600;">PayPlus %s Successful</div>
-                        <table style="border-collapse:collapse">
+                        <table class="payPlusMetaBox" style="border-collapse:collapse">
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Method', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Brand', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
