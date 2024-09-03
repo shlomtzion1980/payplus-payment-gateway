@@ -41,6 +41,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     public function payplus_set_code_footer()
     {
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+        $enableGooglePay = isset($WC_PayPlus_Gateway->enable_google_pay) ? $WC_PayPlus_Gateway->enable_google_pay : false;
+        $enableApplePay = isset($WC_PayPlus_Gateway->enable_apple_pay) ? $WC_PayPlus_Gateway->enable_apple_pay : false;
         if ($this->payplus_chkeck_one_click_visible()) {
 ?>
             <script>
@@ -49,8 +51,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
                 }
 
-                let isGoogleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_google_pay === 'yes') ? 'true' : 'false' ?>';
-                let isAppleEnable = '<?php echo ($WC_PayPlus_Gateway->enable_apple_pay === 'yes') ? 'true' : 'false' ?>';
+                let isGoogleEnable = '<?php echo $enableGooglePay; ?>';
+                let isAppleEnable = '<?php echo $enableApplePay; ?>';
                 let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
                 let removeGooglePay = isFacebookApp();
                 let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
