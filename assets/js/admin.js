@@ -794,7 +794,8 @@ function payplus_get_sum_payments(rowId = -1) {
       }
     }
   }
-  return sum;
+  let roundedValue = Math.round(sum * 100) / 100;
+  return roundedValue;
 }
 function payplus_set_payments(nameClass) {
   const m_payment = parseFloat(number_of_payments.value);

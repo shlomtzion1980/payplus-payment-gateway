@@ -241,6 +241,7 @@ class WC_PayPlus_Statics
                 }
                 if ($boxType === 'payplus') {
                     $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
+                    $manualOrderPayments = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_order_payments', true) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_order_payments', true), true) : false;
                     $responseArray = json_decode($responsePayPlus, true);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         $error_message = json_last_error_msg();
@@ -293,6 +294,26 @@ class WC_PayPlus_Statics
                             }
                         }
                     }
+                    if ($manualOrderPayments && is_array($manualOrderPayments)) {
+                        foreach ($manualOrderPayments as $manulPayment) {
+                            $amount = $manulPayment['price'] ?? null;
+                            $method = $manulPayment['method_payment'] ?? null;
+                            $brand = $manulPayment['brand_name'] ?? null;
+                            $issuer = $manulPayment['issuer_name'] ?? null;
+                            $type = $manulPayment['type'] ?? null;
+                            $number = $manulPayment['order_id'] ?? null;
+                            $fourDigits = $manulPayment['create_at'] ?? null;
+                            $expMonth = $manulPayment['expiry_month'] ?? null;
+                            $expYear = $manulPayment['expiry_year'] ?? null;
+                            $numOfPayments = $manulPayment['number_of_payments'] ?? null;
+                            $voucherNum = $manulPayment['order_id'] ?? null;
+                            $voucherId = $manulPayment['voucher_id'] ?? null;
+                            $tokeUid = $manulPayment['token_uid'] ?? null;
+                            $j5Charge = null;
+                            echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, true));
+                            echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
+                        }
+                    }
                 }
             }
         }
@@ -336,9 +357,10 @@ class WC_PayPlus_Statics
          * 
          * @return string
          */
-        public static function createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge)
+        public static function createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $paymentType = false)
         {
             $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
+            $type_text = $paymentType ? __('Manual Payment', 'payplus-payment-gateway') : $type_text;
             $expMonthYear = "$expMonth/$expYear";
             $box = sprintf(
                 '<div style="font-weight:600;">PayPlus %s Successful</div>
