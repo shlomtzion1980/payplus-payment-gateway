@@ -27,6 +27,9 @@ class WC_PayPlus
     protected static $instance = null;
     public $notices = [];
     private $payplus_payment_gateway_settings;
+    public $applePaySettings;
+    public $isApplePayGateWayEnabled;
+    public $isApplePayExpressEnabled;
     public $invoice_api = null;
     private $_wpnonce;
 
@@ -44,6 +47,10 @@ class WC_PayPlus
     {
         //ACTION
         $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        $this->isApplePayGateWayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
+        $this->isApplePayExpressEnabled = boolval(property_exists($this->payplus_payment_gateway_settings, 'enable_apple_pay') && $this->payplus_payment_gateway_settings->enable_apple_pay === 'yes');
+
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('plugins_loaded', [$this, 'init']);
@@ -527,15 +534,12 @@ class WC_PayPlus
             $customIcons[] = esc_url($icon);
         }
 
-
         if (is_checkout()) {
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
-            if (
-                property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') &&
-                $this->payplus_payment_gateway_settings->import_applepay_script === "yes"
-                && in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe'])
-            ) {
-                $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
+            if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
+                if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                    $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
+                }
             }
             wp_localize_script(
                 'wc-checkout',

@@ -28,6 +28,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $hideOtherPayments;
     public $payPlusSettings;
     public $customIcons;
+    public $importApplePayScript;
+    public $applePaySettings;
 
 
     /**
@@ -49,6 +51,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->displayMode = $this->settings['display_mode'] ?? null;
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
         $this->hideOtherPayments = $this->settings['hide_other_charge_methods'] ?? null;
+        $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
 
         if (isset($this->settings['custom_icons']) && strlen($this->settings['custom_icons']) > 0) {
             $this->customIcons = explode(";", $this->settings['custom_icons']);
@@ -233,6 +237,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
+            'importApplePayScript' => $this->importApplePayScript ? $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION : false,
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',

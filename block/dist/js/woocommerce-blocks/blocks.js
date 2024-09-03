@@ -22,6 +22,24 @@ if (isCheckout || hasOrder) {
     "payplus-payment-gateway"
   );
 
+  function addScriptApple() {
+    if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
+      const script = document.createElement("script");
+      script.src = payPlusGateWay.importApplePayScript;
+      document.body.append(script);
+    }
+  }
+
+  function isMyScriptLoaded(url) {
+    var scripts = document.getElementsByTagName("script");
+    for (var i = scripts.length; i--; ) {
+      if (scripts[i].src == url) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   const gateways = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
   ).gateways;
@@ -346,6 +364,9 @@ if (isCheckout || hasOrder) {
         location.reload();
       });
       pp_iframe.appendChild(iframe);
+      if (payPlusGateWay.importApplePayScript) {
+        addScriptApple();
+      }
     }
   }
 

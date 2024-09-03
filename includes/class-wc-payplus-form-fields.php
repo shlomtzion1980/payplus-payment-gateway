@@ -294,13 +294,13 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Send add data parameter on transaction', 'payplus-payment-gateway'),
                 'default' => 'no',
             ],
-            'import_applepay_script' => [
-                'title' => __('Apple Pay', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Add Apple Pay Script to iframe', 'payplus-payment-gateway'),
-                'description' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-            ],
+            // 'import_applepay_script' => [
+            //     'title' => __('Apple Pay', 'payplus-payment-gateway'),
+            //     'type' => 'checkbox',
+            //     'label' => __('Add Apple Pay Script to iframe', 'payplus-payment-gateway'),
+            //     'description' => __('Include Apple Pay Script in Iframe Mode (You have to join the service first)', 'payplus-payment-gateway'),
+            //     'desc_tip' => true,
+            // ],
             'payment_page_title' => [
                 'title' => __('Payment Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',

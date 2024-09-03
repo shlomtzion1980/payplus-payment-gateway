@@ -339,9 +339,9 @@ jQuery(function ($) {
         $("input#woocommerce_payplus-payment-gateway_iframe_height")
           .closest("tr")
           .hide();
-        $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
-          .closest("tr")
-          .hide();
+        // $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
+        //   .closest("tr")
+        //   .hide();
         $("select#woocommerce_payplus-payment-gateway_display_mode")
           .siblings("p.description")
           .show();
@@ -353,16 +353,16 @@ jQuery(function ($) {
           $("input#woocommerce_payplus-payment-gateway_iframe_height")
             .closest("tr")
             .show();
-          $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
-            .closest("tr")
-            .show();
+          // $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
+          //   .closest("tr")
+          //   .show();
         } else {
           $("input#woocommerce_payplus-payment-gateway_iframe_height")
             .closest("tr")
             .show();
-          $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
-            .closest("tr")
-            .show();
+          // $("input#woocommerce_payplus-payment-gateway_import_applepay_script")
+          //   .closest("tr")
+          //   .show();
           $("select#woocommerce_payplus-payment-gateway_display_mode")
             .siblings("p.description")
             .hide();

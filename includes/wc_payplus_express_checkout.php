@@ -86,7 +86,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $url = $WC_PayPlus_Gateway->api_url . 'ApplePay/PaymentSessionOneClickCheckout';
-        $obj = isset($_POST['obj']) ?  WC_PayPlus_Statics::sanitize_object($_POST['obj']) : null; // phpcs:ignore 
+        $obj = $_POST['obj'];
         $arr['payment_page_uid'] = $this->paymentPageId;
         $arr['display_name'] = get_bloginfo('name') ? get_bloginfo('name') : site_url();
         $arr['website'] = site_url();
@@ -161,8 +161,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $discount = $cart->get_cart_discount_total();
         $taxDiscount = $cart->get_cart_discount_tax_total();
         if (!empty($_POST)) {
-            $obj = isset($_POST['obj']) ?  WC_PayPlus_Statics::sanitize_object($_POST['obj']) : null; // phpcs:ignore 
-            $paymentInfo = isset($obj['cardInfo']['info']) ? $obj['cardInfo']['info'] : null;
+            $obj = $_POST['obj'];
+            $paymentInfo = isset($_POST['obj']['cardInfo']['info']) ? $_POST['obj']['cardInfo']['info'] : null;
             $shipping = $obj['shipping'];
             $methodUrl = $obj['method'] == 'google-pay' ? 'GooglePayProcess' : 'ApplePayProcess';
             $url = $WC_PayPlus_Gateway->api_url . "Transactions/" . $methodUrl;
@@ -349,8 +349,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         if (!empty($_POST)) {
 
             $payload['payment_page_uid'] = $this->paymentPageId;
+            $payload['method'] = $_POST['method'];
             $payload['domain'] = site_url();
-            $method = isset($_POST['method']) ? sanitize_text_field(wp_unslash($_POST['method'])) : null;
+            $method = $_POST['method'];
 
             if ($method == 'apple-pay') {
                 $result = $this->payplus_add_file_ApplePay();
@@ -407,7 +408,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $paying_vat = false;
-        $obj = isset($_POST['obj']) ?  WC_PayPlus_Statics::sanitize_object($_POST['obj']) : null; // phpcs:ignore 
+        $obj = $_POST['obj'];
         global $woocommerce;
         $location = array(
             'country' => $obj['country_iso'],
@@ -449,7 +450,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         if (!empty($_POST)) {
             if (!empty($_POST['formData']['product_id'])) {
                 WC()->cart->empty_cart();
-                $formData = isset($_POST['formData']) ? array_map('sanitize_text_field', wp_unslash($_POST['formData'])) : [];
+                $formData = $_POST['formData'];
                 $productId = $formData['product_id'];
                 $variationId = !empty($formData['variation_id']) ? $formData['variation_id'] : 0;
                 $quantity = !empty($formData['quantity']) ? $formData['quantity'] : 1;

@@ -93,6 +93,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $saveOrderNote;
     public $currentApiKey;
     public $currentSecret;
+    public $applePaySettings;
+    public $allSettings;
     private $_wpnonce;
     private $current_time;
 
@@ -194,7 +196,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $this->display_mode = $this->get_option('display_mode');
         $this->iframe_height = $this->get_option('iframe_height');
-        $this->import_applepay_script = $this->get_option('import_applepay_script') == 'yes' ? true : false;
+        $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        $this->import_applepay_script = boolval(boolval(isset($this->allSettings['enable_apple_pay']) && $this->allSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
+
         $payPlusErrorPage = get_option('error_page_payplus');
         $payplusLinkError = isset($payPlusErrorPage) ? get_permalink($payPlusErrorPage) : null;
 

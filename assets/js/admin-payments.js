@@ -482,15 +482,15 @@ if (
   let currentMode;
   let modeMessage = [];
   // display  Add Apple Pay Script to iframe button
-  const isApplePayEnabled = payplus_script_admin.isApplePayEnabled;
+  // const isApplePayEnabled = payplus_script_admin.isApplePayEnabled;
 
-  isApplePayEnabled
-    ? jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
-        .closest("tr")
-        .fadeIn()
-    : jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
-        .closest("tr")
-        .fadeOut();
+  // isApplePayEnabled
+  //   ? jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
+  //       .closest("tr")
+  //       .fadeIn()
+  //   : jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
+  //       .closest("tr")
+  //       .fadeOut();
   // display allow amount change button
   Number(
     jQuery("#woocommerce_payplus-payment-gateway_transaction_type").val()
