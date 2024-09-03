@@ -481,7 +481,27 @@ if (
 
   let currentMode;
   let modeMessage = [];
+  // display  Add Apple Pay Script to iframe button
+  const isApplePayEnabled = payplus_script_admin.isApplePayEnabled;
 
+  isApplePayEnabled
+    ? jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
+        .closest("tr")
+        .fadeIn()
+    : jQuery("#woocommerce_payplus-payment-gateway_import_applepay_script")
+        .closest("tr")
+        .fadeOut();
+  // display allow amount change button
+  Number(
+    jQuery("#woocommerce_payplus-payment-gateway_transaction_type").val()
+  ) !== 2
+    ? jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization")
+        .closest("tr")
+        .fadeOut()
+    : jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization")
+        .closest("tr")
+        .fadeIn();
+  //display API mode
   if (
     jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() === "yes"
   ) {
@@ -523,6 +543,17 @@ function payplusMenusDisplay() {
   const urlParams = new URLSearchParams(queryString);
   const section = urlParams.get("section");
   const transactionType = payplus_script_admin.payplusTransactionType;
+  const $checkAmountAuthorization = jQuery(
+    "#woocommerce_payplus-payment-gateway_check_amount_authorization"
+  );
+  const $transactionType = jQuery(
+    "#woocommerce_payplus-payment-gateway_transaction_type"
+  );
+  $transactionType.change(function (e) {
+    Number(e.target.value) === 2
+      ? $checkAmountAuthorization.closest("tr").fadeIn()
+      : $checkAmountAuthorization.closest("tr").fadeOut();
+  });
 
   if (
     section === "payplus-payment-gateway-multipass" &&

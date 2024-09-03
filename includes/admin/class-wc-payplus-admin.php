@@ -17,6 +17,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         'payplus-payment-gateway-valuecard',
         'payplus-payment-gateway-finitione',
     );
+    public $applePaySettings;
+    public $isApplePayEnabled;
     public $isInvoiceEnable;
     public $useDedicatedMetaBox;
     public $invoiceDisplayOnly;
@@ -79,7 +81,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->saveOrderNote = isset($this->settings['payplus_data_save_order_note']) ? boolval($this->settings['payplus_data_save_order_note'] === 'yes') : null;
         $this->showPayPlusDataMetabox = isset($this->allSettings['show_payplus_data_metabox']) ? boolval($this->allSettings['show_payplus_data_metabox'] === 'yes') : null;
-
+        $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        $this->isApplePayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);
         // process make payment
@@ -2120,6 +2123,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplusGenerateLinkPayment" => wp_create_nonce('payplus_generate_link_payment'),
                 "payplusCustomAction" => wp_create_nonce('payplus_payplus_ipn'),
                 "frontNonce" => wp_create_nonce('frontNonce'),
+                "isApplePayEnabled" => $this->isApplePayEnabled,
             )
         );
         wp_enqueue_script('payplus-admin-payment');

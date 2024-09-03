@@ -242,6 +242,14 @@ class WC_PayPlus_Form_Fields
                 ],
                 'default' => '1',
             ],
+            'check_amount_authorization' => [
+                'title' => __('Allow amount change', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'yes',
+                'desc_tip' => true,
+                'label' => __('Transaction amount change', 'payplus-payment-gateway'),
+                'description' => __('Choose this to be able to charge a different amount higher/lower than the order total (A number field will appear beside the "Make Paymet" button)', 'payplus-payment-gateway'),
+            ],
             'checkout_page_title' => [
                 'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
