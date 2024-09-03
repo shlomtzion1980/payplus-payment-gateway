@@ -169,7 +169,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if ($screen->post_type === 'shop_order') {
             if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
                 add_meta_box(
-                    'invoice+_order_metabox',
+                    'invoice_plus_order_metabox',
                     "<img style='height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png'>",
                     [$this, 'display_invoice_order_metabox'],
                     $screen->id,
