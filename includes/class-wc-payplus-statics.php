@@ -433,6 +433,20 @@ class WC_PayPlus_Statics
             }
         }
 
+        /**
+         * Check if a variable (or array element) is set and equals a specific value.
+         *
+         * @param mixed $var The variable or array to check.
+         * @param mixed $val The value to compare against.
+         * @param string|false $string Optional key to access a specific array element.
+         * @return bool True if the condition is met, false otherwise.
+         */
+        public static function ppIsSetAnd($var, $val, $string = false)
+        {
+            $var = is_string($string) ? $var[$string] : $var;
+            return isset($var) && $var === $val;
+        }
+
 
         /**
          * @param $url
