@@ -239,6 +239,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
             $arrJson = array_merge($arrJson, $payload);
             $arrJson['paying_vat'] = isset($obj['paying_vat']) ? $obj['paying_vat'] : $arrJson['paying_vat'];
+            $arrJson['paying_vat'] = $arrJson['paying_vat'] === "true" ? true : false;
 
             $payload = wp_json_encode($arrJson);
 
