@@ -530,25 +530,15 @@ class PayplusInvoice
      */
     public function getRateShipping()
     {
+        global $wpdb;
         $tax_rate_shipping = 0;
+        $rates = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates");
 
-        // Get all tax rates
-        $tax_classes = WC_Tax::get_tax_classes();
-        $tax_rates = array();
-
-        foreach ($tax_classes as $tax_class) {
-            $tax_rates = array_merge($tax_rates, WC_Tax::get_rates_for_tax_class($tax_class));
-        }
-
-        if (!empty($tax_rates)) {
-            foreach ($tax_rates as $rate) {
-                if (empty($rate['tax_rate_country']) || $rate['tax_rate_country'] === 'IL') {
-                    $tax_rate_shipping = intval($rate['shipping']);
-                    break;
-                }
+        if (count($rates)) {
+            if ($rates[0]->tax_rate_country == "" || $rates[0]->tax_rate_country == 'IL') {
+                $tax_rate_shipping = intval($rates[0]->tax_rate_shipping);
             }
         }
-
         return $tax_rate_shipping;
     }
 
