@@ -115,7 +115,7 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = [
                     'title' => __('iFrame Height', 'payplus-payment-gateway'),
                     'type' => 'number',
-                    'default' => 600,
+                    'default' => 700,
                     'id' => 'woocommerce_payplus-payment-gateway_settings[iframe_height]'
                 ];
                 $settings[$section][] = [
