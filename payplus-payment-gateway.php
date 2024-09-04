@@ -514,7 +514,6 @@ class WC_PayPlus
             add_action('save_post', [$this, 'payplus_save_meta_box_data']);
             add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
             payplusUpdateActivate();
-            payplus_add_file_ApplePay();
         }
     }
 
