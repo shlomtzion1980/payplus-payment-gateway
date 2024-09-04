@@ -514,6 +514,9 @@ class WC_PayPlus
             add_action('save_post', [$this, 'payplus_save_meta_box_data']);
             add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
             payplusUpdateActivate();
+            if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
+                payplus_add_file_ApplePay();
+            }
         }
     }
 
@@ -522,7 +525,7 @@ class WC_PayPlus
      */
     public function load_checkout_assets()
     {
-        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.js');
+        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.min.js');
         $importAapplepayScript = null;
         $isModbile = (wp_is_mobile()) ? true : false;
         $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
@@ -560,7 +563,7 @@ class WC_PayPlus
 
                 if ($isEnableOneClick) {
                     $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
-                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.js', [], $script_version, true);
+                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.min.js', [], $script_version, true);
                     wp_localize_script(
                         'payplus-front-js',
                         'payplus_script',
