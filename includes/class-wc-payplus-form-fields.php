@@ -533,7 +533,7 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Hide the PayPlus side menu', 'payplus-payment-gateway'),
             ],
             'hide_custom_fields_buttons' => [
-                'title'   => __('Hide custom fields Delete/Update buttons', 'payplus-payment-gateway'),
+                'title'   => __('Disable custom fields editing in orders', 'payplus-payment-gateway'),
                 'type'    => 'checkbox',
                 'default' => 'yes',
             ],

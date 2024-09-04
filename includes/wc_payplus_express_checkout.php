@@ -45,38 +45,38 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $enableApplePay = isset($WC_PayPlus_Gateway->enable_apple_pay) ? $WC_PayPlus_Gateway->enable_apple_pay : false;
         if ($this->payplus_chkeck_one_click_visible()) {
 ?>
-<script>
-function isFacebookApp() {
-    var ua = navigator.userAgent || navigator.vendor || window.opera;
-    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
-}
+            <script>
+                function isFacebookApp() {
+                    var ua = navigator.userAgent || navigator.vendor || window.opera;
+                    return (ua.indexOf("FBAN") > -1) || (ua.indexOf("FBAV") > -1);
+                }
 
-let isGoogleEnable = '<?php echo $enableGooglePay; ?>';
-let isAppleEnable = '<?php echo $enableApplePay; ?>';
-let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
-let removeGooglePay = isFacebookApp();
-let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
-let expresscheckouts = document.querySelectorAll(".express-checkout");
-if (!showExpress) {
-    expresscheckouts.forEach(e => e.remove());
-} else {
-    if (expresscheckouts.length > 1) {
-        expresscheckouts.forEach((element, index) => {
-            if (index) {
-                expresscheckouts[index].remove();
-            }
-        });
-    }
-}
-if (removeGooglePay) {
-    let googlePayButton = document.getElementById('googlePayButton');
-    if (googlePayButton) {
-        googlePayButton.remove();
-    }
+                let isGoogleEnable = '<?php echo esc_js($enableGooglePay); ?>';
+                let isAppleEnable = '<?php echo esc_js($enableApplePay); ?>';
+                let isAppleAvailable = window.ApplePaySession && ApplePaySession?.canMakePayments();
+                let removeGooglePay = isFacebookApp();
+                let showExpress = (isGoogleEnable == 1 && !removeGooglePay) || (isAppleEnable && isAppleAvailable);
+                let expresscheckouts = document.querySelectorAll(".express-checkout");
+                if (!showExpress) {
+                    expresscheckouts.forEach(e => e.remove());
+                } else {
+                    if (expresscheckouts.length > 1) {
+                        expresscheckouts.forEach((element, index) => {
+                            if (index) {
+                                expresscheckouts[index].remove();
+                            }
+                        });
+                    }
+                }
+                if (removeGooglePay) {
+                    let googlePayButton = document.getElementById('googlePayButton');
+                    if (googlePayButton) {
+                        googlePayButton.remove();
+                    }
 
-}
-</script>
-<?php
+                }
+            </script>
+        <?php
         }
     }
 
@@ -351,9 +351,9 @@ if (removeGooglePay) {
         if (!empty($_POST)) {
 
             $payload['payment_page_uid'] = $this->paymentPageId;
-            $payload['method'] = $_POST['method'];
+            $payload['method'] = isset($_POST['method']) ? sanitize_text_field(wp_unslash($_POST['method'])) : null;
             $payload['domain'] = site_url();
-            $method = $_POST['method'];
+            $method = $payload['method'];
 
             if ($method == 'apple-pay') {
                 $result = $this->payplus_add_file_ApplePay();
@@ -681,13 +681,13 @@ if (removeGooglePay) {
             }
 
         ?>
-<input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
-<input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
-<input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
-<input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
-<input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
-<input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
-<?php
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithTax) ?>" id="payplus_pricewt_product">
+            <input type="hidden" value="<?php echo esc_attr($priceProductWithoutTax) ?>" id="payplus_pricewithouttax_product">
+            <input type="hidden" value="<?php echo esc_attr($productName) ?>" id="payplus_product_name">
+            <input type="hidden" value="<?php echo esc_attr($shippingPrice) ?>" id="payplus_shipping">
+            <input type="hidden" value="<?php echo esc_attr(get_woocommerce_currency()) ?>" id="payplus_currency_code">
+            <input type="hidden" value="<?php echo esc_attr($shippingWoo) ?>" id="payplus_shipping_woo">
+            <?php
             if ($shippingWoo === "false") {
                 $globalShippingPriceTax = $globalShipping;
                 if ($globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
@@ -697,9 +697,9 @@ if (removeGooglePay) {
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
                 }
             ?>
-<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
-<input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
-<input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_price_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShippingPriceTax) ?>" id="payplus_pricewt_shipping">
+                <input type="hidden" value="<?php echo esc_attr($globalShipping) ?>" id="payplus_pricewithouttax_shipping">
 <?php
             }
             echo '<div class="express-flex" >';

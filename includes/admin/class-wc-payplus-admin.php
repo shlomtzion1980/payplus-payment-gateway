@@ -155,8 +155,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     {
         $this->isInitiated();
         if ($this->hide_custom_fields_buttons) {
-            echo "<style>.post-type-shop_order #the-list .deletemeta { display: none !important; } #order_custom {textarea,input {pointer-events: none;opacity: 0.5;background-color: #f5f5f5;}} 
-            #newmeta input,#newmeta textarea,.submit.add-custom-field input {pointer-events: auto;opacity: 1;background-color: white;} .post-type-shop_order #the-list .updatemeta { display: none !important; }</style>";
+            echo "<style>.post-type-shop_order #the-list .deletemeta { display: none !important; } #order_custom {textarea,input {pointer-events: none;opacity: 0.5;background-color: #f5f5f5;} #newmeta input,#newmeta textarea,.submit.add-custom-field input {pointer-events: auto !important;opacity: 1 !important;background-color: white !important;}} 
+             .post-type-shop_order #the-list .updatemeta { display: none !important; }</style>";
         }
     }
 
