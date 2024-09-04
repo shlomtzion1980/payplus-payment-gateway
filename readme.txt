@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.1.2 - 04-09-2024 =
+= 7.1.2 - 08-09-2024 =
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
 * Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
@@ -116,59 +116,5 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Introduced a PayPlus cron checker that, if activated, runs every hour. It checks for orders created in the last two hours with a “pending” status and processes IPNs if a payment page request UID is present.
 * Add    - Added new settings for token payments and the PayPlus cron checker.
 * Add    - Introduced an option to add custom icons below or instead of the default PayPlus icon in the Checkout Page Options.
-
-= 7.0.9 = 
-* Add    - Multipass icons will change with fade in and out on the checkout page.
-* Add    - Multipass clubs select in plugin settings.
-* Add    - Brand UID for Sandbox/Development mode.
-* Add    - Hide products in Invoice+ documents - Option to use "General Product".
-* Add    - Transaction CC Issuer and Brand name added to PayPlus metabox.
-* Change - Invoice+ admin settings language selector in capital letters.
-* Change - Design changes for orders: Manual invoice creation tables,manual refunds creation tables and manual payments creation tables.
-* Tweak  - Sandbox/Development mode displayed in RED color in plugin settings.
-* Fix    - Missing nonce in express checkout.
-* Fix    - Express Checkout activation.
-* Fix    - Code Refactor for creation of refunds, invoices and receipts.
-* Fix    - Invoice+ refunds for "General Product" or partial refunds in automatic and manual creation.
-* Fix    - WP_Filesystem() function check before usage.
-* Fix    - Corrected redirect link after order refund action via admin (This occured mainly on sites with order edit links like : /wp-admin/post.php?post=167&action=edit...).
-* Fix    - Callbacks were blocked for some clients. (Nonce issue)
-* Fix    - New user creation on checkout process. (Works with classic checkout fully and with New Blocks Checkout in iFrame popup and in iFrame on the same page) (Nonce issue)
-* Fix    - ipn_response() blocked for some because of nonce issue. (Nonce issue)
-
-= 7.0.8 =
-* Fix    - Enable/Disable option in Basic Settings wasn't connected to the correct setting.
-* Fix    - On bit successful transactions through "uPay" the redirect to thank you page is now corrected for both mobile and desktop.
-* Fix    - Major security code refactor and updates.
-* Add    - Admin settings visual changes - In an approach to make the plugin setup easier and clearer.
-* Add    - Show current API environment mode.
-* Add    - According to the current API environment mode, display the correct set of keys and hide the other.
-* Add    - In MULTIPASS method settings - Show warning if transaction type is set for "Authorization" - MULTIPASS only works with "Charge".
-* Add    - Iframe display of PayPlus FAQ pages plugin settings.
-
-= 7.0.7 = 
-* Add    - PayPlus response json added for express checkout - PayPlus metabox.
-* Add    - Option to show/hide the PayPlus dedicated metabox on the order page.
-* Add    - Option to save the PayPlus transaction data to the order note or not... (appears in the metabox)
-* Fix    - Update order status (on-hold) on callback ipn response for J5 (Approval).
-* Fix    - In WooCommerce Classic Checkout Page: Show only the selected method description and hide the others.
-* Tweak  - Express Checkout button design - corrected height of iframe.
-
-= 7.0.6 = 
-* Fix    - Missing options caused debug errors - After update from older versions some website experienced missing options that should have been created automatically. Code now handles the missing options correctly.
-* Fix    - Fixed auto create payplus error page function.
-* Fix    - Malformed json received with " inside a string of the json sometimes returns from the PayPlus CRM (in the company name for example), it is now fixed and re-saved as correct json.
-* Change - Blocks file name was changed to the new naming convention - part of code refactoring.
-
-= 7.0.2 = 
-* Change - If Multipass payment is turned on in the payment page it will always show other payment methods (Due to Multipass demand that if there isn't enough balance to cover the order with the voucher customers will always be able to add credit-card payment or else).
-* Add    - Payplus data metabox - Show all transactions - not only the last one - including related transactions with the total of all at the bottom.
-* Add    - Payplus data metabox - Show method of payment in the displayed data.
-* Tweak  - Design changes in settings and metaboxes - logos and colors.
-* Tweak  - On all orders display page - if there is only one invoice+ document it will be shown as a link and if more than one the arrow list will be displayed.
-* Tweak  - Express Checkout - Small design changes for mobile and desktop.
-
-= 7.0.1 = 
-* Fix    - Small but important J5 fix for invoices with split payments.
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/CHANGELOG.md).

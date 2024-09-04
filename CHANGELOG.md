@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.1.2] - 2024-09-08 - (Robotnik)
+
+* Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
+* Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
+* Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
+* Add    - Apple script is now added automatically to all iframes if needed in both checkouts.
+* Fix    - Adjusted iframe width in both checkouts on mobile view; also fixed the close frame button to stay at the top of the frame.
+* Fix    - Resolved PHP warning generated from the IP check function, which was missing an `isset` check.
+* Fix    - When a translation doesn't exist for "API Mode" in admin settings, display it in English.
+* Fix    - Corrected behavior of product/item VAT sent to IPN or Invoice+ documents.
+* Fix    - Express Checkout did not display in the last two versions in the classic checkout due to a sanitation error.
+* Tweak  - Display multiple charge invoice documents on the orders page and inside the order page metabox.
+* Tweak  - Updated token payment error note (for token payments made from the admin).
+* Tweak  - Updated Alertify.js version.
+* Tweak  - Error message display on mobile "New Checkout Blocks" was too small.
+* Tweak  - Improved PayPlus IPN function to eliminate PHP warnings.
+* Tweak  - Updated some buttons and colors on the orders page.
+* Tweak  - Sanitation and security fixes according to "Plugin Check" plugin repository requirements.
+* Tweak  - Block/Disable editing custom fields option (available in PayPlus advanced features).
+* Tweak  - Fixed styling of the Express Checkout button in classic checkout.
+
 ##  [7.1.1] - 2024-07-18 - (The Doctor)
 
 * Fix    - Resolved an issue where classic checkout fields were not displaying correctly due to multipass icons logic.
