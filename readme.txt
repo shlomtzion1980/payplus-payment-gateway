@@ -91,6 +91,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
 * Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
 * Add    - Apple script is now added automatically to all iframes if needed in both checkouts.
+* Add    - Added support for free shipping minimum amount conditions for express checkout.
 * Fix    - Adjusted iframe width in both checkouts on mobile view; also fixed the close frame button to stay at the top of the frame.
 * Fix    - Resolved PHP warning generated from the IP check function, which was missing an `isset` check.
 * Fix    - When a translation doesn't exist for "API Mode" in admin settings, display it in English.
