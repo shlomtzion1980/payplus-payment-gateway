@@ -212,8 +212,14 @@ async function onShippingContactSelected(event, session) {
 
     await updatePayingVat(contact);
     if (countryCode) {
+      let total =
+        globalPriceProductsWithoutTax +
+        parseFloat(currentShippingPrice) +
+        (globalPayingVat
+          ? parseFloat(currentShippingTax) + parseFloat(globalTaxForProducts)
+          : 0);
       const arrayShipping = this.formattedShipping(countryCode, false);
-      arrayShipping = minAmountShipping(arrayShipping);
+      arrayShipping = correctShipping(arrayShipping, total);
       formattedtShippingArray = arrayShipping.newShippingOptionsForApple;
       formattedtShippingArrayPayPlus =
         arrayShipping.newShippingOptionsForPayPlus;
@@ -387,7 +393,7 @@ async function handleApplePayClick(event) {
   }
 }
 
-function minAmountShipping(allShipping, total) {
+function correctShipping(allShipping, total) {
   for (const key in allShipping) {
     for (const k in allShipping[key]) {
       if (allShipping[key][k]?.condition?.min_amount?.length) {
@@ -696,7 +702,7 @@ window.addEventListener("message", async function (event) {
           tempElement.innerHTML = encodedJson;
           const decodedJson = tempElement.value;
           shipping = JSON.parse(decodedJson);
-          shipping = minAmountShipping(shipping, calc);
+          shipping = correctShipping(shipping, calc);
         } else {
           shipping = {
             all: [
