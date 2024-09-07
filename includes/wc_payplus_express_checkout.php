@@ -667,6 +667,28 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $globalShippingTax = $WC_PayPlus_Gateway->global_shipping_tax;
             $globalShippingTaxRate = $WC_PayPlus_Gateway->global_shipping_tax_rate;
             $shippingPrice = $this->get_all_shipping_costs();
+            $shipping_zones = WC_Shipping_Zones::get_zones();
+            if ($shippingPrice) {
+                foreach ($shipping_zones as $zone) {
+                    $shipping_methods = $zone['shipping_methods'];
+                    foreach ($shipping_methods as $id => $shipping_method) {
+                        if (isset($shipping_method->requires)) {
+                            $condition = $shipping_method->requires;
+                            $requiredCondition = $shipping_method->$condition;
+                            $shippingPricesArray = json_decode($shippingPrice, true);
+                            foreach ($shippingPricesArray as $country => $siPrice) {
+                                foreach ($siPrice as $key => $sp) {
+                                    if ($sp['id'] === $id) {
+                                        $shippingPricesArray[$country][$key]['condition'][$condition] = $requiredCondition;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                $shippingPrice = wp_json_encode($shippingPricesArray);
+            }
+            $free_shipping_settings = get_option('woocommerce_free_shipping_settings');
             $shippingPrice = ($shippingPrice) ? $shippingPrice : "";
             $productId = ($product) ? $product->get_id() : "";
             $productName = ($product) ? $product->get_title() : "";

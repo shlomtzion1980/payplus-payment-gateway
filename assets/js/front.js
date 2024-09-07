@@ -213,6 +213,7 @@ async function onShippingContactSelected(event, session) {
     await updatePayingVat(contact);
     if (countryCode) {
       const arrayShipping = this.formattedShipping(countryCode, false);
+      arrayShipping = minAmountShipping(arrayShipping);
       formattedtShippingArray = arrayShipping.newShippingOptionsForApple;
       formattedtShippingArrayPayPlus =
         arrayShipping.newShippingOptionsForPayPlus;
@@ -386,6 +387,27 @@ async function handleApplePayClick(event) {
   }
 }
 
+function minAmountShipping(allShipping, total) {
+  for (const key in allShipping) {
+    for (const k in allShipping[key]) {
+      if (allShipping[key][k]?.condition?.min_amount?.length) {
+        if (
+          Number(allShipping[key][k]?.condition?.min_amount) > Number(total)
+        ) {
+          console.log(
+            "total = ",
+            total,
+            allShipping[key][k]?.condition?.min_amount
+          );
+          const wantedValues = [`${k}`]; // Output: [0, 1, 2]
+          allShipping[key].splice(k, 1);
+        }
+      }
+    }
+  }
+  return allShipping;
+}
+
 function formattedShipping(countryCode, withTax = false) {
   let allShipping;
   let shippingWoo =
@@ -424,6 +446,7 @@ function formattedShipping(countryCode, withTax = false) {
     }
 
     newShippingOptionsForApple = shippingOptions.map((item) => ({
+      condition: item.condition ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
@@ -433,6 +456,7 @@ function formattedShipping(countryCode, withTax = false) {
     }));
 
     newShippingOptionsForPayPlus = shippingOptions.map((item) => ({
+      condition: item.condition ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
@@ -548,6 +572,25 @@ function checkClassChange() {
   }
 }
 
+function checkArrayType(product) {
+  console.log(product);
+  const productData = product;
+
+  // Check if it's an array
+  if (Array.isArray(productData)) {
+    // Check if the first element is an object or a string
+    if (typeof productData[0] === "object" && !Array.isArray(productData[0])) {
+      return 3;
+    } else if (typeof productData[0] === "string") {
+      console.log(`${product} is an array of strings.`);
+    } else {
+      console.log(`${product} contains a different type of data.`);
+    }
+  } else {
+    console.log(`${product} is not an array.`);
+  }
+}
+
 window.addEventListener("message", async function (event) {
   let paymentData = event.data;
   const senderOrigin = event.origin;
@@ -615,8 +658,17 @@ window.addEventListener("message", async function (event) {
       let priceUpdateWithTax = 0;
       let globalTaxForProducts = 0;
       let globalDiscount = 0;
-
+      let calc = 0;
       const data2 = await getTotalPriceCart();
+
+      for (const product in data2["products"]) {
+        console.log("product", data2["products"][product]);
+        calc +=
+          Number(data2["products"][product]["quantity"]) *
+          Number(data2["products"][product]["priceProductWithTax"]);
+      }
+
+      console.log("calc: ", calc);
       const {
         arrayItemGoogle,
         totalPrice,
@@ -624,6 +676,7 @@ window.addEventListener("message", async function (event) {
         discountPrice,
         taxGlobal,
       } = formatedProductsArrayGoogle(data2);
+      console.log("salePrice", data2);
       products = arrayItemGoogle;
       priceUpdatedNumber = totalPriceWithoutTax;
       priceUpdateWithTax = totalPrice;
@@ -643,6 +696,7 @@ window.addEventListener("message", async function (event) {
           tempElement.innerHTML = encodedJson;
           const decodedJson = tempElement.value;
           shipping = JSON.parse(decodedJson);
+          shipping = minAmountShipping(shipping, calc);
         } else {
           shipping = {
             all: [
