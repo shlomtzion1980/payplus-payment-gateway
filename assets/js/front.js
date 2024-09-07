@@ -454,7 +454,6 @@ function formattedShipping(countryCode, withTax = false) {
     }
 
     newShippingOptionsForApple = shippingOptions.map((item) => ({
-      condition: item.condition ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
@@ -464,7 +463,6 @@ function formattedShipping(countryCode, withTax = false) {
     }));
 
     newShippingOptionsForPayPlus = shippingOptions.map((item) => ({
-      condition: item.condition ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
