@@ -218,8 +218,10 @@ async function onShippingContactSelected(event, session) {
         (globalPayingVat
           ? parseFloat(currentShippingTax) + parseFloat(globalTaxForProducts)
           : 0);
-      const arrayShipping = this.formattedShipping(countryCode, false);
-      arrayShipping = correctShipping(arrayShipping, total);
+      const arrayShipping = correctShipping(
+        this.formattedShipping(countryCode, false),
+        Number(total)
+      );
       formattedtShippingArray = arrayShipping.newShippingOptionsForApple;
       formattedtShippingArrayPayPlus =
         arrayShipping.newShippingOptionsForPayPlus;
