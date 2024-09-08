@@ -686,7 +686,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         }
                     }
                 }
-                $shippingPrice = wp_json_encode($shippingPricesArray);
+                if (isset($shippingPricesArray) && is_array($shippingPricesArray)) {
+                    $shippingPrice = wp_json_encode($shippingPricesArray);
+                }
             }
             $free_shipping_settings = get_option('woocommerce_free_shipping_settings');
             $shippingPrice = ($shippingPrice) ? $shippingPrice : "";

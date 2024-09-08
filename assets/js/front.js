@@ -415,18 +415,22 @@ function correctShipping(allShipping, total, countryCode = false) {
   return allShipping;
 }
 
-let AllShippingPayPlus = JSON.parse(
-  (allShipping = document.getElementById("payplus_shipping").value)
-);
 let flats = [];
-for (countryCode in AllShippingPayPlus) {
-  for (k in AllShippingPayPlus[countryCode]) {
-    if (AllShippingPayPlus[countryCode][k].cost_with_tax > 0) {
-      flats[countryCode] = parseFloat(
-        AllShippingPayPlus[countryCode][k].cost_with_tax
-      );
+if (document.getElementById("payplus_shipping").value) {
+  let AllShippingPayPlus = JSON.parse(
+    (allShipping = document.getElementById("payplus_shipping").value)
+  );
+  for (countryCode in AllShippingPayPlus) {
+    for (k in AllShippingPayPlus[countryCode]) {
+      if (AllShippingPayPlus[countryCode][k].cost_with_tax > 0) {
+        flats[countryCode] = parseFloat(
+          AllShippingPayPlus[countryCode][k].cost_with_tax
+        );
+      }
     }
   }
+} else {
+  document.getElementById("payplus_shipping").value = "{}";
 }
 
 function formattedShipping(countryCode, total, withTax = false) {
