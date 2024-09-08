@@ -866,7 +866,7 @@ class PayplusInvoice
         $order = wc_get_order($order_id);
         $typePaymentMethod = $order->get_payment_method();
         if ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod") {
-            $this->payplus_invoice_create_order($order_id, 'inv_tax');
+            $this->payplus_invoice_create_order($order_id, 'inv_tax', true);
         }
     }
     public function payplus_check_sum_withholding_tax($payments)
@@ -895,7 +895,7 @@ class PayplusInvoice
      * @param $order_id
      * @return void
      */
-    public function payplus_invoice_create_order($order_id, $typeInvoice = false)
+    public function payplus_invoice_create_order($order_id, $typeInvoice = false, $isCashPayment = false)
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
             wp_die('Not allowed! - payplus_invoice_create_order');
@@ -1051,7 +1051,9 @@ class PayplusInvoice
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
-                    $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $payplus_document_type, $payload);
+                    if (!$isCashPayment) {
+                        $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $payplus_document_type, $payload);
+                    }
 
                     if (is_wp_error($response)) {
                         $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
