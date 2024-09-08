@@ -24,6 +24,7 @@ let globalPriceProductsWithoutTax = 0;
 let globalPriceProductsWithTax = 0;
 let globalTaxForProducts = 0;
 let globalDiscount = 0;
+let appleTotalPrice = 0;
 let globalPayingVat = true;
 let ArrayCheckoutItemsApplePay = [];
 let isProductPage = !!productID;
@@ -202,7 +203,6 @@ async function onShippingContactSelected(event, session) {
     let formattedtShippingArray = [];
     let formattedtShippingArrayPayPlus = [];
     const countryCode = event.shippingContact?.countryCode;
-
     const contact = {
       city: event.shippingContact.locality,
       country_iso: countryCode,
@@ -212,15 +212,10 @@ async function onShippingContactSelected(event, session) {
 
     await updatePayingVat(contact);
     if (countryCode) {
-      let total =
-        globalPriceProductsWithoutTax +
-        parseFloat(currentShippingPrice) +
-        (globalPayingVat
-          ? parseFloat(currentShippingTax) + parseFloat(globalTaxForProducts)
-          : 0);
-      const arrayShipping = correctShipping(
-        this.formattedShipping(countryCode, false),
-        Number(total)
+      const arrayShipping = this.formattedShipping(
+        countryCode,
+        parseFloat(appleTotalPrice),
+        false
       );
       formattedtShippingArray = arrayShipping.newShippingOptionsForApple;
       formattedtShippingArrayPayPlus =
@@ -366,6 +361,7 @@ async function handleApplePayClick(event) {
       session.completeMerchantValidation(data.payment_response);
 
       const data2 = await getTotalPriceCart();
+
       const {
         arrayItemApple,
         totalPrice,
@@ -373,6 +369,7 @@ async function handleApplePayClick(event) {
         discountPrice,
         taxGlobal,
       } = formatedProductsArrayApple(data2);
+      appleTotalPrice = totalPrice;
       globalPriceProductsWithTax = totalPrice;
       globalPriceProductsWithoutTax = totalPriceWithoutTax;
       globalDiscount = discountPrice;
@@ -391,22 +388,24 @@ async function handleApplePayClick(event) {
       await onPaymentAuthorized(event, session);
     };
   } catch (e) {
+    AllShippingPayPlus;
     displayMsgError(textError + e.message);
   }
 }
 
-function correctShipping(allShipping, total) {
+function correctShipping(allShipping, total, countryCode = false) {
+  let flatShipping = 0;
+  if (countryCode) {
+    flatShipping = flats[countryCode];
+  }
   for (const key in allShipping) {
     for (const k in allShipping[key]) {
       if (allShipping[key][k]?.condition?.min_amount?.length) {
         if (
-          Number(allShipping[key][k]?.condition?.min_amount) > Number(total)
+          Number(allShipping[key][k]?.condition?.min_amount) +
+            Number(flatShipping) >
+          Number(total)
         ) {
-          console.log(
-            "total = ",
-            total,
-            allShipping[key][k]?.condition?.min_amount
-          );
           const wantedValues = [`${k}`]; // Output: [0, 1, 2]
           allShipping[key].splice(k, 1);
         }
@@ -416,13 +415,28 @@ function correctShipping(allShipping, total) {
   return allShipping;
 }
 
-function formattedShipping(countryCode, withTax = false) {
+let AllShippingPayPlus = JSON.parse(
+  (allShipping = document.getElementById("payplus_shipping").value)
+);
+let flats = [];
+for (countryCode in AllShippingPayPlus) {
+  for (k in AllShippingPayPlus[countryCode]) {
+    if (AllShippingPayPlus[countryCode][k].cost_with_tax > 0) {
+      flats[countryCode] = parseFloat(
+        AllShippingPayPlus[countryCode][k].cost_with_tax
+      );
+    }
+  }
+}
+
+function formattedShipping(countryCode, total, withTax = false) {
   let allShipping;
   let shippingWoo =
     document.getElementById("payplus_shipping_woo").value === "true";
   if (shippingWoo) {
     allShipping = document.getElementById("payplus_shipping").value;
     allShipping = JSON.parse(allShipping);
+    correctShipping(allShipping, Number(total), countryCode);
   } else {
     const cost_shipping_with_tax = document.getElementById(
       "payplus_pricewt_shipping"
@@ -454,6 +468,7 @@ function formattedShipping(countryCode, withTax = false) {
     }
 
     newShippingOptionsForApple = shippingOptions.map((item) => ({
+      min_amount: item.condition?.min_amount ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
@@ -463,6 +478,7 @@ function formattedShipping(countryCode, withTax = false) {
     }));
 
     newShippingOptionsForPayPlus = shippingOptions.map((item) => ({
+      min_amount: item.condition?.min_amount ?? null,
       identifier: `shipping-${item.id}`,
       label: item.title,
       detail: "shipping",
@@ -668,13 +684,11 @@ window.addEventListener("message", async function (event) {
       const data2 = await getTotalPriceCart();
 
       for (const product in data2["products"]) {
-        console.log("product", data2["products"][product]);
         calc +=
           Number(data2["products"][product]["quantity"]) *
           Number(data2["products"][product]["priceProductWithTax"]);
       }
 
-      console.log("calc: ", calc);
       const {
         arrayItemGoogle,
         totalPrice,
@@ -682,7 +696,7 @@ window.addEventListener("message", async function (event) {
         discountPrice,
         taxGlobal,
       } = formatedProductsArrayGoogle(data2);
-      console.log("salePrice", data2);
+
       products = arrayItemGoogle;
       priceUpdatedNumber = totalPriceWithoutTax;
       priceUpdateWithTax = totalPrice;
