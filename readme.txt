@@ -97,6 +97,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Fix    - When a translation doesn't exist for "API Mode" in admin settings, display it in English.
 * Fix    - Corrected behavior of product/item VAT sent to IPN or Invoice+ documents.
 * Fix    - Express Checkout did not display in the last two versions in the classic checkout due to a sanitation error.
+* Fix    - Fixed duplicate creation of invoice on "cod - cash on delivery" or "bacs - bank transfer" when "issue an automatic tax invoice" is checked in Invoice+.
 * Tweak  - Display multiple charge invoice documents on the orders page and inside the order page metabox.
 * Tweak  - Updated token payment error note (for token payments made from the admin).
 * Tweak  - Updated Alertify.js version.

@@ -8,11 +8,13 @@ All notable changes to this project will be documented in this file.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
 * Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
 * Add    - Apple script is now added automatically to all iframes if needed in both checkouts.
+* Add    - Added support for free shipping minimum amount conditions for express checkout.
 * Fix    - Adjusted iframe width in both checkouts on mobile view; also fixed the close frame button to stay at the top of the frame.
 * Fix    - Resolved PHP warning generated from the IP check function, which was missing an `isset` check.
 * Fix    - When a translation doesn't exist for "API Mode" in admin settings, display it in English.
 * Fix    - Corrected behavior of product/item VAT sent to IPN or Invoice+ documents.
 * Fix    - Express Checkout did not display in the last two versions in the classic checkout due to a sanitation error.
+* Fix    - Fixed duplicate creation of invoice on "cod - cash on delivery" or "bacs - bank transfer" when "issue an automatic tax invoice" is checked in Invoice+.
 * Tweak  - Display multiple charge invoice documents on the orders page and inside the order page metabox.
 * Tweak  - Updated token payment error note (for token payments made from the admin).
 * Tweak  - Updated Alertify.js version.
