@@ -405,7 +405,7 @@ function correctShipping(allShipping, total, countryCode = false) {
     for (const k in allShipping[key]) {
       if (allShipping[key][k]?.condition?.min_amount?.length) {
         if (
-          Number(allShipping[key][k]?.condition?.min_amount) >= Number(total)
+          Number(allShipping[key][k]?.condition?.min_amount) > Number(total)
         ) {
           const wantedValues = [`${k}`]; // Output: [0, 1, 2]
           allShipping[key].splice(k, 1);
