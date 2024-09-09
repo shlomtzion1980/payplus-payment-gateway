@@ -370,8 +370,10 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'list-hidden',
                 );
                 $settings[$section][] = array(
-                    'name' => __('Whether to issue an automatic tax invoice that is paid in cash or by bank transfer', 'payplus-payment-gateway'),
+                    'name' => __('Issue automatic tax invoice for orders paid in cash or bank transfers', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[create-invoice-automatic]',
+                    'desc' => __('This overrides the default setting for automatic documents created for an order and is applicable only for "cod - cash on delivery" or "bacs - bank transfer" payment.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
                     'type' => 'checkbox',
                     'class' => 'payplus-documents'
                 );
