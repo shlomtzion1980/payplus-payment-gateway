@@ -362,6 +362,13 @@ async function handleApplePayClick(event) {
 
       const data2 = await getTotalPriceCart();
 
+      appleTotalPrice = 0;
+      for (const product in data2["products"]) {
+        appleTotalPrice +=
+          Number(data2["products"][product]["quantity"]) *
+          Number(data2["products"][product]["priceProductWithTax"]);
+      }
+
       const {
         arrayItemApple,
         totalPrice,
@@ -369,7 +376,7 @@ async function handleApplePayClick(event) {
         discountPrice,
         taxGlobal,
       } = formatedProductsArrayApple(data2);
-      appleTotalPrice = totalPrice;
+
       globalPriceProductsWithTax = totalPrice;
       globalPriceProductsWithoutTax = totalPriceWithoutTax;
       globalDiscount = discountPrice;
@@ -394,17 +401,11 @@ async function handleApplePayClick(event) {
 }
 
 function correctShipping(allShipping, total, countryCode = false) {
-  let flatShipping = 0;
-  if (countryCode) {
-    flatShipping = flats[countryCode];
-  }
   for (const key in allShipping) {
     for (const k in allShipping[key]) {
       if (allShipping[key][k]?.condition?.min_amount?.length) {
         if (
-          Number(allShipping[key][k]?.condition?.min_amount) +
-            Number(flatShipping) >
-          Number(total)
+          Number(allShipping[key][k]?.condition?.min_amount) >= Number(total)
         ) {
           const wantedValues = [`${k}`]; // Output: [0, 1, 2]
           allShipping[key].splice(k, 1);
@@ -413,21 +414,6 @@ function correctShipping(allShipping, total, countryCode = false) {
     }
   }
   return allShipping;
-}
-
-let flats = [];
-let payplusShippingElement = document.getElementById("payplus_shipping");
-if (payplusShippingElement.value) {
-  let AllShippingPayPlus = JSON.parse(payplusShippingElement.value);
-  for (countryCode in AllShippingPayPlus) {
-    for (k in AllShippingPayPlus[countryCode]) {
-      if (AllShippingPayPlus[countryCode][k].cost_with_tax > 0) {
-        flats[countryCode] = parseFloat(
-          AllShippingPayPlus[countryCode][k].cost_with_tax
-        );
-      }
-    }
-  }
 }
 
 function formattedShipping(countryCode, total, withTax = false) {
