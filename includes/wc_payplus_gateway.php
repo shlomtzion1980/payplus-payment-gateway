@@ -1907,7 +1907,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $hideOtherChargeMethods = isset($options['hideOtherPayments']) ? $options['hideOtherPayments'] : $hideOtherChargeMethods;
         $hideOtherChargeMethods = $this->default_charge_method === 'multipass' ? 'false' : $hideOtherChargeMethods;
 
-        if ($subscription) {
+        if ($options['isSubscriptionOrder']) {
             $hideOtherChargeMethods = 'true';
             $this->default_charge_method = 'credit-card';
         }
@@ -2032,7 +2032,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
         $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
-        $payload = $this->generatePayloadLink($order_id, false, $token, $subscription, $custom_more_info, $move_token);
+
+        $isSubscriptionOrder = false;
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                $isSubscriptionOrder = true;
+                break;
+            }
+        }
+
+        $options = $isSubscriptionOrder ? ['isSubscriptionOrder' => true] : [];
+        $payload = $this->generatePayloadLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
 
         $this->payplus_add_log_all($handle, 'Payload data before Sending to PayPlus');
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');

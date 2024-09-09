@@ -8,6 +8,25 @@ jQuery(function ($) {
 
   $.blockUI.defaults.overlayCSS.cursor = "default";
 
+  function subscriptionOrderHide() {
+    // Select all elements with the wc_payment_method class inside .wc_payment_methods.payment_methods.methods
+    $(".wc_payment_methods.payment_methods.methods .wc_payment_method").each(
+      function () {
+        // Check if the element has any class that starts with 'payment_method_payplus-payment-gateway-'
+        var classes = $(this).attr("class").split(/\s+/);
+        classes.forEach(
+          function (className) {
+            if (
+              className.startsWith("payment_method_payplus-payment-gateway-")
+            ) {
+              $(this).remove();
+            }
+          }.bind(this)
+        );
+      }
+    );
+  }
+
   var wc_checkout_form = {
     updateTimer: false,
     dirtyInput: false,
@@ -466,7 +485,12 @@ jQuery(function ($) {
                 wc_checkout_form.fragments[key] !== value
               ) {
                 $(key).replaceWith(value);
-                addCustomIcons();
+                payplus_script_checkout.isSubscriptionOrder
+                  ? subscriptionOrderHide()
+                  : null;
+                if (!document.querySelector("#payplus-checkout-image-div")) {
+                  addCustomIcons();
+                }
                 let loopImages = true;
                 multiPassIcons(loopImages);
               }

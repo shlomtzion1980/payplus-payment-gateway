@@ -30,6 +30,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $customIcons;
     public $importApplePayScript;
     public $applePaySettings;
+    public $isSubscriptionOrder;
 
 
     /**
@@ -50,7 +51,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
         $this->displayMode = $this->settings['display_mode'] ?? null;
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
-        $this->hideOtherPayments = $this->settings['hide_other_charge_methods'] ?? null;
+        $this->hideOtherPayments = boolval($this->settings['hide_other_charge_methods']) ?? null;
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
 
@@ -85,6 +86,14 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data = $context->payment_data;
         $is_payplus_payment_method = $this->name === $context->payment_method;
         $main_gateway              = new WC_PayPlus_Gateway;
+
+        $this->isSubscriptionOrder = false;
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                $this->isSubscriptionOrder = true;
+                break;
+            }
+        }
 
         $token_id = $context->payment_data['token'];
         $token = WC_Payment_Tokens::get($token_id);
@@ -154,7 +163,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         } else {
             $result->set_payment_details('');
         }
-        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments]);
+
+        $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments, 'isSubscriptionOrder' => $this->isSubscriptionOrder]);
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
         $payment_details = $result->payment_details;
@@ -228,6 +238,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_data()
     {
+        $isSubscriptionOrder = false;
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                $isSubscriptionOrder = true;
+                break;
+            }
+        }
 
         return [
             'title' => $this->get_setting('title'),
@@ -237,6 +254,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
+            'isSubscriptionOrder' => $isSubscriptionOrder,
             'importApplePayScript' => $this->importApplePayScript ? $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION : false,
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],

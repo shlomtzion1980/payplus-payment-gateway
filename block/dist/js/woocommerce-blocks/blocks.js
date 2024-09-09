@@ -40,9 +40,13 @@ if (isCheckout || hasOrder) {
     return true;
   }
 
-  const gateways = window.wc.wcSettings.getPaymentMethodData(
+  let gateways = window.wc.wcSettings.getPaymentMethodData(
     "payplus-payment-gateway"
   ).gateways;
+
+  gateways = payPlusGateWay.isSubscriptionOrder
+    ? ["payplus-payment-gateway"]
+    : gateways;
 
   let customIcons = [];
 

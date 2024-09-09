@@ -158,7 +158,11 @@ body #applePayButton {
 .express-checkout p {
   margin: 0px;
 }
-
+@media screen and (min-width: 568px) {
+  body .alertify .ajs-dialog {
+    height: 82% !important;
+  }
+}
 @media screen and (max-width: 568px) {
   body .alertify:not(.ajs-maximized) .ajs-modal {
     padding: 0px 0px;

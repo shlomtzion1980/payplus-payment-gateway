@@ -273,8 +273,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -535,9 +535,15 @@ class WC_PayPlus
         foreach ($custom_icons as $icon) {
             $customIcons[] = esc_url($icon);
         }
-
+        $isSubscriptionOrder = false;
         if (is_checkout()) {
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                    $isSubscriptionOrder = true;
+                    break;
+                }
+            }
+            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=' . PAYPLUS_VERSION;
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                 if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
                     $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
@@ -546,7 +552,7 @@ class WC_PayPlus
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
-                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons)
+                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons, "isSubscriptionOrder" => $isSubscriptionOrder)
             );
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
@@ -603,8 +609,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
