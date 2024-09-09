@@ -416,10 +416,9 @@ function correctShipping(allShipping, total, countryCode = false) {
 }
 
 let flats = [];
-if (document.getElementById("payplus_shipping").value) {
-  let AllShippingPayPlus = JSON.parse(
-    (allShipping = document.getElementById("payplus_shipping").value)
-  );
+let payplusShippingElement = document.getElementById("payplus_shipping");
+if (payplusShippingElement.value) {
+  let AllShippingPayPlus = JSON.parse(payplusShippingElement.value);
   for (countryCode in AllShippingPayPlus) {
     for (k in AllShippingPayPlus[countryCode]) {
       if (AllShippingPayPlus[countryCode][k].cost_with_tax > 0) {
@@ -429,8 +428,6 @@ if (document.getElementById("payplus_shipping").value) {
       }
     }
   }
-} else {
-  document.getElementById("payplus_shipping").value = "{}";
 }
 
 function formattedShipping(countryCode, total, withTax = false) {

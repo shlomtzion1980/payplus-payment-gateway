@@ -1907,6 +1907,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $hideOtherChargeMethods = isset($options['hideOtherPayments']) ? $options['hideOtherPayments'] : $hideOtherChargeMethods;
         $hideOtherChargeMethods = $this->default_charge_method === 'multipass' ? 'false' : $hideOtherChargeMethods;
 
+        if ($subscription) {
+            $hideOtherChargeMethods = 'true';
+            $this->default_charge_method = 'credit-card';
+        }
+
         $callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
         if ($this->api_test_mode === true && $this->callback_addr) {
             $callback = $this->callback_addr;
