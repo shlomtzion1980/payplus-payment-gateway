@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.1.2] - 2024-09-08 - (Robotnik)
+## [7.1.2] - 2024-09-10 - (Robotnik)
 
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
@@ -26,7 +26,7 @@ All notable changes to this project will be documented in this file.
 * Tweak  - Fixed styling of the Express Checkout button in classic checkout.
 * Change - On subscription orders (orders that contain at least one subscription product), only credit card payments can be used. Now, only the credit card payment method will be displayed and available.
 
-##  [7.1.1] - 2024-07-18 - (The Doctor)
+##  [7.1.1] - 2024-08-18 - (The Doctor)
 
 * Fix    - Resolved an issue where classic checkout fields were not displaying correctly due to multipass icons logic.
 * Fix    - Corrected missing CSS class on the order admin page.

@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.1.2 - 08-09-2024 =
+= 7.1.2 - 10-09-2024 =
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
 * Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
