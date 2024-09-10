@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 * Tweak  - Sanitation and security fixes according to "Plugin Check" plugin repository requirements.
 * Tweak  - Block/Disable editing custom fields option (available in PayPlus advanced features).
 * Tweak  - Fixed styling of the Express Checkout button in classic checkout.
+* Change - On subscription orders (orders that contain at least one subscription product), only credit card payments can be used. Now, only the credit card payment method will be displayed and available.
 
 ##  [7.1.1] - 2024-07-18 - (The Doctor)
 
