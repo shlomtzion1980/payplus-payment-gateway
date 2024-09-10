@@ -88,12 +88,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $main_gateway              = new WC_PayPlus_Gateway;
 
         $this->isSubscriptionOrder = false;
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
-                $this->isSubscriptionOrder = true;
-                break;
+        if (is_checkout()) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                    $this->isSubscriptionOrder = true;
+                    break;
+                }
             }
         }
+
 
         $token_id = $context->payment_data['token'];
         $token = WC_Payment_Tokens::get($token_id);
@@ -239,10 +242,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function get_payment_method_data()
     {
         $isSubscriptionOrder = false;
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
-                $isSubscriptionOrder = true;
-                break;
+        if (is_checkout()) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                    $isSubscriptionOrder = true;
+                    break;
+                }
             }
         }
 

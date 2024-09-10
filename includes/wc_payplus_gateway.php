@@ -1907,7 +1907,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $hideOtherChargeMethods = isset($options['hideOtherPayments']) ? $options['hideOtherPayments'] : $hideOtherChargeMethods;
         $hideOtherChargeMethods = $this->default_charge_method === 'multipass' ? 'false' : $hideOtherChargeMethods;
 
-        if ($options['isSubscriptionOrder']) {
+        if (isset($options['isSubscriptionOrder']) && $options['isSubscriptionOrder']) {
             $hideOtherChargeMethods = 'true';
             $this->default_charge_method = 'credit-card';
         }
