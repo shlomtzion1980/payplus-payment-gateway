@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.1.2] - 2024-09-10 - (Robotnik)
+## [7.1.4] - 2024-09-11 - (Robotnik)
 
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).

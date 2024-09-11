@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 7.1.2
+Stable tag: 7.1.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.1.2 - 10-09-2024 =
+= 7.1.4 - 11-09-2024 =
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
 * Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
