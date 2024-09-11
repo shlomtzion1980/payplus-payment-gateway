@@ -242,7 +242,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function get_payment_method_data()
     {
         $isSubscriptionOrder = false;
-        if (is_checkout()) {
+        if (is_page() && is_checkout()) {
             foreach (WC()->cart->get_cart() as $cart_item) {
                 if (get_class($cart_item['data']) === "WC_Product_Subscription") {
                     $isSubscriptionOrder = true;
