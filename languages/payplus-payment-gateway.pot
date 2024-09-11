@@ -1,0 +1,1840 @@
+# Copyright (C) 2024 PayPlus LTD
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: PayPlus Payment Gateway 7.1.4\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/payplus-payment-gateway\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-09-11T21:27:47+03:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.10.0\n"
+"X-Domain: payplus-payment-gateway\n"
+
+#. Plugin Name of the plugin
+#: payplus-payment-gateway.php
+#: includes/admin/class-wc-payplus-admin.php:2321
+#: payplus-payment-gateway.php:425
+msgid "PayPlus Payment Gateway"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: payplus-payment-gateway.php
+msgid "https://www.payplus.co.il/wordpress"
+msgstr ""
+
+#. Description of the plugin
+#: payplus-payment-gateway.php
+msgid "Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more."
+msgstr ""
+
+#. Author of the plugin
+#: payplus-payment-gateway.php
+msgid "PayPlus LTD"
+msgstr ""
+
+#. Author URI of the plugin
+#: payplus-payment-gateway.php
+msgid "https://www.payplus.co.il/"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:23
+#: includes/admin/class-wc-payplus-admin-settings.php:28
+msgid "Settings"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:33
+#: includes/admin/class-wc-payplus-admin-settings.php:499
+#: includes/wc_payplus_express_checkout.php:733
+msgid "Express Checkout"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:50
+msgid "PayPlus Basic Settings"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:52
+msgid "Simple setup options - The base plugin options. Setup these and you can start working immediately!"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:57
+#: includes/admin/class-wc-payplus-admin-settings.php:228
+#: includes/class-wc-payplus-form-fields.php:169
+#: includes/wc_payplus_subgateways.php:133
+msgid "Enable/Disable"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:59
+#: includes/class-wc-payplus-form-fields.php:167
+msgid "Enable PayPlus+ Payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:64
+#: includes/class-wc-payplus-form-fields.php:193
+msgid "API Key"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:66
+msgid "PayPlus Api Key you can find in your account under Settings"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:71
+#: includes/class-wc-payplus-form-fields.php:200
+msgid "Secret Key"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:73
+#: includes/class-wc-payplus-form-fields.php:202
+msgid "PayPlus Secret Key you can find in your account under Settings"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:78
+#: includes/class-wc-payplus-form-fields.php:207
+msgid "Payment Page UID"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:80
+#: includes/class-wc-payplus-form-fields.php:209
+msgid "Your payment page UID can be found under Payment Pages in your side menu in PayPlus account"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:86
+msgid "Test mode"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:88
+msgid "Enable Test/Sandbox Mode"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:93
+#: includes/class-wc-payplus-form-fields.php:236
+#: payplus-payment-gateway.php:668
+msgid "Transactions Type"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:96
+#: includes/admin/class-wc-payplus-admin-settings.php:453
+#: includes/class-wc-payplus-form-fields.php:239
+#: includes/class-wc-payplus-form-fields.php:331
+#: includes/class-wc-payplus-form-fields.php:343
+msgid "Payment Page Default Setting"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:97
+#: includes/class-wc-payplus-form-fields.php:240
+#: includes/class-wc-payplus-statics.php:78
+#: includes/class-wc-payplus-statics.php:188
+#: payplus-payment-gateway.php:346
+#: payplus-payment-gateway.php:663
+#: payplus-payment-gateway.php:848
+msgid "Charge"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:98
+#: includes/class-wc-payplus-form-fields.php:241
+#: payplus-payment-gateway.php:347
+#: payplus-payment-gateway.php:664
+#: payplus-payment-gateway.php:849
+msgid "Authorization"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:104
+#: includes/class-wc-payplus-form-fields.php:310
+#: includes/wc_payplus_subgateways.php:149
+msgid "Display Mode"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:107
+#: includes/class-wc-payplus-form-fields.php:315
+#: includes/wc_payplus_subgateways.php:153
+msgid "Redirect"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:108
+#: includes/class-wc-payplus-form-fields.php:316
+msgid "iFrame on the next page"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:109
+#: includes/class-wc-payplus-form-fields.php:317
+#: includes/wc_payplus_subgateways.php:155
+msgid "iFrame on the same page"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:110
+#: includes/class-wc-payplus-form-fields.php:318
+#: includes/wc_payplus_subgateways.php:156
+msgid "iFrame in a Popup"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:116
+#: includes/class-wc-payplus-form-fields.php:323
+#: includes/wc_payplus_subgateways.php:161
+msgid "iFrame Height"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:122
+msgid "Allow Saved Credit Cards"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:124
+#: includes/class-wc-payplus-form-fields.php:283
+msgid "Enable Payment via Saved Cards"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:127
+msgid ""
+"Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.\n"
+"            <br>Saving cards can be done either during purchase or through the \"My Account\" section in the website."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:131
+#: includes/class-wc-payplus-form-fields.php:158
+msgid "Default Woo"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:134
+#: includes/class-wc-payplus-form-fields.php:368
+msgid "Successful Order Status"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:141
+#: includes/class-wc-payplus-form-fields.php:374
+msgid "Payment Completed"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:143
+#: includes/class-wc-payplus-form-fields.php:376
+msgid "Fire Payment Completed On Successful Charge"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:144
+msgid "Fire Payment Completed On Successful Charge.<br>Only relevant if you are using the \"Default Woo\" in Successful Order Status option above this one."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:150
+#: includes/class-wc-payplus-form-fields.php:498
+msgid "Transaction data in order notes"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:151
+#: includes/class-wc-payplus-form-fields.php:499
+msgid "Save PayPlus transaction data to the order notes"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:158
+#: includes/class-wc-payplus-form-fields.php:506
+msgid "Show PayPlus Metabox"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:159
+#: includes/class-wc-payplus-form-fields.php:507
+msgid "Show the transaction data in the PayPlus dedicated metabox"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:177
+msgid "Select your clubs:"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:179
+msgid "Choose clubs to show their icon on the checkout page."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:183
+msgid "BuyMe"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:184
+msgid "Rami Levy"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:185
+msgid "Yenot Bitan"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:186
+msgid "Hitechzone"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:187
+msgid "JD Club"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:188
+msgid "911 Club"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:189
+msgid "Forever 21"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:190
+msgid "Dolce Vita"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:191
+msgid "Dolce Vita - Shelra"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:192
+msgid "Mifal Hapayis"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:193
+msgid "Gold Tsafon"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:194
+msgid "iStudent"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:195
+msgid "Yerushalmi"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:196
+msgid "Dolce Vita - Cal"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:197
+msgid "Extra Bonus"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:198
+msgid "Dolce Vita - Bituah Yashir"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:199
+msgid "Nofshonit"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:200
+msgid "Happy Gift"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:201
+msgid "Swagg"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:202
+msgid "Raayonit"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:203
+msgid "Share Spa"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:204
+msgid "Gifta"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:205
+msgid "MegaLean"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:215
+#: includes/admin/class-wc-payplus-admin.php:2110
+msgid "Invoice+ (PayPlus)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:224
+msgid "Check this to activate Invoice+"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:232
+msgid "Display Only - Invoice+ Docs"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:234
+msgid "Only display existing Invoice+ docs without creating or enabling the Invoice+"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:244
+msgid "Type Documents"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:245
+#: includes/admin/class-wc-payplus-admin.php:960
+#: includes/class-wc-payplus-statics.php:20
+msgid "Tax Invoice"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:246
+#: includes/admin/class-wc-payplus-admin.php:961
+#: includes/class-wc-payplus-statics.php:23
+msgid "Tax Invoice Receipt "
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:247
+#: includes/admin/class-wc-payplus-admin.php:962
+#: includes/class-wc-payplus-statics.php:26
+msgid "Receipt"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:248
+#: includes/admin/class-wc-payplus-admin.php:963
+#: includes/class-wc-payplus-statics.php:29
+msgid "Donation Reciept"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:251
+msgid "Invoice's Language"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:258
+msgid "Website code"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:262
+msgid ""
+"Add a unique string here if you have more than one website\n"
+"                    connected to the service <br> This will create a unique id for invoices to each site (website code must be different for each site!)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:268
+msgid "Brand UID"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:272
+msgid "Set brand UID from which the system will issue the documents (Leave blank if you only have one brand)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:277
+msgid "Brand UID - Development/Sandbox"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:281
+msgid "Set development - brand UID from which the system will issue the documents (Leave blank if you only have one brand)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:286
+msgid "Document type for charge transaction"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:293
+msgid "Document type for refund transaction"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:297
+#: includes/admin/class-wc-payplus-admin.php:1712
+msgid "Type Documents Refund"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:298
+#: includes/admin/class-wc-payplus-admin.php:1713
+#: includes/class-wc-payplus-statics.php:32
+msgid "Refund Invoice"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:299
+#: includes/admin/class-wc-payplus-admin.php:1714
+#: includes/class-wc-payplus-statics.php:35
+msgid "Refund Receipt"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:300
+#: includes/admin/class-wc-payplus-admin.php:1715
+msgid "Refund Invoice + Refund Receipt"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:306
+#: includes/admin/class-wc-payplus-admin-settings.php:619
+msgid "Order status for issuing an invoice"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:318
+msgid "Send invoice to the customer via e-mail"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:331
+msgid "Send invoice to the customer via Sms (Only If you purchased an SMS package from PayPlus)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:338
+msgid "Invoice Creation Mode:"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:341
+msgid "Automatic"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:341
+msgid "Manual"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:343
+msgid "Invoice creation: Automatic(Default) or Manual"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:348
+#: includes/class-wc-payplus-form-fields.php:246
+msgid "Allow amount change"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:352
+#: includes/class-wc-payplus-form-fields.php:250
+msgid "Transaction amount change"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:353
+#: includes/class-wc-payplus-form-fields.php:251
+msgid "Choose this to be able to charge a different amount higher/lower than the order total (A number field will appear beside the \"Make Paymet\" button)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:357
+msgid "Select the types you want available for docs creation"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:362
+msgid "Choose from mulitple types of documents to be available in the order page."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:373
+msgid "Issue automatic tax invoice for orders paid in cash or bank transfers"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:375
+msgid "This overrides the default setting for automatic documents created for an order and is applicable only for \"cod - cash on delivery\" or \"bacs - bank transfer\" payment."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:381
+#: includes/class-wc-payplus-form-fields.php:546
+msgid "Logging"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:387
+msgid "Show Invoice+ metabox in order page"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:394
+msgid "Don`t add invoice+ links to order notes"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:409
+msgid "Every order is subject to VAT"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:416
+msgid "VAT change in Eilat"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:424
+msgid "Keywords for deliveries in Eilat"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:427
+msgid "Keywords must be separated with a comma"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:432
+msgid "Hide products from Invoice+ docs"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:434
+msgid "Use \"General Product\" invoice+ documents"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:435
+msgid "Send all items as: \"General Product\" in Invoice+ document creation."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:441
+msgid "Add product variations data to the invoice"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:443
+msgid "Display product variations metadata (If applicable) in a new line."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:450
+msgid "Calculate VAT According to:"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:454
+#: includes/wc_payplus_gateway.php:111
+#: includes/wc_payplus_gateway.php:733
+msgid "PayPlus"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:455
+msgid "WooCommerce"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:462
+msgid "Invoice For Foreign Customers"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:465
+msgid "Paying VAT"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:466
+msgid "Exempt VAT"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:467
+msgid "Exempt VAT If Customer Billing ISO Country Is Different Than..."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:474
+msgid "Your Business VAT Registration Country ISO Code"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:481
+msgid "Custom checkout field name for vat number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:488
+msgid "The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:506
+#: includes/class-wc-payplus-form-fields.php:88
+#: includes/class-wc-payplus-form-fields.php:89
+#: includes/wc_payplus_gateway.php:814
+#: includes/wc_payplus_subgateways.php:41
+msgid "Google Pay"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:517
+#: includes/class-wc-payplus-form-fields.php:95
+#: includes/class-wc-payplus-form-fields.php:96
+#: includes/wc_payplus_gateway.php:817
+#: includes/wc_payplus_subgateways.php:42
+msgid "Apple Pay"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:528
+msgid "Token Apple Pay"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:534
+msgid "If displayed on a product page ?"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:540
+msgid "If you create a new user ?"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:546
+msgid "Shipping according to woocommerce"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:555
+msgid "Global shipping amount"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:563
+msgid "Global shipping Tax"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:566
+msgid "Taxable"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:567
+msgid "None"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:576
+#: includes/admin/class-wc-payplus-admin-settings.php:642
+msgid "Select tax rate"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin-settings.php:598
+msgid "Language of the page"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:265
+#: includes/class-wc-payplus-statics.php:363
+msgid "Pre-Authorization"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:265
+#: includes/admin/class-wc-payplus-admin.php:1903
+#: includes/class-wc-payplus-statics.php:363
+msgid "Payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:401
+#: includes/wc_payplus_gateway.php:638
+#: includes/wc_payplus_invoice.php:325
+msgid "Refund for Order Number: "
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1011
+msgid "Select a document type to create an invoice"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1054
+msgid "Payment details"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1059
+msgid "Credit Card"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1063
+msgid "Cash"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1067
+msgid "Check"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1071
+msgid "Bank Transfer"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1075
+msgid "Payment App"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1079
+#: includes/class-wc-payplus-form-fields.php:109
+#: includes/class-wc-payplus-form-fields.php:110
+#: includes/wc_payplus_gateway.php:823
+#: includes/wc_payplus_subgateways.php:44
+msgid "PayPal"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1083
+msgid "Withholding Tax"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1087
+#: includes/admin/class-wc-payplus-admin.php:1135
+#: includes/admin/class-wc-payplus-admin.php:1152
+msgid "Other"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1096
+#: includes/admin/class-wc-payplus-admin.php:1099
+#: includes/admin/class-wc-payplus-admin.php:1221
+#: includes/admin/class-wc-payplus-admin.php:1224
+#: includes/admin/class-wc-payplus-admin.php:1259
+#: includes/admin/class-wc-payplus-admin.php:1262
+#: includes/admin/class-wc-payplus-admin.php:1311
+#: includes/admin/class-wc-payplus-admin.php:1314
+#: includes/admin/class-wc-payplus-admin.php:1360
+#: includes/admin/class-wc-payplus-admin.php:1363
+#: includes/admin/class-wc-payplus-admin.php:1414
+#: includes/admin/class-wc-payplus-admin.php:1417
+#: includes/admin/class-wc-payplus-admin.php:1458
+#: includes/admin/class-wc-payplus-admin.php:1461
+#: includes/admin/class-wc-payplus-admin.php:1492
+#: includes/admin/class-wc-payplus-admin.php:1495
+#: includes/admin/class-wc-payplus-admin.php:1570
+msgid "Date"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1102
+msgid "Credit card number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1105
+msgid "Four Digits"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1108
+#: includes/admin/class-wc-payplus-admin.php:1111
+msgid "Card Type"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1114
+msgid "Mastercard"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1117
+msgid "American Express"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1120
+msgid "Discover"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1123
+msgid "Visa"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1126
+msgid "Diners"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1129
+msgid "Jcb"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1132
+msgid "Maestro"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1141
+#: includes/admin/class-wc-payplus-admin.php:1145
+msgid "Transaction type"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1147
+msgid "Normal"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1148
+#: includes/admin/class-wc-payplus-admin.php:1176
+#: includes/class-wc-payplus-statics.php:376
+msgid "Payments"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1150
+msgid "Credit"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1151
+msgid "Delayed"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1157
+#: includes/admin/class-wc-payplus-admin.php:1162
+#: includes/admin/class-wc-payplus-admin.php:1227
+#: includes/admin/class-wc-payplus-admin.php:1232
+#: includes/admin/class-wc-payplus-admin.php:1265
+#: includes/admin/class-wc-payplus-admin.php:1270
+#: includes/admin/class-wc-payplus-admin.php:1317
+#: includes/admin/class-wc-payplus-admin.php:1322
+#: includes/admin/class-wc-payplus-admin.php:1366
+#: includes/admin/class-wc-payplus-admin.php:1371
+#: includes/admin/class-wc-payplus-admin.php:1420
+#: includes/admin/class-wc-payplus-admin.php:1425
+#: includes/admin/class-wc-payplus-admin.php:1464
+#: includes/admin/class-wc-payplus-admin.php:1469
+#: includes/admin/class-wc-payplus-admin.php:1498
+#: includes/admin/class-wc-payplus-admin.php:1503
+#: includes/admin/class-wc-payplus-admin.php:1567
+#: includes/admin/class-wc-payplus-admin.php:1761
+msgid "Sum"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1166
+#: includes/admin/class-wc-payplus-admin.php:1236
+#: includes/admin/class-wc-payplus-admin.php:1274
+#: includes/admin/class-wc-payplus-admin.php:1326
+#: includes/admin/class-wc-payplus-admin.php:1375
+#: includes/admin/class-wc-payplus-admin.php:1429
+#: includes/admin/class-wc-payplus-admin.php:1473
+#: includes/admin/class-wc-payplus-admin.php:1507
+msgid "Full Amount"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1193
+#: includes/admin/class-wc-payplus-admin.php:1195
+msgid "First Payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1199
+#: includes/admin/class-wc-payplus-admin.php:1201
+msgid "Additional payments"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1209
+#: includes/admin/class-wc-payplus-admin.php:1249
+#: includes/admin/class-wc-payplus-admin.php:1301
+#: includes/admin/class-wc-payplus-admin.php:1350
+#: includes/admin/class-wc-payplus-admin.php:1404
+#: includes/admin/class-wc-payplus-admin.php:1448
+#: includes/admin/class-wc-payplus-admin.php:1482
+#: includes/admin/class-wc-payplus-admin.php:1525
+msgid "Save payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1241
+#: includes/admin/class-wc-payplus-admin.php:1242
+#: includes/admin/class-wc-payplus-admin.php:1517
+#: includes/admin/class-wc-payplus-admin.php:1518
+msgid "Notes"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1278
+#: includes/admin/class-wc-payplus-admin.php:1279
+#: includes/admin/class-wc-payplus-admin.php:1330
+#: includes/admin/class-wc-payplus-admin.php:1331
+msgid "Bank number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1283
+#: includes/admin/class-wc-payplus-admin.php:1284
+#: includes/admin/class-wc-payplus-admin.php:1335
+#: includes/admin/class-wc-payplus-admin.php:1336
+msgid "Branch number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1288
+#: includes/admin/class-wc-payplus-admin.php:1289
+#: includes/admin/class-wc-payplus-admin.php:1341
+#: includes/admin/class-wc-payplus-admin.php:1342
+msgid "Account number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1293
+#: includes/admin/class-wc-payplus-admin.php:1294
+msgid "Check number"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1379
+#: includes/admin/class-wc-payplus-admin.php:1382
+#: includes/class-wc-payplus-statics.php:373
+msgid "Type"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1395
+#: includes/admin/class-wc-payplus-admin.php:1396
+#: includes/admin/class-wc-payplus-admin.php:1439
+#: includes/admin/class-wc-payplus-admin.php:1440
+#: includes/admin/class-wc-payplus-admin.php:1511
+#: includes/admin/class-wc-payplus-admin.php:1512
+msgid "Transaction id"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1433
+#: includes/admin/class-wc-payplus-admin.php:1434
+msgid "Payer account"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1540
+msgid "Create Document"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1568
+msgid "Details"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1569
+#: includes/admin/class-wc-payplus-admin.php:1762
+msgid "Methods of Payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1747
+msgid "Pay With Token"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1759
+msgid "Refund amount"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1760
+msgid "Amount already refunded"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1802
+msgid "Refund"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1874
+msgid "Create Refund Document"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1885
+msgid "Transaction review"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2000
+#: includes/admin/class-wc-payplus-admin.php:2236
+msgid "Charge for Order Number: "
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2107
+msgid "Cannot charge more than original order sum!"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2109
+msgid "PayPlus Page Error - Settings"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2117
+msgid "Incorrect amount or amount greater than amount that can be refunded"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2137
+msgid "Total payment amounts are not equal to the order sum"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2138
+msgid "The amount of receipts is not equal to the amount of withholding tax clearance"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2139
+msgid "No document type selected"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2140
+msgid "Edit"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2141
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2142
+msgid "The payment item cannot be 0"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2145
+msgid "Total payments"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2146
+msgid "Are you sure you want to delete this payment method?"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2172
+msgid "Charge Order Using PayPlus"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2175
+msgid "Make Payment"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2325
+msgid "user or other, please contact payplus support"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2328
+msgid "Credit card company declined, check credit card details and credit line"
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:2331
+msgid "PayPlus Payment Successful"
+msgstr ""
+
+#: includes/blocks/class-wc-payplus-blocks-support.php:162
+#: includes/blocks/class-wc-payplus-blocks-support.php:164
+#: includes/wc_payplus_gateway.php:1264
+#: payplus-payment-gateway.php:926
+msgid "Something went wrong with the payment page - This Ip is blocked"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:23
+#: includes/class-wc-payplus-form-fields.php:26
+#: includes/class-wc-payplus-form-fields.php:64
+#: includes/class-wc-payplus-form-fields.php:65
+msgid "PayPlus Gateway"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:33
+#: includes/class-wc-payplus-form-fields.php:36
+#: includes/class-wc-payplus-form-fields.php:73
+#: includes/class-wc-payplus-form-fields.php:74
+msgid "PayPlus Invoice+"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:81
+#: includes/class-wc-payplus-form-fields.php:82
+#: includes/wc_payplus_gateway.php:811
+#: includes/wc_payplus_subgateways.php:40
+msgid "bit"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:102
+#: includes/class-wc-payplus-form-fields.php:103
+#: includes/wc_payplus_gateway.php:820
+#: includes/wc_payplus_subgateways.php:43
+msgid "MULTIPASS"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:116
+msgid "Tav zahav"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:117
+#: includes/wc_payplus_gateway.php:826
+#: includes/wc_payplus_subgateways.php:45
+msgid "Tav Zahav"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:125
+#: includes/class-wc-payplus-form-fields.php:126
+msgid "Run PayPlus orders validator"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:162
+msgid "PayPlus Plugin Settings"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:164
+msgid "Basic plugin settings - set these and you`re good to go!"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:173
+#: includes/wc_payplus_subgateways.php:137
+msgid "Title"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:175
+#: includes/wc_payplus_subgateways.php:139
+msgid "This controls the title which the user sees during checkout"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:176
+#: block/dist/js/woocommerce-blocks/blocks.js:136
+msgid "Pay with Debit or Credit Card"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:180
+#: includes/wc_payplus_subgateways.php:144
+msgid "Description"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:182
+msgid "Pay securely by Debit or Credit Card through PayPlus"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:185
+msgid "Plugin Environment"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:187
+msgid "Production Mode"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:187
+msgid "Sandbox/Test Mode"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:188
+msgid "Activate test mode"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:189
+msgid "Enable Sandbox Mode"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:195
+msgid "PayPlus API Key you can find in your account under Settings"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:214
+msgid "Development API Key"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:216
+msgid "PayPlus Dev API Key you can find in your account under Settings"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:222
+msgid "Devlopment Secret Key"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:224
+msgid "PayPlus Dev Secret Key you can find in your account under Settings"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:229
+msgid "Development Payment Page UID"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:231
+msgid "Your Dev payment page UID can be found under Payment Pages in your side menu in PayPlus account"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:254
+msgid "Checkout Page Options"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:256
+msgid "Setup for the wordpress checkout page."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:259
+msgid "Hide PayPlus Icon"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:261
+#: includes/class-wc-payplus-form-fields.php:262
+msgid "Hide PayPlus Icon In The Checkout Page"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:267
+msgid "Design checkout"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:271
+msgid "Change icon layout on checkout page."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:274
+msgid "Custom Checkout Icons"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:277
+msgid "Paste images urls here divided by ; (Semicolon) to show under payment method label side beside side."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:281
+msgid "Saved Credit Cards"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:286
+msgid ""
+"Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.\n"
+"                <br><br>Saving cards can be done either during purchase or through the \"My Account\" section in the website."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:290
+msgid "Add Data Parameter"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:292
+msgid "Relevant only if the clearing company demands \"add_data\" or \"x\" parameters"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:294
+msgid "Send add data parameter on transaction"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:305
+msgid "Payment Page Options"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:307
+msgid "Setup for the PayPlus Payment Page."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:312
+msgid "Set the way the PayPlus Payment Page will be loaded in/from the wordpress checkout page."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:328
+msgid "Hide ID Field In Payment Page"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:332
+#: includes/class-wc-payplus-form-fields.php:344
+#: includes/class-wc-payplus-form-fields.php:356
+#: includes/class-wc-payplus-form-fields.php:392
+#: includes/class-wc-payplus-form-fields.php:401
+#: includes/wc_payplus_subgateways.php:176
+msgid "Yes"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:333
+#: includes/class-wc-payplus-form-fields.php:345
+#: includes/class-wc-payplus-form-fields.php:355
+#: includes/class-wc-payplus-form-fields.php:391
+#: includes/class-wc-payplus-form-fields.php:400
+#: includes/wc_payplus_subgateways.php:175
+msgid "No"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:336
+msgid "Hide the identification field in the payment page - ID or Social Security..."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:340
+msgid "Hide Number Of Payments In Payment Page"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:348
+msgid "Hide the option to choose more than one payment."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:352
+msgid "Hide Other Payment Methods On Payment Page"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:359
+msgid ""
+"Hide the other payment methods on the payment page.<br>Example: If you have Google Pay and Credit Cards - \n"
+"                when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:364
+msgid "Order Settings"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:377
+msgid "Only relevant if you are using the \"Default Woo\" in Successful Order Status option above this one."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:382
+msgid "Failure Order Status"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:388
+msgid "Successful Transaction E-mail Through PayPlus Servers"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:397
+msgid "Failure Transaction E-mail Through PayPlus Servers"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:406
+msgid "Callback url"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:408
+msgid "To receive transaction information you need a web address"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:412
+msgid "Hide products from transaction data"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:414
+#: includes/class-wc-payplus-form-fields.php:415
+msgid "Send all items as: \"General Product\" in PayPlus transaction data."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:420
+msgid "Mark as \"paid\" successfully created subscription orders"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:426
+msgid "Add Product Field Transaction Type"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:432
+msgid "Display company name on the invoice"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:437
+msgid ""
+"If this option is selected,\n"
+"                       the name that will appear on the invoice will be taken from the company name field and not from the personal name field.\n"
+"                         If no company name is entered, the name that will be written on the invoice will be the first name"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:442
+msgid "Display Balance Name"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:448
+msgid "Block ip transactions"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:453
+msgid ""
+"If the client fails transactions more than the number\n"
+"                         of times you entered, his IP will be blocked for one hour."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:457
+msgid "Number of times per hour to block ip"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:462
+msgid "PayPlus Advanced Features"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:466
+msgid "Enable/Disable token payment (Through Admin)"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:467
+msgid "Applicable for users that can edit orders."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:470
+msgid "If the user can edit orders, and there are saved tokens in the customer account. A token select and \"Pay With Token\" button will be shown."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:474
+msgid "Activate PayPlus cron"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:475
+msgid "Enable PayPlus orders cron service."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:478
+msgid "This checks all orders created within the last 2 hours and are in \"pending\" status and verifies the PayPlus IPN Process."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:482
+msgid "Display PayPlus \"Orders Check Button\""
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:483
+msgid "Show PayPlus \"Orders Check Button\" on the side menu."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:486
+msgid "The \"PayPlus Orders Check\" button checks all orders created within the last day are in \"pending\" status and contain \"payplus_page_request_uid\". It verifies the PayPlus IPN Process and sets the correct status if needded."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:490
+msgid "Display PayPlus Subgateways on the side menu"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:491
+msgid "Show all subgatways on the side menu."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:494
+msgid "If the side menu is displayed and this is enabled the subgateways will also be displayed."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:502
+msgid "Whenever a transaction is done add the payplus data to the order note.<br>This data also appears in the PayPlus Data metabox."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:510
+msgid "Adds the PayPlus transaction data in a dedicated metabox on the side in the order page."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:514
+msgid "Legacy post meta support"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:516
+msgid "Slower! (For stores that support HPOS with old fields used)"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:517
+msgid "Check this to view orders meta data created before HPOS was enabled on your store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce DB queries and are viewing new orders, uncheck this."
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:522
+msgid "Hide the top menu"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:524
+#: includes/class-wc-payplus-form-fields.php:526
+msgid "Hide the PayPlus top menu"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:529
+msgid "Hide the side menu"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:531
+#: includes/class-wc-payplus-form-fields.php:533
+msgid "Hide the PayPlus side menu"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:536
+msgid "Disable custom fields editing in orders"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:541
+msgid "Disable woocommerce scheduler"
+msgstr ""
+
+#: includes/class-wc-payplus-form-fields.php:548
+msgid "Log debug messages"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:38
+msgid "Invoice"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:79
+#: includes/class-wc-payplus-statics.php:189
+msgid "Refunds"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:294
+msgid "Total of payments: "
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:364
+msgid "Manual Payment"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:369
+msgid "Transaction#"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:370
+msgid "Method"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:371
+msgid "Brand"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:372
+msgid "Issuer"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:374
+msgid "Last Digits"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:375
+msgid "Expiry Date"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:377
+msgid "Voucher #"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:378
+msgid "Voucher ID"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:379
+msgid "Token"
+msgstr ""
+
+#: includes/class-wc-payplus-statics.php:380
+msgid "Total:"
+msgstr ""
+
+#: includes/elementor/widgets/express_checkout.php:18
+msgid "Payplus Express Checkout"
+msgstr ""
+
+#: includes/wc-payplus-activation-functions.php:463
+msgid "ID \\ VAT Number"
+msgstr ""
+
+#: includes/wc_payplus_express_checkout.php:107
+msgid "Cannot process the transaction. Contact your merchant. Error during validate merchant."
+msgstr ""
+
+#: includes/wc_payplus_express_checkout.php:159
+msgid "Server failure, please contact the site administrator"
+msgstr ""
+
+#: includes/wc_payplus_express_checkout.php:345
+msgid "You do not have permission to connect Google Pay and Apple Pay. Contact to manage a website"
+msgstr ""
+
+#: includes/wc_payplus_express_checkout.php:363
+msgid "Copy file Apple error. Please contact PayPlus to manage your express checkout onboarding."
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:112
+msgid "PayPlus Credit Card Secure Payment"
+msgstr ""
+
+#. translators: %s is the current transaction type status
+#: includes/wc_payplus_gateway.php:619
+msgid "PayPlus Refund is Failed<br />You cannot refund transaction that not charged. Current Transaction Type Status: %s"
+msgstr ""
+
+#. translators: %1$s is the refunded amount, %2$s is the currency
+#: includes/wc_payplus_gateway.php:625
+msgid "PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %1$s %2$s"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:735
+msgid "For more information about PayPlus and Plugin versions <a href=\"https://www.payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</a>"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:743
+msgid "This plugin was developed by <a href=\"https://www.payplus.co.il\">PayPlus LTD</a>"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:829
+#: includes/wc_payplus_subgateways.php:46
+msgid "Valuecard"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:832
+#: includes/wc_payplus_subgateways.php:47
+msgid "finitiOne"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:1214
+msgid "Save credit card in my account"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:1288
+#: includes/wc_payplus_gateway.php:1289
+msgid "Error: user or other, please contact PayPlus support"
+msgstr ""
+
+#. Translators: %s will be replaced with the error message received from the payment gateway.
+#: includes/wc_payplus_gateway.php:1304
+#: includes/wc_payplus_gateway.php:1306
+msgid "Error: Credit card declined. %s"
+msgstr ""
+
+#. Translators: %s will be replaced with the transaction number received from the payment gateway.
+#: includes/wc_payplus_gateway.php:1337
+msgid "PayPlus Token Payment Successful<br/>Transaction Number: %s"
+msgstr ""
+
+#. Translators: %s will be replaced with the transaction number received from the payment gateway.
+#: includes/wc_payplus_gateway.php:1344
+msgid "PayPlus Token Payment Failed<br/>Transaction Number: %s"
+msgstr ""
+
+#. Translators: %s will be replaced with the status description of the error received from the payment gateway.
+#: includes/wc_payplus_gateway.php:1349
+msgid "Error: credit card declined: %s"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:1721
+#: includes/wc_payplus_invoice.php:724
+msgid "Round"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:1747
+#: includes/wc_payplus_invoice.php:686
+msgid "Shipping"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:1769
+#: includes/wc_payplus_gateway.php:1770
+#: includes/wc_payplus_gateway.php:1790
+#: includes/wc_payplus_gateway.php:1791
+#: includes/wc_payplus_invoice.php:713
+#: includes/wc_payplus_invoice.php:714
+#: includes/wc_payplus_invoice.php:746
+#: includes/wc_payplus_invoice.php:747
+msgid "Discount coupons"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:2070
+msgid "Error: The payment page failed to load - please check your page uid and domain settings."
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:2093
+#: includes/wc_payplus_gateway.php:3058
+#: includes/wc_payplus_gateway.php:3066
+msgid "Something went wrong with the payment page"
+msgstr ""
+
+#. Translators: %s will be replaced with the transaction UID received from the payment gateway.
+#: includes/wc_payplus_gateway.php:2625
+msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:2795
+msgid "PayPlus payment failed"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:3089
+msgid "Your new payment method has been added"
+msgstr ""
+
+#: includes/wc_payplus_gateway.php:3099
+msgid "There was a problem adding this card"
+msgstr ""
+
+#. Translators: %s will be replaced with the transaction number received from the payment gateway.
+#: includes/wc_payplus_gateway.php:3144
+msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
+msgstr ""
+
+#. Translators: %s will be replaced with the error description received from the payment gateway.
+#: includes/wc_payplus_gateway.php:3172
+#: includes/wc_payplus_gateway.php:3178
+msgid "PayPlus Subscription Payment Failure<br/>error : %s"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:245
+msgid "General Customer - לקוח כללי"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:408
+msgid "Link Document Refund"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:479
+msgid "Invoice+ Documents"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:994
+#: includes/wc_payplus_invoice.php:1012
+#: includes/wc_payplus_invoice.php:1034
+msgid "General product"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:1046
+msgid "We will not send a balance number to create an invoice because you have more than one product with a balance number"
+msgstr ""
+
+#: includes/wc_payplus_invoice.php:1090
+msgid "Link Document  "
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:29
+#: includes/wc_payplus_subgateways.php:215
+msgid "Pay with bit via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:30
+#: includes/wc_payplus_subgateways.php:218
+msgid "Pay with Google Pay via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:31
+#: includes/wc_payplus_subgateways.php:221
+msgid "Pay with Apple Pay via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:32
+#: includes/wc_payplus_subgateways.php:224
+msgid "Pay With MULTIPASS via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:33
+#: includes/wc_payplus_subgateways.php:227
+msgid "Pay with PayPal via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:34
+#: includes/wc_payplus_subgateways.php:230
+msgid "Pay with Tav Zahav via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:35
+#: includes/wc_payplus_subgateways.php:233
+msgid "Pay with Valuecard via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:36
+#: includes/wc_payplus_subgateways.php:236
+msgid "Pay with finitiOne via PayPlus"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:74
+msgid "PayPlus - bit"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:77
+msgid "PayPlus - Google Pay"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:80
+msgid "PayPlus - Apple Pay"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:83
+msgid "PayPlus - MULTIPASS"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:86
+#: includes/wc_payplus_subgateways.php:95
+msgid "PayPlus - PayPal"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:89
+msgid "PayPlus - Tav Zahav"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:92
+msgid "PayPlus - finitiOne"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:98
+msgid "PayPlus - Valuecard"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:104
+msgid "Pay with bit"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:107
+msgid "Pay with Google Pay"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:110
+msgid "Pay with Apple Pay"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:113
+msgid "Pay with MULTIPASS"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:116
+msgid "Pay with PayPal"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:119
+msgid "Pay with Tav Zahav"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:122
+msgid "Pay with Valuecard"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:125
+msgid "Pay with Tav finitiOne"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:132
+msgid "Enable"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:132
+msgid "Disable"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:152
+#: includes/wc_payplus_subgateways.php:177
+msgid "Use global default"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:154
+msgid "iFrame"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:166
+#: includes/wc_payplus_subgateways.php:168
+msgid "Hide Payment Method Icon In The Checkout Page"
+msgstr ""
+
+#: includes/wc_payplus_subgateways.php:172
+msgid "Hide other payment types on payment page"
+msgstr ""
+
+#: payplus-payment-gateway.php:149
+msgid ""
+"Sandbox mode is active and real transaction cannot be processed. Please make sure to move production when\n"
+"    finishing testing"
+msgstr ""
+
+#: payplus-payment-gateway.php:155
+msgid ""
+"Please change the \"Number of decimal digits\" to 2 or 0 in your WooCommerce settings>General>Currency\n"
+"    settings"
+msgstr ""
+
+#: payplus-payment-gateway.php:320
+msgid "Four last digits"
+msgstr ""
+
+#: payplus-payment-gateway.php:380
+msgid "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" target=\"_blank\">WooCommerce</a> to be activated."
+msgstr ""
+
+#. translators: %1$s: Current PHP version, %2$s: Required PHP version
+#: payplus-payment-gateway.php:393
+msgid "Your server is running PHP version %1$s but some features require at least %2$s."
+msgstr ""
+
+#: payplus-payment-gateway.php:401
+msgid "Please change the \"Number of decimal digits\" to 2 or 0 in your WooCommerce settings>General>Currency setting"
+msgstr ""
+
+#: payplus-payment-gateway.php:443
+msgid "View PayPlus Settings"
+msgstr ""
+
+#: payplus-payment-gateway.php:692
+#: payplus-payment-gateway.php:711
+msgid "Transaction Type "
+msgstr ""
+
+#: payplus-payment-gateway.php:730
+msgid "Transaction Type"
+msgstr ""
+
+#: payplus-payment-gateway.php:753
+#: payplus-payment-gateway.php:770
+msgid "Balance Name"
+msgstr ""
+
+#: payplus-payment-gateway.php:891
+#: payplus-payment-gateway.php:899
+msgid "Cheatin&#8217; huh?"
+msgstr ""
+
+#: payplus-payment-gateway.php:914
+msgid "Unable to create a payment page due to a site settings issue. Please contact the website owner"
+msgstr ""
