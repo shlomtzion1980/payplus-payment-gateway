@@ -86,6 +86,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.1.5 - 12-09-2024 =
+* Fix - Fixed post function user-agent.
+* Add - Added .pot file.
+
 = 7.1.4 - 11-09-2024 =
 * Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
 * Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
