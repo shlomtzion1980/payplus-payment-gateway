@@ -1107,6 +1107,7 @@ class PayplusInvoice
      */
     public function post_payplus_ws($url, $payload = [], $method = "post")
     {
+        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
         $args = array(
             'body' => $payload,
             'timeout' => '60',
@@ -1115,7 +1116,7 @@ class PayplusInvoice
             'blocking' => true,
             'headers' => array(
                 'domain' => home_url(),
-                'User-Agent' => 'WordPress ' . isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "",
+                'User-Agent' => "WordPress $userAgent",
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->payplus_invoice_api_key . '","secret_key":"' . $this->payplus_invoice_secret_key . '"}',
                 'X-creationsource' => 'WordPress Source',

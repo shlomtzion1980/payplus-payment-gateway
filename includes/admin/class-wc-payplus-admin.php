@@ -242,6 +242,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $payload['payment_request_uid'] = $payment_request_uid;
 
+        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
         $args = array(
             'body' => wp_json_encode($payload),
             'timeout' => '60',
@@ -250,7 +251,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             'blocking' => true,
             'headers' => array(
                 'domain' => home_url(),
-                'User-Agent' => 'WordPress ' . isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "",
+                'User-Agent' => "WordPress $userAgent",
                 'Content-Type' => 'application/json',
                 'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
             ),
