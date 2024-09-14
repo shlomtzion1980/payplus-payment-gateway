@@ -158,13 +158,12 @@ if (isCheckout || hasOrder) {
       }
     })();
   })();
-
   document.addEventListener("DOMContentLoaded", function () {
     // Function to start observing for the target element
     let loopImages = true;
+
     function startObserving() {
       console.log("observer started");
-
       const overlay = document.createElement("div");
       overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
       overlay.id = "overlay";
@@ -174,10 +173,47 @@ if (isCheckout || hasOrder) {
       overlay.style.top = "0";
       overlay.style.zIndex = "5";
 
+      payPlusCC = document.querySelector(
+        "#radio-control-wc-payment-method-options-payplus-payment-gateway"
+      );
+
+      if (payPlusCC) {
+        payPlusCC.click();
+      }
+      // Automatically click the 'Place Order' button
+      var params = new URLSearchParams(window.location.search);
+      let isAddressEdit = params.get("address_edit") === "yes";
+      placeOrderButton = document.querySelector(
+        "#wp--skip-link--target > div.entry-content.alignwide.wp-block-post-content.is-layout-flow.wp-block-post-content-is-layout-flow > div > div.wc-block-components-sidebar-layout.wc-block-checkout.is-large > div.wc-block-components-main.wc-block-checkout__main.wp-block-woocommerce-checkout-fields-block > form > div.wc-block-checkout__actions.wp-block-woocommerce-checkout-actions-block > div.wc-block-checkout__actions_row > button"
+      );
+      // Create a div element for the loader
+      var loader = document.createElement("div");
+      loader.class = "payplus_loader";
+
+      // Add loader content
+      loader.innerHTML = `
+      <div class="payplus_loader">
+          <div class="loader">
+              <div class="loader-background">
+                  <div class="text"></div>
+              </div>
+          </div>
+      </div>`;
+
+      if (!isAddressEdit && placeOrderButton && payPlusGateWay.isAutoPPCC) {
+        document.body.appendChild(overlay);
+        overlay.appendChild(loader);
+        placeOrderButton.click();
+      } else {
+        placeOrderButton?.addEventListener("click", function () {
+          document.body.appendChild(overlay);
+          overlay.appendChild(loader);
+        });
+      }
+
       let element = document.querySelector(
         "#radio-control-wc-payment-method-options-payplus-payment-gateway-multipass"
       );
-
       if (loopImages && element) {
         multiPassIcons(loopImages, element);
         loopImages = false;
@@ -187,6 +223,7 @@ if (isCheckout || hasOrder) {
         if (loopImages) {
           multiPassIcons(loopImages, element);
         }
+
         if (store.isComplete()) {
           const activePaymentMethod = payment.getActivePaymentMethod();
           const gateWaySettings =
@@ -285,7 +322,7 @@ if (isCheckout || hasOrder) {
       observer.observe(targetNode, config);
     }
     // Wait for a few seconds before starting to observe
-    setTimeout(startObserving, 1000); // Adjust the time (in milliseconds) as needed
+    setTimeout(startObserving(), 1000); // Adjust the time (in milliseconds) as needed
   });
 
   function startIframe(paymentPageLink, overlay) {
@@ -295,7 +332,6 @@ if (isCheckout || hasOrder) {
         activePaymentMethod + "-settings"
       ];
     var iframe = document.createElement("iframe");
-
     // Set the attributes for the iframe
     iframe.width = "95%";
     iframe.height = "100%";
@@ -323,6 +359,8 @@ if (isCheckout || hasOrder) {
           }
         }
       }
+      document.getElementsByClassName("payplus_loader")[0].style.display =
+        "none";
       gateWaySettings.displayMode =
         window.innerWidth <= 768 &&
         gateWaySettings.displayMode === "samePageIframe"
@@ -348,7 +386,6 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.zIndex = 100000;
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
           pp_iframe.style.borderRadius = "5px";
-          document.body.appendChild(overlay);
           document.body.style.overflow = "hidden";
           break;
         default:
@@ -365,7 +402,20 @@ if (isCheckout || hasOrder) {
       pp_iframe.firstElementChild.addEventListener("click", (e) => {
         e.preventDefault();
         pp_iframe.style.display = "none";
-        location.reload();
+        var currentUrl = window.location.href;
+        var params = new URLSearchParams(currentUrl);
+        let isAddressEdit = currentUrl.search("address_edit=yes") !== -1;
+        if (!isAddressEdit && payPlusGateWay.isAutoPPCC) {
+          if (currentUrl.indexOf("?") === -1) {
+            // No query string, add the parameter
+            window.location.href = currentUrl + "?address_edit=yes";
+          } else {
+            // Query string exists, append the parameter with an '&'
+            window.location.href = currentUrl + "&address_edit=yes";
+          }
+        } else {
+          location.reload();
+        }
       });
       pp_iframe.appendChild(iframe);
       if (payPlusGateWay.importApplePayScript) {

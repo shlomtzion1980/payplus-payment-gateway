@@ -31,6 +31,7 @@ class WC_PayPlus
     public $isApplePayGateWayEnabled;
     public $isApplePayExpressEnabled;
     public $invoice_api = null;
+    public $isAutoPPCC;
     private $_wpnonce;
 
     /**
@@ -50,6 +51,7 @@ class WC_PayPlus
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->isApplePayGateWayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
         $this->isApplePayExpressEnabled = boolval(property_exists($this->payplus_payment_gateway_settings, 'enable_apple_pay') && $this->payplus_payment_gateway_settings->enable_apple_pay === 'yes');
+        $this->isAutoPPCC = boolval(property_exists($this->payplus_payment_gateway_settings, 'auto_load_payplus_cc_method') && $this->payplus_payment_gateway_settings->auto_load_payplus_cc_method === 'yes');
 
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
@@ -273,8 +275,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -552,7 +554,7 @@ class WC_PayPlus
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
-                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons, "isSubscriptionOrder" => $isSubscriptionOrder)
+                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons, "isSubscriptionOrder" => $isSubscriptionOrder, "isAutoPPCC" => $this->isAutoPPCC)
             );
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
@@ -565,7 +567,7 @@ class WC_PayPlus
             ) {
                 $this->payplus_gateway = $this->get_main_payplus_gateway();
                 add_filter('body_class', [$this, 'payplus_body_classes']);
-                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $script_version);
+                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.css', [], $script_version);
 
                 if ($isEnableOneClick) {
                     $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
@@ -609,8 +611,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

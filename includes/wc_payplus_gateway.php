@@ -1257,6 +1257,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
                 $client_ip = ""; // Handle invalid IP scenario if necessary
             }
+            $this->store_payment_ip();
             $counts = array_count_values($this->get_payment_ips());
             $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
             if (in_array($client_ip, $this->get_payment_ips()) && $howMany >= $this->block_ip_transactions_hour) {
@@ -2617,7 +2618,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($res->results->status == "error" || $res->results->status == "rejected") {
 
                         $this->payplus_add_log_all($handle, 'Error IPN Error: ' . print_r($res, true), 'error');
-
+                        $this->store_payment_ip();
                         if ($this->failure_order_status !== 'default-woo') {
                             $order->update_status($this->failure_order_status);
                         }

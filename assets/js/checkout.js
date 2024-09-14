@@ -27,6 +27,20 @@ jQuery(function ($) {
     );
   }
 
+  setTimeout(function () {
+    // Automatically click the 'Place Order' button
+    if (payplus_script_checkout.isAutoPPCC) {
+      jQuery("html, body").animate(
+        {
+          scrollTop: jQuery(".pp_iframe").offset().top,
+        },
+        1000
+      ); // 1000 is the duration in milliseconds (1 second)
+      $("#wc-payplus-payment-gateway-payment-token-new").trigger("click");
+      $("button#place_order").trigger("click");
+    }
+  }, 1000); // You can adjust the delay time as needed
+
   var wc_checkout_form = {
     updateTimer: false,
     dirtyInput: false,
@@ -1025,7 +1039,8 @@ jQuery(function ($) {
             onshow: function () {
               this.elements.dialog.style.maxWidth = "100%";
               this.elements.dialog.style.width = "1050px";
-              this.elements.dialog.style.height = "100%";
+              this.elements.dialog.style.height =
+                windowWidth > 568 ? "82%" : "100%";
               this.elements.content.style.top = "25px";
             },
           },

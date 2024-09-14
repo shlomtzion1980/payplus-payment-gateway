@@ -31,6 +31,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $importApplePayScript;
     public $applePaySettings;
     public $isSubscriptionOrder;
+    public $isAutoPPCC;
 
 
     /**
@@ -54,6 +55,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->hideOtherPayments = boolval($this->settings['hide_other_charge_methods']) ?? null;
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
+        $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
 
         if (isset($this->settings['custom_icons']) && strlen($this->settings['custom_icons']) > 0) {
             $this->customIcons = explode(";", $this->settings['custom_icons']);
@@ -214,13 +216,17 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $style_path = '/block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(
             'dependencies' => array(),
             'version' => '1.0.0'
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
+        $style_url = PAYPLUS_PLUGIN_URL . $style_path;
+
+        // Register the script
         wp_register_script(
             'wc-payplus-payments-block',
             $script_url,
@@ -228,9 +234,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $script_asset['version'],
             true
         );
+
+        // Register the style
+        wp_register_style(
+            'wc-payplus-payments-block-style',
+            $style_url,
+            array(), // Add dependencies if needed
+            $script_asset['version']
+        );
+
+        // Enqueue the style
+        wp_enqueue_style('wc-payplus-payments-block-style');
+
+        // Set script translations if available
         if (function_exists('wp_set_script_translations')) {
             wp_set_script_translations('wc-payplus-payments-block', 'payplus-payment-gateway', PAYPLUS_PLUGIN_URL . 'languages/');
         }
+
         return ['wc-payplus-payments-block'];
     }
 
@@ -260,6 +280,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'hideOtherPayments' => $this->hideOtherPayments,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
             'isSubscriptionOrder' => $isSubscriptionOrder,
+            'isAutoPPCC' => $this->isAutoPPCC,
             'importApplePayScript' => $this->importApplePayScript ? $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION : false,
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
