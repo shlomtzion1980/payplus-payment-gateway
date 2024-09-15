@@ -32,11 +32,13 @@ jQuery(function ($) {
     if (payplus_script_checkout.isAutoPPCC) {
       jQuery("html, body").animate(
         {
-          scrollTop: jQuery(".pp_iframe").offset().top,
+          scrollTop: jQuery(".pp_iframe")?.offset()?.top,
         },
         1000
       ); // 1000 is the duration in milliseconds (1 second)
+      $("#payment_method_payplus-payment-gateway").trigger("click");
       $("#wc-payplus-payment-gateway-payment-token-new").trigger("click");
+      $("#wc-payplus-payment-gateway-new-payment-method").trigger("click");
       $("button#place_order").trigger("click");
     }
   }, 1000); // You can adjust the delay time as needed
