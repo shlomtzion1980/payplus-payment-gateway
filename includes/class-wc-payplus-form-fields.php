@@ -298,7 +298,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Auto load PayPlus credit card payment method', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('Auto load PP CC', 'payplus-payment-gateway'),
-                'description' => __('If customer already entered their addresses auto load the credit card method of payplus - if the customer cancells he can choose a different one.', 'payplus-payment-gateway'),
+                'description' => __('If customer already entered their addresses auto load the credit card method of payplus - if the customer cancels he can choose a different one.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'payment_page_title' => [
