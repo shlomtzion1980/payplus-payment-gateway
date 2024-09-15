@@ -163,6 +163,16 @@ if (isCheckout || hasOrder) {
     // Function to start observing for the target element
     let loopImages = true;
     let autoPPCCrun = true;
+    let WcSettings = window.wc.wcSettings;
+    // if (typeof WcSettings !== "undefined") {
+    //   console.log(WcSettings.allSettings?.customerPaymentMethods?.cc);
+    //   console.log("gota");
+    //   console.log(WcSettings.allSettings?.customerPaymentMethods.length);
+    // }
+
+    if (WcSettings.allSettings?.customerPaymentMethods?.cc !== undefined) {
+      autoPPCCrun = false;
+    }
 
     var loader = document.createElement("div");
     loader.class = "payplus_loader";
