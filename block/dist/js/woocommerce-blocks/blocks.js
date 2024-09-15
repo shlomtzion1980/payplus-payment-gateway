@@ -162,6 +162,21 @@ if (isCheckout || hasOrder) {
   document.addEventListener("DOMContentLoaded", function () {
     // Function to start observing for the target element
     let loopImages = true;
+    let autoPPCCrun = true;
+
+    var loader = document.createElement("div");
+    loader.class = "payplus_loader";
+
+    // Add loader content
+    loader.innerHTML = `
+          <div class="payplus_loader">
+              <div class="loader">
+                  <div class="loader-background">
+                      <div class="text"></div>
+                  </div>
+              </div>
+          </div>`;
+    console.log("isAutoPPCC: ", payPlusGateWay.isAutoPPCC);
     function startObserving() {
       console.log("observer started");
 
@@ -177,105 +192,118 @@ if (isCheckout || hasOrder) {
       let element = document.querySelector(
         "#radio-control-wc-payment-method-options-payplus-payment-gateway-multipass"
       );
-
       if (loopImages && element) {
         multiPassIcons(loopImages, element);
         loopImages = false;
       }
-
+      payPlusCC = document.querySelector(
+        "#radio-control-wc-payment-method-options-payplus-payment-gateway"
+      );
+      if (payPlusGateWay.isAutoPPCC && autoPPCCrun) {
+        console.log("autorun: ", autoPPCCrun);
+        autoPPCC(overlay, loader, payPlusCC);
+        autoPPCCrun = false;
+      }
       const observer = new MutationObserver((mutationsList, observer) => {
         if (loopImages) {
           multiPassIcons(loopImages, element);
         }
+        if (payPlusGateWay.isAutoPPCC && autoPPCCrun) {
+          autoPPCC(overlay, loader, payPlusCC);
+          autoPPCCrun = false;
+        }
         if (store.isComplete()) {
           const activePaymentMethod = payment.getActivePaymentMethod();
-          const gateWaySettings =
-            window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
-              activePaymentMethod + "-settings"
-            ];
-          const isIframe =
-            ["samePageIframe", "popupIframe"].indexOf(
-              gateWaySettings.displayMode
-            ) !== -1;
-          console.log("isIframe?", isIframe);
-          if (
-            gateways.indexOf(payment.getActivePaymentMethod()) !== -1 &&
-            payment.getActiveSavedToken().length === 0
-          ) {
-            console.log("isComplete: " + store.isComplete());
-            // Call the function to handle the target element
-            if (isIframe) {
-              if (
-                payment.getPaymentResult().paymentDetails.paymentPageLink
-                  ?.length > 0
-              ) {
-                console.log(
-                  "paymentPageLink",
-                  payment.getPaymentResult().paymentDetails.paymentPageLink
-                );
-                startIframe(
-                  payment.getPaymentResult().paymentDetails.paymentPageLink,
-                  overlay
-                );
-                // Disconnect the observer to stop observing further changes
-              } else {
-                alert("Error: the payment page failed to load.");
-                location.reload();
-              }
-            }
-            observer.disconnect();
-          }
-        } else if (store.hasError()) {
-          try {
-            let getPaymentResult = payment.getPaymentResult();
-
+          if (activePaymentMethod.search("payplus-payment-gateway") === 0) {
+            const gateWaySettings =
+              window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
+                activePaymentMethod + "-settings"
+              ];
+            const isIframe =
+              ["samePageIframe", "popupIframe"].indexOf(
+                gateWaySettings.displayMode
+              ) !== -1;
+            console.log("isIframe?", isIframe);
             if (
-              getPaymentResult === null ||
-              getPaymentResult === undefined ||
-              getPaymentResult === ""
+              gateways.indexOf(payment.getActivePaymentMethod()) !== -1 &&
+              payment.getActiveSavedToken().length === 0
             ) {
-              throw new Error("Payment result is empty, null, or undefined.");
+              console.log("isComplete: " + store.isComplete());
+              // Call the function to handle the target element
+              if (isIframe) {
+                if (
+                  payment.getPaymentResult().paymentDetails.paymentPageLink
+                    ?.length > 0
+                ) {
+                  console.log(
+                    "paymentPageLink",
+                    payment.getPaymentResult().paymentDetails.paymentPageLink
+                  );
+                  startIframe(
+                    payment.getPaymentResult().paymentDetails.paymentPageLink,
+                    overlay,
+                    loader
+                  );
+                  // Disconnect the observer to stop observing further changes
+                } else {
+                  alert("Error: the payment page failed to load.");
+                  location.reload();
+                }
+              }
+              observer.disconnect();
             }
+          } else if (store.hasError()) {
+            try {
+              let getPaymentResult = payment.getPaymentResult();
 
-            // Process the result here
-            console.log("Payment result:", getPaymentResult);
-            let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
-            pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
-            pp_iframe.style.height = "200px";
-            pp_iframe.style.position = "fixed";
-            pp_iframe.style.backgroundColor = "white";
-            pp_iframe.style.display = "flex";
-            pp_iframe.style.alignItems = "center";
-            pp_iframe.style.textAlign = "center";
-            pp_iframe.style.justifyContent = "center";
-            pp_iframe.style.top = "50%";
-            pp_iframe.style.left = "50%";
-            pp_iframe.style.transform = "translate(-50%, -50%)";
-            pp_iframe.style.zIndex = 100000;
-            pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
-            pp_iframe.style.borderRadius = "25px";
-            pp_iframe.innerHTML =
-              getPaymentResult.paymentDetails.errorMessage !== undefined
-                ? getPaymentResult.paymentDetails.errorMessage +
-                  "<br>" +
-                  "Click this to close."
-                : getPaymentResult.message + "<br>" + "Click this to close.";
-            pp_iframe.addEventListener("click", (e) => {
-              e.preventDefault();
-              pp_iframe.style.display = "none";
-              location.reload();
-            });
-            console.log(getPaymentResult.paymentDetails.errorMessage);
-            if (getPaymentResult.paymentDetails.errorMessage !== undefined) {
-              alert(getPaymentResult.paymentDetails.errorMessage);
-            } else {
-              alert(getPaymentResult.message);
+              if (
+                getPaymentResult === null ||
+                getPaymentResult === undefined ||
+                getPaymentResult === ""
+              ) {
+                throw new Error("Payment result is empty, null, or undefined.");
+              }
+
+              // Process the result here
+              console.log("Payment result:", getPaymentResult);
+              let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
+              pp_iframe.style.width = window.innerWidth <= 768 ? "95%" : "55%";
+              pp_iframe.style.height = "200px";
+              pp_iframe.style.position = "fixed";
+              pp_iframe.style.backgroundColor = "white";
+              pp_iframe.style.display = "flex";
+              pp_iframe.style.alignItems = "center";
+              pp_iframe.style.textAlign = "center";
+              pp_iframe.style.justifyContent = "center";
+              pp_iframe.style.top = "50%";
+              pp_iframe.style.left = "50%";
+              pp_iframe.style.transform = "translate(-50%, -50%)";
+              pp_iframe.style.zIndex = 100000;
+              pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
+              pp_iframe.style.borderRadius = "25px";
+              pp_iframe.innerHTML =
+                getPaymentResult.paymentDetails.errorMessage !== undefined
+                  ? getPaymentResult.paymentDetails.errorMessage +
+                    "<br>" +
+                    "Click this to close."
+                  : getPaymentResult.message + "<br>" + "Click this to close.";
+              pp_iframe.addEventListener("click", (e) => {
+                e.preventDefault();
+                pp_iframe.style.display = "none";
+                location.reload();
+              });
+              console.log(getPaymentResult.paymentDetails.errorMessage);
+              if (getPaymentResult.paymentDetails.errorMessage !== undefined) {
+                alert(getPaymentResult.paymentDetails.errorMessage);
+              } else {
+                alert(getPaymentResult.message);
+              }
+
+              observer.disconnect();
+            } catch (error) {
+              // Handle the error here
+              console.error("An error occurred:", error.message);
             }
-
-            observer.disconnect();
-          } catch (error) {
-            // Handle the error here
-            console.error("An error occurred:", error.message);
           }
         }
       });
@@ -285,17 +313,18 @@ if (isCheckout || hasOrder) {
       observer.observe(targetNode, config);
     }
     // Wait for a few seconds before starting to observe
-    setTimeout(startObserving, 1000); // Adjust the time (in milliseconds) as needed
+    setTimeout(startObserving(), 1000); // Adjust the time (in milliseconds) as needed
   });
 
-  function startIframe(paymentPageLink, overlay) {
+  function startIframe(paymentPageLink, overlay, loader) {
+    document.body.appendChild(overlay);
+    overlay.appendChild(loader);
     const activePaymentMethod = payment.getActivePaymentMethod();
     const gateWaySettings =
       window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
         activePaymentMethod + "-settings"
       ];
     var iframe = document.createElement("iframe");
-
     // Set the attributes for the iframe
     iframe.width = "95%";
     iframe.height = "100%";
@@ -332,6 +361,7 @@ if (isCheckout || hasOrder) {
         case "samePageIframe":
           pp_iframe.style.position = "relative";
           pp_iframe.style.height = gateWaySettings.iFrameHeight;
+          overlay.style.display = "none";
           break;
         case "popupIframe":
           pp_iframe.style.width = window.innerWidth <= 768 ? "98%" : "55%";
@@ -348,8 +378,9 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.zIndex = 100000;
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
           pp_iframe.style.borderRadius = "5px";
-          document.body.appendChild(overlay);
           document.body.style.overflow = "hidden";
+          document.getElementsByClassName("payplus_loader")[0].style.display =
+            "none";
           break;
         default:
           break;
@@ -365,7 +396,20 @@ if (isCheckout || hasOrder) {
       pp_iframe.firstElementChild.addEventListener("click", (e) => {
         e.preventDefault();
         pp_iframe.style.display = "none";
-        location.reload();
+        var currentUrl = window.location.href;
+        var params = new URLSearchParams(currentUrl);
+        let isAddressEdit = currentUrl.search("address_edit=yes") !== -1;
+        if (!isAddressEdit && payPlusGateWay.isAutoPPCC) {
+          if (currentUrl.indexOf("?") === -1) {
+            // No query string, add the parameter
+            window.location.href = currentUrl + "?address_edit=yes";
+          } else {
+            // Query string exists, append the parameter with an '&'
+            window.location.href = currentUrl + "&address_edit=yes";
+          }
+        } else {
+          location.reload();
+        }
       });
       pp_iframe.appendChild(iframe);
       if (payPlusGateWay.importApplePayScript) {
@@ -453,5 +497,48 @@ if (isCheckout || hasOrder) {
       }
     }
     /* finished multipass image replace */
+  }
+
+  function autoPPCC(overlay, loader, payPlusCC = null) {
+    setTimeout(function () {
+      if (payPlusCC === null) {
+        payPlusCC = document.querySelector(
+          "#radio-control-wc-payment-method-options-payplus-payment-gateway"
+        );
+      }
+      if (payPlusCC) {
+        // Automatically click the 'Place Order' button
+        var params = new URLSearchParams(window.location.search);
+        let isAddressEdit = params.get("address_edit") === "yes";
+
+        const actionsRowDiv = document.querySelector(
+          ".wc-block-checkout__actions_row"
+        );
+
+        // Find the button inside this div
+        const placeOrderButton = actionsRowDiv
+          ? actionsRowDiv.querySelector("button")
+          : null;
+
+        if (!isAddressEdit && placeOrderButton && payPlusGateWay.isAutoPPCC) {
+          payPlusCC.click();
+          placeOrderButton.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+          document.body.appendChild(overlay);
+          overlay.appendChild(loader);
+          placeOrderButton.click();
+        } else {
+          placeOrderButton?.addEventListener("click", function () {
+            const activePaymentMethod = payment.getActivePaymentMethod();
+            if (activePaymentMethod.search("payplus-payment-gateway") === 0) {
+              document.body.appendChild(overlay);
+              overlay.appendChild(loader);
+            }
+          });
+        }
+      }
+    }, 1000);
   }
 }
