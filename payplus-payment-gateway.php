@@ -455,7 +455,7 @@ class WC_PayPlus
     public function init()
     {
 
-        load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
         if (class_exists("WooCommerce")) {
             $this->_wpnonce = wp_create_nonce('_wp_payplus');
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
