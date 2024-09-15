@@ -29,7 +29,8 @@ jQuery(function ($) {
 
   setTimeout(function () {
     // Automatically click the 'Place Order' button
-    if (payplus_script_checkout.isAutoPPCC) {
+    let hasSavedCCs = $(".woocommerce-SavedPaymentMethods-token");
+    if (payplus_script_checkout.isAutoPPCC && hasSavedCCs.length === 0) {
       jQuery("html, body").animate(
         {
           scrollTop: jQuery(".pp_iframe")?.offset()?.top,
@@ -994,6 +995,10 @@ jQuery(function ($) {
     const height = ppIframe.getAttribute("data-height");
     ppIframe.innerHTML = "";
     ppIframe.append(getIframePayment(src, "100%", height));
+    $("#closeFrame").on("click", function (e) {
+      e.preventDefault();
+      ppIframe.style.display = "none";
+    });
     $("#place_order").prop("disabled", true);
 
     if (payplus_script_checkout.payplus_mobile) {

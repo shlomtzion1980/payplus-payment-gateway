@@ -522,7 +522,7 @@ if (isCheckout || hasOrder) {
 
         if (!isAddressEdit && placeOrderButton && payPlusGateWay.isAutoPPCC) {
           payPlusCC.click();
-          placeOrderButton.scrollIntoView({
+          payPlusCC.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
