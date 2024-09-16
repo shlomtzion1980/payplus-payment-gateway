@@ -1193,6 +1193,30 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             $this->save_payment_method_checkbox();
         }
+        require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
+        echo '<div class="row" id="cc-wrapper">
+                        <div class="col-12">
+                            <label>Credit card number</label>
+                            <span id="cc" class="form-control fld-frame" data-hosted-fields-identifier="cc"></span>
+                        </div>
+                    </div>';
+        if ($response && json_decode($response, true)['results']['status'] === "success") {
+            $template_path = plugin_dir_path(__FILE__) . '../templates/hostedFields.html';
+
+            if (file_exists($template_path)) {
+                echo file_get_contents($template_path);
+            }
+            wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . '../assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
+            wp_register_script('payplus-hosted', plugin_dir_url(__FILE__) . '../assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
+            wp_localize_script(
+                'payplus-hosted',
+                'payplus_script',
+                [
+                    "hostedResponse" => $response,
+                ]
+            );
+            wp_enqueue_script('payplus-hosted');
+        }
     }
 
     /**
