@@ -2035,12 +2035,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
 
         $isSubscriptionOrder = false;
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if (get_class($cart_item['data']) === "WC_Product_Subscription") {
-                $isSubscriptionOrder = true;
-                break;
+        if (is_checkout()) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                    $isSubscriptionOrder = true;
+                    break;
+                }
             }
         }
+
 
         $options = $isSubscriptionOrder ? ['isSubscriptionOrder' => true] : [];
         $payload = $this->generatePayloadLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
