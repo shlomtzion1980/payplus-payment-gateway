@@ -309,7 +309,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'payplus_voucher_num' => esc_html($responseBody['data']['voucher_num'])
             ];
 
-            WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
+            $responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000" ? WC_PayPlus_Meta_Data::update_meta($order, $responseArray) : $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
+
             $transactionUid = $responseBody['data']['transaction_uid'];
 
             if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {

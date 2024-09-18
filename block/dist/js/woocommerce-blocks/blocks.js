@@ -170,14 +170,14 @@ if (isCheckout || hasOrder) {
     }
 
     var loader = document.createElement("div");
-    loader.class = "payplus_loader";
+    loader.class = "blocks-payplus_loader";
 
     // Add loader content
     loader.innerHTML = `
-          <div class="payplus_loader">
-              <div class="loader">
-                  <div class="loader-background">
-                      <div class="text"></div>
+          <div class="blocks-payplus_loader">
+              <div class="blocks-loader">
+                  <div class="blocks-loader-background">
+                      <div class="blocks-loader-text"></div>
                   </div>
               </div>
           </div>`;
@@ -384,8 +384,9 @@ if (isCheckout || hasOrder) {
           pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
           pp_iframe.style.borderRadius = "5px";
           document.body.style.overflow = "hidden";
-          document.getElementsByClassName("payplus_loader")[0].style.display =
-            "none";
+          document.getElementsByClassName(
+            "blocks-payplus_loader"
+          )[0].style.display = "none";
           break;
         default:
           break;
