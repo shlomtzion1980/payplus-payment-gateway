@@ -45,7 +45,6 @@ hf.SetMainFields({
   .AddField("notes", "[name=notes]", ".notes-wrapper")
   .SetRecaptcha("#recaptcha");
 jQuery(() => {
-  console.log("hfbefore: ", hf);
   // Define the async function to handle the response
   async function processResponse(resp) {
     try {
@@ -61,10 +60,10 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
-          console.log("data: ", data);
-          console.log("hfafter: ", hf);
-          console.log(jQuery("#payment-form"));
+          jQuery(".container").prependTo(".woocommerce-checkout-payment");
           jQuery("#create-payment-form").hide();
+          jQuery("#id-number-wrapper").hide();
+          jQuery("#payments-wrapper").hide();
           jQuery("#payment-form").show();
         });
       } else {
@@ -101,6 +100,10 @@ hf.Upon("pp_responseFromServer", (e) => {
     r = JSON.stringify(e.detail, null, 2);
   } catch (error) {
     r = e.detail;
+  }
+  console.log("Payment Response: ", e.detail);
+  if (e.detail.data.status_code === "000") {
+    alert("Success!");
   }
   jQuery("#status").val(r);
 });

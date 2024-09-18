@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"> -->
-    <title>Buy</title>
     <style>
         .fld-frame {
             border: 1px solid #ced4da;
@@ -56,7 +55,35 @@
                             </select>
                         </div>
                     </div>
+                    <div class="row" id="cc-wrapper">
+                        <div class="col-12">
+                            <label>Credit card number</label>
+                            <span id="cc" class="form-control fld-frame" data-hosted-fields-identifier="cc"></span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2 expiry-wrapper-full">
+                            <label>Expiry date</label>
+                            <span id="expiry" class="fld-frame"></span>
+                        </div>
+                    </div>
+                    <div class="row expiry-wrapper">
+                        <div class="col-2">
+                            <label>Month</label>
+                            <span id="expirym" class="fld-frame"></span>
+                        </div>
+                        <div class="col-2">
+                            <label>Year</label>
+                            <span id="expiryy" class="fld-frame"></span>
+                        </div>
+                        <div class="col-3">
+                            <label>CVV</label>
+                            <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
+                        </div>
+                    </div>
+                    <div class="row" id="cvv-wrapper">
 
+                    </div>
                     <div class="row" id="card-holder-name-wrapper">
                         <div class="col-12">
                             <label>Name</label>
@@ -88,34 +115,6 @@
                         <div class="col-12">
                             <label>Invoice name</label>
                             <input type="text" id="invoice-name" class="form-control" value="">
-                        </div>
-                    </div>
-                    <div class="row" id="cc-wrapper">
-                        <div class="col-12">
-                            <label>Credit card number</label>
-                            <span id="cc" class="form-control fld-frame" data-hosted-fields-identifier="cc"></span>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-4 expiry-wrapper-full">
-                            <label>Expiry date</label>
-                            <span id="expiry" class="fld-frame"></span>
-                        </div>
-                    </div>
-                    <div class="row expiry-wrapper">
-                        <div class="col-2">
-                            <label>Month</label>
-                            <span id="expirym" class="fld-frame"></span>
-                        </div>
-                        <div class="col-2">
-                            <label>Year</label>
-                            <span id="expiryy" class="fld-frame"></span>
-                        </div>
-                    </div>
-                    <div class="row" id="cvv-wrapper">
-                        <div class="col-4">
-                            <label>CVV</label>
-                            <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                         </div>
                     </div>
                 </div>
