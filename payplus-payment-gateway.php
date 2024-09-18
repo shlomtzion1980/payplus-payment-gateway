@@ -60,6 +60,7 @@ class WC_PayPlus
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
         add_action('wp_head', [$this, 'payplus_no_index_page_error']);
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
+        add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
@@ -73,6 +74,19 @@ class WC_PayPlus
         } else {
             $this->payPlusCronDeactivate();
         }
+    }
+
+    public function hostedPayment()
+    {
+        $order_id = $_POST['order_id'];
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+        $order = wc_get_order($order_id);
+        $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+        $metaData['payplus_page_request_uid'] = $_POST['page_request_uid'];
+        WC_PayPlus_Meta_Data::update_meta($order, $metaData);
+        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
     }
 
     public function payPlusCronDeactivate()
@@ -584,10 +598,11 @@ class WC_PayPlus
                     wp_enqueue_script('payplus-front-js');
                 }
             }
+
             require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
 
             wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/bootstrap.css', [], $script_version);
-            if ($response && json_decode($response, true)['results']['status'] === "success") {
+            if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
                 $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
 
                 if (file_exists($template_path)) {
@@ -599,7 +614,7 @@ class WC_PayPlus
                     'payplus-hosted',
                     'payplus_script',
                     [
-                        "hostedResponse" => $response,
+                        "hostedResponse" => $hostedResponse,
                         'ajax_url' => admin_url('admin-ajax.php'),
                         'frontNonce' => wp_create_nonce('frontNonce'),
                     ]

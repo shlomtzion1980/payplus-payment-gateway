@@ -81,6 +81,7 @@ jQuery(() => {
 
 jQuery(() => {
   jQuery("#submit-payment").on("click", () => {
+    jQuery(".blocks-payplus_loader_hosted").fadeIn();
     hf.SubmitPayment();
   });
 });
@@ -102,11 +103,33 @@ hf.Upon("pp_responseFromServer", (e) => {
     r = e.detail;
   }
   console.log("Payment Response: ", e.detail);
+
+  // jQuery("#status").val(r);
   if (e.detail.data.status_code === "000") {
-    alert("Success!");
+    let orderId = e.detail.data.more_info;
+    let token = e.detail.data.token_uid;
+    let pageRequestdUid = e.detail.data.page_request_uid;
+
+    jQuery.ajax({
+      type: "post",
+      dataType: "json",
+      url: payplus_script.ajax_url,
+      data: {
+        action: "make-hosted-payment",
+        order_id: orderId,
+        token: token,
+        page_request_uid: pageRequestdUid,
+        _ajax_nonce: payplus_script.frontNonce,
+      },
+      success: function (response) {
+        if (response === 0) {
+          location.assign(e.detail.data.more_info_5);
+        }
+      },
+    });
   }
-  jQuery("#status").val(r);
 });
 hf.Upon("pp_submitProcess", (e) => {
-  jQuery("#submit-payment").prop("disabled", e.detail);
+  // jQuery("#submit-payment").prop("disabled", e.detail);
+  jQuery("#submit-payment").hide();
 });
