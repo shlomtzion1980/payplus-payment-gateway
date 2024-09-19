@@ -64,7 +64,7 @@ jQuery(() => {
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
           jQuery("#payments-wrapper").hide();
-          jQuery("#payment-form").show();
+          jQuery("#payment-form").css("display", "flex");
         });
       } else {
         alert(resp.results.message);
@@ -103,9 +103,13 @@ hf.Upon("pp_responseFromServer", (e) => {
     r = e.detail;
   }
   console.log("Payment Response: ", e.detail);
+  if (e.detail.errors) {
+    jQuery(".blocks-payplus_loader_hosted").fadeOut();
 
-  // jQuery("#status").val(r);
-  if (e.detail.data.status_code === "000") {
+    alert(e.detail.errors[0].message);
+  }
+
+  if (e.detail.data?.status_code === "000") {
     let orderId = e.detail.data.more_info;
     let token = e.detail.data.token_uid;
     let pageRequestdUid = e.detail.data.page_request_uid;
@@ -130,6 +134,5 @@ hf.Upon("pp_responseFromServer", (e) => {
   }
 });
 hf.Upon("pp_submitProcess", (e) => {
-  // jQuery("#submit-payment").prop("disabled", e.detail);
-  jQuery("#submit-payment").hide();
+  jQuery("#submit-payment").prop("disabled", e.detail);
 });
