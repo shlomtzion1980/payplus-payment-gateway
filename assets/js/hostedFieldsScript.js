@@ -60,7 +60,7 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
-          jQuery(".container").prependTo(".woocommerce-checkout-payment");
+          jQuery(".hostedFields").prependTo(".woocommerce-checkout-payment");
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
           jQuery("#payments-wrapper").hide();

@@ -2,9 +2,17 @@
 if (WC()->cart->get_subtotal() === 0) {
     return;
 }
-define('API_KEY', '34a62c67-cd66-4a97-b14e-55177619ef89');
-define('SECRET_KEY', 'a489da6d-72b2-463f-afe5-c8c5f7993d0c');
-define('PAYMENT_PAGE_UID', 'cb08f952-0ee3-4e46-8054-b8edb7c19093');
+
+$options = get_option('woocommerce_payplus-payment-gateway_settings');
+$testMode = boolval($options['api_test_mode'] === 'yes');
+$url = $testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
+$apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
+$secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
+$paymentPageUid = $testMode ? $options['dev_payment_page_id'] : $options['payment_page_id'];
+
+define('API_KEY', $apiKey);
+define('SECRET_KEY', $secretKey);
+define('PAYMENT_PAGE_UID', $paymentPageUid);
 define('ORIGIN_DOMAIN', site_url());
 define('SUCCESS_URL', 'https://www.example.com/success');
 define('FAILURE_URL', 'https://www.example.com/failure');

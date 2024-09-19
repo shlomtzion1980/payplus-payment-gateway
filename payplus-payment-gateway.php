@@ -599,14 +599,13 @@ class WC_PayPlus
                 }
             }
 
-            if (!is_cart() && !is_product()) {
+            if (!is_cart() && !is_product() && !is_shop()) {
                 require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
-
-                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/bootstrap.css', [], $script_version);
                 if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
                     $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
 
                     if (file_exists($template_path)) {
+                        wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/bootstrap.css', [], $script_version);
                         echo file_get_contents($template_path);
                     }
                     wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);

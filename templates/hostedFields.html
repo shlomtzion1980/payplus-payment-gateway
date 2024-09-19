@@ -31,6 +31,9 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         margin: auto;
+        @media screen and (max-width: 567px) {
+          width: 100% !important;
+        }
       }
       #hostedTop {
         display: flex;
@@ -85,7 +88,7 @@
   </head>
 
   <body>
-    <div class="container">
+    <div class="container hostedFields">
       <br />
       <div id="payment-form">
         <div class="row">
