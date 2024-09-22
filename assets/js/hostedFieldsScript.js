@@ -1,5 +1,6 @@
 const hf = new PayPlusHostedFieldsDom();
 var resp = JSON.parse(payplus_script.hostedResponse);
+let payload;
 hf.SetMainFields({
   cc: {
     elmSelector: "#cc",
@@ -60,7 +61,9 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
+          payload = data;
           jQuery(".hostedFields").prependTo(".woocommerce-checkout-payment");
+          jQuery(".hostedFields").prependTo(".wp-block-woocommerce-checkout");
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
           jQuery("#payments-wrapper").hide();
@@ -82,6 +85,29 @@ jQuery(() => {
 jQuery(() => {
   jQuery("#submit-payment").on("click", () => {
     jQuery(".blocks-payplus_loader_hosted").fadeIn();
+    if (typeof wp !== "undefined") {
+      console.log(
+        wp.data.select("wc/store/cart").getCartTotals().total_shipping
+      );
+      let totalShipping = wp.data
+        .select("wc/store/cart")
+        .getCartTotals().total_shipping;
+      // jQuery.ajax({
+      //   type: "post",
+      //   dataType: "json",
+      //   url: payplus_script.ajax_url,
+      //   data: {
+      //     action: "update-hosted-payment",
+      //     totalShipping: totalShipping,
+      //     _ajax_nonce: payplus_script.frontNonce,
+      //   },
+      //   success: function (response) {
+      //     console.log(response);
+      //   },
+      // });
+      // console.log(payload);
+    }
+
     hf.SubmitPayment();
   });
 });
@@ -113,7 +139,6 @@ hf.Upon("pp_responseFromServer", (e) => {
     let orderId = e.detail.data.more_info;
     let token = e.detail.data.token_uid;
     let pageRequestdUid = e.detail.data.page_request_uid;
-
     jQuery.ajax({
       type: "post",
       dataType: "json",
@@ -126,9 +151,7 @@ hf.Upon("pp_responseFromServer", (e) => {
         _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
-        if (response === 0) {
-          location.assign(e.detail.data.more_info_5);
-        }
+        location.assign(e.detail.url);
       },
     });
   }

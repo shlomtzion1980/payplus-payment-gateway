@@ -1964,6 +1964,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $chargeByItems = false;
             $amount = round((float) $payplusChargeAmount, 2);
             $transaction_uid = $order->get_meta('payplus_transaction_uid');
+            if (empty($transaction_uid)) {
+                $transaction_uid = json_decode($order->get_meta('payplus_response'), true)['transaction_uid'];
+                WC_PayPlus_Meta_Data::update_meta($order, array('transaction_uid' => $transaction_uid));
+            }
             if ($OrderType == "Charge") {
                 echo esc_url($urlEdit);
                 wp_die();

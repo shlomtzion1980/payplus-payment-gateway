@@ -61,6 +61,7 @@ class WC_PayPlus
         add_action('wp_head', [$this, 'payplus_no_index_page_error']);
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
+        add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
@@ -78,7 +79,8 @@ class WC_PayPlus
 
     public function hostedPayment()
     {
-        $order_id = $_POST['order_id'];
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        $order_id = intval($_POST['order_id']);
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
@@ -87,6 +89,20 @@ class WC_PayPlus
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+        delete_transient('hostedPayload');
+    }
+
+    public function updateHostedPayment()
+    {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        $payload = json_decode(get_transient('hostedPayload'), true);
+        foreach ($payload['items'] as $key => $item) {
+            if ($item['name'] === "shipping_total") {
+                $payload['items'][$key]['price'] = intval($_POST['shippingTotal']) / 100;
+            }
+        }
+        $payload = wp_json_encode($payload);
+        print_r($payload);
     }
 
     public function payPlusCronDeactivate()
@@ -599,28 +615,31 @@ class WC_PayPlus
                 }
             }
 
-            if (!is_cart() && !is_product() && !is_shop()) {
-                require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
-                if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-                    $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
+            $userId = get_current_user_id();
+            if ($userId > 0) {
+                if (!is_cart() && !is_product() && !is_shop()) {
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
+                    if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
+                        $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
 
-                    if (file_exists($template_path)) {
-                        wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/bootstrap.css', [], $script_version);
-                        echo file_get_contents($template_path);
+                        if (file_exists($template_path)) {
+                            wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/bootstrap.css', [], $script_version);
+                            echo file_get_contents($template_path);
+                        }
+                        wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
+                        wp_register_script('payplus-hosted', plugin_dir_url(__FILE__) . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
+                        wp_localize_script(
+                            'payplus-hosted',
+                            'payplus_script',
+                            [
+                                "hostedResponse" => $hostedResponse,
+                                'ajax_url' => admin_url('admin-ajax.php'),
+                                'frontNonce' => wp_create_nonce('frontNonce'),
+                                'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
+                            ]
+                        );
+                        wp_enqueue_script('payplus-hosted');
                     }
-                    wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-                    wp_register_script('payplus-hosted', plugin_dir_url(__FILE__) . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
-                    wp_localize_script(
-                        'payplus-hosted',
-                        'payplus_script',
-                        [
-                            "hostedResponse" => $hostedResponse,
-                            'ajax_url' => admin_url('admin-ajax.php'),
-                            'frontNonce' => wp_create_nonce('frontNonce'),
-                            'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
-                        ]
-                    );
-                    wp_enqueue_script('payplus-hosted');
                 }
             }
         }
