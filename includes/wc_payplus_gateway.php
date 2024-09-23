@@ -1913,10 +1913,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->default_charge_method = 'credit-card';
         }
 
-        $callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
-        if ($this->api_test_mode === true && $this->callback_addr) {
-            $callback = $this->callback_addr;
-        }
+        $callback = $this->callback_addr ? $this->callback_addr : get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
+
         $post = $this->payplus_get_posts_id("", array("post_parent" => $order_id));
         $external_recurring_payment = "";
         if ($post && $post[0]->post_type === "shop_subscription") {
