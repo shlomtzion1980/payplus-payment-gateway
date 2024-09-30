@@ -78,28 +78,28 @@ jQuery(() => {
             $topLi.append($newDiv);
           }
 
-          // const inputElement = document.querySelector(
-          //   "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
-          // );
-          // console.log(inputElement);
-          // if (inputElement) {
-          //   // Find the closest parent div
-          //   const topDiv = inputElement.closest("div");
+          const inputElement = document.querySelector(
+            "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
+          );
+          console.log(inputElement);
+          if (inputElement) {
+            // Find the closest parent div
+            const topDiv = inputElement.closest("div");
 
-          //   if (topDiv) {
-          //     // Create a new div element
-          //     const newDiv = document.querySelector(
-          //       "body > div.container.hostedFields"
-          //     );
+            if (topDiv) {
+              // Create a new div element
+              const newDiv = document.querySelector(
+                "body > div.container.hostedFields"
+              );
 
-          //     // Append the new div to the top div
-          //     topDiv.appendChild(newDiv);
-          //   } else {
-          //     console.log("No parent div found.");
-          //   }
-          // } else {
-          //   console.log("Element with the specified ID not found.");
-          // }
+              // Append the new div to the top div
+              topDiv.appendChild(newDiv);
+            } else {
+              console.log("No parent div found.");
+            }
+          } else {
+            console.log("Element with the specified ID not found.");
+          }
 
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
