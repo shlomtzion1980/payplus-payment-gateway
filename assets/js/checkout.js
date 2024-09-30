@@ -515,17 +515,21 @@ jQuery(function ($) {
               $(key).unblock();
             });
             wc_checkout_form.fragments = data.fragments;
-            if (!$(".hostedFields").length) {
-              $(".woocommerce-checkout-payment").prepend(hostedFields);
-            }
+            // if (!$(".hostedFields").length) {
+            //   $(
+            //     ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
+            //   ).prepend(hostedFields);
+            // }
           }
 
-          $(document.body).on("updated_checkout", function () {
-            // Recreate and prepend the .container element after fragments update
-            if (!$(".hostedFields").length) {
-              $(".woocommerce-checkout-payment").prepend(hostedFields);
-            }
-          });
+          // $(document.body).on("updated_checkout", function () {
+          //   // Recreate and prepend the .container element after fragments update
+          //   if (!$(".hostedFields").length) {
+          //     $(
+          //       ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
+          //     ).prepend(hostedFields);
+          //   }
+          // });
 
           // Recheck the terms and conditions box, if needed
           if (termsCheckBoxChecked) {

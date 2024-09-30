@@ -217,6 +217,7 @@ if (isCheckout || hasOrder) {
           autoPPCC(overlay, loader, payPlusCC);
           autoPPCCrun = false;
         }
+
         if (store.isComplete()) {
           const activePaymentMethod = payment.getActivePaymentMethod();
           if (activePaymentMethod.search("payplus-payment-gateway") === 0) {

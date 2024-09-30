@@ -62,8 +62,49 @@ jQuery(() => {
 
         hf.InitPaymentPage.then((data) => {
           payload = data;
-          jQuery(".hostedFields").prependTo(".woocommerce-checkout-payment");
-          jQuery(".hostedFields").prependTo(".wp-block-woocommerce-checkout");
+          // jQuery(".hostedFields").prependTo(".woocommerce-checkout-payment");
+          // jQuery(".hostedFields").prependTo(".wp-block-woocommerce-checkout");
+          var $liElement = jQuery(
+            "li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
+          );
+
+          if ($liElement.length) {
+            // Create a new <div> element
+            var newDiv = jQuery(".hostedFields");
+
+            // Append the new div to the <li> element
+            $liElement.append(newDiv);
+          } else {
+            console.log(
+              "The <li> element with the specified class was not found."
+            );
+          }
+
+          // setTimeout(function () {
+          const inputElement = document.querySelector(
+            "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
+          );
+          console.log(inputElement);
+          if (inputElement) {
+            // Find the closest parent div
+            const topDiv = inputElement.closest("div");
+
+            if (topDiv) {
+              // Create a new div element
+              const newDiv = document.querySelector(
+                "body > div.container.hostedFields"
+              );
+
+              // Append the new div to the top div
+              topDiv.appendChild(newDiv);
+            } else {
+              console.log("No parent div found.");
+            }
+          } else {
+            console.log("Element with the specified ID not found.");
+          }
+          // }, 1000);
+
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
           jQuery("#payments-wrapper").hide();
@@ -85,28 +126,28 @@ jQuery(() => {
 jQuery(() => {
   jQuery("#submit-payment").on("click", () => {
     jQuery(".blocks-payplus_loader_hosted").fadeIn();
-    if (typeof wp !== "undefined") {
-      console.log(
-        wp.data.select("wc/store/cart").getCartTotals().total_shipping
-      );
-      let totalShipping = wp.data
-        .select("wc/store/cart")
-        .getCartTotals().total_shipping;
-      // jQuery.ajax({
-      //   type: "post",
-      //   dataType: "json",
-      //   url: payplus_script.ajax_url,
-      //   data: {
-      //     action: "update-hosted-payment",
-      //     totalShipping: totalShipping,
-      //     _ajax_nonce: payplus_script.frontNonce,
-      //   },
-      //   success: function (response) {
-      //     console.log(response);
-      //   },
-      // });
-      // console.log(payload);
-    }
+    // if (typeof wp !== "undefined") {
+    //   console.log(
+    //     wp.data.select("wc/store/cart").getCartTotals().total_shipping
+    //   );
+    //   let totalShipping = wp.data
+    //     .select("wc/store/cart")
+    //     .getCartTotals().total_shipping;
+    //   // jQuery.ajax({
+    //   //   type: "post",
+    //   //   dataType: "json",
+    //   //   url: payplus_script.ajax_url,
+    //   //   data: {
+    //   //     action: "update-hosted-payment",
+    //   //     totalShipping: totalShipping,
+    //   //     _ajax_nonce: payplus_script.frontNonce,
+    //   //   },
+    //   //   success: function (response) {
+    //   //     console.log(response);
+    //   //   },
+    //   // });
+    //   // console.log(payload);
+    // }
 
     hf.SubmitPayment();
   });
