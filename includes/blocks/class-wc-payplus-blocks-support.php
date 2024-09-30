@@ -144,7 +144,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             "payplus-payment-gateway-multipass" => 'multipass',
             "payplus-payment-gateway-valuecard" => 'valuecard',
             "payplus-payment-gateway-tavzahav" => 'tav-zahav',
-            "payplus-payment-gateway-finitione" => 'finitione'
+            "payplus-payment-gateway-finitione" => 'finitione',
+            "payplus-payment-gateway-hostedfields" => 'hostedFields'
         ];
         $chargeDefault = $names[$context->payment_method];
 
@@ -334,4 +335,8 @@ final class WC_Gateway_Payplus_FinitiOne_Block extends WC_Gateway_Payplus_Paymen
 final class WC_Gateway_Payplus_Paypal_Block extends WC_Gateway_Payplus_Payment_Block
 {
     protected $name = 'payplus-payment-gateway-paypal';
+}
+final class WC_PayPlus_Gateway_HostedFields_Block extends WC_Gateway_Payplus_Payment_Block
+{
+    protected $name = 'payplus-payment-gateway-hostedfields';
 }

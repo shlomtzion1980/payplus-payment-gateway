@@ -33,7 +33,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Pay with PayPal via PayPlus', 'payplus-payment-gateway'),
             __('Pay with Tav Zahav via PayPlus', 'payplus-payment-gateway'),
             __('Pay with Valuecard via PayPlus', 'payplus-payment-gateway'),
-            __('Pay with finitiOne via PayPlus', 'payplus-payment-gateway')
+            __('Pay with finitiOne via PayPlus', 'payplus-payment-gateway'),
+            __('Pay with PayPlus Hosted Fields', 'payplus-payment-gateway')
 
         );
         $this->allTypePayment = array(
@@ -44,7 +45,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('PayPal', 'payplus-payment-gateway'),
             __('Tav Zahav', 'payplus-payment-gateway'),
             __('Valuecard', 'payplus-payment-gateway'),
-            __('finitiOne', 'payplus-payment-gateway')
+            __('finitiOne', 'payplus-payment-gateway'),
+            __('hostedFields', 'payplus-payment-gateway')
         );
 
         $this->method_title = $this->method_title_text;
@@ -97,6 +99,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'PayPlus - Valuecard':
                 $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
                 break;
+            case 'PayPlus - Hosted Fields':
+                $methodTitleText = esc_html__('PayPlus - Hosted Fields', 'payplus-payment-gateway');
+                break;
         }
         $payWithText = '';
         switch ($this->pay_with_text) {
@@ -123,6 +128,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 break;
             case 'Pay with Tav finitiOne':
                 $payWithText = esc_html__('Pay with Tav finitiOne', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Hosted Fields':
+                $payWithText = esc_html__('Pay with Hosted Fields', 'payplus-payment-gateway');
                 break;
         }
         $this->form_fields = [
@@ -234,6 +242,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 break;
             case 'Pay with finitiOne via PayPlus':
                 $methodDescriptionText = esc_html__('Pay with finitiOne via PayPlus', 'payplus-payment-gateway');
+                break;
+            case 'Pay with PayPlus Hosted Fields':
+                $methodDescriptionText = esc_html__('Pay with PayPlus Hosted Fields', 'payplus-payment-gateway');
                 break;
         }
 
@@ -366,4 +377,15 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
     public $payplus_default_charge_method = 'finitione';
     public $iconURL = 'assets/images/finitioneLogo.png';
     public $pay_with_text = 'Pay with Tav finitiOne';
+}
+
+class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
+{
+    public $id = 'payplus-payment-gateway-hostedfields';
+    public $method_title_text = 'PayPlus - Hosted Fields';
+    public $default_description_settings_text = 'payment via PayPlus Hosted Fields';
+    public $method_description_text = 'Pay with PayPlus Hosted Fields';
+    public $payplus_default_charge_method = 'hostedFields';
+    public $iconURL = 'assets/images/PayPlusLogo.svg';
+    public $pay_with_text = 'Pay with PayPlus Hosted Fields';
 }

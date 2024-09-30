@@ -362,7 +362,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'paypal' => 'woocommerce_payplus-payment-gateway-paypal_settings',
             'tavzahav' => 'woocommerce_payplus-payment-gateway-tavzahav_settings',
             'valuecard' => 'woocommerce_payplus-payment-gateway-valuecard_settings',
-            'finitone' => 'woocommerce_payplus-payment-gateway-finitione_settings'
+            'finitone' => 'woocommerce_payplus-payment-gateway-finitione_settings',
+            'hostedFields' => 'woocommerce_payplus-payment-gateway-hostedfields_settings'
         ];
 
         // Get the raw POST body
@@ -796,6 +797,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 "section" => "payplus-payment-gateway-finitione",
                 "style" => "max-height: 100%;"
             ),
+            "hostedFields" => array(
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg",
+                "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-hostedfields",
+                "section" => "payplus-payment-gateway-hostedfields",
+                "style" => "max-height: 100%;"
+            ),
         );
 
         echo "<div id='payplus-options'>";
@@ -830,6 +837,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         break;
                     case 'finitiOne':
                         $translatedKey = esc_html__('finitiOne', 'payplus-payment-gateway');
+                        break;
+                    case 'hostedFields':
+                        $translatedKey = esc_html__('hostedFields', 'payplus-payment-gateway');
                         break;
                 }
                 if ($currentSection === $value['section']) {

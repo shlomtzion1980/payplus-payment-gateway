@@ -16,6 +16,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         'payplus-payment-gateway-tavzahav',
         'payplus-payment-gateway-valuecard',
         'payplus-payment-gateway-finitione',
+        'payplus-payment-gateway-hostedfields',
     );
     public $applePaySettings;
     public $isApplePayEnabled;

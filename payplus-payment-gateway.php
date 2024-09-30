@@ -930,6 +930,7 @@ class WC_PayPlus
         $methods[] = 'WC_PayPlus_Gateway_TavZahav';
         $methods[] = 'WC_PayPlus_Gateway_Valuecard';
         $methods[] = 'WC_PayPlus_Gateway_FinitiOne';
+        $methods[] = 'WC_PayPlus_Gateway_HostedFields';
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if ($payplus_payment_gateway_settings) {
             if (isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
@@ -1061,6 +1062,7 @@ class WC_PayPlus
                     $payment_method_registry->register(new WC_Gateway_Payplus_TavZahav_Block());
                     $payment_method_registry->register(new WC_Gateway_Payplus_Valuecard_Block());
                     $payment_method_registry->register(new WC_Gateway_Payplus_FinitiOne_Block());
+                    $payment_method_registry->register(new WC_PayPlus_Gateway_HostedFields_Block());
                     $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
                 }
             );
