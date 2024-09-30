@@ -520,20 +520,39 @@ jQuery(function ($) {
             //     ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
             //   ).prepend(hostedFields);
             // }
+            putHostedFields();
           }
 
-          // $(document.body).on("updated_checkout", function () {
-          //   // Recreate and prepend the .container element after fragments update
-          //   if (!$(".hostedFields").length) {
-          //     $(
-          //       ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
-          //     ).prepend(hostedFields);
-          //   }
-          // });
+          $(document.body).on("updated_checkout", function () {
+            // // Recreate and prepend the .container element after fragments update
+            // if (!$(".hostedFields").length) {
+            //   $(
+            //     ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
+            //   ).prepend(hostedFields);
+            // }
+            putHostedFields();
+          });
 
           // Recheck the terms and conditions box, if needed
           if (termsCheckBoxChecked) {
             $("#terms").prop("checked", true);
+          }
+
+          function putHostedFields() {
+            var $paymentMethod = jQuery(
+              "#payment_method_payplus-payment-gateway-hostedfields"
+            );
+
+            // Find the closest parent <li>
+            var $topLi = $paymentMethod.closest("li");
+
+            // Select the existing div element that you want to move
+            var $newDiv = jQuery("body > div.container.hostedFields");
+
+            if ($paymentMethod.length && $topLi.length && $newDiv.length) {
+              // Move the existing div to the top <li> of the payment method
+              $topLi.append($newDiv);
+            }
           }
 
           // Fill in the payment details if possible without overwriting data if set.

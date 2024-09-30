@@ -62,48 +62,44 @@ jQuery(() => {
 
         hf.InitPaymentPage.then((data) => {
           payload = data;
-          // jQuery(".hostedFields").prependTo(".woocommerce-checkout-payment");
-          // jQuery(".hostedFields").prependTo(".wp-block-woocommerce-checkout");
-          var $liElement = jQuery(
-            "li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
+          // Select the payment method element
+          var $paymentMethod = jQuery(
+            "#payment_method_payplus-payment-gateway-hostedfields"
           );
 
-          if ($liElement.length) {
-            // Create a new <div> element
-            var newDiv = jQuery(".hostedFields");
+          // Find the closest parent <li>
+          var $topLi = $paymentMethod.closest("li");
 
-            // Append the new div to the <li> element
-            $liElement.append(newDiv);
-          } else {
-            console.log(
-              "The <li> element with the specified class was not found."
-            );
+          // Select the existing div element that you want to move
+          var $newDiv = jQuery("body > div.container.hostedFields");
+
+          if ($paymentMethod.length && $topLi.length && $newDiv.length) {
+            // Move the existing div to the top <li> of the payment method
+            $topLi.append($newDiv);
           }
 
-          // setTimeout(function () {
-          const inputElement = document.querySelector(
-            "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
-          );
-          console.log(inputElement);
-          if (inputElement) {
-            // Find the closest parent div
-            const topDiv = inputElement.closest("div");
+          // const inputElement = document.querySelector(
+          //   "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
+          // );
+          // console.log(inputElement);
+          // if (inputElement) {
+          //   // Find the closest parent div
+          //   const topDiv = inputElement.closest("div");
 
-            if (topDiv) {
-              // Create a new div element
-              const newDiv = document.querySelector(
-                "body > div.container.hostedFields"
-              );
+          //   if (topDiv) {
+          //     // Create a new div element
+          //     const newDiv = document.querySelector(
+          //       "body > div.container.hostedFields"
+          //     );
 
-              // Append the new div to the top div
-              topDiv.appendChild(newDiv);
-            } else {
-              console.log("No parent div found.");
-            }
-          } else {
-            console.log("Element with the specified ID not found.");
-          }
-          // }, 1000);
+          //     // Append the new div to the top div
+          //     topDiv.appendChild(newDiv);
+          //   } else {
+          //     console.log("No parent div found.");
+          //   }
+          // } else {
+          //   console.log("Element with the specified ID not found.");
+          // }
 
           jQuery("#create-payment-form").hide();
           jQuery("#id-number-wrapper").hide();
