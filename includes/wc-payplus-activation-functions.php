@@ -217,9 +217,9 @@ function checkPayPlusErrorPage($errorPageOptions)
  */
 function checkSetPayPlusOptions()
 {
-    $invoiceOptions = get_option('payplus_invoice_option', []);
-    $payPlusOptions = get_option('woocommerce_payplus-payment-gateway_settings', []);
-    $payPlusErrorOptions = get_option('settings_payplus_page_error_option', []);
+    $invoiceOptions = !is_bool(get_option('payplus_invoice_option', [])) ? get_option('payplus_invoice_option', []) : [];
+    $payPlusOptions = !is_bool(get_option('woocommerce_payplus-payment-gateway_settings', [])) ? get_option('woocommerce_payplus-payment-gateway_settings', []) : [];
+    $payPlusErrorOptions = !is_bool(get_option('settings_payplus_page_error_option', [])) ? get_option('settings_payplus_page_error_option', []) : [];
 
     $newPayPlusOptionsYes = ['hide_custom_fields_buttons', 'show_payplus_data_metabox'];
     $newPayPlusOptionsNo  = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type', 'payplus_data_save_order_note'];
