@@ -224,7 +224,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'version' => '1.0.0'
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
-        $style_url = PAYPLUS_PLUGIN_URL . $style_path;
+        // $style_url = PAYPLUS_PLUGIN_URL . $style_path;
 
         // Register the script
         wp_register_script(
@@ -235,13 +235,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             true
         );
 
-        // Register the style
-        wp_register_style(
-            'wc-payplus-payments-block-style',
-            $style_url,
-            array(), // Add dependencies if needed
-            $script_asset['version']
-        );
+        // // Register the style
+        // wp_register_style(
+        //     'wc-payplus-payments-block-style',
+        //     $style_url,
+        //     array(), // Add dependencies if needed
+        //     $script_asset['version']
+        // );
 
         // Enqueue the style
         wp_enqueue_style('wc-payplus-payments-block-style');
