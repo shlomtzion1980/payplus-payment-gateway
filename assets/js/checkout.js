@@ -522,13 +522,165 @@ jQuery(function ($) {
             // }
             putHostedFields();
           }
+          var coupons = [];
+          var couponCode;
+          var totalDiscount = 0;
+          let isSubmitting = false;
+          $('#shipping_method input[type="radio"]').on("change", function () {
+            if (isSubmitting) return; // Prevent multiple submissions
+            isSubmitting = true; // Set flag to true to block further submissions
 
+            // Recreate and prepend the .container element after fragments update
+            // Get the selected shipping method ID
+            var selectedShippingMethod = $(
+              'input[name="shipping_method[0]"]:checked'
+            ).val();
+            console.log(
+              "Selected shipping method ID: " + selectedShippingMethod
+            );
+
+            // Find the label associated with the selected shipping method
+            var label = $('input[name="shipping_method[0]"]:checked')
+              .closest("li")
+              .find("label")
+              .text();
+
+            // Adjust the regex to support both $ and ₪ (or any currency symbol at start or end)
+            var priceMatch = label.match(
+              /(\$|₪)\s*([0-9.,]+)|([0-9.,]+)\s*(\$|₪)/
+            );
+
+            let shippingPrice = 0;
+            if (priceMatch) {
+              var currency = priceMatch[1] || priceMatch[4]; // Captures the currency symbol
+              shippingPrice = priceMatch[2] || priceMatch[3]; // Captures the price number
+              console.log("Shipping price: " + shippingPrice + " " + currency);
+              // Your custom logic with the shipping price and currency
+            }
+
+            let totalShipping = shippingPrice;
+            jQuery.ajax({
+              type: "post",
+              dataType: "json",
+              url: payplus_script.ajax_url,
+              data: {
+                action: "update-hosted-payment",
+                totalShipping: totalShipping,
+                _ajax_nonce: payplus_script.frontNonce,
+              },
+              success: function (response) {
+                console.log(response);
+              },
+              complete: function () {
+                // Reset flag after completion of request
+                isSubmitting = false;
+              },
+            });
+          });
+
+          $(".woocommerce-remove-coupon").on("click", function (e) {
+            setTimeout(function () {
+              // Initialize total discount
+
+              // Select all coupon rows
+              $(".cart-discount").each(function () {
+                couponCode = $(this)
+                  .find("th")
+                  .text()
+                  .match(/Coupon:\s*(.*)/)[1]
+                  .trim();
+                var discountText = $(this)
+                  .find(".woocommerce-Price-amount")
+                  .text()
+                  .trim();
+                coupons.push(couponCode);
+                // Parse the discount amount (assuming it follows a format like "2 ₪")
+                var discountAmount = parseFloat(
+                  discountText.replace(/[^0-9.-]+/g, "")
+                );
+
+                totalDiscount += discountAmount;
+
+                console.log("Coupon Code: " + couponCode);
+                console.log("Discount Amount: " + discountAmount);
+              });
+              console.log("This : ", $(this));
+              console.log(e.target.getAttribute("data-coupon"));
+              console.log("Total Discount: " + totalDiscount);
+              // jQuery.ajax({
+              //   type: "post",
+              //   dataType: "json",
+              //   url: payplus_script.ajax_url,
+              //   data: {
+              //     action: "update-hosted-payment-coupon",
+              //     couponCode: couponCode,
+              //     coupons: coupons,
+              //     totalDiscount: totalDiscount,
+              //     _ajax_nonce: payplus_script.frontNonce,
+              //   },
+              //   success: function (response) {
+              //     console.log(response);
+              //   },
+              //   complete: function () {
+              //     // Reset flag after completion of request
+              //     isSubmitting = false;
+              //   },
+              // });
+            }, 1000); // Wait for the DOM to update after applying the coupon
+          });
+
+          $('button[name="apply_coupon"]').on("click", function (e) {
+            setTimeout(function () {
+              // Initialize total discount
+
+              // Select all coupon rows
+              $(".cart-discount").each(function () {
+                couponCode = $(this)
+                  .find("th")
+                  .text()
+                  .match(/Coupon:\s*(.*)/)[1]
+                  .trim();
+                var discountText = $(this)
+                  .find(".woocommerce-Price-amount")
+                  .text()
+                  .trim();
+                coupons.push(couponCode);
+                // Parse the discount amount (assuming it follows a format like "2 ₪")
+                var discountAmount = parseFloat(
+                  discountText.replace(/[^0-9.-]+/g, "")
+                );
+
+                totalDiscount += discountAmount;
+
+                console.log("Coupon Code: " + couponCode);
+                console.log("Discount Amount: " + discountAmount);
+              });
+
+              console.log("Total Discount: " + totalDiscount);
+              jQuery.ajax({
+                type: "post",
+                dataType: "json",
+                url: payplus_script.ajax_url,
+                data: {
+                  action: "update-hosted-payment-coupon",
+                  couponCode: couponCode,
+                  coupons: coupons,
+                  totalDiscount: totalDiscount,
+                  _ajax_nonce: payplus_script.frontNonce,
+                },
+                success: function (response) {
+                  console.log(response);
+                },
+                complete: function () {
+                  // Reset flag after completion of request
+                  isSubmitting = false;
+                },
+              });
+            }, 1000); // Wait for the DOM to update after applying the coupon
+          });
           $(document.body).on("updated_checkout", function () {
-            // // Recreate and prepend the .container element after fragments update
             // if (!$(".hostedFields").length) {
-            //   $(
-            //     ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
-            //   ).prepend(hostedFields);
+            //   $(".woocommerce-checkout-payment").prepend(hostedFields);
             // }
             putHostedFields();
           });
@@ -544,7 +696,7 @@ jQuery(function ($) {
             );
 
             // Find the closest parent <li>
-            var $topLi = $paymentMethod.closest("li");
+            var $topLi = jQuery(".pp_iframe");
 
             // Select the existing div element that you want to move
             var $newDiv = jQuery("body > div.container.hostedFields");

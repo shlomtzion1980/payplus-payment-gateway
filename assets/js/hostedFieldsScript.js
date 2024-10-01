@@ -45,6 +45,24 @@ hf.SetMainFields({
   .AddField("custom_invoice_name", "#invoice-name", "#invoice-name-wrapper")
   .AddField("notes", "[name=notes]", ".notes-wrapper")
   .SetRecaptcha("#recaptcha");
+
+function putHostedFields() {
+  var $paymentMethod = jQuery(
+    "#payment_method_payplus-payment-gateway-hostedfields"
+  );
+
+  // Find the closest parent <li>
+  var $topLi = jQuery(".pp_iframe");
+
+  // Select the existing div element that you want to move
+  var $newDiv = jQuery("body > div.container.hostedFields");
+
+  if ($paymentMethod.length && $topLi.length && $newDiv.length) {
+    // Move the existing div to the top <li> of the payment method
+    $topLi.append($newDiv);
+  }
+}
+
 jQuery(() => {
   // Define the async function to handle the response
   async function processResponse(resp) {
@@ -63,20 +81,7 @@ jQuery(() => {
         hf.InitPaymentPage.then((data) => {
           payload = data;
           // Select the payment method element
-          var $paymentMethod = jQuery(
-            "#payment_method_payplus-payment-gateway-hostedfields"
-          );
-
-          // Find the closest parent <li>
-          var $topLi = $paymentMethod.closest("li");
-
-          // Select the existing div element that you want to move
-          var $newDiv = jQuery("body > div.container.hostedFields");
-
-          if ($paymentMethod.length && $topLi.length && $newDiv.length) {
-            // Move the existing div to the top <li> of the payment method
-            $topLi.append($newDiv);
-          }
+          putHostedFields();
 
           const inputElement = document.querySelector(
             "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
