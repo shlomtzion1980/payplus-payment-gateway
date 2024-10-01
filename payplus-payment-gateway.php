@@ -540,7 +540,7 @@ class WC_PayPlus
         $isSubscriptionOrder = false;
         if (is_checkout()) {
             foreach (WC()->cart->get_cart() as $cart_item) {
-                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
                     $isSubscriptionOrder = true;
                     break;
                 }
