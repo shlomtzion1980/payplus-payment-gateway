@@ -217,14 +217,14 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function get_payment_method_script_handles()
     {
         $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
-        // $style_path = '/block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
+        $style_path = '/block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(
             'dependencies' => array(),
             'version' => '1.0.0'
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
-        // $style_url = PAYPLUS_PLUGIN_URL . $style_path;
+        $style_url = PAYPLUS_PLUGIN_URL . $style_path;
 
         // Register the script
         wp_register_script(
@@ -235,13 +235,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             true
         );
 
-        // // Register the style
-        // wp_register_style(
-        //     'wc-payplus-payments-block-style',
-        //     $style_url,
-        //     array(), // Add dependencies if needed
-        //     $script_asset['version']
-        // );
+        // Register the style
+        wp_register_style(
+            'wc-payplus-payments-block-style',
+            $style_url,
+            array(), // Add dependencies if needed
+            $script_asset['version']
+        );
 
         // Enqueue the style
         wp_enqueue_style('wc-payplus-payments-block-style');
