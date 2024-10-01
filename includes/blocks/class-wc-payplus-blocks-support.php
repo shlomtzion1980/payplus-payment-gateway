@@ -92,7 +92,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->isSubscriptionOrder = false;
         if (is_checkout()) {
             foreach (WC()->cart->get_cart() as $cart_item) {
-                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
                     $this->isSubscriptionOrder = true;
                     break;
                 }
@@ -265,7 +265,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $isSubscriptionOrder = false;
         if (is_page() && is_checkout()) {
             foreach (WC()->cart->get_cart() as $cart_item) {
-                if (get_class($cart_item['data']) === "WC_Product_Subscription") {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
                     $isSubscriptionOrder = true;
                     break;
                 }
