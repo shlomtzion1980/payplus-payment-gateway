@@ -650,6 +650,43 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         return $this->payplus_extra_button_on_product_page(true);
     }
 
+
+    public function get_continent_by_country($country_code)
+    {
+        $continent_map = [
+            'Africa' => ['DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'CM', 'CV', 'CF', 'TD', 'KM', 'CD', 'DJ', 'EG', 'GQ', 'ER', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'CI', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML', 'MR', 'MU', 'YT', 'MA', 'MZ', 'NA', 'NE', 'NG', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'ZA', 'SS', 'SD', 'SZ', 'TZ', 'TG', 'TN', 'UG', 'EH', 'ZM', 'ZW'],
+            'Europe' => ['AL', 'AD', 'AT', 'BY', 'BE', 'BA', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FO', 'FI', 'FR', 'DE', 'GI', 'GR', 'GG', 'VA', 'HU', 'IS', 'IE', 'IM', 'IT', 'JE', 'LV', 'LI', 'LT', 'LU', 'MT', 'MD', 'MC', 'ME', 'NL', 'MK', 'NO', 'PL', 'PT', 'RO', 'RU', 'SM', 'RS', 'SK', 'SI', 'ES', 'SE', 'CH', 'UA', 'GB'],
+            'Asia' => ['AF', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'KH', 'CN', 'CY', 'GE', 'IN', 'ID', 'IR', 'IQ', 'IL', 'JP', 'JO', 'KZ', 'KW', 'KG', 'LA', 'LB', 'MY', 'MV', 'MN', 'MM', 'NP', 'OM', 'PK', 'PH', 'QA', 'SA', 'SG', 'KR', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE'],
+            'North America' => ['AG', 'BS', 'BB', 'BZ', 'BM', 'VG', 'CA', 'KY', 'CR', 'CU', 'DM', 'DO', 'SV', 'GD', 'GT', 'HT', 'HN', 'JM', 'MX', 'NI', 'PA', 'KN', 'LC', 'VC', 'TT', 'US'],
+            'South America' => ['AR', 'BO', 'BR', 'CL', 'CO', 'EC', 'FK', 'GF', 'GY', 'PY', 'PE', 'SR', 'UY', 'VE'],
+            'Oceania' => ['AS', 'AU', 'CK', 'FJ', 'PF', 'GU', 'KI', 'MH', 'FM', 'NR', 'NC', 'NZ', 'NU', 'NF', 'MP', 'PW', 'PG', 'PN', 'WS', 'SB', 'TK', 'TO', 'TV', 'VU', 'WF'],
+            'Antarctica' => ['AQ']
+        ];
+
+        foreach ($continent_map as $continent => $countries) {
+            if (in_array($country_code, $countries)) {
+                return $continent;
+            }
+        }
+
+        return 'Unknown'; // If the country code doesn't match any continent
+    }
+
+    public function get_continent_full_name($continent_code)
+    {
+        $continent_map = [
+            'AF' => 'Africa',
+            'AS' => 'Asia',
+            'EU' => 'Europe',
+            'NA' => 'North America',
+            'SA' => 'South America',
+            'OC' => 'Oceania',
+            'AN' => 'Antarctica'
+        ];
+
+        return isset($continent_map[$continent_code]) ? $continent_map[$continent_code] : 'Unknown';
+    }
+
     /**
      * @param $visible
      * @return array|string|string[]|void
@@ -668,6 +705,73 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $globalShippingTaxRate = $WC_PayPlus_Gateway->global_shipping_tax_rate;
             $shippingPrice = $this->get_all_shipping_costs();
             $shipping_zones = WC_Shipping_Zones::get_zones();
+            $customerCountry = WC()->customer->get_shipping_country();
+            $customerContinent = $this->get_continent_by_country($customerCountry);
+            $continent_shipping_rates = [];
+            $shippingArray = json_decode($shippingPrice, true);
+
+            foreach ($shipping_zones as $zone_data) {
+                $zone = new WC_Shipping_Zone($zone_data['zone_id']); // Initialize zone object
+
+                // Get the zone locations (countries or regions)
+                $zone_locations = $zone->get_zone_locations();
+
+                foreach ($zone_locations as $location) {
+                    if ($location->type == 'country') {
+                        $country_code = $location->code;
+                        $continent = $this->get_continent_by_country($country_code);
+
+                        // Get the shipping methods for this zone
+                        $shipping_methods = $zone->get_shipping_methods();
+
+                        foreach ($shipping_methods as $method) {
+                            $method_id = $method->id;
+                            $method_title = $method->title;
+                            $method_cost = isset($method->cost) ? $method->cost : 'N/A';
+
+                            // Group the shipping rates by continent
+                            if (!isset($continent_shipping_rates[$continent])) {
+                                $continent_shipping_rates[$continent] = [];
+                            }
+
+                            $continent_shipping_rates[$continent][] = [
+                                'zone_name'    => $zone->get_zone_name(),
+                                'method_title' => $method_title,
+                                'method_cost'  => $method_cost,
+                                'country'      => $country_code
+                            ];
+                        }
+                    } else {
+                        if ($location->type == 'continent') {
+                            if (!isset($shippingArray[$customerCountry]) && $customerContinent === $this->get_continent_full_name($location->code)) {
+                                $shipping_methods = $zone->get_shipping_methods();
+
+                                foreach ($shipping_methods as $method) {
+                                    $method_id = $method->id;
+                                    $method_title = $method->title;
+                                    $method_cost = isset($method->cost) ? $method->cost : 'N/A';
+
+                                    // Group the shipping rates by continent
+                                    if (!isset($continent_shipping_rates[$customerContinent])) {
+                                        $continent_shipping_rates[$customerContinent] = [];
+                                    }
+
+                                    $continent_shipping_rates[$customerContinent][] = [
+                                        'zone_name'    => $zone->get_zone_name(),
+                                        'method_title' => $method_title,
+                                        'method_cost'  => $method_cost,
+                                        'country'      => $customerCountry
+                                    ];
+                                    $newShippingArray[$customerCountry][0]['id'] = 1;
+                                    $newShippingArray[$customerCountry][0]['title'] = $method_title;
+                                    $newShippingArray[$customerCountry][0]['cost_without_tax'] = $method_cost;
+                                    $newShippingArray[$customerCountry][0]['cost_with_tax'] = $method_cost;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if ($shippingPrice) {
                 foreach ($shipping_zones as $zone) {
                     $shipping_methods = $zone['shipping_methods'];
@@ -691,6 +795,12 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 }
             }
             $shippingPrice = ($shippingPrice) ? $shippingPrice : "";
+            $shippingsArray = json_decode($shippingPrice, true);
+
+            if (isset($newShippingArray) && isset($newShippingArray[$customerCountry]) && !isset($shippingsArray[$customerCountry])) {
+                $shippingPrice = wp_json_encode(array_merge($shippingsArray, $newShippingArray));
+            }
+
             $productId = ($product) ? $product->get_id() : "";
             $productName = ($product) ? $product->get_title() : "";
             $disabled = ($product && $product->get_type() === "variable") ? "disabled" : "";
