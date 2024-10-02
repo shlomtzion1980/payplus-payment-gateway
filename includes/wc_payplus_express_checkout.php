@@ -633,11 +633,20 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $isCheckout = is_cart() || is_checkout() || $visible;
         $isProduct = is_product() && $this->payplus_check_product_isnot_one_click();
+        $isSubscriptionOrder = false;
+        if ($isCheckout || $isProduct) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
+                    $isSubscriptionOrder = true;
+                    break;
+                }
+            }
+        }
 
         $isGoogleEnable = $WC_PayPlus_Gateway->enable_google_pay;
         $appleAvailable = "<script>document.write(applePayAvailable);</script>";
         $isAppleEnable = $WC_PayPlus_Gateway->enable_apple_pay;
-        $flag = ($isGoogleEnable || ($isAppleEnable && $appleAvailable != 'undefined')) && ($isCheckout || $isProduct);
+        $flag = ($isGoogleEnable || ($isAppleEnable && $appleAvailable != 'undefined')) && ($isCheckout || $isProduct) && !$isSubscriptionOrder;
 
         return $flag;
     }
