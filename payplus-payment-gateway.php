@@ -62,6 +62,7 @@ class WC_PayPlus
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
+        add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
@@ -75,6 +76,24 @@ class WC_PayPlus
         } else {
             $this->payPlusCronDeactivate();
         }
+    }
+
+
+
+    public function catch_coupon_code_on_checkout($coupon_code)
+    {
+        $coupon = new WC_Coupon($coupon_code);
+
+        // Get the discount amount or coupon value (for fixed discount coupons)
+        $coupon_value = $coupon->get_amount();
+
+        // Get the discount type (percent or fixed)
+        $discount_type = $coupon->get_discount_type(); // 'percent' or 'fixed_cart' or 'fixed_product'
+
+        // Print out the coupon code and its value
+        echo 'Coupon applied: ' . $coupon_code . '<br>';
+        set_transient('hostedCoupon', [$coupon_code, $coupon_value], 10 * MINUTE_IN_SECONDS);
+        echo 'Coupon value: ' . $coupon_value . ' (' . $discount_type . ')';
     }
 
     public function hostedPayment()

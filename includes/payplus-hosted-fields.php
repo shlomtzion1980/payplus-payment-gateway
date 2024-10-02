@@ -3,6 +3,11 @@ if (WC()->cart->get_subtotal() === 0) {
     return;
 }
 
+// $couponTransient = get_transient('hostedCoupon');
+// if (is_array($couponTransient)) {
+//     print_r($couponTransient);
+//     die;
+// }
 $options = get_option('woocommerce_payplus-payment-gateway_settings');
 $testMode = boolval($options['api_test_mode'] === 'yes');
 $url = $testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
@@ -127,21 +132,63 @@ foreach ($products as $product) {
     $item->vat_type = $product['vat_type'];
     $data->items[] = $item;
 }
-if ($totalAll['shipping_total'] > 0) {
-    $item = new stdClass();
-    $item->name = "shipping_total";
-    $item->quantity = 1;
-    $item->price = $totalAll['shipping_total'];
-    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
-    $data->items[] = $item;
-}
 
 $data->more_info = WC()->session->get('order_awaiting_payment');
 $order = wc_get_order($order_id);
+
+$shipping_items = $order->get_items('shipping');
+// Check if there are shipping items
+if (! empty($shipping_items)) {
+    foreach ($shipping_items as $shipping_item) {
+        // Get the shipping method ID (e.g., 'flat_rate:1')
+        $method_id = $shipping_item->get_method_id();
+
+        // Get the shipping method title (e.g., 'Flat Rate')
+        $method_title = $shipping_item->get_method_title();
+        $shipping_cost = $shipping_item->get_total();
+
+        if ($shipping_cost > 0) {
+            $item = new stdClass();
+            $item->name = $method_title;
+            $item->quantity = 1;
+            $item->price = $shipping_cost;
+            $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+            $data->items[] = $item;
+        }
+    }
+}
+
+$coupons = $order->get_coupon_codes();
+
+if (! empty($coupons)) {
+    foreach ($coupons as $coupon_code) {
+        // Get the WC_Coupon object
+        $coupon = new WC_Coupon($coupon_code);
+
+        // Get the coupon discount amount
+        $coupon_value = $coupon->get_amount();
+    }
+    if ($coupon_value > 0) {
+        $item = new stdClass();
+        $item->name = "coupon_discount";
+        $item->quantity = 1;
+        $item->price = -$coupon_value;
+        $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+        $data->items[] = $item;
+    }
+}
+
+$totalAmount = 0;
+foreach ($data->items as $item) {
+    $totalAmount += $item->price * $item->quantity;
+}
+
+$data->amount = number_format($totalAmount, 2, '.', '');
+
 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 $data->refURL_success = $linkRedirect;
 
-$payload = json_encode($data);
+$payload = wp_json_encode($data);
 set_transient('hostedPayload', $payload, 10 * MINUTE_IN_SECONDS);
 
 $auth = json_encode([
@@ -160,7 +207,12 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 curl_setopt($ch, CURLOPT_POST, true);
 $hostedResponse = curl_exec($ch);
 curl_close($ch);
+// echo '<pre>';
+// print_r($hostedResponse);
+// print_r($data);
+// print_r($totalAll);
 
+// die;
 
 function create_order_if_not_exists()
 {
