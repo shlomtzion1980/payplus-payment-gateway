@@ -721,9 +721,29 @@ if (removeGooglePay) {
 
             foreach ($shipping_zones as $zone_data) {
                 $zone = new WC_Shipping_Zone($zone_data['zone_id']); // Initialize zone object
-
+                $shipping_methods = $zone->get_shipping_methods();
                 // Get the zone locations (countries or regions)
                 $zone_locations = $zone->get_zone_locations();
+
+                if ($shippingPrice) {
+                    foreach ($shipping_methods as $id => $shipping_method) {
+                        if (isset($shipping_method->requires)) {
+                            $condition = $shipping_method->requires;
+                            $requiredCondition = $shipping_method->$condition;
+                            $shippingPricesArray = json_decode($shippingPrice, true);
+                            foreach ($shippingPricesArray as $country => $siPrice) {
+                                foreach ($siPrice as $key => $sp) {
+                                    if ($sp['id'] === $id) {
+                                        $shippingPricesArray[$country][$key]['condition'][$condition] = $requiredCondition;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (isset($shippingPricesArray) && is_array($shippingPricesArray)) {
+                        $shippingPrice = wp_json_encode($shippingPricesArray);
+                    }
+                }
 
                 foreach ($zone_locations as $location) {
                     if ($location->type == 'country') {
@@ -731,7 +751,7 @@ if (removeGooglePay) {
                         $continent = $this->get_continent_by_country($country_code);
 
                         // Get the shipping methods for this zone
-                        $shipping_methods = $zone->get_shipping_methods();
+
 
                         foreach ($shipping_methods as $method) {
                             $method_id = $method->id;
@@ -753,7 +773,6 @@ if (removeGooglePay) {
                     } else {
                         if ($location->type == 'continent') {
                             if (!isset($shippingArray[$customerCountry]) && $customerContinent === $this->get_continent_full_name($location->code)) {
-                                $shipping_methods = $zone->get_shipping_methods();
 
                                 foreach ($shipping_methods as $method) {
                                     $method_id = $method->id;
@@ -781,33 +800,14 @@ if (removeGooglePay) {
                     }
                 }
             }
-            if ($shippingPrice) {
-                foreach ($shipping_zones as $zone) {
-                    $shipping_methods = $zone['shipping_methods'];
-                    foreach ($shipping_methods as $id => $shipping_method) {
-                        if (isset($shipping_method->requires)) {
-                            $condition = $shipping_method->requires;
-                            $requiredCondition = $shipping_method->$condition;
-                            $shippingPricesArray = json_decode($shippingPrice, true);
-                            foreach ($shippingPricesArray as $country => $siPrice) {
-                                foreach ($siPrice as $key => $sp) {
-                                    if ($sp['id'] === $id) {
-                                        $shippingPricesArray[$country][$key]['condition'][$condition] = $requiredCondition;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                if (isset($shippingPricesArray) && is_array($shippingPricesArray)) {
-                    $shippingPrice = wp_json_encode($shippingPricesArray);
-                }
-            }
-            $shippingPrice = ($shippingPrice) ? $shippingPrice : "";
-            $shippingsArray = json_decode($shippingPrice, true);
 
-            if (isset($newShippingArray) && isset($newShippingArray[$customerCountry]) && !isset($shippingsArray[$customerCountry])) {
-                $shippingPrice = wp_json_encode(array_merge($shippingsArray, $newShippingArray));
+            $shippingPrice = ($shippingPrice) ? $shippingPrice : "";
+            if ($shippingPrice !== "") {
+                $shippingsArray = json_decode($shippingPrice, true);
+
+                if (isset($newShippingArray) && is_array($newShippingArray) && isset($newShippingArray[$customerCountry]) && !isset($shippingsArray[$customerCountry])) {
+                    $shippingPrice = wp_json_encode(array_merge($shippingsArray, $newShippingArray));
+                }
             }
 
             $productId = ($product) ? $product->get_id() : "";
