@@ -537,7 +537,7 @@ class WC_PayPlus_Admin_Settings
                 ];
 
                 $settings[$section][] = [
-                    'name' => __('If you create a new user ?', 'payplus-payment-gateway'),
+                    'name' => __('Allow customers to create an account during checkout', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_create_user]',
                     'type' => 'checkbox'
                 ];
