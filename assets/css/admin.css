@@ -81,6 +81,7 @@ html[lang="he-IL"] .loading-express {
 #sub-option-paylus a img,
 .tab-option-payplus a img {
   margin-left: 10px;
+  max-height: 100%;
 }
 
 .payplus-delete-error {
@@ -586,13 +587,14 @@ html[lang="en-US"] .payplus_sum_payment {
 
 .inside {
   .wc-order-items-editable {
-    .select-type-invoice ,input, select {
+    .select-type-invoice,
+    input,
+    select {
       border-color: #8c8f9447;
       border-radius: 10px;
     }
   }
 }
-
 
 .type-payment:hover,
 .payplus-payment-button:hover {
