@@ -32,7 +32,7 @@ class WC_PayPlus_Admin_Settings
             'payplus-express-checkout' => array(
                 'name' => __('Express Checkout', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
-                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "express.svg'>",
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "expressCheckout.png'>",
             ),
             // 'payplus-error-setting' => array(
             //     'name' => __('Error Page', 'payplus-payment-gateway'),
