@@ -531,7 +531,7 @@ class WC_PayPlus_Admin_Settings
                     'custom_attributes' => array('readonly' => 'readonly'),
                 ];
                 $settings[$section][] = [
-                    'name' => __('If displayed on a product page ?', 'payplus-payment-gateway'),
+                    'name' => __('Display on product page', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_product]',
                     'type' => 'checkbox'
                 ];
@@ -543,7 +543,7 @@ class WC_PayPlus_Admin_Settings
                 ];
                 $settings[$section][] = array(
                     'id' => 'woocommerce_payplus-payment-gateway_settings[shipping_woo]',
-                    'name' => __('Shipping according to woocommerce', 'payplus-payment-gateway'),
+                    'name' => __('Shipping according to Woocommerce settings', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'class' => 'shipping_woo',
                     'label' => '',
