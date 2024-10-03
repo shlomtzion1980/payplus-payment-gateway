@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-10-03 21:20+0300\n"
-"PO-Revision-Date: 2024-10-03 21:21+0300\n"
+"POT-Creation-Date: 2024-10-04 01:27+0300\n"
+"PO-Revision-Date: 2024-10-04 01:28+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -651,16 +651,16 @@ msgid "Token Apple Pay"
 msgstr "אפל פיי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:534
-msgid "If displayed on a product page ?"
-msgstr "אם להציג בדף מוצר ?"
+msgid "Display on product page"
+msgstr "הצגה בדף מוצר"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:540
 msgid "Allow customers to create an account during checkout"
 msgstr "לאפשר ללקוחות ליצור חשבון בתהליך הצ'קאאוט"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:546
-msgid "Shipping according to woocommerce"
-msgstr "משלוח לפי woocommerce"
+msgid "Shipping according to Woocommerce settings"
+msgstr "שילוח לפי הגדרות ווקומרס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:555
 msgid "Global shipping amount"
