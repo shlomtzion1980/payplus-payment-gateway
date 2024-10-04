@@ -65,6 +65,7 @@ class WC_PayPlus
         add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
         add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
 
+
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
@@ -79,6 +80,7 @@ class WC_PayPlus
             $this->payPlusCronDeactivate();
         }
     }
+
 
     public function catch_remove_coupon_code_on_checkout($coupon_code)
     {
@@ -109,6 +111,7 @@ class WC_PayPlus
 
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = $order = wc_get_order($order_id);
+
         $coupon = new WC_Coupon($coupon_code);
 
         // Get the discount amount or coupon value (for fixed discount coupons)
@@ -148,20 +151,95 @@ class WC_PayPlus
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
-        delete_transient('hostedPayload');
+        WC()->session->__unset('hostedPayload');
+    }
+
+    function createUpdateHostedPaymentPageLink($payload)
+    {
+        $options = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode = boolval($options['api_test_mode'] === 'yes');
+        $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
+        $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
+        $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
+
+        $auth = json_encode([
+            'api_key' => $apiKey,
+            'secret_key' => $secretKey
+        ]);
+        $requestHeaders = [];
+        $requestHeaders[] = 'Content-Type:application/json';
+        $requestHeaders[] = 'Authorization: ' . $auth;
+
+
+        $pageRequestUid = WC()->session->get('page_request_uid');
+
+        if ($pageRequestUid) {
+            $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
+        }
+
+        $ch = curl_init($apiUrl);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($ch, CURLOPT_POST, true);
+        $hostedResponse = curl_exec($ch);
+        curl_close($ch);
+
+        $pageRequestUid = json_decode($hostedResponse, true)['data']['page_request_uid'];
+
+        WC()->session->set('page_request_uid', $pageRequestUid);
+        WC()->session->set('hostedResponse', $hostedResponse);
+
+        return $hostedResponse;
     }
 
     public function updateHostedPayment()
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
-        $payload = json_decode(get_transient('hostedPayload'), true);
+        $payload = json_decode(WC()->session->get('hostedPayload'), true);
+        $order_id = $payload['more_info'];
+        $order = wc_get_order($order_id);
+
+        $totalAmount = 0;
         foreach ($payload['items'] as $key => $item) {
-            if ($item['name'] === "shipping_total") {
-                $payload['items'][$key]['price'] = intval($_POST['shippingTotal']) / 100;
+
+            if ($item['name'] === "Shipping") {
+                $payload['items'][$key]['price'] = intval($_POST['totalShipping']);
+                $totalAmount += intval($_POST['totalShipping']) * $item['quantity'];
+            } else {
+                $totalAmount += $item['price'] * $item['quantity'];
             }
         }
+
+        $payload['amount'] = $totalAmount;
+
+        if (! $order) {
+            return;
+        }
+
+        // Remove existing shipping items
+        foreach ($order->get_items('shipping') as $item_id => $shipping_item) {
+            $order->remove_item($item_id);
+        }
+        // Get the shipping method object by its ID
+
+        // Create a new shipping item for the order
+        $item = new WC_Order_Item_Shipping();
+        $item->set_method_title('Shipping');  // Set the shipping method title (name)
+        $item->set_method_id('shipping_total');        // Set the shipping method ID
+        $item->set_total(intval($_POST['totalShipping']));          // Set the shipping cost
+
+        // Add the shipping item to the order
+        $order->add_item($item);
+
+        // Calculate totals and save the order
+        $order->calculate_totals();
+        $order->save();
+
         $payload = wp_json_encode($payload);
-        print_r($payload);
+        WC()->session->set('hostedPayload', $payload);
+        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+        // wp_die($payload);
     }
 
     public function payPlusCronDeactivate()
@@ -634,7 +712,7 @@ class WC_PayPlus
                     break;
                 }
             }
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
+            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=' . PAYPLUS_VERSION;
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                 if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
                     $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
@@ -679,6 +757,7 @@ class WC_PayPlus
                 if (!is_cart() && !is_product() && !is_shop()) {
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
                     if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
+
                         $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
 
                         if (file_exists($template_path)) {

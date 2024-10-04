@@ -3,11 +3,7 @@ if (WC()->cart->get_subtotal() === 0) {
     return;
 }
 
-// $couponTransient = get_transient('hostedCoupon');
-// if (is_array($couponTransient)) {
-//     print_r($couponTransient);
-//     die;
-// }
+// should be constructor function
 $options = get_option('woocommerce_payplus-payment-gateway_settings');
 $testMode = boolval($options['api_test_mode'] === 'yes');
 $url = $testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
@@ -23,6 +19,7 @@ define('SUCCESS_URL', 'https://www.example.com/success');
 define('FAILURE_URL', site_url() . "/error-payment-payplus/");
 define('CANCEL_URL', 'https://www.example.com/cancel');
 
+// will be run if only if hosted fields is activated and there are no saved tokens.
 create_order_if_not_exists();
 
 /**
@@ -80,13 +77,15 @@ if (count($cart)) {
     }
 }
 
-$totalAll = WC()->cart->get_totals();
-$subTotalAll = WC()->cart->get_subtotal();
-$taxGlobal = round(WC()->cart->get_total_tax() - WC()->cart->get_shipping_tax(), ROUNDING_DECIMALS);
-$error = $totalAll['total'] == 0;
+// $totalAll = WC()->cart->get_totals();
+// $subTotalAll = WC()->cart->get_subtotal();
+// $taxGlobal = round(WC()->cart->get_total_tax() - WC()->cart->get_shipping_tax(), ROUNDING_DECIMALS);
+// $error = $totalAll['total'] == 0;
 
 // echo wp_json_encode(array("error" => $error, "total" => $totalAll['total'], "products" => $products, "total_without_tax" => $subTotalAll, 'discountPrice' => $discountPrice ? $discountPrice : 0, "taxGlobal" => $taxGlobal));
 
+
+// this will be the create initial order data function that calls the curl to create at it's end.
 $checkout = WC()->checkout();
 
 // Get posted checkout data
@@ -121,7 +120,7 @@ $data->customer = new stdClass();
 $data->customer->customer_name = "$billing_first_name $billing_last_name";
 $data->customer->email = $billing_email;
 $data->customer->phone = $phone;
-$data->amount = $totalAll['total'];
+// $data->amount = $totalAll['total'];
 
 
 foreach ($products as $product) {
@@ -147,14 +146,12 @@ if (! empty($shipping_items)) {
         $method_title = $shipping_item->get_method_title();
         $shipping_cost = $shipping_item->get_total();
 
-        if ($shipping_cost > 0) {
-            $item = new stdClass();
-            $item->name = $method_title;
-            $item->quantity = 1;
-            $item->price = $shipping_cost;
-            $item->vat_type = !$wc_tax_enabled ? 0 : 1;
-            $data->items[] = $item;
-        }
+        $item = new stdClass();
+        $item->name = "Shipping";
+        $item->quantity = 1;
+        $item->price = $shipping_cost;
+        $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+        $data->items[] = $item;
     }
 }
 
@@ -189,30 +186,15 @@ $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_ur
 $data->refURL_success = $linkRedirect;
 
 $payload = wp_json_encode($data);
-set_transient('hostedPayload', $payload, 10 * MINUTE_IN_SECONDS);
-
-$auth = json_encode([
-    'api_key' => API_KEY,
-    'secret_key' => SECRET_KEY
-]);
-$requestHeaders = [];
-$requestHeaders[] = 'Content-Type:application/json';
-$requestHeaders[] = 'Authorization: ' . $auth;
+WC()->session->set('hostedPayload', $payload);
 
 
-$ch = curl_init($apiUrl);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-curl_setopt($ch, CURLOPT_POST, true);
-$hostedResponse = curl_exec($ch);
-curl_close($ch);
-// echo '<pre>';
-// print_r($hostedResponse);
-// print_r($data);
-// print_r($totalAll);
 
-// die;
+// this will be the createUpdateHostedPaymentPageLink function - which will run the curl either with update or create flag.
+// the change is in the url
+
+
+$hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
 
 function create_order_if_not_exists()
 {
