@@ -65,6 +65,10 @@ class WC_PayPlus
         add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
         add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
 
+        add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
+        add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
+
+
 
         //end custom hook
 
@@ -81,11 +85,125 @@ class WC_PayPlus
         }
     }
 
+    public function sync_cart_to_existing_order($cart_item_key, $product_id, $quantity, $variation_id, $variations, $cart_item_data)
+    {
+        $order_id = WC()->session->get('order_awaiting_payment');
+        $order = wc_get_order($order_id);
+
+        // Check if the order exists and the cart is not empty
+        if ($order && WC()->cart) {
+            // Add the current product to the existing order
+            $order->add_product(wc_get_product($product_id), $quantity, array(
+                'variation_id' => $variation_id,
+                'variation'    => $variations,
+            ));
+
+            // Recalculate order totals
+            $order->calculate_totals();
+
+            // Save the order
+            $order->save();
+
+            // Optionally clear the cart after syncing
+            // WC()->cart->empty_cart();
+        }
+    }
+
+
+    function remove_cart_item_from_order($cart_item_key, $cart_item)
+    {
+        $order_id = WC()->session->get('order_awaiting_payment');
+        $order = wc_get_order($order_id);
+
+        // Check if the order exists
+        if (!$order) {
+            error_log('Order does not exist: ' . $order_id); // Log error
+            return; // Exit if the order doesn't exist
+        }
+
+        // Get the product ID of the removed cart item
+        $product_id = $cart_item->removed_cart_contents[$cart_item_key]['product_id'];
+        $order_items = $order->get_items();
+
+        // Loop through order items and remove the product if it exists
+        $item_removed = false;
+        foreach ($order_items as $order_item_id => $order_item) {
+            if ($order_item->get_product_id() == $product_id) {
+                // Remove the item from the order
+                $order->remove_item($order_item_id);
+                $item_removed = true; // Track if an item was removed
+                break; // Exit loop after removing
+            }
+        }
+
+        // Check if an item was removed
+        if ($item_removed) {
+            // Recalculate order totals after removal
+            $order->calculate_totals();
+            $order->save();
+        } else {
+            error_log('No matching product found in order for product ID: ' . $product_id); // Log if no match was found
+        }
+    }
+
+    public function getHostedDataFromOrder($order)
+    {
+        // Initialize the result array
+        $order_data = array(
+            'items'    => array(),
+            'shipping' => array(),
+            'coupons'  => array(),
+        );
+
+        // Get all items (products) in the order
+        foreach ($order->get_items() as $item_id => $item) {
+            $product = $item->get_product();
+            $order_data['items'][] = array(
+                'name'        => $item->get_name(),
+                'quantity'    => $item->get_quantity(),
+                'total'       => $item->get_total(),
+                'subtotal'    => $item->get_subtotal(),
+                'tax'         => $item->get_total_tax(),
+                'product_id'  => $product ? $product->get_id() : null,
+                'sku'         => $product ? $product->get_sku() : null,
+            );
+        }
+
+        // Get shipping data
+        foreach ($order->get_items('shipping') as $item_id => $shipping_item) {
+            $order_data['shipping'][] = array(
+                'method_title' => $shipping_item->get_name(),
+                'cost'         => $shipping_item->get_total(),
+                'tax'          => $shipping_item->get_taxes(),
+            );
+        }
+
+        // Get coupon data using $order->get_coupon_codes()
+        $applied_coupons = $order->get_coupon_codes();
+
+        foreach ($applied_coupons as $coupon_code) {
+            // Load the WC_Coupon object
+            $coupon = new WC_Coupon($coupon_code);
+
+            // Get the discount amount and any other details as needed
+            $coupon_discount = $order->get_discount_total(); // Total discount applied
+            $coupon_discount_tax = $order->get_discount_tax(); // Total discount tax
+
+            $order_data['coupons'][] = array(
+                'code'         => $coupon_code,                // Coupon code
+                'discount'     => $coupon_discount,            // Discount amount
+                'discount_tax' => $coupon_discount_tax,        // Discount tax
+                'coupon_type'  => $coupon->get_discount_type(), // Coupon type (fixed_cart, percent, etc.)
+            );
+        }
+
+        // Output the final array (for debugging or further use)
+        return $order_data;
+    }
 
     public function catch_remove_coupon_code_on_checkout($coupon_code)
     {
         $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        print_r($payload);
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = wc_get_order($order_id);
 
@@ -105,6 +223,11 @@ class WC_PayPlus
             $order->save();
         }
 
+        $order = wc_get_order($order_id);
+
+        $orderData = $this->getHostedDataFromOrder($order);
+        print_r($orderData['coupons']);
+
         $totalAmount = 0;
         foreach ($payload['items'] as $key => $item) {
             if ($item['name'] === "coupon_discount") {
@@ -121,23 +244,47 @@ class WC_PayPlus
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
     }
 
-
     public function catch_coupon_code_on_checkout($coupon_code)
     {
         $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        print_r($payload);
         $order_id = WC()->session->get('order_awaiting_payment');
-        $order = $order = wc_get_order($order_id);
+        // Assuming you have the $order object
+        $order = wc_get_order($order_id);
 
         $coupon = new WC_Coupon($coupon_code);
 
         // Get the discount amount or coupon value (for fixed discount coupons)
         $coupon_value = $coupon->get_amount();
 
-        // Get the discount type (percent or fixed)
-        $discount_type = $coupon->get_discount_type(); // 'percent' or 'fixed_cart' or 'fixed_product'
+        if (!$order) {
+            return; // If the order doesn't exist, return early
+        }
+
+        // Load the WooCommerce coupon object using the coupon code
+        if (!$coupon->get_id()) {
+            return; // If the coupon doesn't exist, return early
+        }
+
+        // Add the coupon to the order (apply the coupon)
+        $order->apply_coupon($coupon);
+
+        // Recalculate totals to include the discount from the coupon
+        $order->calculate_totals();
+
+        // Save the updated order
+        $order->save();
+
+        $orderData = $this->getHostedDataFromOrder($order);
+
 
         $totalAmount = 0;
+        print_r($orderData);
+        // foreach ($orderData as $type => $data) {
+        //     print_r($data);
+        //     // $totalAmount += $data['quantity'] * $data['price'];
+        // }
+
+
         $noCoupon = false;
 
         foreach ($payload['items'] as $key => $item) {
@@ -164,24 +311,6 @@ class WC_PayPlus
         $payload = wp_json_encode($payload);
         WC()->session->set('hostedPayload', $payload);
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-
-        if (!$order) {
-            return; // If the order doesn't exist, return early
-        }
-
-        // Load the WooCommerce coupon object using the coupon code
-        if (!$coupon->get_id()) {
-            return; // If the coupon doesn't exist, return early
-        }
-
-        // Add the coupon to the order (apply the coupon)
-        $order->apply_coupon($coupon);
-
-        // Recalculate totals to include the discount from the coupon
-        $order->calculate_totals();
-
-        // Save the updated order
-        $order->save();
     }
 
     public function hostedPayment()
