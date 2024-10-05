@@ -1,6 +1,7 @@
 const hf = new PayPlusHostedFieldsDom();
 var resp = JSON.parse(payplus_script.hostedResponse);
 let payload;
+
 hf.SetMainFields({
   cc: {
     elmSelector: "#cc",
@@ -66,6 +67,7 @@ function putHostedFields() {
 jQuery(() => {
   // Define the async function to handle the response
   async function processResponse(resp) {
+    console.log(resp);
     try {
       if (resp.results.status == "success") {
         try {
@@ -80,9 +82,9 @@ jQuery(() => {
 
         hf.InitPaymentPage.then((data) => {
           payload = data;
+          console.log(payload);
           // Select the payment method element
-          putHostedFields();
-
+          // putHostedFields();
           // const inputElement = document.querySelector(
           //   "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
           // );

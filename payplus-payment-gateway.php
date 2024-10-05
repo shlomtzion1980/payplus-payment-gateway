@@ -84,7 +84,8 @@ class WC_PayPlus
 
     public function catch_remove_coupon_code_on_checkout($coupon_code)
     {
-
+        $payload = json_decode(WC()->session->get('hostedPayload'), true);
+        print_r($payload);
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = wc_get_order($order_id);
 
@@ -103,12 +104,28 @@ class WC_PayPlus
             // Save the updated order
             $order->save();
         }
+
+        $totalAmount = 0;
+        foreach ($payload['items'] as $key => $item) {
+            if ($item['name'] === "coupon_discount") {
+                /// $totalAmount += -floatval($payload['items'][$key]['price']);
+                unset($payload['items'][$key]);
+            } else {
+                $totalAmount += $item['price'] * $item['quantity'];
+            }
+        }
+
+        $payload['amount'] = number_format($totalAmount, 2, '.', '');
+        $payload = wp_json_encode($payload);
+        WC()->session->set('hostedPayload', $payload);
+        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
     }
 
 
     public function catch_coupon_code_on_checkout($coupon_code)
     {
-
+        $payload = json_decode(WC()->session->get('hostedPayload'), true);
+        print_r($payload);
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = $order = wc_get_order($order_id);
 
@@ -119,6 +136,34 @@ class WC_PayPlus
 
         // Get the discount type (percent or fixed)
         $discount_type = $coupon->get_discount_type(); // 'percent' or 'fixed_cart' or 'fixed_product'
+
+        $totalAmount = 0;
+        $noCoupon = false;
+
+        foreach ($payload['items'] as $key => $item) {
+            if ($item['name'] === "coupon_discount") {
+                $payload['items'][$key]['price'] = -floatval($coupon_value);
+                $totalAmount += -floatval($coupon_value) * $item['quantity'];
+                $noCoupon = true;
+            } else {
+                $totalAmount += $item['price'] * $item['quantity'];
+            }
+        }
+
+
+        if (floatval($coupon_value) > 0 && !$noCoupon) {
+            $item['name'] = "coupon_discount";
+            $item['quantity'] = 1;
+            $item['price'] = -floatval($coupon_value);
+            $item['vat_type'] =  0;
+            $totalAmount += -floatval($coupon_value);
+            $payload['items'][] = $item;
+        }
+
+        $payload['amount'] = number_format($totalAmount, 2, '.', '');
+        $payload = wp_json_encode($payload);
+        WC()->session->set('hostedPayload', $payload);
+        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
 
         if (!$order) {
             return; // If the order doesn't exist, return early
@@ -152,6 +197,7 @@ class WC_PayPlus
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
         WC()->session->__unset('hostedPayload');
+        WC()->session->__unset('page_request_uid');
     }
 
     function createUpdateHostedPaymentPageLink($payload)
@@ -182,12 +228,18 @@ class WC_PayPlus
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
         curl_setopt($ch, CURLOPT_POST, true);
+
         $hostedResponse = curl_exec($ch);
+
         curl_close($ch);
 
-        $pageRequestUid = json_decode($hostedResponse, true)['data']['page_request_uid'];
+        $hostedResponseArray = json_decode($hostedResponse, true);
 
-        WC()->session->set('page_request_uid', $pageRequestUid);
+        if (isset($hostedResponseArray['data']['page_request_uid'])) {
+            $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
+            WC()->session->set('page_request_uid', $pageRequestUid);
+        }
+
         WC()->session->set('hostedResponse', $hostedResponse);
 
         return $hostedResponse;
@@ -204,14 +256,14 @@ class WC_PayPlus
         foreach ($payload['items'] as $key => $item) {
 
             if ($item['name'] === "Shipping") {
-                $payload['items'][$key]['price'] = intval($_POST['totalShipping']);
-                $totalAmount += intval($_POST['totalShipping']) * $item['quantity'];
+                $payload['items'][$key]['price'] = floatval($_POST['totalShipping']);
+                $totalAmount += floatval($_POST['totalShipping']) * $item['quantity'];
             } else {
                 $totalAmount += $item['price'] * $item['quantity'];
             }
         }
 
-        $payload['amount'] = $totalAmount;
+        $payload['amount'] = number_format($totalAmount, 2, '.', '');
 
         if (! $order) {
             return;
@@ -227,7 +279,7 @@ class WC_PayPlus
         $item = new WC_Order_Item_Shipping();
         $item->set_method_title('Shipping');  // Set the shipping method title (name)
         $item->set_method_id('shipping_total');        // Set the shipping method ID
-        $item->set_total(intval($_POST['totalShipping']));          // Set the shipping cost
+        $item->set_total(floatval($_POST['totalShipping']));          // Set the shipping cost
 
         // Add the shipping item to the order
         $order->add_item($item);
@@ -237,9 +289,10 @@ class WC_PayPlus
         $order->save();
 
         $payload = wp_json_encode($payload);
+
         WC()->session->set('hostedPayload', $payload);
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-        // wp_die($payload);
+        wp_die($payload);
     }
 
     public function payPlusCronDeactivate()
@@ -712,7 +765,7 @@ class WC_PayPlus
                     break;
                 }
             }
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=' . PAYPLUS_VERSION;
+            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=1' . PAYPLUS_VERSION;
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                 if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
                     $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;

@@ -1,5 +1,6 @@
 <?php
 if (WC()->cart->get_subtotal() === 0) {
+    WC()->session->__unset('page_request_uid');
     return;
 }
 
@@ -195,6 +196,11 @@ WC()->session->set('hostedPayload', $payload);
 
 
 $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+$hostedResponseArray = json_decode($hostedResponse, true);
+if ($hostedResponseArray['results']['status'] === "error") {
+    WC()->session->__unset('page_request_uid');
+    $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+}
 
 function create_order_if_not_exists()
 {
