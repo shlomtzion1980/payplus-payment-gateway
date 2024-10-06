@@ -260,7 +260,6 @@ class WC_PayPlus
         $order = wc_get_order($order_id);
 
         $orderData = $this->getHostedDataFromOrder($order);
-        print_r($orderData['coupons']);
 
         $totalAmount = 0;
         foreach ($payload['items'] as $key => $item) {
