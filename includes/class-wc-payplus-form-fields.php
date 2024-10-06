@@ -294,6 +294,14 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Send add data parameter on transaction', 'payplus-payment-gateway'),
                 'default' => 'no',
             ],
+            'import_applepay_script' => [
+                'title' => __('Apple Pay', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Add Apple Pay Script', 'payplus-payment-gateway'),
+                'description' => __('Include Apple Pay Script', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'yes'
+            ],
             // 'auto_load_payplus_cc_method' => [
             //     'title' => __('Auto load PayPlus credit card payment method', 'payplus-payment-gateway'),
             //     'type' => 'checkbox',
