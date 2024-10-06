@@ -68,12 +68,6 @@ class WC_PayPlus
         add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
         add_action('woocommerce_after_cart_item_quantity_update', [$this, 'sync_order_after_cart_quantity_update'], 10, 4);
         add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
-        // add_filter('woocommerce_add_to_cart_quantity', [$this, 'custom_add_to_cart_quantity'], 10, 2);
-        // add_action('wp_ajax_add_to_cart', [$this, 'custom_ajax_add_to_cart']);
-        // add_action('wp_ajax_nopriv_add_to_cart', [$this, 'custom_ajax_add_to_cart']);
-
-
-
 
         //end custom hook
 
@@ -92,6 +86,7 @@ class WC_PayPlus
 
     public function sync_cart_to_existing_order($cart_item_key, $product_id, $quantity, $variation_id, $variations, $cart_item_data)
     {
+        $payload = json_decode(WC()->session->get('hostedPayload'), true);
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = wc_get_order($order_id);
         // Clear the order's existing items before syncing the new ones
@@ -118,6 +113,17 @@ class WC_PayPlus
             // Save the order
             $order->save();
         }
+        $orderData = $this->getHostedDataFromOrder($order);
+
+        $totalAmount = 0;
+        foreach ($payload['items'] as $key => $item) {
+            $totalAmount += $item['price'] * $item['quantity'];
+        }
+
+        $payload['amount'] = number_format($totalAmount, 2, '.', '');
+        $payload = wp_json_encode($payload);
+        WC()->session->set('hostedPayload', $payload);
+        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
     }
 
 
@@ -146,6 +152,7 @@ class WC_PayPlus
 
     function remove_cart_item_from_order($cart_item_key, $cart_item)
     {
+        $payload = json_decode(WC()->session->get('hostedPayload'), true);
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = wc_get_order($order_id);
 
@@ -178,6 +185,17 @@ class WC_PayPlus
         } else {
             error_log('No matching product found in order for product ID: ' . $product_id); // Log if no match was found
         }
+        $orderData = $this->getHostedDataFromOrder($order);
+
+        $totalAmount = 0;
+        foreach ($payload['items'] as $key => $item) {
+            $totalAmount += $item['price'] * $item['quantity'];
+        }
+
+        $payload['amount'] = number_format($totalAmount, 2, '.', '');
+        $payload = wp_json_encode($payload);
+        WC()->session->set('hostedPayload', $payload);
+        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
     }
 
     public function getHostedDataFromOrder($order)
