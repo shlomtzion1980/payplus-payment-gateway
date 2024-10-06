@@ -33,6 +33,7 @@ class WC_PayPlus
     public $invoice_api = null;
     public $isAutoPPCC;
     private $_wpnonce;
+    public $importApplePayScript;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -52,6 +53,7 @@ class WC_PayPlus
         $this->isApplePayGateWayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
         $this->isApplePayExpressEnabled = boolval(property_exists($this->payplus_payment_gateway_settings, 'enable_apple_pay') && $this->payplus_payment_gateway_settings->enable_apple_pay === 'yes');
         $this->isAutoPPCC = boolval(property_exists($this->payplus_payment_gateway_settings, 'auto_load_payplus_cc_method') && $this->payplus_payment_gateway_settings->auto_load_payplus_cc_method === 'yes');
+        $this->importApplePayScript = boolval(property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') && $this->payplus_payment_gateway_settings->import_applepay_script === 'yes');
 
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
@@ -275,8 +277,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -538,6 +540,14 @@ class WC_PayPlus
             $customIcons[] = esc_url($icon);
         }
         $isSubscriptionOrder = false;
+
+        if (is_checkout() || is_product()) {
+            if ($this->importApplePayScript) {
+                wp_register_script('applePayScript', 'https://payments.payplus.co.il/statics/applePay/script.js', array('jquery'), PAYPLUS_VERSION, true);
+                wp_enqueue_script('applePayScript');
+            }
+        }
+
         if (is_checkout()) {
             foreach (WC()->cart->get_cart() as $cart_item) {
                 if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
@@ -611,8 +621,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
