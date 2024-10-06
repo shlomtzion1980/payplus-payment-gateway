@@ -311,13 +311,6 @@ class WC_PayPlus
 
 
         $totalAmount = 0;
-        print_r($orderData);
-        // foreach ($orderData as $type => $data) {
-        //     print_r($data);
-        //     // $totalAmount += $data['quantity'] * $data['price'];
-        // }
-
-
         $noCoupon = false;
 
         foreach ($payload['items'] as $key => $item) {
