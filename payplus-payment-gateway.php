@@ -66,7 +66,12 @@ class WC_PayPlus
         add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
 
         add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
+        add_action('woocommerce_after_cart_item_quantity_update', [$this, 'sync_order_after_cart_quantity_update'], 10, 4);
         add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
+        // add_filter('woocommerce_add_to_cart_quantity', [$this, 'custom_add_to_cart_quantity'], 10, 2);
+        // add_action('wp_ajax_add_to_cart', [$this, 'custom_ajax_add_to_cart']);
+        // add_action('wp_ajax_nopriv_add_to_cart', [$this, 'custom_ajax_add_to_cart']);
+
 
 
 
@@ -89,7 +94,16 @@ class WC_PayPlus
     {
         $order_id = WC()->session->get('order_awaiting_payment');
         $order = wc_get_order($order_id);
-
+        // Clear the order's existing items before syncing the new ones
+        if (!$order) {
+            return;
+        }
+        foreach ($order->get_items() as $item_id => $item) {
+            $productId = $item->get_product_id(); // Get the product ID
+            if ($productId === $product_id) {
+                $order->remove_item($item_id);
+            }
+        }
         // Check if the order exists and the cart is not empty
         if ($order && WC()->cart) {
             // Add the current product to the existing order
@@ -103,10 +117,30 @@ class WC_PayPlus
 
             // Save the order
             $order->save();
-
-            // Optionally clear the cart after syncing
-            // WC()->cart->empty_cart();
         }
+    }
+
+
+    /**
+     * Sync the cart item changes to an existing order after quantity update
+     *
+     * @param string $cart_item_key The cart item key.
+     * @param int    $quantity The new quantity of the item.
+     * @param int    $old_quantity The old quantity of the item.
+     * @param WC_Cart $cart The cart object.
+     */
+    public function sync_order_after_cart_quantity_update($cart_item_key, $quantity, $old_quantity, $cart)
+    {
+        // Get the cart item data
+        $cart_item = $cart->get_cart_item($cart_item_key);
+
+        $product_id = $cart_item['product_id']; // Get product ID
+        $variation_id = !empty($cart_item['variation_id']) ? $cart_item['variation_id'] : 0; // Check for variation ID
+        $variations = !empty($cart_item['variation']) ? $cart_item['variation'] : array(); // Variation details
+        $cart_item_data = $cart_item['data']; // Get other cart item data
+
+        // Now call your sync function
+        $this->sync_cart_to_existing_order($cart_item_key, $product_id, $quantity, $variation_id, $variations, $cart_item_data);
     }
 
 
@@ -824,6 +858,8 @@ class WC_PayPlus
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
+            add_action('wp_enqueue_scripts', [$this, 'load_cart_assets']);
+
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
             if (WP_DEBUG_LOG) {
                 add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);
@@ -868,6 +904,23 @@ class WC_PayPlus
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                 payplus_add_file_ApplePay();
             }
+        }
+    }
+
+    public function load_cart_assets()
+    {
+        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/hostedFieldsHandler.js');
+        if (is_cart() || is_product() || is_shop()) {
+            wp_register_script('payplus-hosted-js', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsHandler.js', [], $script_version, true);
+            wp_localize_script(
+                'payplus-hosted-js',
+                'payplus_script',
+                [
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'frontNonce' => wp_create_nonce('frontNonce'),
+                ]
+            );
+            wp_enqueue_script('payplus-hosted-js');
         }
     }
 
