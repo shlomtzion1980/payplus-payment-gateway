@@ -34,6 +34,7 @@ class WC_PayPlus
     public $isAutoPPCC;
     private $_wpnonce;
     public $importApplePayScript;
+    public $hostedFieldsOptions;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -49,6 +50,7 @@ class WC_PayPlus
     {
         //ACTION
         $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->isApplePayGateWayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
         $this->isApplePayExpressEnabled = boolval(property_exists($this->payplus_payment_gateway_settings, 'enable_apple_pay') && $this->payplus_payment_gateway_settings->enable_apple_pay === 'yes');
@@ -975,7 +977,7 @@ class WC_PayPlus
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
-                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons, "isSubscriptionOrder" => $isSubscriptionOrder, "isAutoPPCC" => $this->isAutoPPCC)
+                array("payplus_import_applepay_script" => $importAapplepayScript, "payplus_mobile" => $isModbile, "multiPassIcons" => $multipassIcons, "customIcons" => $customIcons, "isSubscriptionOrder" => $isSubscriptionOrder, "isAutoPPCC" => $this->isAutoPPCC, "isHostedFields" => boolval($this->hostedFieldsOptions['enabled'] === "yes"))
             );
         }
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
