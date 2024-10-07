@@ -115,7 +115,6 @@ class WC_PayPlus
             // Save the order
             $order->save();
         }
-        $orderData = $this->getHostedDataFromOrder($order);
 
         $totalAmount = 0;
         foreach ($payload['items'] as $key => $item) {
@@ -187,7 +186,6 @@ class WC_PayPlus
         } else {
             error_log('No matching product found in order for product ID: ' . $product_id); // Log if no match was found
         }
-        $orderData = $this->getHostedDataFromOrder($order);
 
         $totalAmount = 0;
         foreach ($payload['items'] as $key => $item) {
@@ -373,6 +371,7 @@ class WC_PayPlus
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
         WC()->session->__unset('hostedPayload');
         WC()->session->__unset('page_request_uid');
+        WC()->session->__unset('order_awaiting_payment');
     }
 
     function createUpdateHostedPaymentPageLink($payload)
@@ -670,8 +669,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -1062,8 +1061,8 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

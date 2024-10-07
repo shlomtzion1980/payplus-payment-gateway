@@ -23,6 +23,12 @@ define('CANCEL_URL', 'https://www.example.com/cancel');
 // will be run if only if hosted fields is activated and there are no saved tokens.
 create_order_if_not_exists();
 
+$order_id = WC()->session->get('order_awaiting_payment');
+$order = wc_get_order($order_id);
+
+if (! $order) {
+    return;
+}
 /**
  * PAYPLUS_API_URL_DEV is the URL of the API in the development environment.
  */
@@ -35,7 +41,6 @@ define('PAYPLUS_API_URL_PROD', 'https://restapi.payplus.co.il/api/v1.0/PaymentPa
 
 $apiUrl = $testMode ? PAYPLUS_API_URL_DEV : PAYPLUS_API_URL_PROD;
 
-$order_id = WC()->session->get('order_awaiting_payment');
 $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
 $discountPrice = 0;
 $products = array();
@@ -133,8 +138,8 @@ foreach ($products as $product) {
     $data->items[] = $item;
 }
 
-$data->more_info = WC()->session->get('order_awaiting_payment');
-$order = wc_get_order($order_id);
+$data->more_info = $order_id;
+
 
 $shipping_items = $order->get_items('shipping');
 // Check if there are shipping items
@@ -268,8 +273,6 @@ function create_order_if_not_exists()
 
         // Set the order awaiting payment in the session
         WC()->session->set('order_awaiting_payment', $order_id);
-
-        $order = wc_get_order($order_id);
 
         // You can manipulate or save additional order data here
         return $order_id; // Returns the newly created order ID
