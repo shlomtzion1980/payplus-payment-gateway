@@ -186,9 +186,18 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 ],
                 'default' => '1',
             ],
+            'hosted_fields_width' => [
+                'title' => __('Set width for hosted fields container (%)', 'payplus-payment-gateway'),
+                'description' => __('This sets the width of the hosted fields container in percentage (Max is 100).', 'payplus-payment-gateway'),
+                'type' => 'number',
+                'default' => '50'
+            ]
         ];
         if ($this->id === 'payplus-payment-gateway-multipass') {
             unset($this->form_fields['sub_hide_other_charge_methods']);
+        }
+        if ($this->id !== 'payplus-payment-gateway-hostedfields') {
+            unset($this->form_fields['hosted_fields_width']);
         }
     }
 
@@ -257,6 +266,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['display_mode'] = $subOptionsettings['display_mode'];
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
+        $this->settings['hosted_fields_width'] = $subOptionsettings['hosted_fields_width'];
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
         $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : null;
 

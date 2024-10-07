@@ -54,6 +54,24 @@ jQuery(function ($) {
             "checked",
             true
         );
+        setTimeout(function () {
+            $("button#place_order").hide();
+        }, 1000);
+
+        $(document).on("change", 'input[name="payment_method"]', function () {
+            // Check if the hosted fields radio input is NOT checked
+            if (
+                !$("#payment_method_payplus-payment-gateway-hostedfields").is(
+                    ":checked"
+                )
+            ) {
+                $(".container.hostedFields").hide();
+                $("button#place_order").show();
+            } else {
+                $(".container.hostedFields").show();
+                $("button#place_order").hide();
+            }
+        });
     }
     var wc_checkout_form = {
         updateTimer: false,
@@ -557,12 +575,9 @@ jQuery(function ($) {
                             $(key).unblock();
                         });
                         wc_checkout_form.fragments = data.fragments;
-                        // if (!$(".hostedFields").length) {
-                        //   $(
-                        //     ".li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
-                        //   ).prepend(hostedFields);
-                        // }
-                        putHostedFields();
+                        if (payplus_script_checkout.isHostedFields) {
+                            putHostedFields();
+                        }
                     }
                     var coupons = [];
                     var couponCode;
@@ -631,12 +646,11 @@ jQuery(function ($) {
                         }
                     );
 
-                    $(document.body).on("updated_checkout", function () {
-                        // if (!$(".hostedFields").length) {
-                        //   $(".woocommerce-checkout-payment").prepend(hostedFields);
-                        // }
-                        putHostedFields();
-                    });
+                    if (payplus_script_checkout.isHostedFields) {
+                        $(document.body).on("updated_checkout", function () {
+                            putHostedFields();
+                        });
+                    }
 
                     // Recheck the terms and conditions box, if needed
                     if (termsCheckBoxChecked) {
@@ -655,12 +669,24 @@ jQuery(function ($) {
                         var $newDiv = jQuery(
                             "body > div.container.hostedFields"
                         );
-
+                        let $col4Element = $newDiv.find(".col-4").first();
                         if (
                             $paymentMethod.length &&
                             $topLi.length &&
                             $newDiv.length
                         ) {
+                            if (payplus_script_checkout.hostedFieldsWidth) {
+                                $col4Element.attr("style", function (i, style) {
+                                    // Return the width with !important without adding an extra semicolon
+                                    return (
+                                        "width: " +
+                                        payplus_script_checkout.hostedFieldsWidth +
+                                        "% !important;" +
+                                        (style ? " " + style : "")
+                                    );
+                                });
+                            }
+
                             // Move the existing div to the top <li> of the payment method
                             $topLi.append($newDiv);
                         }
