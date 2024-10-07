@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-10-07 02:34+0300\n"
-"PO-Revision-Date: 2024-10-07 02:35+0300\n"
+"POT-Creation-Date: 2024-10-07 09:36+0300\n"
+"PO-Revision-Date: 2024-10-07 09:37+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:23
 #: includes/admin/class-wc-payplus-admin-settings.php:28
-#: payplus-payment-gateway.php:840
+#: payplus-payment-gateway.php:839
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -102,7 +102,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:93
 #: includes/class-wc-payplus-form-fields.php:236
-#: payplus-payment-gateway.php:1121
+#: payplus-payment-gateway.php:1120
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -117,15 +117,15 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/admin/class-wc-payplus-admin-settings.php:97
 #: includes/class-wc-payplus-form-fields.php:240
 #: includes/class-wc-payplus-statics.php:78
-#: includes/class-wc-payplus-statics.php:188 payplus-payment-gateway.php:743
-#: payplus-payment-gateway.php:1116 payplus-payment-gateway.php:1301
+#: includes/class-wc-payplus-statics.php:188 payplus-payment-gateway.php:742
+#: payplus-payment-gateway.php:1115 payplus-payment-gateway.php:1300
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:98
 #: includes/class-wc-payplus-form-fields.php:241
-#: payplus-payment-gateway.php:744 payplus-payment-gateway.php:1117
-#: payplus-payment-gateway.php:1302
+#: payplus-payment-gateway.php:743 payplus-payment-gateway.php:1116
+#: payplus-payment-gateway.php:1301
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -983,7 +983,7 @@ msgid "Transaction review"
 msgstr "בדיקת עסקה"
 
 #: includes/admin/class-wc-payplus-admin.php:2007
-#: includes/admin/class-wc-payplus-admin.php:2243
+#: includes/admin/class-wc-payplus-admin.php:2244
 msgid "Charge for Order Number: "
 msgstr "חיוב עבור הזמנה מספר: "
 
@@ -999,69 +999,75 @@ msgstr "שגיאת עמוד PayPlus - הגדרות"
 msgid "Incorrect amount or amount greater than amount that can be refunded"
 msgstr "סכום שגוי או סכום גדול מהסכום שניתן להחזיר"
 
-#: includes/admin/class-wc-payplus-admin.php:2144
+#: includes/admin/class-wc-payplus-admin.php:2135
+msgid ""
+"Are you sure you want to charge this order with token of CC that ends with: "
+msgstr ""
+"האם את/ה בטוח/ה שהינך רוצה לבצע תשלום עם טוקן של כרטיס אשראי המסתיים בספרות: "
+
+#: includes/admin/class-wc-payplus-admin.php:2145
 msgid "Total payment amounts are not equal to the order sum"
 msgstr "סכום התשלומים אינו תואם את סך כל ההזמנה"
 
-#: includes/admin/class-wc-payplus-admin.php:2145
+#: includes/admin/class-wc-payplus-admin.php:2146
 msgid ""
 "The amount of receipts is not equal to the amount of withholding tax "
 "clearance"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:2146
+#: includes/admin/class-wc-payplus-admin.php:2147
 msgid "No document type selected"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:2147
+#: includes/admin/class-wc-payplus-admin.php:2148
 msgid "Edit"
 msgstr "עדכון"
 
-#: includes/admin/class-wc-payplus-admin.php:2148
+#: includes/admin/class-wc-payplus-admin.php:2149
 msgid "Delete"
 msgstr "מחיקה"
 
-#: includes/admin/class-wc-payplus-admin.php:2149
+#: includes/admin/class-wc-payplus-admin.php:2150
 msgid "The payment item cannot be 0"
 msgstr "פריט התשלום אינו יכול להיות 0"
 
-#: includes/admin/class-wc-payplus-admin.php:2152
+#: includes/admin/class-wc-payplus-admin.php:2153
 msgid "Total payments"
 msgstr "סה\"כ תקבולים"
 
-#: includes/admin/class-wc-payplus-admin.php:2153
+#: includes/admin/class-wc-payplus-admin.php:2154
 msgid "Are you sure you want to delete this payment method?"
 msgstr "האם אתה בטוח שברצונך למחק אמצעי תשלום זה?"
 
-#: includes/admin/class-wc-payplus-admin.php:2179
+#: includes/admin/class-wc-payplus-admin.php:2180
 msgid "Charge Order Using PayPlus"
 msgstr "חיוב הזמנה באמצעות PayPlus"
 
-#: includes/admin/class-wc-payplus-admin.php:2182
+#: includes/admin/class-wc-payplus-admin.php:2183
 msgid "Make Payment"
 msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
-#: includes/admin/class-wc-payplus-admin.php:2328
-#: payplus-payment-gateway.php:822
+#: includes/admin/class-wc-payplus-admin.php:2329
+#: payplus-payment-gateway.php:821
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:2332
+#: includes/admin/class-wc-payplus-admin.php:2333
 msgid "user or other, please contact payplus support"
 msgstr "שגיאת משתמש, נא צור קשר עם בעל האתר"
 
-#: includes/admin/class-wc-payplus-admin.php:2335
+#: includes/admin/class-wc-payplus-admin.php:2336
 msgid "Credit card company declined, check credit card details and credit line"
 msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בדוק את הפרטים בלוגים"
 
-#: includes/admin/class-wc-payplus-admin.php:2338
+#: includes/admin/class-wc-payplus-admin.php:2339
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:165
 #: includes/blocks/class-wc-payplus-blocks-support.php:167
-#: includes/wc_payplus_gateway.php:1274 payplus-payment-gateway.php:1380
+#: includes/wc_payplus_gateway.php:1274 payplus-payment-gateway.php:1379
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1626,7 +1632,7 @@ msgstr "סה\"כ:"
 msgid "Payplus Express Checkout"
 msgstr ""
 
-#: includes/payplus-hosted-fields.php:277
+#: includes/payplus-hosted-fields.php:280
 #, fuzzy
 #| msgid "Error: credit card declined: %s"
 msgid "Error creating order: "
@@ -2023,7 +2029,7 @@ msgstr "הסתר אייקון של שיטת התשלום בעמוד התשלום
 msgid "Hide other payment types on payment page"
 msgstr "הסתר סוגי תשלום אחרים בדף התשלום"
 
-#: payplus-payment-gateway.php:546
+#: payplus-payment-gateway.php:545
 #, fuzzy
 #| msgid ""
 #| "Sandbox mode is active and real transaction cannot be processed. Please "
@@ -2036,7 +2042,7 @@ msgstr ""
 "שים לב: מצב Sandbox פעיל ועסקאות אמיתיות לא יסלקו. אנא וודא להוריד סימון "
 "בתוסף לאחר סיום הבדיקות"
 
-#: payplus-payment-gateway.php:552
+#: payplus-payment-gateway.php:551
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2048,11 +2054,11 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:717
+#: payplus-payment-gateway.php:716
 msgid "Four last digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: payplus-payment-gateway.php:777
+#: payplus-payment-gateway.php:776
 msgid ""
 "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" "
 "target=\"_blank\">WooCommerce</a> to be activated."
@@ -2061,14 +2067,14 @@ msgstr ""
 "target=\"_blank\">WooCommerce</a> ונדרש שיהיה פעיל."
 
 #. translators: %1$s: Current PHP version, %2$s: Required PHP version
-#: payplus-payment-gateway.php:790
+#: payplus-payment-gateway.php:789
 #, php-format
 msgid ""
 "Your server is running PHP version %1$s but some features require at least "
 "%2$s."
 msgstr ""
 
-#: payplus-payment-gateway.php:798
+#: payplus-payment-gateway.php:797
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2079,29 +2085,29 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:840
+#: payplus-payment-gateway.php:839
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:1145 payplus-payment-gateway.php:1164
+#: payplus-payment-gateway.php:1144 payplus-payment-gateway.php:1163
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:1183
+#: payplus-payment-gateway.php:1182
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:1206 payplus-payment-gateway.php:1223
+#: payplus-payment-gateway.php:1205 payplus-payment-gateway.php:1222
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1345 payplus-payment-gateway.php:1353
+#: payplus-payment-gateway.php:1344 payplus-payment-gateway.php:1352
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1368
+#: payplus-payment-gateway.php:1367
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
