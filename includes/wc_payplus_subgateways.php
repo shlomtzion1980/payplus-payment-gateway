@@ -199,6 +199,10 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->id !== 'payplus-payment-gateway-hostedfields') {
             unset($this->form_fields['hosted_fields_width']);
         }
+        if ($this->id === 'payplus-payment-gateway-hostedfields') {
+            unset($this->form_fields['display_mode']);
+            unset($this->form_fields['iframe_height']);
+        }
     }
 
 
