@@ -82,7 +82,7 @@ jQuery(() => {
 
                 hf.InitPaymentPage.then((data) => {
                     jQuery("#create-payment-form").hide();
-                    jQuery("#id-number-wrapper").hide();
+                    // jQuery("#id-number-wrapper").hide();
                     jQuery("#payments-wrapper").hide();
                     jQuery("#payment-form").css("display", "flex");
                 });

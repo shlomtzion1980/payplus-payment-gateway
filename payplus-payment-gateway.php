@@ -1006,11 +1006,11 @@ class WC_PayPlus
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
                         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
 
-                            $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.html';
+                            $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.php';
 
                             if (file_exists($template_path)) {
                                 wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.min.css', [], $script_version);
-                                echo file_get_contents($template_path);
+                                include $template_path;
                             }
                             wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
                             wp_register_script('payplus-hosted', plugin_dir_url(__FILE__) . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
