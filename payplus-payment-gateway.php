@@ -871,7 +871,6 @@ class WC_PayPlus
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
 
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
-            add_action('wp_enqueue_scripts', [$this, 'load_cart_assets']);
 
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
             if (WP_DEBUG_LOG) {
@@ -917,23 +916,6 @@ class WC_PayPlus
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                 payplus_add_file_ApplePay();
             }
-        }
-    }
-
-    public function load_cart_assets()
-    {
-        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/hostedFieldsHandler.js');
-        if (is_cart() || is_product() || is_shop()) {
-            wp_register_script('payplus-hosted-js', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsHandler.js', [], $script_version, true);
-            wp_localize_script(
-                'payplus-hosted-js',
-                'payplus_script',
-                [
-                    'ajax_url' => admin_url('admin-ajax.php'),
-                    'frontNonce' => wp_create_nonce('frontNonce'),
-                ]
-            );
-            wp_enqueue_script('payplus-hosted-js');
         }
     }
 

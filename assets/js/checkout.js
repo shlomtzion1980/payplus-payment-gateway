@@ -6,6 +6,8 @@ jQuery(function ($) {
         return false;
     }
 
+    var $hostedDiv = jQuery("body > div.container.hostedFields");
+
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = $(".woocommerce-SavedPaymentMethods-token");
 
@@ -554,10 +556,10 @@ jQuery(function ($) {
                             }
                             $(key).unblock();
                         });
-                        wc_checkout_form.fragments = data.fragments;
                         if (payplus_script_checkout.isHostedFields) {
                             putHostedFields();
                         }
+                        wc_checkout_form.fragments = data.fragments;
                     }
                     var coupons = [];
                     var couponCode;
@@ -646,14 +648,15 @@ jQuery(function ($) {
                         var $topLi = jQuery(".pp_iframe_h");
 
                         // Select the existing div element that you want to move
-                        var $newDiv = jQuery(
-                            "body > div.container.hostedFields"
+
+                        var $hostedLi = jQuery(
+                            ".wc_payment_method.payment_method_payplus-payment-gateway-hostedfields"
                         );
-                        let $hostedRow = $newDiv.find(".row").first();
+                        let $hostedRow = $hostedDiv.find(".row").first();
                         if (
                             $paymentMethod.length &&
                             $topLi.length &&
-                            $newDiv.length
+                            $hostedDiv.length
                         ) {
                             if (payplus_script_checkout.hostedFieldsWidth) {
                                 $hostedRow.attr("style", function (i, style) {
@@ -666,9 +669,9 @@ jQuery(function ($) {
                                     );
                                 });
                             }
-                            $newDiv.css("display", "none");
                             // Move the existing div to the top <li> of the payment method
-                            $topLi.append($newDiv);
+                            $topLi.append($hostedDiv);
+                            $hostedLi.append($topLi);
                         }
                     }
 
@@ -1253,7 +1256,7 @@ jQuery(function ($) {
     // Add custom icons field if exists under cc method description
     function addCustomIcons() {
         if (payplus_script_checkout.customIcons[0].length > 0) {
-            var $newDiv = $("<div></div>", {
+            var $hostedDiv = $("<div></div>", {
                 class: "payplus-checkout-image-container", // Optional: Add a class to the div
                 id: "payplus-checkout-image-div", // Optional: Add an ID to the div
                 style: "display: flex;",
@@ -1266,10 +1269,10 @@ jQuery(function ($) {
                         alt: "Image " + (index + 1), // Optional: Set alt text for accessibility
                         style: "max-width: 100%; max-height:65px;object-fit: contain;", // Optional: Set inline styles
                     });
-                    $newDiv.append($img);
+                    $hostedDiv.append($img);
                 }
             );
-            $("div.payment_method_payplus-payment-gateway").prepend($newDiv);
+            $("div.payment_method_payplus-payment-gateway").prepend($hostedDiv);
         }
     }
 
