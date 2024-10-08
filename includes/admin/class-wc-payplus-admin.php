@@ -215,7 +215,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      * @param $order
      * @return void
      */
-    public function payplusIpn($order_id = null, $_wpnonce = null)
+    public function payplusIpn($order_id = null, $_wpnonce = null, $isHostedPayment = false)
     {
 
         $this->isInitiated();
@@ -260,6 +260,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $response = wp_remote_post($url, $args);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
+
+        if ($this->create_pp_token && $isHostedPayment) {
+            $user_id = $order->get_user_id();
+            $this->save_token($responseBody['data'], $user_id);
+        }
 
         if (!empty($responseBody['data'])) {
             $type = $responseBody['data']['type'];

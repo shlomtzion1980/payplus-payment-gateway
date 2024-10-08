@@ -370,7 +370,7 @@ class WC_PayPlus
         WC_PayPlus_Meta_Data::update_meta($order, $metaData);
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, true);
         WC()->session->__unset('hostedPayload');
         WC()->session->__unset('page_request_uid');
         WC()->session->__unset('order_awaiting_payment');
