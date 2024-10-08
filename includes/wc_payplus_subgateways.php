@@ -191,6 +191,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'description' => __('This sets the width of the hosted fields container in percentage (Max is 100).', 'payplus-payment-gateway'),
                 'type' => 'number',
                 'default' => '50'
+            ],
+            'hide_payplus_gateway' => [
+                'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
+                'description' => __('Hide PayPlus gateway if current user has no saved tokens', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no'
             ]
         ];
         if ($this->id === 'payplus-payment-gateway-multipass') {
@@ -271,6 +277,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
         $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 50;
+        $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
         $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : null;
 

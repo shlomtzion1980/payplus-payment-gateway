@@ -532,20 +532,21 @@ jQuery(function ($) {
                         }
                     });
 
-                    // if (
-                    //     payplus_script_checkout.isHostedFields &&
-                    //     hasSavedCCs.length === 0
-                    // ) {
-                    //     const checkoutPaymentFragment =
-                    //         data.fragments[".woocommerce-checkout-payment"];
-                    //     const modifiedString = modifyCheckoutPaymentFragment(
-                    //         checkoutPaymentFragment,
-                    //         "wc_payment_method.payment_method_payplus-payment-gateway"
-                    //     );
+                    if (
+                        payplus_script_checkout.isHostedFields &&
+                        hasSavedCCs.length === 0 &&
+                        payplus_script_checkout.hidePPGateway
+                    ) {
+                        const checkoutPaymentFragment =
+                            data.fragments[".woocommerce-checkout-payment"];
+                        const modifiedString = modifyCheckoutPaymentFragment(
+                            checkoutPaymentFragment,
+                            "wc_payment_method.payment_method_payplus-payment-gateway"
+                        );
 
-                    //     data.fragments[".woocommerce-checkout-payment"] =
-                    //         modifiedString;
-                    // }
+                        data.fragments[".woocommerce-checkout-payment"] =
+                            modifiedString;
+                    }
 
                     // Always update the fragments
                     let hostedFields = $(".hostedFields").prop("outerHTML");

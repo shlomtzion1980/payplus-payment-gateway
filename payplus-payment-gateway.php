@@ -968,6 +968,7 @@ class WC_PayPlus
                     "isAutoPPCC" => $this->isAutoPPCC,
                     "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
                     "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 50,
+                    "hidePPGateway" => isset($this->hostedFieldsOptions['hide_payplus_gateway']) ? boolval($this->hostedFieldsOptions['hide_payplus_gateway'] === "yes") : false,
                 ]
             );
         }
