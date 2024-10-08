@@ -1076,6 +1076,7 @@ class WC_PayPlus
         ?>
         <div class="payplus-option-description-area"></div>
         <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

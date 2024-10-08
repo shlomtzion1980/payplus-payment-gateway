@@ -9,6 +9,7 @@ jQuery(function ($) {
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = $(".woocommerce-SavedPaymentMethods-token");
 
+    //function to hide other payment methods when subscription order
     function subscriptionOrderHide() {
         // Select all elements with the wc_payment_method class inside .wc_payment_methods.payment_methods.methods
         $(
@@ -529,20 +530,6 @@ jQuery(function ($) {
                         }
                     });
 
-                    // if (
-                    //   payplus_script_checkout.isHostedFields &&
-                    //   hasSavedCCs.length === 0
-                    // ) {
-                    //   const checkoutPaymentFragment =
-                    //     data.fragments[".woocommerce-checkout-payment"];
-                    //   const modifiedString = modifyCheckoutPaymentFragment(
-                    //     checkoutPaymentFragment,
-                    //     "wc_payment_method.payment_method_payplus-payment-gateway"
-                    //   );
-
-                    //   data.fragments[".woocommerce-checkout-payment"] = modifiedString;
-                    // }
-
                     // Always update the fragments
                     let hostedFields = $(".hostedFields").prop("outerHTML");
                     if (data && data.fragments) {
@@ -656,20 +643,20 @@ jQuery(function ($) {
                         );
 
                         // Find the closest parent <li>
-                        var $topLi = jQuery(".pp_iframe");
+                        var $topLi = jQuery(".pp_iframe_h");
 
                         // Select the existing div element that you want to move
                         var $newDiv = jQuery(
                             "body > div.container.hostedFields"
                         );
-                        let $col4Element = $newDiv.find(".col-4").first();
+                        let $hostedRow = $newDiv.find(".row").first();
                         if (
                             $paymentMethod.length &&
                             $topLi.length &&
                             $newDiv.length
                         ) {
                             if (payplus_script_checkout.hostedFieldsWidth) {
-                                $col4Element.attr("style", function (i, style) {
+                                $hostedRow.attr("style", function (i, style) {
                                     // Return the width with !important without adding an extra semicolon
                                     return (
                                         "width: " +
