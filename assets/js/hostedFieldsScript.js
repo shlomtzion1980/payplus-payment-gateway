@@ -124,6 +124,11 @@ hf.Upon("pp_responseFromServer", (e) => {
     } catch (error) {
         r = e.detail;
     }
+
+    let saveToken = jQuery("#save_token_checkbox").is(":checked")
+        ? true
+        : false;
+
     console.log("Payment Response: ", e.detail);
     if (e.detail.errors) {
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
@@ -143,6 +148,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                 action: "make-hosted-payment",
                 order_id: orderId,
                 token: token,
+                saveToken: saveToken,
                 page_request_uid: pageRequestdUid,
                 _ajax_nonce: payplus_script.frontNonce,
             },

@@ -362,17 +362,19 @@ class WC_PayPlus
     public function hostedPayment()
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
-        $order_id = intval($_POST['order_id']);
         $this->payplus_gateway = $this->get_main_payplus_gateway();
+        $order_id = intval($_POST['order_id']);
         $order = wc_get_order($order_id);
+        $saveToken = isset($_POST['saveToken']) ? filter_var($_POST['saveToken'], FILTER_VALIDATE_BOOLEAN) : false;
         $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
         $metaData['payplus_page_request_uid'] = $_POST['page_request_uid'];
         WC_PayPlus_Meta_Data::update_meta($order, $metaData);
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, true);
+        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
         WC()->session->__unset('hostedPayload');
         WC()->session->__unset('page_request_uid');
+        WC()->session->__unset('hostedResponse');
         WC()->session->__unset('order_awaiting_payment');
     }
 

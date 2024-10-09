@@ -6,7 +6,18 @@ jQuery(function ($) {
         return false;
     }
 
+    // Add save token checkbox to hosted fields container //
     var $hostedDiv = jQuery("body > div.container.hostedFields");
+    var $checkbox = $(
+        '<p class="form-row">' +
+            '<label for="save_token_checkbox">' +
+            '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" />' +
+            " Save credit card in my account" +
+            "</label>" +
+            "</p>"
+    );
+    // Move the existing div to the top <li> of the payment method
+    $hostedDiv.append($checkbox);
 
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = $(".woocommerce-SavedPaymentMethods-token");
@@ -685,7 +696,6 @@ jQuery(function ($) {
                                     );
                                 });
                             }
-                            // Move the existing div to the top <li> of the payment method
                             $topLi.append($hostedDiv);
                             $hostedLi.append($topLi);
                         }
