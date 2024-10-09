@@ -864,23 +864,20 @@ class WC_PayPlus
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
-            add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
+
+            add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
             if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                 add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
             }
-
             add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
-
             add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
-
             add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
             if (WP_DEBUG_LOG) {
                 add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);
             }
-
             add_action('woocommerce_review_order_before_submit', [$this, 'payplus_view_iframe_payment'], 1);
-
             $this->invoice_api = new PayplusInvoice();
             add_action('manage_shop_order_posts_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
             add_action('woocommerce_shop_order_list_table_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
@@ -1006,7 +1003,8 @@ class WC_PayPlus
             if ($userId > 0) {
                 if (!is_cart() && !is_product() && !is_shop()) {
                     if (boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
-                        require_once PAYPLUS_PLUGIN_DIR . '/includes/payplus-hosted-fields.php';
+                        $hostedClass = new WC_PayPlus_HostedFields;
+                        $hostedResponse = $hostedClass->hostedFieldsData();
                         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
 
                             $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.php';

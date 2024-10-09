@@ -592,68 +592,63 @@ jQuery(function ($) {
                     var couponCode;
                     var totalDiscount = 0;
                     let isSubmitting = false;
-                    $('#shipping_method input[type="radio"]').on(
-                        "change",
-                        function () {
-                            if (isSubmitting) return; // Prevent multiple submissions
-                            isSubmitting = true; // Set flag to true to block further submissions
 
-                            // Recreate and prepend the .container element after fragments update
-                            // Get the selected shipping method ID
-                            var selectedShippingMethod = $(
-                                'input[name="shipping_method[0]"]:checked'
-                            ).val();
-                            console.log(
-                                "Selected shipping method ID: " +
-                                    selectedShippingMethod
-                            );
+                    // var selectedShippingMethod = $(
+                    //     'input[name="shipping_method[0]"]:checked'
+                    // ).val();
 
-                            // Find the label associated with the selected shipping method
-                            var label = $(
-                                'input[name="shipping_method[0]"]:checked'
-                            )
-                                .closest("li")
-                                .find("label")
-                                .text();
+                    if (isSubmitting) return; // Prevent multiple submissions
+                    isSubmitting = true; // Set flag to true to block further submissions
 
-                            // Adjust the regex to support both $ and ₪ (or any currency symbol at start or end)
-                            var priceMatch = label.match(
-                                /(\$|₪)\s*([0-9.,]+)|([0-9.,]+)\s*(\$|₪)/
-                            );
+                    // console.log(
+                    //     "Selected shipping method ID: " + selectedShippingMethod
+                    // );
 
-                            let shippingPrice = 0;
-                            if (priceMatch) {
-                                var currency = priceMatch[1] || priceMatch[4]; // Captures the currency symbol
-                                shippingPrice = priceMatch[2] || priceMatch[3]; // Captures the price number
-                                console.log(
-                                    "Shipping price: " +
-                                        shippingPrice +
-                                        " " +
-                                        currency
-                                );
-                                // Your custom logic with the shipping price and currency
-                            }
+                    // Find the label associated with the selected shipping method
+                    var label = $('input[name="shipping_method[0]"]:checked')
+                        .closest("li")
+                        .find("label")
+                        .text();
 
-                            let totalShipping = shippingPrice;
-                            jQuery.ajax({
-                                type: "post",
-                                dataType: "json",
-                                url: payplus_script.ajax_url,
-                                data: {
-                                    action: "update-hosted-payment",
-                                    totalShipping: totalShipping,
-                                    _ajax_nonce: payplus_script.frontNonce,
-                                },
-                                success: function (response) {
-                                    console.log(response);
-                                },
-                                complete: function () {
-                                    // Reset flag after completion of request
-                                    isSubmitting = false;
-                                },
-                            });
-                        }
+                    if (label === "") {
+                        label = $('input[name="shipping_method[0]"]')
+                            .closest("li")
+                            .find("label")
+                            .text();
+                    }
+                    // Adjust the regex to support both $ and ₪ (or any currency symbol at start or end)
+                    var priceMatch = label.match(
+                        /(\$|₪)\s*([0-9.,]+)|([0-9.,]+)\s*(\$|₪)/
                     );
+
+                    let shippingPrice = 0;
+                    if (priceMatch) {
+                        var currency = priceMatch[1] || priceMatch[4]; // Captures the currency symbol
+                        shippingPrice = priceMatch[2] || priceMatch[3]; // Captures the price number
+                        // console.log(
+                        //     "Shipping price: " + shippingPrice + " " + currency
+                        // );
+                    }
+
+                    let totalShipping = shippingPrice;
+                    jQuery.ajax({
+                        type: "post",
+                        dataType: "json",
+                        url: payplus_script.ajax_url,
+                        data: {
+                            action: "update-hosted-payment",
+                            totalShipping: totalShipping,
+                            _ajax_nonce: payplus_script.frontNonce,
+                        },
+                        success: function (response) {
+                            // console.log("data sent: ", data);
+                            // console.log("response : ", response);
+                        },
+                        complete: function () {
+                            // Reset flag after completion of request
+                            isSubmitting = false;
+                        },
+                    });
 
                     if (payplus_script_checkout.isHostedFields) {
                         $(document.body).on("updated_checkout", function () {

@@ -82,7 +82,7 @@ jQuery(() => {
 
                 hf.InitPaymentPage.then((data) => {
                     jQuery("#create-payment-form").hide();
-                    // jQuery("#id-number-wrapper").hide();
+                    jQuery("#id-number-wrapper").hide();
                     jQuery("#payments-wrapper").hide();
                     jQuery("#payment-form").css("display", "flex");
                 });
@@ -102,6 +102,10 @@ jQuery(() => {
 });
 
 jQuery(() => {
+    jQuery(document).on("click", ".expiry-wrapper.expiries", function () {
+        jQuery(".iframe-placeholder").hide();
+    });
+
     jQuery("#submit-payment").on("click", () => {
         jQuery(".blocks-payplus_loader_hosted").fadeIn();
         hf.SubmitPayment();

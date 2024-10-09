@@ -117,6 +117,72 @@
             position: relative;
             z-index: 1000000000000;
         }
+
+        .expiries {
+            background-color: white;
+            width: 90%;
+            display: flex;
+            margin: auto;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            flex-direction: row;
+            border: solid 0.1px;
+            height: 50px;
+        }
+
+
+        .expireClass {
+            background-color: white;
+            width: 30%;
+            height: 49px;
+            display: flex;
+            border: solid 0.1px;
+            justify-content: space-evenly;
+        }
+
+        .smallCol {
+            flex: 0 0 auto;
+            width: 30%;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            /* width: 100%; */
+            /* Adjust based on your iframe size */
+            /* height: 50%; */
+            /* Adjust based on your iframe size */
+        }
+
+        .iframe-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            /* Semi-transparent background */
+            color: #666;
+            font-size: 18px;
+            z-index: 10;
+            pointer-events: none;
+            /* Allows clicks to pass through to the iframe */
+        }
+
+        .pp_iframe_h iframe {
+            border: 0;
+            min-width: 65px;
+        }
+
+        .fld-frame {
+            border: none;
+            box-sizing: unset;
+            outline: unset;
+        }
+
+        .onField {}
     </style>
 </head>
 
@@ -189,15 +255,24 @@
                             <span id="expiry" class="fld-frame"></span>
                         </div>
                     </div>
-                    <div class="row expiry-wrapper">
-                        <div class="col-2">
-                            <label><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
-                            <span id="expirym" class="fld-frame"></span>
+                    <div class="expiry-wrapper expiries">
+                        <div class="expireClass">
+                            <div class="iframe-wrapper">
+                                <div class="smallCol">
+                                    <label class="iframe-placeholder"><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
+                                    <span id="expirym" class="fld-frame"></span>
+                                </div>
+                            </div>
+                            <div class="iframe-wrapper">
+                                <div class="smallCol">
+                                    <div class="iframe-placeholder"><?php echo __('/ Year', 'payplus-payment-gateway'); ?></div>
+                                    <span id="expiryy" class="fld-frame"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-2">
-                            <label><?php echo __('Year', 'payplus-payment-gateway'); ?></label>
-                            <span id="expiryy" class="fld-frame"></span>
-                        </div>
+
+
+
                         <div class="col-3">
                             <label><?php echo __('CVV', 'payplus-payment-gateway'); ?></label>
                             <span
