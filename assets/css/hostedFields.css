@@ -471,7 +471,7 @@
 }
 
 .pp_iframe_h label {
-    display: inline-block;
+    /* display: inline-block; */
 }
 
 .pp_iframe_h button {
