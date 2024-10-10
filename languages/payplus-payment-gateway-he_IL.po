@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-10-10 16:03+0300\n"
-"PO-Revision-Date: 2024-10-10 16:03+0300\n"
+"PO-Revision-Date: 2024-10-10 16:37+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -2168,7 +2168,7 @@ msgstr "קוד CVV"
 
 #: templates/hostedFields.php:375
 msgid "Place Order"
-msgstr "שליחת הזמנה"
+msgstr "לתשלום"
 
 #: templates/hostedFields.php:379
 msgid "Powered By:"

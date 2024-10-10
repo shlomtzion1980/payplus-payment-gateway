@@ -253,6 +253,12 @@
                 padding: unset !important;
             }
         }
+
+        .btn-primary {
+            font-size: 21px !important;
+            padding: unset !important;
+            height: 44px !important;
+        }
     </style>
 </head>
 
