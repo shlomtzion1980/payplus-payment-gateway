@@ -150,7 +150,7 @@
             width: 50%;
             height: 50px;
             display: flex;
-            justify-content: space-evenly;
+            justify-content: center;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px;
 
@@ -259,6 +259,15 @@
             padding: unset !important;
             height: 44px !important;
         }
+
+        .exp {
+            width: 40%;
+        }
+
+        .seperator {
+            padding: 7px;
+            width: 40px;
+        }
     </style>
 </head>
 
@@ -330,12 +339,13 @@
                             </div>
                         </div>
                         <div class="expireClass">
-                            <div id="month" class="iframe-wrapper">
+                            <div id="month" class="iframe-wrapper exp">
                                 <label
                                     class="iframe-placeholder month"><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
                                 <span id="expirym" class="fld-frame"></span>
                             </div>
-                            <div id="year" class="iframe-wrapper">
+                            <span class="seperator"> / </span>
+                            <div id="year" class="iframe-wrapper exp">
                                 <label class="iframe-placeholder year">
                                     <?php echo __('Year', 'payplus-payment-gateway'); ?></label>
                                 <span id="expiryy" class="fld-frame"></span>
@@ -380,8 +390,8 @@
                             <input type="text" id="invoice-name" class="form-control" value="" />
                         </div>
                     </div>
-                    <input type="button" value="<?php echo __('Place Order', 'payplus-payment-gateway'); ?>" id="submit-payment"
-                        class="btn btn-primary" />
+                    <input type="button" value="<?php echo __('Place Order', 'payplus-payment-gateway'); ?>"
+                        id="submit-payment" class="btn btn-primary" />
                     <br />
                     <div id="ppLogo">
                         <?php echo __('Powered by ', 'payplus-payment-gateway'); ?>
