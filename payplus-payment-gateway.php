@@ -385,6 +385,7 @@ class WC_PayPlus
         $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
         $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
         $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
+        $payPlusGateWay = $this->get_main_payplus_gateway();
 
         $auth = json_encode([
             'api_key' => $apiKey,
@@ -401,17 +402,9 @@ class WC_PayPlus
             $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
         }
 
-        $ch = curl_init($apiUrl);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $requestHeaders);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_POST, true);
+        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, $method = "post");
 
-        $hostedResponse = curl_exec($ch);
-
-        curl_close($ch);
-
-        $hostedResponseArray = json_decode($hostedResponse, true);
+        $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
 
         if (isset($hostedResponseArray['data']['page_request_uid'])) {
             $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
@@ -420,7 +413,7 @@ class WC_PayPlus
 
         WC()->session->set('hostedResponse', $hostedResponse);
 
-        return $hostedResponse;
+        return wp_remote_retrieve_body($hostedResponse);
     }
 
     public function updateHostedPayment()
@@ -673,8 +666,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -1003,31 +996,8 @@ class WC_PayPlus
             $userId = get_current_user_id();
             if ($userId > 0) {
                 if (!is_cart() && !is_product() && !is_shop()) {
-                    if (boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
+                    if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
                         $hostedClass = new WC_PayPlus_HostedFields;
-                        $hostedResponse = $hostedClass->hostedFieldsData();
-                        if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-
-                            $template_path = plugin_dir_path(__FILE__) . 'templates/hostedFields.php';
-
-                            if (file_exists($template_path)) {
-                                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
-                                include $template_path;
-                            }
-                            wp_enqueue_script('payplus-hosted-fields-js', plugin_dir_url(__FILE__) . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-                            wp_register_script('payplus-hosted', plugin_dir_url(__FILE__) . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
-                            wp_localize_script(
-                                'payplus-hosted',
-                                'payplus_script',
-                                [
-                                    "hostedResponse" => $hostedResponse,
-                                    'ajax_url' => admin_url('admin-ajax.php'),
-                                    'frontNonce' => wp_create_nonce('frontNonce'),
-                                    'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
-                                ]
-                            );
-                            wp_enqueue_script('payplus-hosted');
-                        }
                     }
                 }
             }
@@ -1058,9 +1028,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

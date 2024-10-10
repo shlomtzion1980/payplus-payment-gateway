@@ -45,12 +45,40 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $this->apiUrl = $this->testMode ? PAYPLUS_API_URL_DEV : PAYPLUS_API_URL_PROD;
 
-        if (WC()->cart->get_subtotal() === 0) {
+        $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
+        if (WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) {
+            WC()->session->__unset('hostedPayload');
             WC()->session->__unset('page_request_uid');
+            WC()->session->__unset('hostedResponse');
+            WC()->session->__unset('order_awaiting_payment');
             return;
         }
 
         $this->create_order_if_not_exists();
+        $hostedResponse = $this->hostedFieldsData();
+
+        if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
+            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
+            $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
+
+            if (file_exists($template_path)) {
+                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
+                include $template_path;
+            }
+            wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
+            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
+            wp_localize_script(
+                'payplus-hosted',
+                'payplus_script',
+                [
+                    "hostedResponse" => $hostedResponse,
+                    'ajax_url' => admin_url('admin-ajax.php'),
+                    'frontNonce' => wp_create_nonce('frontNonce'),
+                    'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
+                ]
+            );
+            wp_enqueue_script('payplus-hosted');
+        }
     }
 
     /**
