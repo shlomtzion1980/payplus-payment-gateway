@@ -90,13 +90,15 @@
             font-family: "Almoni", sans-serif;
             color: #c5cbcf;
             text-align: center;
+            font-size: 12px;
             width: 90%;
             bottom: 5px;
             direction: ltr;
             padding: 1em;
 
             img {
-                height: 20px;
+                height: 17px;
+                top: 2px;
             }
         }
 
@@ -376,7 +378,7 @@
                         class="btn btn-primary" />
                     <br />
                     <div id="ppLogo">
-                        <?php echo __('Powered By:', 'payplus-payment-gateway'); ?>
+                        <?php echo __('Powered by ', 'payplus-payment-gateway'); ?>
                         <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png"
                             alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
                     </div>
