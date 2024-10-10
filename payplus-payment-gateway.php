@@ -673,8 +673,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -968,6 +968,7 @@ class WC_PayPlus
                     "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
                     "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 50,
                     "hidePPGateway" => isset($this->hostedFieldsOptions['hide_payplus_gateway']) ? boolval($this->hostedFieldsOptions['hide_payplus_gateway'] === "yes") : false,
+                    "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
                 ]
             );
         }
@@ -1057,9 +1058,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

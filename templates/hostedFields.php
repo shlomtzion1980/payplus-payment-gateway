@@ -6,184 +6,251 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-    label {
-        margin: unset !important;
-    }
-
-    .fld-frame {
-        border: 1px solid #ced4da;
-        height: 37px;
-        padding: 5px;
-        margin: 5px 0;
-        background-color: #fff;
-        border-radius: 5px;
-        width: 100%;
-    }
-
-    .col-4 {
-        flex: 0 0 auto;
-        width: fit-content !important;
-        display: block;
-        background-color: #e9e9e9;
-        padding: 15px;
-        border-radius: 10px;
-        border: solid 0.5px;
-        position: relative;
-        flex-direction: row;
-        align-content: center;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        margin: auto;
-        /* @media screen and (max-width: 567px) {
-          width: 100% !important;
-        } */
-    }
-
-    #hostedTop {
-        display: flex;
-        height: 50px;
-        justify-content: space-between;
-
-        .topText {
-            color: #c5cbcf;
+        label {
+            margin: unset !important;
+            border: none !important;
         }
 
-        .creditCards {
-            img {
-                height: 35px;
+        .fld-frame {
+            border: 1px solid #ced4da;
+            height: 37px;
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .col-4 {
+            flex: 0 0 auto;
+            width: fit-content !important;
+            display: block;
+            background: #F7F7F7;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            position: relative;
+            flex-direction: row;
+            /* align-content: center; */
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin: auto;
+            display: flex;
+            /* flex-direction: column; */
+            background: #F7F7F7;
+            /* height: 55vh; */
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        #hostedTop {
+            display: flex;
+            height: fit-content;
+            justify-content: space-between;
+            border-bottom: 1px solid #E3E6E9 !important;
+            width: 100%;
+            padding: 20px;
+
+            .topText {
+                color: #000000;
+                font-size: 16px;
+            }
+
+            .creditCards {
+                img {
+                    height: 19px;
+                }
             }
         }
-    }
 
-    #submit-payment {
-        background-color: var(--wp--preset--color--contrast);
-        border-radius: 0.33rem;
-        border-color: var(--wp--preset--color--contrast);
-        border-width: 0;
-        color: var(--wp--preset--color--base);
-        font-family: inherit;
-        font-size: var(--wp--preset--font-size--small);
-        font-style: normal;
-        font-weight: 500;
-        line-height: inherit;
-        padding-top: 0.6rem;
-        padding-right: 1rem;
-        padding-bottom: 0.6rem;
-        padding-left: 1rem;
-        text-decoration: none;
-        margin-top: 10px !important;
-    }
-
-    #ppLogo {
-        font-family: "Almoni", sans-serif;
-        color: #c5cbcf;
-        position: absolute;
-        right: 10px;
-        bottom: 5px;
-
-        img {
-            height: 20px;
+        #submit-payment {
+            background-color: var(--wp--preset--color--contrast);
+            border-radius: 0.33rem;
+            border-color: var(--wp--preset--color--contrast);
+            border-width: 0;
+            color: var(--wp--preset--color--base);
+            font-family: inherit;
+            font-size: var(--wp--preset--font-size--small);
+            font-style: normal;
+            font-weight: 500;
+            line-height: inherit;
+            padding-top: 0.6rem;
+            padding-right: 1rem;
+            padding-bottom: 0.6rem;
+            padding-left: 1rem;
+            text-decoration: none;
+            margin-top: 15px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            border-radius: 8px;
+            width: 90%;
         }
-    }
 
-    .expiry-wrapper {
-        justify-content: space-between;
-    }
+        #ppLogo {
+            font-family: "Almoni", sans-serif;
+            color: #c5cbcf;
+            text-align: center;
+            width: 90%;
+            bottom: 5px;
+            direction: ltr;
+            padding: 1em;
 
-    .container.hostedFields {
-        display: none;
-    }
+            img {
+                height: 20px;
+            }
+        }
 
-    #payment-form {
-        display: none;
-        align-items: center;
-        flex-direction: column;
-        flex-wrap: wrap;
-        align-content: flex-start;
-    }
+        .expiry-wrapper {
+            justify-content: space-between;
+        }
 
-    .__payplus_hosted_fields_err_fld {
-        color: red;
-        border: 1px solid red;
-    }
+        .container.hostedFields {
+            display: none;
+        }
 
-    input[readonly] {
-        background-color: #eee;
-        outline: 0;
-    }
+        #payment-form {
+            display: none;
+            align-items: center;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
 
-    .blocks-payplus_loader_hosted {
-        display: none;
-        position: relative;
-        z-index: 1000000000000;
-    }
+        .__payplus_hosted_fields_err_fld {
+            color: red;
+            border: 1px solid red;
+        }
 
-    .expiries {
-        background-color: white;
-        width: 90%;
-        display: flex;
-        margin: auto;
-        border: solid 0.1px;
-        height: 50px;
-    }
+        input[readonly] {
+            background-color: #eee;
+            outline: 0;
+        }
 
-    input:-internal-autofill-selected {
-        background-color: transparent !important;
-    }
+        .blocks-payplus_loader_hosted {
+            display: none;
+            position: relative;
+            z-index: 1000000000000;
+        }
 
-    .expireClass {
-        background-color: white;
-        width: 50%;
-        height: 49px;
-        display: flex;
-        border: solid 0.1px;
-        justify-content: space-evenly;
-    }
+        .expiries {
+            width: 90%;
+            display: flex;
+            margin: auto;
+            flex-wrap: wrap;
+        }
 
-    .smallCol {
-        flex: 0 0 auto;
-        width: 30%;
-    }
+        input:-internal-autofill-selected {
+            background-color: transparent !important;
+        }
 
-    .iframe-wrapper {
-        position: relative;
-        /* width: 100%; */
-        /* Adjust based on your iframe size */
-        /* height: 50%; */
-        /* Adjust based on your iframe size */
-    }
+        .expireClass {
+            background-color: white;
+            width: 50%;
+            height: 50px;
+            display: flex;
+            justify-content: space-evenly;
+            border: 1px solid #E3E6E9 !important;
+            border-radius: 8px;
 
-    .iframe-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: rgba(255, 255, 255, 0.8);
-        /* Semi-transparent background */
-        color: #666;
-        font-size: 18px;
-        z-index: 10;
-        pointer-events: none;
-        /* Allows clicks to pass through to the iframe */
-    }
+            @media screen and (max-width: 567px) {
+                min-width: 100%;
+            }
+        }
 
-    .pp_iframe_h iframe {
-        border: 0;
-        /* min-width: 55px;
+        .smallCol {
+            flex: 0 0 auto;
+            width: 30%;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            /* Adjust based on your iframe size */
+            /* height: 50%; */
+            /* Adjust based on your iframe size */
+        }
+
+        .justBorder {
+            border: 1px solid #E3E6E9 !important;
+        }
+
+        .iframe-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            padding: 10px;
+            border-radius: 8px;
+            /* justify-content: center; */
+            align-items: center;
+            background-color: transparent;
+            /* border: 1px solid #E3E6E9 !important; */
+            /* Semi-transparent background */
+            color: #A2ADB5;
+            font-size: 18px;
+            ;
+
+            z-index: 10;
+            pointer-events: none;
+            /* Allows clicks to pass through to the iframe */
+        }
+
+        .pp_iframe_h iframe {
+            border: 0;
+            max-height: 45px;
+            /* min-width: 55px;
             text-align: center; */
-    }
+        }
 
-    .fld-frame {
-        border: none;
-        box-sizing: unset;
-        outline: unset;
-    }
+        .fld-frame {
+            border: none;
+            box-sizing: unset;
+            outline: unset;
+        }
 
-    .onField {}
+        input {
+            outline: unset;
+        }
+
+        .pp_iframe_h {
+            .form-control {
+                width: 100% !important;
+                padding: 0.5rem 0.75rem !important;
+                font-size: 20px !important;
+                border: 1px solid #E3E6E9 !important;
+                border-radius: 8px !important;
+                height: 45px;
+                margin: auto !important;
+            }
+        }
+
+        input[type="text" i] {
+            font-size: 20px;
+        }
+
+        .h-fld-wrapper {
+            width: 100%;
+        }
+
+        .fld-wrapper {
+            width: 90%;
+            margin: auto;
+            margin-bottom: 0.2em;
+        }
+
+        .row {
+            @media screen and (max-width: 768px) {
+                min-width: 100% !important;
+            }
+        }
+
+        .pp_iframe_h {
+            .row>* {
+                padding: unset !important;
+            }
+        }
     </style>
 </head>
 
@@ -203,21 +270,29 @@
                     <div id="hostedTop">
                         <div class="topText"><?php echo __('Credit card', 'payplus-payment-gateway'); ?></div>
                         <div class="creditCards">
-                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/visa.png"
+                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cCards.png"
+                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
+                            <!-- <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/visa.png"
                                 alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
                             <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/mastercard.png"
                                 alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
                             <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/amex.png"
                                 alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
                             <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/diners.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
+                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" /> -->
                         </div>
                     </div>
-                    <div class="row" id="id-number-wrapper">
-                        <div class="col-12">
-                            <label><?php echo __('ID number', 'payplus-payment-gateway'); ?></label>
-                            <input id="id-number" type="number" class="form-control" value="" />
-                        </div>
+                    <div id="card-holder-name-wrapper" class="fld-wrapper">
+                        <!-- <div class="iframe-wrapper"> -->
+                        <label><?php echo __('Name', 'payplus-payment-gateway'); ?></label>
+                        <input type="text" id="card-holder-name" class="form-control" value="" />
+                        <!-- </div> -->
+                    </div>
+                    <div id="id-number-wrapper" class="fld-wrapper">
+                        <!-- <div class="iframe-wrapper"> -->
+                        <label><?php echo __('ID number', 'payplus-payment-gateway'); ?></label>
+                        <input id="id-number" type="number" class="form-control" value="" />
+                        <!-- </div> -->
                     </div>
                     <div class="row" id="payments-wrapper">
                         <div class="col-12">
@@ -229,13 +304,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="row" id="cc-wrapper">
-                        <div class="col-12">
-                            <label><?php echo __('Card number', 'payplus-payment-gateway'); ?></label>
-                            <span id="cc" placeholder="Card Number" class="form-control fld-frame"
-                                data-hosted-fields-identifier="cc"></span>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-2 expiry-wrapper-full">
                             <label>Expiry date</label>
@@ -243,35 +311,38 @@
                         </div>
                     </div>
                     <div class="expiry-wrapper expiries">
-                        <div class="expireClass">
-                            <div id="month" class="iframe-wrapper">
-                                <div class="smallCol">
-                                    <label
-                                        class="iframe-placeholder"><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
-                                    <span id="expirym" class="fld-frame"></span>
-                                </div>
-                            </div>
-                            <div class="iframe-wrapper">
-                                <label class="iframe-placeholder">
-                                    <?php echo __('/ Year', 'payplus-payment-gateway'); ?></label>
-                                <span id="expiryy" class="fld-frame"></span>
+                        <div id="cc-wrapper" class="h-fld-wrapper">
+                            <label><?php echo __('Card number', 'payplus-payment-gateway'); ?></label>
+                            <div id="cCard" class="iframe-wrapper">
+
+                                <label
+                                    class="iframe-placeholder cCard"><?php echo __('1234 1234 1234 1234', 'payplus-payment-gateway'); ?></label>
+                                <span id="cc" placeholder="Card Number" class="form-control fld-frame"
+                                    data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
                         <div class="expireClass">
+                            <div id="month" class="iframe-wrapper">
+                                <label
+                                    class="iframe-placeholder month"><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
+                                <span id="expirym" class="fld-frame"></span>
+                            </div>
+                            <div id="year" class="iframe-wrapper">
+                                <label class="iframe-placeholder year">
+                                    <?php echo __('Year', 'payplus-payment-gateway'); ?></label>
+                                <span id="expiryy" class="fld-frame"></span>
+                            </div>
+                        </div>
+                        <div id="cvv-fld" class="expireClass">
                             <div class="iframe-wrapper">
                                 <label
-                                    class="iframe-placeholder"><?php echo __('CVV', 'payplus-payment-gateway'); ?></label>
+                                    class="iframe-placeholder cvv-fld"><?php echo __('CVV', 'payplus-payment-gateway'); ?></label>
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row" id="cvv-wrapper"></div>
-                    <div class="row" id="card-holder-name-wrapper">
-                        <div class="col-12">
-                            <label><?php echo __('Name', 'payplus-payment-gateway'); ?></label>
-                            <input type="text" id="card-holder-name" class="form-control" value="" />
-                        </div>
-                    </div>
+
                     <div class="row card-holder-phone-wrapper">
                         <div class="col-12">
                             <label>Phone</label>
@@ -301,6 +372,8 @@
                             <input type="text" id="invoice-name" class="form-control" value="" />
                         </div>
                     </div>
+                    <input type="button" value="<?php echo __('Place Order', 'payplus-payment-gateway'); ?>" id="submit-payment"
+                        class="btn btn-primary" />
                     <br />
                     <div id="ppLogo">
                         <?php echo __('Powered By:', 'payplus-payment-gateway'); ?>
@@ -341,8 +414,6 @@
                     </div>
                 </div>
             </div>
-            <input type="button" value="<?php echo __('Place Order', 'payplus-payment-gateway'); ?>" id="submit-payment"
-                class="btn btn-primary" />
         </div>
     </div>
     <span id="recaptcha"></span>

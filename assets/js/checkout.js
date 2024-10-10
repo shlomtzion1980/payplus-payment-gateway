@@ -12,7 +12,8 @@ jQuery(function ($) {
         '<p class="form-row">' +
             '<label for="save_token_checkbox">' +
             '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" />' +
-            " Save credit card in my account" +
+            " " +
+            payplus_script_checkout.saveCreditCard +
             "</label>" +
             "</p>"
     );
