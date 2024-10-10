@@ -91,7 +91,7 @@
             color: #c5cbcf;
             text-align: center;
             font-size: 12px;
-            width: 90%;
+            width: 100%;
             bottom: 5px;
             direction: ltr;
             padding: 1em;
