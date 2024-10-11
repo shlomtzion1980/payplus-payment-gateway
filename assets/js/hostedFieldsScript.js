@@ -83,7 +83,7 @@ jQuery(() => {
         hf.InitPaymentPage.then((data) => {
           jQuery("#create-payment-form").hide();
           //   jQuery("#id-number-wrapper").hide();
-          jQuery("#payments-wrapper").hide();
+          // jQuery("#payments-wrapper").hide();
           jQuery("#payment-form").css("display", "flex");
         });
       } else {
@@ -162,6 +162,7 @@ hf.Upon("pp_responseFromServer", (e) => {
         ? e.detail.results.description
         : e.detail.errors[0].message;
     alert(errorMessage);
+    overlay(true);
   }
 
   if (e.detail.data?.status_code === "000") {
@@ -190,28 +191,44 @@ hf.Upon("pp_submitProcess", (e) => {
   jQuery("#submit-payment").prop("disabled", e.detail);
 });
 
-const overlay = () => {
-  var $overlay = jQuery("<div></div>")
-    .css({
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(255, 255, 255, 0.7)", // milky opacity
-      zIndex: 9999,
-      cursor: "not-allowed",
-    })
-    .appendTo("body");
+let $overlay; // Declare outside to store the overlay reference
 
-  // Prevent scrolling
-  jQuery("body").css({
-    overflow: "hidden",
-  });
+const overlay = (remove = false) => {
+  if (remove) {
+    // If remove is true, remove the overlay and restore scrolling
+    if ($overlay) {
+      $overlay.remove();
+      jQuery("body").css({
+        overflow: "", // Restore scrolling
+      });
+      $overlay = null; // Clear the reference
+    }
+  } else {
+    // If remove is false, create and show the overlay
+    if (!$overlay) {
+      $overlay = jQuery("<div></div>")
+        .css({
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          backgroundColor: "rgba(255, 255, 255, 0.7)", // milky opacity
+          zIndex: 9999,
+          cursor: "not-allowed",
+        })
+        .appendTo("body");
 
-  // Disallow clicks
-  $overlay.on("click", function (event) {
-    event.stopPropagation();
-    event.preventDefault();
-  });
+      // Prevent scrolling
+      jQuery("body").css({
+        overflow: "hidden",
+      });
+
+      // Disallow clicks on overlay
+      $overlay.on("click", function (event) {
+        event.stopPropagation();
+        event.preventDefault();
+      });
+    }
+  }
 };

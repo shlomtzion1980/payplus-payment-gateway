@@ -266,6 +266,19 @@
         padding: 7px;
         width: 40px;
     }
+
+    .form-select {
+        height: 45px;
+        border: 1px solid #E3E6E9 !important;
+        border-radius: 8px !important;
+        background-color: white;
+    }
+
+    #payments-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+    }
     </style>
 </head>
 
@@ -309,16 +322,6 @@
                         <input id="id-number" type="number" class="form-control" value="" />
                         <!-- </div> -->
                     </div>
-                    <div class="row" id="payments-wrapper">
-                        <div class="col-12">
-                            <label>Number of payments</label>
-                            <select class="form-select" id="payments" aria-label="Default select example">
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="row">
                         <div class="col-2 expiry-wrapper-full">
                             <label>Expiry date</label>
@@ -361,7 +364,14 @@
                         </div>
                     </div>
                     <div class="row" id="cvv-wrapper"></div>
-
+                    <div id="payments-wrapper" class="fld-wrapper">
+                        <label><?php echo __("Payments", "payplus-payment-gateway"); ?></label>
+                        <select class="form-select" id="payments" aria-label="Default select example">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
                     <div class="row card-holder-phone-wrapper">
                         <div class="col-12">
                             <label>Phone</label>
