@@ -6,6 +6,14 @@ jQuery(function ($) {
     return false;
   }
 
+  $("form.checkout").on(
+    "checkout_place_order_success",
+    function (event, response) {
+      if (response.custom_js_trigger) {
+        return false; // Prevent the default WooCommerce redirect
+      }
+    }
+  );
   // Add save token checkbox to hosted fields container //
   var $hostedDiv = jQuery("body > div.container.hostedFields");
   var $checkbox = $(

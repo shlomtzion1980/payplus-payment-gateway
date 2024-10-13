@@ -409,4 +409,26 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     public $payplus_default_charge_method = 'hostedFields';
     public $iconURL = 'assets/images/PayPlusLogo.svg';
     public $pay_with_text = 'Pay with PayPlus Hosted Fields';
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->id = 'payplus-payment-gateway-hostedfields';
+        $this->method_title = __('PayPlus - Hosted Fields', 'woocommerce');
+    }
+
+    // Override the process_payment method
+    public function process_payment($order_id)
+    {
+        $order = wc_get_order($order_id);
+
+        if ($this->id === "payplus-payment-gateway-hostedfields") {
+            new WC_PayPlus_HostedFields($order, $order_id);
+        }
+        return array(
+            'result'   => 'success',
+            'redirect' => '#', // No redirect here
+            'custom_js_trigger' => true, // Custom flag for JS
+        );
+    }
 }

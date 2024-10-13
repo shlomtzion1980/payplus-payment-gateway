@@ -3,6 +3,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 
 class WC_PayPlus_HostedFields extends WC_PayPlus
 {
+    private $order_id;
+    private $order;
     private $initiated = false;
     protected static $instance = null;
     public $options;
@@ -13,10 +15,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $paymentPageUid;
     public $apiUrl;
 
+
     /**
      *
      */
-    public function __construct()
+    public function __construct($order_id = "000", $order = null)
     {
         $this->options = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->testMode = boolval($this->options['api_test_mode'] === 'yes');
@@ -24,6 +27,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->apiKey = $this->testMode ? $this->options['dev_api_key'] : $this->options['api_key'];
         $this->secretKey = $this->testMode ? $this->options['dev_secret_key'] : $this->options['secret_key'];
         $this->paymentPageUid = $this->testMode ? $this->options['dev_payment_page_id'] : $this->options['payment_page_id'];
+        $this->order_id = $order_id;
+        $this->order = $order;
 
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
@@ -54,8 +59,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
-        $this->create_order_if_not_exists();
-        $hostedResponse = $this->hostedFieldsData();
+        // $this->create_order_if_not_exists();
+        $hostedResponse = $this->hostedFieldsData($this->order_id);
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
@@ -193,14 +198,17 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         return $order_data;
     }
 
-    public function hostedFieldsData()
+    public function hostedFieldsData($order_id)
     {
-        $order_id = WC()->session->get('order_awaiting_payment');
-        $order = wc_get_order($order_id);
+        // $order_id = WC()->session->get('order_awaiting_payment');
+        if ($order_id !== "000") {
+            $order = wc_get_order($order_id);
 
-        if (! $order) {
-            return;
+            if (! $order) {
+                return;
+            }
         }
+
 
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
@@ -298,46 +306,48 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->items[] = $item;
         }
 
-        $data->more_info = $order_id;
+        if ($order_id !== "000") {
+            $data->more_info = $order_id;
+            WC()->session->set('order_awaiting_payment', $order_id);
+            $shipping_items = $order->get_items('shipping');
+            // Check if there are shipping items
+            if (! empty($shipping_items)) {
+                foreach ($shipping_items as $shipping_item) {
+                    // Get the shipping method ID (e.g., 'flat_rate:1')
+                    $method_id = $shipping_item->get_method_id();
 
-        $shipping_items = $order->get_items('shipping');
-        // Check if there are shipping items
-        if (! empty($shipping_items)) {
-            foreach ($shipping_items as $shipping_item) {
-                // Get the shipping method ID (e.g., 'flat_rate:1')
-                $method_id = $shipping_item->get_method_id();
+                    // Get the shipping method title (e.g., 'Flat Rate')
+                    $method_title = $shipping_item->get_method_title();
+                    $shipping_cost = $shipping_item->get_total();
 
-                // Get the shipping method title (e.g., 'Flat Rate')
-                $method_title = $shipping_item->get_method_title();
-                $shipping_cost = $shipping_item->get_total();
-
-                $item = new stdClass();
-                $item->name = $method_title;
-                $item->quantity = 1;
-                $item->price = $shipping_cost;
-                $item->vat_type = !$wc_tax_enabled ? 0 : 1;
-                $data->items[] = $item;
+                    $item = new stdClass();
+                    $item->name = $method_title;
+                    $item->quantity = 1;
+                    $item->price = $shipping_cost;
+                    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+                    $data->items[] = $item;
+                }
             }
-        }
 
-        $coupons = $order->get_coupon_codes();
-        $totalFromOrder = $order->get_total();
+            $coupons = $order->get_coupon_codes();
+            $totalFromOrder = $order->get_total();
 
-        if (! empty($coupons)) {
-            foreach ($coupons as $coupon_code) {
-                // Get the WC_Coupon object
-                $coupon = new WC_Coupon($coupon_code);
+            if (! empty($coupons)) {
+                foreach ($coupons as $coupon_code) {
+                    // Get the WC_Coupon object
+                    $coupon = new WC_Coupon($coupon_code);
 
-                // Get the coupon discount amount
-                $coupon_value = $coupon->get_amount();
-            }
-            if ($coupon_value > 0) {
-                $item = new stdClass();
-                $item->name = "coupon_discount";
-                $item->quantity = 1;
-                $item->price = -$coupon_value;
-                $item->vat_type = !$wc_tax_enabled ? 0 : 1;
-                $data->items[] = $item;
+                    // Get the coupon discount amount
+                    $coupon_value = $coupon->get_amount();
+                }
+                if ($coupon_value > 0) {
+                    $item = new stdClass();
+                    $item->name = "coupon_discount";
+                    $item->quantity = 1;
+                    $item->price = -$coupon_value;
+                    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+                    $data->items[] = $item;
+                }
             }
         }
 
@@ -348,7 +358,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $data->amount = number_format($totalAmount, 2, '.', '');
 
-        $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+        // $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 
         $payload = wp_json_encode($data);
         WC()->session->set('hostedPayload', $payload);

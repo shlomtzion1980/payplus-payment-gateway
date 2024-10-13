@@ -1282,11 +1282,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
 
-
-        if ($this->id === "payplus-payment-gateway-hostedfields" && $this->isHostedEnabled) {
-            new WC_PayPlus_HostedFields;
-        }
-
         $objectLogging = new stdClass();
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
