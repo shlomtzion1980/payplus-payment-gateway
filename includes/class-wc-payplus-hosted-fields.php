@@ -30,6 +30,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->order_id = $order_id;
         $this->order = $order;
 
+
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
         define('PAYMENT_PAGE_UID', $this->paymentPageUid);
@@ -200,7 +201,10 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function hostedFieldsData($order_id)
     {
-        // $order_id = WC()->session->get('order_awaiting_payment');
+
+
+        $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
+
         if ($order_id !== "000") {
             $order = wc_get_order($order_id);
 
@@ -252,14 +256,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 $discountPrice = round(floatval(WC()->cart->get_discount_total()), ROUNDING_DECIMALS);
             }
         }
-
-        // $totalAll = WC()->cart->get_totals();
-        // $subTotalAll = WC()->cart->get_subtotal();
-        // $taxGlobal = round(WC()->cart->get_total_tax() - WC()->cart->get_shipping_tax(), ROUNDING_DECIMALS);
-        // $error = $totalAll['total'] == 0;
-
-        // echo wp_json_encode(array("error" => $error, "total" => $totalAll['total'], "products" => $products, "total_without_tax" => $subTotalAll, 'discountPrice' => $discountPrice ? $discountPrice : 0, "taxGlobal" => $taxGlobal));
-
 
         // this will be the create initial order data function that calls the curl to create at it's end.
         $checkout = WC()->checkout();
