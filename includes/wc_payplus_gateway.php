@@ -97,6 +97,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $allSettings;
     private $_wpnonce;
     private $current_time;
+    public $hostedFieldsOptions;
+    public $isHostedEnabled;
 
     /**
      *
@@ -145,6 +147,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'));
         $this->rounding_decimals = ROUNDING_DECIMALS;
         $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
+        $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
+        $this->isHostedEnabled = boolval(isset($this->hostedFieldsOptions['enabled']) && $this->hostedFieldsOptions['enabled'] === "yes");
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -1279,7 +1283,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $order = wc_get_order($order_id);
 
 
-        if ($this->id === "payplus-payment-gateway-hostedfields") {
+        if ($this->id === "payplus-payment-gateway-hostedfields" && $this->isHostedEnabled) {
             new WC_PayPlus_HostedFields;
         }
 
@@ -2143,7 +2147,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
-        // echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
+        echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
     }
 
     /**
