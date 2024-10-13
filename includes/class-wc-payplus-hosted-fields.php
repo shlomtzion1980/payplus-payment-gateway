@@ -235,7 +235,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     'priceProductWithTax' => $priceProductWithTax,
                     'priceProductWithoutTax' => $priceProductWithoutTax,
                     'quantity' => $cart_item['quantity'],
-                    'vat_type' => $productVat,
+                    'vat_type' => !$wc_tax_enabled ? 0 : 1,
                     'org_product_tax' => $product->get_tax_status(),
                 );
             }
@@ -299,7 +299,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $data->more_info = $order_id;
-
 
         $shipping_items = $order->get_items('shipping');
         // Check if there are shipping items

@@ -6,279 +6,279 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-    label {
-        margin: unset !important;
-        border: none !important;
-    }
-
-    .fld-frame {
-        border: 1px solid #ced4da;
-        height: 37px;
-        padding: 5px;
-        margin: 5px 0;
-        background-color: #fff;
-        border-radius: 5px;
-        width: 100%;
-    }
-
-    .col-4 {
-        flex: 0 0 auto;
-        width: fit-content !important;
-        display: block;
-        background: #F7F7F7;
-        padding: 15px;
-        border-radius: 10px;
-        border: none;
-        position: relative;
-        flex-direction: row;
-        /* align-content: center; */
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        margin: auto;
-        display: flex;
-        /* flex-direction: column; */
-        background: #F7F7F7;
-        /* height: 55vh; */
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-
-    #hostedTop {
-        display: flex;
-        height: fit-content;
-        justify-content: space-between;
-        border-bottom: 1px solid #E3E6E9 !important;
-        width: 100%;
-        padding: 20px;
-
-        .topText {
-            color: #000000;
-            font-size: 16px;
+        label {
+            margin: unset !important;
+            border: none !important;
         }
 
-        .creditCards {
-            img {
-                height: 19px;
+        .fld-frame {
+            border: 1px solid #ced4da;
+            height: 37px;
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        .col-4 {
+            flex: 0 0 auto;
+            width: fit-content !important;
+            display: block;
+            background: #F7F7F7;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            position: relative;
+            flex-direction: row;
+            /* align-content: center; */
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin: auto;
+            display: flex;
+            /* flex-direction: column; */
+            background: #F7F7F7;
+            /* height: 55vh; */
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        #hostedTop {
+            display: flex;
+            height: fit-content;
+            justify-content: space-between;
+            border-bottom: 1px solid #E3E6E9 !important;
+            width: 100%;
+            padding: 20px;
+
+            .topText {
+                color: #000000;
+                font-size: 16px;
+            }
+
+            .creditCards {
+                img {
+                    height: 19px;
+                }
             }
         }
-    }
 
-    #submit-payment {
-        background-color: var(--wp--preset--color--contrast);
-        border-radius: 0.33rem;
-        border-color: var(--wp--preset--color--contrast);
-        border-width: 0;
-        color: var(--wp--preset--color--base);
-        font-family: inherit;
-        font-size: var(--wp--preset--font-size--small);
-        font-style: normal;
-        font-weight: 500;
-        line-height: inherit;
-        padding-top: 0.6rem;
-        padding-right: 1rem;
-        padding-bottom: 0.6rem;
-        padding-left: 1rem;
-        text-decoration: none;
-        margin-top: 15px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        border-radius: 8px;
-        width: 90%;
-    }
-
-    #ppLogo {
-        font-family: "Almoni", sans-serif;
-        color: #c5cbcf;
-        text-align: center;
-        font-size: 12px;
-        width: 100%;
-        bottom: 5px;
-        direction: ltr;
-        padding: 1em;
-
-        img {
-            height: 17px;
-            top: 2px;
+        #submit-payment {
+            background-color: var(--wp--preset--color--contrast);
+            border-radius: 0.33rem;
+            border-color: var(--wp--preset--color--contrast);
+            border-width: 0;
+            color: var(--wp--preset--color--base);
+            font-family: inherit;
+            font-size: var(--wp--preset--font-size--small);
+            font-style: normal;
+            font-weight: 500;
+            line-height: inherit;
+            padding-top: 0.6rem;
+            padding-right: 1rem;
+            padding-bottom: 0.6rem;
+            padding-left: 1rem;
+            text-decoration: none;
+            margin-top: 15px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            border-radius: 8px;
+            width: 90%;
         }
-    }
 
-    .expiry-wrapper {
-        justify-content: space-between;
-    }
+        #ppLogo {
+            font-family: "Almoni", sans-serif;
+            color: #c5cbcf;
+            text-align: center;
+            font-size: 12px;
+            width: 100%;
+            bottom: 5px;
+            direction: ltr;
+            padding: 1em;
 
-    .container.hostedFields {
-        display: none;
-    }
-
-    #payment-form {
-        display: none;
-        align-items: center;
-        flex-direction: column;
-        flex-wrap: wrap;
-        align-content: flex-start;
-    }
-
-    .__payplus_hosted_fields_err_fld {
-        color: red;
-        border: 1px solid red;
-    }
-
-    input[readonly] {
-        background-color: #eee;
-        outline: 0;
-    }
-
-    .blocks-payplus_loader_hosted {
-        display: none;
-        position: relative;
-        z-index: 1000000000000;
-    }
-
-    .expiries {
-        width: 90%;
-        display: flex;
-        margin: auto;
-        flex-wrap: wrap;
-    }
-
-    input:-internal-autofill-selected {
-        background-color: transparent !important;
-    }
-
-    .expireClass {
-        background-color: white;
-        width: 50%;
-        height: 50px;
-        display: flex;
-        justify-content: center;
-        border: 1px solid #E3E6E9 !important;
-        border-radius: 8px;
-
-        @media screen and (max-width: 567px) {
-            min-width: 100%;
+            img {
+                height: 17px;
+                top: 2px;
+            }
         }
-    }
 
-    .smallCol {
-        flex: 0 0 auto;
-        width: 30%;
-    }
+        .expiry-wrapper {
+            justify-content: space-between;
+        }
 
-    .iframe-wrapper {
-        position: relative;
-        width: 100%;
-        /* Adjust based on your iframe size */
-        /* height: 50%; */
-        /* Adjust based on your iframe size */
-    }
+        .container.hostedFields {
+            display: none;
+        }
 
-    .justBorder {
-        border: 1px solid #E3E6E9 !important;
-    }
+        #payment-form {
+            display: none;
+            align-items: center;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
 
-    .iframe-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        padding: 10px;
-        border-radius: 8px;
-        /* justify-content: center; */
-        align-items: center;
-        background-color: transparent;
-        /* border: 1px solid #E3E6E9 !important; */
-        /* Semi-transparent background */
-        color: #A2ADB5;
-        font-size: 18px;
-        z-index: 10;
-        pointer-events: none;
-        /* Allows clicks to pass through to the iframe */
-    }
+        .__payplus_hosted_fields_err_fld {
+            color: red;
+            border: 1px solid red;
+        }
 
-    .pp_iframe_h iframe {
-        border: 0;
-        max-height: 45px;
-        /* min-width: 55px;
+        input[readonly] {
+            background-color: #eee;
+            outline: 0;
+        }
+
+        .blocks-payplus_loader_hosted {
+            display: none;
+            position: relative;
+            z-index: 1000000000000;
+        }
+
+        .expiries {
+            width: 90%;
+            display: flex;
+            margin: auto;
+            flex-wrap: wrap;
+        }
+
+        input:-internal-autofill-selected {
+            background-color: transparent !important;
+        }
+
+        .expireClass {
+            background-color: white;
+            width: 50%;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            border: 1px solid #E3E6E9 !important;
+            border-radius: 8px;
+
+            @media screen and (max-width: 567px) {
+                min-width: 100%;
+            }
+        }
+
+        .smallCol {
+            flex: 0 0 auto;
+            width: 30%;
+        }
+
+        .iframe-wrapper {
+            position: relative;
+            width: 100%;
+            /* Adjust based on your iframe size */
+            /* height: 50%; */
+            /* Adjust based on your iframe size */
+        }
+
+        .justBorder {
+            border: 1px solid #E3E6E9 !important;
+        }
+
+        .iframe-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            padding: 10px;
+            border-radius: 8px;
+            /* justify-content: center; */
+            align-items: center;
+            background-color: transparent;
+            /* border: 1px solid #E3E6E9 !important; */
+            /* Semi-transparent background */
+            color: #A2ADB5;
+            font-size: 18px;
+            z-index: 10;
+            pointer-events: none;
+            /* Allows clicks to pass through to the iframe */
+        }
+
+        .pp_iframe_h iframe {
+            border: 0;
+            max-height: 45px;
+            /* min-width: 55px;
             text-align: center; */
-    }
+        }
 
-    .fld-frame {
-        border: none;
-        box-sizing: unset;
-        outline: unset;
-    }
+        .fld-frame {
+            border: none;
+            box-sizing: unset;
+            outline: unset;
+        }
 
-    input {
-        outline: unset;
-    }
+        input {
+            outline: unset;
+        }
 
-    .pp_iframe_h {
-        .form-control {
-            width: 100% !important;
-            padding: 0.5rem 0.75rem !important;
-            font-size: 20px !important;
+        .pp_iframe_h {
+            .form-control {
+                width: 100% !important;
+                padding: 0.5rem 0.75rem !important;
+                font-size: 20px !important;
+                border: 1px solid #E3E6E9 !important;
+                border-radius: 8px !important;
+                height: 45px;
+                margin: auto !important;
+            }
+        }
+
+        input[type="text" i] {
+            font-size: 20px;
+        }
+
+        .h-fld-wrapper {
+            width: 100%;
+        }
+
+        .fld-wrapper {
+            width: 90%;
+            margin: auto;
+            margin-bottom: 0.2em;
+        }
+
+        .row {
+            @media screen and (max-width: 768px) {
+                min-width: 100% !important;
+            }
+        }
+
+        .pp_iframe_h {
+            .row>* {
+                padding: unset !important;
+            }
+        }
+
+        .btn-primary {
+            font-size: 21px !important;
+            padding: unset !important;
+            height: 44px !important;
+        }
+
+        .exp {
+            width: 40%;
+        }
+
+        .seperator {
+            padding: 7px;
+            width: 40px;
+        }
+
+        .form-select {
+            height: 45px;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px !important;
-            height: 45px;
-            margin: auto !important;
+            background-color: white;
         }
-    }
 
-    input[type="text"i] {
-        font-size: 20px;
-    }
-
-    .h-fld-wrapper {
-        width: 100%;
-    }
-
-    .fld-wrapper {
-        width: 90%;
-        margin: auto;
-        margin-bottom: 0.2em;
-    }
-
-    .row {
-        @media screen and (max-width: 768px) {
-            min-width: 100% !important;
+        #payments-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column-reverse;
         }
-    }
-
-    .pp_iframe_h {
-        .row>* {
-            padding: unset !important;
-        }
-    }
-
-    .btn-primary {
-        font-size: 21px !important;
-        padding: unset !important;
-        height: 44px !important;
-    }
-
-    .exp {
-        width: 40%;
-    }
-
-    .seperator {
-        padding: 7px;
-        width: 40px;
-    }
-
-    .form-select {
-        height: 45px;
-        border: 1px solid #E3E6E9 !important;
-        border-radius: 8px !important;
-        background-color: white;
-    }
-
-    #payments-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-    }
     </style>
 </head>
 
@@ -358,7 +358,7 @@
                                     class="iframe-placeholder cvv-fld"><?php echo __('CVV', 'payplus-payment-gateway'); ?><img
                                         src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
                                         alt="&nbsp;&nbsp;Pay with Debit or Credit Card"
-                                        style="top: 1.4px; right: 10%" /></label>
+                                        style="top: 1.4px;" /></label>
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>
                         </div>
