@@ -1,6 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [7.1.6] - 2024-10-13 - (Kaos)
+
+- Fix   - Subscription order renewals.
+- Fix   - Nonce verification on IPN response for certain users.
+- Add   - Option to force Apple Pay script from admin settings.
+- Add   - Updated shipping functions for express checkout.
+- Tweak - Improved menu translations.
+
 
 ## [7.1.5] - 2024-09-12 - (MonkeyDLuffy)
 
