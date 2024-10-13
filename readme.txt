@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= [7.1.6] - 13-10-2024 =
+= 7.1.6 - 13-10-2024 =
 
 * Fix   - Subscription order renewals.
 * Fix   - Nonce verification on IPN response for certain users.
