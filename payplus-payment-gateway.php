@@ -66,12 +66,12 @@ class WC_PayPlus
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
-        add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
-        add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
+        // add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
+        // add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
 
-        add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
-        add_action('woocommerce_after_cart_item_quantity_update', [$this, 'sync_order_after_cart_quantity_update'], 10, 4);
-        add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
+        // add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
+        // add_action('woocommerce_after_cart_item_quantity_update', [$this, 'sync_order_after_cart_quantity_update'], 10, 4);
+        // add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
 
         //end custom hook
 
@@ -558,18 +558,31 @@ class WC_PayPlus
         if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplus')) {
             wp_die('Not allowed! - ipn_response');
         }
+
         global $wpdb;
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST);
+
+        if (isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true") {
+            $REQUEST = json_decode(stripslashes($REQUEST['jsonData']), true)['data'];
+        }
+
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
         $indexRow = 0;
         if (!empty($REQUEST['more_info'])) {
+            if (!isset($_REQUEST['status_code'])) {
+                $_REQUEST = $REQUEST;
+            }
+
             $status_code = isset($_REQUEST['status_code']) ? sanitize_text_field(wp_unslash($_REQUEST['status_code'])) : '';
+
             if ($status_code !== '000') {
                 $this->payplus_gateway->store_payment_ip();
             }
+
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : '';
+
             $result = $wpdb->get_results($wpdb->prepare(
                 "SELECT id as rowId, count(*) as rowCount, count_process FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND ( status_code = %d )",
                 $order_id,
@@ -607,7 +620,12 @@ class WC_PayPlus
                     'brand_id' => isset($_REQUEST['brand_id']) ? sanitize_text_field(wp_unslash($_REQUEST['brand_id'])) : null,
                 ];
 
-                $order = $this->payplus_gateway->validateOrder($data);
+                if (!boolval($_GET['hostedFields'] === "true")) {
+                    $order = $this->payplus_gateway->validateOrder($data);
+                } else {
+                    $order_id = $REQUEST['more_info'];
+                    $order = wc_get_order($order_id);
+                }
 
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 

@@ -1277,6 +1277,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
+
+
+        if ($this->id === "payplus-payment-gateway-hostedfields") {
+            new WC_PayPlus_HostedFields;
+        }
+
         $objectLogging = new stdClass();
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();
@@ -1286,6 +1292,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             WC_PayPlus_Meta_Data::update_meta($order, array('save_payment_method' => true));
         }
         $order->save_meta_data();
+
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
         if ($is_token) {
@@ -1367,8 +1374,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'redirect' => $redirect_to,
             'viewMode' => $this->display_mode,
         ];
-        if (in_array($this->display_mode, ['samePageIframe', 'popupIframe']) && !$is_token) {
-
+        if (in_array($this->display_mode, ['samePageIframe', 'popupIframe']) && !$is_token || $this->id === "payplus-payment-gateway-hostedfields") {
             $result['payplus_iframe'] = $this->receipt_page($order_id, null, false, '', 0, true);
         }
         return $result;
@@ -2060,6 +2066,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $response = $this->post_payplus_ws($this->payment_url, $payload);
 
         $this->payplus_add_log_all($handle, 'WS PayPlus Response');
+
         if (is_wp_error($response)) {
             $this->payplus_add_log_all($handle, print_r($response, true), 'error');
         } else {
@@ -2087,7 +2094,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($token || $inline) {
                 return $res;
             }
+
             $dataLink = $res->data;
+
             if (isset($dataLink->payment_page_link) && $this->validateUrl($dataLink->payment_page_link)) {
                 $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
                 $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $dataLink->payment_page_link . "\n" . $this->payplus_get_space());
@@ -2134,7 +2143,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
-        echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
+        // echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
     }
 
     /**

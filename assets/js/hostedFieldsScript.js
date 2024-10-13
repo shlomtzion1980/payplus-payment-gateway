@@ -81,6 +81,31 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
+          // const inputElement = document.querySelector(
+          //   "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
+          // );
+          // console.log("input", inputElement);
+          // if (inputElement) {
+          //   // Find the closest parent div
+          //   const topDiv = inputElement.closest("div");
+
+          //   if (topDiv) {
+          //     // Create a new div element
+          //     const newDiv = document.querySelector(
+          //       "body > div.container.hostedFields"
+          //     );
+          //     newDiv.className = "pp_iframe_h";
+
+          //     // Append the new div to the top div
+          //     topDiv.appendChild(newDiv);
+          //   } else {
+          //     console.log("No parent div found.");
+          //   }
+          // } else {
+          //   console.log("Element with the specified ID not found.");
+          // }
+
+          // jQuery(".container.hostedFields").show();
           jQuery("#create-payment-form").hide();
           //   jQuery("#id-number-wrapper").hide();
           // jQuery("#payments-wrapper").hide();
@@ -128,6 +153,7 @@ jQuery(() => {
   });
 
   jQuery("#submit-payment").on("click", () => {
+    jQuery("button#place_order").trigger("click");
     overlay();
     jQuery(".blocks-payplus_loader_hosted").fadeIn();
     hf.SubmitPayment();
@@ -182,7 +208,24 @@ hf.Upon("pp_responseFromServer", (e) => {
         _ajax_nonce: payplus_script.frontNonce,
       },
       success: function (response) {
-        location.assign(e.detail.url);
+        const jsonData = e.detail;
+
+        // Create a form dynamically
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = e.detail.url;
+
+        // Create a hidden input with JSON data
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "jsonData";
+        input.value = JSON.stringify(jsonData);
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        // Submit the form
+        form.submit();
       },
     });
   }

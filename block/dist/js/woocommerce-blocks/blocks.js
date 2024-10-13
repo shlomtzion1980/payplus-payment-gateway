@@ -44,9 +44,9 @@ if (isCheckout || hasOrder) {
     "payplus-payment-gateway"
   ).gateways;
 
-  gateways = gateways.filter(
-    (item) => item !== "payplus-payment-gateway-hostedfields"
-  );
+  // gateways = gateways.filter(
+  //   (item) => item !== "payplus-payment-gateway-hostedfields"
+  // );
 
   console.log(gateways);
 
@@ -226,6 +226,17 @@ if (isCheckout || hasOrder) {
 
         if (store.isComplete()) {
           const activePaymentMethod = payment.getActivePaymentMethod();
+          console.log("active", activePaymentMethod);
+          alert("active");
+          if (
+            activePaymentMethod.search(
+              "payplus-payment-gateway-hostedfields"
+            ) === 0
+          ) {
+            document.querySelector("#submit-payment").click();
+            return;
+          }
+
           if (activePaymentMethod.search("payplus-payment-gateway") === 0) {
             const gateWaySettings =
               window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[

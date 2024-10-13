@@ -29,7 +29,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         define('SECRET_KEY', $this->secretKey);
         define('PAYMENT_PAGE_UID', $this->paymentPageUid);
         define('ORIGIN_DOMAIN', site_url());
-        define('SUCCESS_URL', 'https://www.example.com/success');
+        define('SUCCESS_URL', site_url() . '?wc-api=payplus_gateway&hostedFields=true');
         define('FAILURE_URL', site_url() . "/error-payment-payplus/");
         define('CANCEL_URL', 'https://www.example.com/cancel');
 
@@ -98,6 +98,99 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $this->initiated = true;
             parent::__construct();
         }
+    }
+
+    function createUpdateHostedPaymentPageLink($payload)
+    {
+        $options = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode = boolval($options['api_test_mode'] === 'yes');
+        $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
+        $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
+        $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
+        $payPlusGateWay = $this->get_main_payplus_gateway();
+
+        $auth = json_encode([
+            'api_key' => $apiKey,
+            'secret_key' => $secretKey
+        ]);
+        $requestHeaders = [];
+        $requestHeaders[] = 'Content-Type:application/json';
+        $requestHeaders[] = 'Authorization: ' . $auth;
+
+
+        $pageRequestUid = WC()->session->get('page_request_uid');
+
+        if ($pageRequestUid) {
+            $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
+        }
+
+        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, $method = "post");
+
+        $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
+
+        if (isset($hostedResponseArray['data']['page_request_uid'])) {
+            $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
+            WC()->session->set('page_request_uid', $pageRequestUid);
+        }
+
+        WC()->session->set('hostedResponse', $hostedResponse);
+
+        return wp_remote_retrieve_body($hostedResponse);
+    }
+
+    public function getHostedDataFromOrder($order)
+    {
+        // Initialize the result array
+        $order_data = array(
+            'items'    => array(),
+            'shipping' => array(),
+            'coupons'  => array(),
+        );
+
+        // Get all items (products) in the order
+        foreach ($order->get_items() as $item_id => $item) {
+            $product = $item->get_product();
+            $order_data['items'][] = array(
+                'name'        => $item->get_name(),
+                'quantity'    => $item->get_quantity(),
+                'total'       => $item->get_total(),
+                'subtotal'    => $item->get_subtotal(),
+                'tax'         => $item->get_total_tax(),
+                'product_id'  => $product ? $product->get_id() : null,
+                'sku'         => $product ? $product->get_sku() : null,
+            );
+        }
+
+        // Get shipping data
+        foreach ($order->get_items('shipping') as $item_id => $shipping_item) {
+            $order_data['shipping'][] = array(
+                'method_title' => $shipping_item->get_name(),
+                'cost'         => $shipping_item->get_total(),
+                'tax'          => $shipping_item->get_taxes(),
+            );
+        }
+
+        // Get coupon data using $order->get_coupon_codes()
+        $applied_coupons = $order->get_coupon_codes();
+
+        foreach ($applied_coupons as $coupon_code) {
+            // Load the WC_Coupon object
+            $coupon = new WC_Coupon($coupon_code);
+
+            // Get the discount amount and any other details as needed
+            $coupon_discount = $order->get_discount_total(); // Total discount applied
+            $coupon_discount_tax = $order->get_discount_tax(); // Total discount tax
+
+            $order_data['coupons'][] = array(
+                'code'         => $coupon_code,                // Coupon code
+                'discount'     => $coupon_discount,            // Discount amount
+                'discount_tax' => $coupon_discount_tax,        // Discount tax
+                'coupon_type'  => $coupon->get_discount_type(), // Coupon type (fixed_cart, percent, etc.)
+            );
+        }
+
+        // Output the final array (for debugging or further use)
+        return $order_data;
     }
 
     public function hostedFieldsData()
@@ -195,8 +288,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data->customer->customer_name = "$billing_first_name $billing_last_name";
         $data->customer->email = $billing_email;
         $data->customer->phone = $phone;
-        // $data->amount = $totalAll['total'];
-
 
         foreach ($products as $product) {
             $item = new stdClass();
@@ -222,7 +313,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 $shipping_cost = $shipping_item->get_total();
 
                 $item = new stdClass();
-                $item->name = "Shipping";
+                $item->name = $method_title;
                 $item->quantity = 1;
                 $item->price = $shipping_cost;
                 $item->vat_type = !$wc_tax_enabled ? 0 : 1;
@@ -259,26 +350,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data->amount = number_format($totalAmount, 2, '.', '');
 
         $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
-        $data->refURL_success = $linkRedirect;
-
-        // if ($order->get_total() !== $data->amount) {
-
-        //     $hostedData = $this->getHostedDataFromOrder($order);
-        //     print_r($hostedData);
-        //     print_r($data);
-        //     print_r($totalFromOrder);
-        //     die;
-        // }
-
 
         $payload = wp_json_encode($data);
         WC()->session->set('hostedPayload', $payload);
-
-
-
-        // this will be the createUpdateHostedPaymentPageLink function - which will run the curl either with update or create flag.
-        // the change is in the url
-
 
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
         $hostedResponseArray = json_decode($hostedResponse, true);
