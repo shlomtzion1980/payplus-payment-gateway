@@ -168,7 +168,6 @@ class WC_PayPlus
     {
         if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplusIpn')) {
             check_ajax_referer('payload_link', '_wpnonce');
-            wp_die('Not allowed! - ipn_response');
         }
 
         global $wpdb;
