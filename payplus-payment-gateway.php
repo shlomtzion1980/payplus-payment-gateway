@@ -555,8 +555,8 @@ class WC_PayPlus
      */
     public function ipn_response()
     {
-        if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplus')) {
-            wp_die('Not allowed! - ipn_response');
+        if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplusIpn')) {
+            check_ajax_referer('payload_link', '_wpnonce');
         }
 
         global $wpdb;
@@ -684,8 +684,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -866,7 +866,7 @@ class WC_PayPlus
 
         load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
         if (class_exists("WooCommerce")) {
-            $this->_wpnonce = wp_create_nonce('_wp_payplus');
+            $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin-settings.php';
             require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
@@ -1046,9 +1046,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
