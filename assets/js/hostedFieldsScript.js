@@ -67,7 +67,6 @@ function putHostedFields() {
 jQuery(() => {
     // Define the async function to handle the response
     async function processResponse(resp) {
-        console.log(resp);
         try {
             if (resp.results.status == "success") {
                 try {
@@ -127,8 +126,8 @@ jQuery(() => {
 });
 
 jQuery(() => {
+    checkErrors();
     var currentLanguage = jQuery("html").attr("lang");
-    console.log(currentLanguage);
     currentLanguage === "en-US"
         ? jQuery(".iframe-placeholder").css("direction", "rtl")
         : null;
@@ -137,7 +136,6 @@ jQuery(() => {
 
     jQuery.each(labelClasses, function (index, labelClass) {
         jQuery("#" + labelClass).on("click", function (e) {
-            console.log(labelClass);
             jQuery("." + labelClass).html("");
             jQuery("." + labelClass).css("background-color", "transparent");
         });
@@ -149,11 +147,6 @@ jQuery(() => {
         document.querySelector("#hosted-fld").style.fontSize = "21px";
     });
 
-    jQuery("input").on("input", function (e) {
-        console.log(e.target);
-        console.log("Input field value changed (possibly autofilled)");
-    });
-
     jQuery("#submit-payment").on("click", () => {
         jQuery("button#place_order").trigger("click");
         overlay();
@@ -161,6 +154,21 @@ jQuery(() => {
         hf.SubmitPayment();
     });
 });
+
+function checkErrors() {
+    var checkError = setInterval(function () {
+        if (jQuery(".woocommerce-error").length) {
+            if (
+                jQuery(".woocommerce-error")
+                    .text()
+                    .includes("There was an error processing your order.")
+            ) {
+                jQuery(".woocommerce-error").hide();
+                clearInterval(checkError);
+            }
+        }
+    }, 100);
+}
 
 hf.Upon("pp_pageExpired", (e) => {
     jQuery("#submit-payment").prop("disabled", true);
@@ -172,7 +180,6 @@ hf.Upon("pp_noAttemptedRemaining", (e) => {
 });
 
 hf.Upon("pp_responseFromServer", (e) => {
-    jQuery(".woocommerce-error").css("display", "none");
     let r = "";
     try {
         r = JSON.stringify(e.detail, null, 2);
@@ -184,7 +191,6 @@ hf.Upon("pp_responseFromServer", (e) => {
         ? true
         : false;
 
-    console.log("Payment Response: ", e.detail);
     if (e.detail.errors) {
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
         let errorMessage =
@@ -195,6 +201,7 @@ hf.Upon("pp_responseFromServer", (e) => {
         const ifError = () => {
             alert(errorMessage);
             overlay(true);
+            checkErrors();
         };
 
         errorMessage !== "not-authorize-success" ? ifError() : null;
@@ -263,11 +270,11 @@ const overlay = (remove = false) => {
                     position: "fixed",
                     top: "51.5vh",
                     left: "50%",
-                    width: "65%",
-                    height: "76.5vh",
+                    width: "50%",
+                    height: "50.5vh",
                     border: "solid 0.1px black",
                     borderRadius: "20px",
-                    backgroundColor: "rgba(255, 255, 255, 0.95)", // milky opacity
+                    backgroundColor: "rgba(255, 255, 255, 0.9)", // milky opacity
                     zIndex: 9999,
                     cursor: "not-allowed",
                     transform: "translate(-50%, -50%)", // Centers the div
