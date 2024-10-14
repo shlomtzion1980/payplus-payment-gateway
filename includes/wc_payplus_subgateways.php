@@ -415,20 +415,45 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         parent::__construct();
         $this->id = 'payplus-payment-gateway-hostedfields';
         $this->method_title = __('PayPlus - Hosted Fields', 'woocommerce');
+        add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
+        add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
+    }
+
+    public function complete_order_via_ajax()
+    {
+
+        $order_id = intval($_POST['order_id']);
+        $payment_response = sanitize_text_field($_POST['payment_response']['data']['result']);
+
+        $order = wc_get_order($order_id);
+
+        if ($order && $payment_response === "success") {
+            // Mark the order as completed or paid
+            $order->payment_complete();
+
+            $redirect_to = add_query_arg('order-received', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
+
+            wp_send_json_success(array(
+                'redirect_url' => $redirect_to
+            ));
+        } else {
+            wp_send_json_error(array('message' => 'Payment failed'));
+        }
     }
 
     // Override the process_payment method
     public function process_payment($order_id)
     {
         $order = wc_get_order($order_id);
-
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             new WC_PayPlus_HostedFields($order, $order_id);
         }
+
         return array(
             'result'   => 'success',
-            'redirect' => '#', // No redirect here
-            'custom_js_trigger' => true, // Custom flag for JS
+            'order_id' => $order_id,
+            'method' => 'hostedFields',
+            'nonce'    => wp_create_nonce('my_payment_nonce'),
         );
     }
 }

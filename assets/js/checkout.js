@@ -826,15 +826,6 @@ jQuery(function ($) {
                 console.log("Unable to fix malformed JSON");
               }
             }
-            if (
-              $("input#payment_method_payplus-payment-gateway-hostedfields").is(
-                ":checked"
-              )
-            ) {
-              overlay();
-              jQuery(".blocks-payplus_loader_hosted").fadeIn();
-              hf.SubmitPayment();
-            }
             return raw_response;
           },
         });
@@ -845,62 +836,73 @@ jQuery(function ($) {
           data: $form.serialize(),
           dataType: "json",
           success: function (result) {
-            // Detach the unload handler that prevents a reload / redirect
-            wc_checkout_form.detachUnloadEventsOnSubmit();
-            if (result.payplus_iframe && "success" === result.result) {
-              wc_checkout_form.$checkout_form
-                .removeClass("processing")
-                .unblock();
-              if (result.viewMode == "samePageIframe") {
-                openPayplusIframe(result.payplus_iframe.data.payment_page_link);
-              } else if (result.viewMode == "popupIframe") {
-                openIframePopup(
-                  result.payplus_iframe.data.payment_page_link,
-                  700
-                );
-              }
-              return true;
-            }
-            try {
-              if (
-                "success" === result.result &&
-                $form.triggerHandler("checkout_place_order_success", result) !==
-                  false
-              ) {
-                if (
-                  -1 === result.redirect.indexOf("https://") ||
-                  -1 === result.redirect.indexOf("http://")
-                ) {
-                  window.location = result.redirect;
-                } else {
-                  window.location = decodeURI(result.redirect);
+            console.log("my result!", result);
+            if (result.method === "hostedFields") {
+              overlay();
+              jQuery(".blocks-payplus_loader_hosted").fadeIn();
+              hf.SubmitPayment();
+            } else {
+              // Detach the unload handler that prevents a reload / redirect
+              wc_checkout_form.detachUnloadEventsOnSubmit();
+              if (result.payplus_iframe && "success" === result.result) {
+                wc_checkout_form.$checkout_form
+                  .removeClass("processing")
+                  .unblock();
+                if (result.viewMode == "samePageIframe") {
+                  openPayplusIframe(
+                    result.payplus_iframe.data.payment_page_link
+                  );
+                } else if (result.viewMode == "popupIframe") {
+                  openIframePopup(
+                    result.payplus_iframe.data.payment_page_link,
+                    700
+                  );
                 }
-              } else if ("failure" === result.result) {
-                throw "Result failure";
-              } else {
-                throw "Invalid response";
+                return true;
               }
-            } catch (err) {
-              // Reload page
-              if (true === result.reload) {
-                window.location.reload();
-                return;
-              }
+              try {
+                if (
+                  "success" === result.result &&
+                  $form.triggerHandler(
+                    "checkout_place_order_success",
+                    result
+                  ) !== false
+                ) {
+                  if (
+                    -1 === result.redirect.indexOf("https://") ||
+                    -1 === result.redirect.indexOf("http://")
+                  ) {
+                    window.location = result.redirect;
+                  } else {
+                    window.location = decodeURI(result.redirect);
+                  }
+                } else if ("failure" === result.result) {
+                  throw "Result failure";
+                } else {
+                  throw "Invalid response";
+                }
+              } catch (err) {
+                // Reload page
+                if (true === result.reload) {
+                  window.location.reload();
+                  return;
+                }
 
-              // Trigger update in case we need a fresh nonce
-              if (true === result.refresh) {
-                $(document.body).trigger("update_checkout");
-              }
+                // Trigger update in case we need a fresh nonce
+                if (true === result.refresh) {
+                  $(document.body).trigger("update_checkout");
+                }
 
-              // Add new errors
-              if (result.messages) {
-                wc_checkout_form.submit_error(result.messages);
-              } else {
-                wc_checkout_form.submit_error(
-                  '<div class="woocommerce-error">' +
-                    wc_checkout_params.i18n_checkout_error +
-                    "</div>"
-                ); // eslint-disable-line max-len
+                // Add new errors
+                if (result.messages) {
+                  wc_checkout_form.submit_error(result.messages);
+                } else {
+                  wc_checkout_form.submit_error(
+                    '<div class="woocommerce-error">' +
+                      wc_checkout_params.i18n_checkout_error +
+                      "</div>"
+                  ); // eslint-disable-line max-len
+                }
               }
             }
           },

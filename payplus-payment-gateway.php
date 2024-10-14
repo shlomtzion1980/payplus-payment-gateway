@@ -376,6 +376,7 @@ class WC_PayPlus
         WC()->session->__unset('page_request_uid');
         WC()->session->__unset('hostedResponse');
         WC()->session->__unset('order_awaiting_payment');
+        wp_send_json_success(array('result' => "success"));
     }
 
     function createUpdateHostedPaymentPageLink($payload)
