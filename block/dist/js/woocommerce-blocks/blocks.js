@@ -44,12 +44,6 @@ if (isCheckout || hasOrder) {
         "payplus-payment-gateway"
     ).gateways;
 
-    // gateways = gateways.filter(
-    //   (item) => item !== "payplus-payment-gateway-hostedfields"
-    // );
-
-    console.log(gateways);
-
     gateways = payPlusGateWay.isSubscriptionOrder
         ? ["payplus-payment-gateway"]
         : gateways;

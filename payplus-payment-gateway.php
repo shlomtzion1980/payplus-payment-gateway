@@ -66,12 +66,6 @@ class WC_PayPlus
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
-        // add_action('woocommerce_applied_coupon', [$this, 'catch_coupon_code_on_checkout'], 10, 1);
-        // add_action('woocommerce_removed_coupon', [$this, 'catch_remove_coupon_code_on_checkout'], 10, 1);
-
-        // add_action('woocommerce_add_to_cart', [$this, 'sync_cart_to_existing_order'], 10, 6);
-        // add_action('woocommerce_after_cart_item_quantity_update', [$this, 'sync_order_after_cart_quantity_update'], 10, 4);
-        // add_action('woocommerce_cart_item_removed', [$this, 'remove_cart_item_from_order'], 10, 2);
 
         //end custom hook
 
@@ -88,286 +82,15 @@ class WC_PayPlus
         }
     }
 
-    public function sync_cart_to_existing_order($cart_item_key, $product_id, $quantity, $variation_id, $variations, $cart_item_data)
-    {
-        $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        $order_id = WC()->session->get('order_awaiting_payment');
-        $order = wc_get_order($order_id);
-        // Clear the order's existing items before syncing the new ones
-        if (!$order) {
-            return;
-        }
-        foreach ($order->get_items() as $item_id => $item) {
-            $productId = $item->get_product_id(); // Get the product ID
-            if ($productId === $product_id) {
-                $order->remove_item($item_id);
-            }
-        }
-        // Check if the order exists and the cart is not empty
-        if ($order && WC()->cart) {
-            // Add the current product to the existing order
-            $order->add_product(wc_get_product($product_id), $quantity, array(
-                'variation_id' => $variation_id,
-                'variation'    => $variations,
-            ));
-
-            // Recalculate order totals
-            $order->calculate_totals();
-
-            // Save the order
-            $order->save();
-        }
-
-        $totalAmount = 0;
-        foreach ($payload['items'] as $key => $item) {
-            $totalAmount += $item['price'] * $item['quantity'];
-        }
-
-        $payload['amount'] = number_format($totalAmount, 2, '.', '');
-        $payload = wp_json_encode($payload);
-        WC()->session->set('hostedPayload', $payload);
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-    }
-
-
-    /**
-     * Sync the cart item changes to an existing order after quantity update
-     *
-     * @param string $cart_item_key The cart item key.
-     * @param int    $quantity The new quantity of the item.
-     * @param int    $old_quantity The old quantity of the item.
-     * @param WC_Cart $cart The cart object.
-     */
-    public function sync_order_after_cart_quantity_update($cart_item_key, $quantity, $old_quantity, $cart)
-    {
-        // Get the cart item data
-        $cart_item = $cart->get_cart_item($cart_item_key);
-
-        $product_id = $cart_item['product_id']; // Get product ID
-        $variation_id = !empty($cart_item['variation_id']) ? $cart_item['variation_id'] : 0; // Check for variation ID
-        $variations = !empty($cart_item['variation']) ? $cart_item['variation'] : array(); // Variation details
-        $cart_item_data = $cart_item['data']; // Get other cart item data
-
-        // Now call your sync function
-        $this->sync_cart_to_existing_order($cart_item_key, $product_id, $quantity, $variation_id, $variations, $cart_item_data);
-    }
-
-
-    function remove_cart_item_from_order($cart_item_key, $cart_item)
-    {
-        $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        $order_id = WC()->session->get('order_awaiting_payment');
-        $order = wc_get_order($order_id);
-
-        // Check if the order exists
-        if (!$order) {
-            error_log('Order does not exist: ' . $order_id); // Log error
-            return; // Exit if the order doesn't exist
-        }
-
-        // Get the product ID of the removed cart item
-        $product_id = $cart_item->removed_cart_contents[$cart_item_key]['product_id'];
-        $order_items = $order->get_items();
-
-        // Loop through order items and remove the product if it exists
-        $item_removed = false;
-        foreach ($order_items as $order_item_id => $order_item) {
-            if ($order_item->get_product_id() == $product_id) {
-                // Remove the item from the order
-                $order->remove_item($order_item_id);
-                $item_removed = true; // Track if an item was removed
-                break; // Exit loop after removing
-            }
-        }
-
-        // Check if an item was removed
-        if ($item_removed) {
-            // Recalculate order totals after removal
-            $order->calculate_totals();
-            $order->save();
-        } else {
-            error_log('No matching product found in order for product ID: ' . $product_id); // Log if no match was found
-        }
-
-        $totalAmount = 0;
-        foreach ($payload['items'] as $key => $item) {
-            $totalAmount += $item['price'] * $item['quantity'];
-        }
-
-        $payload['amount'] = number_format($totalAmount, 2, '.', '');
-        $payload = wp_json_encode($payload);
-        WC()->session->set('hostedPayload', $payload);
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-    }
-
-    public function getHostedDataFromOrder($order)
-    {
-        // Initialize the result array
-        $order_data = array(
-            'items'    => array(),
-            'shipping' => array(),
-            'coupons'  => array(),
-        );
-
-        // Get all items (products) in the order
-        foreach ($order->get_items() as $item_id => $item) {
-            $product = $item->get_product();
-            $order_data['items'][] = array(
-                'name'        => $item->get_name(),
-                'quantity'    => $item->get_quantity(),
-                'total'       => $item->get_total(),
-                'subtotal'    => $item->get_subtotal(),
-                'tax'         => $item->get_total_tax(),
-                'product_id'  => $product ? $product->get_id() : null,
-                'sku'         => $product ? $product->get_sku() : null,
-            );
-        }
-
-        // Get shipping data
-        foreach ($order->get_items('shipping') as $item_id => $shipping_item) {
-            $order_data['shipping'][] = array(
-                'method_title' => $shipping_item->get_name(),
-                'cost'         => $shipping_item->get_total(),
-                'tax'          => $shipping_item->get_taxes(),
-            );
-        }
-
-        // Get coupon data using $order->get_coupon_codes()
-        $applied_coupons = $order->get_coupon_codes();
-
-        foreach ($applied_coupons as $coupon_code) {
-            // Load the WC_Coupon object
-            $coupon = new WC_Coupon($coupon_code);
-
-            // Get the discount amount and any other details as needed
-            $coupon_discount = $order->get_discount_total(); // Total discount applied
-            $coupon_discount_tax = $order->get_discount_tax(); // Total discount tax
-
-            $order_data['coupons'][] = array(
-                'code'         => $coupon_code,                // Coupon code
-                'discount'     => $coupon_discount,            // Discount amount
-                'discount_tax' => $coupon_discount_tax,        // Discount tax
-                'coupon_type'  => $coupon->get_discount_type(), // Coupon type (fixed_cart, percent, etc.)
-            );
-        }
-
-        // Output the final array (for debugging or further use)
-        return $order_data;
-    }
-
-    public function catch_remove_coupon_code_on_checkout($coupon_code)
-    {
-        $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        $order_id = WC()->session->get('order_awaiting_payment');
-        $order = wc_get_order($order_id);
-
-        if (! $order) {
-            return; // Exit if the order doesn't exist
-        }
-
-        // Check if the coupon was applied to the order
-        if (in_array($coupon_code, $order->get_coupon_codes())) {
-            // Remove the coupon from the order
-            $order->remove_coupon($coupon_code);
-
-            // Recalculate totals after removing the coupon
-            $order->calculate_totals();
-
-            // Save the updated order
-            $order->save();
-        }
-
-        $order = wc_get_order($order_id);
-
-        $orderData = $this->getHostedDataFromOrder($order);
-
-        $totalAmount = 0;
-        foreach ($payload['items'] as $key => $item) {
-            if ($item['name'] === "coupon_discount") {
-                /// $totalAmount += -floatval($payload['items'][$key]['price']);
-                unset($payload['items'][$key]);
-            } else {
-                $totalAmount += $item['price'] * $item['quantity'];
-            }
-        }
-
-        $payload['amount'] = number_format($totalAmount, 2, '.', '');
-        $payload = wp_json_encode($payload);
-        WC()->session->set('hostedPayload', $payload);
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-    }
-
-    public function catch_coupon_code_on_checkout($coupon_code)
-    {
-        $payload = json_decode(WC()->session->get('hostedPayload'), true);
-        $order_id = WC()->session->get('order_awaiting_payment');
-        // Assuming you have the $order object
-        $order = wc_get_order($order_id);
-
-        $coupon = new WC_Coupon($coupon_code);
-
-        // Get the discount amount or coupon value (for fixed discount coupons)
-        $coupon_value = $coupon->get_amount();
-
-        if (!$order) {
-            return; // If the order doesn't exist, return early
-        }
-
-        // Load the WooCommerce coupon object using the coupon code
-        if (!$coupon->get_id()) {
-            return; // If the coupon doesn't exist, return early
-        }
-
-        // Add the coupon to the order (apply the coupon)
-        $order->apply_coupon($coupon);
-
-        // Recalculate totals to include the discount from the coupon
-        $order->calculate_totals();
-
-        // Save the updated order
-        $order->save();
-
-        $orderData = $this->getHostedDataFromOrder($order);
-
-
-        $totalAmount = 0;
-        $noCoupon = false;
-
-        foreach ($payload['items'] as $key => $item) {
-            if ($item['name'] === "coupon_discount") {
-                $payload['items'][$key]['price'] = -floatval($coupon_value);
-                $totalAmount += -floatval($coupon_value) * $item['quantity'];
-                $noCoupon = true;
-            } else {
-                $totalAmount += $item['price'] * $item['quantity'];
-            }
-        }
-
-
-        if (floatval($coupon_value) > 0 && !$noCoupon) {
-            $item['name'] = "coupon_discount";
-            $item['quantity'] = 1;
-            $item['price'] = -floatval($coupon_value);
-            $item['vat_type'] =  0;
-            $totalAmount += -floatval($coupon_value);
-            $payload['items'][] = $item;
-        }
-
-        $payload['amount'] = number_format($totalAmount, 2, '.', '');
-        $payload = wp_json_encode($payload);
-        WC()->session->set('hostedPayload', $payload);
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-    }
-
     public function hostedPayment()
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $order_id = intval($_POST['order_id']);
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order = wc_get_order($order_id);
-        $saveToken = isset($_POST['saveToken']) ? filter_var($_POST['saveToken'], FILTER_VALIDATE_BOOLEAN) : false;
+        $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
         $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
-        $metaData['payplus_page_request_uid'] = $_POST['page_request_uid'];
+        $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
         WC_PayPlus_Meta_Data::update_meta($order, $metaData);
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
@@ -388,7 +111,7 @@ class WC_PayPlus
         $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
         $payPlusGateWay = $this->get_main_payplus_gateway();
 
-        $auth = json_encode([
+        $auth = wp_json_encode([
             'api_key' => $apiKey,
             'secret_key' => $secretKey
         ]);
@@ -428,7 +151,7 @@ class WC_PayPlus
         foreach ($payload['items'] as $key => $item) {
 
             if ($item['name'] === "Shipping") {
-                $payload['items'][$key]['price'] = floatval($_POST['totalShipping']);
+                $payload['items'][$key]['price'] = isset($_POST['totalShipping']) ? floatval($_POST['totalShipping']) : 0.0;
                 $totalAmount += floatval($_POST['totalShipping']) * $item['quantity'];
             } else {
                 $totalAmount += $item['price'] * $item['quantity'];
@@ -464,7 +187,7 @@ class WC_PayPlus
 
         WC()->session->set('hostedPayload', $payload);
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
-        wp_die($payload);
+        wp_die();
     }
 
     public function payPlusCronDeactivate()

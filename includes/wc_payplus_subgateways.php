@@ -421,9 +421,9 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
 
     public function complete_order_via_ajax()
     {
-
-        $order_id = intval($_POST['order_id']);
-        $payment_response = sanitize_text_field($_POST['payment_response']['data']['result']);
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $payment_response = isset($_POST['payment_response']['data']['result']) ? sanitize_text_field(wp_unslash($_POST['payment_response']['data']['result'])) : '';
 
         $order = wc_get_order($order_id);
 
@@ -453,7 +453,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             'result'   => 'success',
             'order_id' => $order_id,
             'method' => 'hostedFields',
-            'nonce'    => wp_create_nonce('my_payment_nonce'),
+            'nonce'    => wp_create_nonce('hostedPaymentNonce'),
         );
     }
 }

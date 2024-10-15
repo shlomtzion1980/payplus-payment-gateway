@@ -64,15 +64,15 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedResponse = $this->hostedFieldsData($this->order_id);
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
+            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             if (file_exists($template_path)) {
-                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
+                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.min.css', [], $script_version);
                 include $template_path;
             }
             wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
+            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.min.js', array('jquery'), '1.0', true);
             wp_localize_script(
                 'payplus-hosted',
                 'payplus_script',
@@ -115,7 +115,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
         $payPlusGateWay = $this->get_main_payplus_gateway();
 
-        $auth = json_encode([
+        $auth = wp_json_encode([
             'api_key' => $apiKey,
             'secret_key' => $secretKey
         ]);
@@ -130,7 +130,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
         }
 
-        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, $method = "post");
+        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, "post");
 
         $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
 
@@ -144,65 +144,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         return wp_remote_retrieve_body($hostedResponse);
     }
 
-    public function getHostedDataFromOrder($order)
-    {
-        // Initialize the result array
-        $order_data = array(
-            'items'    => array(),
-            'shipping' => array(),
-            'coupons'  => array(),
-        );
-
-        // Get all items (products) in the order
-        foreach ($order->get_items() as $item_id => $item) {
-            $product = $item->get_product();
-            $order_data['items'][] = array(
-                'name'        => $item->get_name(),
-                'quantity'    => $item->get_quantity(),
-                'total'       => $item->get_total(),
-                'subtotal'    => $item->get_subtotal(),
-                'tax'         => $item->get_total_tax(),
-                'product_id'  => $product ? $product->get_id() : null,
-                'sku'         => $product ? $product->get_sku() : null,
-            );
-        }
-
-        // Get shipping data
-        foreach ($order->get_items('shipping') as $item_id => $shipping_item) {
-            $order_data['shipping'][] = array(
-                'method_title' => $shipping_item->get_name(),
-                'cost'         => $shipping_item->get_total(),
-                'tax'          => $shipping_item->get_taxes(),
-            );
-        }
-
-        // Get coupon data using $order->get_coupon_codes()
-        $applied_coupons = $order->get_coupon_codes();
-
-        foreach ($applied_coupons as $coupon_code) {
-            // Load the WC_Coupon object
-            $coupon = new WC_Coupon($coupon_code);
-
-            // Get the discount amount and any other details as needed
-            $coupon_discount = $order->get_discount_total(); // Total discount applied
-            $coupon_discount_tax = $order->get_discount_tax(); // Total discount tax
-
-            $order_data['coupons'][] = array(
-                'code'         => $coupon_code,                // Coupon code
-                'discount'     => $coupon_discount,            // Discount amount
-                'discount_tax' => $coupon_discount_tax,        // Discount tax
-                'coupon_type'  => $coupon->get_discount_type(), // Coupon type (fixed_cart, percent, etc.)
-            );
-        }
-
-        // Output the final array (for debugging or further use)
-        return $order_data;
-    }
-
     public function hostedFieldsData($order_id)
     {
-
-
         $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
 
         if ($order_id !== "000") {
@@ -212,8 +155,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 return;
             }
         }
-
-
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $discountPrice = 0;
@@ -261,12 +202,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $checkout = WC()->checkout();
 
         // Get posted checkout data
-        $billing_first_name = $checkout->get_value('billing_first_name');
-        $billing_last_name  = $checkout->get_value('billing_last_name');
-        $billing_email      = $checkout->get_value('billing_email');
-        $shipping_address   = $checkout->get_value('shipping_address_1');
-        $phone   = $checkout->get_value('billing_phone');
-
+        $billing_first_name = !empty($checkout->get_value('billing_first_name')) ? $checkout->get_value('billing_first_name') : "general-first-name";
+        $billing_last_name  = !empty($checkout->get_value('billing_last_name')) ? $checkout->get_value('billing_last_name') : "general-last-name";
+        $billing_email      = !empty($checkout->get_value('billing_email')) ? $checkout->get_value('billing_email') : "general@payplus.co.il";
+        $shipping_address   = !empty($checkout->get_value('shipping_address_1')) ? $checkout->get_value('shipping_address_1') : "general-shipping-address";
+        $phone              = !empty($checkout->get_value('billing_phone')) ? $checkout->get_value('billing_phone') : "050-0000000";
 
         // Building sample request to create a payment page
         $data = new stdClass();

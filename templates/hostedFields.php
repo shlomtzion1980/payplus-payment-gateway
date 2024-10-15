@@ -296,7 +296,7 @@
                 </div>
                 <div class="col-4">
                     <div id="hostedTop">
-                        <div class="topText"><?php echo __('Credit card', 'payplus-payment-gateway'); ?></div>
+                        <div class="topText"><?php echo esc_html__('Credit card', 'payplus-payment-gateway'); ?></div>
                         <div class="creditCards">
                             <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cCards.png"
                                 alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
@@ -312,13 +312,13 @@
                     </div>
                     <div id="card-holder-name-wrapper" class="fld-wrapper">
                         <!-- <div class="iframe-wrapper"> -->
-                        <label><?php echo __('Name', 'payplus-payment-gateway'); ?></label>
+                        <label><?php echo esc_html__('Name', 'payplus-payment-gateway'); ?></label>
                         <input type="text" id="card-holder-name" class="form-control" value="" />
                         <!-- </div> -->
                     </div>
                     <div id="id-number-wrapper" class="fld-wrapper">
                         <!-- <div class="iframe-wrapper"> -->
-                        <label><?php echo __('ID number', 'payplus-payment-gateway'); ?></label>
+                        <label><?php echo esc_html__('ID number', 'payplus-payment-gateway'); ?></label>
                         <input id="id-number" type="number" class="form-control" value="" />
                         <!-- </div> -->
                     </div>
@@ -330,42 +330,39 @@
                     </div>
                     <div class="expiry-wrapper expiries">
                         <div id="cc-wrapper" class="h-fld-wrapper">
-                            <label><?php echo __('Card number', 'payplus-payment-gateway'); ?></label>
+                            <label><?php echo esc_html__('Card number', 'payplus-payment-gateway'); ?></label>
                             <div id="cCard" class="iframe-wrapper">
-
-                                <label
-                                    class="iframe-placeholder cCard"><?php echo __('1234 1234 1234 1234', 'payplus-payment-gateway'); ?></label>
+                                <label class="iframe-placeholder cCard"><?php echo esc_html__('1234 1234 1234 1234', 'payplus-payment-gateway'); ?></label>
                                 <span id="cc" placeholder="Card Number" class="form-control fld-frame"
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
                         <div class="expireClass">
                             <div id="month" class="iframe-wrapper exp">
-                                <label
-                                    class="iframe-placeholder month"><?php echo __('Month', 'payplus-payment-gateway'); ?></label>
+                                <label class="iframe-placeholder month"><?php echo esc_html__('Month', 'payplus-payment-gateway'); ?></label>
                                 <span id="expirym" class="fld-frame"></span>
                             </div>
                             <span class="seperator"> / </span>
                             <div id="year" class="iframe-wrapper exp">
-                                <label class="iframe-placeholder year">
-                                    <?php echo __('Year', 'payplus-payment-gateway'); ?></label>
+                                <label class="iframe-placeholder year"><?php echo esc_html__('Year', 'payplus-payment-gateway'); ?></label>
                                 <span id="expiryy" class="fld-frame"></span>
                             </div>
                         </div>
                         <div id="cvv-fld" class="expireClass">
                             <div class="iframe-wrapper">
-                                <label
-                                    class="iframe-placeholder cvv-fld"><?php echo __('CVV', 'payplus-payment-gateway'); ?><img
-                                        src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
-                                        alt="&nbsp;&nbsp;Pay with Debit or Credit Card"
-                                        style="top: 1.4px;" /></label>
+                                <label class="iframe-placeholder cvv-fld">
+                                    <?php echo esc_html__('CVV', 'payplus-payment-gateway'); ?>
+                                    <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
+                                        alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
+                                        style="top: 1.4px;" />
+                                </label>
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row" id="cvv-wrapper"></div>
                     <div id="payments-wrapper" class="fld-wrapper">
-                        <label><?php echo __("Payments", "payplus-payment-gateway"); ?></label>
+                        <label><?php echo esc_html__('Payments', 'payplus-payment-gateway'); ?></label>
                         <select class="form-select" id="payments" aria-label="Default select example">
                             <option value="1">1</option>
                             <option value="2">2</option>
@@ -401,13 +398,13 @@
                             <input type="text" id="invoice-name" class="form-control" value="" />
                         </div>
                     </div>
-                    <input type="button" value="<?php echo __('Place Order', 'payplus-payment-gateway'); ?>"
+                    <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
                         id="submit-payment" class="btn btn-primary" />
                     <br />
                     <div id="ppLogo">
-                        <?php echo __('Powered by ', 'payplus-payment-gateway'); ?>
+                        <?php echo esc_html__('Powered by ', 'payplus-payment-gateway'); ?>
                         <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png"
-                            alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
+                            alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>" />
                     </div>
                 </div>
                 <div class="col-4" style="display: none">
@@ -446,9 +443,6 @@
         </div>
     </div>
     <span id="recaptcha"></span>
-    <!-- <script src="node_modules/jquery/dist/jquery.min.js"></script> -->
-    <!-- <script src="https://wordpress.test/wp-content/plugins/payplus-payment-gateway/assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js"></script>
-    <script src="https://wordpress.test/wp-content/plugins/payplus-payment-gateway/assets/js/hostedFieldsScript.js?ver=1.0"></script> -->
 </body>
 
 </html>
