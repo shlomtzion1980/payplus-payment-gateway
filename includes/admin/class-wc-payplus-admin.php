@@ -292,6 +292,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $responseArray = [
                 'payplus_response' => wp_json_encode($responseBody['data']),
+                'payplus_transaction_uid' => esc_html($responseBody['data']['transaction_uid']),
                 'payplus_type' => esc_html($responseBody['data']['type']),
                 'payplus_brand_name' => esc_html($responseBody['data']['brand_name']),
                 'payplus_method' => esc_html($responseBody['data']['method']),
