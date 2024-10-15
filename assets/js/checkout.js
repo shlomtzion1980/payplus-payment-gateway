@@ -10,7 +10,7 @@ jQuery(function ($) {
     var $checkbox = $(
         '<p class="form-row">' +
             '<label for="save_token_checkbox">' +
-            '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" />' +
+            '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin-right: 10px;"/>' +
             " " +
             payplus_script_checkout.saveCreditCard +
             "</label>" +
@@ -849,17 +849,17 @@ jQuery(function ($) {
                                 raw_response.match(/{"result.*}/);
 
                             if (null === maybe_valid_json) {
-                                console.log("Unable to fix malformed JSON");
+                                // console.log("Unable to fix malformed JSON");
                             } else if (
                                 wc_checkout_form.is_valid_json(
                                     maybe_valid_json[0]
                                 )
                             ) {
-                                console.log("Fixed malformed JSON. Original:");
-                                console.log(raw_response);
+                                // console.log("Fixed malformed JSON. Original:");
+                                // console.log(raw_response);
                                 raw_response = maybe_valid_json[0];
                             } else {
-                                console.log("Unable to fix malformed JSON");
+                                // console.log("Unable to fix malformed JSON");
                             }
                         }
                         return raw_response;
