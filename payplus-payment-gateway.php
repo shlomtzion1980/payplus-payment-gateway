@@ -700,6 +700,7 @@ class WC_PayPlus
                     "payplus_mobile" => $isModbile,
                     "multiPassIcons" => $multipassIcons,
                     "customIcons" => $customIcons,
+                    "isLoggedIn" => boolval(get_current_user_id() > 0),
                     "isSubscriptionOrder" => $isSubscriptionOrder,
                     "isAutoPPCC" => $this->isAutoPPCC,
                     "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,

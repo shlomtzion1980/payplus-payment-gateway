@@ -16,8 +16,8 @@ jQuery(function ($) {
             "</label>" +
             "</p>"
     );
-    // Move the existing div to the top <li> of the payment method
-    $hostedDiv.append($checkbox);
+
+    payplus_script_checkout.isLoggedIn ? $hostedDiv.append($checkbox) : null;
 
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = $(".woocommerce-SavedPaymentMethods-token");
