@@ -65,7 +65,9 @@ class WC_PayPlus
         add_action('wp_head', [$this, 'payplus_no_index_page_error']);
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
+        add_action('wp_ajax_nopriv_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
+        add_action('wp_ajax_nopriv_update-hosted-payment', [$this, 'updateHostedPayment']);
 
         //end custom hook
 
@@ -735,12 +737,9 @@ class WC_PayPlus
                 }
             }
 
-            $userId = get_current_user_id();
-            if ($userId > 0) {
-                if (!is_cart() && !is_product() && !is_shop()) {
-                    if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
-                        $hostedClass = new WC_PayPlus_HostedFields;
-                    }
+            if (!is_cart() && !is_product() && !is_shop()) {
+                if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
+                    new WC_PayPlus_HostedFields;
                 }
             }
         }
