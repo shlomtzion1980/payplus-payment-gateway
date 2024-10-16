@@ -829,6 +829,9 @@ jQuery(function ($) {
             if (result.method === "hostedFields") {
               overlay();
               jQuery(".blocks-payplus_loader_hosted").fadeIn();
+              wc_checkout_form.$checkout_form
+                .removeClass("processing")
+                .unblock();
               hf.SubmitPayment();
             } else {
               // Detach the unload handler that prevents a reload / redirect
