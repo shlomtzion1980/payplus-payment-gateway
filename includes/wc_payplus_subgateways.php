@@ -34,7 +34,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Pay with Tav Zahav via PayPlus', 'payplus-payment-gateway'),
             __('Pay with Valuecard via PayPlus', 'payplus-payment-gateway'),
             __('Pay with finitiOne via PayPlus', 'payplus-payment-gateway'),
-            __('Pay with PayPlus Hosted Fields', 'payplus-payment-gateway')
+            __('Pay with PayPlus Embedded', 'payplus-payment-gateway')
 
         );
         $this->allTypePayment = array(
@@ -99,8 +99,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'PayPlus - Valuecard':
                 $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
                 break;
-            case 'PayPlus - Hosted Fields':
-                $methodTitleText = esc_html__('PayPlus - Hosted Fields', 'payplus-payment-gateway');
+            case 'PayPlus - Embedded':
+                $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
                 break;
         }
         $payWithText = '';
@@ -129,8 +129,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'Pay with Tav finitiOne':
                 $payWithText = esc_html__('Pay with Tav finitiOne', 'payplus-payment-gateway');
                 break;
-            case 'Pay with Hosted Fields':
-                $payWithText = esc_html__('Pay with Hosted Fields', 'payplus-payment-gateway');
+            case 'Pay with Embedded':
+                $payWithText = esc_html__('Pay with Embedded', 'payplus-payment-gateway');
                 break;
         }
         $this->form_fields = [
@@ -187,14 +187,20 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => '1',
             ],
             'hosted_fields_width' => [
-                'title' => __('Set width for hosted fields container (%)', 'payplus-payment-gateway'),
-                'description' => __('This sets the width of the hosted fields container in percentage (Max is 100).', 'payplus-payment-gateway'),
+                'title' => __('Set width for Embedded container (%)', 'payplus-payment-gateway'),
+                'description' => __('This sets the width of the Embedded container in percentage (Max is 100).', 'payplus-payment-gateway'),
                 'type' => 'number',
                 'default' => '50'
             ],
             'hide_payplus_gateway' => [
                 'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
                 'description' => __('Hide PayPlus gateway if current user has no saved tokens', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no'
+            ],
+            'hosted_fields_is_main' => [
+                'title' => __('Make PayPlus Embedded main gateway', 'payplus-payment-gateway'),
+                'description' => __('Make PayPlus Embedded main gateway (No subscription support yet!)', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no'
             ]
@@ -204,6 +210,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         }
         if ($this->id !== 'payplus-payment-gateway-hostedfields') {
             unset($this->form_fields['hosted_fields_width']);
+            unset($this->form_fields['hide_payplus_gateway']);
+            unset($this->form_fields['hosted_fields_is_main']);
         }
         if ($this->id === 'payplus-payment-gateway-hostedfields') {
             unset($this->form_fields['display_mode']);
@@ -262,8 +270,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'Pay with finitiOne via PayPlus':
                 $methodDescriptionText = esc_html__('Pay with finitiOne via PayPlus', 'payplus-payment-gateway');
                 break;
-            case 'Pay with PayPlus Hosted Fields':
-                $methodDescriptionText = esc_html__('Pay with PayPlus Hosted Fields', 'payplus-payment-gateway');
+            case 'Pay with PayPlus Embedded':
+                $methodDescriptionText = esc_html__('Pay with PayPlus Embedded', 'payplus-payment-gateway');
                 break;
         }
 
@@ -278,6 +286,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
         $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 50;
         $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';
+        $this->settings['hosted_fields_is_main'] = isset($subOptionsettings['hosted_fields_is_main']) ? $subOptionsettings['hosted_fields_is_main'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
         $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : null;
 
@@ -403,18 +412,18 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
 class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
 {
     public $id = 'payplus-payment-gateway-hostedfields';
-    public $method_title_text = 'PayPlus - Hosted Fields';
-    public $default_description_settings_text = 'payment via PayPlus Hosted Fields';
-    public $method_description_text = 'Pay with PayPlus Hosted Fields';
+    public $method_title_text = 'PayPlus - Embedded';
+    public $default_description_settings_text = 'payment via PayPlus Embedded';
+    public $method_description_text = 'Pay with PayPlus Embedded';
     public $payplus_default_charge_method = 'hostedFields';
     public $iconURL = 'assets/images/PayPlusLogo.svg';
-    public $pay_with_text = 'Pay with PayPlus Hosted Fields';
+    public $pay_with_text = 'Pay with PayPlus Embedded';
 
     public function __construct()
     {
         parent::__construct();
         $this->id = 'payplus-payment-gateway-hostedfields';
-        $this->method_title = __('PayPlus - Hosted Fields', 'woocommerce');
+        $this->method_title = __('PayPlus - Embedded', 'woocommerce');
         add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
     }

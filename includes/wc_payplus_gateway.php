@@ -843,7 +843,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $translatedKey = esc_html__('finitiOne', 'payplus-payment-gateway');
                         break;
                     case 'hostedFields':
-                        $translatedKey = esc_html__('Hosted Fields', 'payplus-payment-gateway');
+                        $translatedKey = esc_html__('Embedded', 'payplus-payment-gateway');
                         break;
                 }
                 if ($currentSection === $value['section']) {
