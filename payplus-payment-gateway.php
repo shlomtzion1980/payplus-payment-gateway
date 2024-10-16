@@ -35,6 +35,7 @@ class WC_PayPlus
     private $_wpnonce;
     public $importApplePayScript;
     public $hostedFieldsOptions;
+    private $isHostedInitiated = false;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -410,8 +411,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-            <meta name=" robots" content="noindex,nofollow">
-        <?php
+<meta name=" robots" content="noindex,nofollow">
+<?php
         }
     }
 
@@ -655,6 +656,14 @@ class WC_PayPlus
         }
     }
 
+    public function isHostedInitiated()
+    {
+        if (!$this->isHostedInitiated) {
+            $this->isHostedInitiated = true;
+            new WC_PayPlus_HostedFields;
+        }
+    }
+
     /**
      * @return void
      */
@@ -712,12 +721,12 @@ class WC_PayPlus
             );
             if (!is_cart() && !is_product() && !is_shop()) {
                 if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
-                    new WC_PayPlus_HostedFields;
+                    $this->isHostedInitiated();
                 }
             }
         }
 
-        $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? new WC_PayPlus_HostedFields : null;
+        $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? $this->isHostedInitiated() : null;
 
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
         $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
@@ -793,9 +802,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-        <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="payplus-option-description-area"></div>
+<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);
