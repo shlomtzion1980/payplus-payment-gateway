@@ -71,9 +71,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         foreach (array_keys($gateways) as $payPlusGateWay) {
             $this->settings['gateways'][] = strpos($payPlusGateWay, 'payplus-payment-gateway') === 0 ? $payPlusGateWay : null;
         }
-        $this->settings['gateways'] = array_filter($this->settings['gateways'], function ($item) {
-            return $item !== "payplus-payment-gateway-hostedfields";
-        });
+        // $this->settings['gateways'] = array_filter($this->settings['gateways'], function ($item) {
+        //     return $item !== "payplus-payment-gateway-hostedfields";
+        // });
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
     }
@@ -116,7 +116,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         );
 
-        if (!in_array($context->payment_method, $this->settings['gateways'])) {
+        if (!in_array($context->payment_method, $this->settings['gateways']) || $context->payment_method === "payplus-payment-gateway-hostedfields") {
             return;
         }
 
@@ -219,7 +219,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
         $style_path = 'block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(

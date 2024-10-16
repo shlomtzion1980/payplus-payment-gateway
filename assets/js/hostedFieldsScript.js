@@ -78,32 +78,37 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
-          // const inputElement = document.querySelector(
-          //   "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
-          // );
-          // console.log("input", inputElement);
-          // if (inputElement) {
-          //   // Find the closest parent div
-          //   const topDiv = inputElement.closest("div");
+          const inputElement = document.querySelector(
+            "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
+          );
+          console.log("input", inputElement);
+          if (inputElement) {
+            // Find the closest parent div
+            const topDiv = inputElement.closest("div");
 
-          //   if (topDiv) {
-          //     // Create a new div element
-          //     const newDiv = document.querySelector(
-          //       "body > div.container.hostedFields"
-          //     );
-          //     newDiv.className = "pp_iframe_h";
+            if (topDiv) {
+              // Create a new div element
+              const newDiv = document.querySelector(
+                "body > div.container.hostedFields"
+              );
+              newDiv.className = "pp_iframe_h";
 
-          //     // Append the new div to the top div
-          //     topDiv.appendChild(newDiv);
-          //   } else {
-          //     console.log("No parent div found.");
-          //   }
-          // } else {
-          //   console.log("Element with the specified ID not found.");
-          // }
+              // Append the new div to the top div
+              topDiv.appendChild(newDiv);
+            } else {
+              console.log("No parent div found.");
+            }
+          } else {
+            console.log("Element with the specified ID not found.");
+          }
 
           // jQuery(".container.hostedFields").show();
           jQuery("#create-payment-form").hide();
+          jQuery("#submit-payment").attr(
+            "style",
+            "visibility: hidden;height: 0px !important;margin: 0 0 0 0 !important;"
+          );
+          jQuery("#submit-payment").next().hide();
           //   jQuery("#id-number-wrapper").hide();
           // jQuery("#payments-wrapper").hide();
           jQuery("#payment-form").css("display", "flex");
@@ -185,7 +190,9 @@ hf.Upon("pp_responseFromServer", (e) => {
   }
 
   if (e.detail.data?.status_code === "000") {
-    let orderId = e.detail.data.more_info;
+    let orderId =
+      e.detail.data.more_info ??
+      wp.data.select("wc/store/checkout").getOrderId();
     let token = e.detail.data.token_uid;
     let pageRequestdUid = e.detail.data.page_request_uid;
     jQuery.ajax({

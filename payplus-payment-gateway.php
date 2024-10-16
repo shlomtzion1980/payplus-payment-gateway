@@ -410,8 +410,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -710,7 +710,15 @@ class WC_PayPlus
                     "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
                 ]
             );
+            if (!is_cart() && !is_product() && !is_shop()) {
+                if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
+                    new WC_PayPlus_HostedFields;
+                }
+            }
         }
+
+        $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? new WC_PayPlus_HostedFields : null;
+
         $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
         $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
             (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
@@ -738,17 +746,31 @@ class WC_PayPlus
                     wp_enqueue_script('payplus-front-js');
                 }
             }
-
-            if (!is_cart() && !is_product() && !is_shop()) {
-                if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
-                    new WC_PayPlus_HostedFields;
-                }
-            }
         }
 
         wp_enqueue_style('alertifycss', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css', array(), '1.14.0', 'all');
         wp_register_script('alertifyjs', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js', array('jquery'), '1.14.0', true);
         wp_enqueue_script('alertifyjs');
+    }
+
+    public function is_block_based_checkout()
+    {
+        // Get the WooCommerce Checkout page ID
+        $page_id = get_the_ID();
+        // Check if we're currently on the checkout page
+        if (is_page($page_id)) {
+            // Get the content of the checkout page
+            $post = get_post($page_id);
+
+            // Check if the 'woocommerce/checkout' block is present in the page content
+            if (has_block('woocommerce/checkout', $post->post_content)) {
+                // Block-based checkout is active
+                return true;
+            }
+        }
+
+        // Return false if not a block-based checkout
+        return false;
     }
 
     /**
@@ -771,9 +793,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

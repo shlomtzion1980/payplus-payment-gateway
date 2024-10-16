@@ -338,8 +338,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
             }
         } else {
-            $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
-            $order->add_order_note('PayPlus IPN: ' . $note);
+            // $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
+            // $order->add_order_note('PayPlus IPN: ' . $note);
         }
     }
 

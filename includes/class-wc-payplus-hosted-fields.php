@@ -64,7 +64,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedResponse = $this->hostedFieldsData($this->order_id);
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
+            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             if (file_exists($template_path)) {
@@ -72,7 +72,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 include $template_path;
             }
             wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.min.js', array('jquery'), '1.0', true);
+            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
             wp_localize_script(
                 'payplus-hosted',
                 'payplus_script',
@@ -243,7 +243,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         if ($order_id !== "000") {
-            $data->more_info = $order_id;
+            $data->more_info = (string)$order_id;
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
             // Check if there are shipping items
