@@ -231,6 +231,7 @@ if (isCheckout || hasOrder) {
             ) === 0
           ) {
             jQuery(".blocks-payplus_loader_hosted").fadeIn();
+            putOverlay();
             hf.SubmitPayment();
             return;
           }
@@ -563,4 +564,44 @@ if (isCheckout || hasOrder) {
       }
     }, 1000);
   }
+
+  const putOverlay = (remove = false) => {
+    if (remove) {
+      // If remove is true, remove the overlay and restore scrolling
+      if ($overlay) {
+        $overlay.remove();
+        jQuery("body").css({
+          overflow: "", // Restore scrolling
+        });
+        $overlay = null; // Clear the reference
+      }
+    } else {
+      // If remove is false, create and show the overlay
+      if (!$overlay) {
+        $overlay = jQuery("<div></div>")
+          .css({
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.7)", // milky opacity
+            zIndex: 9999,
+            cursor: "not-allowed",
+          })
+          .appendTo("body");
+
+        // Prevent scrolling
+        jQuery("body").css({
+          overflow: "hidden",
+        });
+
+        // Disallow clicks on overlay
+        $overlay.on("click", function (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        });
+      }
+    }
+  };
 }

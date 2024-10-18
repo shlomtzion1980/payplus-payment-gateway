@@ -175,7 +175,6 @@ hf.Upon("pp_responseFromServer", (e) => {
   let saveToken = jQuery("#save_token_checkbox").is(":checked") ? true : false;
 
   if (e.detail.errors) {
-    jQuery(".blocks-payplus_loader_hosted").fadeOut();
     let errorMessage =
       e.detail.errors[0].message === null
         ? e.detail.results.description
@@ -183,10 +182,16 @@ hf.Upon("pp_responseFromServer", (e) => {
 
     const ifError = (event) => {
       alert(errorMessage);
+      jQuery(".blocks-payplus_loader_hosted").fadeOut();
       overlay(true);
+      return;
     };
 
-    errorMessage !== "not-authorize-success" ? ifError() : null;
+    !["not-authorize-success", "payment-is-still-in-process"].includes(
+      errorMessage
+    )
+      ? ifError()
+      : null;
   }
 
   if (e.detail.data?.status_code === "000") {
