@@ -67,8 +67,6 @@ class WC_PayPlus
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_nopriv_make-hosted-payment', [$this, 'hostedPayment']);
-        add_action('wp_ajax_update-hosted-payment', [$this, 'updateHostedPayment']);
-        add_action('wp_ajax_nopriv_update-hosted-payment', [$this, 'updateHostedPayment']);
 
         //end custom hook
 
@@ -411,8 +409,8 @@ class WC_PayPlus
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
 ?>
-<meta name=" robots" content="noindex,nofollow">
-<?php
+            <meta name=" robots" content="noindex,nofollow">
+        <?php
         }
     }
 
@@ -802,9 +800,9 @@ class WC_PayPlus
         $height = $this->payplus_payment_gateway_settings->iframe_height;
         ob_start();
         ?>
-<div class="payplus-option-description-area"></div>
-<div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
-<div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="payplus-option-description-area"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
         $html = ob_get_clean();
         echo wp_kses_post($html);

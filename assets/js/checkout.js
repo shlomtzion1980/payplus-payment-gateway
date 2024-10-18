@@ -602,30 +602,7 @@ jQuery(function ($) {
           if (priceMatch) {
             var currency = priceMatch[1] || priceMatch[4]; // Captures the currency symbol
             shippingPrice = priceMatch[2] || priceMatch[3]; // Captures the price number
-            // console.log(
-            //     "Shipping price: " + shippingPrice + " " + currency
-            // );
           }
-
-          let totalShipping = shippingPrice;
-          jQuery.ajax({
-            type: "post",
-            dataType: "json",
-            url: payplus_script.ajax_url,
-            data: {
-              action: "update-hosted-payment",
-              totalShipping: totalShipping,
-              _ajax_nonce: payplus_script.frontNonce,
-            },
-            success: function (response) {
-              // console.log("data sent: ", data);
-              // console.log("response : ", response);
-            },
-            complete: function () {
-              // Reset flag after completion of request
-              isSubmitting = false;
-            },
-          });
 
           if (payplus_script_checkout.isHostedFields) {
             $(document.body).on("updated_checkout", function () {

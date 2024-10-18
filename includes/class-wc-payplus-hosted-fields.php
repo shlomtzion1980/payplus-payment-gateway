@@ -14,6 +14,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $secretKey;
     public $paymentPageUid;
     public $apiUrl;
+    // public $hostedFieldsResponse;
 
 
     /**
@@ -243,7 +244,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         if ($order_id !== "000") {
-            $data->more_info = (string)$order_id;
+            $data->more_info = $order_id;
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
             // Check if there are shipping items
@@ -300,6 +301,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC()->session->set('hostedPayload', $payload);
 
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
@@ -307,6 +309,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
         }
 
+        // $this->hostedFieldsResponse = $hostedResponse;
         return $hostedResponse;
     }
 

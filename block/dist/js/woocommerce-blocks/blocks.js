@@ -230,10 +230,7 @@ if (isCheckout || hasOrder) {
               "payplus-payment-gateway-hostedfields"
             ) === 0
           ) {
-            document.querySelector("#submit-payment").click();
-            // overlay();
             jQuery(".blocks-payplus_loader_hosted").fadeIn();
-            // wc_checkout_form.$checkout_form.removeClass("processing").unblock();
             hf.SubmitPayment();
             return;
           }
