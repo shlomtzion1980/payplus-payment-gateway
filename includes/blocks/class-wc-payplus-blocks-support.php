@@ -309,9 +309,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data = $context->payment_data;
         $is_payplus_payment_method = $this->name === $context->payment_method;
         $main_gateway              = new WC_PayPlus_Gateway;
-        $this->orderId = $context->order->id;
-        $order = wc_get_order($this->orderId);
-        $this->hostedFieldsData($this->orderId);
+
 
 
         $this->isSubscriptionOrder = false;
@@ -340,7 +338,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         );
 
         if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
-
+            $this->orderId = $context->order->id;
+            $order = wc_get_order($this->orderId);
+            $this->hostedFieldsData($this->orderId);
 
             $result->set_payment_details('');
             $payment_details = $result->payment_details;
