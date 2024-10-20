@@ -699,6 +699,7 @@ class WC_PayPlus
                     $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
                 }
             }
+
             wp_localize_script(
                 'wc-checkout',
                 'payplus_script_checkout',
@@ -709,7 +710,7 @@ class WC_PayPlus
                     "customIcons" => $customIcons,
                     "isLoggedIn" => boolval(get_current_user_id() > 0),
                     "isSubscriptionOrder" => $isSubscriptionOrder,
-                    "isAutoPPCC" => $this->isAutoPPCC,
+                    "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
                     "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
                     "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 50,
                     "hidePPGateway" => isset($this->hostedFieldsOptions['hide_payplus_gateway']) ? boolval($this->hostedFieldsOptions['hide_payplus_gateway'] === "yes") : false,
