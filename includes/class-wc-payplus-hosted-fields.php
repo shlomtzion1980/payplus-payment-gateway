@@ -127,8 +127,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
 
         $pageRequestUid = WC()->session->get('page_request_uid');
+        $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-        if ($pageRequestUid) {
+        if ($pageRequestUid && $hostedFieldsUUID) {
             $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
         }
 
@@ -148,7 +149,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $hostedFieldsUUID = $bodyArray['data']['hosted_fields_uuid'];
             WC()->session->set('hostedFieldsUUID', $hostedFieldsUUID);
         } else {
-            $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
+
             $bodyArray['data']['hosted_fields_uuid'] = $hostedFieldsUUID;
         }
         $hostedResponse = wp_json_encode($bodyArray);

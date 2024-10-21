@@ -1,28 +1,31 @@
 const hf = new PayPlusHostedFieldsDom();
 var resp = JSON.parse(payplus_script.hostedResponse);
 let payload;
+const pageLang = document.documentElement.lang;
+const month = pageLang !== "he-IL" ? "Month" : "חודש";
+const year = pageLang !== "he-IL" ? "Year" : "שנה";
+let direction = pageLang !== "he-IL" ? "left" : "right";
 
 hf.SetMainFields({
     cc: {
         elmSelector: "#cc",
         wrapperElmSelector: "#cc-wrapper",
         config: {
-            placeholder:
-                "Card Number                                                  1234 1234 1234 1234",
+            placeholder: "1234 1234 1234 1234",
         },
     },
     expiryy: {
         elmSelector: "#expiryy",
         wrapperElmSelector: ".expiry-wrapper",
         config: {
-            placeholder: "        Year",
+            placeholder: year,
         },
     },
     expirym: {
         elmSelector: "#expirym",
         wrapperElmSelector: ".expiry-wrapper",
         config: {
-            placeholder: "        Month",
+            placeholder: month,
         },
     },
     expiry: {
@@ -39,7 +42,11 @@ hf.SetMainFields({
 })
     .AddField("card_holder_id", "#id-number", "#id-number-wrapper")
     .AddField("payments", "#payments", "#payments-wrapper")
-    .AddField("card_holder_name", "#card-holder-name", "#card-holder-name")
+    .AddField(
+        "card_holder_name",
+        "#card-holder-name",
+        "#card-holder-name-wrapper"
+    )
     .AddField(
         "card_holder_phone",
         ".card-holder-phone",
@@ -58,7 +65,14 @@ hf.SetMainFields({
     .AddField("contact_country", "[name=country]", ".country-wrapper")
     .AddField("custom_invoice_name", "#invoice-name", "#invoice-name-wrapper")
     .AddField("notes", "[name=notes]", ".notes-wrapper")
-    .SetRecaptcha("#recaptcha");
+    .SetRecaptcha("#recaptcha")
+    .SetHostedFieldsStyles(
+        ".hf-inp-name-cc {font-size:1rem !important;text-align: " +
+            direction +
+            "} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
+            direction +
+            "} .hf-inp-name-expirym,.hf-inp-name-expiryy {text-align: center; font-size: 1rem}"
+    );
 
 function putHostedFields() {
     var $paymentMethod = jQuery("#payment_method_payplus-payment-gateway");

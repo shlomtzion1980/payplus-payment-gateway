@@ -1,3 +1,10 @@
+<?php
+$ccImage = site_url() . "/wp-content/plugins/payplus-payment-gateway/assets/images/cCards.png";
+$ccImageAltText = 'Pay with Debit or Credit Card';
+
+$locale = get_locale();
+$rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +13,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
+        @font-face {
+            font-family: 'AlmoniMLv5AAA';
+            src: url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
+                url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
+                url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
+            font-weight: normal;
+            /* Or bold if necessary */
+            font-style: normal;
+            /* Or italic if necessary */
+        }
+
         label {
             margin: unset !important;
             border: none !important;
@@ -19,6 +37,10 @@
             background-color: #fff;
             border-radius: 5px;
             width: 100%;
+        }
+
+        .iframe-placeholder.cvv-fld {
+            flex-direction: <?php echo $rowDirection; ?>
         }
 
         .col-4 {
@@ -41,6 +63,7 @@
             /* height: 55vh; */
             flex-wrap: wrap;
             justify-content: space-between;
+            font-family: 'AlmoniMLv5AAA';
         }
 
         #hostedTop {
@@ -58,7 +81,7 @@
 
             .creditCards {
                 img {
-                    height: 19px;
+                    max-height: 60px;
                 }
             }
         }
@@ -218,7 +241,7 @@
             .form-control {
                 width: 100% !important;
                 padding: 0.5rem 0.75rem !important;
-                font-size: 13px !important;
+                font-size: 1rem !important;
                 border: 1px solid #E3E6E9 !important;
                 border-radius: 8px !important;
                 height: 45px;
@@ -265,6 +288,7 @@
         .seperator {
             padding: 7px;
             width: 40px;
+            color: #E3E6E9;
         }
 
         .form-select {
@@ -282,6 +306,8 @@
     </style>
 </head>
 
+
+
 <body>
     <div class="container hostedFields">
         <br />
@@ -298,29 +324,16 @@
                     <div id="hostedTop">
                         <div class="topText"><?php echo esc_html__('Credit card', 'payplus-payment-gateway'); ?></div>
                         <div class="creditCards">
-                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cCards.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
-                            <!-- <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/visa.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
-                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/mastercard.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
-                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/amex.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" />
-                            <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/diners.png"
-                                alt="&nbsp;&nbsp;Pay with Debit or Credit Card" /> -->
+                            <img src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" />
                         </div>
                     </div>
                     <div id="card-holder-name-wrapper" class="fld-wrapper">
-                        <!-- <div class="iframe-wrapper"> -->
                         <label><?php echo esc_html__('Name', 'payplus-payment-gateway'); ?></label>
                         <input type="text" id="card-holder-name" class="form-control" value="" />
-                        <!-- </div> -->
                     </div>
                     <div id="id-number-wrapper" class="fld-wrapper">
-                        <!-- <div class="iframe-wrapper"> -->
                         <label><?php echo esc_html__('ID number', 'payplus-payment-gateway'); ?></label>
                         <input id="id-number" type="number" class="form-control" value="" />
-                        <!-- </div> -->
                     </div>
                     <div class="row">
                         <div class="col-2 expiry-wrapper-full">
@@ -332,21 +345,14 @@
                         <div id="cc-wrapper" class="h-fld-wrapper">
                             <label><?php echo esc_html__('Card number', 'payplus-payment-gateway'); ?></label>
                             <div id="cCard" class="iframe-wrapper">
-
                                 <span id="cc" placeholder="Card Number" class="form-control fld-frame"
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
                         <div class="expireClass">
-                            <!-- <div id="month" class="iframe-wrapper exp"> -->
-
                             <span id="expirym" class="fld-frame"></span>
-                            <!-- </div> -->
                             <span class="seperator"> / </span>
-                            <!-- <div id="year" class="iframe-wrapper exp"> -->
-
                             <span id="expiryy" class="fld-frame"></span>
-                            <!-- </div> -->
                         </div>
                         <div id="cvv-fld" class="expireClass">
                             <div class="iframe-wrapper">
@@ -355,11 +361,12 @@
                                         alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
                                         style="top: 1.4px;" />
                                 </label>
-                                <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
+                                <div class="row" id="cvv-wrapper">
+                                    <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="row" id="cvv-wrapper"></div>
                     <div id="payments-wrapper" class="fld-wrapper">
                         <label><?php echo esc_html__('Payments', 'payplus-payment-gateway'); ?></label>
                         <select class="form-select" id="payments" aria-label="Default select example">
