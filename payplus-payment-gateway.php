@@ -100,6 +100,7 @@ class WC_PayPlus
         WC()->session->__unset('page_request_uid');
         WC()->session->__unset('hostedResponse');
         WC()->session->__unset('order_awaiting_payment');
+        WC()->session->__unset('hostedFieldsUUID');
         wp_send_json_success(array('result' => "success"));
     }
 

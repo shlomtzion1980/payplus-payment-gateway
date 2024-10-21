@@ -58,6 +58,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             WC()->session->__unset('page_request_uid');
             WC()->session->__unset('hostedResponse');
             WC()->session->__unset('order_awaiting_payment');
+            WC()->session->__unset('hostedFieldsUUID');
             return;
         }
 
@@ -140,9 +141,20 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             WC()->session->set('page_request_uid', $pageRequestUid);
         }
 
+        $body = wp_remote_retrieve_body($hostedResponse);
+        $bodyArray = json_decode($body, true);
+
+        if (isset($bodyArray['data']['hosted_fields_uuid']) && $bodyArray['data']['hosted_fields_uuid'] !== null) {
+            $hostedFieldsUUID = $bodyArray['data']['hosted_fields_uuid'];
+            WC()->session->set('hostedFieldsUUID', $hostedFieldsUUID);
+        } else {
+            $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
+            $bodyArray['data']['hosted_fields_uuid'] = $hostedFieldsUUID;
+        }
+        $hostedResponse = wp_json_encode($bodyArray);
         WC()->session->set('hostedResponse', $hostedResponse);
 
-        return wp_remote_retrieve_body($hostedResponse);
+        return $hostedResponse;
     }
 
     public function hostedFieldsData($order_id)
@@ -298,6 +310,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         // $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 
         $payload = wp_json_encode($data);
+
         WC()->session->set('hostedPayload', $payload);
 
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
@@ -309,7 +322,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
         }
 
-        // $this->hostedFieldsResponse = $hostedResponse;
         return $hostedResponse;
     }
 

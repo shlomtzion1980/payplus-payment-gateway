@@ -218,7 +218,7 @@
             .form-control {
                 width: 100% !important;
                 padding: 0.5rem 0.75rem !important;
-                font-size: 20px !important;
+                font-size: 13px !important;
                 border: 1px solid #E3E6E9 !important;
                 border-radius: 8px !important;
                 height: 45px;
@@ -332,26 +332,25 @@
                         <div id="cc-wrapper" class="h-fld-wrapper">
                             <label><?php echo esc_html__('Card number', 'payplus-payment-gateway'); ?></label>
                             <div id="cCard" class="iframe-wrapper">
-                                <label class="iframe-placeholder cCard"><?php echo esc_html__('1234 1234 1234 1234', 'payplus-payment-gateway'); ?></label>
+
                                 <span id="cc" placeholder="Card Number" class="form-control fld-frame"
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
                         <div class="expireClass">
-                            <div id="month" class="iframe-wrapper exp">
-                                <label class="iframe-placeholder month"><?php echo esc_html__('Month', 'payplus-payment-gateway'); ?></label>
-                                <span id="expirym" class="fld-frame"></span>
-                            </div>
+                            <!-- <div id="month" class="iframe-wrapper exp"> -->
+
+                            <span id="expirym" class="fld-frame"></span>
+                            <!-- </div> -->
                             <span class="seperator"> / </span>
-                            <div id="year" class="iframe-wrapper exp">
-                                <label class="iframe-placeholder year"><?php echo esc_html__('Year', 'payplus-payment-gateway'); ?></label>
-                                <span id="expiryy" class="fld-frame"></span>
-                            </div>
+                            <!-- <div id="year" class="iframe-wrapper exp"> -->
+
+                            <span id="expiryy" class="fld-frame"></span>
+                            <!-- </div> -->
                         </div>
                         <div id="cvv-fld" class="expireClass">
                             <div class="iframe-wrapper">
                                 <label class="iframe-placeholder cvv-fld">
-                                    <?php echo esc_html__('CVV', 'payplus-payment-gateway'); ?>
                                     <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
                                         alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
                                         style="top: 1.4px;" />
