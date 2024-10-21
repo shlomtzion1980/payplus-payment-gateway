@@ -64,6 +64,7 @@ $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
             flex-wrap: wrap;
             justify-content: space-between;
             font-family: 'AlmoniMLv5AAA';
+            min-height: 533px;
         }
 
         #hostedTop {
