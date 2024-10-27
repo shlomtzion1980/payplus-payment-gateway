@@ -2356,6 +2356,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 );
             }
         }
+
+        $response = array(
+            'status' => 'success',
+            'message' => 'PayPlus callback function ended.',
+        );
+
+        wp_die(
+            json_encode($response),
+            '',
+            array(
+                'response' => 200,
+                'content_type' => 'application/json'
+            )
+        );
     }
 
 
