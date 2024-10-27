@@ -4,6 +4,7 @@ $ccImageAltText = 'Pay with Debit or Credit Card';
 
 $locale = get_locale();
 $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
+$direction = $locale !== "he_IL" ? "right" : "left";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -177,10 +178,6 @@ $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
             justify-content: center;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px;
-
-            @media screen and (max-width: 567px) {
-                min-width: 100%;
-            }
         }
 
         .smallCol {
@@ -297,12 +294,39 @@ $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px !important;
             background-color: white;
+            outline: none;
         }
 
         #payments-wrapper {
             display: flex;
             flex-wrap: wrap;
             flex-direction: column-reverse;
+        }
+
+        .card-holder-phone-prefix {
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
+
+        #payments {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        select {
+
+
+            @media screen and (min-width: 567px) {
+                appearance: none;
+                /* Remove default arrow (Webkit) */
+                -moz-appearance: none;
+                /* Remove default arrow (Firefox) */
+
+                background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo $direction; ?> 15px center;
+                /* Add custom arrow */
+                background-size: 10px;
+            }
         }
     </style>
 </head>
@@ -335,6 +359,29 @@ $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
                     <div id="id-number-wrapper" class="fld-wrapper">
                         <label><?php echo esc_html__('ID number', 'payplus-payment-gateway'); ?></label>
                         <input id="id-number" type="number" class="form-control" value="" />
+                    </div>
+                    <div class="card-holder-phone-wrapper fld-wrapper">
+                        <div class="col-12">
+                            <label><?php echo esc_html__('Phone', 'payplus-payment-gateway'); ?></label></label>
+                            <div class="row" dir="ltr">
+                                <div class="col-3">
+                                    <select class="form-select card-holder-phone-prefix"
+                                        aria-label="Default select example">
+                                        <option value="1">+1</option>
+                                        <option value="20">+20</option>
+                                        <option value="27">+27</option>
+                                        <option value="30">+30</option>
+                                        <option value="31">+31</option>
+                                        <option selected value="972">
+                                            +972
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-9">
+                                    <input type="text" placeholder="999-999-9999" class="form-control card-holder-phone" value="" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="col-2 expiry-wrapper-full">
@@ -375,29 +422,6 @@ $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
                             <option value="2">2</option>
                             <option value="3">3</option>
                         </select>
-                    </div>
-                    <div class="row card-holder-phone-wrapper">
-                        <div class="col-12">
-                            <label>Phone</label>
-                            <div class="row">
-                                <div class="col-3">
-                                    <select class="form-select card-holder-phone-prefix"
-                                        aria-label="Default select example">
-                                        <option value="1">+1</option>
-                                        <option value="20">+20</option>
-                                        <option value="27">+27</option>
-                                        <option value="30">+30</option>
-                                        <option value="31">+31</option>
-                                        <option selected value="972">
-                                            +972
-                                        </option>
-                                    </select>
-                                </div>
-                                <div class="col-9">
-                                    <input type="text" class="form-control card-holder-phone" value="" />
-                                </div>
-                            </div>
-                        </div>
                     </div>
                     <div class="row" id="invoice-name-wrapper">
                         <div class="col-12">

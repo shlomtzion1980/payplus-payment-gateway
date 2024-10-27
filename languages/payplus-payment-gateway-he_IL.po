@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-10-16 12:32+0300\n"
-"PO-Revision-Date: 2024-10-16 12:57+0300\n"
+"POT-Creation-Date: 2024-10-27 07:51+0200\n"
+"PO-Revision-Date: 2024-10-27 07:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -102,7 +102,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:93
 #: includes/class-wc-payplus-form-fields.php:236
-#: payplus-payment-gateway.php:831
+#: payplus-payment-gateway.php:862
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -118,14 +118,14 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/class-wc-payplus-form-fields.php:240
 #: includes/class-wc-payplus-statics.php:78
 #: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:483
-#: payplus-payment-gateway.php:826 payplus-payment-gateway.php:1011
+#: payplus-payment-gateway.php:857 payplus-payment-gateway.php:1042
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:98
 #: includes/class-wc-payplus-form-fields.php:241
-#: payplus-payment-gateway.php:484 payplus-payment-gateway.php:827
-#: payplus-payment-gateway.php:1012
+#: payplus-payment-gateway.php:484 payplus-payment-gateway.php:858
+#: payplus-payment-gateway.php:1043
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -821,7 +821,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1157
 #: includes/admin/class-wc-payplus-admin.php:1185
-#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:365
+#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:378
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1065,9 +1065,9 @@ msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בד
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:167
-#: includes/blocks/class-wc-payplus-blocks-support.php:169
-#: includes/wc_payplus_gateway.php:1278 payplus-payment-gateway.php:1090
+#: includes/blocks/class-wc-payplus-blocks-support.php:400
+#: includes/blocks/class-wc-payplus-blocks-support.php:402
+#: includes/wc_payplus_gateway.php:1278 payplus-payment-gateway.php:1121
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1133,8 +1133,8 @@ msgstr "כותרת"
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:356
-#: templates/hostedFields.php:407
+#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:368
+#: templates/hostedFields.php:420
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
@@ -1570,7 +1570,7 @@ msgstr "השבת את מתזמן WooCommerce"
 msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
-#: includes/class-wc-payplus-hosted-fields.php:383
+#: includes/class-wc-payplus-hosted-fields.php:399
 #, fuzzy
 #| msgid "Error: credit card declined: %s"
 msgid "Error creating order: "
@@ -1744,7 +1744,7 @@ msgstr ""
 msgid "Embedded"
 msgstr "טופס מובנה"
 
-#: includes/wc_payplus_gateway.php:1228 payplus-payment-gateway.php:710
+#: includes/wc_payplus_gateway.php:1228 payplus-payment-gateway.php:719
 msgid "Save credit card in my account"
 msgstr "שמור את כרטיס האשראי בחשבון שלי"
 
@@ -1861,49 +1861,49 @@ msgid "Link Document  "
 msgstr "לינק מסמך "
 
 #: includes/wc_payplus_subgateways.php:29
-#: includes/wc_payplus_subgateways.php:250
+#: includes/wc_payplus_subgateways.php:251
 msgid "Pay with bit via PayPlus"
 msgstr "שלם באמצעות ביט"
 
 #: includes/wc_payplus_subgateways.php:30
-#: includes/wc_payplus_subgateways.php:253
+#: includes/wc_payplus_subgateways.php:254
 msgid "Pay with Google Pay via PayPlus"
 msgstr "שלם באמצעות גוגל פיי"
 
 #: includes/wc_payplus_subgateways.php:31
-#: includes/wc_payplus_subgateways.php:256
+#: includes/wc_payplus_subgateways.php:257
 msgid "Pay with Apple Pay via PayPlus"
 msgstr "שלם באמצעות  אפל פיי"
 
 #: includes/wc_payplus_subgateways.php:32
-#: includes/wc_payplus_subgateways.php:259
+#: includes/wc_payplus_subgateways.php:260
 msgid "Pay With MULTIPASS via PayPlus"
 msgstr "תשלום באמצעות מולטיפאס"
 
 #: includes/wc_payplus_subgateways.php:33
-#: includes/wc_payplus_subgateways.php:262
+#: includes/wc_payplus_subgateways.php:263
 msgid "Pay with PayPal via PayPlus"
 msgstr "שלם באמצעות פייפאל"
 
 #: includes/wc_payplus_subgateways.php:34
-#: includes/wc_payplus_subgateways.php:265
+#: includes/wc_payplus_subgateways.php:266
 msgid "Pay with Tav Zahav via PayPlus"
 msgstr "שלם באמצעות תו הזהב"
 
 #: includes/wc_payplus_subgateways.php:35
-#: includes/wc_payplus_subgateways.php:268
+#: includes/wc_payplus_subgateways.php:269
 #, fuzzy
 #| msgid "Pay with PayPal via PayPlus"
 msgid "Pay with Valuecard via PayPlus"
 msgstr "שלם באמצעות פייפאל"
 
 #: includes/wc_payplus_subgateways.php:36
-#: includes/wc_payplus_subgateways.php:271
+#: includes/wc_payplus_subgateways.php:272
 msgid "Pay with finitiOne via PayPlus"
 msgstr "שלם באמצעות פיניטי אוון"
 
 #: includes/wc_payplus_subgateways.php:37
-#: includes/wc_payplus_subgateways.php:274
+#: includes/wc_payplus_subgateways.php:275
 msgid "Pay with PayPlus Embedded"
 msgstr "תשלום עם טופס מובנה"
 
@@ -1947,7 +1947,7 @@ msgid "PayPlus - Valuecard"
 msgstr "פיי פלוס וואליו קארד"
 
 #: includes/wc_payplus_subgateways.php:103
-#: includes/wc_payplus_subgateways.php:426
+#: includes/wc_payplus_subgateways.php:427
 msgid "PayPlus - Embedded"
 msgstr "פייפלוס - טופס מובנה"
 
@@ -2117,67 +2117,55 @@ msgstr ""
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:855 payplus-payment-gateway.php:874
+#: payplus-payment-gateway.php:886 payplus-payment-gateway.php:905
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:893
+#: payplus-payment-gateway.php:924
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:916 payplus-payment-gateway.php:933
+#: payplus-payment-gateway.php:947 payplus-payment-gateway.php:964
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1055 payplus-payment-gateway.php:1063
+#: payplus-payment-gateway.php:1086 payplus-payment-gateway.php:1094
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1078
+#: payplus-payment-gateway.php:1109
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:299
+#: templates/hostedFields.php:332
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:315
+#: templates/hostedFields.php:338
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:321
+#: templates/hostedFields.php:342
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:333
+#: templates/hostedFields.php:353
 msgid "Card number"
 msgstr "מידע על הכרטיס"
 
-#: templates/hostedFields.php:335
-msgid "1234 1234 1234 1234"
-msgstr ""
+#: templates/hostedFields.php:387
+msgid "Phone"
+msgstr "טלפון"
 
-#: templates/hostedFields.php:342
-msgid "Month"
-msgstr "חודש"
-
-#: templates/hostedFields.php:347
-msgid "Year"
-msgstr "שנה"
-
-#: templates/hostedFields.php:354
-msgid "CVV"
-msgstr "קוד CVV"
-
-#: templates/hostedFields.php:401
+#: templates/hostedFields.php:414
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:405
+#: templates/hostedFields.php:418
 msgid "Powered by "
 msgstr ""
 
@@ -2202,6 +2190,15 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Month"
+#~ msgstr "חודש"
+
+#~ msgid "Year"
+#~ msgstr "שנה"
+
+#~ msgid "CVV"
+#~ msgstr "קוד CVV"
 
 #~ msgid "Hosted Fields"
 #~ msgstr "שדות מאורחים"
@@ -2535,9 +2532,6 @@ msgstr ""
 
 #~ msgid "Fullname"
 #~ msgstr "שם מלא"
-
-#~ msgid "Phone"
-#~ msgstr "טלפון"
 
 #~ msgid "Email"
 #~ msgstr "דוא”ל"
