@@ -170,9 +170,17 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             background-color: transparent !important;
         }
 
+        .col-9 {
+            @media screen and (min-width: 467px) {
+                margin-left: 3px;
+                max-width: 74% !important;
+            }
+        }
+
         .expireClass {
             background-color: white;
-            width: 50%;
+            margin-top: 4px;
+            width: 49.5%;
             height: 50px;
             display: flex;
             justify-content: center;
