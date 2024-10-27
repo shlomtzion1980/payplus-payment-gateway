@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-10-27 07:51+0200\n"
-"PO-Revision-Date: 2024-10-27 07:51+0200\n"
+"POT-Creation-Date: 2024-10-27 14:53+0200\n"
+"PO-Revision-Date: 2024-10-27 14:54+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -821,7 +821,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1157
 #: includes/admin/class-wc-payplus-admin.php:1185
-#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:378
+#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:427
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -957,6 +957,17 @@ msgstr "פרטים"
 #: includes/admin/class-wc-payplus-admin.php:1771
 msgid "Methods of Payment"
 msgstr "אמצעי תשלום"
+
+#: includes/admin/class-wc-payplus-admin.php:1679
+msgid ""
+"This button triggers an IPN process based on the payment page request UID, "
+"retrieving relevant data and updating the order accordingly. If the charge "
+"or approval is successful, the order status will automatically update to the "
+"default status. Please be aware of this behavior."
+msgstr ""
+"כפתור זה יפעיל תהליך IPN בהתאם ל-UID של בקשת עמוד התשלום, יאחזר את הנתונים "
+"הרלוונטיים ויעדכן את ההזמנה בהתאם. במקרה של חיוב או אישור מוצלח, סטטוס "
+"ההזמנה יעודכן אוטומטית לסטטוס ברירת המחדל. יש לשים לב להתנהגות זו."
 
 #: includes/admin/class-wc-payplus-admin.php:1756
 msgid "Pay With Token"
@@ -1133,8 +1144,8 @@ msgstr "כותרת"
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:368
-#: templates/hostedFields.php:420
+#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:417
+#: templates/hostedFields.php:446
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
@@ -1799,34 +1810,34 @@ msgid ""
 "domain settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2112 includes/wc_payplus_gateway.php:3078
-#: includes/wc_payplus_gateway.php:3086
+#: includes/wc_payplus_gateway.php:2112 includes/wc_payplus_gateway.php:3092
+#: includes/wc_payplus_gateway.php:3100
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:2645
+#: includes/wc_payplus_gateway.php:2659
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:2815
+#: includes/wc_payplus_gateway.php:2829
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:3109
+#: includes/wc_payplus_gateway.php:3123
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:3119
+#: includes/wc_payplus_gateway.php:3133
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:3164
+#: includes/wc_payplus_gateway.php:3178
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:3192 includes/wc_payplus_gateway.php:3198
+#: includes/wc_payplus_gateway.php:3206 includes/wc_payplus_gateway.php:3212
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
@@ -2141,31 +2152,31 @@ msgid ""
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:332
+#: templates/hostedFields.php:358
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:338
+#: templates/hostedFields.php:364
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:342
+#: templates/hostedFields.php:368
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:353
-msgid "Card number"
-msgstr "מידע על הכרטיס"
-
-#: templates/hostedFields.php:387
+#: templates/hostedFields.php:373
 msgid "Phone"
 msgstr "טלפון"
 
-#: templates/hostedFields.php:414
+#: templates/hostedFields.php:402
+msgid "Card number"
+msgstr "מידע על הכרטיס"
+
+#: templates/hostedFields.php:440
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:418
+#: templates/hostedFields.php:444
 msgid "Powered by "
 msgstr ""
 
