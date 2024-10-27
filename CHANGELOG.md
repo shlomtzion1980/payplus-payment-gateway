@@ -1,6 +1,9 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [7.1.7] - 27-10-2024  (Ryu)
+- Fix   - Callback response.
+
 ## [7.1.6] - 2024-10-13 - (Kaos)
 
 - Fix   - Subscription order renewals.
