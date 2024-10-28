@@ -41,7 +41,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         }
 
         .iframe-placeholder.cvv-fld {
-            flex-direction: <?php echo $rowDirection; ?>
+            flex-direction: <?php echo esc_attr($rowDirection); ?>
         }
 
         .col-4 {
@@ -331,7 +331,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                 -moz-appearance: none;
                 /* Remove default arrow (Firefox) */
 
-                background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo $direction; ?> 15px center;
+                background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo esc_attr($direction); ?> 15px center;
                 /* Add custom arrow */
                 background-size: 10px;
             }
