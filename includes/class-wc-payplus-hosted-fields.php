@@ -226,6 +226,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data = new stdClass();
         $data->payment_page_uid = PAYMENT_PAGE_UID;
         $data->refURL_success = SUCCESS_URL;
+        $_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
+        $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = FAILURE_URL;
         $data->refURL_cancel = CANCEL_URL;
         $data->create_token = true;
