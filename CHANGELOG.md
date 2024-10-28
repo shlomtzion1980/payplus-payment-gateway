@@ -1,7 +1,14 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
+## [7.1.8] - 28-10-2024 - (Ken)
+
+* Add   - Transaction UID handling to the payPlusIpn function.
+* Tweak - Callbacks are now consistently received locally and forwarded to the "Callback URL" when defined in plugin settings.
+
 ## [7.1.7] - 27-10-2024  (Ryu)
+
 - Fix   - Callback response.
 
 ## [7.1.6] - 2024-10-13 - (Kaos)
@@ -11,7 +18,6 @@ All notable changes to this project will be documented in this file.
 - Add   - Option to force Apple Pay script from admin settings.
 - Add   - Updated shipping functions for express checkout.
 - Tweak - Improved menu translations.
-
 
 ## [7.1.5] - 2024-09-12 - (MonkeyDLuffy)
 
