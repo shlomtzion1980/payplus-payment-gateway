@@ -2380,7 +2380,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         );
 
         wp_die(
-            json_encode($response),
+            wp_json_encode($response),
             '',
             array(
                 'response' => 200,
