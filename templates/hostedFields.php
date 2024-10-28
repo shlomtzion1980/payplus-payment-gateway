@@ -156,7 +156,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         .blocks-payplus_loader_hosted {
             display: none;
             position: relative;
-            z-index: 1000000000000;
+            z-index: 999999;
         }
 
         .expiries {

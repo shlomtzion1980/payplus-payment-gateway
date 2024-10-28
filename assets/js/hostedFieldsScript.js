@@ -4,7 +4,7 @@ let payload;
 const pageLang = document.documentElement.lang;
 const month = pageLang !== "he-IL" ? "Month" : "חודש";
 const year = pageLang !== "he-IL" ? "Year" : "שנה";
-let direction = pageLang !== "he-IL" ? "left" : "right";
+const direction = pageLang !== "he-IL" ? "left" : "right";
 
 hf.SetMainFields({
     cc: {
