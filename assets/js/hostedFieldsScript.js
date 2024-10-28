@@ -205,7 +205,7 @@ hf.Upon("pp_responseFromServer", (e) => {
         ? true
         : false;
 
-    if (e.detail.data.error || e.detail.data.status === "reject") {
+    if (e.detail?.data?.error || e.detail?.data?.status === "reject") {
         alert(e.detail.data.message);
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
         overlay(true);
