@@ -1913,7 +1913,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->default_charge_method = 'credit-card';
         }
 
-        $callback = $this->callback_addr ? $this->callback_addr : get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
+        $callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
 
         $post = $this->payplus_get_posts_id("", array("post_parent" => $order_id));
         $external_recurring_payment = "";
@@ -2239,6 +2239,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function callback_response()
     {
+
         global $wpdb;
         $indexRow = 0;
         $json = file_get_contents('php://input');
@@ -2248,6 +2249,22 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $tblname = esc_sql($tblname);
         $handle = 'payplus_callback_begin';
         $payplusHash = isset($_SERVER['HTTP_HASH']) ? sanitize_text_field($_SERVER['HTTP_HASH']) : ""; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
+
+        if ($this->callback_addr) {
+            $url = $this->callback_addr;
+            $body = wp_json_encode($json);
+
+            // Set up the request arguments
+            $args = array(
+                'body'        => $body,
+                'headers'     => array('Content-Type' => 'application/json'),
+                'method'      => 'POST',
+                'blocking'    => false, // Allows asynchronous (non-blocking) request
+            );
+
+            // Send the request
+            wp_remote_post($url, $args);
+        }
 
         if ($payplusGenHash === $payplusHash) {
             $order_id = intval($response['transaction']['more_info']);
