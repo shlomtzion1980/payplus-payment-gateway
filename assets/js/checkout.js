@@ -24,7 +24,8 @@ jQuery(function ($) {
                 "</p>"
         );
 
-        payplus_script_checkout.isLoggedIn
+        payplus_script_checkout.isLoggedIn &&
+        payplus_script_checkout.isSavingCerditCards
             ? $hostedDiv.append($checkbox)
             : null;
     }
