@@ -311,6 +311,10 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                 min-width: 100% !important;
             }
 
+            .hf-col-12 {
+                width: 100%;
+            }
+
             .hf-col-3 {
                 flex: 0 0 auto;
                 width: 25%;
@@ -368,7 +372,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         #payments-wrapper {
             display: flex;
             flex-wrap: wrap;
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .card-holder-phone-prefix {
@@ -409,7 +413,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         <input id="id-number" type="number" class="form-control" value="" />
                     </div>
                     <div class="card-holder-phone-wrapper fld-wrapper">
-                        <div class="col-12">
+                        <div class="hf-col-12">
                             <label><?php echo esc_html__('Phone', 'payplus-payment-gateway'); ?></label></label>
                             <div class="hf-row" dir="ltr">
                                 <div class="hf-col-3">
@@ -469,7 +473,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         </select>
                     </div>
                     <div class="hf-row" id="invoice-name-wrapper">
-                        <div class="col-12">
+                        <div class="hf-col-12">
                             <label>Invoice name</label>
                             <input type="text" id="invoice-name" class="form-control" value="" />
                         </div>
@@ -485,31 +489,31 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                 </div>
                 <div class="hf-col-4" style="display: none">
                     <div class="hf-row">
-                        <div class="col-12 wrapper customer_name-wrapper">
+                        <div class="hf-col-12 wrapper customer_name-wrapper">
                             <label>Customer name</label>
                             <input type="text" name="customer_name" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper customer_id-wrapper">
+                        <div class="hf-col-12 wrapper customer_id-wrapper">
                             <label>Customer id</label>
                             <input type="text" name="customer_id" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper phone-wrapper">
+                        <div class="hf-col-12 wrapper phone-wrapper">
                             <label>Phone</label>
                             <input type="text" name="phone" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper email-wrapper">
+                        <div class="hf-col-12 wrapper email-wrapper">
                             <label>email</label>
                             <input type="email" name="email" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper address-wrapper">
+                        <div class="hf-col-12 wrapper address-wrapper">
                             <label>Address</label>
                             <input type="text" name="address" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper country-wrapper">
+                        <div class="hf-col-12 wrapper country-wrapper">
                             <label>Country</label>
                             <input type="text" name="country" class="form-control" value="" />
                         </div>
-                        <div class="col-12 wrapper notes-wrapper">
+                        <div class="hf-col-12 wrapper notes-wrapper">
                             <label>Notes</label>
                             <input type="text" name="notes" class="form-control" value="" />
                         </div>
