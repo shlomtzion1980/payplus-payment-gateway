@@ -31,6 +31,9 @@ hf.SetMainFields({
     expiry: {
         elmSelector: "#expiry",
         wrapperElmSelector: ".expiry-wrapper-full",
+        config: {
+            placeholder: month + " / " + year,
+        },
     },
     cvv: {
         elmSelector: "#cvv",
@@ -71,7 +74,7 @@ hf.SetMainFields({
             direction +
             "} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
             direction +
-            "} .hf-inp-name-expirym,.hf-inp-name-expiryy {text-align: center; font-size: 1rem}"
+            "} .hf-inp-name-expirym,.hf-inp-name-expiryy,.hf-inp-name-expiry {text-align: center; font-size: 1rem}"
     );
 
 function putHostedFields() {

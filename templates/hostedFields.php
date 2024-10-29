@@ -185,6 +185,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             display: flex;
             margin: auto;
             flex-wrap: wrap;
+            justify-content: space-between;
         }
 
         input:-internal-autofill-selected {
@@ -198,12 +199,13 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             }
         }
 
-        .expireClass {
+        .expireCvvClass {
             background-color: white;
             margin-top: 4px;
             width: 49.5%;
             height: 50px;
             display: flex;
+            padding: 7px;
             justify-content: center;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px;
@@ -290,14 +292,14 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             margin-bottom: 0.2em;
         }
 
-        .row {
+        .hf-row {
             @media screen and (max-width: 768px) {
                 min-width: 100% !important;
             }
         }
 
         .pp_iframe_h {
-            .row>* {
+            .hf-row>* {
                 padding: unset !important;
             }
         }
@@ -329,7 +331,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         #payments-wrapper {
             display: flex;
             flex-wrap: wrap;
-            flex-direction: column-reverse;
+            flex-direction: column;
         }
 
         .card-holder-phone-prefix {
@@ -337,8 +339,6 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             outline: none;
             text-align: center;
         }
-
-        #payments {}
     </style>
 </head>
 
@@ -348,7 +348,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
     <div class="container hostedFields">
         <br />
         <div id="payment-form">
-            <div class="row">
+            <div class="hf-row">
                 <div class="blocks-payplus_loader_hosted">
                     <div class="blocks-loader">
                         <div class="blocks-loader-background">
@@ -374,7 +374,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                     <div class="card-holder-phone-wrapper fld-wrapper">
                         <div class="col-12">
                             <label><?php echo esc_html__('Phone', 'payplus-payment-gateway'); ?></label></label>
-                            <div class="row" dir="ltr">
+                            <div class="hf-row" dir="ltr">
                                 <div class="col-3">
                                     <select class="form-select card-holder-phone-prefix"
                                         aria-label="Default select example">
@@ -394,13 +394,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-2 expiry-wrapper-full">
-                            <label>Expiry date</label>
-                            <span id="expiry" class="fld-frame"></span>
-                        </div>
-                    </div>
-                    <div class="expiry-wrapper expiries">
+                    <div class="expiries">
                         <div id="cc-wrapper" class="h-fld-wrapper">
                             <label><?php echo esc_html__('Card number', 'payplus-payment-gateway'); ?></label>
                             <div id="cCard" class="iframe-wrapper">
@@ -408,19 +402,22 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
-                        <div class="expireClass">
+                        <div class="expiry-wrapper-full expireCvvClass">
+                            <span id="expiry" class="fld-frame"></span>
+                        </div>
+                        <div class="expiry-wrapper expireCvvClass">
                             <span id="expirym" class="fld-frame"></span>
                             <span class="seperator"> / </span>
                             <span id="expiryy" class="fld-frame"></span>
                         </div>
-                        <div id="cvv-fld" class="expireClass">
+                        <div id="cvv-fld" class="expireCvvClass">
                             <div class="iframe-wrapper">
                                 <label class="iframe-placeholder cvv-fld">
                                     <img class="hf-image" src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
                                         alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
                                         style="top: 1.4px;" />
                                 </label>
-                                <div class="row" id="cvv-wrapper">
+                                <div class="hf-row" id="cvv-wrapper">
                                     <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                                 </div>
                             </div>
@@ -434,7 +431,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                             <option value="3">3</option>
                         </select>
                     </div>
-                    <div class="row" id="invoice-name-wrapper">
+                    <div class="hf-row" id="invoice-name-wrapper">
                         <div class="col-12">
                             <label>Invoice name</label>
                             <input type="text" id="invoice-name" class="form-control" value="" />
@@ -450,7 +447,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                     </div>
                 </div>
                 <div class="hf-col-4" style="display: none">
-                    <div class="row">
+                    <div class="hf-row">
                         <div class="col-12 wrapper customer_name-wrapper">
                             <label>Customer name</label>
                             <input type="text" name="customer_name" class="form-control" value="" />
