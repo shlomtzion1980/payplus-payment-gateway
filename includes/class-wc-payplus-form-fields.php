@@ -253,7 +253,7 @@ class WC_PayPlus_Form_Fields
             'checkout_page_title' => [
                 'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
-                'description' => __('Setup for the wordpress checkout page.', 'payplus-payment-gateway'),
+                'description' => __('Setup for the woocommerce checkout page.', 'payplus-payment-gateway'),
             ],
             'hide_icon' => [
                 'title' => __('Hide PayPlus Icon', 'payplus-payment-gateway'),
