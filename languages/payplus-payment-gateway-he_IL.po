@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-10-27 14:53+0200\n"
-"PO-Revision-Date: 2024-10-27 14:54+0200\n"
+"POT-Creation-Date: 2024-10-29 22:51+0200\n"
+"PO-Revision-Date: 2024-10-29 22:52+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -102,7 +102,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:93
 #: includes/class-wc-payplus-form-fields.php:236
-#: payplus-payment-gateway.php:862
+#: payplus-payment-gateway.php:863
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -118,14 +118,14 @@ msgstr "הגדרות ברירת מחדל בדף תשלום"
 #: includes/class-wc-payplus-form-fields.php:240
 #: includes/class-wc-payplus-statics.php:78
 #: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:483
-#: payplus-payment-gateway.php:857 payplus-payment-gateway.php:1042
+#: payplus-payment-gateway.php:858 payplus-payment-gateway.php:1043
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:98
 #: includes/class-wc-payplus-form-fields.php:241
-#: payplus-payment-gateway.php:484 payplus-payment-gateway.php:858
-#: payplus-payment-gateway.php:1043
+#: payplus-payment-gateway.php:484 payplus-payment-gateway.php:859
+#: payplus-payment-gateway.php:1044
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -821,7 +821,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1157
 #: includes/admin/class-wc-payplus-admin.php:1185
-#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:427
+#: includes/class-wc-payplus-statics.php:383 templates/hostedFields.php:486
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1078,7 +1078,7 @@ msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:400
 #: includes/blocks/class-wc-payplus-blocks-support.php:402
-#: includes/wc_payplus_gateway.php:1278 payplus-payment-gateway.php:1121
+#: includes/wc_payplus_gateway.php:1278 payplus-payment-gateway.php:1122
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1144,8 +1144,8 @@ msgstr "כותרת"
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:417
-#: templates/hostedFields.php:446
+#: includes/class-wc-payplus-form-fields.php:176 templates/hostedFields.php:476
+#: templates/hostedFields.php:506
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
@@ -1581,7 +1581,7 @@ msgstr "השבת את מתזמן WooCommerce"
 msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
-#: includes/class-wc-payplus-hosted-fields.php:399
+#: includes/class-wc-payplus-hosted-fields.php:401
 #, fuzzy
 #| msgid "Error: credit card declined: %s"
 msgid "Error creating order: "
@@ -1810,34 +1810,34 @@ msgid ""
 "domain settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2112 includes/wc_payplus_gateway.php:3092
-#: includes/wc_payplus_gateway.php:3100
+#: includes/wc_payplus_gateway.php:2112 includes/wc_payplus_gateway.php:3106
+#: includes/wc_payplus_gateway.php:3114
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:2659
+#: includes/wc_payplus_gateway.php:2673
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:2829
+#: includes/wc_payplus_gateway.php:2843
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:3123
+#: includes/wc_payplus_gateway.php:3137
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:3133
+#: includes/wc_payplus_gateway.php:3147
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:3178
+#: includes/wc_payplus_gateway.php:3192
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:3206 includes/wc_payplus_gateway.php:3212
+#: includes/wc_payplus_gateway.php:3220 includes/wc_payplus_gateway.php:3226
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
@@ -2046,8 +2046,11 @@ msgstr "רוחב התצוגה של טופס מובנה (%)"
 
 #: includes/wc_payplus_subgateways.php:191
 msgid ""
-"This sets the width of the Embedded container in percentage (Max is 100)."
-msgstr "הגדרה לרוחב תצוגת טופס האשראי המובנה של פייפלוס לפי אחוזים (עד 100)"
+"This sets the width of the Embedded container in percentage (Max is 100 of "
+"the container)."
+msgstr ""
+"הגדרה לרוחב תצוגת טופס האשראי המובנה של פייפלוס לפי אחוזים (עד 100% מגודל "
+"התצוגה של המיכל)"
 
 #: includes/wc_payplus_subgateways.php:196
 msgid "Hide PayPlus gateway (No saved tokens)"
@@ -2063,7 +2066,11 @@ msgid "Make PayPlus Embedded main gateway"
 msgstr "טופס מובנה כשיטת תשלום ראשית"
 
 #: includes/wc_payplus_subgateways.php:203
-msgid "Make PayPlus Embedded main gateway (No subscription support yet!)"
+#, fuzzy
+#| msgid "Make PayPlus Embedded main gateway (No subscription support yet!)"
+msgid ""
+"Make PayPlus Embedded main gateway (Overrides \"Hide PayPlus gateway\") [No "
+"subscription support yet!]"
 msgstr ""
 "קביעת פייפלוס - טופס מובנה כשיטת התשלום הראשית - מחליף את טעינת דף תשלום "
 "בטופס מובנה (אין תמיכה במינויים לפי שעה)"
@@ -2128,55 +2135,55 @@ msgstr ""
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:886 payplus-payment-gateway.php:905
+#: payplus-payment-gateway.php:887 payplus-payment-gateway.php:906
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:924
+#: payplus-payment-gateway.php:925
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:947 payplus-payment-gateway.php:964
+#: payplus-payment-gateway.php:948 payplus-payment-gateway.php:965
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1086 payplus-payment-gateway.php:1094
+#: payplus-payment-gateway.php:1087 payplus-payment-gateway.php:1095
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1109
+#: payplus-payment-gateway.php:1110
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:358
+#: templates/hostedFields.php:417
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:364
+#: templates/hostedFields.php:424
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:368
+#: templates/hostedFields.php:428
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:373
+#: templates/hostedFields.php:433
 msgid "Phone"
 msgstr "טלפון"
 
-#: templates/hostedFields.php:402
+#: templates/hostedFields.php:457
 msgid "Card number"
 msgstr "מידע על הכרטיס"
 
-#: templates/hostedFields.php:440
+#: templates/hostedFields.php:499
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:444
+#: templates/hostedFields.php:503
 msgid "Powered by "
 msgstr ""
 
