@@ -372,7 +372,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         #payments-wrapper {
             display: flex;
             flex-wrap: wrap;
-            flex-direction: column;
+            flex-direction: column-reverse;
         }
 
         .card-holder-phone-prefix {
