@@ -65,7 +65,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             flex-wrap: wrap;
             justify-content: space-between;
             font-family: 'AlmoniMLv5AAA';
-            min-height: 533px;
+            /* min-height: 533px; */
 
             #payments {
                 background-color: white !important;
