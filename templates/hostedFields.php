@@ -71,6 +71,12 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                 background-color: white !important;
             }
 
+            .hf-row {
+                select {
+                    background-color: white !important;
+                }
+            }
+
             select {
 
                 padding-right: 15px !important;
@@ -296,7 +302,8 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             margin-bottom: 0.2em;
         }
 
-        .hf-row {
+        .hf-row,
+        .hf-main {
             width: 100%;
             display: flex;
 
@@ -306,7 +313,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         }
 
         .pp_iframe_h {
-            .hf-row>* {
+            .hf-main>* {
                 padding: unset !important;
             }
         }
@@ -355,7 +362,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
     <div class="container hostedFields">
         <br />
         <div id="payment-form">
-            <div class="hf-row">
+            <div class="hf-main">
                 <div class="blocks-payplus_loader_hosted">
                     <div class="blocks-loader">
                         <div class="blocks-loader-background">

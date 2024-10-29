@@ -659,7 +659,7 @@ jQuery(function ($) {
                         var $hostedLi = jQuery(
                             ".wc_payment_method." + inputPayPlus
                         );
-                        let $hostedRow = $hostedDiv.find(".hf-row").first();
+                        let $hostedRow = $hostedDiv.find(".hf-main").first();
                         if (
                             $paymentMethod.length &&
                             $topLi.length &&
