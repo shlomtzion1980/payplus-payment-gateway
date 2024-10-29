@@ -310,6 +310,29 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             @media screen and (max-width: 768px) {
                 min-width: 100% !important;
             }
+
+            .hf-col-3 {
+                flex: 0 0 auto;
+                width: 25%;
+
+                @media screen and (max-width: 568px) {
+                    width: 35%;
+                }
+            }
+
+            .hf-col-9 {
+                flex: 0 0 auto;
+                width: 75%;
+
+                @media screen and (max-width: 568px) {
+                    width: 65%;
+                }
+
+                @media screen and (min-width: 467px) {
+                    margin-left: 3px;
+                    max-width: 74% !important;
+                }
+            }
         }
 
         .pp_iframe_h {
@@ -389,7 +412,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         <div class="col-12">
                             <label><?php echo esc_html__('Phone', 'payplus-payment-gateway'); ?></label></label>
                             <div class="hf-row" dir="ltr">
-                                <div class="col-3">
+                                <div class="hf-col-3">
                                     <select class="form-select card-holder-phone-prefix"
                                         aria-label="Default select example">
                                         <option value="1">+1</option>
@@ -402,7 +425,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                                         </option>
                                     </select>
                                 </div>
-                                <div class="col-9">
+                                <div class="hf-col-9">
                                     <input type="text" placeholder="999-999-9999" class="form-control card-holder-phone" value="" />
                                 </div>
                             </div>
