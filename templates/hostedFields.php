@@ -339,6 +339,10 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             }
         }
 
+        .hf-save {
+            margin-top: 10px !important;
+        }
+
         .pp_iframe_h {
             .hf-main>* {
                 padding: unset !important;

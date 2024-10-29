@@ -15,7 +15,7 @@ jQuery(function ($) {
         // Add save token checkbox to hosted fields container //
         var $hostedDiv = jQuery("body > div.container.hostedFields");
         var $checkbox = $(
-            '<p class="form-row">' +
+            '<p class="hf-save form-row">' +
                 '<label for="save_token_checkbox">' +
                 '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
                 " " +
