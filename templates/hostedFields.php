@@ -298,7 +298,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
 
         .fld-wrapper {
             width: 90%;
-            margin-bottom: 0.2em auto 0.2em auto;
+            margin: 0.2em auto 0.2em auto;
         }
 
         .hf-row,
