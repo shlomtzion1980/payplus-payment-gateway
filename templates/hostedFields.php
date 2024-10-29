@@ -44,14 +44,14 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             flex-direction: <?php echo esc_attr($rowDirection); ?>
         }
 
-        .col-4 {
+        .hf-col-4 {
             flex: 0 0 auto;
             width: fit-content !important;
             display: block;
             background: #F7F7F7;
             padding: 15px;
             border-radius: 10px;
-            border: none;
+            border: 1px solid #E3E6E9 !important;
             position: relative;
             flex-direction: row;
             /* align-content: center; */
@@ -66,6 +66,26 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             justify-content: space-between;
             font-family: 'AlmoniMLv5AAA';
             min-height: 533px;
+
+            select {
+
+                padding-right: 15px !important;
+                padding-left: 15px !important;
+                padding-top: unset !important;
+                padding-bottom: unset !important;
+                font-size: 1rem !important;
+
+                @media screen and (min-width: 567px) {
+                    appearance: none;
+                    /* Remove default arrow (Webkit) */
+                    -moz-appearance: none;
+                    /* Remove default arrow (Firefox) */
+
+                    background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo esc_attr($direction); ?> 15px center !important;
+                    /* Add custom arrow */
+                    background-size: 10px;
+                }
+            }
         }
 
         #hostedTop {
@@ -121,9 +141,10 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             direction: ltr;
             padding: 1em;
 
-            img {
+            .hf-image {
                 height: 17px;
                 top: 2px;
+                display: initial;
             }
         }
 
@@ -317,25 +338,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             text-align: center;
         }
 
-        #payments {
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-
-        select {
-
-
-            @media screen and (min-width: 567px) {
-                appearance: none;
-                /* Remove default arrow (Webkit) */
-                -moz-appearance: none;
-                /* Remove default arrow (Firefox) */
-
-                background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo esc_attr($direction); ?> 15px center;
-                /* Add custom arrow */
-                background-size: 10px;
-            }
-        }
+        #payments {}
     </style>
 </head>
 
@@ -353,11 +356,11 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
+                <div class="hf-col-4">
                     <div id="hostedTop">
                         <div class="topText"><?php echo esc_html__('Credit card', 'payplus-payment-gateway'); ?></div>
                         <div class="creditCards">
-                            <img src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" />
+                            <img class="hf-image" src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" />
                         </div>
                     </div>
                     <div id="card-holder-name-wrapper" class="fld-wrapper">
@@ -413,7 +416,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         <div id="cvv-fld" class="expireClass">
                             <div class="iframe-wrapper">
                                 <label class="iframe-placeholder cvv-fld">
-                                    <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
+                                    <img class="hf-image" src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
                                         alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
                                         style="top: 1.4px;" />
                                 </label>
@@ -442,11 +445,11 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                     <br />
                     <div id="ppLogo">
                         <?php echo esc_html__('Powered by ', 'payplus-payment-gateway'); ?>
-                        <img src="../wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png"
+                        <img class="hf-image" src="../wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png"
                             alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>" />
                     </div>
                 </div>
-                <div class="col-4" style="display: none">
+                <div class="hf-col-4" style="display: none">
                     <div class="row">
                         <div class="col-12 wrapper customer_name-wrapper">
                             <label>Customer name</label>
