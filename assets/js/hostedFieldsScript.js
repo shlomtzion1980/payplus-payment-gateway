@@ -166,12 +166,12 @@ jQuery(() => {
 
     var labelClasses = ["month", "year", "cvv-fld", "cCard"];
 
-    jQuery.each(labelClasses, function (index, labelClass) {
-        jQuery("#" + labelClass).on("click", function (e) {
-            jQuery("." + labelClass).html("");
-            jQuery("." + labelClass).css("background-color", "transparent");
-        });
-    });
+    // jQuery.each(labelClasses, function (index, labelClass) {
+    //     jQuery("#" + labelClass).on("click", function (e) {
+    //         jQuery("." + labelClass).html("");
+    //         jQuery("." + labelClass).css("background-color", "transparent");
+    //     });
+    // });
 
     jQuery(".seperator").on("click", function () {
         jQuery(".month").html("");
