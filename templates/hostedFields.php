@@ -205,7 +205,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             width: 49.5%;
             height: 50px;
             display: flex;
-            padding: 7px;
+            padding: inherit;
             justify-content: center;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px;
@@ -331,7 +331,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         #payments-wrapper {
             display: flex;
             flex-wrap: wrap;
-            flex-direction: column;
+            flex-direction: column-reverse;
         }
 
         .card-holder-phone-prefix {
