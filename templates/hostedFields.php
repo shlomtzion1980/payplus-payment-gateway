@@ -67,6 +67,10 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             font-family: 'AlmoniMLv5AAA';
             min-height: 533px;
 
+            #payments {
+                background-color: white !important;
+            }
+
             select {
 
                 padding-right: 15px !important;
@@ -202,7 +206,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         .expireCvvClass {
             background-color: white;
             margin-top: 4px;
-            width: 49.5%;
+            width: 49.8%;
             height: 50px;
             display: flex;
             padding: inherit;
@@ -293,6 +297,9 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         }
 
         .hf-row {
+            width: 100%;
+            display: flex;
+
             @media screen and (max-width: 768px) {
                 min-width: 100% !important;
             }
