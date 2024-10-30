@@ -14,387 +14,360 @@ $direction = $locale !== "he_IL" ? "right" : "left";
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
-    @font-face {
-        font-family: 'AlmoniMLv5AAA';
-        src: url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
-            url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
-            url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
-        font-weight: normal;
-        /* Or bold if necessary */
-        font-style: normal;
-        /* Or italic if necessary */
-    }
-
-    label {
-        margin: unset !important;
-        border: none !important;
-    }
-
-    .fld-frame {
-        border: 1px solid #ced4da;
-        height: 37px;
-        padding: 5px;
-        margin: 5px 0;
-        background-color: #fff;
-        border-radius: 5px;
-        width: 100%;
-    }
-
-    .iframe-placeholder.cvv-fld {
-        flex-direction: <?php echo esc_attr($rowDirection);
-        ?>
-    }
-
-    .hf-col-4 {
-        flex: 0 0 auto;
-        width: fit-content !important;
-        display: block;
-        background: #F7F7F7;
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #E3E6E9 !important;
-        position: relative;
-        flex-direction: row;
-        /* align-content: center; */
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        margin: auto;
-        display: flex;
-        /* flex-direction: column; */
-        background: #F7F7F7;
-        /* height: 55vh; */
-        flex-wrap: wrap;
-        justify-content: space-between;
-        font-family: 'AlmoniMLv5AAA';
-        min-height: 533px;
-
-        #payments {
-            background-color: white !important;
+        @font-face {
+            font-family: 'AlmoniMLv5AAA';
+            src: url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
+                url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
+                url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
+            font-weight: normal;
+            /* Or bold if necessary */
+            font-style: normal;
+            /* Or italic if necessary */
         }
 
-        .hf-row {
-            select {
-                background-color: white !important;
-            }
+        label {
+            margin: unset !important;
+            border: none !important;
         }
 
-        select {
-
-            padding-right: 15px !important;
-            padding-left: 15px !important;
-            padding-top: unset !important;
-            padding-bottom: unset !important;
-            font-size: 1rem !important;
-
-            @media screen and (min-width: 567px) {
-                appearance: none;
-                /* Remove default arrow (Webkit) */
-                -moz-appearance: none;
-                /* Remove default arrow (Firefox) */
-
-                background: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png') no-repeat <?php echo esc_attr($direction);
-                ?>15px center !important;
-                /* Add custom arrow */
-                background-size: 10px;
-            }
-        }
-    }
-
-    #hostedTop {
-        display: flex;
-        height: fit-content;
-        justify-content: space-between;
-        border-bottom: 1px solid #E3E6E9 !important;
-        width: 100%;
-        padding: 20px;
-
-        .topText {
-            color: #000000;
-            font-size: 16px;
-        }
-
-        .creditCards {
-            img {
-                max-height: 60px;
-            }
-        }
-    }
-
-    #submit-payment {
-        background-color: var(--wp--preset--color--contrast);
-        border-radius: 0.33rem;
-        border-color: var(--wp--preset--color--contrast);
-        border-width: 0;
-        color: var(--wp--preset--color--base);
-        font-family: inherit;
-        font-size: var(--wp--preset--font-size--small);
-        font-style: normal;
-        font-weight: 500;
-        line-height: inherit;
-        padding-top: 0.6rem;
-        padding-right: 1rem;
-        padding-bottom: 0.6rem;
-        padding-left: 1rem;
-        text-decoration: none;
-        margin-top: 15px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-        border-radius: 8px;
-        width: 90%;
-    }
-
-    #ppLogo {
-        font-family: "Almoni", sans-serif;
-        color: #c5cbcf;
-        text-align: center;
-        font-size: 12px;
-        width: 100%;
-        bottom: 5px;
-        direction: ltr;
-        padding: 1em;
-
-        .hf-image {
-            height: 17px;
-            top: 2px;
-            display: initial;
-        }
-    }
-
-    .expiry-wrapper {
-        justify-content: space-between;
-    }
-
-    .container.hostedFields {
-        display: none;
-    }
-
-    #payment-form {
-        display: none;
-        align-items: center;
-        flex-direction: column;
-        flex-wrap: wrap;
-        align-content: flex-start;
-    }
-
-    .__payplus_hosted_fields_err_fld {
-        color: red;
-        border: 1px solid red;
-    }
-
-    input[readonly] {
-        background-color: #eee;
-        outline: 0;
-    }
-
-    .blocks-payplus_loader_hosted {
-        display: none;
-        position: relative;
-        z-index: 999999;
-    }
-
-    .expiries {
-        width: 90%;
-        display: flex;
-        margin: auto;
-        flex-wrap: wrap;
-        justify-content: space-between;
-    }
-
-    input:-internal-autofill-selected {
-        background-color: transparent !important;
-    }
-
-    .col-9 {
-        @media screen and (min-width: 467px) {
-            margin-left: 3px;
-            max-width: 74% !important;
-        }
-    }
-
-    .expireCvvClass {
-        background-color: white;
-        margin-top: 4px;
-        width: 49.8%;
-        height: 50px;
-        display: flex;
-        padding: inherit;
-        justify-content: center;
-        border: 1px solid #E3E6E9 !important;
-        border-radius: 8px;
-    }
-
-    .smallCol {
-        flex: 0 0 auto;
-        width: 30%;
-    }
-
-    .iframe-wrapper {
-        position: relative;
-        width: 100%;
-        /* Adjust based on your iframe size */
-        /* height: 50%; */
-        /* Adjust based on your iframe size */
-    }
-
-    .justBorder {
-        border: 1px solid #E3E6E9 !important;
-    }
-
-    .iframe-placeholder {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        padding: 10px;
-        border-radius: 8px;
-        /* justify-content: center; */
-        align-items: center;
-        background-color: transparent;
-        /* border: 1px solid #E3E6E9 !important; */
-        /* Semi-transparent background */
-        color: #A2ADB5;
-        font-size: 18px;
-        z-index: 10;
-        pointer-events: none;
-        /* Allows clicks to pass through to the iframe */
-    }
-
-    .pp_iframe_h iframe {
-        border: 0;
-        max-height: 45px;
-        /* min-width: 55px;
-            text-align: center; */
-    }
-
-    .fld-frame {
-        border: none;
-        box-sizing: unset;
-        outline: unset;
-    }
-
-    input {
-        outline: unset;
-    }
-
-    .pp_iframe_h {
-        .form-control {
-            width: 100% !important;
-            padding: 0.5rem 0.75rem !important;
-            font-size: 1rem !important;
-            border: 1px solid #E3E6E9 !important;
-            border-radius: 8px !important;
-            height: 45px;
-            margin: auto !important;
-        }
-    }
-
-    input[type="text"i] {
-        font-size: 20px;
-    }
-
-    .h-fld-wrapper {
-        width: 100%;
-    }
-
-    .fld-wrapper {
-        width: 90%;
-        margin: 0.2em auto 0.2em auto;
-    }
-
-    .hf-row,
-    .hf-main {
-        width: 100%;
-        display: flex;
-
-        @media screen and (max-width: 768px) {
-            min-width: 100% !important;
-        }
-
-        .hf-col-12 {
+        .fld-frame {
+            border: 1px solid #ced4da;
+            height: 37px;
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            border-radius: 5px;
             width: 100%;
         }
 
-        .hf-col-3 {
+        .hf-col-4 {
             flex: 0 0 auto;
-            width: 25%;
+            width: fit-content !important;
+            display: block;
+            background: #F7F7F7;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #E3E6E9 !important;
+            position: relative;
+            flex-direction: row;
+            /* align-content: center; */
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            margin: auto;
+            display: flex;
+            /* flex-direction: column; */
+            background: #F7F7F7;
+            /* height: 55vh; */
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-family: 'AlmoniMLv5AAA';
+            min-height: 533px;
 
-            @media screen and (max-width: 568px) {
-                width: 35%;
+            #payments {
+                background-color: white !important;
+            }
+
+            .hf-row {
+                select {
+                    background-color: white !important;
+                }
+            }
+
+            select {
+
+                padding-right: 15px !important;
+                padding-left: 15px !important;
+                padding-top: unset !important;
+                padding-bottom: unset !important;
+                font-size: 1rem !important;
+
+                @media screen and (min-width: 567px) {
+                    appearance: none;
+                    /* Remove default arrow (Webkit) */
+                    -moz-appearance: none;
+                    /* Remove default arrow (Firefox) */
+
+                    background-image: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
+                    background-repeat: no-repeat;
+                    background-position: <?php echo esc_attr($direction); ?> 15px center;
+                    /* Add custom arrow */
+                    background-size: 10px;
+                }
             }
         }
 
-        .hf-col-9 {
-            flex: 0 0 auto;
-            width: 75%;
+        #hostedTop {
+            display: flex;
+            height: fit-content;
+            justify-content: space-between;
+            border-bottom: 1px solid #E3E6E9 !important;
+            width: 100%;
+            padding: 20px;
 
-            @media screen and (max-width: 568px) {
-                width: 65%;
+            .topText {
+                color: #000000;
+                font-size: 16px;
             }
 
+            .creditCards {
+                img {
+                    max-height: 60px;
+                }
+            }
+        }
+
+        #submit-payment {
+            background-color: var(--wp--preset--color--contrast);
+            border-radius: 0.33rem;
+            border-color: var(--wp--preset--color--contrast);
+            border-width: 0;
+            color: var(--wp--preset--color--base);
+            font-family: inherit;
+            font-size: var(--wp--preset--font-size--small);
+            font-style: normal;
+            font-weight: 500;
+            line-height: inherit;
+            padding-top: 0.6rem;
+            padding-right: 1rem;
+            padding-bottom: 0.6rem;
+            padding-left: 1rem;
+            text-decoration: none;
+            margin-top: 15px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            border-radius: 8px;
+            width: 90%;
+        }
+
+        #ppLogo {
+            font-family: "Almoni", sans-serif;
+            color: #c5cbcf;
+            text-align: center;
+            font-size: 12px;
+            width: 100%;
+            bottom: 5px;
+            direction: ltr;
+            padding: 1em;
+
+            .hf-image {
+                height: 17px;
+                top: 2px;
+                display: initial;
+            }
+        }
+
+        .expiry-wrapper {
+            justify-content: space-between;
+        }
+
+        .container.hostedFields {
+            display: none;
+        }
+
+        #payment-form {
+            display: none;
+            align-items: center;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+
+        .__payplus_hosted_fields_err_fld {
+            color: red;
+            border: 1px solid red;
+        }
+
+        input[readonly] {
+            background-color: #eee;
+            outline: 0;
+        }
+
+        .blocks-payplus_loader_hosted {
+            display: none;
+            position: relative;
+            z-index: 999999;
+        }
+
+        .__payplus_hosted_fields_item_fld-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+        }
+
+        .expiries {
+            width: 90%;
+            display: flex;
+            margin: auto;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        input:-internal-autofill-selected {
+            background-color: transparent !important;
+        }
+
+        .col-9 {
             @media screen and (min-width: 467px) {
                 margin-left: 3px;
                 max-width: 74% !important;
             }
         }
-    }
 
-    .hf-save {
-        margin-top: 10px !important;
-    }
-
-    .pp_iframe_h {
-        .hf-main>* {
-            padding: unset !important;
+        .expireCvvClass {
+            background-color: white;
+            margin-top: 4px;
+            width: 49.8%;
+            max-height: 45px;
+            display: flex;
+            padding: inherit;
+            justify-content: center;
+            border: 1px solid #E3E6E9 !important;
+            border-radius: 8px;
         }
-    }
 
-    .btn-primary {
-        font-size: 21px !important;
-        padding: unset !important;
-        height: 44px !important;
-    }
+        .smallCol {
+            flex: 0 0 auto;
+            width: 30%;
+        }
 
-    .exp {
-        width: 40%;
-    }
+        .justBorder {
+            border: 1px solid #E3E6E9 !important;
+        }
 
-    .seperator {
-        padding: 7px;
-        width: 40px;
-        color: #E3E6E9;
-    }
+        .pp_iframe_h iframe {
+            border: 0;
+            max-height: 45px;
+            /* min-width: 55px;
+            text-align: center; */
+        }
 
-    .form-select {
-        height: 45px;
-        border: 1px solid #E3E6E9 !important;
-        border-radius: 8px !important;
-        background-color: white;
-        outline: none;
-    }
+        .fld-frame {
+            border: none;
+            box-sizing: unset;
+            outline: unset;
+        }
 
-    #payments-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: column;
-    }
+        input {
+            outline: unset;
+        }
 
-    #payments-wrapper label {
-        order: 1;
-        /* Label always appears first */
-    }
+        .pp_iframe_h {
+            .form-control {
+                width: 100% !important;
+                padding: 0.5rem 0.75rem !important;
+                font-size: 1rem !important;
+                border: 1px solid #E3E6E9 !important;
+                border-radius: 8px !important;
+                height: 45px;
+                margin: auto !important;
+            }
+        }
 
-    #payments-wrapper select {
-        order: 2;
-        /* Select field always appears second */
-    }
+        input[type="text" i] {
+            font-size: 20px;
+        }
 
-    .card-holder-phone-prefix {
-        width: 100%;
-        outline: none;
-        text-align: center;
-    }
+        .h-fld-wrapper {
+            width: 100%;
+        }
+
+        .fld-wrapper {
+            width: 90%;
+            margin: 0.2em auto 0.2em auto;
+        }
+
+        .hf-row,
+        .hf-main {
+            width: 100%;
+            display: flex;
+
+            @media screen and (max-width: 768px) {
+                min-width: 100% !important;
+            }
+
+            .hf-col-12 {
+                width: 100%;
+            }
+
+            .hf-col-3 {
+                flex: 0 0 auto;
+                width: 25%;
+
+                @media screen and (max-width: 568px) {
+                    width: 35%;
+                }
+            }
+
+            .hf-col-9 {
+                flex: 0 0 auto;
+                width: 75%;
+
+                @media screen and (max-width: 568px) {
+                    width: 65%;
+                }
+
+                @media screen and (min-width: 467px) {
+                    margin-left: 3px;
+                    max-width: 74% !important;
+                }
+            }
+        }
+
+        .hf-save {
+            margin-top: 10px !important;
+        }
+
+        .pp_iframe_h {
+            .hf-main>* {
+                padding: unset !important;
+            }
+        }
+
+        .btn-primary {
+            font-size: 21px !important;
+            padding: unset !important;
+            height: 44px !important;
+        }
+
+        .exp {
+            width: 40%;
+        }
+
+        .seperator {
+            padding: 7px;
+            width: 40px;
+            color: #E3E6E9;
+        }
+
+        .form-select {
+            height: 45px;
+            border: 1px solid #E3E6E9 !important;
+            border-radius: 8px !important;
+            background-color: white;
+            outline: none;
+        }
+
+        #payments-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+
+        #payments-wrapper label {
+            order: 1;
+            /* Label always appears first */
+        }
+
+        #payments-wrapper select {
+            order: 2;
+            /* Select field always appears second */
+        }
+
+        .card-holder-phone-prefix {
+            width: 100%;
+            outline: none;
+            text-align: center;
+        }
     </style>
 </head>
 
@@ -459,7 +432,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                     <div class="expiries">
                         <div id="cc-wrapper" class="h-fld-wrapper">
                             <label><?php echo esc_html__('Card number', 'payplus-payment-gateway'); ?></label>
-                            <div id="cCard" class="iframe-wrapper">
+                            <div id="cCard">
                                 <span id="cc" placeholder="Card Number" class="form-control fld-frame"
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
@@ -473,16 +446,8 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                             <span id="expiryy" class="fld-frame"></span>
                         </div>
                         <div id="cvv-fld" class="expireCvvClass">
-                            <div class="iframe-wrapper">
-                                <label class="iframe-placeholder cvv-fld">
-                                    <img class="hf-image"
-                                        src="../wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg"
-                                        alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>"
-                                        style="top: 1.4px;" />
-                                </label>
-                                <div class="hf-row" id="cvv-wrapper">
-                                    <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
-                                </div>
+                            <div class="hf-row" id="cvv-wrapper">
+                                <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>
                         </div>
                     </div>

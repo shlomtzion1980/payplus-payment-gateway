@@ -5,6 +5,8 @@ const pageLang = document.documentElement.lang;
 const month = pageLang !== "he-IL" ? "Month" : "חודש";
 const year = pageLang !== "he-IL" ? "Year" : "שנה";
 const direction = pageLang !== "he-IL" ? "left" : "right";
+const opposite = direction === "right" ? "left" : "right";
+var origin = window.location.origin;
 
 hf.SetMainFields({
     cc: {
@@ -79,6 +81,10 @@ hf.SetMainFields({
             direction +
             "} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
             direction +
+            "; background-image: url(" +
+            origin +
+            "/wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg);background-repeat: no-repeat;background-position: " +
+            opposite +
             "} .hf-inp-name-expirym,.hf-inp-name-expiryy,.hf-inp-name-expiry {text-align: center; font-size: 1rem}"
     );
 
@@ -161,35 +167,6 @@ jQuery(() => {
 
     // Call the async function to process the response
     processResponse(resp);
-});
-
-jQuery(() => {
-    var currentLanguage = jQuery("html").attr("lang");
-    currentLanguage === "en-US"
-        ? jQuery(".iframe-placeholder").css("direction", "rtl")
-        : null;
-
-    var labelClasses = ["month", "year", "cvv-fld", "cCard"];
-
-    // jQuery.each(labelClasses, function (index, labelClass) {
-    //     jQuery("#" + labelClass).on("click", function (e) {
-    //         jQuery("." + labelClass).html("");
-    //         jQuery("." + labelClass).css("background-color", "transparent");
-    //     });
-    // });
-
-    jQuery(".seperator").on("click", function () {
-        jQuery(".month").html("");
-        jQuery(".year").html("");
-        document.querySelector("#hosted-fld").style.fontSize = "21px";
-    });
-
-    // jQuery("#submit-payment").on("click", () => {
-    //   jQuery("button#place_order").trigger("click");
-    //   overlay();
-    //   jQuery(".blocks-payplus_loader_hosted").fadeIn();
-    //   // hf.SubmitPayment();
-    // });
 });
 
 hf.Upon("pp_pageExpired", (e) => {
