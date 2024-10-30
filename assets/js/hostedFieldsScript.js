@@ -91,7 +91,15 @@ hf.SetMainFields({
       origin +
       "/wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg);background-repeat: no-repeat;background-position: " +
       opposite +
-      "} .hf-inp-name-expirym,.hf-inp-name-expiryy {text-align: center; font-size: 1rem} .hf-inp-name-expiry {text-align: " +
+      "} .hf-inp-name-expirym {text-align: " +
+      direction +
+      "; font-size: 1rem} .hf-inp-name-expiryy {text-align: " +
+      direction +
+      "; font-size: 1rem;  background-image: url(" +
+      origin +
+      "/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg);background-repeat: no-repeat;background-position: " +
+      opposite +
+      " center;} .hf-inp-name-expiry {text-align: " +
       direction +
       "; font-size: 1rem; background-image: url(" +
       origin +
