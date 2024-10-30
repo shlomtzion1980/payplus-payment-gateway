@@ -79,7 +79,7 @@ hf.SetMainFields({
   .AddField("notes", "[name=notes]", ".notes-wrapper")
   .SetRecaptcha("#recaptcha")
   .SetHostedFieldsStyles(
-    ".hf-inp-name-cc {font-size:1rem !important;text-align: " +
+    "::placeholder {color: #A2ADB5;} .hf-inp-name-cc {font-size:1rem !important;text-align: " +
       direction +
       "; background-image: url(" +
       origin +
