@@ -221,7 +221,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
         height: 45px;
         display: flex;
         padding: 0 10px 0 10px;
-        justify-content: center;
+        align-items: center;
         border: 1px solid #E3E6E9 !important;
         border-top: none !important;
 
@@ -263,6 +263,18 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     }
 
     .pp_iframe_h {
+        iframe {
+            outline: none;
+            border: none;
+            /* This also removes any visible border */
+        }
+
+        input:focus,
+        iframe:focus {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
         .form-control {
             width: 100% !important;
             padding: 0.5rem 0.75rem !important;
@@ -358,9 +370,11 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     }
 
     .seperator {
-        margin-top: 3%;
-        width: auto;
+        display: flex;
+        width: 50%;
         color: #E3E6E9;
+        height: fit-content;
+        justify-content: center;
     }
 
     .form-select {
@@ -489,7 +503,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                     <div id="ppLogo">
                         <?php echo esc_html__('Powered by ', 'payplus-payment-gateway'); ?>
                         <img class="hf-image"
-                            src="<?php echo site_url();?>/wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png"
+                            src="<?php echo esc_url(site_url() . '/wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png');?>"
                             alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>" />
                     </div>
                 </div>
