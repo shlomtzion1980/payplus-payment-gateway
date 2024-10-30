@@ -90,8 +90,8 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
 
                 background-image: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
                 background-repeat: no-repeat;
-                background-position: <?php echo esc_attr($direction);
-                ?>15px center;
+                background-position: <?php echo esc_attr($direction) . ' 15px center';
+                ?>;
                 /* Add custom arrow */
                 background-size: 10px;
             }
