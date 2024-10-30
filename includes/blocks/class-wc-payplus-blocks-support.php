@@ -78,9 +78,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         foreach (array_keys($gateways) as $payPlusGateWay) {
             $this->settings['gateways'][] = strpos($payPlusGateWay, 'payplus-payment-gateway') === 0 ? $payPlusGateWay : null;
         }
-        $this->settings['gateways'] = array_filter($this->settings['gateways'], function ($item) {
-            return $item !== "payplus-payment-gateway-hostedfields";
-        });
+        // $this->settings['gateways'] = array_filter($this->settings['gateways'], function ($item) {
+        //     return $item !== "payplus-payment-gateway-hostedfields";
+        // });
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
     }
@@ -158,9 +158,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
         WC()->customer->set_shipping_country($merchantCountryCode);
         WC()->cart->calculate_totals();
-        $wc_tax_enabled = wc_tax_enabled();
-
         $cart = WC()->cart->get_cart();
+
+        $wc_tax_enabled = wc_tax_enabled();
+        $isTaxIncluded = wc_prices_include_tax();
 
         if (count($cart)) {
             foreach ($cart as $cart_item_key => $cart_item) {
@@ -178,14 +179,22 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
                     $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
                 }
-                $productVat = $product->get_tax_status() === 'taxable' && !$wc_tax_enabled ? 0 : 2;
-                $productVat = 0 && $wc_tax_enabled ? 1 : $productVat;
+
+
+                $productVat = 0;
+
+                if ($wc_tax_enabled) {
+                    $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
+                    $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                }
+
                 $products[] = array(
                     'title' => $product->get_title(),
                     'priceProductWithTax' => $priceProductWithTax,
                     'priceProductWithoutTax' => $priceProductWithoutTax,
+                    'barcode' => ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId,
                     'quantity' => $cart_item['quantity'],
-                    'vat_type' => !$wc_tax_enabled ? 0 : 1,
+                    'vat_type' => $productVat,
                     'org_product_tax' => $product->get_tax_status(),
                 );
             }
@@ -234,6 +243,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $item = new stdClass();
             $item->name = $product['title'];
             $item->quantity = $product['quantity'];
+            $item->barcode = $product['barcode'];
             $item->price = $product['priceProductWithTax'];
             $item->vat_type = $product['vat_type'];
             $data->items[] = $item;

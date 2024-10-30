@@ -176,9 +176,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
         WC()->customer->set_shipping_country($merchantCountryCode);
         WC()->cart->calculate_totals();
-        $wc_tax_enabled = wc_tax_enabled();
-
         $cart = WC()->cart->get_cart();
+
+        $wc_tax_enabled = wc_tax_enabled();
+        $isTaxIncluded = wc_prices_include_tax();
+
         if (count($cart)) {
             foreach ($cart as $cart_item_key => $cart_item) {
                 $productId = $cart_item['product_id'];
@@ -195,14 +197,22 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
                     $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
                 }
-                $productVat = $product->get_tax_status() === 'taxable' && !$wc_tax_enabled ? 0 : 2;
-                $productVat = 0 && $wc_tax_enabled ? 1 : $productVat;
+
+
+                $productVat = 0;
+
+                if ($wc_tax_enabled) {
+                    $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
+                    $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                }
+
                 $products[] = array(
                     'title' => $product->get_title(),
                     'priceProductWithTax' => $priceProductWithTax,
                     'priceProductWithoutTax' => $priceProductWithoutTax,
+                    'barcode' => ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId,
                     'quantity' => $cart_item['quantity'],
-                    'vat_type' => !$wc_tax_enabled ? 0 : 1,
+                    'vat_type' => $productVat,
                     'org_product_tax' => $product->get_tax_status(),
                 );
             }
@@ -253,6 +263,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $item = new stdClass();
             $item->name = $product['title'];
             $item->quantity = $product['quantity'];
+            $item->barcode = $product['barcode'];
             $item->price = $product['priceProductWithTax'];
             $item->vat_type = $product['vat_type'];
             $data->items[] = $item;
@@ -271,12 +282,15 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     // Get the shipping method title (e.g., 'Flat Rate')
                     $method_title = $shipping_item->get_method_title();
                     $shipping_cost = $shipping_item->get_total();
+                    $shipping_taxes = $shipping_item->get_taxes();
+
+                    $shipping_tax_total = $wc_tax_enabled ? array_sum($shipping_taxes['total']) : 0;
 
                     $item = new stdClass();
                     $item->name = $method_title;
                     $item->quantity = 1;
-                    $item->price = $shipping_cost;
-                    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+                    $item->price = $shipping_cost + array_sum($shipping_taxes['total']);
+                    $item->vat_type = $shipping_tax_total > 0 ? 1 : 0;
                     $data->items[] = $item;
                 }
             }
