@@ -4,6 +4,8 @@ let payload;
 const pageLang = document.documentElement.lang;
 const month = pageLang !== "he-IL" ? "Month" : "חודש";
 const year = pageLang !== "he-IL" ? "Year" : "שנה";
+const yearMonth =
+    pageLang !== "he-IL" ? month + " / " + year : year + " / " + month;
 const direction = pageLang !== "he-IL" ? "left" : "right";
 const opposite = direction === "right" ? "left" : "right";
 var origin = window.location.origin;
@@ -37,7 +39,7 @@ hf.SetMainFields({
         elmSelector: "#expiry",
         wrapperElmSelector: ".expiry-wrapper-full",
         config: {
-            placeholder: month + " / " + year,
+            placeholder: yearMonth,
             fontName: "almoni",
         },
     },
