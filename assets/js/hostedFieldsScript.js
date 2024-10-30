@@ -12,6 +12,7 @@ hf.SetMainFields({
         wrapperElmSelector: "#cc-wrapper",
         config: {
             placeholder: "1234 1234 1234 1234",
+            fontName: "almoni",
         },
     },
     expiryy: {
@@ -19,6 +20,7 @@ hf.SetMainFields({
         wrapperElmSelector: ".expiry-wrapper",
         config: {
             placeholder: year,
+            fontName: "almoni",
         },
     },
     expirym: {
@@ -26,6 +28,7 @@ hf.SetMainFields({
         wrapperElmSelector: ".expiry-wrapper",
         config: {
             placeholder: month,
+            fontName: "almoni",
         },
     },
     expiry: {
@@ -33,6 +36,7 @@ hf.SetMainFields({
         wrapperElmSelector: ".expiry-wrapper-full",
         config: {
             placeholder: month + " / " + year,
+            fontName: "almoni",
         },
     },
     cvv: {
@@ -40,6 +44,7 @@ hf.SetMainFields({
         wrapperElmSelector: "#cvv-wrapper",
         config: {
             placeholder: "CVV",
+            fontName: "almoni",
         },
     },
 })

@@ -428,6 +428,10 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                         <label><?php echo esc_html__('ID number', 'payplus-payment-gateway'); ?></label>
                         <input id="id-number" type="number" class="form-control" value="" />
                     </div>
+                    <div class="fld-wrapper" id="invoice-name-wrapper">
+                        <label><?php echo esc_html__('Invoice Name', 'payplus-payment-gateway'); ?></label>
+                        <input type="text" id="invoice-name" class="form-control" value="" />
+                    </div>
                     <div class="card-holder-phone-wrapper fld-wrapper">
                         <div class="hf-col-12">
                             <label><?php echo esc_html__('Phone', 'payplus-payment-gateway'); ?></label></label>
@@ -489,12 +493,6 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                             <option value="2">2</option>
                             <option value="3">3</option>
                         </select>
-                    </div>
-                    <div class="hf-row" id="invoice-name-wrapper">
-                        <div class="hf-col-12">
-                            <label>Invoice name</label>
-                            <input type="text" id="invoice-name" class="form-control" value="" />
-                        </div>
                     </div>
                     <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
                         id="submit-payment" class="btn btn-primary" />
