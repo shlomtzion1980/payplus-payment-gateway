@@ -217,7 +217,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             background-color: white;
             margin-top: 4px;
             width: 49.8%;
-            max-height: 45px;
+            height: 45px;
             display: flex;
             padding: inherit;
             justify-content: center;
