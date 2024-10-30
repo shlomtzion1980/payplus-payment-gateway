@@ -260,6 +260,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                 border-radius: 8px !important;
                 height: 45px;
                 margin: auto !important;
+                text-align: inherit;
             }
         }
 

@@ -70,7 +70,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             if (file_exists($template_path)) {
-                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.min.css', [], $script_version);
+                wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
                 include $template_path;
             }
             wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
