@@ -81,7 +81,11 @@ hf.SetMainFields({
   .SetHostedFieldsStyles(
     ".hf-inp-name-cc {font-size:1rem !important;text-align: " +
       direction +
-      "} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
+      "; background-image: url(" +
+      origin +
+      "/wp-content/plugins/payplus-payment-gateway/assets/images/lock.svg);background-repeat: no-repeat;background-position: " +
+      opposite +
+      " center;} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
       direction +
       "; background-image: url(" +
       origin +
@@ -89,7 +93,11 @@ hf.SetMainFields({
       opposite +
       "} .hf-inp-name-expirym,.hf-inp-name-expiryy {text-align: center; font-size: 1rem} .hf-inp-name-expiry {text-align: " +
       direction +
-      "; font-size: 1rem}"
+      "; font-size: 1rem; background-image: url(" +
+      origin +
+      "/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg);background-repeat: no-repeat;background-position: " +
+      opposite +
+      " center;}"
   );
 
 function putHostedFields() {

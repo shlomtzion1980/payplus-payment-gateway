@@ -18,9 +18,9 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     <style>
     @font-face {
         font-family: 'AlmoniMLv5AAA';
-        src: url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
-            url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
-            url('../wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
+        src: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
+            url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
+            url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
         font-weight: normal;
         /* Or bold if necessary */
         font-style: normal;
@@ -88,9 +88,9 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                 -moz-appearance: none;
                 /* Remove default arrow (Firefox) */
 
-                background-image: url('../wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
+                background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
                 background-repeat: no-repeat;
-                background-position: <?php echo esc_attr($direction) . ' 15px center';
+                background-position: <?php echo esc_attr(text: $direction) . ' 15px center';
                 ?>;
                 /* Add custom arrow */
                 background-size: 10px;
@@ -172,6 +172,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
         flex-direction: column;
         flex-wrap: wrap;
         align-content: flex-start;
+        max-width: 440px;
     }
 
     .__payplus_hosted_fields_err_fld {
@@ -218,7 +219,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     .expireCvvClass {
         background-color: white;
         width: 50%;
-        height: 45px;
+        height: 38px;
         display: flex;
         padding: 0 10px 0 10px;
         align-items: center;
@@ -247,7 +248,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
 
     .pp_iframe_h iframe {
         border: 0;
-        max-height: 45px;
+        max-height: 38px;
         /* min-width: 55px;
             text-align: center; */
     }
@@ -282,7 +283,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             border: 1px solid #E3E6E9 !important;
             border-top-left-radius: 8px;
             border-top-right-radius: 8px;
-            height: 45px;
+            height: 38px;
             margin: auto !important;
             text-align: inherit;
         }
@@ -293,9 +294,13 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             font-size: 1rem !important;
             border: 1px solid #E3E6E9 !important;
             border-radius: 8px !important;
-            height: 45px;
+            height: 38px;
             margin: auto !important;
             text-align: inherit;
+            background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+            background-repeat: no-repeat;
+            background-position: <?php echo esc_attr(text: $direction) . " 15px center";
+            ?>;
         }
     }
 
@@ -378,7 +383,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     }
 
     .form-select {
-        height: 45px;
+        height: 38px;
         border: 1px solid #E3E6E9 !important;
         border-radius: 8px !important;
         background-color: white;
@@ -475,15 +480,15 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
-                        <div class="expiry-wrapper-full expireCvvClass <?php echo $opposite; ?>">
+                        <div class="expiry-wrapper-full expireCvvClass <?php echo esc_attr(text: $opposite); ?>">
                             <span id="expiry" class="fld-frame"></span>
                         </div>
-                        <div class="expiry-wrapper expireCvvClass <?php echo $opposite; ?>">
+                        <div class="expiry-wrapper expireCvvClass <?php echo esc_attr(text: $opposite); ?>">
                             <span id="expirym" class="fld-frame"></span>
                             <span class="seperator"> / </span>
                             <span id="expiryy" class="fld-frame"></span>
                         </div>
-                        <div id="cvv-fld" class="expireCvvClass <?php echo $direction; ?>">
+                        <div id="cvv-fld" class="expireCvvClass <?php echo esc_attr(text: $direction); ?>">
                             <div class="hf-row" id="cvv-wrapper">
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>
@@ -503,7 +508,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                     <div id="ppLogo">
                         <?php echo esc_html__('Powered by ', 'payplus-payment-gateway'); ?>
                         <img class="hf-image"
-                            src="<?php echo esc_url(site_url() . '/wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png');?>"
+                            src="<?php echo esc_url(site_url() . '/wp-content/plugins/payplus-payment-gateway/assets/images/payplus-logo-new.png'); ?>"
                             alt="<?php echo esc_attr__('Pay with Debit or Credit Card', 'payplus-payment-gateway'); ?>" />
                     </div>
                 </div>
