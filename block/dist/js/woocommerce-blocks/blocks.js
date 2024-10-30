@@ -186,7 +186,7 @@ if (isCheckout || hasOrder) {
               </div>
           </div>`;
     console.log("isAutoPPCC: ", payPlusGateWay.isAutoPPCC);
-    function startObserving() {
+    function startObserving(event) {
       console.log("observer started");
 
       const overlay = document.createElement("div");
@@ -230,9 +230,10 @@ if (isCheckout || hasOrder) {
               "payplus-payment-gateway-hostedfields"
             ) === 0
           ) {
-            jQuery(".blocks-payplus_loader_hosted").fadeIn();
-            putOverlay();
             hf.SubmitPayment();
+            hf.Upon("pp_responseFromServer", (e) => {
+              console.log("heklloo!!!!!");
+            });
             return;
           }
 

@@ -139,31 +139,46 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
-          jQuery(document).ready(function () {
-            const inputElement = document.querySelector(
-              "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
-            );
-            // console.log("input", inputElement);
-            if (inputElement) {
-              // Find the closest parent div
-              const topDiv = inputElement.closest("div");
+          const isCheckout = !document.querySelector(
+            'div[data-block-name="woocommerce/checkout"]'
+          )
+            ? false
+            : true;
 
-              if (topDiv) {
-                // Create a new div element
-                const newDiv = document.querySelector(
-                  "body > div.container.hostedFields"
+          if (isCheckout) {
+            console.log("checkout page (hosted)?", isCheckout);
+            jQuery(document).ready(function () {
+              function waitForInput() {
+                const inputElement = document.querySelector(
+                  "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
                 );
-                newDiv.className = "pp_iframe_h";
+                console.log("input", inputElement);
+                if (inputElement) {
+                  // Find the closest parent div
+                  const topDiv = inputElement.closest("div");
 
-                // Append the new div to the top div
-                topDiv.appendChild(newDiv);
-              } else {
-                console.log("No parent div found.");
+                  if (topDiv) {
+                    // Create a new div element
+                    const newDiv = document.querySelector(
+                      "body > div.container.hostedFields"
+                    );
+                    newDiv.className = "pp_iframe_h";
+
+                    // Append the new div to the top div
+                    topDiv.appendChild(newDiv);
+                  } else {
+                    console.log("No parent div found.");
+                  }
+                } else {
+                  console.log("Element with the specified ID not found.");
+                  setTimeout(function () {
+                    waitForInput();
+                  }, 1000);
+                }
               }
-            } else {
-              // console.log("Element with the specified ID not found.");
-            }
-          });
+              waitForInput();
+            });
+          }
 
           // jQuery(".container.hostedFields").show();
           jQuery("#create-payment-form").hide();
@@ -280,6 +295,8 @@ hf.Upon("pp_responseFromServer", (e) => {
   }
 });
 hf.Upon("pp_submitProcess", (e) => {
+  // jQuery(".blocks-payplus_loader_hosted").fadeIn();
+  // overlay();
   jQuery("#submit-payment").prop("disabled", e.detail);
 });
 
