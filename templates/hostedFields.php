@@ -5,6 +5,8 @@ $ccImageAltText = 'Pay with Debit or Credit Card';
 $locale = get_locale();
 $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
 $direction = $locale !== "he_IL" ? "right" : "left";
+$opposite = $locale !== "he_IL" ?  "left" : "right";
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -26,7 +28,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         }
 
         label {
-            margin: unset !important;
+            margin-bottom: 6px !important;
             border: none !important;
         }
 
@@ -36,7 +38,6 @@ $direction = $locale !== "he_IL" ? "right" : "left";
             padding: 5px;
             margin: 5px 0;
             background-color: #fff;
-            border-radius: 5px;
             width: 100%;
         }
 
@@ -215,14 +216,23 @@ $direction = $locale !== "he_IL" ? "right" : "left";
 
         .expireCvvClass {
             background-color: white;
-            margin-top: 4px;
-            width: 49.8%;
+            width: 50%;
             height: 45px;
             display: flex;
-            padding: inherit;
+            padding: 0 10px 0 10px;
             justify-content: center;
             border: 1px solid #E3E6E9 !important;
-            border-radius: 8px;
+            border-top: none !important;
+
+
+            &.right {
+                border-bottom-right-radius: 8px;
+                border-left: none !important;
+            }
+
+            &.left {
+                border-bottom-left-radius: 8px;
+            }
         }
 
         .smallCol {
@@ -253,6 +263,18 @@ $direction = $locale !== "he_IL" ? "right" : "left";
 
         .pp_iframe_h {
             .form-control {
+                width: 100% !important;
+                padding: 0.5rem 0.75rem !important;
+                font-size: 1rem !important;
+                border: 1px solid #E3E6E9 !important;
+                border-top-left-radius: 8px;
+                border-top-right-radius: 8px;
+                height: 45px;
+                margin: auto !important;
+                text-align: inherit;
+            }
+
+            .forms-control {
                 width: 100% !important;
                 padding: 0.5rem 0.75rem !important;
                 font-size: 1rem !important;
@@ -335,8 +357,8 @@ $direction = $locale !== "he_IL" ? "right" : "left";
         }
 
         .seperator {
-            padding: 7px;
-            width: 40px;
+            margin-top: 3%;
+            width: auto;
             color: #E3E6E9;
         }
 
@@ -396,15 +418,15 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                     </div>
                     <div id="card-holder-name-wrapper" class="fld-wrapper">
                         <label><?php echo esc_html__('Name', 'payplus-payment-gateway'); ?></label>
-                        <input type="text" id="card-holder-name" class="form-control" value="" />
+                        <input type="text" id="card-holder-name" class="forms-control" value="" />
                     </div>
                     <div id="id-number-wrapper" class="fld-wrapper">
                         <label><?php echo esc_html__('ID number', 'payplus-payment-gateway'); ?></label>
-                        <input id="id-number" type="number" class="form-control" value="" />
+                        <input id="id-number" type="number" class="forms-control" value="" />
                     </div>
                     <div class="fld-wrapper" id="invoice-name-wrapper">
                         <label><?php echo esc_html__('Invoice Name', 'payplus-payment-gateway'); ?></label>
-                        <input type="text" id="invoice-name" class="form-control" value="" />
+                        <input type="text" id="invoice-name" class="forms-control" value="" />
                     </div>
                     <div class="card-holder-phone-wrapper fld-wrapper">
                         <div class="hf-col-12">
@@ -438,15 +460,15 @@ $direction = $locale !== "he_IL" ? "right" : "left";
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
-                        <div class="expiry-wrapper-full expireCvvClass">
+                        <div class="expiry-wrapper-full expireCvvClass <?php echo $opposite; ?>">
                             <span id="expiry" class="fld-frame"></span>
                         </div>
-                        <div class="expiry-wrapper expireCvvClass">
+                        <div class="expiry-wrapper expireCvvClass <?php echo $opposite; ?>">
                             <span id="expirym" class="fld-frame"></span>
                             <span class="seperator"> / </span>
                             <span id="expiryy" class="fld-frame"></span>
                         </div>
-                        <div id="cvv-fld" class="expireCvvClass">
+                        <div id="cvv-fld" class="expireCvvClass <?php echo $direction; ?>">
                             <div class="hf-row" id="cvv-wrapper">
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>

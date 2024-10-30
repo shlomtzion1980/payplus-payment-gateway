@@ -87,7 +87,7 @@ hf.SetMainFields({
             origin +
             "/wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg);background-repeat: no-repeat;background-position: " +
             opposite +
-            "} .hf-inp-name-expirym,.hf-inp-name-expiryy,.hf-inp-name-expiry {text-align: center; font-size: 1rem}"
+            "} .hf-inp-name-expirym,.hf-inp-name-expiryy,.hf-inp-name-expiry {text-align: right; font-size: 1rem}"
     );
 
 function putHostedFields() {
@@ -124,7 +124,7 @@ jQuery(() => {
                     const inputElement = document.querySelector(
                         "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
                     );
-                    console.log("input", inputElement);
+                    // console.log("input", inputElement);
                     if (inputElement) {
                         // Find the closest parent div
                         const topDiv = inputElement.closest("div");
@@ -142,7 +142,7 @@ jQuery(() => {
                             console.log("No parent div found.");
                         }
                     } else {
-                        console.log("Element with the specified ID not found.");
+                        // console.log("Element with the specified ID not found.");
                     }
 
                     // jQuery(".container.hostedFields").show();
