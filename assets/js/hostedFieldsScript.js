@@ -401,3 +401,33 @@ const overlay = (remove = false) => {
         }
     }
 };
+
+jQuery(document).ready(function () {
+    let $cardHolderNameInput = jQuery("#card-holder-name");
+    $cardHolderNameInput.on("blur", function () {
+        // Get the input value and trim any extra spaces
+        let name = jQuery(this).val().trim();
+
+        // Check if the name contains at least two words
+        if (!/^[a-zA-Z]+ [a-zA-Z]+$/.test(name)) {
+            // If validation fails, show an error message or add an error class
+            jQuery(this).removeClass("validated");
+        } else {
+            // If validation passes, remove any error indication
+            jQuery(this).addClass("validated");
+        }
+    });
+    jQuery("#id-number").on("blur", function () {
+        // Get the input value and trim any extra spaces
+        let id = jQuery(this).val().trim();
+
+        // Check if the ID contains exactly 9 digits
+        if (!/^\d{9}$/.test(id)) {
+            // If validation fails, show an error message or add an error class
+            jQuery(this).removeClass("validated");
+        } else {
+            // If validation passes, remove any error indication
+            jQuery(this).addClass("validated");
+        }
+    });
+});

@@ -309,6 +309,10 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                 background-repeat: no-repeat;
                 background-position: <?php echo esc_attr(text: $direction) . " 15px center";
                                         ?>;
+
+                &.validated {
+                    background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+                }
             }
         }
 
