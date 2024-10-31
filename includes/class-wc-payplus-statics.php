@@ -319,7 +319,7 @@ class WC_PayPlus_Statics
                             $voucherId = $manualPayment['voucher_id'] ?? null;
                             $tokeUid = $manualPayment['token_uid'] ?? null;
                             $j5Charge = null;
-                            $status = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD') ? "Successful Manual Invoice Created" : null;
+                            $status = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD') ? "Successful" : null;
                             $statusCode = $manualPayment['status_code'] ?? null;
                             echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, true));
                             echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
