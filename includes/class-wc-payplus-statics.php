@@ -53,10 +53,10 @@ class WC_PayPlus_Statics
                 $invDcoNum = array_key_first($doc);
                 $invDoc = $doc[$invDcoNum];
                 $docType = WC_PayPlus_Statics::translateInvoiceType($invDocType); ?>
-<a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-    href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-    (<?php echo esc_html($invDcoNum); ?>)</a>
-<?php
+                <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                    href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                    (<?php echo esc_html($invDcoNum); ?>)</a>
+        <?php
             }
         }
     }
@@ -81,74 +81,74 @@ class WC_PayPlus_Statics
 
 
         ?>
-<div class="invoicePlusButtonContainer">
-    <?php
+        <div class="invoicePlusButtonContainer">
+            <?php
             if (strlen($invDoc) > 0 && !is_array($refundsArray)) {
                 if (!is_array($invoicesArray) || count($invoicesArray) === 1) {
             ?>
-    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>">
-        <?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)
-    </a>
-    <?php
+                    <a class="invoicePlusButton" style="text-decoration: none;" target="_blank" href="<?php echo esc_url($invDoc); ?>">
+                        <?php echo esc_html($docType); ?> (<?php echo esc_html($invDocNumber); ?>)
+                    </a>
+                <?php
                 } else {
                 ?>
-    <button class="toggle-button invoicePlusButtonShow"></button>
-    <div class="hidden-buttons invoicePlusButtonHidden">
-        <?php
+                    <button class="toggle-button invoicePlusButtonShow"></button>
+                    <div class="hidden-buttons invoicePlusButtonHidden">
+                        <?php
                         WC_PayPlus_Statics::returnInvDocs($invoicesArray); ?>
-    </div>
-    <?php
+                    </div>
+                <?php
                 }
             } elseif (strlen($invDoc) > 0 && is_array($refundsArray)) { ?>
-    <button class="toggle-button invoicePlusButtonShow"></button>
-    <div class="hidden-buttons invoicePlusButtonHidden">
+                <button class="toggle-button invoicePlusButtonShow"></button>
+                <div class="hidden-buttons invoicePlusButtonHidden">
 
-        <?php if (!is_array($invoicesArray)) {
+                    <?php if (!is_array($invoicesArray)) {
                         if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-            <?php echo esc_html($chargeText); ?></h4><?php } ?>
-        <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-            (<?php echo esc_html($invDocNumber); ?>)</a>
-        <?php
+                                <?php echo esc_html($chargeText); ?></h4><?php } ?>
+                        <a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                            (<?php echo esc_html($invDocNumber); ?>)</a>
+                    <?php
                     } else {
                         WC_PayPlus_Statics::returnInvDocs($invoicesArray);
                     }
                     if (isset($options['no-headlines']) && $options['no-headlines'] !== true) { ?><h4>
-            <?php echo esc_html($refundsText); ?></h4><?php } ?>
-        <?php
+                            <?php echo esc_html($refundsText); ?></h4><?php } ?>
+                    <?php
                     if (is_array($refundsArray)) {
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
                             $docText = WC_PayPlus_Statics::translateInvoiceType($doc['type']);
                     ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-            href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
-        <?php
+                                href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                    <?php
                         }
                     }
                     ?>
-    </div>
-</div>
-<?php   } elseif (is_array($refundsArray)) {
+                </div>
+        </div>
+        <?php   } elseif (is_array($refundsArray)) {
                 if (count($refundsArray) > 1) { ?>
-<button class="toggle-button invoicePlusButtonShow"></button>
-<div class="hidden-buttons invoicePlusButtonHidden">
-    <?php
+            <button class="toggle-button invoicePlusButtonShow"></button>
+            <div class="hidden-buttons invoicePlusButtonHidden">
+            <?php
                 }
                 foreach ($refundsArray as $docNumber => $doc) {
                     $docLink = $doc['link'];
                     $docText = WC_PayPlus_Statics::translateInvoiceType($doc['type']);
             ?><a class="invoicePlusButton" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
-    <?php
+                    href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+            <?php
                 }
                 if (count($refundsArray) > 1) { ?>
-</div>
-<?php
+            </div>
+        <?php
                 }
             } elseif ($errorInvoice) { ?>
-<p class='link-invoice-error'>
-    <?php echo esc_html($errorInvoice); ?>
-</p><?php
+        <p class='link-invoice-error'>
+            <?php echo esc_html($errorInvoice); ?>
+        </p><?php
             }
         }
 
@@ -189,54 +189,54 @@ class WC_PayPlus_Statics
                     $refundsText = __('Refunds', 'payplus-payment-gateway');
 
                     if (is_array($payPlusInvoiceDocs)) { ?>
-<div>
-    <h4><?php echo esc_html($chargeText); ?></h4>
-    <?php
+                <div>
+                    <h4><?php echo esc_html($chargeText); ?></h4>
+                    <?php
                         foreach ($payPlusInvoiceDocs as $invDocType => $inv) {
                             $docType = WC_PayPlus_Statics::translateInvoiceType($invDocType);
                             $invDocNumber = array_key_first($inv);
                             $invDocUrl = reset($inv);
                             if (strlen($invDocUrl) > 0) { ?>
 
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($invDocUrl); ?>"><?php echo esc_html($docType); ?>
-        (<?php echo esc_html($invDocNumber); ?>)</a>
+                            <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                                href="<?php echo esc_url($invDocUrl); ?>"><?php echo esc_html($docType); ?>
+                                (<?php echo esc_html($invDocNumber); ?>)</a>
 
-    <?php
+                    <?php
                             }
                         }
                     ?>
-</div>
-<?php
+                </div>
+                <?php
                     } else {
                         if (strlen($invDoc) > 0) {
                             $docType = WC_PayPlus_Statics::translateInvoiceType($invDocType);
                 ?>
-<div>
-    <h4><?php echo esc_html($chargeText); ?></h4>
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
-        (<?php echo esc_html($invDocNumber); ?>)</a>
-</div>
-<?php
+                    <div>
+                        <h4><?php echo esc_html($chargeText); ?></h4>
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($invDoc); ?>"><?php echo esc_html($docType); ?>
+                            (<?php echo esc_html($invDocNumber); ?>)</a>
+                    </div>
+                <?php
                         }
                     }
 
                     if (is_array($refundsArray)) {
                 ?>
-<div>
-    <h4><?php echo esc_html($refundsText); ?></h4>
-    <?php
+                <div>
+                    <h4><?php echo esc_html($refundsText); ?></h4>
+                    <?php
                         foreach ($refundsArray as $docNumber => $doc) {
                             $docLink = $doc['link'];
                             $docText = WC_PayPlus_Statics::translateInvoiceType($doc['type']);
                     ?>
-    <a class="link-invoice" style="text-decoration: none;" target="_blank"
-        href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
-    <?php
+                        <a class="link-invoice" style="text-decoration: none;" target="_blank"
+                            href="<?php echo esc_url($docLink); ?>"><?php echo esc_html("$docText ($docNumber)"); ?></a>
+                    <?php
                         }
                     ?>
-</div>
+                </div>
 <?php
                     }
                 }
@@ -269,9 +269,13 @@ class WC_PayPlus_Statics
                                 $numOfPayments = $responseArray['number_of_payments'] ?? $responseArray['data']['transaction']['payments']['number_of_payments'] ?? null;
                                 $voucherNum = $responseArray['voucher_num'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
                                 $voucherId = $responseArray['voucher_id'] ?? $responseArray['data']['transaction']['voucher_number'] ?? null;
+                                $statusCode = $responseArray['status_code'] ?? $responseArray['data']['transaction']['status_code'] ?? null;
+                                $status = $responseArray['status'] ?? $responseArray['data']['transaction']['status'] ?? null;
+                                $status = $status === "rejected" ? "<span style='color: red;'>Rejected</span>" : $status;
+                                $status = $status === "approved" ? "Approved" : $status;
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
-                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
                                     $amount = $transaction['amount'];
@@ -288,7 +292,11 @@ class WC_PayPlus_Statics
                                     $voucherId = $transaction['voucher_id'] ?? null;
                                     $tokeUid = $transaction['token_uid'];
                                     $j5Charge = null;
-                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                    $statusCode = $transaction['status_code'] ?? null;
+                                    $status = $transaction['status'] ?? null;
+                                    $status = $status === "rejected" ? "<span style='color: red;'>Rejected</span>" : $status;
+                                    $status = $status === "approved" ? "Approved" : $status;
+                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
                                 echo esc_html(__('Total of payments: ', 'payplus-payment-gateway')) . esc_html($totalAmount);
@@ -296,22 +304,24 @@ class WC_PayPlus_Statics
                         }
                     }
                     if ($manualOrderPayments && is_array($manualOrderPayments)) {
-                        foreach ($manualOrderPayments as $manulPayment) {
-                            $amount = $manulPayment['price'] ?? null;
-                            $method = $manulPayment['method_payment'] ?? null;
-                            $brand = $manulPayment['brand_name'] ?? null;
-                            $issuer = $manulPayment['issuer_name'] ?? null;
-                            $type = $manulPayment['type'] ?? null;
-                            $number = $manulPayment['order_id'] ?? null;
-                            $fourDigits = $manulPayment['create_at'] ?? null;
-                            $expMonth = $manulPayment['expiry_month'] ?? null;
-                            $expYear = $manulPayment['expiry_year'] ?? null;
-                            $numOfPayments = $manulPayment['number_of_payments'] ?? null;
-                            $voucherNum = $manulPayment['order_id'] ?? null;
-                            $voucherId = $manulPayment['voucher_id'] ?? null;
-                            $tokeUid = $manulPayment['token_uid'] ?? null;
+                        foreach ($manualOrderPayments as $manualPayment) {
+                            $amount = $manualPayment['price'] ?? null;
+                            $method = $manualPayment['method_payment'] ?? null;
+                            $brand = $manualPayment['brand_name'] ?? null;
+                            $issuer = $manualPayment['issuer_name'] ?? null;
+                            $type = $manualPayment['type'] ?? null;
+                            $number = $manualPayment['order_id'] ?? null;
+                            $fourDigits = $manualPayment['create_at'] ?? null;
+                            $expMonth = $manualPayment['expiry_month'] ?? null;
+                            $expYear = $manualPayment['expiry_year'] ?? null;
+                            $numOfPayments = $manualPayment['number_of_payments'] ?? null;
+                            $voucherNum = $manualPayment['order_id'] ?? null;
+                            $voucherId = $manualPayment['voucher_id'] ?? null;
+                            $tokeUid = $manualPayment['token_uid'] ?? null;
                             $j5Charge = null;
-                            echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, true));
+                            $status = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD') ? "Successful Manual Invoice Created" : null;
+                            $statusCode = $manualPayment['status_code'] ?? null;
+                            echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, true));
                             echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                         }
                     }
@@ -358,13 +368,13 @@ class WC_PayPlus_Statics
          * 
          * @return string
          */
-        public static function createPayPlusDataBox($amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $paymentType = false)
+        public static function createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $paymentType = false)
         {
             $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
             $type_text = $paymentType ? __('Manual Payment', 'payplus-payment-gateway') : $type_text;
             $expMonthYear = "$expMonth/$expYear";
             $box = sprintf(
-                '<div style="font-weight:600;">PayPlus %s Successful</div>
+                '<div style="font-weight:600;">PayPlus %s %s</div>
                         <table class="payPlusMetaBox" style="border-collapse:collapse">
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Method', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -378,9 +388,11 @@ class WC_PayPlus_Statics
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Voucher ID', 'payplus-payment-gateway') . '</td><td  style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="vertical-align:top;">' . __('Token', 'payplus-payment-gateway') . '</td><td style="vertical-align:top;">%s</td></tr>
                             <tr><td style="vertical-align:top;">' . __('Total:', 'payplus-payment-gateway') . '</td><td style="vertical-align:top;">%s</td></tr>
+                            <tr><td style="vertical-align:top;">' . __('Status:', 'payplus-payment-gateway') . '</td><td style="vertical-align:top;">%s</td></tr>
                         </table>
                     ',
                 $type_text,
+                $status,
                 $number,
                 $method,
                 $brand,
@@ -392,7 +404,8 @@ class WC_PayPlus_Statics
                 $voucherNum,
                 $voucherId,
                 $tokeUid,
-                $j5Charge ? $j5Charge : $amount
+                $j5Charge ? $j5Charge : $amount,
+                $status,
             );
             return $box;
         }
