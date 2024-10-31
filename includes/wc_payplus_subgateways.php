@@ -186,12 +186,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 ],
                 'default' => '1',
             ],
-            'hosted_fields_width' => [
-                'title' => __('Set width for Embedded container (%)', 'payplus-payment-gateway'),
-                'description' => __('This sets the width of the Embedded container in percentage (Max is 100 of the container).', 'payplus-payment-gateway'),
-                'type' => 'number',
-                'default' => '50'
-            ],
+            // 'hosted_fields_width' => [
+            //     'title' => __('Set width for Embedded container (%)', 'payplus-payment-gateway'),
+            //     'description' => __('This sets the width of the Embedded container in percentage (Max is 100 of the container).', 'payplus-payment-gateway'),
+            //     'type' => 'number',
+            //     'default' => '50'
+            // ],
             'hide_payplus_gateway' => [
                 'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
                 'description' => __('Hide PayPlus gateway if current user has no saved tokens', 'payplus-payment-gateway'),

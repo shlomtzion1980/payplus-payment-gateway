@@ -170,6 +170,11 @@ jQuery(() => {
                                         // Append the new div to the top div
                                         topDiv.appendChild(newDiv);
                                         newDiv.style.display = "none";
+                                        newDiv.style.justifyContent = "center";
+                                        document.querySelector(
+                                            "#payment-form"
+                                        ).style.marginBottom = "4%";
+
                                         inputElement.addEventListener(
                                             "click",
                                             (event) => {

@@ -264,10 +264,6 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
         }
 
         .pp_iframe_h {
-
-            display: flex;
-            justify-content: center;
-
             iframe {
                 outline: none;
                 border: none;

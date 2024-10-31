@@ -234,7 +234,24 @@ if (isCheckout || hasOrder) {
                         ) === 0
                     ) {
                         hf.SubmitPayment();
-                        hf.Upon("pp_responseFromServer", (e) => {});
+                        document.body.style.overflow = "hidden";
+                        document.querySelector(
+                            ".blocks-payplus_loader_hosted"
+                        ).style.display = "block";
+                        const inputs = document.querySelectorAll(
+                            'input[type="radio"], input'
+                        );
+                        inputs.forEach((input) => {
+                            input.disabled = true;
+                        });
+                        hf.Upon("pp_responseFromServer", (e) => {
+                            if (e.detail.errors) {
+                                document.querySelector(
+                                    ".blocks-payplus_loader_hosted"
+                                ).style.display = "none";
+                                location.reload();
+                            }
+                        });
                         return;
                     }
 
