@@ -41,6 +41,13 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
         }
 
         .hf-col-4 {
+
+            input[type="number"]::-webkit-outer-spin-button,
+            input[type="number"]::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
             flex: 0 0 auto;
             width: fit-content !important;
             display: block;
