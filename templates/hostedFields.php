@@ -305,7 +305,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                 height: 38px;
                 margin: auto !important;
                 text-align: inherit;
-                background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+                /* background-image: url('<?php /* echo site_url();*/ ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg'); */
                 background-repeat: no-repeat;
                 background-position: <?php echo esc_attr(text: $direction) . " 15px center";
                                         ?>;

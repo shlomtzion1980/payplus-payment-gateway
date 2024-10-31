@@ -134,6 +134,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, "post");
+        // $this->payplus_gateway->payplus_add_log_all('payplus-hostedfields-create-update', "HostedFields payload: $payload");
 
         $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
 

@@ -9,6 +9,13 @@ const yearMonth =
 const direction = pageLang !== "he-IL" ? "left" : "right";
 const opposite = direction === "right" ? "left" : "right";
 var origin = window.location.origin;
+let viImage =
+    "background-image: url(" +
+    origin +
+    "/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg);background-repeat: no-repeat;background-position: " +
+    opposite +
+    " center";
+viImage = "";
 
 hf.SetMainFields({
     cc: {
@@ -95,15 +102,13 @@ hf.SetMainFields({
             direction +
             "; font-size: 1rem} .hf-inp-name-expiryy {text-align: " +
             direction +
-            "; font-size: 1rem;  background-image: url(" +
-            origin +
-            "/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg);background-repeat: no-repeat;background-position: " +
-            opposite +
-            " center;} .hf-inp-name-expiry {text-align: " +
+            "; font-size: 1rem; " +
+            viImage +
+            "} .hf-inp-name-expiry {text-align: " +
             direction +
-            "; font-size: 1rem; background-image: url(" +
-            origin +
-            "/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg);background-repeat: no-repeat;background-position: " +
+            "; font-size: 1rem; " +
+            viImage +
+            ";background-repeat: no-repeat;background-position: " +
             opposite +
             " center;}"
     );
@@ -165,15 +170,18 @@ jQuery(() => {
                                         const newDiv = document.querySelector(
                                             "body > div.container.hostedFields"
                                         );
+                                        const paymentForm =
+                                            document.querySelector(
+                                                "#payment-form"
+                                            );
                                         newDiv.className = "pp_iframe_h";
 
                                         // Append the new div to the top div
                                         topDiv.appendChild(newDiv);
                                         newDiv.style.display = "none";
                                         newDiv.style.justifyContent = "center";
-                                        document.querySelector(
-                                            "#payment-form"
-                                        ).style.marginBottom = "4%";
+                                        paymentForm.style.marginBottom = "4%";
+                                        paymentForm.style.width = "99%";
 
                                         inputElement.addEventListener(
                                             "click",

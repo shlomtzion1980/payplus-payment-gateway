@@ -235,6 +235,8 @@ if (isCheckout || hasOrder) {
                     ) {
                         hf.SubmitPayment();
                         document.body.style.overflow = "hidden";
+                        document.body.style.backgroundColor = "white";
+                        document.body.style.opacity = "0.7";
                         document.querySelector(
                             ".blocks-payplus_loader_hosted"
                         ).style.display = "block";
@@ -246,9 +248,6 @@ if (isCheckout || hasOrder) {
                         });
                         hf.Upon("pp_responseFromServer", (e) => {
                             if (e.detail.errors) {
-                                document.querySelector(
-                                    ".blocks-payplus_loader_hosted"
-                                ).style.display = "none";
                                 location.reload();
                             }
                         });
@@ -507,7 +506,7 @@ if (isCheckout || hasOrder) {
                     .multiPassIcons
             ).length > 0
         ) {
-            console.log("isMultiPass");
+            // console.log("isMultiPass");
             const multiPassIcons =
                 wcSettings.paymentMethodData["payplus-payment-gateway"]
                     .multiPassIcons;
