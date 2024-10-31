@@ -963,6 +963,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     public function payplus_get_section_invoice_not_automatic($orderId, $theTokens)
     {
+
+        if (WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_status') === "rejected") {
+            return;
+        };
         $this->isInitiated();
         $order = wc_get_order($orderId);
         $selectInvoice = array(
