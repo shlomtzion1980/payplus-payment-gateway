@@ -221,6 +221,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data = new stdClass();
         $data->payment_page_uid = $paymentPageUid;
         $data->refURL_success = site_url() . '?wc-api=payplus_gateway&hostedFields=true';
+        $_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
+        $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = site_url() . "/error-payment-payplus/";
         $data->refURL_cancel = 'https://www.example.com/cancel';
         $data->create_token = true;
