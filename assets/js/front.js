@@ -556,7 +556,10 @@ function formatedProductsArrayGoogle(data) {
 
 function displayMsgError(errorMsg = "") {
   const errorPayplusApi = document.getElementById("error-api-payplus");
-  if (typeof errorPayplusApi !== undefined) {
+  if (
+    typeof errorPayplusApi !== undefined ||
+    typeof errorPayplusApi !== "undefined"
+  ) {
     errorPayplusApi.innerHTML = "<p>" + errorMsg + "</p>";
   }
 }
