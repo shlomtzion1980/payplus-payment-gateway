@@ -172,6 +172,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", 'HostedFields: (' . $order_id . ')');
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -328,6 +329,12 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         // $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
 
         $payload = wp_json_encode($data);
+        if (WC()->session->get('hostedPayload') === $payload) {
+            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\nPayload is identical no need to run.");
+            return WC()->session->get('hostedResponse');
+        }
+
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\n$payload");
 
         WC()->session->set('hostedPayload', $payload);
 

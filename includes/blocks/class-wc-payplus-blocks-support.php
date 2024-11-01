@@ -153,6 +153,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\nblocks!!!");
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -350,7 +351,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
             $this->orderId = $context->order->id;
             $order = wc_get_order($this->orderId);
-            $this->hostedFieldsData($this->orderId);
+
+            $hostedFieldsClass = new WC_PayPlus_Gateway_HostedFields;
+
+            // $this->hostedFieldsData($this->orderId);
 
             $result->set_payment_details('');
             $payment_details = $result->payment_details;
