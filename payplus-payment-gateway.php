@@ -98,9 +98,12 @@ class WC_PayPlus
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
         WC()->session->__unset('hostedPayload');
         WC()->session->__unset('page_request_uid');
-        WC()->session->__unset('hostedResponse');
+        WC()->session->set('hostedResponse', null); // Clear the data
+        WC()->session->__unset('hostedResponse');   // Now unset the session key
+
         WC()->session->__unset('order_awaiting_payment');
         WC()->session->__unset('hostedFieldsUUID');
+        WC()->session->set('hostedStarted', false);
         wp_send_json_success(array('result' => "success"));
     }
 

@@ -135,7 +135,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     }
 
 
-    public function hostedFieldsData($order_id)
+    public function hostedFieldsData($order_id, $isHostedStarted)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $testMode = boolval($options['api_test_mode'] === 'yes');
@@ -153,7 +153,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\nblocks!!!");
+        $paylodfrom = WC()->session->get('hostedPayload');
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(1): ($order_id)\nblocks!!!$isHostedStarted");
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -250,8 +251,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $data->items[] = $item;
         }
 
+        $randomHash = bin2hex(random_bytes(16));
+        $data->more_info = $order_id === "000" ? $randomHash : $order_id;
+
         if ($order_id !== "000") {
-            $data->more_info = $order_id;
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
             // Check if there are shipping items
@@ -303,8 +306,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data->amount = number_format($totalAmount, 2, '.', '');
 
         $payload = wp_json_encode($data);
+        if (WC()->session->get('hostedPayload') === $payload) {
+            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(2): ($order_id)\nPayload is identical no need to run.");
+            return WC()->session->get('hostedResponse');
+        }
+
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(3): ($order_id)\n$payload");
+
+        WC()->session->set('hostedPayload', $payload);
 
         $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+
+        $hostedResponseArray = json_decode($hostedResponse, true);
+
+        if ($hostedResponseArray['results']['status'] === "error") {
+            WC()->session->__unset('page_request_uid');
+            $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+        }
 
         return $hostedResponse;
     }
@@ -348,13 +366,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         );
 
-        if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
+        $isHostedStarted = WC()->session->get('hostedStarted');
+        if ($context->payment_method === "payplus-payment-gateway-hostedfields" && !$isHostedStarted) {
+            WC()->session->set('hostedStarted', true);
             $this->orderId = $context->order->id;
             $order = wc_get_order($this->orderId);
 
-            $hostedFieldsClass = new WC_PayPlus_Gateway_HostedFields;
+            // $hostedFieldsClass = new WC_PayPlus_HostedFields($this->orderId, $order);
 
-            // $this->hostedFieldsData($this->orderId);
+            $this->hostedFieldsData($this->orderId, $isHostedStarted);
 
             $result->set_payment_details('');
             $payment_details = $result->payment_details;

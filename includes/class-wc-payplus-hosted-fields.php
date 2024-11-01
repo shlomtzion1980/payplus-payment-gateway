@@ -56,12 +56,17 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         if (WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) {
             WC()->session->__unset('hostedPayload');
             WC()->session->__unset('page_request_uid');
-            WC()->session->__unset('hostedResponse');
+            WC()->session->set('hostedResponse', false);
             WC()->session->__unset('order_awaiting_payment');
             WC()->session->__unset('hostedFieldsUUID');
+            WC()->session->set('hostedStarted', false);
             return;
         }
 
+        // $isHostedStarted = WC()->session->get('hostedStarted');
+        // if ($isHostedStarted) {
+        //     return;
+        // }
         // $this->create_order_if_not_exists();
         $hostedResponse = $this->hostedFieldsData($this->order_id);
 
@@ -172,7 +177,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", 'HostedFields: (' . $order_id . ')');
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -271,8 +276,10 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->items[] = $item;
         }
 
+        $randomHash = bin2hex(random_bytes(16));
+        $data->more_info = $order_id === "000" ? $randomHash : $order_id;
+
         if ($order_id !== "000") {
-            $data->more_info = $order_id;
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
             // Check if there are shipping items
@@ -330,11 +337,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $payload = wp_json_encode($data);
         if (WC()->session->get('hostedPayload') === $payload) {
-            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\nPayload is identical no need to run.");
+            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFieldshostedFieldsData(2): ($order_id)\nPayload is identical no need to run.");
             return WC()->session->get('hostedResponse');
         }
 
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields: ($order_id)\n$payload");
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(3) ($order_id)\n$payload");
 
         WC()->session->set('hostedPayload', $payload);
 
