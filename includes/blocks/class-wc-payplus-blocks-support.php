@@ -145,7 +145,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $paymentPageUid = $testMode ? $options['dev_payment_page_id'] : $options['payment_page_id'];
 
         if ($order_id !== "000") {
-            WC()->session->__unset('randomHash');
+            WC()->session->set('randomHash', bin2hex(random_bytes(16)));
             $order = wc_get_order($order_id);
 
             if (! $order) {

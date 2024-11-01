@@ -129,6 +129,11 @@ function putHostedFields() {
 }
 
 jQuery(() => {
+  const isCheckout = !document.querySelector(
+    'div[data-block-name="woocommerce/checkout"]'
+  )
+    ? false
+    : true;
   // Define the async function to handle the response
   async function processResponse(resp) {
     try {
@@ -144,12 +149,6 @@ jQuery(() => {
         }
 
         hf.InitPaymentPage.then((data) => {
-          const isCheckout = !document.querySelector(
-            'div[data-block-name="woocommerce/checkout"]'
-          )
-            ? false
-            : true;
-
           if (isCheckout) {
             console.log("checkout page (hosted)?", isCheckout);
             jQuery(document).ready(function () {
@@ -254,12 +253,12 @@ hf.Upon("pp_noAttemptedRemaining", (e) => {
 });
 
 hf.Upon("pp_responseFromServer", (e) => {
-  // let r = "";
-  // try {
-  //     r = JSON.stringify(e.detail, null, 2);
-  // } catch (error) {
-  //     r = e.detail;
-  // }
+  let r = "";
+  try {
+    r = JSON.stringify(e.detail, null, 2);
+  } catch (error) {
+    r = e.detail;
+  }
 
   let saveToken = jQuery("#save_token_checkbox").is(":checked") ? true : false;
 
@@ -267,6 +266,7 @@ hf.Upon("pp_responseFromServer", (e) => {
     alert(e.detail.data.message);
     jQuery(".blocks-payplus_loader_hosted").fadeOut();
     overlay(true);
+    isCheckout ? location.reload() : null;
     return;
   }
 

@@ -104,6 +104,7 @@ class WC_PayPlus
         WC()->session->__unset('order_awaiting_payment');
         WC()->session->__unset('hostedFieldsUUID');
         WC()->session->set('hostedStarted', false);
+        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
         wp_send_json_success(array('result' => "success"));
     }
 
