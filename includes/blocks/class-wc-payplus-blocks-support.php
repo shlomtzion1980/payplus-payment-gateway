@@ -145,6 +145,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $paymentPageUid = $testMode ? $options['dev_payment_page_id'] : $options['payment_page_id'];
 
         if ($order_id !== "000") {
+            WC()->session->__unset('randomHash');
             $order = wc_get_order($order_id);
 
             if (! $order) {
@@ -251,7 +252,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $data->items[] = $item;
         }
 
-        $randomHash = bin2hex(random_bytes(16));
+        $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
+        WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
 
         if ($order_id !== "000") {

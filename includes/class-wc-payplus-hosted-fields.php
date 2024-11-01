@@ -60,6 +60,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             WC()->session->__unset('order_awaiting_payment');
             WC()->session->__unset('hostedFieldsUUID');
             WC()->session->set('hostedStarted', false);
+            WC()->session->__unset('randomHash');
             return;
         }
 
@@ -169,6 +170,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
 
         if ($order_id !== "000") {
+            WC()->session->__unset('randomHash');
             $order = wc_get_order($order_id);
 
             if (! $order) {
@@ -276,7 +278,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->items[] = $item;
         }
 
-        $randomHash = bin2hex(random_bytes(16));
+        $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
+        WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
 
         if ($order_id !== "000") {
