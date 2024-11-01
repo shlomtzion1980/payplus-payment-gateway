@@ -155,7 +155,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $paylodfrom = WC()->session->get('hostedPayload');
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(1): ($order_id)\nblocks!!!$isHostedStarted");
+        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(1): ($order_id) - Payment process started.");
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -270,12 +270,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     // Get the shipping method title (e.g., 'Flat Rate')
                     $method_title = $shipping_item->get_method_title();
                     $shipping_cost = $shipping_item->get_total();
+                    $shipping_taxes = $shipping_item->get_taxes();
+
+                    $shipping_tax_total = $wc_tax_enabled ? array_sum($shipping_taxes['total']) : 0;
 
                     $item = new stdClass();
                     $item->name = $method_title;
                     $item->quantity = 1;
-                    $item->price = $shipping_cost;
-                    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+                    $item->price = $shipping_cost + array_sum($shipping_taxes['total']);
+                    $item->vat_type = $shipping_tax_total > 0 ? 1 : 0;
                     $data->items[] = $item;
                 }
             }
@@ -375,8 +378,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             WC()->session->set('hostedStarted', true);
             $this->orderId = $context->order->id;
             $order = wc_get_order($this->orderId);
-
-            // $hostedFieldsClass = new WC_PayPlus_HostedFields($this->orderId, $order);
 
             $this->hostedFieldsData($this->orderId, $isHostedStarted);
 
