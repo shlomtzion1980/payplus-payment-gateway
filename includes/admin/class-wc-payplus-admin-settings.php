@@ -450,10 +450,11 @@ class WC_PayPlus_Admin_Settings
                     'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [
-                        '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                        '0' => __('Default', 'payplus-payment-gateway'),
                         '1' => __('PayPlus', 'payplus-payment-gateway'),
                         '2' => __('WooCommerce', 'payplus-payment-gateway'),
                     ],
+                    'desc' => __('If you don`t know what to do here leave it on default :)', 'payplus-payment-gateway'),
                     'default' => '0',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[initial_invoice]',
                     'class' => 'payplus-vat'

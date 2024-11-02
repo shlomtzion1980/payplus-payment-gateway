@@ -563,6 +563,7 @@ class PayplusInvoice
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         $tax = 1;
         $wc_tax_enabled = wc_tax_enabled();
+        $isTaxIncluded = wc_prices_include_tax();
         if (is_numeric($temptax)) {
             $tax = 1 + ($temptax / 100);
         }
@@ -658,10 +659,12 @@ class PayplusInvoice
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
                 }
 
-                if ($item_data->get_tax_status() == 'none' || !$wc_tax_enabled) {
+                if ($item_data->get_tax_status() === 'none') {
                     $itemDetails['vat_type_code'] = 'vat-type-exempt';
-                } else {
+                } elseif ($isTaxIncluded && $item_data->get_tax_status() === 'taxable') {
                     $itemDetails['vat_type_code'] = 'vat-type-included';
+                } else {
+                    $itemDetails['vat_type_code'] = 'vat-type-not-included';
                 }
 
                 $productsItems[] = $itemDetails;

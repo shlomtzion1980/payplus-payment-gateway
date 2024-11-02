@@ -1624,6 +1624,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $totalCartAmount = 0;
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         $wc_tax_enabled = (wc_tax_enabled());
+        $isTaxIncluded = wc_prices_include_tax();
         $temptax = payplus_woocommerce_get_tax_rates($order);
         $tax = 1;
         $isAdmin = is_admin();
@@ -1716,8 +1717,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($metaAll));
                 }
 
-                $itemDetails['vat_type'] = $item_data->get_tax_status() == 'none' || !$wc_tax_enabled ? 2 : 0;
-                $itemDetails['vat_type'] = $this->paying_vat_all_order === "yes" ? 0 : $itemDetails['vat_type'];
+                // $itemDetails['vat_type'] = $item_data->get_tax_status() == 'none' || !$wc_tax_enabled ? 2 : 0;
+                // $itemDetails['vat_type'] = $this->paying_vat_all_order === "yes" ? 0 : $itemDetails['vat_type'];
+
+                $itemDetails['vat_type'] = 0;
+
+                if ($wc_tax_enabled) {
+                    $itemDetails['vat_type'] = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
+                    $itemDetails['vat_type'] = $product->get_tax_status() === 'none' ? 2 : $itemDetails['vat_type'];
+                }
 
                 if ($this->change_vat_in_eilat) {
                     $itemDetails['vat_type'] = $this->payplus_check_is_vat_eilat($order_id) ? 2 : 0;
