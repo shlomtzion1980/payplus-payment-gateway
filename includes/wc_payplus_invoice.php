@@ -659,10 +659,11 @@ class PayplusInvoice
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
                 }
 
-                if ($item_data->get_tax_status() == 'none' || !$wc_tax_enabled) {
-                    $itemDetails['vat_type_code'] = 'vat-type-exempt';
-                } else {
-                    $itemDetails['vat_type_code'] = 'vat-type-included';
+                $itemDetails['vat_type_code'] = 0;
+
+                if ($wc_tax_enabled) {
+                    $itemDetails['vat_type_code'] = $product->get_tax_status() === 'taxable' ? 'vat-type-included' : 'vat-type-exempt';
+                    $itemDetails['vat_type_code'] = $product->get_tax_status() === 'none' ? 'vat-type-exempt' : $itemDetails['vat_type_code'];
                 }
 
                 $productsItems[] = $itemDetails;
