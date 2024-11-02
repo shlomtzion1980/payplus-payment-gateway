@@ -542,6 +542,60 @@ class PayplusInvoice
         return $tax_rate_shipping;
     }
 
+    public function payplusGetOrderItems($order_id)
+    {
+        $order = wc_get_order(1022);
+        $order_items = $order->get_items();
+        // $payPlusResponse = WC_PayPlus_Meta_Data::get_meta(1022, 'payplus_response');
+        // print_r($payPlusResponse);
+        // die;
+
+        foreach ($order_items as $item_id => $item) {
+            // Get original price values recorded at the time of purchase
+            $original_price_per_item = $item->get_subtotal() / $item->get_quantity();
+
+
+            $original_subtotal       = $item->get_subtotal();
+            $tax_total               = $item->get_total_tax();
+            $original_total          = $item->get_total() + $tax_total;
+            $tax_per_item = $item->get_quantity() > 0 ? $tax_total / $item->get_quantity() : 0;
+            $totalWithTx_price_per_item = $original_price_per_item + $tax_per_item;
+
+            // Get product ID and SKU
+            $product_id      = $item->get_product_id();
+            $product         = $item->get_product(); // Get the product object
+            $product_sku     = $product ? $product->get_sku() : 'N/A'; // SKU, if available
+
+            echo "Product: " . $item->get_name() . "<br>";
+            echo "Price per item (original): " . wc_price($original_price_per_item) . "<br>";
+            echo "Subtotal (original): " . wc_price($original_subtotal) . "<br>";
+            echo "Total (original): " . wc_price($original_total) . "<br>";
+            echo "Total Tax: " . wc_price($tax_total) . "<br>";
+            echo "Total Tax for item: " . wc_price($tax_per_item) . "<br>";
+            echo "Total With Tax Price for item: " . wc_price($totalWithTx_price_per_item) . "<br>";
+
+            echo "product id: " . $product_id . "<br>";
+            echo "product_sku: " . $product_sku . "<br>";
+            echo "<hr>";
+            // Retrieve the shipping total, discount total, and other details as recorded
+        }
+
+        $shipping_tax     = $order->get_shipping_tax();   // Shipping tax amount
+        $shipping_total   = $order->get_shipping_total() + $shipping_tax; // Shipping cost before taxes
+        $total_discount   = $order->get_discount_total(); // Discount total amount (coupons)
+        $discount_tax     = $order->get_discount_tax();   // Tax for discounts, if applicable
+        $order_total      = $order->get_total();          // Final total order amount
+
+        // Displaying the values
+        echo "Shipping Total: " . wc_price($shipping_total) . "<br>";
+        echo "Shipping Tax: " . wc_price($shipping_tax) . "<br>";
+        echo "Discount Total: " . wc_price($total_discount) . "<br>";
+        echo "Discount Tax: " . wc_price($discount_tax) . "<br>";
+        echo "Order Total: " . wc_price($order_total) . "<br>";
+
+        die;
+    }
+
     /**
      * @param $order_id
      * @param $dual
