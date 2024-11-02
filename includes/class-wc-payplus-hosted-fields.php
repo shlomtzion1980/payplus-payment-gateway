@@ -171,10 +171,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function hostedFieldsData($order_id)
     {
         $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
-        // $payPlusPayload = WC_PayPlus_Meta_Data::get_meta(13199, 'payplus_payload');
-        // echo '<pre>';
-        // print_r(json_decode($payPlusPayload, true));
-        // die;
+
         if ($order_id !== "000") {
             WC()->session->set('randomHash', bin2hex(random_bytes(16)));
             $order = wc_get_order($order_id);
@@ -222,7 +219,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 }
 
                 $products[] = array(
-                    'title' => $product->get_title(),
+                    'title' => $product->get_name(),
                     'priceProductWithTax' => $priceProductWithTax,
                     'priceProductWithoutTax' => $priceProductWithoutTax,
                     'barcode' => ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId,

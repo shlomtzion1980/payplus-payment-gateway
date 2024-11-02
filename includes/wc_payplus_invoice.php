@@ -544,12 +544,16 @@ class PayplusInvoice
 
     public function payplusGetOrderItems($order_id)
     {
-        $order = wc_get_order(1022);
+        $payPlusPayload = WC_PayPlus_Meta_Data::get_meta(13199, 'payplus_payload');
+        echo '<pre>';
+        print_r(json_decode($payPlusPayload, true));
+        $order = wc_get_order(13199);
         $order_items = $order->get_items();
-        // $payPlusResponse = WC_PayPlus_Meta_Data::get_meta(1022, 'payplus_response');
-        // print_r($payPlusResponse);
+        // $payPlusPayload = WC_PayPlus_Meta_Data::get_meta(13199, 'payplus_payload');
+        // echo '<pre>';
+        // print_r(json_decode($payPlusPayload, true));
         // die;
-
+        $pItems = [];
         foreach ($order_items as $item_id => $item) {
             // Get original price values recorded at the time of purchase
             $original_price_per_item = $item->get_subtotal() / $item->get_quantity();
@@ -559,7 +563,7 @@ class PayplusInvoice
             $tax_total               = $item->get_total_tax();
             $original_total          = $item->get_total() + $tax_total;
             $tax_per_item = $item->get_quantity() > 0 ? $tax_total / $item->get_quantity() : 0;
-            $totalWithTx_price_per_item = $original_price_per_item + $tax_per_item;
+            $itemTotalPriceWithTax = $original_price_per_item + $tax_per_item;
 
             // Get product ID and SKU
             $product_id      = $item->get_product_id();
@@ -572,14 +576,26 @@ class PayplusInvoice
             echo "Total (original): " . wc_price($original_total) . "<br>";
             echo "Total Tax: " . wc_price($tax_total) . "<br>";
             echo "Total Tax for item: " . wc_price($tax_per_item) . "<br>";
-            echo "Total With Tax Price for item: " . wc_price($totalWithTx_price_per_item) . "<br>";
+            echo "Total With Tax Price for item: " . wc_price($itemTotalPriceWithTax) . "<br>";
 
             echo "product id: " . $product_id . "<br>";
             echo "product_sku: " . $product_sku . "<br>";
             echo "<hr>";
+            $pItem = [];
+            $pItem['name'] = $item->get_name();
+            $pItem['price'] = $itemTotalPriceWithTax;
+            $pItem['quantity'] = $item->get_quantity();
+            $pItem['vat_type'] = $tax_total > 0 && $itemTotalPriceWithTax !== $original_subtotal ? "vat-type-included" : "vat-type-exempt";
+            $pItem['barcode'] = $product->get_sku() ? $product->get_sku() : $product_id;
+            $tax_lines = $order->get_tax_totals();
+            foreach ($tax_lines as $tax) {
+                echo 'Tax Name: ' . $tax->label . '<br>';
+                echo 'Tax Amount: ' . wc_price($tax->amount) . '<br>';
+                echo 'Tax Rate ID: ' . $tax->rate_id . '<br>';
+            }
             // Retrieve the shipping total, discount total, and other details as recorded
         }
-
+        print_r($pItem);
         $shipping_tax     = $order->get_shipping_tax();   // Shipping tax amount
         $shipping_total   = $order->get_shipping_total() + $shipping_tax; // Shipping cost before taxes
         $total_discount   = $order->get_discount_total(); // Discount total amount (coupons)
@@ -592,7 +608,6 @@ class PayplusInvoice
         echo "Discount Total: " . wc_price($total_discount) . "<br>";
         echo "Discount Tax: " . wc_price($discount_tax) . "<br>";
         echo "Order Total: " . wc_price($order_total) . "<br>";
-
         die;
     }
 
