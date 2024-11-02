@@ -313,6 +313,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data->amount = number_format($totalAmount, 2, '.', '');
 
         $payload = wp_json_encode($data);
+        is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]) : null;
         if (WC()->session->get('hostedPayload') === $payload) {
             $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(2): ($order_id)\nPayload is identical no need to run.");
             return WC()->session->get('hostedResponse');
