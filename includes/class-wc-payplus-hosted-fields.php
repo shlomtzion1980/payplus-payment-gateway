@@ -68,11 +68,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
-        // $this->create_order_if_not_exists(); 
-        $hostedResponse = $this->hostedFieldsData($this->order_id);
+        $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $this->emptyResponse();
-        $hostedResponse = isset(json_decode($hostedResponse, true)['message']) && json_decode($hostedResponse, true)['message']
-            === "not-authorize-page-expired" ? $this->emptyResponse() : $hostedResponse;
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
@@ -371,79 +368,24 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         return $hostedResponse;
     }
 
-    public function create_order_if_not_exists()
+    public function checkHostedTime()
     {
-        if (! is_checkout()) {
-            return; // Only run on the checkout page
+        $savedTimestamp = WC()->session->get(key: 'hostedTimeStamp');
+        if (!$savedTimestamp) {
+            // First run or if no timestamp is saved, save the current time
+            $savedTimestamp = time(); // Store this in the database or file
+            WC()->session->set('hostedTimeStamp', $savedTimestamp);
         }
 
-        // Check if an order already exists in the session
-        if (WC()->session->get('order_awaiting_payment')) {
-            return; // Order already exists, no need to create another
-        }
+        $currentTimestamp = time();
 
-        // Create a new order using the WC_Checkout object
-        $checkout = WC()->checkout();
+        $timeLimit = 30 * 60; // 30 minutes
 
-        // Get posted billing and shipping data from the checkout form
-        $billing_first_name  = $checkout->get_value('billing_first_name');
-        $billing_last_name   = $checkout->get_value('billing_last_name');
-        $billing_email       = $checkout->get_value('billing_email');
-        $billing_phone       = $checkout->get_value('billing_phone');
-        $billing_address_1   = $checkout->get_value('billing_address_1');
-        $billing_city        = $checkout->get_value('billing_city');
-        $billing_postcode    = $checkout->get_value('billing_postcode');
-        $billing_country     = $checkout->get_value('billing_country');
-
-        // Shipping data
-        $shipping_first_name = $checkout->get_value('shipping_first_name');
-        $shipping_last_name  = $checkout->get_value('shipping_last_name');
-        $shipping_address_1  = $checkout->get_value('shipping_address_1');
-        $shipping_city       = $checkout->get_value('shipping_city');
-        $shipping_postcode   = $checkout->get_value('shipping_postcode');
-        $shipping_country    = $checkout->get_value('shipping_country');
-
-        // Get available payment gateways
-        $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
-        $chosen_payment_method = key($available_gateways); // Select the first available gateway, or set your own logic
-
-        // Populate checkout data with necessary fields
-        $data = array(
-            // Billing data
-            'billing_first_name' => $billing_first_name,
-            'billing_last_name'  => $billing_last_name,
-            'billing_email'      => $billing_email,
-            'billing_phone'      => $billing_phone,
-            'billing_address_1'  => $billing_address_1,
-            'billing_city'       => $billing_city,
-            'billing_postcode'   => $billing_postcode,
-            'billing_country'    => $billing_country,
-
-            // Shipping data
-            'shipping_first_name' => $shipping_first_name,
-            'shipping_last_name'  => $shipping_last_name,
-            'shipping_address_1'  => $shipping_address_1,
-            'shipping_city'       => $shipping_city,
-            'shipping_postcode'   => $shipping_postcode,
-            'shipping_country'    => $shipping_country,
-
-            // Payment method
-            'payment_method' => $chosen_payment_method, // Set the payment method
-        );
-
-        try {
-            // Create a new order using the checkout data
-            $order_id = $checkout->create_order($data);
-
-            // Set the order awaiting payment in the session
-            WC()->session->set('order_awaiting_payment', $order_id);
-
-            // You can manipulate or save additional order data here
-            return $order_id; // Returns the newly created order ID
-        } catch (Exception $e) {
-            wc_add_notice(__('Error creating order: ') . $e->getMessage(), 'error');
+        if (($currentTimestamp - $savedTimestamp) <= $timeLimit) {
+            return true;
+        } else {
+            WC()->session->set('hostedTimeStamp', false);
+            return false;
         }
     }
 }
-
-// WC_PayPlus_HostedFields::get_instance();
