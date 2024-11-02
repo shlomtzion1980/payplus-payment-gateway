@@ -197,7 +197,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             foreach ($cart as $cart_item_key => $cart_item) {
                 $productId = $cart_item['product_id'];
 
-                if (!empty($cart_item['variation_id'])) {
+                if (isset($cart_item['variation_id']) && !empty($cart_item['variation_id'])) {
                     $product = new WC_Product_Variable($productId);
                     $productData = $product->get_available_variation($cart_item['variation_id']);
                     $tax = (WC()->cart->get_total_tax()) ? WC()->cart->get_total_tax() / $cart_item['quantity'] : 0;
