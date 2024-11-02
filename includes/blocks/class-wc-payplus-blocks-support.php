@@ -32,6 +32,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $applePaySettings;
     public $isSubscriptionOrder;
     public $isAutoPPCC;
+    public $vat4All;
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
      *
@@ -138,6 +139,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function hostedFieldsData($order_id, $isHostedStarted)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->vat4All = isset($options['paying_vat_all_order']) ? boolval($options['paying_vat_all_order'] === "yes") : false;
         $testMode = boolval($options['api_test_mode'] === 'yes');
         $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
         $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
@@ -189,6 +191,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 if ($wc_tax_enabled) {
                     $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
                     $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                    $productVat = $this->vat4All ? 0 : $productVat;
                 }
 
                 $products[] = array(

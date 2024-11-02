@@ -14,6 +14,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $secretKey;
     public $paymentPageUid;
     public $apiUrl;
+    public $vat4All;
+    public $payPlusGateway;
     // public $hostedFieldsResponse;
 
 
@@ -22,14 +24,16 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
      */
     public function __construct($order_id = "000", $order = null)
     {
-        $this->options = get_option('woocommerce_payplus-payment-gateway_settings');
-        $this->testMode = boolval($this->options['api_test_mode'] === 'yes');
+        $this->payPlusGateway = $this->get_main_payplus_gateway();
+        $this->vat4All = isset($this->payPlusGateway->settings['paying_vat_all_order']) ? boolval($this->payPlusGateway->settings['paying_vat_all_order'] === "yes") : false;
+        $this->testMode = boolval($this->payPlusGateway->settings['api_test_mode'] === 'yes');
         $this->url = $this->testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
-        $this->apiKey = $this->testMode ? $this->options['dev_api_key'] : $this->options['api_key'];
-        $this->secretKey = $this->testMode ? $this->options['dev_secret_key'] : $this->options['secret_key'];
-        $this->paymentPageUid = $this->testMode ? $this->options['dev_payment_page_id'] : $this->options['payment_page_id'];
+        $this->apiKey = $this->testMode ? $this->payPlusGateway->settings['dev_api_key'] : $this->payPlusGateway->settings['api_key'];
+        $this->secretKey = $this->testMode ? $this->payPlusGateway->settings['dev_secret_key'] : $this->payPlusGateway->settings['secret_key'];
+        $this->paymentPageUid = $this->testMode ? $this->payPlusGateway->settings['dev_payment_page_id'] : $this->payPlusGateway->settings['payment_page_id'];
         $this->order_id = $order_id;
         $this->order = $order;
+
 
 
         define('API_KEY', $this->apiKey);
@@ -67,6 +71,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         // $this->create_order_if_not_exists(); 
         $hostedResponse = $this->hostedFieldsData($this->order_id);
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $this->emptyResponse();
+        $hostedResponse = isset(json_decode($hostedResponse, true)['message']) && json_decode($hostedResponse, true)['message']
+            === "not-authorize-page-expired" ? $this->emptyResponse() : $hostedResponse;
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
@@ -95,7 +101,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function emptyResponse()
     {
         WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-        $this->hostedFieldsData($this->order_id);
+        return $this->hostedFieldsData($this->order_id);
     }
 
     /**
@@ -119,12 +125,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     function createUpdateHostedPaymentPageLink($payload)
     {
-        $options = get_option('woocommerce_payplus-payment-gateway_settings');
-        $testMode = boolval($options['api_test_mode'] === 'yes');
+        $testMode = boolval($this->payPlusGateway->settings['api_test_mode'] === 'yes');
         $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
-        $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
-        $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
-        $payPlusGateWay = $this->get_main_payplus_gateway();
+        $apiKey = $testMode ? $this->payPlusGateway->settings['dev_api_key'] : $this->payPlusGateway->settings['api_key'];
+        $secretKey = $testMode ? $this->payPlusGateway->settings['dev_secret_key'] : $this->payPlusGateway->settings['secret_key'];
+
 
         $auth = wp_json_encode([
             'api_key' => $apiKey,
@@ -142,7 +147,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
         }
 
-        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, "post");
+        $hostedResponse = $this->payPlusGateway->post_payplus_ws($apiUrl, $payload, "post");
         // $this->payplus_gateway->payplus_add_log_all('payplus-hostedfields-create-update', "HostedFields payload: $payload");
 
         $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
@@ -216,6 +221,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 if ($wc_tax_enabled) {
                     $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
                     $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                    $productVat = $this->vat4All ? 0 : $productVat;
                 }
 
                 $products[] = array(
