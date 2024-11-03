@@ -401,7 +401,7 @@ class PayplusInvoice
                 $insetData["payplus_invoice_copyDocAddress" . $responeType] = $res->details->copyDocAddress;
                 $insetData["payplus_invoice_customer_uuid" . $responeType] = $res->details->customer_uuid;
                 $insetData["payplus_check_invoice_send_refund"] = 1;
-                $insetData["payplus_total_refunded_amount"] = null;
+                $insetData["payplus_payload_invoice_refund"] = $payload;
                 WC_PayPlus_Meta_Data::update_meta($order, $insetData);
                 if (!$this->invoice_notes_no) {
                     $titleNote = "PayPlus Document " . $nameDocment;
@@ -1132,6 +1132,7 @@ class PayplusInvoice
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
+                            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
                             $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
                             $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
