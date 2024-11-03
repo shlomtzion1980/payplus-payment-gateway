@@ -3044,7 +3044,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $token->set_user_id($user_id ?: get_current_user_id());
             $token->save();
 
-            $this->payplus_add_log_all('payplus_save_tokens', 'Saved And Finished: ' . sanitize_text_field($token));
+            // $this->payplus_add_log_all('payplus_save_tokens', 'Saved And Finished: ' . sanitize_text_field($token));
         }
     }
 

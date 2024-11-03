@@ -261,11 +261,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $response = wp_remote_post($url, $args);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
 
-        if ($this->create_pp_token && $isHostedPayment && $saveToken) {
-            $user_id = $order->get_user_id();
-            $this->save_token($responseBody['data'], $user_id);
-        }
-
         if (!empty($responseBody['data'])) {
             $type = $responseBody['data']['type'];
 
@@ -320,21 +315,27 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $transactionUid = $responseBody['data']['transaction_uid'];
 
-            if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Charge') {
-                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
-                $order->update_status('wc-processing');
-                if ($this->saveOrderNote) {
-                    $order->add_order_note(
-                        $successNote
-                    );
+            if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
+                if ($responseBody['data']['type'] === 'Charge') {
+                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
+                    $order->update_status('wc-processing');
+                    if ($this->saveOrderNote) {
+                        $order->add_order_note(
+                            $successNote
+                        );
+                    }
+                } elseif ($responseBody['data']['type'] === 'Approval') {
+                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
+                    $order->update_status('wc-on-hold');
+                    if ($this->saveOrderNote) {
+                        $order->add_order_note(
+                            $successNote
+                        );
+                    }
                 }
-            } elseif ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000' && $responseBody['data']['type'] === 'Approval') {
-                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
-                $order->update_status('wc-on-hold');
-                if ($this->saveOrderNote) {
-                    $order->add_order_note(
-                        $successNote
-                    );
+                if ($this->create_pp_token && $isHostedPayment && $saveToken) {
+                    $user_id = $order->get_user_id();
+                    $this->save_token($responseBody['data'], $user_id);
                 }
             }
         } else {
