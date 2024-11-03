@@ -340,12 +340,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $totalAmount += $item->price * $item->quantity;
         }
 
-        $data->amount = number_format($totalAmount, 2, '.', '');
+        $hostedResponse = WC()->session->get('hostedPayload');
+        $hostedResponseArray = json_decode($hostedResponse, true);
 
+        $data->amount = number_format($totalAmount, 2, '.', '');
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
         $payload = wp_json_encode($data);
-        is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]) : null;
-        if (WC()->session->get('hostedPayload') === $payload) {
+        is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]) : null;
+        if ($hostedResponse === $payload) {
             $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(2): ($order_id)\nPayload is identical no need to run.");
             return WC()->session->get('hostedResponse');
         } else {

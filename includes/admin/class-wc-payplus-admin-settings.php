@@ -394,17 +394,9 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Don`t add invoice+ links to order notes', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[invoices_notes_no]',
                     'type' => 'checkbox',
-                    'default' => 'no',
+                    'default' => 'yes',
                     'class' => 'payplus-display'
                 );
-                // $settings[$section][] = [
-                //     'title' => __('Show pick up  method on invoice', 'payplus-payment-gateway'),
-                //     'type' => 'checkbox',
-                //     'label' => '',
-                //     'default' => 'no',
-                //     'id' => 'woocommerce_payplus-payment-gateway_settings[is_Local_pickup]',
-                //     'class' => 'payplus-documents'
-                // ];
                 $settings[$section][] = [
                     'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
