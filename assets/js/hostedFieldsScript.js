@@ -195,7 +195,6 @@ jQuery(() => {
                                                 "</label>" +
                                                 "</p>"
                                         );
-                                        console.log("checkbox", $checkbox);
 
                                         payplus_script_hosted.isLoggedIn &&
                                         payplus_script_hosted.isSavingCerditCards
@@ -350,7 +349,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                 _ajax_nonce: payplus_script_hosted.frontNonce,
             },
             success: function (response) {
-                // console.log("Hosted payment response: ", response);
+                console.log("Hosted payment response: ", response);
                 jQuery.ajax({
                     url: payplus_script_hosted.ajax_url,
                     type: "POST",
@@ -361,7 +360,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                         _ajax_nonce: payplus_script_hosted.frontNonce,
                     },
                     success: function (final_response) {
-                        // console.log("final response: ", final_response);
+                        console.log("final response: ", final_response);
                         if (final_response.success) {
                             // Redirect to the thank you page or complete payment
                             jQuery(window).off("beforeunload");
@@ -374,7 +373,13 @@ hf.Upon("pp_responseFromServer", (e) => {
                             );
                         }
                     },
+                    error: function (xhr, status, error) {
+                        alert("Error completing order: " + error);
+                    },
                 });
+            },
+            error: function (xhr, status, error) {
+                alert("Error making hosted payment: " + error);
             },
         });
     }

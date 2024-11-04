@@ -32,6 +32,12 @@ class PayplusInvoice
     private $invoice_notes_no;
     private $invoiceDisplayOnly;
     private $_wpnonce;
+    /**
+     * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
+     *
+     * @var null|WC_PayPlus_Gateway
+     */
+    protected $payplus_gateway = null;
 
     /**
      *
@@ -108,6 +114,21 @@ class PayplusInvoice
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'));
     }
+
+    /**
+     * Returns the main PayPlus payment gateway class instance.
+     *
+     * @return new WC_PayPlus_Gateway
+     */
+    public function get_main_payplus_gateway()
+    {
+        if (!is_null($this->payplus_gateway)) {
+            return $this->payplus_gateway;
+        }
+        $this->payplus_gateway = new WC_PayPlus_Gateway();
+        return $this->payplus_gateway;
+    }
+
     /**
      * @return mixed
      */
@@ -277,6 +298,10 @@ class PayplusInvoice
      */
     public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
     {
+        $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
+        if ($payPlusPayloadInvoice) {
+            return $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund);
+        }
 
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $payload = array();
@@ -294,6 +319,8 @@ class PayplusInvoice
         }
 
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
+        $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
         }
@@ -428,19 +455,24 @@ class PayplusInvoice
      */
     public function payplus_create_document_dashboard($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null)
     {
+        $order = wc_get_order($order_id);
         if ($payplus_invoice_type_document_refund === "inv_refund_receipt") {
             $payplus_document_type = "inv_refund_receipt";
             $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
     }
@@ -542,73 +574,35 @@ class PayplusInvoice
         return $tax_rate_shipping;
     }
 
-    public function payplusGetOrderItems($order_id)
+    /**
+     * Get the invoice payload for a given order.
+     *
+     * @param int $order_id The ID of the order.
+     * @param string|false $payPlusPayloadInvoice the invoice payload or false.
+     * @param string $docType Indicates the document type - decides if it is a refund invoice,receipt or something else...:)
+     * @return array|false Returns the invoice payload as an array or false if not found.
+     */
+    public function payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $docType)
     {
-        $payPlusPayload = WC_PayPlus_Meta_Data::get_meta(13199, 'payplus_payload');
-        echo '<pre>';
-        print_r(json_decode($payPlusPayload, true));
-        $order = wc_get_order(13199);
-        $order_items = $order->get_items();
-        // $payPlusPayload = WC_PayPlus_Meta_Data::get_meta(13199, 'payplus_payload');
-        // echo '<pre>';
-        // print_r(json_decode($payPlusPayload, true));
-        // die;
-        $pItems = [];
-        foreach ($order_items as $item_id => $item) {
-            // Get original price values recorded at the time of purchase
-            $original_price_per_item = $item->get_subtotal() / $item->get_quantity();
+        $isRefund = false;
+        $isRefund = $docType === 'inv_refund_receipt' ? true : $isRefund;
+        $isRefund = $docType === 'inv_refund' ? false : $isRefund;
 
-
-            $original_subtotal       = $item->get_subtotal();
-            $tax_total               = $item->get_total_tax();
-            $original_total          = $item->get_total() + $tax_total;
-            $tax_per_item = $item->get_quantity() > 0 ? $tax_total / $item->get_quantity() : 0;
-            $itemTotalPriceWithTax = $original_price_per_item + $tax_per_item;
-
-            // Get product ID and SKU
-            $product_id      = $item->get_product_id();
-            $product         = $item->get_product(); // Get the product object
-            $product_sku     = $product ? $product->get_sku() : 'N/A'; // SKU, if available
-
-            echo "Product: " . $item->get_name() . "<br>";
-            echo "Price per item (original): " . wc_price($original_price_per_item) . "<br>";
-            echo "Subtotal (original): " . wc_price($original_subtotal) . "<br>";
-            echo "Total (original): " . wc_price($original_total) . "<br>";
-            echo "Total Tax: " . wc_price($tax_total) . "<br>";
-            echo "Total Tax for item: " . wc_price($tax_per_item) . "<br>";
-            echo "Total With Tax Price for item: " . wc_price($itemTotalPriceWithTax) . "<br>";
-
-            echo "product id: " . $product_id . "<br>";
-            echo "product_sku: " . $product_sku . "<br>";
-            echo "<hr>";
-            $pItem = [];
-            $pItem['name'] = $item->get_name();
-            $pItem['price'] = $itemTotalPriceWithTax;
-            $pItem['quantity'] = $item->get_quantity();
-            $pItem['vat_type'] = $tax_total > 0 && $itemTotalPriceWithTax !== $original_subtotal ? "vat-type-included" : "vat-type-exempt";
-            $pItem['barcode'] = $product->get_sku() ? $product->get_sku() : $product_id;
-            $tax_lines = $order->get_tax_totals();
-            foreach ($tax_lines as $tax) {
-                echo 'Tax Name: ' . $tax->label . '<br>';
-                echo 'Tax Amount: ' . wc_price($tax->amount) . '<br>';
-                echo 'Tax Rate ID: ' . $tax->rate_id . '<br>';
+        if ($payPlusPayloadInvoice) {
+            $payPlusPayloadInvoice = json_decode($payPlusPayloadInvoice, true);
+            unset($payPlusPayloadInvoice['unique_identifier']);
+            $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
+            foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
+                $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
+                $payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value'];
             }
-            // Retrieve the shipping total, discount total, and other details as recorded
+            foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
+                $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
+            }
+            return $payPlusPayloadInvoice;
+        } else {
+            return false;
         }
-        print_r($pItem);
-        $shipping_tax     = $order->get_shipping_tax();   // Shipping tax amount
-        $shipping_total   = $order->get_shipping_total() + $shipping_tax; // Shipping cost before taxes
-        $total_discount   = $order->get_discount_total(); // Discount total amount (coupons)
-        $discount_tax     = $order->get_discount_tax();   // Tax for discounts, if applicable
-        $order_total      = $order->get_total();          // Final total order amount
-
-        // Displaying the values
-        echo "Shipping Total: " . wc_price($shipping_total) . "<br>";
-        echo "Shipping Tax: " . wc_price($shipping_tax) . "<br>";
-        echo "Discount Total: " . wc_price($total_discount) . "<br>";
-        echo "Discount Tax: " . wc_price($discount_tax) . "<br>";
-        echo "Order Total: " . wc_price($order_total) . "<br>";
-        die;
     }
 
     /**
@@ -1010,6 +1004,8 @@ class PayplusInvoice
                     $date = $date->format('m-d-Y H:i');
                     $order = wc_get_order($order_id);
                     $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
+                    $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+
                     if (!empty($payplusTransactionUid)) {
                         $payload['transaction_uuid'] = $payplusTransactionUid;
                     }
