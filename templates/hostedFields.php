@@ -27,10 +27,6 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             /* Or italic if necessary */
         }
 
-        label {
-            border: none !important;
-        }
-
         .fld-frame {
             border: 1px solid #ced4da;
             height: 37px;
@@ -40,69 +36,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             width: 100%;
         }
 
-        .hf-col-4 {
 
-            input[type="number"]::-webkit-outer-spin-button,
-            input[type="number"]::-webkit-inner-spin-button {
-                -webkit-appearance: none;
-                margin: 0;
-            }
-
-            flex: 0 0 auto;
-            width: fit-content !important;
-            display: block;
-            background: #F7F7F7;
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid #E3E6E9 !important;
-            position: relative;
-            flex-direction: row;
-            /* align-content: center; */
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            margin: auto;
-            display: flex;
-            /* flex-direction: column; */
-            background: #F7F7F7;
-            /* height: 55vh; */
-            flex-wrap: wrap;
-            justify-content: space-between;
-            font-family: 'AlmoniMLv5AAA';
-            min-height: 533px;
-
-            #payments {
-                background-color: white !important;
-            }
-
-            .hf-row {
-                select {
-                    background-color: white !important;
-                }
-            }
-
-            select {
-
-                padding-right: 15px !important;
-                padding-left: 15px !important;
-                padding-top: unset !important;
-                padding-bottom: unset !important;
-                font-size: 1rem !important;
-
-                @media screen and (min-width: 567px) {
-                    appearance: none;
-                    /* Remove default arrow (Webkit) */
-                    -moz-appearance: none;
-                    /* Remove default arrow (Firefox) */
-
-                    background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
-                    background-repeat: no-repeat;
-                    background-position: <?php echo esc_attr(text: $direction) . ' 15px center';
-                                            ?>;
-                    /* Add custom arrow */
-                    background-size: 10px;
-                }
-            }
-        }
 
         #hostedTop {
             display: flex;
@@ -148,38 +82,12 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             width: 90%;
         }
 
-        #ppLogo {
-            font-family: "Almoni", sans-serif;
-            color: #c5cbcf;
-            text-align: center !important;
-            font-size: 12px;
-            width: 100%;
-            bottom: 5px;
-            direction: ltr;
-            padding: 1em;
-
-            .hf-image {
-                height: 17px;
-                top: 2px;
-                display: initial;
-            }
-        }
-
         .expiry-wrapper {
             justify-content: space-between;
         }
 
         .container.hostedFields {
             display: none;
-        }
-
-        #payment-form {
-            display: none;
-            align-items: center;
-            flex-direction: column;
-            flex-wrap: wrap;
-            align-content: flex-start;
-            max-width: 440px;
         }
 
         .__payplus_hosted_fields_err_fld {
@@ -266,75 +174,162 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             outline: unset;
         }
 
-        input {
-            outline: unset;
-        }
-
         .hsted-Flds--r-secure3ds-iframe {
             border-radius: 15px;
             width: 33% !important;
             height: 70% !important;
         }
 
-
         .pp_iframe_h {
 
-            iframe {
-                outline: none;
-                border: none;
-                /* This also removes any visible border */
-            }
+            #payment-form {
+                display: none;
+                align-items: center;
+                flex-direction: column;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                max-width: 440px;
 
-            input:focus,
-            iframe:focus {
-                outline: none !important;
-                box-shadow: none !important;
-            }
+                .hf-col-4 {
 
-            input::placeholder {
-                color: #A2ADB5;
+                    input[type="number"]::-webkit-outer-spin-button,
+                    input[type="number"]::-webkit-inner-spin-button {
+                        -webkit-appearance: none;
+                        margin: 0;
+                    }
 
-                /* Change to desired color */
-                opacity: 1;
-                /* Optional, removes default opacity in some browsers */
-            }
+                    flex: 0 0 auto;
+                    width: fit-content !important;
+                    display: block;
+                    background: #F7F7F7;
+                    padding: 15px;
+                    border-radius: 10px;
+                    border: 1px solid #E3E6E9 !important;
+                    position: relative;
+                    flex-direction: row;
+                    /* align-content: center; */
+                    flex-wrap: wrap;
+                    justify-content: flex-end;
+                    margin: auto;
+                    display: flex;
+                    /* flex-direction: column; */
+                    background: #F7F7F7;
+                    /* height: 55vh; */
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    font-family: 'AlmoniMLv5AAA';
+                    min-height: 533px;
 
-            #card-holder-name,
-            #id-number,
-            #card-holder-phone,
-            #invoice-name {
-                background-color: white !important;
-            }
+                    #payments {
+                        background-color: white !important;
+                    }
 
-            .form-control {
-                width: 100% !important;
-                padding: 0.5rem 0.75rem !important;
-                font-size: 1rem !important;
-                border: 1px solid #E3E6E9 !important;
-                border-top-left-radius: 8px;
-                border-top-right-radius: 8px;
-                height: 38px;
-                margin: auto !important;
-                text-align: inherit;
-            }
+                    .hf-row {
+                        select {
+                            background-color: white !important;
+                        }
+                    }
 
-            .forms-control {
-                width: 100% !important;
-                padding: 0.5rem 0.75rem !important;
-                font-size: 1rem !important;
-                border: 1px solid #E3E6E9 !important;
-                border-radius: 8px !important;
-                height: 38px;
-                margin: auto !important;
-                text-align: inherit;
-                /* background-image: url('<?php /* echo site_url();*/
-                                            ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg'); */
-                background-repeat: no-repeat;
-                background-position: <?php echo esc_attr(text: $direction) . " 15px center";
-                                        ?>;
+                    select {
 
-                &.validated {
-                    background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+                        padding-right: 15px !important;
+                        padding-left: 15px !important;
+                        padding-top: unset !important;
+                        padding-bottom: unset !important;
+                        font-size: 1rem !important;
+
+                        @media screen and (min-width: 567px) {
+                            appearance: none;
+                            /* Remove default arrow (Webkit) */
+                            -moz-appearance: none;
+                            /* Remove default arrow (Firefox) */
+
+                            background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
+                            background-repeat: no-repeat;
+                            background-position: <?php echo esc_attr($direction) . ' 15px center';
+                                                    ?>;
+                            /* Add custom arrow */
+                            background-size: 10px;
+                        }
+                    }
+                }
+
+                #ppLogo {
+                    font-family: "Almoni", sans-serif;
+                    color: #c5cbcf;
+                    text-align: center !important;
+                    font-size: 12px;
+                    width: 100%;
+                    bottom: 5px;
+                    direction: ltr;
+                    padding: 1em;
+
+                    .hf-image {
+                        height: 17px;
+                        top: 2px;
+                        display: initial;
+                    }
+                }
+
+                label {
+                    border: none !important;
+                }
+
+                iframe {
+                    outline: none;
+                    border: none;
+                    /* This also removes any visible border */
+                }
+
+                input:focus,
+                iframe:focus {
+                    outline: none !important;
+                    box-shadow: none !important;
+                }
+
+                input::placeholder {
+                    color: #A2ADB5;
+
+                    /* Change to desired color */
+                    opacity: 1;
+                    /* Optional, removes default opacity in some browsers */
+                }
+
+                input {
+                    background-color: white !important;
+                    outline: unset;
+                }
+
+                .form-control {
+                    width: 100% !important;
+                    padding: 0.5rem 0.75rem !important;
+                    font-size: 1rem !important;
+                    border: 1px solid #E3E6E9 !important;
+                    border-top-left-radius: 8px;
+                    border-top-right-radius: 8px;
+                    height: 38px;
+                    margin: auto !important;
+                    text-align: inherit;
+                }
+
+                .forms-control {
+                    width: 100% !important;
+                    padding: 0.5rem 0.75rem !important;
+                    font-size: 1rem !important;
+                    border: 1px solid #E3E6E9 !important;
+                    border-radius: 8px !important;
+                    height: 38px;
+                    margin: auto !important;
+                    text-align: inherit;
+                    /* background-image: url('<?php /* echo site_url();*/
+                                                ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg'); */
+                    background-repeat: no-repeat;
+                    background-position: <?php echo esc_attr($direction) . " 15px center";
+                                            ?>;
+
+                    &.validated {
+                        background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+                    }
                 }
             }
         }
@@ -515,15 +510,15 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                                     data-hosted-fields-identifier="cc"></span>
                             </div>
                         </div>
-                        <div class="expiry-wrapper-full expireCvvClass <?php echo esc_attr(text: $opposite); ?>">
+                        <div class="expiry-wrapper-full expireCvvClass <?php echo esc_attr($opposite); ?>">
                             <span id="expiry" class="fld-frame"></span>
                         </div>
-                        <div class="expiry-wrapper expireCvvClass <?php echo esc_attr(text: $opposite); ?>">
+                        <div class="expiry-wrapper expireCvvClass <?php echo esc_attr($opposite); ?>">
                             <span id="expirym" class="fld-frame"></span>
                             <span class="seperator"> / </span>
                             <span id="expiryy" class="fld-frame"></span>
                         </div>
-                        <div id="cvv-fld" class="expireCvvClass <?php echo esc_attr(text: $direction); ?>">
+                        <div id="cvv-fld" class="expireCvvClass <?php echo esc_attr($direction); ?>">
                             <div class="hf-row" id="cvv-wrapper">
                                 <span id="cvv" class="fld-frame" data-hosted-fields-identifier="main-form"></span>
                             </div>

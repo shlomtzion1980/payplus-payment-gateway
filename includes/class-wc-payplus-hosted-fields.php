@@ -376,7 +376,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function checkHostedTime()
     {
-        $savedTimestamp = WC()->session->get(key: 'hostedTimeStamp');
+        $savedTimestamp = WC()->session->get('hostedTimeStamp');
         if (!$savedTimestamp) {
             // First run or if no timestamp is saved, save the current time
             $savedTimestamp = time(); // Store this in the database or file
