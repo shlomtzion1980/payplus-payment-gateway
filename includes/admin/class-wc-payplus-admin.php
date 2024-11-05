@@ -130,7 +130,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $token = isset($_POST['token']) ? sanitize_text_field(wp_unslash($_POST['token'])) : null;
 
         $payload = $this->generatePayloadLink($order_id, true, $token);
-
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $order->set_payment_method('payplus-payment-gateway');
         $order->set_payment_method_title('Pay with Debit or Credit Card');
 
@@ -770,6 +770,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order->set_payment_method_title('Pay with Debit or Credit Card');
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $payload = $this->generatePayloadLink($order_id, true);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
             $response = $this->post_payplus_ws($this->payment_url, $payload);
 

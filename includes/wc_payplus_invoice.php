@@ -32,6 +32,12 @@ class PayplusInvoice
     private $invoice_notes_no;
     private $invoiceDisplayOnly;
     private $_wpnonce;
+    /**
+     * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
+     *
+     * @var null|WC_PayPlus_Gateway
+     */
+    protected $payplus_gateway = null;
 
     /**
      *
@@ -108,6 +114,21 @@ class PayplusInvoice
         add_filter('woocommerce_shop_order_list_table_columns', [$this, 'payplus_invoice_add_order_columns'], 20);
         $this->payplus_is_table_exists = WC_PayPlus::payplus_check_exists_table(wp_create_nonce('PayPlusGateWayNonce'));
     }
+
+    /**
+     * Returns the main PayPlus payment gateway class instance.
+     *
+     * @return new WC_PayPlus_Gateway
+     */
+    public function get_main_payplus_gateway()
+    {
+        if (!is_null($this->payplus_gateway)) {
+            return $this->payplus_gateway;
+        }
+        $this->payplus_gateway = new WC_PayPlus_Gateway();
+        return $this->payplus_gateway;
+    }
+
     /**
      * @return mixed
      */
@@ -277,6 +298,10 @@ class PayplusInvoice
      */
     public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
     {
+        $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
+        if ($payPlusPayloadInvoice) {
+            return $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund);
+        }
 
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $payload = array();
@@ -428,19 +453,24 @@ class PayplusInvoice
      */
     public function payplus_create_document_dashboard($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null)
     {
+        $order = wc_get_order($order_id);
         if ($payplus_invoice_type_document_refund === "inv_refund_receipt") {
             $payplus_document_type = "inv_refund_receipt";
             $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
     }
@@ -540,6 +570,37 @@ class PayplusInvoice
             }
         }
         return $tax_rate_shipping;
+    }
+
+    /**
+     * Get the invoice payload for a given order.
+     *
+     * @param int $order_id The ID of the order.
+     * @param string|false $payPlusPayloadInvoice the invoice payload or false.
+     * @param string $docType Indicates the document type - decides if it is a refund invoice,receipt or something else...:)
+     * @return array|false Returns the invoice payload as an array or false if not found.
+     */
+    public function payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $docType)
+    {
+        $isRefund = false;
+        $isRefund = $docType === 'inv_refund_receipt' ? true : $isRefund;
+        $isRefund = $docType === 'inv_refund' ? false : $isRefund;
+
+        if ($payPlusPayloadInvoice) {
+            $payPlusPayloadInvoice = json_decode($payPlusPayloadInvoice, true);
+            unset($payPlusPayloadInvoice['unique_identifier']);
+            $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
+            foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
+                $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
+                $payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value'];
+            }
+            foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
+                $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
+            }
+            return $payPlusPayloadInvoice;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -939,6 +1000,8 @@ class PayplusInvoice
                     $date = $date->format('m-d-Y H:i');
                     $order = wc_get_order($order_id);
                     $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
+                    $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+
                     if (!empty($payplusTransactionUid)) {
                         $payload['transaction_uuid'] = $payplusTransactionUid;
                     }
@@ -1061,7 +1124,6 @@ class PayplusInvoice
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
                             $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
                             $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
@@ -1095,6 +1157,7 @@ class PayplusInvoice
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
                         }
+                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                     }
                 }
             }

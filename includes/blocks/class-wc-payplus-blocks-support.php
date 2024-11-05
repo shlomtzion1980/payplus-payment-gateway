@@ -170,6 +170,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
 
         $payload = $main_gateway->generatePayloadLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments, 'isSubscriptionOrder' => $this->isSubscriptionOrder]);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $response = $main_gateway->post_payplus_ws($main_gateway->payment_url, $payload);
 
         $payment_details = $result->payment_details;

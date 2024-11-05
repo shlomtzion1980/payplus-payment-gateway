@@ -2045,7 +2045,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $options = $isSubscriptionOrder ? ['isSubscriptionOrder' => true] : [];
         $payload = $this->generatePayloadLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
-
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $this->payplus_add_log_all($handle, 'Payload data before Sending to PayPlus');
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
         $response = $this->post_payplus_ws($this->payment_url, $payload);
