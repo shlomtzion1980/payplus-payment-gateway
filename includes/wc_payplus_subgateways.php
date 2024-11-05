@@ -190,7 +190,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             //     'title' => __('Set width for Embedded container (%)', 'payplus-payment-gateway'),
             //     'description' => __('This sets the width of the Embedded container in percentage (Max is 100 of the container).', 'payplus-payment-gateway'),
             //     'type' => 'number',
-            //     'default' => '50'
+            //     'default' => '100'
             // ],
             'hide_payplus_gateway' => [
                 'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
@@ -285,7 +285,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['display_mode'] = $subOptionsettings['display_mode'];
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
-        $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 50;
+        $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 100;
         $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';
         $this->settings['hosted_fields_is_main'] = isset($subOptionsettings['hosted_fields_is_main']) ? $subOptionsettings['hosted_fields_is_main'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
