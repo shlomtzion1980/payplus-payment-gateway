@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.0] - 05-10-2024 = (Hosted Monkey) Beta - Currently available for selected customers only!
+
+* Add   - PayPlus Embedded - New form payment for credit cards built in the checkout page with no redirects and no hassle!
+
 ## [7.1.8] - 28-10-2024 - (Ken)
 
 * Add   - Transaction UID handling to the payPlusIpn function.
