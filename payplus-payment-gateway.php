@@ -685,7 +685,7 @@ class WC_PayPlus
         $isSubscriptionOrder = false;
 
         if (is_checkout() || is_product()) {
-            if ($this->importApplePayScript && !wp_script_is('applePayScript', 'enqueued')) {
+            if ($this->importApplePayScript && !wp_script_is('applePayScript', 'enqueued') && !$this->is_block_based_checkout()) {
                 wp_register_script('applePayScript', 'https://payments.payplus.co.il/statics/applePay/script.js', array('jquery'), PAYPLUS_VERSION, true);
                 wp_enqueue_script('applePayScript');
             }
