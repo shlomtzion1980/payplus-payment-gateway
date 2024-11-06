@@ -737,8 +737,6 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                             foreach ($shippingPricesArray as $country => $siPrice) {
                                 foreach ($siPrice as $key => $sp) {
                                     if ($sp['id'] === $id && $requiredCondition) {
-                                        print_r($condition);
-                                        print_r($requiredCondition);
                                         $shippingPricesArray[$country][$key]['condition'][$condition] = $requiredCondition;
                                     }
                                 }
