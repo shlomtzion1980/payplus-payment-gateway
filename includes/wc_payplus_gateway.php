@@ -2138,9 +2138,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($this->display_mode == 'iframe') {
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
             echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($this->iframe_height) . "px; border: 0;'></iframe>";
-            if ($this->import_applepay_script) {
+            if ($this->import_applepay_script && !wp_script_is('applePayScript', 'enqueued')) {
                 wp_enqueue_script(
-                    'payplus-applepay-script',
+                    'applePayScript',
                     'https://payments' . ($this->api_test_mode ? 'dev' : '') . '.payplus.co.il/statics/applePay/script.js',
                     array(),
                     PAYPLUS_VERSION,
