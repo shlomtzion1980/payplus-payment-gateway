@@ -724,16 +724,18 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $shipping_methods = $zone->get_shipping_methods();
                 // Get the zone locations (countries or regions)
                 $zone_locations = $zone->get_zone_locations();
-
                 if ($shippingPrice) {
                     foreach ($shipping_methods as $id => $shipping_method) {
                         if (isset($shipping_method->requires)) {
+
                             $condition = $shipping_method->requires;
-                            $requiredCondition = $shipping_method->$condition;
+
+                            $requiredCondition = property_exists($shipping_method, $condition) ? $shipping_method->$condition : false;
+
                             $shippingPricesArray = json_decode($shippingPrice, true);
                             foreach ($shippingPricesArray as $country => $siPrice) {
                                 foreach ($siPrice as $key => $sp) {
-                                    if ($sp['id'] === $id) {
+                                    if ($sp['id'] === $id && $requiredCondition) {
                                         $shippingPricesArray[$country][$key]['condition'][$condition] = $requiredCondition;
                                     }
                                 }
@@ -744,6 +746,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         $shippingPrice = wp_json_encode($shippingPricesArray);
                     }
                 }
+
+
 
                 foreach ($zone_locations as $location) {
                     if ($location->type == 'country') {
