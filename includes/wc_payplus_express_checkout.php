@@ -728,11 +728,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 if ($shippingPrice) {
                     foreach ($shipping_methods as $id => $shipping_method) {
                         if (isset($shipping_method->requires)) {
-
                             $condition = $shipping_method->requires;
-
                             $requiredCondition = property_exists($shipping_method, $condition) ? $shipping_method->$condition : false;
-
                             $shippingPricesArray = json_decode($shippingPrice, true);
                             foreach ($shippingPricesArray as $country => $siPrice) {
                                 foreach ($siPrice as $key => $sp) {
@@ -744,24 +741,25 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         }
                     }
                     if (isset($shippingPricesArray) && is_array($shippingPricesArray)) {
+                        foreach ($shippingPricesArray as &$innerArray) {
+                            usort($innerArray, function ($a, $b) {
+                                return $a['cost_with_tax'] <=> $b['cost_with_tax'];
+                            });
+                        }
+                        unset($innerArray); // Unset reference to avoid issues
                         $shippingPrice = wp_json_encode($shippingPricesArray);
                     }
                 }
 
-
-
-                foreach ($zone_locations as $location) {
+                foreach ($zone_locations as $k => $location) {
                     if ($location->type == 'country') {
                         $country_code = $location->code;
                         $continent = $this->get_continent_by_country($country_code);
-
                         // Get the shipping methods for this zone
-
-
                         foreach ($shipping_methods as $method) {
                             $method_id = $method->id;
                             $method_title = $method->title;
-                            $method_cost = isset($method->cost) ? $method->cost : 'N/A';
+                            $method_cost = isset($method->cost) ? $method->cost : 0;
 
                             // Group the shipping rates by continent
                             if (!isset($continent_shipping_rates[$continent])) {
@@ -775,30 +773,40 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                 'country'      => $country_code
                             ];
                         }
-                    } else {
-                        if ($location->type == 'continent') {
-                            if (!isset($shippingArray[$customerCountry]) && $customerContinent === $this->get_continent_full_name($location->code)) {
+                    }
 
-                                foreach ($shipping_methods as $method) {
-                                    $method_id = $method->id;
-                                    $method_title = $method->title;
-                                    $method_cost = isset($method->cost) ? $method->cost : 'N/A';
-
-                                    // Group the shipping rates by continent
-                                    if (!isset($continent_shipping_rates[$customerContinent])) {
-                                        $continent_shipping_rates[$customerContinent] = [];
+                    if ($location->type == 'continent') {
+                        if (!empty($customerContinent)) {
+                            foreach ($shipping_methods as $kc => $method) {
+                                $method_id = $method->id;
+                                $method_title = $method->title;
+                                $method_cost = isset($method->cost) ? $method->cost : 0;
+                                // Group the shipping rates by continent
+                                if (!isset($continent_shipping_rates[$customerContinent])) {
+                                    $continent_shipping_rates[$customerContinent] = [];
+                                }
+                                $continent_shipping_rates[$customerContinent][] = [
+                                    'zone_name'    => $zone->get_zone_name(),
+                                    'method_title' => $method_title,
+                                    'method_cost'  => $method_cost,
+                                    'country'      => $customerCountry
+                                ];
+                                $newShippingArray[$customerCountry][] = [
+                                    'id'    => $zone->get_zone_name() . "$customerCountry-$kc",
+                                    'title' => $method_title,
+                                    'cost_without_tax'  => $method_cost,
+                                    'cost_with_tax'      => $method_cost
+                                ];
+                                if (isset($method->requires)) {
+                                    $condition = $method->requires;
+                                    $requiredCondition = property_exists($method, $condition) ? $method->$condition : false;
+                                    foreach ($newShippingArray as $country => $siPrice) {
+                                        foreach ($siPrice as $nkey => $sp) {
+                                            if ($sp['id'] === $zone->get_zone_name() . "$customerCountry-$kc" && $requiredCondition) {
+                                                $newShippingArray[$customerCountry][$nkey]['condition'][$condition] = $requiredCondition;
+                                            }
+                                        }
                                     }
-
-                                    $continent_shipping_rates[$customerContinent][] = [
-                                        'zone_name'    => $zone->get_zone_name(),
-                                        'method_title' => $method_title,
-                                        'method_cost'  => $method_cost,
-                                        'country'      => $customerCountry
-                                    ];
-                                    $newShippingArray[$customerCountry][0]['id'] = 1;
-                                    $newShippingArray[$customerCountry][0]['title'] = $method_title;
-                                    $newShippingArray[$customerCountry][0]['cost_without_tax'] = $method_cost;
-                                    $newShippingArray[$customerCountry][0]['cost_with_tax'] = $method_cost;
                                 }
                             }
                         }
@@ -807,11 +815,19 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
 
             $shippingPrice = ($shippingPrice) ? $shippingPrice : "";
-            if ($shippingPrice !== "") {
+            if ($shippingPrice !== "" || $newShippingArray) {
                 $shippingsArray = json_decode($shippingPrice, true);
-
                 if (isset($newShippingArray) && is_array($newShippingArray) && isset($newShippingArray[$customerCountry]) && !isset($shippingsArray[$customerCountry])) {
-                    $shippingPrice = wp_json_encode(array_merge($shippingsArray, $newShippingArray));
+                    $allShippingArray = array_merge($shippingsArray, $newShippingArray);
+                    if (isset($allShippingArray) && is_array($allShippingArray)) {
+                        foreach ($allShippingArray as &$innerArray) {
+                            usort($innerArray, function ($a, $b) {
+                                return $a['cost_with_tax'] <=> $b['cost_with_tax'];
+                            });
+                        }
+                        unset($innerArray); // Unset reference to avoid issues
+                        $shippingPrice = wp_json_encode($allShippingArray);
+                    }
                 }
             }
 
