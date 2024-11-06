@@ -274,6 +274,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
 
                 label {
                     border: none !important;
+                    margin-bottom: .3rem;
                 }
 
                 iframe {
