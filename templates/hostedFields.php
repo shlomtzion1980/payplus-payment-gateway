@@ -245,7 +245,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                             -moz-appearance: none;
                             /* Remove default arrow (Firefox) */
 
-                            background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png');
+                            background-image: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/images/dropdown-arrow.png')); ?>');
                             background-repeat: no-repeat;
                             background-position: <?php echo esc_attr($direction) . ' 15px center';
                                                     ?>;
@@ -330,7 +330,7 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                                             ?>;
 
                     &.validated {
-                        background-image: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg');
+                        background-image: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg')); ?>');
                     }
                 }
             }
