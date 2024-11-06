@@ -18,9 +18,10 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
     <style>
         @font-face {
             font-family: 'AlmoniMLv5AAA';
-            src: url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2') format('woff2'),
-                url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff') format('woff'),
-                url('<?php echo site_url(); ?>/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot') format('opentype');
+            src: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff2')); ?>') format('woff2'),
+                url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.woff')); ?>') format('woff'),
+                url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/css/fonts/almoni-medium-aaa.eot')); ?>') format('opentype');
+
             font-weight: normal;
             /* Or bold if necessary */
             font-style: normal;
