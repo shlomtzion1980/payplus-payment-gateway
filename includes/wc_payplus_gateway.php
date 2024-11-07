@@ -279,6 +279,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
+    public function process_admin_options()
+    {
+        if (
+            isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
+            $_GET['page'] === 'wc-settings' &&
+            $_GET['tab'] === 'checkout' &&
+            $_GET['section'] === 'payplus-payment-gateway-hostedfields'
+        ) {
+?>
+            <div class="notice notice-success is-dismissible">
+                <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-paymnet-gateway'); ?></p>
+            </div>
+<?php
+        }
+    }
 
     public function payPlusOrdersCheck($nonce)
     {
