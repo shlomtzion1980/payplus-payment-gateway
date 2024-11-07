@@ -544,6 +544,12 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array(
                     'id' => 'woocommerce_payplus-payment-gateway_settings[shipping_woo]',
                     'name' => __('Shipping according to Woocommerce settings', 'payplus-payment-gateway'),
+                    'desc' => __('
+                    <br>Countries (Continents not supported):
+                    <br>Flat rate,
+                    <br>Free (Condition support for min amount or no condition).
+                    <br>
+                    IMPORTANT:<br> if you have complex shipping rules they might not work with express checkout, for complex use:"Global shipping amount"'),
                     'type' => 'checkbox',
                     'class' => 'shipping_woo',
                     'label' => '',
