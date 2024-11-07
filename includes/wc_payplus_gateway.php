@@ -245,6 +245,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
         add_action('woocommerce_update_options_payment_gateways_' . $this->id, [$this, 'process_admin_options']);
+        add_action('admin_notices', [$this, 'payplus_display_admin_notice']);
+
         add_action('woocommerce_receipt_' . $this->id, [$this, 'receipt_page']);
         add_action('woocommerce_api_payplus_add_payment', [$this, 'add_payment_ipn_response']);
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
@@ -281,17 +283,36 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function process_admin_options()
     {
-        if (
-            isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
-            $_GET['page'] === 'wc-settings' &&
-            $_GET['tab'] === 'checkout' &&
-            $_GET['section'] === 'payplus-payment-gateway-hostedfields'
-        ) {
+        // Call parent method to handle saving settings.
+        $saved = parent::process_admin_options();
+
+        // Check if settings were saved successfully
+        if ($saved) {
+            // Set a transient to display the notice on the next page load.
+            set_transient('payplus_admin_notice', true, 30);
+        }
+        return $saved;
+    }
+
+    public function payplus_display_admin_notice()
+    {
+        // Only show the notice if the transient is set.
+        if (get_transient('payplus_admin_notice')) {
+            // Display the notice.
+            if (
+                isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
+                $_GET['page'] === 'wc-settings' &&
+                $_GET['tab'] === 'checkout' &&
+                $_GET['section'] === 'payplus-payment-gateway-hostedfields'
+            ) {
 ?>
-            <div class="notice notice-success is-dismissible">
-                <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-paymnet-gateway'); ?></p>
-            </div>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?></p>
+                </div>
 <?php
+                // Delete the transient so the notice only shows once.
+                delete_transient('payplus_admin_notice');
+            }
         }
     }
 
