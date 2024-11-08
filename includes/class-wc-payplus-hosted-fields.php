@@ -16,6 +16,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $apiUrl;
     public $vat4All;
     public $payPlusGateway;
+    public $isHideLoaderLogo;
     // public $hostedFieldsResponse;
 
 
@@ -25,6 +26,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function __construct($order_id = "000", $order = null)
     {
         $this->payPlusGateway = $this->get_main_payplus_gateway();
+        $this->isHideLoaderLogo = boolval(isset($this->payPlusGateway->hostedFieldsOptions['hide_loader_logo']) && $this->payPlusGateway->hostedFieldsOptions['hide_loader_logo'] === 'yes');
         $this->vat4All = isset($this->payPlusGateway->settings['paying_vat_all_order']) ? boolval($this->payPlusGateway->settings['paying_vat_all_order'] === "yes") : false;
         $this->testMode = boolval($this->payPlusGateway->settings['api_test_mode'] === 'yes');
         $this->url = $this->testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
@@ -42,7 +44,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         define('ORIGIN_DOMAIN', site_url());
         define('SUCCESS_URL', site_url() . '?wc-api=payplus_gateway&hostedFields=true');
         define('FAILURE_URL', site_url() . "/error-payment-payplus/");
-        define('CANCEL_URL', 'https://www.example.com/cancel');
+        define('CANCEL_URL', site_url() . "/cancel-payment-payplus/");
 
         /**
          * PAYPLUS_API_URL_DEV is the URL of the API in the development environment.
@@ -86,6 +88,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 'payplus_script_hosted',
                 [
                     "hostedResponse" => $hostedResponse,
+                    "isHideLoaderLogo" => $this->isHideLoaderLogo,
                     "isLoggedIn" => boolval(get_current_user_id() > 0),
                     "isSavingCerditCards" => boolval(isset($this->payPlusGateway->settings['create_pp_token']) && $this->payPlusGateway->settings['create_pp_token'] === 'yes'),
                     'ajax_url' => admin_url('admin-ajax.php'),
@@ -101,7 +104,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function emptyResponse()
     {
-        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+        WC()->session->set('randomHash', $this->order_id = bin2hex(random_bytes(16)));
         return $this->hostedFieldsData($this->order_id);
     }
 
@@ -391,6 +394,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return true;
         } else {
             WC()->session->set('hostedTimeStamp', false);
+            WC()->session->set('randomHash', bin2hex(random_bytes(16)));
             return false;
         }
     }

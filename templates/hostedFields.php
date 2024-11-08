@@ -105,6 +105,20 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
             display: none;
             position: relative;
             z-index: 999999;
+
+            .blocks-loader-text {
+                &.no-image {
+                    background-image: none;
+                }
+
+                &.no-image::before {
+                    content: "<?php echo __('Processing...', 'payplus-payment-gateway'); ?>";
+                    position: relative;
+                    bottom: 27px;
+                    font-size: 7px;
+                    color: white;
+                }
+            }
         }
 
         .__payplus_hosted_fields_item_fld-wrapper {
@@ -498,8 +512,8 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                                     </select>
                                 </div>
                                 <div class="hf-col-9">
-                                    <input type="text" id="card-holder-phone" placeholder="999-999-9999" class="form-control card-holder-phone"
-                                        value="" />
+                                    <input type="text" id="card-holder-phone" placeholder="999-999-9999"
+                                        class="form-control card-holder-phone" value="" />
                                 </div>
                             </div>
                         </div>

@@ -192,6 +192,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             //     'type' => 'number',
             //     'default' => '100'
             // ],
+            'hide_loader_logo' => [
+                'title' => __('Hide PayPlus logo when showing loader', 'payplus-payment-gateway'),
+                'description' => __('Hide PayPlus from loader and display: "Processing..."', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no'
+            ],
             'hide_payplus_gateway' => [
                 'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
                 'description' => __('Hide PayPlus gateway if current user has no saved tokens', 'payplus-payment-gateway'),
@@ -211,6 +217,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->id !== 'payplus-payment-gateway-hostedfields') {
             unset($this->form_fields['hosted_fields_width']);
             unset($this->form_fields['hide_payplus_gateway']);
+            unset($this->form_fields['hide_loader_logo']);
             unset($this->form_fields['hosted_fields_is_main']);
         }
         if ($this->id === 'payplus-payment-gateway-hostedfields') {
@@ -277,6 +284,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         }
 
         $subOptionsettings = get_option($this->get_option_key(), $defaultOptions);
+
         $this->settings = get_option('woocommerce_payplus-payment-gateway_settings', $defaultOptions);
 
         $this->enabled = $this->settings['enabled'] = $subOptionsettings['enabled'];
@@ -287,9 +295,10 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
         $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 100;
         $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';
+        $this->settings['hide_loader_logo'] = isset($subOptionsettings['hide_loader_logo']) ? $subOptionsettings['hide_loader_logo'] : 'no';
         $this->settings['hosted_fields_is_main'] = isset($subOptionsettings['hosted_fields_is_main']) ? $subOptionsettings['hosted_fields_is_main'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
-        $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : null;
+        $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : false;
 
         if ($this->settings['sub_hide_other_charge_methods'] != 2 && $this->settings['sub_hide_other_charge_methods'] !== null) {
             $this->settings['hide_other_charge_methods'] = $this->settings['sub_hide_other_charge_methods'];

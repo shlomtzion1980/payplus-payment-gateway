@@ -129,6 +129,10 @@ function putHostedFields() {
 }
 
 jQuery(() => {
+  if (payplus_script_hosted.isHideLoaderLogo) {
+    jQuery(".blocks-loader-text").addClass("no-image");
+  }
+
   const isCheckout = !document.querySelector(
     'div[data-block-name="woocommerce/checkout"]'
   )
@@ -364,6 +368,7 @@ hf.Upon("pp_responseFromServer", (e) => {
   }
 });
 hf.Upon("pp_submitProcess", (e) => {
+  jQuery(".blocks-loader-text").addClass("no-image");
   // jQuery(".blocks-payplus_loader_hosted").fadeIn();
   // overlay();
   jQuery("#submit-payment").prop("disabled", e.detail);

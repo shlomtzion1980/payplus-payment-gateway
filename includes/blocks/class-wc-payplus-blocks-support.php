@@ -227,7 +227,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
         $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = site_url() . "/error-payment-payplus/";
-        $data->refURL_cancel = 'https://www.example.com/cancel';
+        $data->refURL_cancel = site_url() . "/cancel-payment-payplus/";
         $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($WC_PayPlus_Gateway->settings['transaction_type']);
