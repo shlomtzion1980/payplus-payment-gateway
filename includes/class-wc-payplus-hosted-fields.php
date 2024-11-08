@@ -105,6 +105,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function emptyResponse()
     {
         WC()->session->set('randomHash', $this->order_id = bin2hex(random_bytes(16)));
+        WC()->session->__unset('order_awaiting_payment');
+
         return $this->hostedFieldsData($this->order_id);
     }
 
