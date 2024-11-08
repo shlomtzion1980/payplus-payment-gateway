@@ -368,7 +368,6 @@ hf.Upon("pp_responseFromServer", (e) => {
   }
 });
 hf.Upon("pp_submitProcess", (e) => {
-  jQuery(".blocks-loader-text").addClass("no-image");
   // jQuery(".blocks-payplus_loader_hosted").fadeIn();
   // overlay();
   jQuery("#submit-payment").prop("disabled", e.detail);
