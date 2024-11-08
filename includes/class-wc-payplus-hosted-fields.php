@@ -396,6 +396,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return true;
         } else {
             WC()->session->set('hostedTimeStamp', false);
+            WC()->session->__unset('order_awaiting_payment');
             WC()->session->set('randomHash', bin2hex(random_bytes(16)));
             return false;
         }
