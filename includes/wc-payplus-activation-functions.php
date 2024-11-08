@@ -199,13 +199,16 @@ function payplusGenerateErrorPage()
  */
 function checkPayPlusErrorPage($errorPageOptions)
 {
-    $error_page_payplus = get_option('error_page_payplus');
-    $errorPagePayPlus = get_post($error_page_payplus);
-    if (strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
-        wp_update_post(array(
-            'ID' => $error_page_payplus,
-            "post_content" => "The transaction has failed, please contact the seller."
-        ));
+    $error_page_payplus = get_option('error_page_payplus') ?? false;
+
+    if($error_page_payplus){
+        $errorPagePayPlus = get_post($error_page_payplus);
+        if ($errorPagePayPlus->post_content !== null && strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || $errorPagePayPlus->post_content !== null && strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
+            wp_update_post(array(
+                'ID' => $error_page_payplus,
+                "post_content" => "The transaction has failed, please contact the seller."
+            ));
+        }
     }
 }
 
