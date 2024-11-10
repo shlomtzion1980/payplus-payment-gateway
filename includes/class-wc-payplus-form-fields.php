@@ -57,7 +57,8 @@ class WC_PayPlus_Form_Fields
         global $submenu;
         $parent_slug = 'payplus-payment-gateway';
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-        $showOrdersButton = boolval(isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
+        $isPayPlus = boolval(isset($payplus_payment_gateway_settings['enabled']) && $payplus_payment_gateway_settings['enabled'] === 'yes');
+        $showOrdersButton = boolval($isPayPlus && isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
         $showSubGatewaysOnSide = boolval(isset($payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu']) && $payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu'] === 'yes');
 
         add_menu_page(
@@ -136,9 +137,9 @@ class WC_PayPlus_Form_Fields
         if (current_user_can('edit_shop_orders')) {
             $nonce = wp_create_nonce('payPlusOrderChecker');
 ?>
-<form method="post" action="">
-    <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-</form>
+            <form method="post" action="">
+                <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+            </form>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
