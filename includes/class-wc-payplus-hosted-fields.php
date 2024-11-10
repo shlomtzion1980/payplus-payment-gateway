@@ -36,8 +36,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->order_id = $order_id;
         $this->order = $order;
 
-
-
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
         define('PAYMENT_PAGE_UID', $this->paymentPageUid);
@@ -184,13 +182,12 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
 
         if ($order_id !== "000" && !is_string($order_id)) {
-            WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-
             $order = wc_get_order($order_id);
             if (!$order && !empty(WC()->session->get('hostedPayload'))) {
+                WC()->session->set('randomHash', $order_id = bin2hex(random_bytes(16)));
                 $payload = json_decode(WC()->session->get('hostedPayload'), true);
-                $payload['more_info'] = WC()->session->get('randomHash');
-                WC()->session->set('order_awaiting_payment', $payload['more_info']);
+                $payload['more_info'] = $order_id;
+                WC()->session->set('order_awaiting_payment', $order_id);
             }
         }
 
