@@ -296,7 +296,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
 
-        if ($order_id !== "000" && $order) {
+        if ($order_id !== "000" && isset($order) && $order) {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
 
