@@ -377,17 +377,16 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         );
 
         $isHostedStarted = WC()->session->get('hostedStarted');
-        if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
-            WC()->session->set('hostedStarted', true);
+        if ($context->payment_method === "payplus-payment-gateway-hostedfields" && !$isHostedStarted) {
 
             $this->hostedFieldsData($this->orderId, $isHostedStarted);
-
             $result->set_payment_details('');
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;
             $payment_details['secret_key'] = $this->secretKey;
             $result->set_payment_details($payment_details);
             $result->set_status('pending');
+            WC()->session->set('hostedStarted', true);
         } else {
             if (!in_array($context->payment_method, $this->settings['gateways'])) {
                 return;
