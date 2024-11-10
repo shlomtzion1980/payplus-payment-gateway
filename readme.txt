@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.6.2
 Requires PHP: 7.4
-Stable tag: 7.2.0
+Stable tag: 7.2.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,9 +86,15 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.2.0(Beta) - 05-10-2024 = (Hosted Monkey) - Currently available for selected customers only!
+= 7.2.0 - 10-11-2024 =
 
-* Add   - PayPlus Embedded - New form payment for credit cards built in the checkout page with no redirects and no hassle!
+* Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
+* Add   - Display payment status in the PayPlus metabox.
+* Add   - Logs for payloads in order meta.
+* Add   - Utilize saved logs for creating refunds (Invoice+), ensuring refund data for products matches the original invoice creation, rather than the current product or site settings.
+* Tweak - Express checkout shipping now supports minimum amount rules for displaying free/flat rate and is sorted.
+* Tweak - Improved icon resolution.
+* Fix   - Resolved missing setting error that occurred on some fresh installations.
 
 = 7.1.8 - 28-10-2024 =
 
