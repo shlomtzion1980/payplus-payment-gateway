@@ -179,9 +179,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function hostedFieldsData($order_id)
     {
 
-        $order_id = !empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id;
+        $order_id = is_int($order_id) ? $order_id : (!empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id);
 
-        if ($order_id !== "000" && !is_string($order_id)) {
+        if ($order_id !== "000" && is_int($order_id)) {
             $order = wc_get_order($order_id);
             if (!$order && !empty(WC()->session->get('hostedPayload'))) {
                 WC()->session->set('randomHash', $order_id = bin2hex(random_bytes(16)));
