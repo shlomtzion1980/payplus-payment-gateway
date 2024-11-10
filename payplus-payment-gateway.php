@@ -27,6 +27,7 @@ class WC_PayPlus
     protected static $instance = null;
     public $notices = [];
     private $payplus_payment_gateway_settings;
+    public $isPayPlus;
     public $applePaySettings;
     public $isApplePayGateWayEnabled;
     public $isApplePayExpressEnabled;
@@ -57,6 +58,7 @@ class WC_PayPlus
         $this->isApplePayExpressEnabled = boolval(property_exists($this->payplus_payment_gateway_settings, 'enable_apple_pay') && $this->payplus_payment_gateway_settings->enable_apple_pay === 'yes');
         $this->isAutoPPCC = boolval(property_exists($this->payplus_payment_gateway_settings, 'auto_load_payplus_cc_method') && $this->payplus_payment_gateway_settings->auto_load_payplus_cc_method === 'yes');
         $this->importApplePayScript = boolval(property_exists($this->payplus_payment_gateway_settings, 'import_applepay_script') && $this->payplus_payment_gateway_settings->import_applepay_script === 'yes');
+        $this->isPayPlus = boolval(property_exists($this->payplus_payment_gateway_settings, 'enabled') && $this->payplus_payment_gateway_settings->enabled === 'yes');
 
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
@@ -75,7 +77,8 @@ class WC_PayPlus
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
-        if (isset($this->payplus_payment_gateway_settings->payplus_cron_service) && boolval($this->payplus_payment_gateway_settings->payplus_cron_service === 'yes')) {
+
+        if ($this->isPayPlus && boolval(isset($this->payplus_payment_gateway_settings->payplus_cron_service) && $this->payplus_payment_gateway_settings->payplus_cron_service === 'yes')) {
             $this->payPlusCronActivate();
             add_action('payplus_hourly_cron_job', [$this, 'getPayplusCron']);
         } else {
