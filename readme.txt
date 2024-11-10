@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.6.2
 Requires PHP: 7.4
-Stable tag: 7.1.9
+Stable tag: 7.2.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.1.9 - 10-11-2024 =
+= 7.2.0 - 10-11-2024 =
 
 * Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
 * Add   - Display payment status in the PayPlus metabox.

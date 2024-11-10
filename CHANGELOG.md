@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.1.9] - 10-11-2024 - (Optimus)
+## [7.2.0] - 10-11-2024 - (Optimus)
 
 * Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
 * Add   - Display payment status in the PayPlus metabox.
