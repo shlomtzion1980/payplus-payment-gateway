@@ -1,176 +1,184 @@
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  label:first-of-type {
-  display: flex;
-  order: 2;
-  margin-bottom: 1px;
-  align-items: center;
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type {
+    display: flex;
+    order: 2;
+    margin-bottom: 1px;
+    align-items: center;
 }
 
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  label:first-of-type
-  span {
-  order: 1;
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    span {
+    order: 1;
 }
 
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  label:first-of-type
-  img {
-  order: -1;
-  margin-left: 20px;
-  max-height: 32px;
-  max-width: 64px;
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img {
+    order: -1;
+    margin-left: 20px;
+    max-height: 32px;
+    max-width: 64px;
+}
+
+#payment
+    > ul
+    > li[class^="wc_payment_method payment_method_payplus-payment-gateway-"] {
+    img {
+        max-height: 32px;
+    }
 }
 
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  .payment-method-description {
-  margin-top: 0;
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    .payment-method-description {
+    margin-top: 0;
 }
 
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  input[type="radio"][name="payment_method"]
-  ~ .payment_box {
-  margin-top: 0.2rem;
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    input[type="radio"][name="payment_method"]
+    ~ .payment_box {
+    margin-top: 0.2rem;
 }
 
 .checkout-payplus input[type="radio"][name="payment_method"] + label::before,
 .checkout-payplus
-  input[type="radio"][name="payment_method"]:checked
-  + label::before {
-  order: -1;
-  transform: none;
+    input[type="radio"][name="payment_method"]:checked
+    + label::before {
+    order: -1;
+    transform: none;
 }
 
 .show-border {
-  animation: borderChange 0.5s forwards;
+    animation: borderChange 0.5s forwards;
 }
 
 @keyframes borderChange {
-  0% {
-    border-color: grey;
-  }
+    0% {
+        border-color: grey;
+    }
 
-  100% {
-    border-color: green;
-  }
+    100% {
+        border-color: green;
+    }
 }
 
 html[lang="en-US"]
-  .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  label:first-of-type
-  img,
+    .checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img,
 html[lang="en"]
-  .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
-  label:first-of-type
-  img {
-  margin-left: 0;
-  margin-right: 20px;
+    .checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img {
+    margin-left: 0;
+    margin-right: 20px;
 }
 
 .express-checkout-product {
-  margin: 5% auto;
-  border-radius: 12px;
-  border: 1px solid #e3e6e9;
-  padding: 20px 10px 10px 10px;
-  position: relative;
-  display: block;
-  width: 100%;
+    margin: 5% auto;
+    border-radius: 12px;
+    border: 1px solid #e3e6e9;
+    padding: 20px 10px 10px 10px;
+    position: relative;
+    display: block;
+    width: 100%;
 }
 
 @media (min-width: 767.98px) {
-  .express-checkout {
-    margin: 5% auto;
-    border-radius: 12px;
-    border: 1px solid #e3e6e9;
-    padding: 20px 10px 10px 10px;
-    position: relative;
-    display: block;
-    width: 48%;
-  }
+    .express-checkout {
+        margin: 5% auto;
+        border-radius: 12px;
+        border: 1px solid #e3e6e9;
+        padding: 20px 10px 10px 10px;
+        position: relative;
+        display: block;
+        width: 48%;
+    }
 }
 
 @media (max-width: 767.98px) {
-  .express-checkout {
-    margin: 5% auto;
-    border-radius: 12px;
-    border: 1px solid #e3e6e9;
-    padding: 20px 10px 10px 10px;
-    position: relative;
-    display: block;
-    width: 92%;
-  }
+    .express-checkout {
+        margin: 5% auto;
+        border-radius: 12px;
+        border: 1px solid #e3e6e9;
+        padding: 20px 10px 10px 10px;
+        position: relative;
+        display: block;
+        width: 92%;
+    }
 }
 
 .express-flex {
-  display: flex;
-  position: absolute;
-  top: 0px;
-  width: 100%;
-  left: 0px;
+    display: flex;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    left: 0px;
 }
 
 body #applePayButton {
-  margin-top: 10px;
-  border-radius: 0px !important;
-  border: 0px;
+    margin-top: 10px;
+    border-radius: 0px !important;
+    border: 0px;
 }
 
 .title-express-checkout {
-  margin: 0px;
-  position: absolute;
-  top: -12px;
-  font-size: 14px;
-  width: 100%;
-  text-align: center;
+    margin: 0px;
+    position: absolute;
+    top: -12px;
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
 }
 
 .title-express-checkout span {
-  background: #ffffff;
-  padding: 0px 15px;
-  text-align: center;
-  display: inline-block;
-  color: #000;
+    background: #ffffff;
+    padding: 0px 15px;
+    text-align: center;
+    display: inline-block;
+    color: #000;
 }
 
 #error-api-payplus p {
-  font-size: 14px;
-  margin: 0;
-  color: red;
-  text-align: center;
+    font-size: 14px;
+    margin: 0;
+    color: red;
+    text-align: center;
 }
 
 .express-checkout iframe.disabled,
 #applePayButton.disabled {
-  pointer-events: none;
-  cursor: not-allowed;
+    pointer-events: none;
+    cursor: not-allowed;
 }
 
 .express-checkout.disabled {
-  opacity: 0.5;
+    opacity: 0.5;
 }
 
 .express-checkout p {
-  margin: 0px;
+    margin: 0px;
 }
 @media screen and (min-width: 568px) {
-  body .alertify .ajs-dialog {
-    height: 82% !important;
-  }
+    body .alertify .ajs-dialog {
+        height: 82% !important;
+    }
 }
 @media screen and (max-width: 568px) {
-  body .alertify:not(.ajs-maximized) .ajs-modal {
-    padding: 0px 0px;
-  }
+    body .alertify:not(.ajs-maximized) .ajs-modal {
+        padding: 0px 0px;
+    }
 
-  body .alertify .ajs-dialog {
-    margin: 0 auto;
-  }
+    body .alertify .ajs-dialog {
+        margin: 0 auto;
+    }
 }
 
 /*# sourceMappingURL=style.css.map */
