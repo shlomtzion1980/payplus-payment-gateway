@@ -458,19 +458,19 @@ class PayplusInvoice
             $payplus_document_type = "inv_refund_receipt";
             $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => wp_json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => wp_json_encode($payload)]);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => wp_json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => wp_json_encode($payload)]);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
     }
