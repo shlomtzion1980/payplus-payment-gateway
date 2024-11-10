@@ -69,7 +69,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             WC()->session->set('randomHash', bin2hex(random_bytes(16)));
             return;
         }
-        $this->emptyResponse();
+
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $this->emptyResponse();
 
