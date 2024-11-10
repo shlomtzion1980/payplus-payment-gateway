@@ -185,16 +185,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         if ($order_id !== "000" && !is_string($order_id)) {
             WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-            $order = wc_get_order($order_id);
 
-            if (! $order) {
-                return;
+            $order = wc_get_order($order_id);
+            if (!$order && !empty(WC()->session->get('hostedPayload'))) {
+                $payload = json_decode(WC()->session->get('hostedPayload'), true);
+                $payload['more_info'] = WC()->session->get('randomHash');
+                WC()->session->set('order_awaiting_payment', $payload['more_info']);
             }
-        } else {
-            $payload = json_decode(WC()->session->get('hostedPayload'), true);
-            $payload['more_info'] = WC()->session->get('randomHash');
-            $hostedResponse = $this->createUpdateHostedPaymentPageLink(wp_json_encode($payload));
-            return $hostedResponse;
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
@@ -302,11 +299,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
 
-        if ($order_id !== "000") {
+        if ($order_id !== "000" && $order) {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
+
             // Check if there are shipping items
             if (! empty($shipping_items)) {
+
                 foreach ($shipping_items as $shipping_item) {
                     // Get the shipping method ID (e.g., 'flat_rate:1')
                     $method_id = $shipping_item->get_method_id();
