@@ -722,7 +722,7 @@ class PayplusInvoice
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
                 }
 
-                $itemDetails['vat_type_code'] = 0;
+                $itemDetails['vat_type_code'] = 'vat-type-included';
 
                 if ($wc_tax_enabled) {
                     $itemDetails['vat_type_code'] = $product->get_tax_status() === 'taxable' ? 'vat-type-included' : 'vat-type-exempt';
@@ -1115,6 +1115,8 @@ class PayplusInvoice
                     }
 
                     $payload = wp_json_encode($payload);
+                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
+
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
@@ -1128,7 +1130,6 @@ class PayplusInvoice
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
-                            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
                             $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
                             $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;

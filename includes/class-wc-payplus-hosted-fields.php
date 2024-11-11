@@ -337,7 +337,10 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $item->name = "coupon_discount";
                     $item->quantity = 1;
                     $item->price = -$coupon_value;
-                    $item->vat_type = !$wc_tax_enabled ? 0 : 1;
+                    $item->vat_type = !$wc_tax_enabled ? 1 : 0;
+                    $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
+                    $item->vat_type = $wc_tax_enabled && $isTaxIncluded ? 0 : $item->vat_type;
+                    $item->vat_type = $this->vat4All ? 0 : $item->vat_type;
                     $data->items[] = $item;
                 }
             }
