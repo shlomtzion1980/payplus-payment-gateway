@@ -136,7 +136,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     }
 
 
-    public function hostedFieldsData($order_id, $isHostedStarted)
+    public function hostedFieldsData($order_id)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->vat4All = isset($options['paying_vat_all_order']) ? boolval($options['paying_vat_all_order'] === "yes") : false;
@@ -320,6 +320,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $payload = wp_json_encode($data);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]) : null;
         if (WC()->session->get('hostedPayload') === $payload) {
+            // WC()->session->set('hostedStarted', false);
             $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(2): ($order_id)\nPayload is identical no need to run.");
             return WC()->session->get('hostedResponse');
         }
@@ -378,10 +379,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         );
 
-        $isHostedStarted = WC()->session->get('hostedStarted');
-        if ($context->payment_method === "payplus-payment-gateway-hostedfields" && !$isHostedStarted) {
-
-            $this->hostedFieldsData($this->orderId, $isHostedStarted);
+        // $isHostedStarted = WC()->session->get('hostedStarted');
+        if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
+            // WC()->session->set('hostedStarted', true);
+            $this->hostedFieldsData($this->orderId);
 
             $result->set_payment_details('');
             $payment_details = $result->payment_details;
@@ -389,7 +390,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $payment_details['secret_key'] = $this->secretKey;
             $result->set_payment_details($payment_details);
             $result->set_status('pending');
-            WC()->session->set('hostedStarted', true);
         } else {
             if (!in_array($context->payment_method, $this->settings['gateways'])) {
                 return;
