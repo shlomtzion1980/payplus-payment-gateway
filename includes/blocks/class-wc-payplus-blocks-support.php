@@ -100,7 +100,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         return $this->payplus_gateway;
     }
 
-    function createUpdateHostedPaymentPageLink($payload)
+    public function createUpdateHostedPaymentPageLink($payload)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $testMode = boolval($options['api_test_mode'] === 'yes');
@@ -156,7 +156,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
 
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $paylodfrom = WC()->session->get('hostedPayload');
         $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-Blocks(1): ($order_id) - Payment process started.");
         $discountPrice = 0;
         $products = array();
@@ -380,6 +379,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if ($context->payment_method === "payplus-payment-gateway-hostedfields" && !$isHostedStarted) {
 
             $this->hostedFieldsData($this->orderId, $isHostedStarted);
+
             $result->set_payment_details('');
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;

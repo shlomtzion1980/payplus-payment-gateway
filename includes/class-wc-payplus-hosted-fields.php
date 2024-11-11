@@ -126,7 +126,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
     }
 
-    function createUpdateHostedPaymentPageLink($payload)
+    public function createUpdateHostedPaymentPageLink($payload)
     {
         $testMode = boolval($this->payPlusGateway->settings['api_test_mode'] === 'yes');
         $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
@@ -178,7 +178,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function hostedFieldsData($order_id)
     {
-
         $order_id = is_int($order_id) ? $order_id : (!empty(WC()->session->get('order_awaiting_payment')) ? WC()->session->get('order_awaiting_payment') : $order_id);
 
         if ($order_id !== "000" && is_int($order_id)) {
@@ -191,8 +190,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             }
         }
 
-        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
+        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -211,7 +209,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $product = new WC_Product_Variable($productId);
                     $productData = $product->get_available_variation($cart_item['variation_id']);
                     $tax = (WC()->cart->get_total_tax()) ? WC()->cart->get_total_tax() / $cart_item['quantity'] : 0;
-                    $tax = round($tax, $WC_PayPlus_Gateway->rounding_decimals);
+                    $tax = round($tax, $this->payPlusGateway->rounding_decimals);
                     $priceProductWithTax = round($productData['display_price'] + $tax, ROUNDING_DECIMALS);
                     $priceProductWithoutTax = round($productData['display_price'], ROUNDING_DECIMALS);
                 } else {
@@ -265,7 +263,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data->refURL_cancel = CANCEL_URL;
         $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
-        $data->charge_method = intval($WC_PayPlus_Gateway->settings['transaction_type']);
+        $data->charge_method = intval($this->payPlusGateway->settings['transaction_type']);
 
         /**
          * Origin domain is the domain of the page that is requesting the payment page.
@@ -358,13 +356,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $payload = wp_json_encode($data);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]) : null;
         if ($hostedResponse === $payload) {
-            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(2): ($order_id)\nPayload is identical no need to run.");
+            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(2): ($order_id)\nPayload is identical no need to run.");
             return WC()->session->get('hostedResponse');
         } else {
-            $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", $firstMessage  . "HostedFields-hostedFieldsData(2)\n");
+            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", $firstMessage  . "HostedFields-hostedFieldsData(2)\n");
         }
 
-        $WC_PayPlus_Gateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(3) Payload: \n$payload");
+        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(3) Payload: \n$payload");
 
         WC()->session->set('hostedPayload', $payload);
 
