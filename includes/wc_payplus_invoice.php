@@ -1111,6 +1111,8 @@ class PayplusInvoice
                     }
 
                     $payload = wp_json_encode($payload);
+                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
+
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
@@ -1157,7 +1159,6 @@ class PayplusInvoice
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
                         }
-                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                     }
                 }
             }
