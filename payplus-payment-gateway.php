@@ -73,6 +73,10 @@ class WC_PayPlus
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
+        add_action('admin_enqueue_scripts', [$this, 'check_websocket_connectivity']);
+        add_action('wp_ajax_websocket_check_notification', [$this, 'websocket_check_notification']);
+        add_action('admin_notices', [$this, 'display_websocket_inactive_notice']);
+
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -85,6 +89,93 @@ class WC_PayPlus
             $this->payPlusCronDeactivate();
         }
     }
+
+    public function websocket_check_notification()
+    {
+        check_ajax_referer('websocket_check_nonce', 'nonce');
+
+        if (isset($_POST['is_active']) && !$_POST['is_active']) {
+            // Store a transient to display admin notice
+            set_transient('websocket_inactive_warning', true, 12 * HOUR_IN_SECONDS);
+        }
+
+        wp_send_json_success();
+    }
+
+    // Display an admin notice if WebSocket is inactive
+    public function display_websocket_inactive_notice()
+    {
+        if (!get_transient('websocket_inactive_warning')) {
+?>
+            <div class="notice notice-error">
+                <p>
+                    <strong>PayPlus Warning:</strong> WebSockets are active on your website. This may make your site vulnerable for
+                    hacks!
+                </p>
+            </div>
+        <?php
+            // Delete the transient after displaying the notice
+            delete_transient('websocket_inactive_warning');
+        }
+    }
+    // Enqueue the WebSocket check script in admin area
+
+    public function check_websocket_connectivity()
+    {
+        ?>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const wsUrl = 'wss://your-websocket-server-url'; // Replace with your WebSocket server URL
+
+                // Function to check WebSocket connectivity
+                function checkWebSocket() {
+                    return new Promise((resolve) => {
+                        let ws;
+                        try {
+                            ws = new WebSocket(wsUrl);
+                        } catch (error) {
+                            console.error('WebSocket initialization error:', error);
+                            resolve(false);
+                            return;
+                        }
+
+                        // If connected, WebSocket is active
+                        ws.onopen = function() {
+                            alert('con');
+                            ws.close();
+                            resolve(true);
+                        };
+
+                        // If there is an error, WebSocket is not active
+                        ws.onerror = function() {
+                            alert('no');
+                            resolve(false);
+                        };
+
+                        // Timeout after 3 seconds if no response
+                        setTimeout(() => {
+                            ws.close();
+                            resolve(false);
+                        }, 3000);
+                    });
+                }
+
+                // Check WebSocket and send the result via AJAX
+                checkWebSocket().then((isActive) => {
+                    if (!isActive) {
+                        // Send AJAX request to notify server
+                        jQuery.post(ajaxurl, {
+                            action: 'websocket_check_notification',
+                            is_active: isActive,
+                            nonce: '<?php echo wp_create_nonce('websocket_check_nonce'); ?>'
+                        });
+                    }
+                });
+            });
+        </script>
+        <?php
+    }
+
 
     public function hostedPayment()
     {
@@ -417,7 +508,7 @@ class WC_PayPlus
         $error_page_payplus = get_option('error_page_payplus');
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
         if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
-?>
+        ?>
             <meta name=" robots" content="noindex,nofollow">
         <?php
         }
