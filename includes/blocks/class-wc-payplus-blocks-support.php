@@ -352,8 +352,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $data = $context->payment_data;
         $is_payplus_payment_method = $this->name === $context->payment_method;
         $main_gateway              = new WC_PayPlus_Gateway;
-        $this->orderId = $context->order->id;
-        $order = wc_get_order($this->orderId);
+        $this->orderId = $context->order->get_id();
+        $order = $context->order;
 
         $this->isSubscriptionOrder = false;
         if (is_checkout()) {
@@ -365,8 +365,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         }
 
-        $token_id = $context->payment_data['token'];
-        $token = WC_Payment_Tokens::get($token_id);
+        $token_id = isset($context->payment_data['token']) ? $context->payment_data['token'] : false;
+        $token = $token_id ? WC_Payment_Tokens::get($token_id) : false;
 
         // Hook into PayPlus error processing so that we can capture the error to payment details.
         // This error would have been registered via wc_add_notice() and thus is not helpful for block checkout processing.
@@ -384,7 +384,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             // WC()->session->set('hostedStarted', true);
             $this->hostedFieldsData($this->orderId);
 
-            $result->set_payment_details('');
+
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;
             $payment_details['secret_key'] = $this->secretKey;
@@ -426,8 +426,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             ];
             $chargeDefault = $names[$context->payment_method];
 
-            $this->orderId = $context->order->id;
-            $order = wc_get_order($this->orderId);
+            $this->orderId = $context->order->get_id();
+            $order = $context->order;
             $isSaveToken = $context->payment_data['wc-payplus-payment-gateway-new-payment-method'];
 
             if ($main_gateway->block_ip_transactions) {

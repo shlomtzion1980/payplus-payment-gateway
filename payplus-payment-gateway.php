@@ -92,23 +92,24 @@ class WC_PayPlus
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order = wc_get_order($order_id);
-        $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
-        $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
-        $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
-        WC_PayPlus_Meta_Data::update_meta($order, $metaData);
-        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
-        WC()->session->__unset('hostedPayload');
-        WC()->session->__unset('page_request_uid');
-        WC()->session->set('hostedResponse', null); // Clear the data
-        WC()->session->__unset('hostedResponse');   // Now unset the session key
-
-        WC()->session->__unset('order_awaiting_payment');
-        WC()->session->__unset('hostedFieldsUUID');
-        WC()->session->set('hostedStarted', false);
-        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-        wp_send_json_success(array('result' => "success"));
+        if ($order) {
+            $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
+            $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+            $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
+            WC_PayPlus_Meta_Data::update_meta($order, $metaData);
+            $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+            $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
+            WC()->session->set('hostedTimeStamp', false);
+            WC()->session->set('hostedPayload', false);
+            WC()->session->set('page_request_uid', false);
+            WC()->session->set('hostedResponse', false);
+            WC()->session->__unset('order_awaiting_payment');
+            WC()->session->__unset('hostedFieldsUUID');
+            WC()->session->set('hostedStarted', false);
+            WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+            wp_send_json_success(array('result' => "success"));
+        }
     }
 
     function createUpdateHostedPaymentPageLink($payload)
@@ -353,7 +354,7 @@ class WC_PayPlus
                     'brand_id' => isset($_REQUEST['brand_id']) ? sanitize_text_field(wp_unslash($_REQUEST['brand_id'])) : null,
                 ];
 
-                if (!boolval($_GET['hostedFields'] === "true")) {
+                if (!boolval(isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true")) {
                     $order = $this->payplus_gateway->validateOrder($data);
                 } else {
                     $order_id = $REQUEST['more_info'];

@@ -1232,7 +1232,7 @@ class PayplusInvoice
             for ($i = 0; $i < count($resultApps); $i++) {
 
                 $resultApp = $resultApps[$i];
-                $create_at = $resultApp->create_at;
+                $create_at = property_exists($resultApp, 'create_at') ? $resultApp->create_at : null;
                 $paymentType = 'payment-app';
                 $typePayment = array();
                 if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax'))) {
@@ -1249,10 +1249,12 @@ class PayplusInvoice
                 }
                 if (in_array($resultApp->method_payment, $typeAll)) {
                     if ($resultApp->method_payment == "credit-card") {
-                        if ($resultApp->transaction_type == "payments" || $resultApp->transaction_type == "credit") {
-                            $typePayment['payments'] = (intval($resultApp->number_of_payments) > 1) ? $resultApp->number_of_payments : 1;
+                        if (property_exists($resultApp, 'transaction_type')) {
+                            if ($resultApp->transaction_type == "payments" || $resultApp->transaction_type == "credit") {
+                                $typePayment['payments'] = (intval($resultApp->number_of_payments) > 1) ? $resultApp->number_of_payments : 1;
+                            }
+                            $typePayment['transaction_type'] = $resultApp->transaction_type;
                         }
-                        $typePayment['transaction_type'] = $resultApp->transaction_type;
                         $typePayment['card_type'] = $resultApp->brand_name;
                     } elseif ($resultApp->method_payment == "tav-zahav" || $resultApp->method_payment == "multipass") {
                         $typePayment['transaction_number'] = $payplusApprovalNum;

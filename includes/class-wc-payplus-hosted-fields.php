@@ -61,7 +61,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
         if (WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) {
             WC()->session->set('hostedTimeStamp', false);
-            WC()->session->__unset('hostedPayload');
+            WC()->session->set('hostedPayload', false);
             WC()->session->__unset('page_request_uid');
             WC()->session->set('hostedResponse', false);
             WC()->session->__unset('order_awaiting_payment');
