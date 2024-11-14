@@ -71,9 +71,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
-        // !$this->isHostedStarted ? $hostedResponse = $this->emptyResponse() : null;
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
-        $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $this->emptyResponse();
+        $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
@@ -106,8 +105,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function emptyResponse()
     {
-        WC()->session->set('randomHash', $this->order_id = bin2hex(random_bytes(16)));
-        WC()->session->__unset('order_awaiting_payment');
+        $this->order_id = WC()->session->get('order_awaiting_payment');
         return $this->hostedFieldsData($this->order_id);
     }
 
