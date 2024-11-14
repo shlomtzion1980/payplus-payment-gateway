@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.1] = 14-11-2024 - (Octopus)
+
+* Tweak - The Apple Pay script is now loaded locally from the plugin.
+
 ## [7.2.0] - 10-11-2024 - (Optimus)
 
 * Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
