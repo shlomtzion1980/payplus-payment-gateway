@@ -2177,7 +2177,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($this->import_applepay_script && !wp_script_is('applePayScript', 'enqueued')) {
                 wp_enqueue_script(
                     'applePayScript',
-                    'https://payments' . ($this->api_test_mode ? 'dev' : '') . '.payplus.co.il/statics/applePay/script.js',
+                    PAYPLUS_PLUGIN_URL . 'assets/js/script.js',
                     array(),
                     PAYPLUS_VERSION,
                     true
