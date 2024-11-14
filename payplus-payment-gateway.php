@@ -543,8 +543,8 @@ class WC_PayPlus
         $isSubscriptionOrder = false;
 
         if (is_checkout() || is_product()) {
-            if ($this->importApplePayScript) {
-                wp_register_script('applePayScript', 'https://payments.payplus.co.il/statics/applePay/script.js', array('jquery'), PAYPLUS_VERSION, true);
+            if ($this->importApplePayScript && !wp_script_is('applePayScript', 'enqueued')) {
+                wp_register_script('applePayScript', PAYPLUS_PLUGIN_URL . 'assets/js/script.js', array('jquery'), PAYPLUS_VERSION, true);
                 wp_enqueue_script('applePayScript');
             }
         }
@@ -558,8 +558,10 @@ class WC_PayPlus
             }
             wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=' . PAYPLUS_VERSION;
             if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
-                if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
-                    $importAapplepayScript = 'https://payments.payplus.co.il/statics/applePay/script.js?var=' . PAYPLUS_VERSION;
+                if (!wp_script_is('applePayScript', 'enqueued')) {
+                    if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                        $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?var=' . PAYPLUS_VERSION;
+                    }
                 }
             }
             wp_localize_script(
