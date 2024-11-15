@@ -306,6 +306,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order_id = $order_id === "000" ? updateOrderId($randomHash) : $order_id;
         $data->more_info = $order_id;
 
+        $shippingPrice = false;
         if ($order_id !== "000" && isset($order) && $order) {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
@@ -328,13 +329,19 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $item->name = $method_title;
                     $item->quantity = 1;
                     $item->price = $shipping_cost + array_sum($shipping_taxes['total']);
+                    $shippingPrice = $item->price;
                     $item->vat_type = $shipping_tax_total > 0 ? 1 : 0;
                     $data->items[] = $item;
                 }
             }
 
+            $totalAmount = 0;
+            foreach ($data->items as $item) {
+                $totalAmount += $item->price * $item->quantity;
+            }
+            $totalBeforeDiscount = $totalAmount - $shippingPrice;
+
             $coupons = $order->get_coupon_codes();
-            $totalFromOrder = $order->get_total();
 
             if (! empty($coupons)) {
                 foreach ($coupons as $coupon_code) {
@@ -348,6 +355,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $item = new stdClass();
                     $item->name = "coupon_discount";
                     $item->quantity = 1;
+                    $coupon_value > $totalBeforeDiscount ? $coupon_value = $totalBeforeDiscount : $coupon_value;
                     $item->price = -$coupon_value;
                     $item->vat_type = !$wc_tax_enabled ? 1 : 0;
                     $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
