@@ -391,7 +391,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $result->set_payment_details($payment_details);
             $result->set_status('pending');
         } else {
-            if (!in_array($context->payment_method, $this->settings['gateways']) || $context->payment_method === 'payplus-payment-gateway-applepay') {
+            if (!in_array($context->payment_method, $this->settings['gateways'])) {
                 return;
             }
 
