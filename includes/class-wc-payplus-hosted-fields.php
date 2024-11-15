@@ -71,6 +71,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
+        WC()->session->set('hostedStarted', false);
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
 

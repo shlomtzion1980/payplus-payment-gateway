@@ -88,15 +88,15 @@ class WC_PayPlus
         } else {
             $this->payPlusCronDeactivate();
         }
+        // remove_all_actions('admin_notices');
     }
 
     public function websocket_check_notification()
     {
         check_ajax_referer('websocket_check_nonce', 'nonce');
-
         if (isset($_POST['is_active']) && !$_POST['is_active']) {
             // Store a transient to display admin notice
-            set_transient('websocket_inactive_warning', true, 12 * HOUR_IN_SECONDS);
+            set_transient('websocket_inactive_warning', true, 1 * MINUTE_IN_SECONDS);
         }
 
         wp_send_json_success();
@@ -125,7 +125,7 @@ class WC_PayPlus
         ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const wsUrl = 'wss://your-websocket-server-url'; // Replace with your WebSocket server URL
+                const wsUrl = 'wss://ws.postman-echo.com/raw'; // Replace with your WebSocket server URL
 
                 // Function to check WebSocket connectivity
                 function checkWebSocket() {
@@ -141,14 +141,12 @@ class WC_PayPlus
 
                         // If connected, WebSocket is active
                         ws.onopen = function() {
-                            alert('con');
                             ws.close();
                             resolve(true);
                         };
 
                         // If there is an error, WebSocket is not active
                         ws.onerror = function() {
-                            alert('no');
                             resolve(false);
                         };
 
@@ -162,7 +160,7 @@ class WC_PayPlus
 
                 // Check WebSocket and send the result via AJAX
                 checkWebSocket().then((isActive) => {
-                    if (!isActive) {
+                    if (isActive) {
                         // Send AJAX request to notify server
                         jQuery.post(ajaxurl, {
                             action: 'websocket_check_notification',

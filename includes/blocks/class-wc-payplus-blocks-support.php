@@ -259,7 +259,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
         WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
-
+        $shippingPrice = false;
         if ($order_id !== "000") {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
@@ -276,17 +276,24 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
                     $shipping_tax_total = $wc_tax_enabled ? array_sum($shipping_taxes['total']) : 0;
 
+
                     $item = new stdClass();
                     $item->name = $method_title;
                     $item->quantity = 1;
                     $item->price = $shipping_cost + array_sum($shipping_taxes['total']);
+                    $shippingPrice = $item->price;
                     $item->vat_type = $shipping_tax_total > 0 ? 1 : 0;
                     $data->items[] = $item;
                 }
             }
 
+            $totalAmount = 0;
+            foreach ($data->items as $item) {
+                $totalAmount += $item->price * $item->quantity;
+            }
+            $totalBeforeDiscount = $totalAmount - $shippingPrice;
+
             $coupons = $order->get_coupon_codes();
-            $totalFromOrder = $order->get_total();
 
             if (! empty($coupons)) {
                 foreach ($coupons as $coupon_code) {
@@ -300,6 +307,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     $item = new stdClass();
                     $item->name = "coupon_discount";
                     $item->quantity = 1;
+                    $coupon_value > $totalBeforeDiscount ? $coupon_value = $totalBeforeDiscount : $coupon_value;
                     $item->price = -$coupon_value;
                     $item->vat_type = !$wc_tax_enabled ? 1 : 0;
                     $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
@@ -379,17 +387,18 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         );
 
-        // $isHostedStarted = WC()->session->get('hostedStarted');
+        $hostedStarted = WC()->session->get('hostedStarted') ? WC()->session->get('hostedStarted') : WC()->session->set('hostedStarted', 0);
         if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
-            // WC()->session->set('hostedStarted', true);
-            $this->hostedFieldsData($this->orderId);
-
-
-            $payment_details = $result->payment_details;
-            $payment_details['order_id'] = $this->orderId;
-            $payment_details['secret_key'] = $this->secretKey;
-            $result->set_payment_details($payment_details);
-            $result->set_status('pending');
+            ++$hostedStarted;
+            if ($hostedStarted <= 1) {
+                WC()->session->set('hostedStarted', $hostedStarted);
+                $this->hostedFieldsData($this->orderId);
+                $payment_details = $result->payment_details;
+                $payment_details['order_id'] = $this->orderId;
+                $payment_details['secret_key'] = $this->secretKey;
+                $result->set_payment_details($payment_details);
+                $result->set_status('pending');
+            }
         } else {
             if (!in_array($context->payment_method, $this->settings['gateways'])) {
                 return;
