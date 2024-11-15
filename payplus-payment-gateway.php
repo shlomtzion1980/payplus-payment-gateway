@@ -94,9 +94,10 @@ class WC_PayPlus
     public function websocket_check_notification()
     {
         check_ajax_referer('websocket_check_nonce', 'nonce');
-        if (isset($_POST['is_active']) && !$_POST['is_active']) {
+
+        if (isset($_POST['is_active']) && $_POST['is_active']) {
             // Store a transient to display admin notice
-            set_transient('websocket_inactive_warning', true, 1 * MINUTE_IN_SECONDS);
+            set_transient('websocket_inactive_warning', true);
         }
 
         wp_send_json_success();
@@ -105,7 +106,7 @@ class WC_PayPlus
     // Display an admin notice if WebSocket is inactive
     public function display_websocket_inactive_notice()
     {
-        if (!get_transient('websocket_inactive_warning')) {
+        if (get_transient('websocket_inactive_warning')) {
 ?>
             <div class="notice notice-error">
                 <p>
