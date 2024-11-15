@@ -306,9 +306,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $_GET['section'] === 'payplus-payment-gateway-hostedfields'
             ) {
 ?>
-                <div class="notice notice-success is-dismissible">
-                    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?></p>
-                </div>
+<div class="notice notice-success is-dismissible">
+    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?>
+    </p>
+</div>
 <?php
                 // Delete the transient so the notice only shows once.
                 delete_transient('payplus_admin_notice');
@@ -2174,15 +2175,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($this->display_mode == 'iframe') {
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
             echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($this->iframe_height) . "px; border: 0;'></iframe>";
-            if ($this->import_applepay_script && !wp_script_is('applePayScript', 'enqueued')) {
-                wp_enqueue_script(
-                    'applePayScript',
-                    PAYPLUS_PLUGIN_URL . 'assets/js/script.js',
-                    array(),
-                    PAYPLUS_VERSION,
-                    true
-                );
-            }
+            // if ($this->import_applepay_script && !wp_script_is('applePayScript', 'enqueued')) {
+            //     wp_enqueue_script(
+            //         'applePayScript',
+            //         PAYPLUS_PLUGIN_URL . 'assets/js/script.js',
+            //         array(),
+            //         PAYPLUS_VERSION,
+            //         true
+            //     );
+            // }
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
