@@ -196,7 +196,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'title' => __('Hide PayPlus logo when showing loader', 'payplus-payment-gateway'),
                 'description' => __('Hide PayPlus from loader and display: "Processing..."', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'default' => 'no'
+                'default' => 'yes'
             ],
             'hide_payplus_gateway' => [
                 'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
