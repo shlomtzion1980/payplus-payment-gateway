@@ -259,7 +259,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
         WC()->session->set('randomHash', $randomHash);
         $data->more_info = $order_id === "000" ? $randomHash : $order_id;
-        $shippingPrice = false;
+        $shippingPrice = 0;
         if ($order_id !== "000") {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');

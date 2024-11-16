@@ -126,10 +126,10 @@ class WC_PayPlus
         ?>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                const wsUrl = 'wss://ws.postman-echo.com/raw'; // Replace with your WebSocket server URL
+                const wsUrl = 'wss://ws.postman-echo.com/raw'; // WebSocket server URL
 
-                // Function to check WebSocket connectivity
-                function checkWebSocket() {
+                // Function to check WebSocket connectivity and show response
+                async function checkWebSocket() {
                     return new Promise((resolve) => {
                         let ws;
                         try {
@@ -140,14 +140,34 @@ class WC_PayPlus
                             return;
                         }
 
-                        // If connected, WebSocket is active
+                        // When the connection is open
                         ws.onopen = function() {
+                            console.log('WebSocket connection opened');
+
+                            // Send a message to the server
+                            const message = 'Hello from the client!';
+                            ws.send(message);
+                            console.log('Message sent:', message);
+                        };
+
+                        // Listen for messages from the server
+                        ws.onmessage = function(event) {
+                            console.log('Message received from server:', event.data);
+
+                            // Display the response on the page
+                            const responseElement = document.getElementById('ws-response');
+                            if (responseElement) {
+                                responseElement.textContent = `Server Response: ${event.data}`;
+                            }
+
+                            // Close the WebSocket connection
                             ws.close();
                             resolve(true);
                         };
 
-                        // If there is an error, WebSocket is not active
-                        ws.onerror = function() {
+                        // If there is an error
+                        ws.onerror = function(error) {
+                            console.error('WebSocket error:', error);
                             resolve(false);
                         };
 
