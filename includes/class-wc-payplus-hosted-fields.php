@@ -62,7 +62,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         if (WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) {
             WC()->session->set('hostedTimeStamp', false);
             WC()->session->set('hostedPayload', false);
-            WC()->session->__unset('page_request_uid');
+            WC()->session->set('page_request_uid', false);
             WC()->session->set('hostedResponse', false);
             WC()->session->__unset('order_awaiting_payment');
             WC()->session->__unset('hostedFieldsUUID');
@@ -394,7 +394,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
-            WC()->session->__unset('page_request_uid');
+            WC()->session->set('page_request_uid', false);
             $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
         }
 
@@ -405,10 +405,18 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     {
         $savedTimestamp = WC()->session->get('hostedTimeStamp');
         if (!$savedTimestamp) {
-            $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "HostedFields timestamp started");
+            WC()->session->__unset('hostedPayload');
+            WC()->session->set('page_request_uid', false);
+            WC()->session->set('hostedResponse', false);
+            $randomHash = bin2hex(random_bytes(16));
+            WC()->session->set('order_awaiting_payment', $randomHash);
+            WC()->session->__unset('hostedFieldsUUID');
+            WC()->session->set('hostedStarted', false);
+            WC()->session->set('randomHash', $randomHash);
             // First run or if no timestamp is saved, save the current time
             $savedTimestamp = time(); // Store this in the database or file
             WC()->session->set('hostedTimeStamp', $savedTimestamp);
+            $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "HostedFields timestamp started: $savedTimestamp");
         }
 
         $currentTimestamp = time();
@@ -421,7 +429,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "HostedFields timestamp ended: $currentTimestamp");
             WC()->session->set('hostedTimeStamp', false);
             WC()->session->__unset('hostedPayload');
-            WC()->session->__unset('page_request_uid');
+            WC()->session->set('page_request_uid', false);
             WC()->session->set('hostedResponse', false);
             $randomHash = bin2hex(random_bytes(16));
             WC()->session->set('order_awaiting_payment', $randomHash);
