@@ -129,15 +129,19 @@ function putHostedFields() {
 }
 
 jQuery(() => {
-  if (payplus_script_hosted.isHideLoaderLogo) {
-    jQuery(".blocks-loader-text").addClass("no-image");
-  }
-
   const isCheckout = !document.querySelector(
     'div[data-block-name="woocommerce/checkout"]'
   )
     ? false
     : true;
+
+  if (payplus_script_hosted.isHideLoaderLogo) {
+    jQuery(".blocks-loader-text").addClass("no-image");
+    if (isCheckout) {
+      jQuery(".blocks-loader-text").addClass("blocks");
+    }
+  }
+
   // Define the async function to handle the response
   async function processResponse(resp) {
     try {

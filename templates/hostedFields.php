@@ -114,9 +114,13 @@ $opposite = $locale !== "he_IL" ?  "left" : "right";
                 &.no-image::before {
                     content: "<?php echo __('Processing...', 'payplus-payment-gateway'); ?>";
                     position: relative;
-                    bottom: 20px;
+                    bottom: 25px;
                     font-size: 7px;
                     color: white;
+                }
+
+                &.no-image.blocks::before {
+                    bottom: 20px;
                 }
             }
         }
