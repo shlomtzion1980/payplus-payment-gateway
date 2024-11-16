@@ -61,6 +61,10 @@ jQuery(function ($) {
       }, 1000);
     } else {
       $("input#" + inputPayPlus).prop("checked", false);
+      setTimeout(function () {
+        const mainPayPlus = "payment_method_payplus-payment-gateway";
+        $("input#" + mainPayPlus).prop("checked", true);
+      }, 1000);
     }
     $(document).on("change", 'input[name="payment_method"]', function () {
       // Check if the hosted fields radio input is NOT checked
