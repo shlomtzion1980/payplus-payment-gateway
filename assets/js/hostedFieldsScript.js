@@ -139,6 +139,9 @@ jQuery(() => {
     jQuery(".blocks-loader-text").addClass("no-image");
     if (isCheckout) {
       jQuery(".blocks-loader-text").addClass("blocks");
+      // pageLang !== "he-IL"
+      //   ? jQuery(".blocks-loader-text").addClass("blocks")
+      //   : jQuery(".blocks-loader-text").addClass("blocks-he");
     }
   }
 
