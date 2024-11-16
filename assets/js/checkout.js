@@ -53,18 +53,18 @@ jQuery(function ($) {
       : null;
 
     if (hasSavedCCs.length === 0) {
-      $("input#" + inputPayPlus).prop("checked", true);
-
       setTimeout(function () {
+        $("input#" + inputPayPlus).prop("checked", true);
         $("#submit-payment").hide();
         $("div.container.hostedFields").show();
       }, 1000);
     } else {
-      $("input#" + inputPayPlus).prop("checked", false);
       setTimeout(function () {
+        $(".payment_method_payplus-payment-gateway").css("display", "block");
+        $("input#" + inputPayPlus).prop("checked", false);
         const mainPayPlus = "payment_method_payplus-payment-gateway";
         $("input#" + mainPayPlus).prop("checked", true);
-      }, 1000);
+      }, 2000);
     }
     $(document).on("change", 'input[name="payment_method"]', function () {
       // Check if the hosted fields radio input is NOT checked
