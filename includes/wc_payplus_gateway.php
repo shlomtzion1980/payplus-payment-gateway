@@ -352,9 +352,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $hour = $order->get_date_created()->date('H');
                 $min = $order->get_date_created()->date('i');
                 $calc = $current_minute - $min;
+                // echo "calc: $calc \n";
+                // echo "current hour: $current_hour\n";
+                // echo "hour: $hour\n";
+                // $isEligible = boolval($current_hour === $hour && $calc < 30);
+                // $isEligible ? print_r("isEligible ? $isEligible\n") : print_r("not eligible\n");
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
-                if ($paymentPageUid) {
+                $payPlusCronTested = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested');
+                if ($paymentPageUid && !$payPlusCronTested) {
+                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => true]);
                     echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
                     if ($order->get_status() === 'cancelled') {
                         $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
@@ -363,11 +370,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             if ($responseStatus === "000") {
                                 echo esc_html("\n-=<Order: $order_id>=-\n");
                                 echo "---------------------------------------------------\n";
-                                echo "The order was created and paid for succcessfully\n";
-                                echo "The order was edited to cancelled manually.\n";
-                                echo "Not running ipn check.\n";
+                                echo "ATTENTION: The order was created and paid for succcessfully\n";
+                                echo "ATTENTION: The order was edited to cancelled manually.\n";
+                                echo "Running ipn check.\n";
                                 echo "---------------------------------------------------\n";
-                                $runIpn = false;
+                                // $runIpn = false;
                             }
                         }
                     }
@@ -380,6 +387,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
                     }
                 }
+                echo "$order_id - Was already tested cron - tested exists.\n";
             }
         } else {
             echo "<pre>";
