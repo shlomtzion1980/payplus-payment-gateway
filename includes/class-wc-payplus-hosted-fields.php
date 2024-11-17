@@ -278,10 +278,24 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
          */
         $data->hosted_fields = true;
 
-        $data->customer = new stdClass();
-        $data->customer->customer_name = "$billing_first_name $billing_last_name";
-        $data->customer->email = $billing_email;
-        $data->customer->phone = $phone;
+        if (is_int($order_id)) {
+            $payPlusInvoice = new PayplusInvoice;
+            $customer = $payPlusInvoice->payplus_get_client_by_order_id($order_id);
+            $data->customer = new stdClass();
+            $data->customer->customer_name = $customer['name'];
+            $data->customer->email = $customer['email'];
+            $data->customer->phone = $customer['phone'];
+            $data->customer->address = $customer['street_name'];
+            $data->customer->city = $customer['city'];
+            $data->customer->postal_code = $customer['postal_code'];
+            $data->customer->country_iso = $customer['country_iso'];
+            $data->customer->customer_external_number = $order->get_customer_id();
+        } else {
+            $data->customer = new stdClass();
+            $data->customer->customer_name = "$billing_first_name $billing_last_name";
+            $data->customer->email = $billing_email;
+            $data->customer->phone = $phone;
+        }
 
         foreach ($products as $product) {
             $item = new stdClass();
