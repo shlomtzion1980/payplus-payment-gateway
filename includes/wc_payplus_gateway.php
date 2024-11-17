@@ -306,10 +306,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $_GET['section'] === 'payplus-payment-gateway-hostedfields'
             ) {
 ?>
-<div class="notice notice-success is-dismissible">
-    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?>
-    </p>
-</div>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?>
+                    </p>
+                </div>
 <?php
                 // Delete the transient so the notice only shows once.
                 delete_transient('payplus_admin_notice');
