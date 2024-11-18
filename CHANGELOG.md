@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.2] = 18-11-2024 - (Starscream) 
+
+* Added - PayPlus cron now processes "cancelled" or "pending" orders that are over 30 minutes old, created today, have a payment_page_uid, and do not have the cron test flag (to avoid retesting already tested orders).
+
 ## [7.2.1] = 14-11-2024 - (Octopus)
 
 * Tweak - The Apple Pay script is now loaded locally from the plugin.
