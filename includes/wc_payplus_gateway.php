@@ -326,9 +326,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 echo "---------------------------------------------------\n";
                                 echo "ATTENTION: The order was created and paid for succcessfully\n";
                                 echo "ATTENTION: The order was edited to cancelled manually.\n";
-                                echo "Running ipn check.\n";
+                                echo "NOT Running ipn check.\n";
                                 echo "---------------------------------------------------\n";
-                                // $runIpn = false;
+                                $runIpn = false;
                             }
                         }
                     }
