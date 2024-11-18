@@ -341,22 +341,35 @@ class WC_PayPlus
         $this->payplus_gateway = $this->get_main_payplus_gateway();
 
         $orders = array_reverse(wc_get_orders($args));
-        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started:' . "\n" . 'Checking orders with statuses of: "pending" and "cancelled" created last half an hour and created today - with cron tested flag.' . "\nOrders:" . wp_json_encode($orders), 'default');
+        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started:' . "\n" . 'Checking orders with statuses of: "pending" and "cancelled" created last half an hour and created today.' . "\nOrders:" . wp_json_encode($orders), 'default');
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
             $hour = $order->get_date_created()->date('H');
             $min = $order->get_date_created()->date('i');
             $calc = $current_minute - $min;
             $isEligible = boolval($current_hour === $hour && $calc < 30);
+            $runIpn = true;
             if ($current_hour >= $hour - 2 && !$isEligible) {
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested');
                 if ($paymentPageUid && !$payPlusCronTested) {
-                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => true]);
-                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
-                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                    if ($order->get_status() === 'cancelled') {
+                        $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                        if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
+                            $responseStatus = json_decode($payPlusResponse, true)['status_code'];
+                            if ($responseStatus === "000") {
+                                $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: ATTENTION: The order was edited to cancelled manually\n");
+                                $runIpn = false;
+                            }
+                        }
+                    }
+                    if ($runIpn) {
+                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => true]);
+                        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
+                        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                    }
                 } else {
                     $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - Was already tested with cron - skipping.\n");
                 }
