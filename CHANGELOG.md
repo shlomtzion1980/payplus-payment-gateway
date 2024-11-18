@@ -2,9 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.2.2] = 18-11-2024 - (Starscream) 
+## [7.2.3] = 18-11-2024 - (Starscream) 
 
 * Added - PayPlus cron now processes "cancelled" or "pending" orders that are over 30 minutes old, created today, have a payment_page_uid, and do not have the cron test flag (to avoid retesting already tested orders).
+Orders that were successful and cancelled manually will not be tested or updated via cron.
 
 ## [7.2.1] = 14-11-2024 - (Octopus)
 
