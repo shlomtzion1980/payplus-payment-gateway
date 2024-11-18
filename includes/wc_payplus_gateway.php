@@ -387,7 +387,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
                     }
                 }
-                echo "$order_id - Was already tested cron - tested exists.\n";
+                echo esc_html("$order_id - Was already tested cron - tested exists.\n");
             }
         } else {
             echo "<pre>";
