@@ -311,11 +311,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $hour = $order->get_date_created()->date('H');
                 $min = $order->get_date_created()->date('i');
                 $calc = $current_minute - $min;
-                // echo "calc: $calc \n";
-                // echo "current hour: $current_hour\n";
-                // echo "hour: $hour\n";
-                // $isEligible = boolval($current_hour === $hour && $calc < 30);
-                // $isEligible ? print_r("isEligible ? $isEligible\n") : print_r("not eligible\n");
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested');
