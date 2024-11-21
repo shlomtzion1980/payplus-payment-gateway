@@ -505,6 +505,32 @@ class WC_PayPlus_Statics
             return $response;
         }
 
+        public static function getHostedIcons()
+        {
+            $iconsArray = [
+                'visa' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "visa.png",
+                'discover' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "discover.png",
+                'amex' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "amex.png",
+                'max' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "max.png",
+                'isracard' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "isracard.png",
+                'diners' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "diners.png",
+                'maestro' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "maestro.png",
+                'mastercard' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "mastercard.png",
+                'jcb' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "jcb.png",
+            ];
+
+            $options = get_option('payplus-payment-gateway-hostedfields', []);
+            $iconsReturn = [];
+            if (isset($options['cards'])) {
+                foreach ($options['cards'] as $cards) {
+                    if (array_key_exists($cards, $iconsArray)) {
+                        $iconsReturn[$cards] = $iconsArray[$cards];
+                    }
+                }
+            }
+            return $iconsReturn;
+        }
+
         public static function getMultiPassIcons()
         {
             $iconsArray = [

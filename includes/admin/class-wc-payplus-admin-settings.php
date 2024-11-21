@@ -167,6 +167,32 @@ class WC_PayPlus_Admin_Settings
             case 'payplus-error-setting':
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-error-setting');
                 break;
+            case 'payplus-payment-gateway-hostedfields':
+                $settings[$section][] = array(
+                    'name' => '',
+                    'type' => 'title',
+                    'id' => 'payplus-payment-gateway-hostedfields[clubsTitle]'
+                );
+                $settings[$section][] = array(
+                    'name' => esc_html__('Select your cards (optional):', 'payplus-payment-gateway'),
+                    'id' => 'payplus-payment-gateway-hostedfields[cards]',
+                    'desc' => __("Choose card icons to be displayed (none for default).", 'payplus-payment-gateway'),
+                    'type' => 'multiselect',
+                    'class' => 'myHostedCards',
+                    'options' => [
+                        'amex' => esc_html__('American Express', 'payplus-payment-gateway'),
+                        'visa' => esc_html__('Visa', 'payplus-payment-gateway'),
+                        'max' => esc_html__('MAX', 'payplus-payment-gateway'),
+                        'isracard' => esc_html__('Isracard', 'payplus-payment-gateway'),
+                        'discover' => esc_html__('Discover', 'payplus-payment-gateway'),
+                        'diners' => esc_html__('Diners', 'payplus-payment-gateway'),
+                        'mastercard' => esc_html__('Mastercard', 'payplus-payment-gateway'),
+                        'maestro' => esc_html__('Maestro', 'payplus-payment-gateway'),
+                        'jcb' => esc_html__('JCB', 'payplus-payment-gateway'),
+                    ]
+                );
+                $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-payment-gateway-hostedfields');
+                break;
             case 'payplus-payment-gateway-multipass':
                 $settings[$section][] = array(
                     'name' => '',
