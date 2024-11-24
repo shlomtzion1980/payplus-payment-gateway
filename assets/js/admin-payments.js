@@ -625,7 +625,12 @@ function payplusMenusDisplay() {
         section == "payplus-payment-gateway-multipass"
     ) {
         //don't display on multipass but use the other display settings ...:)
-        if (section !== "payplus-payment-gateway-multipass") {
+        //this displays the top 3 payplus settings invoice settings and express checkout tabs - above the subgateways...
+        //next if is not to display twice because we already loaded it.
+        if (
+            section !== "payplus-payment-gateway-multipass" &&
+            section !== "payplus-payment-gateway-hostedfields"
+        ) {
             jQuery(".wrap.woocommerce")
                 .find("h1")
                 .before(payplus_script_admin.menu_option);
