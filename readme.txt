@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 7.2.5
+Stable tag: 7.2.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.2.6 - 24-11-2024 = 
+
+* Fix     - Loading iframe issue in redirect and on the next page fixed.
 
 = 7.2.5 - 24-11-2024 = 
 

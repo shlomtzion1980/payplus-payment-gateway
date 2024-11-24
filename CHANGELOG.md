@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.6] = 24-11-2024 - (PrimeWithFix)
+
+* Fix     - Loading iframe issue in redirect and on the next page fixed.
+
 ## [7.2.5] = 24-11-2024 - (Prime) 
 
 * Add   - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
