@@ -116,7 +116,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                 }
 
                 &.no-image::before {
-                    content: "<?php echo __('Processing...', 'payplus-payment-gateway'); ?>";
+                    content: "<?php echo esc_attr(__('Processing...', 'payplus-payment-gateway')); ?>";
                     position: relative;
                     bottom: 25px;
                     font-size: 7px;
@@ -563,7 +563,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         <label><?php echo esc_html__('Payments', 'payplus-payment-gateway'); ?></label>
                         <select class="form-select" id="payments" aria-label="Default select example">
                             <?php for ($i = 1; $i <= $numPaymentsAllowed; $i++): ?>
-                                <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
                             <?php endfor; ?>
                         </select>
                     </div>

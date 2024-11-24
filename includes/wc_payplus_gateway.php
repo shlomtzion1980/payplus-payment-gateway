@@ -307,8 +307,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ) {
 ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php _e('It is recommended to change the names and description of the main payplus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?>
-                    </p>
+                    <p><?php esc_html_e('It is recommended to change the names and description of the main PayPlus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?></p>
                 </div>
 <?php
                 // Delete the transient so the notice only shows once.
@@ -578,7 +577,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         wc_clear_notices();
         /* translators: 1) Opening anchor tag 2) closing anchor tag */
-        wc_add_notice(sprintf(__('If your billing address has been changed for saved payment methods, be sure to remove any %1$ssaved payment methods%2$s on file and re-add them.', 'paypluse-payment-gateway'), '<a href="' . esc_url(wc_get_endpoint_url('payment-methods')) . '" class="wc-payplus-update-card-notice" style="text-decoration:underline;">', '</a>'), 'notice');
+        wc_add_notice(sprintf(__('If your billing address has been changed for saved payment methods, be sure to remove any %1$ssaved payment methods%2$s on file and re-add them.', 'payplus-payment-gateway'), '<a href="' . esc_url(wc_get_endpoint_url('payment-methods')) . '" class="wc-payplus-update-card-notice" style="text-decoration:underline;">', '</a>'), 'notice');
     }
 
     /**
@@ -2126,7 +2125,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
                 } catch (Exception $e) {
                     // Translators: %s is the error message retrieved from the exception.
-                    $error_message = sprintf(__('An error occurred: %s', 'text-domain'), $e->getMessage());
+                    $error_message = sprintf(__('An error occurred: %s', 'payplus-payment-gateway'), $e->getMessage());
                     $wp_error = new WP_Error('payplus_update_meta_error', $error_message);
                     // Display or log the error as needed
                     wp_die(esc_html($wp_error));

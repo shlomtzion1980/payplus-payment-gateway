@@ -3,19 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
-/**
- * @param $element
- * @return void
- */
-function print_db($element)
-{
-    echo "<pre style='direction: ltr;'>";
-    var_dump($element);
-    echo "</pre>";
-    echo "\n";
-}
-
 add_action('init', 'payplus_register_order_statuses');
 /**
  * @return void
@@ -23,9 +10,9 @@ add_action('init', 'payplus_register_order_statuses');
 function payplus_register_order_statuses()
 {
     /* translators: Order status label for recurring subscriptions */
-    $messageOrderStatuses = _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'woocommerce');
+    $messageOrderStatuses = _n_noop('Recurring subscription created <span class="count">(%s)</span>', 'Recurring subscription created<span class="count">(%s)</span>', 'payplus-payment-gateway');
     register_post_status('wc-recsubc', array(
-        'label' => _x('Recurring subscription created', 'Order status', 'woocommerce'),
+        'label' => _x('Recurring subscription created', 'Order status', 'payplus-payment-gateway'),
         'public' => true,
         'exclude_from_search' => false,
         'show_in_admin_all_list' => true,
@@ -40,7 +27,7 @@ add_filter('wc_order_statuses', 'payplus_wc_order_statuses');
  */
 function payplus_wc_order_statuses($order_statuses)
 {
-    $order_statuses['wc-recsubc'] = _x('Recurring subscription created', 'Order status', 'woocommerce');
+    $order_statuses['wc-recsubc'] = _x('Recurring subscription created', 'Order status', 'payplus-payment-gateway');
 
     return $order_statuses;
 }
@@ -201,7 +188,7 @@ function checkPayPlusErrorPage($errorPageOptions)
 {
     $error_page_payplus = get_option('error_page_payplus') ?? false;
 
-    if($error_page_payplus){
+    if ($error_page_payplus) {
         $errorPagePayPlus = get_post($error_page_payplus);
         if ($errorPagePayPlus->post_content !== null && strpos($errorPagePayPlus->post_content, "[error-payplus-content]") === 0 || $errorPagePayPlus->post_content !== null && strpos($errorPagePayPlus->post_content, "[error-payplus-content]") > 0) {
             wp_update_post(array(

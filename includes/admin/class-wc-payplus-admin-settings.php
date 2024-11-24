@@ -27,7 +27,7 @@ class WC_PayPlus_Admin_Settings
             'payplus-invoice' => array(
                 'name' => __('Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice',
-                'img' => "<img style='height: 75%;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png'>",
+                'img' => "<img style='height: 75%;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png'>",
             ),
             'payplus-express-checkout' => array(
                 'name' => __('Express Checkout', 'payplus-payment-gateway'),
@@ -568,7 +568,7 @@ class WC_PayPlus_Admin_Settings
                     <br>Flat rate,
                     <br>Free (Condition support for min amount or no condition).
                     <br>
-                    IMPORTANT:<br> if you have complex shipping rules they might not work with express checkout, for complex use:"Global shipping amount"'),
+                    IMPORTANT:<br> if you have complex shipping rules they might not work with express checkout, for complex use:"Global shipping amount"', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'class' => 'shipping_woo',
                     'label' => '',

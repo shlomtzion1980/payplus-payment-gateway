@@ -267,7 +267,7 @@ class WC_PayPlus_Form_Fields
             'enable_design_checkout' => [
                 'title' => __('Design checkout', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'description' => __('Place the payment icons on the left of the text - relevant for classic checkout page only.', 'payplys-payment-gateway'),
+                'description' => __('Place the payment icons on the left of the text - relevant for classic checkout page only.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
                 'label' => __('Change icon layout on checkout page.', 'payplus-payment-gateway'),
             ],

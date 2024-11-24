@@ -171,7 +171,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if (($this->isInvoiceEnable  && $this->useDedicatedMetaBox) || $this->invoiceDisplayOnly) {
                 add_meta_box(
                     'invoice_plus_order_metabox',
-                    "<img style='height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png'>",
+                    "<img style='height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png'>",
                     [$this, 'display_invoice_order_metabox'],
                     $screen->id,
                     'side',
@@ -1578,7 +1578,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             <thead>
                 <tr>
                     <th><img style="display: block; margin: auto; padding: 1px 0 2px 0;"
-                            src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "Invoice+logo.png"); ?>'></th>
+                            src='<?php echo esc_url(PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png"); ?>'></th>
                     <th><?php echo esc_html__("Sum", "payplus-payment-gateway") ?></th>
                     <th><?php echo esc_html__("Details", "payplus-payment-gateway") ?></th>
                     <th><?php echo esc_html__("Methods of Payment", "payplus-payment-gateway") ?></th>

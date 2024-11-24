@@ -436,7 +436,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     {
         parent::__construct();
         $this->id = 'payplus-payment-gateway-hostedfields';
-        $this->method_title = __('PayPlus - Embedded', 'woocommerce');
+        $this->method_title = __('PayPlus - Embedded', 'payplus-payment-gateway');
         add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
     }

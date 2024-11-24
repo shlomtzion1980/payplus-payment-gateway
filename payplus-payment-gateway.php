@@ -95,9 +95,15 @@ class WC_PayPlus
     {
         check_ajax_referer('websocket_check_nonce', 'nonce');
 
-        if (isset($_POST['is_active']) && $_POST['is_active']) {
+        if (isset($_POST['is_active'])) {
+            $is_active = filter_var(wp_unslash($_POST['is_active']), FILTER_VALIDATE_BOOLEAN);
+
+
+            if ($is_active) {
+                set_transient('websocket_inactive_warning', true);
+            }
             // Store a transient to display admin notice
-            set_transient('websocket_inactive_warning', true);
+
         }
 
         wp_send_json_success();
@@ -186,7 +192,7 @@ class WC_PayPlus
                         jQuery.post(ajaxurl, {
                             action: 'websocket_check_notification',
                             is_active: isActive,
-                            nonce: '<?php echo wp_create_nonce('websocket_check_nonce'); ?>'
+                            nonce: "<?php echo esc_js(wp_create_nonce('websocket_check_nonce')); ?>"
                         });
                     }
                 });
@@ -715,7 +721,7 @@ class WC_PayPlus
     public static function plugin_action_links($links)
     {
         $action_links = [
-            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . esc_html__('View PayPlus Settings', 'payplus-payment-gateway') . '">' . esc_html__('Settings') . '</a>',
+            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . esc_html__('View PayPlus Settings', 'payplus-payment-gateway') . '">' . esc_html__('Settings', 'payplus-payment-gateway') . '</a>',
         ];
         $links = array_merge($action_links, $links);
 
