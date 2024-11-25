@@ -298,10 +298,10 @@ class PayplusInvoice
      */
     public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
     {
-        $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
-        if ($payPlusPayloadInvoice) {
-            return $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund);
-        }
+        // $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
+        // if ($payPlusPayloadInvoice) {
+        //     return $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund);
+        // }
 
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $payload = array();
