@@ -76,7 +76,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
+            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             if (file_exists($template_path)) {
@@ -84,7 +84,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 include $template_path;
             }
             wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.js', array('jquery'), '1.0', true);
+            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.min.js', array('jquery'), '1.0', true);
             wp_localize_script(
                 'payplus-hosted',
                 'payplus_script_hosted',
@@ -95,7 +95,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     "isSavingCerditCards" => boolval(isset($this->payPlusGateway->settings['create_pp_token']) && $this->payPlusGateway->settings['create_pp_token'] === 'yes'),
                     'ajax_url' => admin_url('admin-ajax.php'),
                     "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
-                    'dddd' => 'ddd',
+                    'testMode' => $this->testMode,
                     'frontNonce' => wp_create_nonce('frontNonce'),
                     'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
                 ]
