@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.7] = 24-11-2024 - (PrimeWithFix2 :)
+
+* Fix     - Small fix for refund invoices - removed usage of saved payloads.
+
 ## [7.2.6] = 24-11-2024 - (PrimeWithFix)
 
 * Fix     - Loading iframe issue in redirect and on the next page fixed.

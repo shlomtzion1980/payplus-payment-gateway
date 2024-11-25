@@ -86,6 +86,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.2.7 - 24-11-2024 = 
+
+* Fix     - Small fix for refund invoices - removed usage of saved payloads.
+
 = 7.2.6 - 24-11-2024 = 
 
 * Fix     - Loading iframe issue in redirect and on the next page fixed.
