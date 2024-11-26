@@ -223,7 +223,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'title' => __('Hide Number Of Payments In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
-                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '0' => __('Use global default', 'payplus-payment-gateway'),
                     '1' => __('Yes', 'payplus-payment-gateway'),
                     '2' => __('No', 'payplus-payment-gateway'),
                 ],

@@ -237,7 +237,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Transactions Type', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
-                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '0' => __('Use global default', 'payplus-payment-gateway'),
                     '1' => __('Charge', 'payplus-payment-gateway'),
                     '2' => __('Authorization', 'payplus-payment-gateway'),
                 ],
@@ -337,7 +337,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
-                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '0' => __('Use global default', 'payplus-payment-gateway'),
                     '1' => __('Yes', 'payplus-payment-gateway'),
                     '2' => __('No', 'payplus-payment-gateway'),
                 ],
@@ -349,7 +349,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Hide Number Of Payments In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => [
-                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '0' => __('Use global default', 'payplus-payment-gateway'),
                     '1' => __('Yes', 'payplus-payment-gateway'),
                     '2' => __('No', 'payplus-payment-gateway'),
                 ],
