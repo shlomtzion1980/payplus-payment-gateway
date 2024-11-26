@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.2.9] = 26-11-2024 - (Ironhide) 
+
+* Added   - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
+* Tweak   - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
+
 ## [7.2.8] = 25-11-2024 - (PrimeWithFix3 :)
 
 * Fix     - Fix - PayPlus Embedded origin for testmode and production.
