@@ -414,7 +414,7 @@ class WC_PayPlus_Form_Fields
             'callback_addr' => [
                 'title' => __('Callback url', 'payplus-payment-gateway'),
                 'type' => 'url',
-                'description' => __('To receive transaction information you need a web address', 'payplus-payment-gateway'),
+                'description' => __('To receive transaction information you need a web address<br>(Only http:// or https:// links are applicable)', 'payplus-payment-gateway'),
                 'default' => '',
             ],
             'send_products' => [

@@ -64,6 +64,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $successful_order_status;
     public $failure_order_status;
     public $callback_addr;
+    public $allowSendCallBack;
     public $logging;
     public $fire_completed;
     public $invoice_lang;
@@ -190,6 +191,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->successful_order_status = $this->get_option('successful_order_status');
         $this->failure_order_status = $this->get_option('failure_order_status');
         $this->callback_addr = $this->get_option('callback_addr');
+        $this->allowSendCallBack = isset($this->callback_addr) && (strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0) ? true : false;
+
         $this->logging = wc_get_logger();
         $this->fire_completed = $this->get_option('fire_completed') == 'yes' ? true : false;
         $this->invoice_lang = $this->get_option('invoice_lang') == 'en' ? 'en' : '';
@@ -286,6 +289,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Call parent method to handle saving settings.
         $saved = parent::process_admin_options();
 
+
         // Check if settings were saved successfully
         if ($saved) {
             // Set a transient to display the notice on the next page load.
@@ -298,6 +302,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         // Only show the notice if the transient is set.
         if (get_transient('payplus_admin_notice')) {
+            if (
+                isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
+                $_GET['page'] === 'wc-settings' &&
+                $_GET['tab'] === 'checkout' &&
+                $_GET['section'] === 'payplus-payment-gateway'
+            ) {
+                if (!empty($this->callback_addr)) {
+                    $alert = strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0 ? true : false;
+
+                    !$alert ? $message = 'Sorry we only support https:// or http:// the callback will not be fired.' : $message = false;
+
+                    if ($message) {
+?>
+                        <div class="notice notice-error is-dismissible">
+                            <p><?php esc_html_e($message, 'payplus-payment-gateway'); ?></p>
+                        </div>
+                <?php
+                        delete_transient('payplus_admin_notice');
+                    }
+                }
+            }
+
             // Display the notice.
             if (
                 isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
@@ -305,7 +331,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $_GET['tab'] === 'checkout' &&
                 $_GET['section'] === 'payplus-payment-gateway-hostedfields'
             ) {
-?>
+                ?>
                 <div class="notice notice-success is-dismissible">
                     <p><?php esc_html_e('It is recommended to change the names and description of the main PayPlus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?></p>
                 </div>
@@ -2316,7 +2342,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payplusHash = isset($_SERVER['HTTP_HASH']) ? sanitize_text_field($_SERVER['HTTP_HASH']) : ""; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
         if ($payplusGenHash === $payplusHash) {
-            if ($this->callback_addr) {
+            if ($this->callback_addr && $this->allowSendCallBack) {
                 $url = $this->callback_addr;
                 // Set up the request arguments
                 $args = array(
