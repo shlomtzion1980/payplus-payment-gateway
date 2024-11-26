@@ -218,6 +218,20 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => '3'
             ]
         ];
+        if ($this->id === 'payplus-payment-gateway-googlepay' || $this->id === 'payplus-payment-gateway-applepay') {
+            $this->form_fields['hide_payments_field'] = [
+                'title' => __('Hide Number Of Payments In Payment Page', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'options' => [
+                    '0' => __('Payment Page Default Setting', 'payplus-payment-gateway'),
+                    '1' => __('Yes', 'payplus-payment-gateway'),
+                    '2' => __('No', 'payplus-payment-gateway'),
+                ],
+                'default' => '0',
+                'description' => __('Hide the option to choose more than one payment.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ];
+        }
         if ($this->id === 'payplus-payment-gateway-multipass') {
             unset($this->form_fields['sub_hide_other_charge_methods']);
         }
@@ -304,6 +318,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 100;
         $this->settings['hosted_fields_payments_amount'] = isset($subOptionsettings['hosted_fields_payments_amount']) ? $subOptionsettings['hosted_fields_payments_amount'] : 3;
         $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';
+        $this->settings['hide_payments_field'] = isset($subOptionsettings['hide_payments_field']) ? $subOptionsettings['hide_payments_field'] : 'no';
         $this->settings['hide_loader_logo'] = isset($subOptionsettings['hide_loader_logo']) ? $subOptionsettings['hide_loader_logo'] : 'no';
         $this->settings['hosted_fields_is_main'] = isset($subOptionsettings['hosted_fields_is_main']) ? $subOptionsettings['hosted_fields_is_main'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
