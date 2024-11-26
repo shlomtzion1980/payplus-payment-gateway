@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.2.7] = 24-11-2024 - (PrimeWithFix2 :)
+## [7.2.8] = 25-11-2024 - (PrimeWithFix3 :)
+
+* Fix     - Fix - PayPlus Embedded origin for testmode and production.
+
+## [7.2.7] = 25-11-2024 - (PrimeWithFix2 :)
 
 * Fix     - Small fix for refund invoices - removed usage of saved payloads.
 
