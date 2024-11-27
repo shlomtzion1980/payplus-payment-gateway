@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.0] = 27-11-2024 - (Ratchet)
+
+* Fix     - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
+
 ## [7.2.9] = 26-11-2024 - (Ironhide) 
 
 * Added   - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
