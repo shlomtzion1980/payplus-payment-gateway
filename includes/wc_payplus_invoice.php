@@ -373,7 +373,18 @@ class PayplusInvoice
             } else {
                 $method_payment = 'other';
                 $otherMethod = strtolower($order->get_payment_method_title());
-                if (strpos($otherMethod, 'paypal') !== false) {
+                $orOtherMethod = strtolower($order->get_payment_method());
+                $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
+
+                $found_in_other = array_filter($search_terms, function ($term) use ($otherMethod) {
+                    return strpos($otherMethod, $term) !== false;
+                });
+
+                $found_in_or_other = array_filter($search_terms, function ($term) use ($orOtherMethod) {
+                    return strpos($orOtherMethod, $term) !== false;
+                });
+
+                if (!empty($found_in_other) || !empty($found_in_or_other)) {
                     $method_payment = 'paypal';
                 }
                 $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
@@ -1039,8 +1050,20 @@ class PayplusInvoice
                             $paymentArray['price'] = ($dual * $totalCartAmount) * 100;
                             $resultApps[] = (object) $paymentArray;
                         } else {
+                            $method_payment = 'other';
                             $otherMethod = strtolower($order->get_payment_method_title());
-                            if (strpos($otherMethod, 'paypal') !== false) {
+                            $orOtherMethod = strtolower($order->get_payment_method());
+                            $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
+
+                            $found_in_other = array_filter($search_terms, function ($term) use ($otherMethod) {
+                                return strpos($otherMethod, $term) !== false;
+                            });
+
+                            $found_in_or_other = array_filter($search_terms, function ($term) use ($orOtherMethod) {
+                                return strpos($orOtherMethod, $term) !== false;
+                            });
+
+                            if (!empty($found_in_other) || !empty($found_in_or_other)) {
                                 $method_payment = 'paypal';
                             }
                             $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
