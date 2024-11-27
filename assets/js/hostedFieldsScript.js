@@ -129,6 +129,51 @@ function putHostedFields() {
     }
 }
 
+function showError(message, code) {
+    const errorMessageDiv = document.querySelector(".payment-error-message");
+    const loaderCountdown = document.querySelector(".loader-countdown");
+    const circle = document.querySelector(".progress-ring__circle");
+    const errorMessage = document.querySelector(".error-message");
+    const errorCode = document.querySelector(".error-code");
+
+    errorMessageDiv.style.display = "flex";
+    errorMessage.innerText = message;
+    errorCode.innerText = code;
+
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+
+    // Set circle circumference
+    circle.style.strokeDasharray = `${circumference}`;
+    circle.style.strokeDashoffset = "0";
+
+    let countdown = 5;
+
+    const updateLoader = () => {
+        // Update countdown number
+        loaderCountdown.textContent = countdown;
+
+        // Calculate stroke-dashoffset for the "drain" effect
+        const offset = circumference - (countdown / 5) * circumference + 15;
+        circle.style.strokeDashoffset = offset;
+
+        // If countdown is complete, hide the error message
+        if (countdown <= 0) {
+            clearInterval(timer);
+            errorMessageDiv.style.display = "none";
+        }
+
+        countdown--;
+    };
+
+    // Start the countdown
+    const timer = setInterval(updateLoader, 1000);
+}
+
+// setTimeout(() => {
+//     showError("שגיאה: סירוב. העסקה לא אושרה", "קוד שגיאה: 4");
+// }, 10000);
+
 jQuery(() => {
     const isCheckout = !document.querySelector(
         'div[data-block-name="woocommerce/checkout"]'
