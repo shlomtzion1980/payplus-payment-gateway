@@ -156,8 +156,19 @@ function showError(message, code) {
   loaderCountdown.textContent = countdown;
   showElement(errorMessageDiv, "flex");
   // errorMessageDiv.style.display = "flex";
-  errorMessage.innerText = message;
-  errorCode.innerText = code;
+
+  let errorCodePrefix;
+  let errorMessagePrefix = pageLang !== "en-US" ? "שגיאה: " : "Error: ";
+  errorMessage.innerText = errorMessagePrefix + message;
+
+  if (typeof code !== "string") {
+    errorCodePrefix = pageLang !== "en-US" ? "קוד שגיאה: " : "Error code: ";
+  } else {
+    errorCodePrefix = pageLang !== "en-US" ? "שדה: " : "Field: ";
+  }
+
+  errorCode.innerText =
+    code.toString().length > 0 ? errorCodePrefix + code : code;
 
   const radius = circle.r.baseVal.value;
   const circumference = 2 * Math.PI * radius;
