@@ -129,6 +129,23 @@ function putHostedFields() {
     }
 }
 
+function showElement(element, display) {
+    element.style.display = display; // Set display to block
+    element.style.opacity = "1"; // Fully visible
+    element.style.transition = "opacity 1s"; // Slow transition (1 second)
+    setTimeout(() => {
+        element.style.opacity = "1"; // Fade in
+    }, 10); // Small delay to ensure the transition applies
+}
+
+function hideElement(element) {
+    element.style.opacity = "0"; // Fade out
+    element.style.transition = "opacity 1s"; // Slow transition (1 second)
+    setTimeout(() => {
+        element.style.display = "none"; // Hide after fade-out
+    }, 1000); // Match the transition duration (1s = 1000ms)
+}
+
 function showError(message, code) {
     const errorMessageDiv = document.querySelector(".payment-error-message");
     const loaderCountdown = document.querySelector(".loader-countdown");
@@ -136,7 +153,8 @@ function showError(message, code) {
     const errorMessage = document.querySelector(".error-message");
     const errorCode = document.querySelector(".error-code");
 
-    errorMessageDiv.style.display = "flex";
+    showElement(errorMessageDiv, "flex");
+    // errorMessageDiv.style.display = "flex";
     errorMessage.innerText = message;
     errorCode.innerText = code;
 
@@ -158,21 +176,18 @@ function showError(message, code) {
         circle.style.strokeDashoffset = offset;
 
         // If countdown is complete, hide the error message
-        if (countdown <= 0) {
+        if (countdown === 1) {
             clearInterval(timer);
-            errorMessageDiv.style.display = "none";
+            // errorMessageDiv.style.display = "none";
+            hideElement(errorMessageDiv);
+        } else {
+            countdown--;
         }
-
-        countdown--;
     };
 
     // Start the countdown
     const timer = setInterval(updateLoader, 1000);
 }
-
-// setTimeout(() => {
-//     showError("שגיאה: סירוב. העסקה לא אושרה", "קוד שגיאה: 4");
-// }, 10000);
 
 jQuery(() => {
     const isCheckout = !document.querySelector(
@@ -362,7 +377,9 @@ hf.Upon("pp_responseFromServer", (e) => {
         : false;
 
     if (e.detail?.data?.error || e.detail?.data?.status === "reject") {
-        alert(e.detail.data.message);
+        console.log(e.detail.data);
+        // alert(e.detail.data.message);
+        showError(e.detail.data.message, "");
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
         overlay(true);
         isCheckout ? location.reload() : null;
@@ -374,9 +391,15 @@ hf.Upon("pp_responseFromServer", (e) => {
             e.detail.errors[0].message === null
                 ? e.detail.results.description
                 : e.detail.errors[0].message;
+        let errorCode =
+            e.detail.errors[0].message === null
+                ? e.detail.results.error_code
+                : e.detail.errors[0].field;
 
         const ifError = (event) => {
-            alert(errorMessage);
+            // alert(errorMessage);
+            console.log(e.detail);
+            showError(errorMessage, errorCode);
             jQuery(".blocks-payplus_loader_hosted").fadeOut();
             overlay(true);
             return;

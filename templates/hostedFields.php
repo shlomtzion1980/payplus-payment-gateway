@@ -6,6 +6,8 @@ $locale = get_locale();
 $rowDirection = $locale !== "he_IL" ? "row" : "row-reverse";
 $direction = $locale !== "he_IL" ? "right" : "left";
 $opposite = $locale !== "he_IL" ?  "left" : "right";
+$cssDirection = $locale !== "he_IL" ?  "ltr" : "rtl";
+$cssOpposite = $locale !== "he_IL" ?  "rtl" : "ltr";
 $hostedIcons = WC_PayPlus_Statics::getHostedIcons();
 $numPaymentsAllowed = $this->payplus_gateway->hostedFieldsOptions['hosted_fields_payments_amount'];
 $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 and min 1
@@ -365,6 +367,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                 display: none;
                 align-items: center;
                 justify-content: space-between;
+                direction: <?php echo esc_attr($cssOpposite); ?>;
                 /* background-color: #ffe6e6; */
                 /* Light red background */
                 color: #FF3366;
@@ -414,12 +417,12 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
 
 
             .error-details {
-                width: 90%;
+                width: 80%;
 
                 p {
                     font-size: 14px;
                     line-height: 18px;
-                    text-align: right;
+                    text-align: <?php echo esc_attr($opposite); ?>;
                 }
             }
 
