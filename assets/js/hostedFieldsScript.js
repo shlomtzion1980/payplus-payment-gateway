@@ -377,8 +377,6 @@ hf.Upon("pp_responseFromServer", (e) => {
         : false;
 
     if (e.detail?.data?.error || e.detail?.data?.status === "reject") {
-        console.log(e.detail.data);
-        // alert(e.detail.data.message);
         showError(e.detail.data.message, "");
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
         overlay(true);
@@ -397,8 +395,6 @@ hf.Upon("pp_responseFromServer", (e) => {
                 : e.detail.errors[0].field;
 
         const ifError = (event) => {
-            // alert(errorMessage);
-            console.log(e.detail);
             showError(errorMessage, errorCode);
             jQuery(".blocks-payplus_loader_hosted").fadeOut();
             overlay(true);
