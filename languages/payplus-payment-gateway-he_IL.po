@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-11-26 16:26+0200\n"
-"PO-Revision-Date: 2024-11-26 16:27+0200\n"
+"POT-Creation-Date: 2024-11-28 12:25+0200\n"
+"PO-Revision-Date: 2024-11-28 12:29+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -227,22 +227,22 @@ msgstr ""
 "הסתיימה בהצלחה (מעל אופציה זו)."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:150
-#: includes/class-wc-payplus-form-fields.php:507
+#: includes/class-wc-payplus-form-fields.php:508
 msgid "Transaction data in order notes"
 msgstr "שמירת מידע עסקאות בהערות הזמנה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:151
-#: includes/class-wc-payplus-form-fields.php:508
+#: includes/class-wc-payplus-form-fields.php:509
 msgid "Save PayPlus transaction data to the order notes"
 msgstr "שמירת מידע פייפלוס אודות עסקאות בהערות הזמנה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:158
-#: includes/class-wc-payplus-form-fields.php:515
+#: includes/class-wc-payplus-form-fields.php:516
 msgid "Show PayPlus Metabox"
 msgstr "הצגת תיבת מידע פייפלוס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:159
-#: includes/class-wc-payplus-form-fields.php:516
+#: includes/class-wc-payplus-form-fields.php:517
 msgid "Show the transaction data in the PayPlus dedicated metabox"
 msgstr ""
 "הצגת מידע פייפלוס אודות עסקאות בתיבת מידע ייעודית בעמוד ההזמנה בפאנל הניהול"
@@ -589,7 +589,7 @@ msgstr ""
 "להזמנות אשר שולמו במזומן (תשלום לשליח) או בהעברה בנקאית."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:407
-#: includes/class-wc-payplus-form-fields.php:555
+#: includes/class-wc-payplus-form-fields.php:556
 msgid "Logging"
 msgstr "שמור לוגים לגבי פעילות הקשורה לתוסף הסליקה של פייפלוס"
 
@@ -874,7 +874,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1163
 #: includes/admin/class-wc-payplus-admin.php:1191
-#: includes/class-wc-payplus-statics.php:393 templates/hostedFields.php:563
+#: includes/class-wc-payplus-statics.php:393 templates/hostedFields.php:646
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1197,7 +1197,7 @@ msgstr "כותרת"
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:177 templates/hostedFields.php:577
+#: includes/class-wc-payplus-form-fields.php:177 templates/hostedFields.php:674
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
@@ -1535,39 +1535,49 @@ msgstr "הפעלה/כיבוי של אוטומצית Cron פייפלוס."
 
 #: includes/class-wc-payplus-form-fields.php:487
 msgid ""
-"This checks all orders created within the last 2 hours and are in \"pending"
-"\" status and verifies the PayPlus IPN Process."
+"PayPlus cron processes \"cancelled\" or \"pending\" orders that are over 30 "
+"minutes old, created today, have a payment_page_uid, and do not have the "
+"cron test flag (to avoid retesting already tested orders).\n"
+"Orders that were successful and cancelled manually will not be tested or "
+"updated via cron."
 msgstr ""
-"בודק את כל ההזמנות אשר נוצרו בשעתיים האחרונות, נמצאות בסטטוס \"ממתין לתשלום"
-"\" ומכילות ID של עמוד תשלום, אם אלו קיימים מריץ את תהליך ה IPN ומעדכן אותן."
+"קרון PayPlus מעבד הזמנות בסטטוסים \"מבוטל\" או \"בהמתנה\" שגילן מעל 30 דקות, "
+"שנוצרו היום, יש להן payment_page_uid, ואין להן את דגל הבדיקה של הקרון (כדי "
+"להימנע מבדיקת הזמנות שכבר נבדקו).\n"
+"הזמנות שבוצעו בהצלחה ובוטלו ידנית לא ייבדקו או יעודכנו על ידי הקרון.The "
+"\"PayPlus Orders Check\" button checks all orders created within the last "
+"day are in \"pending\" status or \"cancelled\" and contain "
+"\"payplus_page_request_uid\". It verifies the PayPlus IPN Process and sets "
+"the correct status if needded."
 
-#: includes/class-wc-payplus-form-fields.php:491
+#: includes/class-wc-payplus-form-fields.php:492
 msgid "Display PayPlus \"Orders Check Button\""
 msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד"
 
-#: includes/class-wc-payplus-form-fields.php:492
+#: includes/class-wc-payplus-form-fields.php:493
 msgid "Show PayPlus \"Orders Check Button\" on the side menu."
 msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד."
 
-#: includes/class-wc-payplus-form-fields.php:495
+#: includes/class-wc-payplus-form-fields.php:496
 msgid ""
 "The \"PayPlus Orders Check\" button checks all orders created within the "
-"last day are in \"pending\" status and contain \"payplus_page_request_uid\". "
-"It verifies the PayPlus IPN Process and sets the correct status if needded."
+"last day are in \"pending\" status or \"cancelled\" and contain "
+"\"payplus_page_request_uid\". It verifies the PayPlus IPN Process and sets "
+"the correct status if needded."
 msgstr ""
-"בודק את כל ההזמנות אשר נוצרו ביממה האחרונה, נמצאות בסטטוס \"ממתין לתשלום\" "
-"ומכילות ID של עמוד תשלום, אם אלו קיימים מריץ את תהליך ה IPN ומעדכן אותן - רק "
-"דרך לחיצת הכפתור."
+"כפתור \"בדיקת הזמנות PayPlus\" בודק את כל ההזמנות שנוצרו במהלך היום האחרון, "
+"נמצאות בסטטוס \"בהמתנה\" או \"מבוטל\", ומכילות payplus_page_request_uid.\n"
+"הכפתור מאמת את תהליך ה-IPN של PayPlus ומעדכן את הסטטוס הנכון במידת הצורך."
 
-#: includes/class-wc-payplus-form-fields.php:499
+#: includes/class-wc-payplus-form-fields.php:500
 msgid "Display PayPlus Subgateways on the side menu"
 msgstr "הצגת כל שיטות התשלום של פייפלוס בתפריט הצד"
 
-#: includes/class-wc-payplus-form-fields.php:500
+#: includes/class-wc-payplus-form-fields.php:501
 msgid "Show all subgatways on the side menu."
 msgstr "הצגת כל שיטות התשלום של פייפלוס בתפריט הצד."
 
-#: includes/class-wc-payplus-form-fields.php:503
+#: includes/class-wc-payplus-form-fields.php:504
 msgid ""
 "If the side menu is displayed and this is enabled the subgateways will also "
 "be displayed."
@@ -1575,7 +1585,7 @@ msgstr ""
 "אם תפריט הצד של פייפלוס מוצג ואפשרות זו דלוקה, יוצגו בתפריט הצד כל \"שערי "
 "התשלום\" האפשריים של פייפלוס."
 
-#: includes/class-wc-payplus-form-fields.php:511
+#: includes/class-wc-payplus-form-fields.php:512
 msgid ""
 "Whenever a transaction is done add the payplus data to the order note."
 "<br>This data also appears in the PayPlus Data metabox."
@@ -1583,7 +1593,7 @@ msgstr ""
 "בכל פעם שעסקה מבוצעת - מידע העסקה יישמר בהערות ההזמנה (אותו מידע שמוצג בתיבת "
 "מידע פייפלוס)"
 
-#: includes/class-wc-payplus-form-fields.php:519
+#: includes/class-wc-payplus-form-fields.php:520
 msgid ""
 "Adds the PayPlus transaction data in a dedicated metabox on the side in the "
 "order page."
@@ -1591,15 +1601,15 @@ msgstr ""
 "מידע אודות העסקאות שנעשו דרך פייפלוס יופיע בתיבה ייעודית של פייפלוס בעמוד "
 "ההזמנה ויתעדכן בצורה דינמית."
 
-#: includes/class-wc-payplus-form-fields.php:523
+#: includes/class-wc-payplus-form-fields.php:524
 msgid "Legacy post meta support"
 msgstr "תמיכה בשדות מטה מדור קודם"
 
-#: includes/class-wc-payplus-form-fields.php:525
+#: includes/class-wc-payplus-form-fields.php:526
 msgid "Slower! (For stores that support HPOS with old fields used)"
 msgstr "איטי יותר! (עבור חנויות התומכות ב-HPOS)"
 
-#: includes/class-wc-payplus-form-fields.php:526
+#: includes/class-wc-payplus-form-fields.php:527
 msgid ""
 "Check this to view orders meta data created before HPOS was enabled on your "
 "store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce "
@@ -1609,33 +1619,33 @@ msgstr ""
 "זו לא משפיעה על חנויות ללא תמיכה בשדות מהדור החדש <br> אם ברצונך להפחית "
 "קריאות מיותרות לדאטה בייס ויש תמיכה בשדות מהדור החדש, מומלץ לבטל את הבחירה."
 
-#: includes/class-wc-payplus-form-fields.php:531
+#: includes/class-wc-payplus-form-fields.php:532
 msgid "Hide the top menu"
 msgstr "הסתרת תפריט עליון"
 
-#: includes/class-wc-payplus-form-fields.php:533
-#: includes/class-wc-payplus-form-fields.php:535
+#: includes/class-wc-payplus-form-fields.php:534
+#: includes/class-wc-payplus-form-fields.php:536
 msgid "Hide the PayPlus top menu"
 msgstr "הסתרת התפריט העליון של פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:538
+#: includes/class-wc-payplus-form-fields.php:539
 msgid "Hide the side menu"
 msgstr "הסתרת תפריט צד"
 
-#: includes/class-wc-payplus-form-fields.php:540
-#: includes/class-wc-payplus-form-fields.php:542
+#: includes/class-wc-payplus-form-fields.php:541
+#: includes/class-wc-payplus-form-fields.php:543
 msgid "Hide the PayPlus side menu"
 msgstr "הסתרת תפריט הצד של פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:545
+#: includes/class-wc-payplus-form-fields.php:546
 msgid "Disable custom fields editing in orders"
 msgstr ""
 
-#: includes/class-wc-payplus-form-fields.php:550
+#: includes/class-wc-payplus-form-fields.php:551
 msgid "Disable woocommerce scheduler"
 msgstr "השבת את מתזמן WooCommerce"
 
-#: includes/class-wc-payplus-form-fields.php:557
+#: includes/class-wc-payplus-form-fields.php:558
 msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
@@ -1855,18 +1865,18 @@ msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1809 includes/wc_payplus_invoice.php:789
+#: includes/wc_payplus_gateway.php:1809 includes/wc_payplus_invoice.php:800
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1835 includes/wc_payplus_invoice.php:751
+#: includes/wc_payplus_gateway.php:1835 includes/wc_payplus_invoice.php:762
 msgid "Shipping"
 msgstr "משלוח"
 
 #: includes/wc_payplus_gateway.php:1857 includes/wc_payplus_gateway.php:1858
 #: includes/wc_payplus_gateway.php:1878 includes/wc_payplus_gateway.php:1879
-#: includes/wc_payplus_invoice.php:778 includes/wc_payplus_invoice.php:779
-#: includes/wc_payplus_invoice.php:811 includes/wc_payplus_invoice.php:812
+#: includes/wc_payplus_invoice.php:789 includes/wc_payplus_invoice.php:790
+#: includes/wc_payplus_invoice.php:822 includes/wc_payplus_invoice.php:823
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
@@ -1918,27 +1928,27 @@ msgstr "חידוש המנוי בפיי פלוס נכשל<br/>מספר אישור
 msgid "General Customer - לקוח כללי"
 msgstr ""
 
-#: includes/wc_payplus_invoice.php:435
+#: includes/wc_payplus_invoice.php:446
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:511
+#: includes/wc_payplus_invoice.php:522
 msgid "Invoice+ Documents"
 msgstr "מסמכי חשבונית+"
 
-#: includes/wc_payplus_invoice.php:1061 includes/wc_payplus_invoice.php:1079
-#: includes/wc_payplus_invoice.php:1101
+#: includes/wc_payplus_invoice.php:1084 includes/wc_payplus_invoice.php:1102
+#: includes/wc_payplus_invoice.php:1124
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:1113
+#: includes/wc_payplus_invoice.php:1136
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
 msgstr ""
 "לא נשלח מספר יתרה ליצירת חשבונית מכיוון שיש לך יותר ממוצר אחד עם מספר יתרה"
 
-#: includes/wc_payplus_invoice.php:1159
+#: includes/wc_payplus_invoice.php:1182
 msgid "Link Document  "
 msgstr "לינק מסמך "
 
@@ -2230,39 +2240,39 @@ msgid ""
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:119
+#: templates/hostedFields.php:121
 msgid "Processing..."
 msgstr "בתהליך..."
 
-#: templates/hostedFields.php:489
+#: templates/hostedFields.php:572
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:505
+#: templates/hostedFields.php:588
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:509
+#: templates/hostedFields.php:592
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:513
+#: templates/hostedFields.php:596
 msgid "Invoice Name"
 msgstr "הנפק חשבונית / קבלה על שם"
 
-#: templates/hostedFields.php:518
+#: templates/hostedFields.php:601
 msgid "Phone"
 msgstr "טלפון"
 
-#: templates/hostedFields.php:542
+#: templates/hostedFields.php:625
 msgid "Card number"
 msgstr "מידע על הכרטיס"
 
-#: templates/hostedFields.php:570
+#: templates/hostedFields.php:653
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:574
+#: templates/hostedFields.php:671
 msgid "Powered by "
 msgstr ""
 
@@ -2287,6 +2297,14 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid ""
+#~ "This checks all orders created within the last 2 hours and are in "
+#~ "\"pending\" status and verifies the PayPlus IPN Process."
+#~ msgstr ""
+#~ "בודק את כל ההזמנות אשר נוצרו בשעתיים האחרונות, נמצאות בסטטוס \"ממתין "
+#~ "לתשלום\" ומכילות ID של עמוד תשלום, אם אלו קיימים מריץ את תהליך ה IPN "
+#~ "ומעדכן אותן."
 
 #~ msgid "Payment Page Default Setting"
 #~ msgstr "הגדרות ברירת מחדל בדף תשלום"
