@@ -386,7 +386,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $hostedResponse = WC()->session->get('hostedPayload');
-        $hostedResponseArray = json_decode($hostedResponse, true);
 
         $data->amount = number_format($totalAmount, 2, '.', '');
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
