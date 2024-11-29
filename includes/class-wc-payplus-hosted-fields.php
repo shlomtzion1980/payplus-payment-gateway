@@ -267,7 +267,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($this->payPlusGateway->settings['transaction_type']);
-
         /**
          * Origin domain is the domain of the page that is requesting the payment page.
          * This is necessary for the hosted fields to be able to communicate with the client website.
@@ -290,6 +289,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->customer->postal_code = $customer['postal_code'];
             $data->customer->country_iso = $customer['country_iso'];
             $data->customer->customer_external_number = $order->get_customer_id();
+            $payingVat = isset($this->payPlusGateway->settings['paying_vat']) && in_array($this->payPlusGateway->settings['paying_vat'], [0, 1, 2]) ? $this->payPlusGateway->settings['paying_vat'] : false;
+            if ($payingVat) {
+                $payingVat = $payingVat === "0" ? true : false;
+                $payingVat = $payingVat === "1" ? false : true;
+                $payingVat = $payingVat === "2" ? ($customer['country_iso'] !== trim(strtolower($this->payPlusGateway->settings['paying_vat_iso_code'])) ? false : true) : $payingVat;
+                $data->paying_vat = $payingVat;
+            }
         } else {
             $data->customer = new stdClass();
             $data->customer->customer_name = "$billing_first_name $billing_last_name";
