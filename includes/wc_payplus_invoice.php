@@ -298,10 +298,8 @@ class PayplusInvoice
      */
     public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
     {
-        // $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
-        // if ($payPlusPayloadInvoice) {
-        //     return $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund);
-        // }
+        $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
+        !empty($payPlusPayloadInvoice) ? $payloadInvoiceData = $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund) : null;
 
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $payload = array();
@@ -320,29 +318,31 @@ class PayplusInvoice
 
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+        $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
 
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
         }
         if (!empty($payplusTransactionUid)) {
-            $payload['transaction_uuid'] = $payplusTransactionUid;
+            $payload['transaction_uuid'] = $payloadInvoiceData ? $payloadInvoiceData['transaction_uuid'] : $payplusTransactionUid;
         }
         $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+
         $payplusBalanceNames = $objectProducts->balanceNames;
 
         if ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
-            $productsItems = $objectProducts->productsItems;
-            $sum = $objectProducts->amount;
+            $productsItems = $payloadInvoiceData ? $payloadInvoiceData['items'] : $objectProducts->productsItems;
+            $sum = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : $objectProducts->amount;
         }
 
-        $payload['currency_code'] = $order->get_currency();
-        $payload['autocalculate_rate'] = true;
-        $payload['totalAmount'] = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
-        $payload['language'] = $payplus_invoice_option['payplus_langrage_invoice'];
+        $payload['currency_code'] = $payloadInvoiceData ? $payloadInvoiceData['currency_code'] : $order->get_currency();
+        $payload['autocalculate_rate'] = $payloadInvoiceData ? $payloadInvoiceData['autocalculate_rate'] : true;
+        $payload['totalAmount'] = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : round($sum, $WC_PayPlus_Gateway->rounding_decimals);
+        $payload['language'] = $payloadInvoiceData ? $payloadInvoiceData['language'] : $payplus_invoice_option['payplus_langrage_invoice'];
         $payload['more_info'] = $order_id;
 
         if (count($productsItems) && !$this->hide_products_invoice) {
-            $payload['items'] = $productsItems;
+            $payload['items'] = $payloadInvoiceData ? $payloadInvoiceData['items'] : $productsItems;
         } else {
             $sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
@@ -355,8 +355,8 @@ class PayplusInvoice
             );
         }
 
-        $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
-        $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
+        $payload['send_document_email'] = $payloadInvoiceData ? $payloadInvoiceData['send_document_email'] : $this->payplus_invoice_send_document_email;
+        $payload['send_document_sms'] = $payloadInvoiceData ? $payloadInvoiceData['send_document_sms'] : $this->payplus_invoice_send_document_sms;
 
         if (!empty($unique_identifier)) {
             $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
