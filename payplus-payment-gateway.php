@@ -702,662 +702,675 @@ class WC_PayPlus
      */
     public function admin_notices()
     {
-        $output = '';
-        $title = esc_html__('PayPlus Payment Gateway', 'payplus-payment-gateway');
-        if (count($this->notices)) {
-            foreach ($this->notices as $notice) {
-                $class = esc_attr($notice['class']);
-                $message = esc_html($notice['message']);
-                $output .= "<div class='$class'><p><b>$title:</b> $message</p></div>";
-            }
-        }
-        echo wp_kses_post($output);
-    }
-
-    /**
-     * @param array $links
-     * @return array|string[]
-     */
-    public static function plugin_action_links($links)
-    {
-        $action_links = [
-            'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . esc_html__('View PayPlus Settings', 'payplus-payment-gateway') . '">' . esc_html__('Settings', 'payplus-payment-gateway') . '</a>',
-        ];
-        $links = array_merge($action_links, $links);
-
-        return $links;
-    }
-
-    /**
-     * @return void
-     */
-    public function init()
-    {
-
-        load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-        if (class_exists("WooCommerce")) {
-            $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin-settings.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
-            require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
-
-            add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
-            if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-                add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
-            }
-            add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
-            add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
-            add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
-            if (WP_DEBUG_LOG) {
-                add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);
-            }
-            add_action('woocommerce_review_order_before_submit', [$this, 'payplus_view_iframe_payment'], 1);
-            $this->invoice_api = new PayplusInvoice();
-            add_action('manage_shop_order_posts_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
-            add_action('woocommerce_shop_order_list_table_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
-
-            if ($this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
-
-                add_action('woocommerce_order_status_' . $this->invoice_api->payplus_get_invoice_status_order(), [$this->invoice_api, 'payplus_invoice_create_order']);
-                if ($this->invoice_api->payplus_get_create_invoice_automatic()) {
-                    add_action('woocommerce_order_status_on-hold', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
-                    add_action('woocommerce_order_status_processing', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
+        $integrity_check_result = get_transient('payplus_plugin_integrity_check_failed');
+        if ($integrity_check_result) {
+            delete_transient('payplus_plugin_integrity_check_failed');
+        ?>
+            <div class="notice notice-error is-dismissible">
+                <p>
+                    <strong>PayPlus Plugin Security Warning:</strong> <?php echo esc_html($integrity_check_result); ?>
+                </p>
+            </div><?php
                 }
-            }
 
-            if (
-                $this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings, 'add_product_field_transaction_type')
-                && $this->payplus_payment_gateway_settings->add_product_field_transaction_type == "yes"
-            ) {
-                add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_transaction_type']);
-                add_action('manage_product_posts_columns', [$this, 'payplus_add_order_column_order_product'], 100);
-                add_action('manage_shop_order_posts_custom_column', [$this, 'payplus_add_order_column_order_transaction_type'], 100);
-                add_filter('manage_edit-shop_order_columns', [$this, 'payplus_add_order_column_orders'], 20);
-            }
-            if (
-                $this->payplus_payment_gateway_settings
-                && property_exists($this->payplus_payment_gateway_settings, 'balance_name')
-                && $this->payplus_payment_gateway_settings->balance_name == "yes"
-            ) {
-                add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_balance_name']);
-            }
-
-            add_action('save_post', [$this, 'payplus_save_meta_box_data']);
-            add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
-            payplusUpdateActivate();
-            if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
-                payplus_add_file_ApplePay();
-            }
-        }
-    }
-
-    public function isHostedInitiated()
-    {
-        if (!$this->isHostedInitiated) {
-            $this->isHostedInitiated = true;
-            new WC_PayPlus_HostedFields;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function load_checkout_assets()
-    {
-        $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.min.js');
-        $importAapplepayScript = null;
-        $isModbile = (wp_is_mobile()) ? true : false;
-        $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
-        $custom_icons = property_exists($this->payplus_payment_gateway_settings, 'custom_icons') ? $this->payplus_payment_gateway_settings->custom_icons : false;
-        $customIcons = [];
-        $custom_icons = explode(";", $custom_icons);
-        foreach ($custom_icons as $icon) {
-            $customIcons[] = esc_url($icon);
-        }
-        $isSubscriptionOrder = false;
-
-        if (is_checkout() || is_product()) {
-            if ($this->importApplePayScript && !wp_script_is('applePayScript', 'enqueued') && !$this->is_block_based_checkout()) {
-                wp_register_script('applePayScript', PAYPLUS_PLUGIN_URL . 'assets/js/script.js', array('jquery'), PAYPLUS_VERSION, true);
-                wp_enqueue_script('applePayScript');
-            }
-        }
-
-        if (is_checkout()) {
-            foreach (WC()->cart->get_cart() as $cart_item) {
-                if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
-                    $isSubscriptionOrder = true;
-                    break;
+                $output = '';
+                $title = esc_html__('PayPlus Payment Gateway', 'payplus-payment-gateway');
+                if (count($this->notices)) {
+                    foreach ($this->notices as $notice) {
+                        $class = esc_attr($notice['class']);
+                        $message = esc_html($notice['message']);
+                        $output .= "<div class='$class'><p><b>$title:</b> $message</p></div>";
+                    }
                 }
+                echo wp_kses_post($output);
             }
-            wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=1' . PAYPLUS_VERSION;
-            if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
-                if (!wp_script_is('applePayScript', 'enqueued')) {
-                    if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
-                        $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?var=' . PAYPLUS_VERSION;
+
+            /**
+             * @param array $links
+             * @return array|string[]
+             */
+            public static function plugin_action_links($links)
+            {
+                $action_links = [
+                    'settings' => '<a href="' . admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway') . '" aria-label="' . esc_html__('View PayPlus Settings', 'payplus-payment-gateway') . '">' . esc_html__('Settings', 'payplus-payment-gateway') . '</a>',
+                ];
+                $links = array_merge($action_links, $links);
+
+                return $links;
+            }
+
+            /**
+             * @return void
+             */
+            public function init()
+            {
+
+                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+                if (class_exists("WooCommerce")) {
+                    $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin-settings.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
+
+                    add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+                    if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
+                        add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
+                    }
+                    add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
+                    add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
+                    add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
+                    if (WP_DEBUG_LOG) {
+                        add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);
+                    }
+                    add_action('woocommerce_review_order_before_submit', [$this, 'payplus_view_iframe_payment'], 1);
+                    $this->invoice_api = new PayplusInvoice();
+                    add_action('manage_shop_order_posts_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
+                    add_action('woocommerce_shop_order_list_table_custom_column', [$this->invoice_api, 'payplus_add_order_column_order_invoice'], 100, 2);
+
+                    if ($this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
+
+                        add_action('woocommerce_order_status_' . $this->invoice_api->payplus_get_invoice_status_order(), [$this->invoice_api, 'payplus_invoice_create_order']);
+                        if ($this->invoice_api->payplus_get_create_invoice_automatic()) {
+                            add_action('woocommerce_order_status_on-hold', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
+                            add_action('woocommerce_order_status_processing', [$this->invoice_api, 'payplus_invoice_create_order_automatic']);
+                        }
+                    }
+
+                    if (
+                        $this->payplus_payment_gateway_settings
+                        && property_exists($this->payplus_payment_gateway_settings, 'add_product_field_transaction_type')
+                        && $this->payplus_payment_gateway_settings->add_product_field_transaction_type == "yes"
+                    ) {
+                        add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_transaction_type']);
+                        add_action('manage_product_posts_columns', [$this, 'payplus_add_order_column_order_product'], 100);
+                        add_action('manage_shop_order_posts_custom_column', [$this, 'payplus_add_order_column_order_transaction_type'], 100);
+                        add_filter('manage_edit-shop_order_columns', [$this, 'payplus_add_order_column_orders'], 20);
+                    }
+                    if (
+                        $this->payplus_payment_gateway_settings
+                        && property_exists($this->payplus_payment_gateway_settings, 'balance_name')
+                        && $this->payplus_payment_gateway_settings->balance_name == "yes"
+                    ) {
+                        add_action('add_meta_boxes', [$this, 'payplus_add_product_meta_box_balance_name']);
+                    }
+
+                    add_action('save_post', [$this, 'payplus_save_meta_box_data']);
+                    add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
+                    payplusUpdateActivate();
+                    if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
+                        payplus_add_file_ApplePay();
                     }
                 }
             }
 
-            wp_localize_script(
-                'wc-checkout',
-                'payplus_script_checkout',
-                [
-                    "payplus_import_applepay_script" => $importAapplepayScript,
-                    "payplus_mobile" => $isModbile,
-                    "multiPassIcons" => $multipassIcons,
-                    "customIcons" => $customIcons,
-                    "isLoggedIn" => boolval(get_current_user_id() > 0),
-                    "isSubscriptionOrder" => $isSubscriptionOrder,
-                    "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
-                    "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
-                    "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 100,
-                    "hidePPGateway" => isset($this->hostedFieldsOptions['hide_payplus_gateway']) ? boolval($this->hostedFieldsOptions['hide_payplus_gateway'] === "yes") : false,
-                    "hostedFieldsIsMain" => isset($this->hostedFieldsOptions['hosted_fields_is_main']) ? boolval($this->hostedFieldsOptions['hosted_fields_is_main'] === "yes") : false,
-                    "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
-                    "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
-                ]
-            );
-            if (!is_cart() && !is_product() && !is_shop()) {
-                if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
-                    $this->isHostedInitiated();
+            public function isHostedInitiated()
+            {
+                if (!$this->isHostedInitiated) {
+                    $this->isHostedInitiated = true;
+                    new WC_PayPlus_HostedFields;
                 }
             }
-        }
 
-        $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? $this->isHostedInitiated() : null;
+            /**
+             * @return void
+             */
+            public function load_checkout_assets()
+            {
+                $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.min.js');
+                $importAapplepayScript = null;
+                $isModbile = (wp_is_mobile()) ? true : false;
+                $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
+                $custom_icons = property_exists($this->payplus_payment_gateway_settings, 'custom_icons') ? $this->payplus_payment_gateway_settings->custom_icons : false;
+                $customIcons = [];
+                $custom_icons = explode(";", $custom_icons);
+                foreach ($custom_icons as $icon) {
+                    $customIcons[] = esc_url($icon);
+                }
+                $isSubscriptionOrder = false;
 
-        $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
-        $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
-            (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
-        if (is_checkout() || is_product() || is_cart() || $isElementor) {
-            if (
-                $this->payplus_payment_gateway_settings->enable_design_checkout === "yes" || $isEnableOneClick
+                if (is_checkout() || is_product()) {
+                    if ($this->importApplePayScript && !wp_script_is('applePayScript', 'enqueued') && !$this->is_block_based_checkout()) {
+                        wp_register_script('applePayScript', PAYPLUS_PLUGIN_URL . 'assets/js/script.js', array('jquery'), PAYPLUS_VERSION, true);
+                        wp_enqueue_script('applePayScript');
+                    }
+                }
 
-            ) {
-                $this->payplus_gateway = $this->get_main_payplus_gateway();
-                add_filter('body_class', [$this, 'payplus_body_classes']);
-                wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $script_version);
+                if (is_checkout()) {
+                    foreach (WC()->cart->get_cart() as $cart_item) {
+                        if (get_class($cart_item['data']) === "WC_Product_Subscription" || get_class($cart_item['data']) === "WC_Product_Subscription_Variation") {
+                            $isSubscriptionOrder = true;
+                            break;
+                        }
+                    }
+                    wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=1' . PAYPLUS_VERSION;
+                    if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
+                        if (!wp_script_is('applePayScript', 'enqueued')) {
+                            if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                                $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?var=' . PAYPLUS_VERSION;
+                            }
+                        }
+                    }
 
-                if ($isEnableOneClick) {
-                    $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
-                    wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.min.js', [], $script_version, true);
                     wp_localize_script(
-                        'payplus-front-js',
-                        'payplus_script',
+                        'wc-checkout',
+                        'payplus_script_checkout',
                         [
-                            "payment_url_google_pay_iframe" => $payment_url_google_pay_iframe,
-                            'ajax_url' => admin_url('admin-ajax.php'),
-                            'frontNonce' => wp_create_nonce('frontNonce'),
+                            "payplus_import_applepay_script" => $importAapplepayScript,
+                            "payplus_mobile" => $isModbile,
+                            "multiPassIcons" => $multipassIcons,
+                            "customIcons" => $customIcons,
+                            "isLoggedIn" => boolval(get_current_user_id() > 0),
+                            "isSubscriptionOrder" => $isSubscriptionOrder,
+                            "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
+                            "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
+                            "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 100,
+                            "hidePPGateway" => isset($this->hostedFieldsOptions['hide_payplus_gateway']) ? boolval($this->hostedFieldsOptions['hide_payplus_gateway'] === "yes") : false,
+                            "hostedFieldsIsMain" => isset($this->hostedFieldsOptions['hosted_fields_is_main']) ? boolval($this->hostedFieldsOptions['hosted_fields_is_main'] === "yes") : false,
+                            "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
+                            "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
                         ]
                     );
-                    wp_enqueue_script('payplus-front-js');
+                    if (!is_cart() && !is_product() && !is_shop()) {
+                        if (boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder) {
+                            $this->isHostedInitiated();
+                        }
+                    }
                 }
+
+                $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? $this->isHostedInitiated() : null;
+
+                $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
+                $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
+                    (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
+                if (is_checkout() || is_product() || is_cart() || $isElementor) {
+                    if (
+                        $this->payplus_payment_gateway_settings->enable_design_checkout === "yes" || $isEnableOneClick
+
+                    ) {
+                        $this->payplus_gateway = $this->get_main_payplus_gateway();
+                        add_filter('body_class', [$this, 'payplus_body_classes']);
+                        wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $script_version);
+
+                        if ($isEnableOneClick) {
+                            $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
+                            wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.min.js', [], $script_version, true);
+                            wp_localize_script(
+                                'payplus-front-js',
+                                'payplus_script',
+                                [
+                                    "payment_url_google_pay_iframe" => $payment_url_google_pay_iframe,
+                                    'ajax_url' => admin_url('admin-ajax.php'),
+                                    'frontNonce' => wp_create_nonce('frontNonce'),
+                                ]
+                            );
+                            wp_enqueue_script('payplus-front-js');
+                        }
+                    }
+                }
+
+                wp_enqueue_style('alertifycss', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css', array(), '1.14.0', 'all');
+                wp_register_script('alertifyjs', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js', array('jquery'), '1.14.0', true);
+                wp_enqueue_script('alertifyjs');
             }
-        }
 
-        wp_enqueue_style('alertifycss', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/css/alertify.min.css', array(), '1.14.0', 'all');
-        wp_register_script('alertifyjs', '//cdn.jsdelivr.net/npm/alertifyjs@1.14.0/build/alertify.min.js', array('jquery'), '1.14.0', true);
-        wp_enqueue_script('alertifyjs');
-    }
+            public function is_block_based_checkout()
+            {
+                // Get the WooCommerce Checkout page ID
+                $page_id = get_the_ID();
+                // Check if we're currently on the checkout page
+                if (is_page($page_id)) {
+                    // Get the content of the checkout page
+                    $post = get_post($page_id);
 
-    public function is_block_based_checkout()
-    {
-        // Get the WooCommerce Checkout page ID
-        $page_id = get_the_ID();
-        // Check if we're currently on the checkout page
-        if (is_page($page_id)) {
-            // Get the content of the checkout page
-            $post = get_post($page_id);
+                    // Check if the 'woocommerce/checkout' block is present in the page content
+                    if (has_block('woocommerce/checkout', $post->post_content)) {
+                        // Block-based checkout is active
+                        return true;
+                    }
+                }
 
-            // Check if the 'woocommerce/checkout' block is present in the page content
-            if (has_block('woocommerce/checkout', $post->post_content)) {
-                // Block-based checkout is active
-                return true;
+                // Return false if not a block-based checkout
+                return false;
             }
-        }
 
-        // Return false if not a block-based checkout
-        return false;
-    }
+            /**
+             * @param array $classes
+             * @return array
+             */
+            public function payplus_body_classes($classes)
+            {
+                if ($this->payplus_payment_gateway_settings->enable_design_checkout == "yes") {
+                    $classes[] = 'checkout-payplus';
+                }
+                return $classes;
+            }
 
-    /**
-     * @param array $classes
-     * @return array
-     */
-    public function payplus_body_classes($classes)
-    {
-        if ($this->payplus_payment_gateway_settings->enable_design_checkout == "yes") {
-            $classes[] = 'checkout-payplus';
-        }
-        return $classes;
-    }
-
-    /**
-     * @return void
-     */
-    public function payplus_view_iframe_payment()
-    {
-        $height = $this->payplus_payment_gateway_settings->iframe_height;
-        ob_start();
-        ?>
+            /**
+             * @return void
+             */
+            public function payplus_view_iframe_payment()
+            {
+                $height = $this->payplus_payment_gateway_settings->iframe_height;
+                ob_start();
+                    ?>
         <div class="payplus-option-description-area"></div>
         <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
         <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
-        $html = ob_get_clean();
-        echo wp_kses_post($html);
-    }
-
-    /**
-     * @param array $available_gateways
-     * @return array
-     */
-    public function payplus_applepay_disable_manager($available_gateways)
-    {
-        $currency = strtolower(get_woocommerce_currency());
-        if (
-            isset($available_gateways['payplus-payment-gateway-applepay']) && !is_admin() && isset($_SERVER['HTTP_USER_AGENT']) &&
-            !preg_match('/Mac|iPad|iPod|iPhone/', sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])))
-        ) {
-            unset($available_gateways['payplus-payment-gateway-applepay']);
-        }
-        if (!is_admin() && $currency != 'ils') {
-            $arrPayment = array(
-                'payplus-payment-gateway',
-                'payplus-payment-gateway-bit',
-                'payplus-payment-gateway-googlepay',
-                'payplus-payment-gateway-applepay',
-                'payplus-payment-gateway-paypal',
-            );
-            foreach ($available_gateways as $key => $available_gateway) {
-                if (strpos($key, 'payplus-payment-gateway') && !in_array($key, $arrPayment)) {
-                    unset($available_gateways[$key]);
-                }
+                $html = ob_get_clean();
+                echo wp_kses_post($html);
             }
-        }
-        return $available_gateways;
-    }
-    /*
+
+            /**
+             * @param array $available_gateways
+             * @return array
+             */
+            public function payplus_applepay_disable_manager($available_gateways)
+            {
+                $currency = strtolower(get_woocommerce_currency());
+                if (
+                    isset($available_gateways['payplus-payment-gateway-applepay']) && !is_admin() && isset($_SERVER['HTTP_USER_AGENT']) &&
+                    !preg_match('/Mac|iPad|iPod|iPhone/', sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])))
+                ) {
+                    unset($available_gateways['payplus-payment-gateway-applepay']);
+                }
+                if (!is_admin() && $currency != 'ils') {
+                    $arrPayment = array(
+                        'payplus-payment-gateway',
+                        'payplus-payment-gateway-bit',
+                        'payplus-payment-gateway-googlepay',
+                        'payplus-payment-gateway-applepay',
+                        'payplus-payment-gateway-paypal',
+                    );
+                    foreach ($available_gateways as $key => $available_gateway) {
+                        if (strpos($key, 'payplus-payment-gateway') && !in_array($key, $arrPayment)) {
+                            unset($available_gateways[$key]);
+                        }
+                    }
+                }
+                return $available_gateways;
+            }
+            /*
     ===  Begin Section  field "transaction_type" ==
      */
-    /**
-     * @param $post
-     * @return void
-     */
-    public function payplus_meta_box_product_transaction_type($post)
-    {
+            /**
+             * @param $post
+             * @return void
+             */
+            public function payplus_meta_box_product_transaction_type($post)
+            {
 
-        ob_start();
-        wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
-        $transactionTypeValue = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
+                ob_start();
+                wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
+                $transactionTypeValue = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
 
-        $transactionTypes = array(
-            '1' => __('Charge', 'payplus-payment-gateway'),
-            '2' => __('Authorization', 'payplus-payment-gateway'),
-        );
-        if (count($transactionTypes)) {
-            echo "<select id='payplus_transaction_type' name='payplus_transaction_type'>";
-            echo "<option value=''>" . esc_html__('Transactions Type', 'payplus-payment-gateway') . "</option>";
-
-            foreach ($transactionTypes as $key => $transactionType) {
-                $selected = ($transactionTypeValue == $key) ? "selected" : "";
-                echo '<option ' . esc_attr($selected) . ' value="' . esc_attr($key) . '">' . esc_html($transactionType) . '</option>';
-            }
-            echo "</select>";
-        }
-        echo ob_get_clean();
-    }
-
-    /**
-     * @param array $columns
-     * @return array
-     */
-    public function payplus_add_order_column_orders($columns)
-    {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $new_columns = array();
-        if (count($columns)) {
-            foreach ($columns as $column_name => $column_info) {
-                $new_columns[$column_name] = $column_info;
-                if ('shipping_address' === $column_name && $this->payplus_gateway->enabled === "yes") {
-
-                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
-                }
-            }
-        }
-        return $new_columns;
-    }
-
-    /**
-     * @param array $columns
-     * @return array
-     */
-    public function payplus_add_order_column_order_product($columns)
-    {
-        $new_columns = array();
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-        if (count($columns)) {
-            foreach ($columns as $column_name => $column_info) {
-                $new_columns[$column_name] = $column_info;
-                if ('price' === $column_name && $this->payplus_gateway->enabled === "yes") {
-                    $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
-                }
-            }
-        }
-        return $new_columns;
-    }
-
-    /**
-     * @return void
-     */
-    public function payplus_add_product_meta_box_transaction_type()
-    {
-        global $post;
-        if (!empty($post) && get_post_type() === "product") {
-            $product = wc_get_product($post->ID);
-            $typeProducts = array('variable-subscription', 'subscription');
-            if (!in_array($product->get_type(), $typeProducts)) {
-                add_meta_box(
-                    'payplus_transaction_type',
-                    __('Transaction Type', 'payplus-payment-gateway'),
-                    [$this, 'payplus_meta_box_product_transaction_type'],
-                    'product'
-                );
-            }
-        }
-    }
-    /*
-    ===  END Section  field "transaction_type" ==
-     */
-    /*
-    ===  Begin Section  field "balance_name" ==
-     */
-    /**
-     * @return void
-     */
-    public function payplus_add_product_meta_box_balance_name()
-    {
-        global $post;
-        if (!empty($post) && get_post_type() === "product") {
-
-            add_meta_box(
-                'payplus_balance_name',
-                __('Balance Name', 'payplus-payment-gateway'),
-                [$this, 'payplus_meta_box_product_balance_name'],
-                'product'
-            );
-        }
-    }
-
-    /**
-     * @param $post
-     * @return void
-     */
-    public function payplus_meta_box_product_balance_name($post)
-    {
-        ob_start();
-        wp_nonce_field('payplus_notice_product_nonce', 'payplus_notice_product_nonce');
-        $balanceName = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_balance_name', true);
-
-        printf('<input maxlength="20" value="%s" placeholder="%s" type="text" id="payplus_balance_name" name="payplus_balance_name" />', esc_attr($balanceName), esc_attr__('Balance Name', 'payplus-payment-gateway'));
-
-        echo wp_kses_post(ob_get_clean());
-    }
-    /*
-    ===  End Section  field "balance_name" ==
-     */
-    /**
-     * @param int $post_id
-     * @return void
-     */
-    public function payplus_save_meta_box_data($post_id)
-    {
-        // Check if our nonce is set.
-        if (!isset($_POST['payplus_notice_proudct_nonce'])) {
-            return;
-        }
-        // Verify that the nonce is valid.
-        if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['payplus_notice_proudct_nonce'])), 'payplus_notice_proudct_nonce')) {
-            return;
-        }
-        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-            return;
-        }
-        if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
-
-            if (!current_user_can('edit_post', $post_id)) {
-
-                return;
-            }
-        }
-        if (!isset($_POST['payplus_transaction_type']) && !isset($_POST['payplus_balance_name'])) {
-
-            return;
-        }
-
-        if (isset($_POST['payplus_transaction_type'])) {
-
-            $transaction_type = sanitize_text_field(wp_unslash($_POST['payplus_transaction_type']));
-            update_post_meta($post_id, 'payplus_transaction_type', $transaction_type);
-        }
-        if (isset($_POST['payplus_balance_name'])) {
-
-            $payplus_balance_name = sanitize_text_field(wp_unslash($_POST['payplus_balance_name']));
-            update_post_meta($post_id, 'payplus_balance_name', $payplus_balance_name);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public function callback_response()
-    {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $this->payplus_gateway->callback_response();
-    }
-    /**
-     * @return void
-     */
-    public function callback_response_hash()
-    {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $this->payplus_gateway->callback_response_hash();
-    }
-
-    /**
-     * @param string $column
-     * @return void
-     */
-    public function payplus_add_order_column_order_transaction_type($column)
-    {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-
-        if ($column == "payplus_transaction_type" && $this->payplus_gateway->add_product_field_transaction_type) {
-            global $post;
-            $payplusTransactionType = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
-            if (!empty($payplusTransactionType)) {
                 $transactionTypes = array(
                     '1' => __('Charge', 'payplus-payment-gateway'),
                     '2' => __('Authorization', 'payplus-payment-gateway'),
                 );
-                if (isset($transactionTypes[$payplusTransactionType])) {
-                    echo esc_html($transactionTypes[$payplusTransactionType]);
+                if (count($transactionTypes)) {
+                    echo "<select id='payplus_transaction_type' name='payplus_transaction_type'>";
+                    echo "<option value=''>" . esc_html__('Transactions Type', 'payplus-payment-gateway') . "</option>";
+
+                    foreach ($transactionTypes as $key => $transactionType) {
+                        $selected = ($transactionTypeValue == $key) ? "selected" : "";
+                        echo '<option ' . esc_attr($selected) . ' value="' . esc_attr($key) . '">' . esc_html($transactionType) . '</option>';
+                    }
+                    echo "</select>";
+                }
+                echo ob_get_clean();
+            }
+
+            /**
+             * @param array $columns
+             * @return array
+             */
+            public function payplus_add_order_column_orders($columns)
+            {
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+                $new_columns = array();
+                if (count($columns)) {
+                    foreach ($columns as $column_name => $column_info) {
+                        $new_columns[$column_name] = $column_info;
+                        if ('shipping_address' === $column_name && $this->payplus_gateway->enabled === "yes") {
+
+                            $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
+                        }
+                    }
+                }
+                return $new_columns;
+            }
+
+            /**
+             * @param array $columns
+             * @return array
+             */
+            public function payplus_add_order_column_order_product($columns)
+            {
+                $new_columns = array();
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+                if (count($columns)) {
+                    foreach ($columns as $column_name => $column_info) {
+                        $new_columns[$column_name] = $column_info;
+                        if ('price' === $column_name && $this->payplus_gateway->enabled === "yes") {
+                            $new_columns['payplus_transaction_type'] = "<span class='text-center'>" . esc_html__('Transaction Type ', 'payplus-payment-gateway') . "</span>";
+                        }
+                    }
+                }
+                return $new_columns;
+            }
+
+            /**
+             * @return void
+             */
+            public function payplus_add_product_meta_box_transaction_type()
+            {
+                global $post;
+                if (!empty($post) && get_post_type() === "product") {
+                    $product = wc_get_product($post->ID);
+                    $typeProducts = array('variable-subscription', 'subscription');
+                    if (!in_array($product->get_type(), $typeProducts)) {
+                        add_meta_box(
+                            'payplus_transaction_type',
+                            __('Transaction Type', 'payplus-payment-gateway'),
+                            [$this, 'payplus_meta_box_product_transaction_type'],
+                            'product'
+                        );
+                    }
+                }
+            }
+            /*
+    ===  END Section  field "transaction_type" ==
+     */
+            /*
+    ===  Begin Section  field "balance_name" ==
+     */
+            /**
+             * @return void
+             */
+            public function payplus_add_product_meta_box_balance_name()
+            {
+                global $post;
+                if (!empty($post) && get_post_type() === "product") {
+
+                    add_meta_box(
+                        'payplus_balance_name',
+                        __('Balance Name', 'payplus-payment-gateway'),
+                        [$this, 'payplus_meta_box_product_balance_name'],
+                        'product'
+                    );
+                }
+            }
+
+            /**
+             * @param $post
+             * @return void
+             */
+            public function payplus_meta_box_product_balance_name($post)
+            {
+                ob_start();
+                wp_nonce_field('payplus_notice_product_nonce', 'payplus_notice_product_nonce');
+                $balanceName = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_balance_name', true);
+
+                printf('<input maxlength="20" value="%s" placeholder="%s" type="text" id="payplus_balance_name" name="payplus_balance_name" />', esc_attr($balanceName), esc_attr__('Balance Name', 'payplus-payment-gateway'));
+
+                echo wp_kses_post(ob_get_clean());
+            }
+            /*
+    ===  End Section  field "balance_name" ==
+     */
+            /**
+             * @param int $post_id
+             * @return void
+             */
+            public function payplus_save_meta_box_data($post_id)
+            {
+                // Check if our nonce is set.
+                if (!isset($_POST['payplus_notice_proudct_nonce'])) {
+                    return;
+                }
+                // Verify that the nonce is valid.
+                if (!wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['payplus_notice_proudct_nonce'])), 'payplus_notice_proudct_nonce')) {
+                    return;
+                }
+                if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+                    return;
+                }
+                if (isset($_POST['post_type']) && 'product' == $_POST['post_type']) {
+
+                    if (!current_user_can('edit_post', $post_id)) {
+
+                        return;
+                    }
+                }
+                if (!isset($_POST['payplus_transaction_type']) && !isset($_POST['payplus_balance_name'])) {
+
+                    return;
+                }
+
+                if (isset($_POST['payplus_transaction_type'])) {
+
+                    $transaction_type = sanitize_text_field(wp_unslash($_POST['payplus_transaction_type']));
+                    update_post_meta($post_id, 'payplus_transaction_type', $transaction_type);
+                }
+                if (isset($_POST['payplus_balance_name'])) {
+
+                    $payplus_balance_name = sanitize_text_field(wp_unslash($_POST['payplus_balance_name']));
+                    update_post_meta($post_id, 'payplus_balance_name', $payplus_balance_name);
+                }
+            }
+
+            /**
+             * @return void
+             */
+            public function callback_response()
+            {
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+                $this->payplus_gateway->callback_response();
+            }
+            /**
+             * @return void
+             */
+            public function callback_response_hash()
+            {
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+                $this->payplus_gateway->callback_response_hash();
+            }
+
+            /**
+             * @param string $column
+             * @return void
+             */
+            public function payplus_add_order_column_order_transaction_type($column)
+            {
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+
+                if ($column == "payplus_transaction_type" && $this->payplus_gateway->add_product_field_transaction_type) {
+                    global $post;
+                    $payplusTransactionType = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
+                    if (!empty($payplusTransactionType)) {
+                        $transactionTypes = array(
+                            '1' => __('Charge', 'payplus-payment-gateway'),
+                            '2' => __('Authorization', 'payplus-payment-gateway'),
+                        );
+                        if (isset($transactionTypes[$payplusTransactionType])) {
+                            echo esc_html($transactionTypes[$payplusTransactionType]);
+                        }
+                    }
+                }
+            }
+
+            /**
+             * @param array $methods
+             * @return array
+             */
+            public function add_payplus_gateway($methods)
+            {
+                $methods[] = 'WC_PayPlus_Gateway';
+                $methods[] = 'WC_PayPlus_Gateway_Bit';
+                $methods[] = 'WC_PayPlus_Gateway_GooglePay';
+                $methods[] = 'WC_PayPlus_Gateway_ApplePay';
+                $methods[] = 'WC_PayPlus_Gateway_Multipass';
+                $methods[] = 'WC_PayPlus_Gateway_Paypal';
+                $methods[] = 'WC_PayPlus_Gateway_TavZahav';
+                $methods[] = 'WC_PayPlus_Gateway_Valuecard';
+                $methods[] = 'WC_PayPlus_Gateway_FinitiOne';
+                $methods[] = 'WC_PayPlus_Gateway_HostedFields';
+                $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+                if ($payplus_payment_gateway_settings) {
+                    if (isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
+                        add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
+                    }
+                    if (isset($payplus_payment_gateway_settings['disable_menu_side']) && $payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
+                        add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 99);
+                    }
+                }
+                return $methods;
+            }
+
+
+            /**
+             * @return void
+             */
+            public function __clone()
+            {
+                _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
+            }
+
+            /**
+             * @return void
+             */
+            public function __wakeup()
+            {
+                _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
+            }
+
+            /**
+             * @param $fields
+             * @param $errors
+             * @return void
+             */
+            public function payplus_validation_cart_checkout($fields, $errors)
+            {
+                $this->payplus_gateway = $this->get_main_payplus_gateway();
+
+                $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
+
+                if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
+                    $errors->add('error', esc_html__('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
+                }
+                if ($this->payplus_gateway->block_ip_transactions) {
+                    $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
+                    if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
+                        $client_ip = ""; // Handle invalid IP scenario if necessary
+                    }
+                    $counts = array_count_values($this->payplus_gateway->get_payment_ips());
+                    $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
+                    if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= $this->payplus_gateway->block_ip_transactions_hour) {
+                        $errors->add(
+                            'error',
+                            __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
+                        );
+                    }
+                }
+            }
+
+            /**
+             * @param $widgets_manager
+             * @return void
+             */
+            public function payplus_register_widgets($widgets_manager)
+            {
+
+                require_once PAYPLUS_PLUGIN_DIR . '/includes/elementor/widgets/express_checkout.php';
+                $widgets_manager->register(new \Elementor_Express_Checkout());
+            }
+
+            /**
+             * @return bool
+             */
+            public static function payplus_check_exists_table($wpnonce, $table = 'payplus_order')
+            {
+                if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
+                    wp_die('Not allowed! - payplus_check_exists_table');
+                }
+                global $wpdb;
+                $table_name = $wpdb->prefix . $table;
+                $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
+                $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $like_table_name)) != $table_name) ? true : false;
+                return $flag;
+            }
+            public static function payplus_get_admin_menu($nonce)
+            {
+                if (!wp_verify_nonce(sanitize_key($nonce), 'menu_option')) {
+                    wp_die('Not allowed! - payplus_get_admin_menu');
+                }
+                ob_start();
+                $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
+                $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
+                echo "<div id='payplus-options'>";
+                if (count($adminTabs)) {
+                    echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
+                    foreach ($adminTabs as $key => $arrValue) {
+                        $allowed_html = array(
+                            'img' => array(
+                                'src' => true,
+                                'alt' => true,
+                                // Add other allowed attributes as needed
+                            ),
+                        );
+                        $selected = ($key == $currentSection) ? "nav-tab-active" : "";
+                        echo '<a href="' . esc_url($arrValue['link']) . '" class="nav-tab ' . esc_attr($selected) . '">' .
+                            wp_kses($arrValue['img'], $allowed_html) .
+                            esc_html($arrValue['name']) .
+                            '</a>';
+                    }
+                    echo "</nav>";
+                }
+                echo "</div>";
+                return ob_get_clean();
+            }
+
+            public function woocommerce_payplus_woocommerce_block_support()
+            {
+                if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
+
+                    require_once 'includes/blocks/class-wc-payplus-blocks-support.php';
+                    add_action(
+                        'woocommerce_blocks_payment_method_type_registration',
+                        function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
+                            $payment_method_registry->register(new WC_Gateway_Payplus_credit_Card_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Googlepay_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Multipas_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Bit_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Applepay_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_TavZahav_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Valuecard_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_FinitiOne_Block());
+                            $payment_method_registry->register(new WC_PayPlus_Gateway_HostedFields_Block());
+                            $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
+                        }
+                    );
                 }
             }
         }
-    }
 
-    /**
-     * @param array $methods
-     * @return array
-     */
-    public function add_payplus_gateway($methods)
-    {
-        $methods[] = 'WC_PayPlus_Gateway';
-        $methods[] = 'WC_PayPlus_Gateway_Bit';
-        $methods[] = 'WC_PayPlus_Gateway_GooglePay';
-        $methods[] = 'WC_PayPlus_Gateway_ApplePay';
-        $methods[] = 'WC_PayPlus_Gateway_Multipass';
-        $methods[] = 'WC_PayPlus_Gateway_Paypal';
-        $methods[] = 'WC_PayPlus_Gateway_TavZahav';
-        $methods[] = 'WC_PayPlus_Gateway_Valuecard';
-        $methods[] = 'WC_PayPlus_Gateway_FinitiOne';
-        $methods[] = 'WC_PayPlus_Gateway_HostedFields';
-        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-        if ($payplus_payment_gateway_settings) {
-            if (isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
-                add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
-            }
-            if (isset($payplus_payment_gateway_settings['disable_menu_side']) && $payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
-                add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 99);
-            }
-        }
-        return $methods;
-    }
+        WC_PayPlus::get_instance();
 
+        require_once PAYPLUS_PLUGIN_DIR . '/includes/wc-payplus-activation-functions.php';
 
-    /**
-     * @return void
-     */
-    public function __clone()
-    {
-        _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
-    }
-
-    /**
-     * @return void
-     */
-    public function __wakeup()
-    {
-        _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'payplus-payment-gateway'), '2.0');
-    }
-
-    /**
-     * @param $fields
-     * @param $errors
-     * @return void
-     */
-    public function payplus_validation_cart_checkout($fields, $errors)
-    {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-
-        $woocommerce_price_num_decimal = get_option('woocommerce_price_num_decimals');
-
-        if ($woocommerce_price_num_decimal > 2 || $woocommerce_price_num_decimal == 1 || $woocommerce_price_num_decimal < 0) {
-            $errors->add('error', esc_html__('Unable to create a payment page due to a site settings issue. Please contact the website owner', 'payplus-payment-gateway'));
-        }
-        if ($this->payplus_gateway->block_ip_transactions) {
-            $client_ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : "";
-            if (filter_var($client_ip, FILTER_VALIDATE_IP) === false) {
-                $client_ip = ""; // Handle invalid IP scenario if necessary
-            }
-            $counts = array_count_values($this->payplus_gateway->get_payment_ips());
-            $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
-            if (in_array($client_ip, $this->payplus_gateway->get_payment_ips()) && $howMany >= $this->payplus_gateway->block_ip_transactions_hour) {
-                $errors->add(
-                    'error',
-                    __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway')
-                );
-            }
-        }
-    }
-
-    /**
-     * @param $widgets_manager
-     * @return void
-     */
-    public function payplus_register_widgets($widgets_manager)
-    {
-
-        require_once PAYPLUS_PLUGIN_DIR . '/includes/elementor/widgets/express_checkout.php';
-        $widgets_manager->register(new \Elementor_Express_Checkout());
-    }
-
-    /**
-     * @return bool
-     */
-    public static function payplus_check_exists_table($wpnonce, $table = 'payplus_order')
-    {
-        if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - payplus_check_exists_table');
-        }
-        global $wpdb;
-        $table_name = $wpdb->prefix . $table;
-        $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
-        $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $like_table_name)) != $table_name) ? true : false;
-        return $flag;
-    }
-    public static function payplus_get_admin_menu($nonce)
-    {
-        if (!wp_verify_nonce(sanitize_key($nonce), 'menu_option')) {
-            wp_die('Not allowed! - payplus_get_admin_menu');
-        }
-        ob_start();
-        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
-        $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
-        echo "<div id='payplus-options'>";
-        if (count($adminTabs)) {
-            echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
-            foreach ($adminTabs as $key => $arrValue) {
-                $allowed_html = array(
-                    'img' => array(
-                        'src' => true,
-                        'alt' => true,
-                        // Add other allowed attributes as needed
-                    ),
-                );
-                $selected = ($key == $currentSection) ? "nav-tab-active" : "";
-                echo '<a href="' . esc_url($arrValue['link']) . '" class="nav-tab ' . esc_attr($selected) . '">' .
-                    wp_kses($arrValue['img'], $allowed_html) .
-                    esc_html($arrValue['name']) .
-                    '</a>';
-            }
-            echo "</nav>";
-        }
-        echo "</div>";
-        return ob_get_clean();
-    }
-
-    public function woocommerce_payplus_woocommerce_block_support()
-    {
-        if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
-
-            require_once 'includes/blocks/class-wc-payplus-blocks-support.php';
-            add_action(
-                'woocommerce_blocks_payment_method_type_registration',
-                function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
-                    $payment_method_registry->register(new WC_Gateway_Payplus_credit_Card_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Googlepay_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Multipas_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Bit_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Applepay_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_TavZahav_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Valuecard_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_FinitiOne_Block());
-                    $payment_method_registry->register(new WC_PayPlus_Gateway_HostedFields_Block());
-                    $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
-                }
-            );
-        }
-    }
-}
-WC_PayPlus::get_instance();
-
-require_once PAYPLUS_PLUGIN_DIR . '/includes/wc-payplus-activation-functions.php';
-
-register_activation_hook(__FILE__, 'payplus_create_table_order');
-register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
-register_activation_hook(__FILE__, 'payplus_create_table_process');
-register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
-register_activation_hook(__FILE__, 'payplusGenerateErrorPage');
-// register_activation_hook(__FILE__, 'cron_activate');
-register_deactivation_hook(__FILE__, 'payplus_cron_deactivate');
+        register_activation_hook(__FILE__, 'payplus_create_table_order');
+        register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
+        register_activation_hook(__FILE__, 'payplus_create_table_process');
+        register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
+        register_activation_hook(__FILE__, 'payplusGenerateErrorPage');
+        register_activation_hook(__FILE__, 'display_hash_check_notice');
+        // register_activation_hook(__FILE__, 'cron_activate');
+        register_deactivation_hook(__FILE__, 'payplus_cron_deactivate');

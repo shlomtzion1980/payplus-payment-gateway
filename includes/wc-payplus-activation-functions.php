@@ -65,6 +65,46 @@ function payplus_orders_bulk_actions($redirect_to, $action, $post_ids)
     return $redirect_to;
 }
 
+function display_hash_check_notice()
+{
+    $plugin_dir = PAYPLUS_PLUGIN_DIR;
+    $integrity_check_result = verify_plugin_integrity($plugin_dir);
+    if ($integrity_check_result !== 'All files are intact.') {
+        set_transient('payplus_plugin_integrity_check_failed', $integrity_check_result);
+    }
+}
+
+function verify_plugin_integrity($plugin_dir)
+{
+    $hash_file = $plugin_dir . '/hashes.json';
+
+    if (!file_exists($hash_file)) {
+        return 'Integrity file not found.';
+    }
+
+    $expected_hashes = json_decode(file_get_contents($hash_file), true);
+    if (!$expected_hashes) {
+        return 'Invalid integrity file.';
+    }
+
+    $current_hashes = [];
+    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($plugin_dir));
+    foreach ($iterator as $file) {
+        if ($file->isFile()) {
+            $relative_path = str_replace($plugin_dir, '', $file->getPathname());
+            $current_hashes[$relative_path] = hash_file('sha256', $file->getPathname());
+        }
+    }
+
+    foreach ($expected_hashes as $path => $expected_hash) {
+        if (!isset($current_hashes[$path]) || $current_hashes[$path] !== $expected_hash) {
+            return "File integrity check failed: $path";
+        }
+    }
+
+    return 'All files are intact.';
+}
+
 add_action('payplus_cron_send_order', function () {
     $invoice = new PayplusInvoice();
 
