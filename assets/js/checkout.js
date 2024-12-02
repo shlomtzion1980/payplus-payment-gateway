@@ -1104,8 +1104,7 @@ jQuery(function ($) {
   }
   function addScriptApple() {
     if (
-      payplus_script_checkout.payplus_import_applepay_script &&
-      isMyScriptLoaded(payplus_script_checkout.payplus_import_applepay_script)
+      !isMyScriptLoaded(payplus_script_checkout.payplus_import_applepay_script)
     ) {
       const script = document.createElement("script");
       script.src = payplus_script_checkout.payplus_import_applepay_script;
@@ -1114,8 +1113,10 @@ jQuery(function ($) {
   }
   function isMyScriptLoaded(url) {
     var scripts = document.getElementsByTagName("script");
-    for (var i = scripts.length; i--; ) {
-      if (scripts[i].src == url) return false;
+    for (var i = scripts.length; i--; ) {  
+      if (scripts[i].src.search(url)){
+        return false;
+      }
     }
     return true;
   }
