@@ -389,7 +389,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
 
             .loader-countdown {
                 position: absolute;
-                top: 50%;
+                top: 52%;
                 left: 47%;
                 transform: translate(-50%, -50%);
                 font-size: 14px;
@@ -582,8 +582,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                         alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
                                                                                         }
                                                                                     } else {
-                                                                                            ?><img
-                                    class="hf-image" src="<?php echo esc_url($ccImage); ?>"
+                                                                                            ?><img class="hf-image"
+                                    src="<?php echo esc_url($ccImage); ?>"
                                     alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
                                                                                     }
                                                                                         ?>
