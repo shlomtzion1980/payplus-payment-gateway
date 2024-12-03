@@ -154,8 +154,11 @@ function showError(message, code) {
     const errorCode = document.querySelector(".error-code");
     let countdown = 5;
     loaderCountdown.textContent = countdown;
+
+    message = payplus_script_hosted.allErrors.Errors[message] ?? message;
+    code = payplus_script_hosted.allErrors.Errors[code] ?? code;
+
     showElement(errorMessageDiv, "flex");
-    // errorMessageDiv.style.display = "flex";
 
     let errorCodePrefix;
     let errorMessagePrefix = pageLang !== "en-US" ? "שגיאה: " : "Error: ";

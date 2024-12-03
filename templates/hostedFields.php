@@ -12,7 +12,6 @@ $hostedIcons = WC_PayPlus_Statics::getHostedIcons();
 $numPaymentsAllowed = $this->payplus_gateway->hostedFieldsOptions['hosted_fields_payments_amount'];
 $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 and min 1
 
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
