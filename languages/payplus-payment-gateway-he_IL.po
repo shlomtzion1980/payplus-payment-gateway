@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-12-04 07:50+0200\n"
-"PO-Revision-Date: 2024-12-04 17:03+0200\n"
+"POT-Creation-Date: 2024-12-04 17:48+0200\n"
+"PO-Revision-Date: 2024-12-04 17:49+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -1171,15 +1171,19 @@ msgstr "חסר מספר תעודת זהות"
 msgid "Recaptcha confirmation is missing"
 msgstr "(מבחן אבטחה כדי לוודא שהמשתמש הוא אדם ולא רובוט) חסר או לא הושלםStatus"
 
-#: includes/class-wc-payplus-error-handler.php:20
+#: includes/class-wc-payplus-error-handler.php:19
+msgid "Credit card number not validated"
+msgstr "מספר הכרטיס אינו תקין"
+
+#: includes/class-wc-payplus-error-handler.php:21
 msgid "Card holder name"
 msgstr "שם בעל הכרטיס"
 
-#: includes/class-wc-payplus-error-handler.php:21
+#: includes/class-wc-payplus-error-handler.php:22
 msgid "CVV"
 msgstr "CVV"
 
-#: includes/class-wc-payplus-error-handler.php:22
+#: includes/class-wc-payplus-error-handler.php:23
 msgid "Card holder ID"
 msgstr "תעודת זהות בעל הכרטיס"
 

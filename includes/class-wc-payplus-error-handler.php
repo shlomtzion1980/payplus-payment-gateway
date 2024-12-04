@@ -16,6 +16,7 @@ class WCPayplusErrorCodes
         $this->errors['missing-cvv'] = esc_html__('Missing CVV', 'payplus-payment-gateway');
         $this->errors['missing-id'] = esc_html__('Missing ID', 'payplus-payment-gateway');
         $this->errors['recaptcha-confirmation-is-missing'] = esc_html__('Recaptcha confirmation is missing', 'payplus-payment-gateway');
+        $this->errors['error-codes-terminal-type-6-code-i-131'] = esc_html__('Credit card number not validated', 'payplus-payment-gateway');
         //Messages translations
         $this->fieldNames['card_holder_name'] = esc_html__('Card holder name', 'payplus-payment-gateway');
         $this->fieldNames['cvv'] = esc_html__('CVV', 'payplus-payment-gateway');
