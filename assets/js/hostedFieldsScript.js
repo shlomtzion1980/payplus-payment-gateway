@@ -156,7 +156,7 @@ function showError(message, code) {
     loaderCountdown.textContent = countdown;
 
     message = payplus_script_hosted.allErrors.Errors[message] ?? message;
-    code = payplus_script_hosted.allErrors.Errors[code] ?? code;
+    code = payplus_script_hosted.allErrors.Fields[code] ?? code;
 
     showElement(errorMessageDiv, "flex");
 

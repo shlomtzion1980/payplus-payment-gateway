@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-12-03 17:30+0200\n"
-"PO-Revision-Date: 2024-12-03 17:31+0200\n"
+"POT-Creation-Date: 2024-12-04 07:50+0200\n"
+"PO-Revision-Date: 2024-12-04 11:51+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -26,7 +26,7 @@ msgstr ""
 #: includes/admin/class-wc-payplus-admin-settings.php:28
 #: payplus-payment-gateway.php:735
 msgid "Settings"
-msgstr "הגדרות"
+msgstr "Card hoהגדרות"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:33
 #: includes/admin/class-wc-payplus-admin-settings.php:518
@@ -1155,9 +1155,33 @@ msgstr "מידע על הכרטיס"
 msgid "The payment page has expired, please reload to refresh."
 msgstr "פג תוקף דף התשלום, אנא רענן/י את הדף."
 
+#: includes/class-wc-payplus-error-handler.php:15
+msgid "Field not found"
+msgstr "השדה/ות לא נמצא/או - או ריק/ים"
+
 #: includes/class-wc-payplus-error-handler.php:16
+msgid "Missing CVV"
+msgstr "חסר קןד CVV"
+
+#: includes/class-wc-payplus-error-handler.php:17
+msgid "Missing ID"
+msgstr "חסר מספר תעודת זהות"
+
+#: includes/class-wc-payplus-error-handler.php:18
+msgid "Recaptcha confirmation is missing"
+msgstr "(מבחן אבטחה כדי לוודא שהמשתמש הוא אדם ולא רובוט) חסר או לא הושלםStatus"
+
+#: includes/class-wc-payplus-error-handler.php:20
 msgid "Card holder name"
-msgstr "שדה שם בעל הכרטיס"
+msgstr "שם בעל הכרטיס"
+
+#: includes/class-wc-payplus-error-handler.php:21
+msgid "CVV"
+msgstr "CVV"
+
+#: includes/class-wc-payplus-error-handler.php:22
+msgid "Card holder ID"
+msgstr "תעודת זהות בעל הכרטיס"
 
 #: includes/class-wc-payplus-form-fields.php:23
 #: includes/class-wc-payplus-form-fields.php:26
@@ -1737,7 +1761,7 @@ msgstr "סה\"כ:"
 
 #: includes/class-wc-payplus-statics.php:398
 msgid "Status:"
-msgstr ""
+msgstr "סטטוס:"
 
 #: includes/elementor/widgets/express_checkout.php:18
 msgid "Payplus Express Checkout"
@@ -2361,9 +2385,6 @@ msgstr ""
 
 #~ msgid "Year"
 #~ msgstr "שנה"
-
-#~ msgid "CVV"
-#~ msgstr "קוד CVV"
 
 #~ msgid "Hosted Fields"
 #~ msgstr "שדות מאורחים"
