@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2024-12-04 07:50+0200\n"
-"PO-Revision-Date: 2024-12-04 11:51+0200\n"
+"PO-Revision-Date: 2024-12-04 17:03+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -26,7 +26,7 @@ msgstr ""
 #: includes/admin/class-wc-payplus-admin-settings.php:28
 #: payplus-payment-gateway.php:735
 msgid "Settings"
-msgstr "Card hoהגדרות"
+msgstr "הגדרות"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:33
 #: includes/admin/class-wc-payplus-admin-settings.php:518
