@@ -71,6 +71,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
+        WC()->session->set('hostedStarted', false);
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
 
@@ -109,7 +110,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
     public function emptyResponse()
     {
-        WC()->session->set('order_awaiting_payment', $this->order_id = bin2hex(random_bytes(16)));
+        $this->order_id = WC()->session->get('order_awaiting_payment');
         return $this->hostedFieldsData($this->order_id);
     }
 
@@ -180,13 +181,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC()->session->set('hostedResponse', $hostedResponse);
 
         return $hostedResponse;
-    }
-
-    public function updateOrderId($randomHash)
-    {
-        WC()->session->set('order_awaiting_payment', $randomHash);
-        $order_id = $randomHash;
-        return $order_id;
     }
 
     public function hostedFieldsData($order_id)
@@ -326,7 +320,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
         WC()->session->set('randomHash', $randomHash);
 
-        $order_id = $order_id === "000" ? $this->updateOrderId($randomHash) : $order_id;
+        function updateOrderId($randomHash)
+        {
+            WC()->session->set('order_awaiting_payment', $randomHash);
+            $order_id = $randomHash;
+            return $order_id;
+        }
+
+        $order_id = $order_id === "000" ? updateOrderId($randomHash) : $order_id;
         $data->more_info = $order_id;
 
         $shippingPrice = 0;
