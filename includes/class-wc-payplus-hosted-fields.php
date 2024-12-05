@@ -133,56 +133,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
     }
 
-    public function createUpdateHostedPaymentPageLink($payload)
-    {
-        $testMode = boolval($this->payPlusGateway->settings['api_test_mode'] === 'yes');
-        $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
-        $apiKey = $testMode ? $this->payPlusGateway->settings['dev_api_key'] : $this->payPlusGateway->settings['api_key'];
-        $secretKey = $testMode ? $this->payPlusGateway->settings['dev_secret_key'] : $this->payPlusGateway->settings['secret_key'];
-
-
-        $auth = wp_json_encode([
-            'api_key' => $apiKey,
-            'secret_key' => $secretKey
-        ]);
-        $requestHeaders = [];
-        $requestHeaders[] = 'Content-Type:application/json';
-        $requestHeaders[] = 'Authorization: ' . $auth;
-
-
-        $pageRequestUid = WC()->session->get('page_request_uid');
-        $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
-
-        if ($pageRequestUid && $hostedFieldsUUID) {
-            $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
-        }
-
-        $hostedResponse = $this->payPlusGateway->post_payplus_ws($apiUrl, $payload, "post");
-
-        $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
-
-        if (isset($hostedResponseArray['data']['page_request_uid'])) {
-            $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
-            WC()->session->set('page_request_uid', $pageRequestUid);
-        }
-
-        $body = wp_remote_retrieve_body($hostedResponse);
-        $bodyArray = json_decode($body, true);
-
-        if (isset($bodyArray['data']['hosted_fields_uuid']) && $bodyArray['data']['hosted_fields_uuid'] !== null) {
-            $hostedFieldsUUID = $bodyArray['data']['hosted_fields_uuid'];
-            WC()->session->set('hostedFieldsUUID', $hostedFieldsUUID);
-        } else {
-
-            $bodyArray['data']['hosted_fields_uuid'] = $hostedFieldsUUID;
-        }
-        $hostedResponse = wp_json_encode($bodyArray);
-        // WC()->session->set('hostedStarted', true);
-        WC()->session->set('hostedResponse', $hostedResponse);
-
-        return $hostedResponse;
-    }
-
     public function updateOrderId($randomHash)
     {
         WC()->session->set('order_awaiting_payment', $randomHash);
@@ -413,13 +363,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
             WC()->session->set('page_request_uid', false);
-            $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
         }
 
         return $hostedResponse;

@@ -570,4 +570,80 @@ class WC_PayPlus_Statics
             }
             return $iconsReturn;
         }
+
+        /**
+         * @param $url
+         * @param $payload
+         * @return array|WP_Error
+         */
+        public static function payPlusRemote($url, $payload = [], $method = "post")
+        {
+            $options = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode = boolval($options['api_test_mode'] === 'yes');
+            $apiKey = $testMode === true ? $options['dev_api_key'] : $options['api_key'];
+            $secretKey = $testMode === true ? $options['dev_secret_key'] : $options['secret_key'];
+
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
+            $args = array(
+                'body' => $payload,
+                'timeout' => '60',
+                'redirection' => '5',
+                'httpversion' => '1.0',
+                'blocking' => true,
+                'headers' => array(
+                    'domain' => home_url(),
+                    'User-Agent' => "WordPress $userAgent",
+                    'Content-Type' => 'application/json',
+                    'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+                    'X-creationsource' => 'WordPress Source',
+                    'X-versionpayplus' => PAYPLUS_VERSION,
+                )
+            );
+
+            if ($method == "post") {
+                $response = wp_remote_post($url, $args);
+            } else {
+                $response = wp_remote_get($url, $args);
+            }
+
+            return $response;
+        }
+
+        public static function createUpdateHostedPaymentPageLink($payload)
+        {
+            $options = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode = boolval($options['api_test_mode'] === 'yes');
+            $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
+
+            $pageRequestUid = WC()->session->get('page_request_uid');
+            $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
+
+            if ($pageRequestUid && $hostedFieldsUUID) {
+                $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
+            }
+
+            $hostedResponse = WC_PayPlus_Statics::payPlusRemote($apiUrl, $payload, "post");
+
+            $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
+
+            if (isset($hostedResponseArray['data']['page_request_uid'])) {
+                $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
+                WC()->session->set('page_request_uid', $pageRequestUid);
+            }
+
+            $body = wp_remote_retrieve_body($hostedResponse);
+            $bodyArray = json_decode($body, true);
+
+            if (isset($bodyArray['data']['hosted_fields_uuid']) && $bodyArray['data']['hosted_fields_uuid'] !== null) {
+                $hostedFieldsUUID = $bodyArray['data']['hosted_fields_uuid'];
+                WC()->session->set('hostedFieldsUUID', $hostedFieldsUUID);
+            } else {
+
+                $bodyArray['data']['hosted_fields_uuid'] = $hostedFieldsUUID;
+            }
+            $hostedResponse = wp_json_encode($bodyArray);
+            WC()->session->set('hostedResponse', $hostedResponse);
+
+            return $hostedResponse;
+        }
     }

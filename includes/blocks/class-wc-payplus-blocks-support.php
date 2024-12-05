@@ -100,42 +100,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         return $this->payplus_gateway;
     }
 
-    public function createUpdateHostedPaymentPageLink($payload)
-    {
-        $options = get_option('woocommerce_payplus-payment-gateway_settings');
-        $testMode = boolval($options['api_test_mode'] === 'yes');
-        $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
-        $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
-        $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
-        $payPlusGateWay = $this->get_main_payplus_gateway();
-
-        $auth = wp_json_encode([
-            'api_key' => $apiKey,
-            'secret_key' => $secretKey
-        ]);
-        $requestHeaders = [];
-        $requestHeaders[] = 'Content-Type:application/json';
-        $requestHeaders[] = 'Authorization: ' . $auth;
-
-
-        $pageRequestUid = WC()->session->get('page_request_uid');
-
-        if ($pageRequestUid) {
-            $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
-        }
-
-        $hostedResponse = $payPlusGateWay->post_payplus_ws($apiUrl, $payload, "post");
-
-        $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
-
-        if (isset($hostedResponseArray['data']['page_request_uid'])) {
-            $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
-        }
-
-        return wp_remote_retrieve_body($hostedResponse);
-    }
-
-
     public function hostedFieldsData($order_id)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
@@ -358,13 +322,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
             WC()->session->__unset('page_request_uid');
-            $hostedResponse = $this->createUpdateHostedPaymentPageLink($payload);
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
         }
 
         return $hostedResponse;
