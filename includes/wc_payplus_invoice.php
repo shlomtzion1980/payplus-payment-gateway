@@ -330,7 +330,13 @@ class PayplusInvoice
         }
         $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
 
-        $payplusBalanceNames = $objectProducts->balanceNames;
+        $payloadInvoiceData && isset($payloadInvoiceData['customer']['balance_name']) ? $payplusBalanceNames[0] = $payloadInvoiceData['customer']['balance_name'] : $payplusBalanceNames = $objectProducts->balanceNames;
+
+        if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
+            if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
+                $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
+            }
+        }
 
         if ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
             $productsItems = $payloadInvoiceData ? $payloadInvoiceData['items'] : $objectProducts->productsItems;
@@ -396,12 +402,6 @@ class PayplusInvoice
         }
 
         $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
-
-        if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
-            if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
-                $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
-            }
-        }
 
         return $payload;
     }
