@@ -421,7 +421,7 @@ class PayplusInvoice
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-        $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $documentType, $payload);
+        $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $documentType, $payload);
         if (is_wp_error($response)) {
             $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
             return false;
@@ -1146,7 +1146,7 @@ class PayplusInvoice
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
                     if (!$isCashPayment) {
-                        $response = $this->post_payplus_ws($this->url_payplus_create_invoice . $payplus_document_type, $payload);
+                        $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $payplus_document_type, $payload);
                     }
 
                     if (is_wp_error($response)) {
@@ -1192,39 +1192,6 @@ class PayplusInvoice
                 }
             }
         }
-    }
-
-    /**
-     * @param $url
-     * @param $payload
-     * @return array|WP_Error
-     */
-    public function post_payplus_ws($url, $payload = [], $method = "post")
-    {
-        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
-        $args = array(
-            'body' => $payload,
-            'timeout' => '60',
-            'redirection' => '5',
-            'httpversion' => '1.0',
-            'blocking' => true,
-            'headers' => array(
-                'domain' => home_url(),
-                'User-Agent' => "WordPress $userAgent",
-                'Content-Type' => 'application/json',
-                'Authorization' => '{"api_key":"' . $this->payplus_invoice_api_key . '","secret_key":"' . $this->payplus_invoice_secret_key . '"}',
-                'X-creationsource' => 'WordPress Source',
-                'X-versionpayplus' => PAYPLUS_VERSION,
-            )
-        );
-
-        if ($method == "post") {
-            $response = wp_remote_post($url, $args);
-        } else {
-            $response = wp_remote_get($url, $args);
-        }
-
-        return $response;
     }
 
     /**

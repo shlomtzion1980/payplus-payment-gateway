@@ -96,7 +96,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $arr['url_validation'] = $obj['urlValidation'];
         $arr = wp_json_encode($arr);
         $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($arr, true), 'payload');
-        $resp = $WC_PayPlus_Gateway->post_payplus_ws($url, $arr);
+        $resp = WC_PayPlus_Statics::payPlusRemote($url, $arr);
         $res = json_decode(wp_remote_retrieve_body($resp));
         $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($res, true), 'completed');
         if ($res) {
@@ -248,7 +248,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', '', 'before-payload');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($payload, true), 'payload');
 
-            $response = $WC_PayPlus_Gateway->post_payplus_ws($url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($url, $payload);
 
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
@@ -375,7 +375,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $payload = wp_json_encode($payload);
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', '', 'before-payload');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', print_r($payload, true), 'payload');
-            $response = $WC_PayPlus_Gateway->post_payplus_ws($url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($url, $payload);
             $res = json_decode(wp_remote_retrieve_body($response));
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', 'WS PayPlus Response');

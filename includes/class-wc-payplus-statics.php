@@ -574,6 +574,7 @@ class WC_PayPlus_Statics
         /**
          * @param $url
          * @param $payload
+         * @param $method
          * @return array|WP_Error
          */
         public static function payPlusRemote($url, $payload = [], $method = "post")

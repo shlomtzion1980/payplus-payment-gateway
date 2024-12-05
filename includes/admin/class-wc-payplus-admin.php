@@ -135,7 +135,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $order->set_payment_method('payplus-payment-gateway');
         $order->set_payment_method_title('Pay with Debit or Credit Card');
 
-        $response = $this->post_payplus_ws($this->payment_url, $payload);
+        $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
         $response = json_decode(wp_remote_retrieve_body($response));
 
         if ($response->data->status_code === "000") {
@@ -416,7 +416,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $payload = wp_json_encode($payload);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-            $response = $this->post_payplus_ws($this->refund_url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($this->refund_url, $payload);
             if (is_wp_error($response)) {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
             } else {
@@ -780,7 +780,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payload = $this->generatePayloadLink($order_id, true);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-            $response = $this->post_payplus_ws($this->payment_url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
 
             if (is_wp_error($response)) {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
@@ -839,7 +839,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payload['related_transaction'] = true;
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
             $payload = wp_json_encode($payload);
-            $response = $this->post_payplus_ws($this->ipn_url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
 
             $res = json_decode(wp_remote_retrieve_body($response));
             if ($res->results->status == "error" || $res->data->status_code !== "000") {
@@ -2022,7 +2022,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
-            $response = $this->post_payplus_ws($this->api_url . 'Transactions/ChargeByTransactionUID', $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($this->api_url . 'Transactions/ChargeByTransactionUID', $payload);
 
             if (is_wp_error($response)) {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
@@ -2263,7 +2263,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
 
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-        $response = $this->post_payplus_ws($apiURL . 'Transactions/ChargeByTransactionUID', $payload);
+        $response = WC_PayPlus_Statics::payPlusRemote($apiURL . 'Transactions/ChargeByTransactionUID', $payload);
         $res = json_decode(wp_remote_retrieve_body($response));
         if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
             delete_post_meta($order_id, 'payplus_type');
@@ -2288,31 +2288,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $this->error_msg = 2;
         }
         add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
-    }
-
-    /**
-     * @param $url
-     * @param $payload
-     * @param $method
-     * @return array|WP_Error
-     */
-    public function post_payplus_ws($url, $payload = array(), $method = "post")
-    {
-        $args = array(
-            'body' => $payload,
-            'timeout' => '60',
-            'redirection' => '5',
-            'httpversion' => '1.0',
-            'blocking' => true,
-            'headers' => array(
-                'domain' => home_url(),
-                'Content-Type' => 'application/json',
-                'User-Agent' => 'WordPress',
-                'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
-            )
-        );
-        $response = wp_remote_post($url, $args);
-        return $response;
     }
 
     /**

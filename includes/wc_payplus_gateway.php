@@ -332,7 +332,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ) {
                 ?>
                 <div class="notice notice-success is-dismissible">
-                    <p><?php esc_html_e('It is recommended to change the names and description of the main PayPlus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?></p>
+                    <p><?php esc_html_e('It is recommended to change the names and description of the main PayPlus gateway to reflect the current setup.', 'payplus-payment-gateway'); ?>
+                    </p>
                 </div>
 <?php
                 // Delete the transient so the notice only shows once.
@@ -491,7 +492,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $clearingCompanies = get_option('payplus_clearing_companies');
         if (empty($clearingCompanies)) {
             $clearingCompanies = [];
-            $response = $this->post_payplus_ws($this->clearing_companies_url, array(), 'get');
+            $response = WC_PayPlus_Statics::payPlusRemote($this->clearing_companies_url, array(), 'get');
             $res = json_decode(wp_remote_retrieve_body($response));
             $res = $res->clearing;
             if ($res) {
@@ -520,7 +521,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (empty($issuersCompanies)) {
             $issuersCompanies = [];
-            $response = $this->post_payplus_ws($this->issuers_companies_url, array(), 'get');
+            $response = WC_PayPlus_Statics::payPlusRemote($this->issuers_companies_url, array(), 'get');
             $res = json_decode(wp_remote_retrieve_body($response));
             $res = $res->isuuer;
             if ($res) {
@@ -548,7 +549,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $brands = get_option('payplus_brands');
         if (empty($brands)) {
             $brands = [];
-            $response = $this->post_payplus_ws($this->brands_list_url, array(), 'get');
+            $response = WC_PayPlus_Statics::payPlusRemote($this->brands_list_url, array(), 'get');
             $res = json_decode(wp_remote_retrieve_body($response));
 
             $res = $res->transactionsCardsBrands;
@@ -712,7 +713,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             $payload = wp_json_encode($payload);
             $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-            $response = $this->post_payplus_ws($this->refund_url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($this->refund_url, $payload);
 
             if (is_wp_error($response)) {
                 $this->payplus_add_log_all($handle, print_r($response, true), 'error');
@@ -2134,7 +2135,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $this->payplus_add_log_all($handle, 'Payload data before Sending to PayPlus');
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
-        $response = $this->post_payplus_ws($this->payment_url, $payload);
+        $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
 
         $this->payplus_add_log_all($handle, 'WS PayPlus Response');
 
@@ -2229,38 +2230,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             return true;
         }
-    }
-
-    /**
-     * @param $url
-     * @param $payload
-     * @param $method
-     * @return array|WP_Error
-     */
-    public function post_payplus_ws($url, $payload = array(), $method = "post")
-    {
-        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
-        $args = array(
-            'body' => $payload,
-            'timeout' => '60',
-            'redirection' => '5',
-            'httpversion' => '1.0',
-            'blocking' => true,
-            'headers' => array(
-                'domain' => home_url(),
-                'User-Agent' => "WordPress $userAgent",
-                'Content-Type' => 'application/json',
-                'Authorization' => '{"api_key":"' . $this->api_key . '","secret_key":"' . $this->secret_key . '"}',
-            )
-        );
-
-        if ($method == "post") {
-            $response = wp_remote_post($url, $args);
-        } else {
-            $response = wp_remote_get($url, $args);
-        }
-
-        return $response;
     }
 
     /**
@@ -2714,7 +2683,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             $insertMeta = array();
             for ($i = 0; $i < $countLoop; $i++) {
-                $response = $this->post_payplus_ws($this->ipn_url, $payload);
+                $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
 
                 if (is_wp_error($response)) {
                     $error = $response->get_error_message();
@@ -3173,7 +3142,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'All data collected before Sending to PayPlus');
         $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
-        $response = $this->post_payplus_ws($this->payment_url, $payload);
+        $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
 
         if (is_wp_error($response)) {
             $this->payplus_add_log_all($handle, print_r($response, true), 'error');
