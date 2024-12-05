@@ -300,7 +300,7 @@ class PayplusInvoice
     {
         $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
         $payloadInvoiceData = !empty($payPlusPayloadInvoice)
-            ? $this->payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund)
+            ? $this->payPlusParseInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund)
             : false;
 
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
@@ -595,7 +595,7 @@ class PayplusInvoice
      * @param string $docType Indicates the document type - decides if it is a refund invoice,receipt or something else...:)
      * @return array|false Returns the invoice payload as an array or false if not found.
      */
-    public function payplusGetInvoicePayload($order_id, $payPlusPayloadInvoice, $docType)
+    public function payPlusParseInvoicePayload($order_id, $payPlusPayloadInvoice, $docType)
     {
         $isRefund = false;
         $isRefund = $docType === 'inv_refund_receipt' ? true : $isRefund;
