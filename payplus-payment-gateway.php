@@ -915,7 +915,6 @@ class WC_PayPlus
              */
             public function payplus_meta_box_product_transaction_type($post)
             {
-
                 ob_start();
                 wp_nonce_field('payplus_notice_proudct_nonce', 'payplus_notice_proudct_nonce');
                 $transactionTypeValue = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_type', true);
@@ -934,7 +933,7 @@ class WC_PayPlus
                     }
                     echo "</select>";
                 }
-                echo ob_get_clean();
+                echo ob_get_clean(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             }
 
             /**
@@ -1030,7 +1029,7 @@ class WC_PayPlus
 
                 printf('<input maxlength="20" value="%s" placeholder="%s" type="text" id="payplus_balance_name" name="payplus_balance_name" />', esc_attr($balanceName), esc_attr__('Balance Name', 'payplus-payment-gateway'));
 
-                echo wp_kses_post(ob_get_clean());
+                echo ob_get_clean(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             }
             /*
     ===  End Section  field "balance_name" ==

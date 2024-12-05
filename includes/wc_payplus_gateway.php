@@ -311,12 +311,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if (!empty($this->callback_addr)) {
                     $alert = strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0 ? true : false;
 
-                    !$alert ? $message = 'Sorry we only support https:// or http:// the callback will not be fired.' : $message = false;
+                    !$alert ? $message = __('Sorry we only support https:// or http:// the callback will not be fired.', 'payplus-payment-gateway') : $message = false;
 
-                    if ($message) {
-?>
+                    if ($message) { ?>
                         <div class="notice notice-error is-dismissible">
-                            <p><?php esc_html_e($message, 'payplus-payment-gateway'); ?></p>
+                            <p><?php echo esc_html($message); ?></p>
                         </div>
                 <?php
                         delete_transient('payplus_admin_notice');
@@ -1295,7 +1294,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $html .= '</div>';
 
-        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this);
+        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     public function get_payment_ips()
