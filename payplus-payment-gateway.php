@@ -485,7 +485,7 @@ class WC_PayPlus
             //$amount = WC_PayPlus_Meta_Data::get_meta($refund_id, '_refund_amount', true);
             $amount = $order->get_total_refunded();
             if (floatval($amount)) {
-                $invoice_api->payplus_create_document_dashboard(
+                $invoice_api->payPlusCreateRefundInvoicePlus(
                     $order_id,
                     $invoice_api->payplus_get_invoice_type_document_refund(),
                     array(),

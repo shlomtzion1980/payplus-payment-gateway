@@ -443,7 +443,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             $payments[$indexRow]->price = $amount * 100;
                         }
                         $rand = wp_rand(0, intval($orderID));
-                        $this->invoice_api->payplus_create_document_dashboard(
+                        $this->invoice_api->payPlusCreateRefundInvoicePlus(
                             $orderID,
                             $this->invoice_api->payplus_get_invoice_type_document_refund(),
                             $payments,
@@ -651,7 +651,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             if (count($resultApps)) {
-                $this->payPlusInvoice->payplus_create_document_dashboard(
+                $this->payPlusInvoice->payPlusCreateRefundInvoicePlus(
                     $order_id,
                     $type_document,
                     $resultApps,
@@ -2434,7 +2434,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         if (!empty($payment_method) && strpos($payment_method, 'payplus') === false) {
             if (!$this->payPlusInvoice->payplus_get_create_invoice_manual() && $amount > 0) {
-                $this->payPlusInvoice->payplus_create_document_dashboard(
+                $this->payPlusInvoice->payPlusCreateRefundInvoicePlus(
                     $order_id,
                     sanitize_text_field($this->payPlusInvoice->payplus_get_invoice_type_document_refund()),
                     array(),
