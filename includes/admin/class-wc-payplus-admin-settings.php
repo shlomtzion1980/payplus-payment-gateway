@@ -410,6 +410,15 @@ class WC_PayPlus_Admin_Settings
                     'custom_attributes' => array('disabled' => 'disabled', 'checked' => 'checked'),
                 );
                 $settings[$section][] = array(
+                    'name' => esc_html__('Do not create documents for the following methods:', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[do-not-create]',
+                    'desc' => __("Select methods that documents will not be created for.", 'payplus-payment-gateway'),
+                    'type' => 'multiselect',
+                    'options' => [
+                        'paypal' => esc_html__('PayPal', 'payplus-payment-gateway'),
+                    ]
+                );
+                $settings[$section][] = array(
                     'name' => __('Show Invoice+ metabox in order page', 'payplus-payment-gateway'),
                     'id' => 'payplus_invoice_option[dedicated_invoice_metabox]',
                     'type' => 'checkbox',

@@ -905,6 +905,9 @@ class PayplusInvoice
     {
         $order = wc_get_order($order_id);
         $typePaymentMethod = $order->get_payment_method();
+        if (isset($this->payplus_invoice_option['do-not-create']) && in_array($typePaymentMethod, $this->payplus_invoice_option['invoiceplus-do-not-create'])) {
+            return;
+        }
         if ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod") {
             $this->payplus_invoice_create_order($order_id, 'inv_tax', true);
         }
@@ -940,6 +943,7 @@ class PayplusInvoice
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
             wp_die('Not allowed! - payplus_invoice_create_order');
         }
+
         $payload = array();
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $handle = 'payplus_process_invoice';
@@ -1029,6 +1033,10 @@ class PayplusInvoice
 
                             if (!empty($found_in_other) || !empty($found_in_or_other)) {
                                 $method_payment = 'paypal';
+                            }
+                            if (isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create'])) {
+                                $order->add_order_note('This payment method is set as: Not to create documents');
+                                return;
                             }
                             $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
                             $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
