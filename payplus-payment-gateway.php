@@ -61,6 +61,8 @@ class WC_PayPlus
         $this->isPayPlus = boolval(property_exists($this->payplus_payment_gateway_settings, 'enabled') && $this->payplus_payment_gateway_settings->enabled === 'yes');
 
         add_action('admin_init', [$this, 'check_environment']);
+        add_action('admin_init', [$this, 'wc_payplus_check_version']);
+
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('plugins_loaded', [$this, 'init']);
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
@@ -91,6 +93,49 @@ class WC_PayPlus
         // remove_all_actions('admin_notices');
     }
 
+    public function wc_payplus_check_version()
+    {
+        $previous_version = get_option('wc_payplus_version');
+        $display_count = get_option('wc_payplus_display_count', 0);
+
+        if (version_compare($previous_version, '7.3.1', '<')) {
+            if ($display_count < 5) {
+                add_action('admin_notices', [$this, 'wc_payplus_show_update_message']);
+                update_option('wc_payplus_display_count', $display_count + 1);
+            }
+            update_option('wc_payplus_version', PAYPLUS_VERSION);
+        }
+    }
+
+    public function wc_payplus_show_update_message()
+    {
+?>
+        <div id="wc-payplus-update-message" class="notice notice-success is-dismissible">
+            <p><?php _e("**PayPlus Payment Gateway Plugin - Version 7.3.0 Update**<br><br>
+
+**Important Notice:**<br>
+This update introduces a major refactoring of the invoice code to enhance performance and align with current WooCommerce standards.<br>
+Additionally, the refund process has been refactored.
+<br><br>
+If you are updating from a version earlier than 7.2.0, you may encounter issues with refund document creation for orders created in those earlier versions.<br>
+In such cases:<br>
+1. Downgrade to version 7.2.9 to process refunds.<br>
+2. Once refunds are complete, you can safely upgrade back to version 7.3.0.<br>
+<br>
+No settings will be lost during this process. Please note this only affects the refund process for orders created in versions prior to 7.2.0.", 'payplus-payment-gateway'); ?>
+            </p>
+        </div>
+        <script type="text/javascript">
+            jQuery(document).ready(function($) {
+                setTimeout(function() {
+                    $(".notice-success").fadeOut();
+                }, 35000);
+            });
+        </script>
+        <?php
+    }
+
+
     public function websocket_check_notification()
     {
         check_ajax_referer('websocket_check_nonce', 'nonce');
@@ -113,7 +158,7 @@ class WC_PayPlus
     public function display_websocket_inactive_notice()
     {
         if (get_transient('websocket_inactive_warning')) {
-?>
+        ?>
             <div class="notice notice-error">
                 <p>
                     <strong>PayPlus Warning:</strong> WebSockets are active on your website. This may make your site vulnerable for
