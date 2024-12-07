@@ -271,13 +271,6 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'label' => __('Change icon layout on checkout page.', 'payplus-payment-gateway'),
             ],
-            'custom_icons' => [
-                'title' => __('Custom Checkout Icons', 'payplus-payment-gateway'),
-                'type' => 'textarea',
-                'default' => '',
-                'description' => __('Paste images urls here divided by ; (Semicolon) to show under payment method label side beside side.', 'payplus-payment-gateway'),
-                'desc_tip' => true,
-            ],
             'create_pp_token' => [
                 'title' => __('Saved Credit Cards', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
