@@ -505,7 +505,7 @@ class WC_PayPlus_Statics
             return $response;
         }
 
-        public static function getHostedIcons()
+        public static function getCardsLogos()
         {
             $iconsArray = [
                 'visa' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "visa.png",
@@ -519,7 +519,7 @@ class WC_PayPlus_Statics
                 'jcb' => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "jcb.png",
             ];
 
-            $options = get_option('payplus-payment-gateway-hostedfields', []);
+            $options = get_option('woocommerce_payplus-payment-gateway_settings', []);
             $iconsReturn = [];
             if (isset($options['cards'])) {
                 foreach ($options['cards'] as $cards) {

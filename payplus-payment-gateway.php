@@ -784,9 +784,7 @@ No settings will be lost during this process. Please note this only affects the 
                 $importAapplepayScript = null;
                 $isModbile = (wp_is_mobile()) ? true : false;
                 $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
-                $custom_icons = property_exists($this->payplus_payment_gateway_settings, 'custom_icons') ? $this->payplus_payment_gateway_settings->custom_icons : false;
-                $customIcons = [];
-                $custom_icons = explode(";", $custom_icons);
+                $custom_icons = WC_PayPlus_Statics::getCardsLogos();
                 foreach ($custom_icons as $icon) {
                     $customIcons[] = esc_url($icon);
                 }

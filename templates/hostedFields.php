@@ -8,7 +8,7 @@ $direction = $locale !== "he_IL" ? "right" : "left";
 $opposite = $locale !== "he_IL" ?  "left" : "right";
 $cssDirection = $locale !== "he_IL" ?  "ltr" : "rtl";
 $cssOpposite = $locale !== "he_IL" ?  "rtl" : "ltr";
-$hostedIcons = WC_PayPlus_Statics::getHostedIcons();
+$hostedIcons = WC_PayPlus_Statics::getCardsLogos();
 $numPaymentsAllowed = $this->payplus_gateway->hostedFieldsOptions['hosted_fields_payments_amount'];
 $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 and min 1
 
@@ -590,10 +590,9 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                                                                         }
                                                                                     } else {
                                                                                             ?><img class="hf-image"
-                                    src="<?php echo esc_url($ccImage); ?>"
-                                    alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                    }
-                                                                                        ?>
+                                    src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
+                                                                                                                        }
+                                                                                                                            ?>
 
                         </div>
                     </div>

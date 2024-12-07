@@ -63,15 +63,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
         $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
-
-
-        if (isset($this->settings['custom_icons']) && strlen($this->settings['custom_icons']) > 0) {
-            $this->customIcons = explode(";", $this->settings['custom_icons']);
-        } else {
-            $this->customIcons = [];
-        }
-
-
+        $this->customIcons = array_values(WC_PayPlus_Statics::getCardsLogos());
         $this->secretKey = $this->settings['secret_key'] ?? null;
         $gateways = WC()->payment_gateways->payment_gateways();
 
@@ -490,7 +482,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
         $style_path = 'block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(
