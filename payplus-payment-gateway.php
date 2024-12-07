@@ -817,7 +817,7 @@ No settings will be lost during this process. Please note this only affects the 
                             "payplus_import_applepay_script" => $importAapplepayScript,
                             "payplus_mobile" => $isModbile,
                             "multiPassIcons" => $multipassIcons,
-                            "customIcons" => $customIcons,
+                            "customIcons" => isset($customIcons) ? $customIcons : [],
                             "isLoggedIn" => boolval(get_current_user_id() > 0),
                             "isSubscriptionOrder" => $isSubscriptionOrder,
                             "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
