@@ -583,12 +583,12 @@ function payplusMenusDisplay() {
   }
   const $selectCards = document.querySelector(
     "#woocommerce_payplus-payment-gateway_settings\\[cards\\]"
-  ).parentElement.parentElement.parentElement.parentElement;
+  )?.parentElement?.parentElement?.parentElement?.parentElement;
   const $checkOutPageOptions = document.querySelector(
     "#woocommerce_payplus-payment-gateway_hide_icon"
-  ).parentElement.parentElement.parentElement.parentElement.parentElement;
+  )?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement;
 
-  $checkOutPageOptions.append($selectCards);
+  $checkOutPageOptions?.append($selectCards);
   if (
     section == "payplus-invoice" ||
     section == "payplus-payment-gateway-setup-wizard" ||
