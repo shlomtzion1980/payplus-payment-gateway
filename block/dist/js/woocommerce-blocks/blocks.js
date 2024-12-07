@@ -51,7 +51,6 @@ if (isCheckout || hasOrder) {
   let customIcons = [];
 
   const w = window.React;
-  console.log("payPlusGateWay.customIcons", payPlusGateWay.customIcons);
   for (let c = 0; c < payPlusGateWay.customIcons?.length; c++) {
     customIcons[c] = (0, w.createElement)("img", {
       src: payPlusGateWay.customIcons[c],

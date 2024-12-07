@@ -610,7 +610,6 @@ function payplusMenusDisplay() {
     }
 
     const formTables = jQuery(".wrap.woocommerce").find(".form-table");
-    console.log(formTables);
     formTables.each(function () {
       if (this.innerHTML.trim().length === 0) {
         this.style.display = "none";
