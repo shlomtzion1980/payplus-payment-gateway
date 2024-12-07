@@ -388,8 +388,16 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
 
             .loader-countdown {
                 position: absolute;
-                top: 52%;
-                left: 47%;
+                top: 53%;
+
+                left: <?php if ($locale !== "he_IL") {
+                            echo "47%";
+                        } else {
+                            echo "49.5%";
+                        }
+
+                        ?>;
+
                 transform: translate(-50%, -50%);
                 font-size: 14px;
                 font-weight: bold;
