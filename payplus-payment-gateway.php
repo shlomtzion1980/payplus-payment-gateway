@@ -98,8 +98,8 @@ class WC_PayPlus
         $previous_version = get_option('wc_payplus_version');
         $display_count = get_option('wc_payplus_display_count', 0);
 
-        if (version_compare($previous_version, '7.3.1', '<')) {
-            if ($display_count < 25) {
+        if (version_compare($previous_version, '7.3.3', '<')) {
+            if ($display_count < 120) {
                 add_action('admin_notices', [$this, 'wc_payplus_show_update_message']);
                 update_option('wc_payplus_display_count', $display_count + 1);
             }
@@ -111,18 +111,27 @@ class WC_PayPlus
     {
 ?>
         <div id="wc-payplus-update-message" class="notice notice-success is-dismissible">
-            <p><?php _e("**PayPlus Payment Gateway Plugin - Version 7.3.1 Update**<br><br>
+            <p> <?php
+                echo wp_kses_post(
+                    sprintf(
+                        __(
+                            "**PayPlus Payment Gateway Plugin - Version 7.3.1 Update**<br><br>
 
-**Important Notice:**<br>
-This update introduces a major refactoring of the invoice code to enhance performance and align with current WooCommerce standards.<br>
-Additionally, the refund process has been refactored.
-<br><br>
-If you are updating from a version earlier than 7.2.0, you may encounter issues with refund document creation for orders created in those earlier versions.<br>
-In such cases:<br>
-1. Downgrade to version 7.3.0 to process refunds.<br>
-2. Once refunds are complete, you can safely upgrade back to version 7.3.1.<br>
-<br>
-No settings will be lost during this process. Please note this only affects the refund process for orders created in versions prior to 7.2.0.", 'payplus-payment-gateway'); ?>
+            **Important Notice:**<br>
+            This update introduces a major refactoring of the invoice code to enhance performance and align with current WooCommerce standards.<br>
+            Additionally, the refund process has been refactored.<br><br>
+
+            If you are updating from a version earlier than 7.2.0, you may encounter issues with refund document creation for orders created in those earlier versions.<br>
+            In such cases:<br>
+            1. Downgrade to version 7.3.0 to process refunds.<br>
+            2. Once refunds are complete, you can safely upgrade back to version 7.3.1.<br><br>
+
+            No settings will be lost during this process. Please note this only affects the refund process for orders created in versions prior to 7.2.0.",
+                            'payplus-payment-gateway'
+                        )
+                    )
+                );
+                ?>
             </p>
         </div>
         <?php
@@ -154,7 +163,8 @@ No settings will be lost during this process. Please note this only affects the 
         ?>
             <div class="notice notice-error">
                 <p>
-                    <strong>PayPlus Warning:</strong> WebSockets are active on your website. This may make your site vulnerable for
+                    <strong>PayPlus Warning:</strong> WebSockets are active on your website. This may make your site vulnerable
+                    for
                     hacks!
                 </p>
             </div>
