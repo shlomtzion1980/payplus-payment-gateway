@@ -475,7 +475,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             $order->payment_complete();
             WC()->cart->empty_cart();
 
-            $redirect_to = add_query_arg('order-received', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
+            $redirect_to = $order->get_checkout_order_received_url();
 
             wp_send_json_success(array(
                 'redirect_url' => $redirect_to
