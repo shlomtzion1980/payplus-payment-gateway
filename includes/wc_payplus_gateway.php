@@ -1921,10 +1921,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $customer_country_iso = $order->get_billing_country();
         $totallCart = round($order->get_total(), $this->rounding_decimals);
 
-        $shippingMethod = $this->getShippingMethod($order);
         if (!$this->send_products) {
             $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         }
+
         $redirectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
 
         $this->default_charge_method = ($this->default_charge_method) ?: 'credit-card';
