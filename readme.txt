@@ -89,7 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 = 7.3.1 - 08-12-2024 = 
 
 * Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
-* Added - Support for the "payin_vat" setup in PayPlus Embedded.
+* Added - Support for the "paying_vat" setup in PayPlus Embedded.
 * Added - Plugin integrity check during activation.
 * Added - Option to block the creation of Invoice+ documents for PayPal via plugin settings.
 * Added - "Select Your Cards" feature (optional) to display selected credit card logos from the plugin settings. This affects both the PayPlus main gateway and PayPlus Embedded.

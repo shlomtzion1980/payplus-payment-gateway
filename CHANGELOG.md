@@ -2,84 +2,82 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.3.1] = 08-12-2024 - (Heimerdinger) 
+## [7.3.1] = 08-12-2024 - (Heimerdinger)
 
-* Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
-* Added - Support for the "payin_vat" setup in PayPlus Embedded.
-* Added - Plugin integrity check during activation.
-* Added - Option to block the creation of Invoice+ documents for PayPal via plugin settings.
-* Added - "Select Your Cards" feature (optional) to display selected credit card logos from the plugin settings. This affects both the PayPlus main gateway and PayPlus Embedded.
-* Fixed - Apple Pay script now loads correctly on websites using iframes.
-* Fixed - Error messages were not displayed properly in the new Blocks Checkout; this issue has been resolved.
-* Tweak - Enhanced translations for error messages in PayPlus Embedded.
-* Tweak - Updated translations for cron options.
-* Tweak - Improved plugin sanitation and adherence to WordPress standards via Plugin Check.
-* Refactored - Enhanced the process for Invoice+ refunds.
-* Removed  - Custom icons added via plugin settings using pasted links have been removed and replaced with the "Select Your Cards" feature.
+- Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
+- Added - Support for the "paying_vat" setup in PayPlus Embedded.
+- Added - Plugin integrity check during activation.
+- Added - Option to block the creation of Invoice+ documents for PayPal via plugin settings.
+- Added - "Select Your Cards" feature (optional) to display selected credit card logos from the plugin settings. This affects both the PayPlus main gateway and PayPlus Embedded.
+- Fixed - Apple Pay script now loads correctly on websites using iframes.
+- Fixed - Error messages were not displayed properly in the new Blocks Checkout; this issue has been resolved.
+- Tweak - Enhanced translations for error messages in PayPlus Embedded.
+- Tweak - Updated translations for cron options.
+- Tweak - Improved plugin sanitation and adherence to WordPress standards via Plugin Check.
+- Refactored - Enhanced the process for Invoice+ refunds.
+- Removed - Custom icons added via plugin settings using pasted links have been removed and replaced with the "Select Your Cards" feature.
 
 ## [7.3.0] = 27-11-2024 - (Ratchet)
 
-* Fix     - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
+- Fix - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
 
-## [7.2.9] = 26-11-2024 - (Ironhide) 
+## [7.2.9] = 26-11-2024 - (Ironhide)
 
-* Added   - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
-* Tweak   - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
+- Added - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
+- Tweak - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
 
 ## [7.2.8] = 25-11-2024 - (PrimeWithFix3 :)
 
-* Fix     - Fix - PayPlus Embedded origin for testmode and production.
+- Fix - Fix - PayPlus Embedded origin for testmode and production.
 
 ## [7.2.7] = 25-11-2024 - (PrimeWithFix2 :)
 
-* Fix     - Small fix for refund invoices - removed usage of saved payloads.
+- Fix - Small fix for refund invoices - removed usage of saved payloads.
 
 ## [7.2.6] = 24-11-2024 - (PrimeWithFix)
 
-* Fix     - Loading iframe issue in redirect and on the next page fixed.
+- Fix - Loading iframe issue in redirect and on the next page fixed.
 
-## [7.2.5] = 24-11-2024 - (Prime) 
+## [7.2.5] = 24-11-2024 - (Prime)
 
-* Add   - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
+- Add - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
 
 The new feature can be enabled via the admin settings menu under "Subgateways." It can function as a standalone option or alongside existing payment pages. Note that PayPlus Embedded supports credit card payments exclusively.
 
-## [7.2.3] = 18-11-2024 - (Starscream) 
+## [7.2.3] = 18-11-2024 - (Starscream)
 
-* Added - PayPlus cron now processes "cancelled" or "pending" orders that are over 30 minutes old, created today, have a payment_page_uid, and do not have the cron test flag (to avoid retesting already tested orders).
-Orders that were successful and cancelled manually will not be tested or updated via cron.
+- Added - PayPlus cron now processes "cancelled" or "pending" orders that are over 30 minutes old, created today, have a payment_page_uid, and do not have the cron test flag (to avoid retesting already tested orders).
+  Orders that were successful and cancelled manually will not be tested or updated via cron.
 
 ## [7.2.1] = 14-11-2024 - (Octopus)
 
-* Tweak - The Apple Pay script is now loaded locally from the plugin.
+- Tweak - The Apple Pay script is now loaded locally from the plugin.
 
 ## [7.2.0] - 10-11-2024 - (Optimus)
 
-* Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
-* Add   - Display payment status in the PayPlus metabox.
-* Add   - Logs for payloads in order meta.
-* Add   - Utilize saved logs for creating refunds (Invoice+), ensuring refund data for products matches the original invoice creation, rather than the current product or site settings.
-* Tweak - Express checkout shipping now supports minimum amount rules for displaying free/flat rate and is sorted.
-* Tweak - Improved icon resolution.
-* Fix   - Resolved missing setting error that occurred on some fresh installations.
-
-
+- Add - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
+- Add - Display payment status in the PayPlus metabox.
+- Add - Logs for payloads in order meta.
+- Add - Utilize saved logs for creating refunds (Invoice+), ensuring refund data for products matches the original invoice creation, rather than the current product or site settings.
+- Tweak - Express checkout shipping now supports minimum amount rules for displaying free/flat rate and is sorted.
+- Tweak - Improved icon resolution.
+- Fix - Resolved missing setting error that occurred on some fresh installations.
 
 ## [7.1.8] - 28-10-2024 - (Ken)
 
-* Add   - Transaction UID handling to the payPlusIpn function.
-* Tweak - Callbacks are now consistently received locally and forwarded to the "Callback URL" when defined in plugin settings.
+- Add - Transaction UID handling to the payPlusIpn function.
+- Tweak - Callbacks are now consistently received locally and forwarded to the "Callback URL" when defined in plugin settings.
 
-## [7.1.7] - 27-10-2024  (Ryu)
+## [7.1.7] - 27-10-2024 (Ryu)
 
-- Fix   - Callback response.
+- Fix - Callback response.
 
 ## [7.1.6] - 2024-10-13 - (Kaos)
 
-- Fix   - Subscription order renewals.
-- Fix   - Nonce verification on IPN response for certain users.
-- Add   - Option to force Apple Pay script from admin settings.
-- Add   - Updated shipping functions for express checkout.
+- Fix - Subscription order renewals.
+- Fix - Nonce verification on IPN response for certain users.
+- Add - Option to force Apple Pay script from admin settings.
+- Add - Updated shipping functions for express checkout.
 - Tweak - Improved menu translations.
 
 ## [7.1.5] - 2024-09-12 - (MonkeyDLuffy)
