@@ -905,7 +905,7 @@ class PayplusInvoice
     {
         $order = wc_get_order($order_id);
         $typePaymentMethod = $order->get_payment_method();
-        if (isset($this->payplus_invoice_option['do-not-create']) && in_array($typePaymentMethod, $this->payplus_invoice_option['invoiceplus-do-not-create'])) {
+        if (isset($this->payplus_invoice_option['do-not-create']) && in_array($typePaymentMethod, $this->payplus_invoice_option['do-not-create'])) {
             return;
         }
         if ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod") {
