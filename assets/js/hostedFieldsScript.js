@@ -479,7 +479,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                                 final_response.data.redirect_url;
                         } else {
                             alert(
-                                "Order completion failed: " +
+                                "Order completion failed(Please try again): " +
                                     final_response.message
                             );
                             location.reload();
