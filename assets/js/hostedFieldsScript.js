@@ -371,6 +371,7 @@ jQuery(() => {
                 });
             } else {
                 alert(resp.results.message);
+                location.reload();
             }
         } catch (error) {
             jQuery("#error").append(`<div>Error:</div>`);
@@ -481,15 +482,18 @@ hf.Upon("pp_responseFromServer", (e) => {
                                 "Order completion failed: " +
                                     final_response.message
                             );
+                            location.reload();
                         }
                     },
                     error: function (xhr, status, error) {
                         alert("Error completing order: " + error);
+                        location.reload();
                     },
                 });
             },
             error: function (xhr, status, error) {
                 alert("Error making hosted payment: " + error);
+                location.reload();
             },
         });
     }
