@@ -99,7 +99,7 @@ class WC_PayPlus
         $display_count = get_option('wc_payplus_display_count', 0);
 
         if (version_compare($previous_version, '7.3.1', '<')) {
-            if ($display_count < 5) {
+            if ($display_count < 25) {
                 add_action('admin_notices', [$this, 'wc_payplus_show_update_message']);
                 update_option('wc_payplus_display_count', $display_count + 1);
             }
@@ -125,13 +125,6 @@ In such cases:<br>
 No settings will be lost during this process. Please note this only affects the refund process for orders created in versions prior to 7.2.0.", 'payplus-payment-gateway'); ?>
             </p>
         </div>
-        <script type="text/javascript">
-            jQuery(document).ready(function($) {
-                setTimeout(function() {
-                    $(".notice-success").fadeOut();
-                }, 35000);
-            });
-        </script>
         <?php
     }
 
