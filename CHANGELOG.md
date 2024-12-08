@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.1] = 08-12-2024 - (Heimerdinger) 
+
+* Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
+* Added - Support for the "payin_vat" setup in PayPlus Embedded.
+* Added - Plugin integrity check during activation.
+* Added - Option to block the creation of Invoice+ documents for PayPal via plugin settings.
+* Added - "Select Your Cards" feature (optional) to display selected credit card logos from the plugin settings. This affects both the PayPlus main gateway and PayPlus Embedded.
+* Fixed - Apple Pay script now loads correctly on websites using iframes.
+* Fixed - Error messages were not displayed properly in the new Blocks Checkout; this issue has been resolved.
+* Tweak - Enhanced translations for error messages in PayPlus Embedded.
+* Tweak - Updated translations for cron options.
+* Tweak - Improved plugin sanitation and adherence to WordPress standards via Plugin Check.
+* Refactored - Enhanced the process for Invoice+ refunds.
+* Removed  - Custom icons added via plugin settings using pasted links have been removed and replaced with the "Select Your Cards" feature.
+
 ## [7.3.0] = 27-11-2024 - (Ratchet)
 
 * Fix     - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.

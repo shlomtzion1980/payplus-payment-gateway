@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 7.3.0
+Stable tag: 7.3.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,30 +86,47 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.3.1 - 08-12-2024 = 
+
+* Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
+* Added - Support for the "payin_vat" setup in PayPlus Embedded.
+* Added - Plugin integrity check during activation.
+* Added - Option to block the creation of Invoice+ documents for PayPal via plugin settings.
+* Added - "Select Your Cards" feature (optional) to display selected credit card logos from the plugin settings. This affects both the PayPlus main gateway and PayPlus Embedded.
+* Fixed - Apple Pay script now loads correctly on websites using iframes.
+* Fixed - Error messages were not displayed properly in the new Blocks Checkout; this issue has been resolved.
+* Tweak - Enhanced translations for error messages in PayPlus Embedded.
+* Tweak - Updated translations for cron options.
+* Tweak - Improved plugin sanitation and adherence to WordPress standards via Plugin Check.
+* Refactored - Enhanced the process for Invoice+ refunds.
+* Removed  - Custom icons added via plugin settings using pasted links have been removed and replaced with the "Select Your Cards" feature.
+
+
+
 = 7.3.0 - 27-11-2024 = 
 
-* Fix     - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
+* Fix   - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
 
 = 7.2.9 - 26-11-2024 = 
 
-* Added   - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
-* Tweak   - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
+* Added - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
+* Tweak - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
 
 = 7.2.8 - 25-11-2024 = 
 
-* Fix     - PayPlus Embedded origin for testmode and production.
+* Fix   - PayPlus Embedded origin for testmode and production.
 
 = 7.2.7 - 25-11-2024 = 
 
-* Fix     - Small fix for refund invoices - removed usage of saved payloads.
+* Fix   - Small fix for refund invoices - removed usage of saved payloads.
 
 = 7.2.6 - 24-11-2024 = 
 
-* Fix     - Loading iframe issue in redirect and on the next page fixed.
+* Fix   - Loading iframe issue in redirect and on the next page fixed.
 
 = 7.2.5 - 24-11-2024 = 
 
-* Added   - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
+* Added - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
 
 The new feature can be enabled via the admin settings menu under "Subgateways." It can function as a standalone option or alongside existing payment pages. Note that PayPlus Embedded supports credit card payments exclusively.
 
