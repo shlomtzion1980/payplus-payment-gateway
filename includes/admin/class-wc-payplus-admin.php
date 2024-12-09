@@ -1932,7 +1932,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 <?php
         }
         $output = ob_get_clean();
-        echo $output;
+        echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     /**
