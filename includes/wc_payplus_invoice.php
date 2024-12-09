@@ -1111,12 +1111,14 @@ class PayplusInvoice
 
                     $payload = wp_json_encode($payload);
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
-
-                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
+                    $logCashPayment = !$isCashPayment ? 'No' : 'Yes';
+                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')' . ' is CashePayment: ' . $logCashPayment);
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
 
                     if (!$isCashPayment) {
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Doing post:  (' . $order_id . ')');
                         $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $payplus_document_type, $payload);
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Response: ' . wp_json_encode($response));
                     }
 
                     if (is_wp_error($response)) {
