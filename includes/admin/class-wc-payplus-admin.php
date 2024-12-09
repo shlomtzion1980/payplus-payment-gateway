@@ -1059,8 +1059,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $installed_payment_methods = array_map('get_payment_payplus', array_keys($installed_payment_methods), array_values($installed_payment_methods));
             $installed_payment_methods = array_filter($installed_payment_methods, function ($value) {
-                return $value != '' && $value != null;
+                return $value != '' && $value != null && $value != 'hostedFields';
             });
+
             $installed_payment_methods[] = 'pay-box';
         ?>
             <input id="all-sum" type="hidden" value="<?php echo esc_attr($order->get_total()); ?>">
