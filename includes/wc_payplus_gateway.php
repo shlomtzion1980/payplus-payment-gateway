@@ -1993,6 +1993,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         isset($token) && $token !== null ? $payload['secure3d'] = ['activate' => false] : null;
 
+        $payload['initial_invoice'] = false;
         $this->initial_invoice === "2" ? $payload['initial_invoice'] = false : $payload['initial_invoice'];
         $this->initial_invoice === "1" ? $payload['initial_invoice'] = true : $payload['initial_invoice'];
         $this->invoice_api->payplus_get_invoice_enable() ? $payload['initial_invoice'] = false : $payload['initial_invoice'];
