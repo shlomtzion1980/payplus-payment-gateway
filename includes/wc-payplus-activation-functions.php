@@ -76,13 +76,17 @@ function display_hash_check_notice()
 
 function verify_plugin_integrity($plugin_dir)
 {
-    $hash_file = $plugin_dir . '/hashes.json';
+    $trunk_url = 'https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/';
+    $hashes_file_url = $trunk_url . 'hashes.json';
 
-    if (!file_exists($hash_file)) {
-        return 'Integrity file not found.';
+    // Fetch the hashes.json file
+    $response = wp_remote_get($hashes_file_url);
+    if (is_wp_error($response)) {
+        return 'Failed to fetch integrity file.';
     }
 
-    $expected_hashes = json_decode(file_get_contents($hash_file), true);
+    $body = wp_remote_retrieve_body($response);
+    $expected_hashes = json_decode($body, true);
     if (!$expected_hashes) {
         return 'Invalid integrity file.';
     }
