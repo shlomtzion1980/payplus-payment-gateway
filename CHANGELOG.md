@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.2] = 10-12-2024 - (Jinx)
+
+- Fixed - Resolved issues with creating refunds for PayPal through Invoice+ after the refactor.
+- Logs - Added logging for the invoice creation process.
+- Tweak - Removed "hostedFields" (PayPlus Embedded) from manual payment Invoice+ creation.
+
 ## [7.3.1] = 08-12-2024 - (Heimerdinger)
 
 - Added - Error messages in PayPlus Embedded now appear at the bottom of the form with a fade-out animation and counter, consistent with the payment pages.
