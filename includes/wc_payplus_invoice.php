@@ -575,7 +575,9 @@ class PayplusInvoice
 
         if ($payPlusPayloadInvoice) {
             $payPlusPayloadInvoice = json_decode($payPlusPayloadInvoice, true);
-            unset($payPlusPayloadInvoice['unique_identifier']);
+            if (strpos($docType, 'refund') !== false) {
+                unset($payPlusPayloadInvoice['unique_identifier']);
+            }
             $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
             foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
                 $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
