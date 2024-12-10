@@ -1921,11 +1921,65 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $customer_country_iso = $order->get_billing_country();
         $totallCart = round($order->get_total(), $this->rounding_decimals);
 
+        $shippingMethod = $this->getShippingMethod($order);
+        $customer = $this->payplus_get_client_by_order_id($order_id);
         if (!$this->send_products) {
             $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         }
 
-        $redirectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
+        $customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
+        $redriectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
+        $setInvoice = '';
+        $payingVat = '';
+        $invoiceLanguage = '';
+        $addChargeLine = '';
+        if ($subscription) {
+            $addChargeLine = '"charge_method": 1,';
+        } else if ($this->settings['transaction_type'] != "0") {
+            $addChargeLine = '"charge_method": ' . $this->settings['transaction_type'] . ',';
+        }
+        if (!$subscription && $this->add_product_field_transaction_type) {
+            if ($this->payplus_check_all_product($order, "2")) {
+                $addChargeLine = '"charge_method": 2,';
+            } elseif ($this->payplus_check_all_product($order, "1")) {
+                $addChargeLine = '"charge_method": 1,';
+            }
+        }
+
+        if ($this->invoice_api->payplus_get_invoice_enable()) {
+            $flagInvoice = 'false';
+            $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
+        } elseif ($this->initial_invoice == "1") {
+            $flagInvoice = 'true';
+            $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
+        } elseif ($this->initial_invoice == "2") {
+            $flagInvoice = 'false';
+            $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
+        }
+        if ($this->paying_vat_all_order == "yes") {
+            $payingVat = '"paying_vat": true,';
+        }
+        // Paying Vat & Invoices
+        if ($this->paying_vat == "0") {
+            $payingVat = '"paying_vat": true,';
+        } else if ($this->paying_vat == "1") {
+            $payingVat = '"paying_vat": false,';
+        } else if ($this->paying_vat == "2") {
+            if (trim(strtolower($customer_country_iso)) != trim(strtolower($this->paying_vat_iso_code))) {
+                $payingVat = '"paying_vat": false,';
+                if (!empty($this->foreign_invoices_lang)) {
+                    $invoiceLanguage = '"invoice_language": "' . strtolower($this->foreign_invoices_lang) . '",';
+                }
+            } else {
+                $payingVat = '"paying_vat": true,';
+            }
+        }
+        if ($this->change_vat_in_eilat) {
+
+            if ($this->payplus_check_is_vat_eilat($order_id)) {
+                $payingVat = '"paying_vat": false,';
+            }
+        }
 
         $this->default_charge_method = ($this->default_charge_method) ?: 'credit-card';
         $this->default_charge_method = isset($options['chargeDefault']) ? $options['chargeDefault'] : $this->default_charge_method;
@@ -1949,89 +2003,59 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $this->_wpnonce);
 
         $post = $this->payplus_get_posts_id("", array("post_parent" => $order_id));
+        $external_recurring_payment = "";
+        if ($post && $post[0]->post_type === "shop_subscription") {
+            $external_recurring_id = $post[0]->ID;
+            $external_recurring_payment = '"external_recurring_payment":' . $this->getRecurring($external_recurring_id, $order_id) . ",";
+        } elseif ($subscription) {
+
+            $external_recurring_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal', true);
+            $external_recurring_payment = '"external_recurring_payment":' . $this->getRecurring($external_recurring_id, $order_id) . ",";
+        }
+        $json_move_token = "";
+        if ($move_token) {
+            $json_move_token = ',"move_token": true';
+        }
 
         $totalCartAmount = $objectProducts->amount;
+        $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
 
-        $payload = [
-            "payment_page_uid" => $this->payment_page_id,
-            "expiry_datetime" => "30",
-            "hide_other_charge_methods" => $hideOtherChargeMethods,
-            "language_code" => trim(strtolower($langCode[0])),
-            "refURL_success" => $redirectSuccess . '&charge_method=' . $this->default_charge_method,
-            "refURL_failure" => $this->response_error_url,
-            "refURL_callback" => $callback,
-            "charge_default" => $this->default_charge_method,
-            "amount" => $this->send_products ? $totallCart : $totalCartAmount,
-            "currency_code" => $order->get_currency(),
-            "sendEmailApproval" => $this->sendEmailApproval == 1,
-            "sendEmailFailure" => $this->sendEmailFailure == 1,
-            "create_token" => $bSaveToken,
-            "more_info" => $custom_more_info ? $custom_more_info : $order_id
-        ];
-
-        if (!$this->send_products) {
-            $payload["items"] = array_map('json_decode', $objectProducts->productsItems);
-        }
-
-        if ($token) {
-            $payload["token"] = is_object($token) ? $token->get_token() : $token;
-        }
-
-        if ($this->send_add_data) {
-            $payload["add_data"] = $order_id;
-        }
-
-        if ($this->hide_payments_field > 0) {
-            $payload["hide_payments_field"] = $this->hide_payments_field == 1;
-        }
-
-        if ($this->hide_identification_id > 0) {
-            $payload["hide_identification_id"] = $this->hide_identification_id == 1;
-        }
-
-        $payload['more_info_4'] = PAYPLUS_VERSION;
-
-        isset($token) && $token !== null ? $payload['secure3d'] = ['activate' => false] : null;
-
-        $payload['initial_invoice'] = false;
-        $this->initial_invoice === "2" ? $payload['initial_invoice'] = false : $payload['initial_invoice'];
-        $this->initial_invoice === "1" ? $payload['initial_invoice'] = true : $payload['initial_invoice'];
-        $this->invoice_api->payplus_get_invoice_enable() ? $payload['initial_invoice'] = false : $payload['initial_invoice'];
-
-        $external_recurring_id = $post && $post[0]->post_type === "shop_subscription" ? $post[0]->ID : ($subscription ? WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal', true) : null);
-        $external_recurring_id ? $payload['external_recurring_payment'] = $this->getRecurring($external_recurring_id, $order_id) : null;
-        $move_token ? $payload['move_token'] = true : null;
-
-        $customer = $this->payplus_get_client_by_order_id($order_id);
-        $customer = (count($customer)) ? $customer : "";
-        $payload['customer'] = $customer;
-
-        if ($subscription) {
-            $payload['charge_method'] = 1;
-        } else if ($this->settings['transaction_type'] != "0") {
-            $payload['charge_method'] = $this->settings['transaction_type'];
-        }
-        if (!$subscription && $this->add_product_field_transaction_type) {
-            if ($this->payplus_check_all_product($order, "2")) {
-                $payload['charge_method'] = 2;
-            } elseif ($this->payplus_check_all_product($order, "1")) {
-                $payload['charge_method'] = 1;
-            }
-        }
-
-        $payload['paying_vat'] = ($this->paying_vat_all_order == "yes") ? true : (($this->paying_vat == "0") ? true : (($this->paying_vat == "1") ? false : (($this->paying_vat == "2" && trim(strtolower($customer_country_iso)) != trim(strtolower($this->paying_vat_iso_code))) ? false : true)));
-
-        if ($this->paying_vat == "2" && trim(strtolower($customer_country_iso)) != trim(strtolower($this->paying_vat_iso_code)) && !empty($this->foreign_invoices_lang)) {
-            $payload['invoice_language'] = strtolower($this->foreign_invoices_lang);
-        }
-
-        if ($this->change_vat_in_eilat && $this->payplus_check_is_vat_eilat($order_id)) {
-            $payload['paying_vat'] = false;
-        }
-
-        $payload = wp_json_encode($payload);
+        $payload = '{
+            "payment_page_uid": "' . $this->payment_page_id . '",
+            ' . $addChargeLine . '
+            "expiry_datetime": "30",
+            "hide_other_charge_methods": ' . $hideOtherChargeMethods . ',
+            "language_code": "' . trim(strtolower($langCode[0])) . '",
+            "refURL_success": "' . $redriectSuccess . '&charge_method=' . $this->default_charge_method . '",
+            "refURL_failure": "' . $this->response_error_url . '",
+            "refURL_callback": "' . $callback . '",
+            "charge_default":"' . $this->default_charge_method . '",
+            ' . $payingVat . $customer
+            . (!$this->send_products ? '
+            "items": [
+                ' . implode(",", $objectProducts->productsItems) . '
+            ],' : '') . '
+            ' . ($token ? '"token" : "' . (is_object($token) ? $token->get_token() : $token) . '",' : '') . '
+            ' . $secure3d . '
+            "amount": ' . ($this->send_products ? $totallCart : $totalCartAmount) . ',
+            "currency_code": "' . $order->get_currency() . '",
+            "sendEmailApproval": ' . ($this->sendEmailApproval == 1 ? 'true' : 'false') . ',
+            "sendEmailFailure": ' . ($this->sendEmailFailure == 1 ? 'true' : 'false') . ',
+            "create_token": ' . ($bSaveToken ? 'true' : 'false') . ',
+            ' . $setInvoice . '
+            ' . $invoiceLanguage
+            . $external_recurring_payment
+            . ($this->send_add_data ? '"add_data": "' . $order_id . '",' : '') . '
+            ' . ($this->hide_payments_field > 0 ? '"hide_payments_field": ' . ($this->hide_payments_field == 1 ? 'true' : 'false') . ',' : '') . '
+            ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
+            "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
+            $json_move_token . '}';
+        $payloadArray = json_decode($payload, true);
+        $payloadArray['more_info_4'] = PAYPLUS_VERSION;
+        $payload = wp_json_encode($payloadArray);
         return $payload;
     }
+
 
     /**
      * @param $order_id
