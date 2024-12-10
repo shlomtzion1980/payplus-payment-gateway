@@ -364,9 +364,11 @@ class PayplusInvoice
         !empty($unique_identifier) ? $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'] : null;
 
         if ($payloadInvoiceData['payments'][0]['payment_type'] !== 'credit-card' && empty($payplusApprovalNum)) {
-            $payplusApprovalNum = $order->get_transaction_id();
-            $payloadInvoiceData['payments'][0]['transaction_number'] = $payplusApprovalNum;
-            $payloadInvoiceData['payments'][0]['transaction_id'] = $payplusApprovalNum;
+            if (in_array($payloadInvoiceData['payments'][0]['payment_type'], ['paypal', 'tav-zahav', 'multipass'])) {
+                $payplusApprovalNum = "";
+                $payloadInvoiceData['payments'][0]['transaction_number'] = $payplusApprovalNum;
+                $payloadInvoiceData['payments'][0]['transaction_id'] = $payplusApprovalNum;
+            }
         }
 
         !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true)) ? $payloadInvoiceData['payments'][0]['number_of_payments'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true) : null;
