@@ -610,7 +610,7 @@ class WC_PayPlus_Statics
             return $response;
         }
 
-        public static function createUpdateHostedPaymentPageLink($payload)
+        public static function createUpdateHostedPaymentPageLink($payload, $isPlaceOrder = false)
         {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
             $testMode = boolval($options['api_test_mode'] === 'yes');
@@ -624,7 +624,7 @@ class WC_PayPlus_Statics
             }
 
             $hostedResponse = WC_PayPlus_Statics::payPlusRemote($apiUrl, $payload, "post");
-            if ($pageRequestUid && $hostedFieldsUUID) {
+            if ($isPlaceOrder) {
                 $moreInfo = json_decode($payload, true)['more_info'];
                 if (is_numeric($moreInfo)) {
                     sleep(2); // wait for data to be updated in the system
@@ -645,7 +645,6 @@ class WC_PayPlus_Statics
                 $hostedFieldsUUID = $bodyArray['data']['hosted_fields_uuid'];
                 WC()->session->set('hostedFieldsUUID', $hostedFieldsUUID);
             } else {
-
                 $bodyArray['data']['hosted_fields_uuid'] = $hostedFieldsUUID;
             }
             $hostedResponse = wp_json_encode($bodyArray);

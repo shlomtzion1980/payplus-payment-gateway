@@ -18,13 +18,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $payPlusGateway;
     public $isHideLoaderLogo;
     public $isHostedStarted;
+    public $isPlaceOrder;
     // public $hostedFieldsResponse;
 
 
     /**
      *
      */
-    public function __construct($order_id = "000", $order = null)
+    public function __construct($order_id = "000", $order = null, $isPlaceOrder = false)
     {
         $this->payPlusGateway = $this->get_main_payplus_gateway();
         $this->isHideLoaderLogo = boolval(isset($this->payPlusGateway->hostedFieldsOptions['hide_loader_logo']) && $this->payPlusGateway->hostedFieldsOptions['hide_loader_logo'] === 'yes');
@@ -34,9 +35,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->apiKey = $this->testMode ? $this->payPlusGateway->settings['dev_api_key'] : $this->payPlusGateway->settings['api_key'];
         $this->secretKey = $this->testMode ? $this->payPlusGateway->settings['dev_secret_key'] : $this->payPlusGateway->settings['secret_key'];
         $this->paymentPageUid = $this->testMode ? $this->payPlusGateway->settings['dev_payment_page_id'] : $this->payPlusGateway->settings['payment_page_id'];
-        // $this->isHostedStarted = WC()->session->get('hostedStarted');
         $this->order_id = $order_id;
         $this->order = $order;
+        $this->isPlaceOrder = $isPlaceOrder;
 
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
@@ -361,24 +362,18 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
         $payload = wp_json_encode($data);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]) : null;
-        if ($hostedResponse === $payload) {
-            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(2): ($order_id)\nPayload is identical no need to run.");
-            return WC()->session->get('hostedResponse');
-        } else {
-            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", $firstMessage  . "HostedFields-hostedFieldsData(2)\n");
-        }
 
-        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData(3) Payload: \n$payload");
+        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-Class Payload: \n$payload");
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
             WC()->session->set('page_request_uid', false);
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
         }
 
         return $hostedResponse;
