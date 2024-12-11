@@ -289,25 +289,37 @@ if (isCheckout || hasOrder) {
                             "payplus-payment-gateway-hostedfields"
                         ) === 0
                     ) {
-                        hf.SubmitPayment();
-                        document.body.style.overflow = "hidden";
-                        document.body.style.backgroundColor = "white";
-                        document.body.style.opacity = "0.7";
-                        document.querySelector(
-                            ".blocks-payplus_loader_hosted"
-                        ).style.display = "block";
-                        const inputs = document.querySelectorAll(
-                            'input[type="radio"], input'
-                        );
-                        inputs.forEach((input) => {
-                            input.disabled = true;
-                        });
-                        hf.Upon("pp_responseFromServer", (e) => {
-                            if (e.detail.errors) {
-                                location.reload();
-                            }
-                        });
-                        return;
+                        if (
+                            !isNaN(hostedPayload.more_info) ||
+                            (hostedPayload.customer.email !==
+                                "general@payplus.co.il" &&
+                                hostedPayload.customer.customer_name !==
+                                    "general-first-name general-last-name")
+                        ) {
+                            hf.SubmitPayment();
+                            document.body.style.overflow = "hidden";
+                            document.body.style.backgroundColor = "white";
+                            document.body.style.opacity = "0.7";
+                            document.querySelector(
+                                ".blocks-payplus_loader_hosted"
+                            ).style.display = "block";
+                            const inputs = document.querySelectorAll(
+                                'input[type="radio"], input'
+                            );
+                            inputs.forEach((input) => {
+                                input.disabled = true;
+                            });
+                            hf.Upon("pp_responseFromServer", (e) => {
+                                if (e.detail.errors) {
+                                    location.reload();
+                                }
+                            });
+                            return;
+                        } else {
+                            alert(
+                                "There`s been an error with the payment, Please try again or use a different payment method"
+                            );
+                        }
                     }
 
                     if (
