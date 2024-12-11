@@ -59,7 +59,7 @@ jQuery(function ($) {
                 $("input#" + inputPayPlus).prop("checked", true);
                 $("#submit-payment").hide();
                 $("div.container.hostedFields").show();
-            }, 1000);
+            }, 2000);
         } else {
             setTimeout(function () {
                 $(".payment_method_payplus-payment-gateway").css(
