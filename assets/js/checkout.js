@@ -881,7 +881,7 @@ jQuery(function ($) {
                                 hf.SubmitPayment();
                             } else {
                                 alert(
-                                    "There`s been an error with the payment, Please try again or use a different payment method"
+                                    "There`s been an error with the payment - you were not charged - please try again"
                                 );
                                 location.reload();
                             }
