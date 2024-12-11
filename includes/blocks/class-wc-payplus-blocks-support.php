@@ -280,12 +280,18 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     // Get the coupon discount amount
                     $coupon_value = $coupon->get_amount();
                 }
+
+                $discount_tax = 0;
+                foreach ($order->get_items('coupon') as $item_id => $item) {
+                    $discount_tax += $item->get_discount_tax();
+                }
+
                 if ($coupon_value > 0) {
                     $item = new stdClass();
                     $item->name = "coupon_discount";
                     $item->quantity = 1;
                     $coupon_value > $totalBeforeDiscount ? $coupon_value = $totalBeforeDiscount : $coupon_value;
-                    $item->price = -$coupon_value;
+                    $item->price = $wc_tax_enabled && !$isTaxIncluded ? - ($coupon_value + $discount_tax) :  -$coupon_value;
                     $item->vat_type = !$wc_tax_enabled ? 1 : 0;
                     $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
                     $item->vat_type = $wc_tax_enabled && $isTaxIncluded ? 0 : $item->vat_type;

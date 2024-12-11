@@ -861,30 +861,12 @@ jQuery(function ($) {
                     dataType: "json",
                     success: function (result) {
                         if (result.method === "hostedFields") {
-                            const hostedPayload = JSON.parse(
-                                payplus_script_checkout.hostedPayload
-                            );
-                            if (
-                                !isNaN(hostedPayload.more_info) &&
-                                hostedPayload.customer.email !==
-                                    "general@payplus.co.il" &&
-                                hostedPayload.customer.customer_name !==
-                                    "general-first-name general-last-name"
-                            ) {
-                                overlay();
-                                jQuery(
-                                    ".blocks-payplus_loader_hosted"
-                                ).fadeIn();
-                                wc_checkout_form.$checkout_form
-                                    .removeClass("processing")
-                                    .unblock();
-                                hf.SubmitPayment();
-                            } else {
-                                alert(
-                                    "There`s been an error with the payment - you were not charged - please try again"
-                                );
-                                location.reload();
-                            }
+                            overlay();
+                            jQuery(".blocks-payplus_loader_hosted").fadeIn();
+                            wc_checkout_form.$checkout_form
+                                .removeClass("processing")
+                                .unblock();
+                            hf.SubmitPayment();
                         } else {
                             // Detach the unload handler that prevents a reload / redirect
                             wc_checkout_form.detachUnloadEventsOnSubmit();
