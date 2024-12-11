@@ -883,6 +883,7 @@ jQuery(function ($) {
                                 alert(
                                     "There`s been an error with the payment, Please try again or use a different payment method"
                                 );
+                                location.reload();
                             }
                         } else {
                             // Detach the unload handler that prevents a reload / redirect
