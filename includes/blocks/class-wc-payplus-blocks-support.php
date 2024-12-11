@@ -482,7 +482,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
         $style_path = 'block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(
@@ -506,7 +506,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             [
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'frontNonce' => wp_create_nonce('frontNonce'),
-                "hostedPayload" => WC()->session->get('hostedPayload'),
+                "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
             ]
         );
 

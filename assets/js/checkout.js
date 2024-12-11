@@ -865,11 +865,11 @@ jQuery(function ($) {
                                 payplus_script_checkout.hostedPayload
                             );
                             if (
-                                !isNaN(hostedPayload.more_info) ||
-                                (hostedPayload.customer.email !==
+                                !isNaN(hostedPayload.more_info) &&
+                                hostedPayload.customer.email !==
                                     "general@payplus.co.il" &&
-                                    hostedPayload.customer.customer_name !==
-                                        "general-first-name general-last-name")
+                                hostedPayload.customer.customer_name !==
+                                    "general-first-name general-last-name"
                             ) {
                                 overlay();
                                 jQuery(

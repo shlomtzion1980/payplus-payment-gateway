@@ -14,6 +14,7 @@ const isCheckout = !document.querySelector(
 if (isCheckout || hasOrder) {
     console.log("checkout page?", isCheckout);
     console.log("has order?", hasOrder);
+    const hostedPayload = JSON.parse(payplus_script.hostedPayload);
 
     const customerId = store.getCustomerId();
     const additionalFields = store.getAdditionalFields();
@@ -290,11 +291,11 @@ if (isCheckout || hasOrder) {
                         ) === 0
                     ) {
                         if (
-                            !isNaN(hostedPayload.more_info) ||
-                            (hostedPayload.customer.email !==
+                            !isNaN(hostedPayload.more_info) &&
+                            hostedPayload.customer.email !==
                                 "general@payplus.co.il" &&
-                                hostedPayload.customer.customer_name !==
-                                    "general-first-name general-last-name")
+                            hostedPayload.customer.customer_name !==
+                                "general-first-name general-last-name"
                         ) {
                             hf.SubmitPayment();
                             document.body.style.overflow = "hidden";
