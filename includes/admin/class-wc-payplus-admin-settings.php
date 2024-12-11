@@ -575,8 +575,7 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = array(
                     'id' => 'woocommerce_payplus-payment-gateway_settings[shipping_woo]',
                     'name' => __('Shipping according to Woocommerce settings', 'payplus-payment-gateway'),
-                    'desc' => __('
-                    <br>Countries (Continents not supported):
+                    'desc' => __('<br>Countries (Continents not supported):
                     <br>Flat rate,
                     <br>Free (Condition support for min amount or no condition).
                     <br>
