@@ -74,6 +74,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC()->session->set('hostedStarted', false);
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
+        $hostedResponseArray = json_decode($hostedResponse, true);
+        $hostedResponseArray['results']['status'] === "error" ? $this->updateOrderId() : null;
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
@@ -133,8 +135,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
     }
 
-    public function updateOrderId($randomHash)
+    public function updateOrderId($randomHash = null)
     {
+        $randomHash = $randomHash ?? bin2hex(random_bytes(16));
         WC()->session->set('order_awaiting_payment', $randomHash);
         $order_id = $randomHash;
         return $order_id;
