@@ -1,6 +1,6 @@
 <?php
 
-class WCPayplusErrorCodes
+class WCPayPlusErrorCodes
 {
     public $errors = [];
     public $fieldNames = [];

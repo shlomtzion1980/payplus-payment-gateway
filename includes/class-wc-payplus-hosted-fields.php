@@ -82,7 +82,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-error-handler.php';
-            $payPlusErrors = new WCPayplusErrorCodes();
+            $payPlusErrors = new WCPayPlusErrorCodes();
 
             if (file_exists($template_path)) {
                 wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
