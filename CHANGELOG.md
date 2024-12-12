@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.2] = 12-12-2024 - (Powder)
+
+- Fix - PayPlus Embedded - Resolved an issue where coupons/discounts did not account for taxes on stores with exclusive prices and tax management enabled.
+- Tweak - PayPlus Embedded - Improved payload validation before payment, added error messages with reload functionality for payment failures, and implemented minor refactoring to enhance performance by reducing unnecessary checks.
+
+
 ## [7.3.2] = 10-12-2024 - (Jinx)
 
 - Fixed - Resolved issues with creating refunds for PayPal through Invoice+ after the refactor.
