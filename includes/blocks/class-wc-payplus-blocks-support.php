@@ -92,7 +92,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         return $this->payplus_gateway;
     }
 
-    public function hostedFieldsData($order_id)
+    public function hostedFieldsData($order_id, $isPlaceOrder = false)
     {
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->vat4All = isset($options['paying_vat_all_order']) ? boolval($options['paying_vat_all_order'] === "yes") : false;
@@ -320,13 +320,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
         if ($hostedResponseArray['results']['status'] === "error") {
             WC()->session->__unset('page_request_uid');
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload);
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
         }
 
         return $hostedResponse;
@@ -375,7 +375,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             ++$hostedStarted;
             if ($hostedStarted <= 1) {
                 WC()->session->set('hostedStarted', $hostedStarted);
-                $this->hostedFieldsData($this->orderId);
+                $this->hostedFieldsData($this->orderId, true);
                 $payment_details = $result->payment_details;
                 $payment_details['order_id'] = $this->orderId;
                 $payment_details['secret_key'] = $this->secretKey;
