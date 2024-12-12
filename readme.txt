@@ -86,10 +86,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.3.2 - 12-12-2024
+= 7.3.3 - 12-12-2024
 
 - Fix - PayPlus Embedded - Resolved an issue where coupons/discounts did not account for taxes on stores with exclusive prices and tax management enabled.
 - Tweak - PayPlus Embedded - Improved payload validation before payment, added error messages with reload functionality for payment failures, and implemented minor refactoring to enhance performance by reducing unnecessary checks.
+- Tweak - Alertify is now loaded locally to comply with WordPress plugin check requirements.
 
 = 7.3.2 - 10-12-2024
 
