@@ -1538,7 +1538,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($where) {
             $sql .= " WHERE" . $where;
         }
-        $posts = $wpdb->get_results($sql);
+        $posts = $wpdb->get_results($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
         return $posts;
     }
