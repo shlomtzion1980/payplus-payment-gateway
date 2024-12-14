@@ -886,7 +886,7 @@ class PayplusInvoice
 
             $sql .= implode(' OR ', $clauses) . ")";
 
-            $resultApps = $wpdb->get_results($sql, OBJECT);
+            $resultApps = $wpdb->get_results($sql, OBJECT); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
             $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
         return $resultApps;
