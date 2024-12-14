@@ -493,7 +493,7 @@ class PayplusInvoice
                 foreach ($columns as $column_name => $column_info) {
                     $new_columns[$column_name] = $column_info;
                     if ('shipping_address' === $column_name) {
-                        $new_columns['order_invoice'] = "<img style='text-align: center;height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png'>";
+                        $new_columns['order_invoice'] = "<img style='height: 30px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png' alt='Invoice Plus documents'>";
                     }
                 }
             }
