@@ -498,11 +498,16 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     // Override the process_payment method
     public function process_payment($order_id)
     {
+        if (!is_numeric($order_id)) {
+            return array(
+                'result'   => 'failure',
+                'message'  => __('Invalid order ID', 'payplus-payment-gateway'),
+            );
+        }
         $order = wc_get_order($order_id);
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             new WC_PayPlus_HostedFields($order_id, $order, true);
         }
-
         return array(
             'result'   => 'success',
             'order_id' => $order_id,

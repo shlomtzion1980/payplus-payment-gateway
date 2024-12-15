@@ -396,6 +396,7 @@ hf.Upon("pp_noAttemptedRemaining", (e) => {
 });
 
 hf.Upon("pp_responseFromServer", (e) => {
+    // console.log("response from server", e.detail);
     let r = "";
     try {
         r = JSON.stringify(e.detail, null, 2);
@@ -480,7 +481,8 @@ hf.Upon("pp_responseFromServer", (e) => {
                         } else {
                             alert(
                                 "Order completion failed(Please try again): " +
-                                    final_response.message
+                                    (final_response.message ||
+                                        final_response.data.message)
                             );
                             location.reload();
                         }
