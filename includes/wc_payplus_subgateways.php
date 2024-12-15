@@ -460,11 +460,11 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $this->method_title = __('PayPlus - Embedded', 'payplus-payment-gateway');
         add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
-        add_action('wp_ajax_get-hosted-payload', [$this, 'getPayPlusPayload']);
-        add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getPayPlusPayload']);
+        add_action('wp_ajax_get-hosted-payload', [$this, 'getHostedPayload']);
+        add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
     }
 
-    public function getPayPlusPayload()
+    public function getHostedPayload()
     {
         $hostedPayload = WC()->session->get('hostedPayload');
         wp_send_json_success(array(
