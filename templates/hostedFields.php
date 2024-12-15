@@ -116,10 +116,10 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                     background-image: none;
                 }
 
-                &.no-image::before {
-                    content: "<?php echo esc_attr(__('Processing...', 'payplus-payment-gateway')); ?>";
-                    position: relative;
-                    bottom: 25px;
+                &.no-image {
+                    /* content: "<?php echo esc_attr(__('Processing...', 'payplus-payment-gateway')); ?>"; */
+                    /* position: relative; */
+                    /* bottom: 25px; */
                     font-size: 7px;
                     color: white;
                 }
@@ -574,7 +574,9 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                 <div class="blocks-payplus_loader_hosted">
                     <div class="blocks-loader">
                         <div class="blocks-loader-background">
-                            <div class="blocks-loader-text"></div>
+                            <div class="blocks-loader-text"><span
+                                    class="no-image"><?php echo esc_attr(__('Processing...', 'payplus-payment-gateway')); ?></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -590,9 +592,10 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                                                                         }
                                                                                     } else {
                                                                                             ?><img class="hf-image"
-                                    src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                                                        }
-                                                                                                                            ?>
+                                    src="<?php echo esc_url($ccImage); ?>"
+                                    alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
+                                                                                    }
+                                                                                        ?>
 
                         </div>
                     </div>
