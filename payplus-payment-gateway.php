@@ -819,9 +819,11 @@ class WC_PayPlus
                         [
                             "payplus_import_applepay_script" => $importAapplepayScript,
                             "payplus_mobile" => $isModbile,
+                            'ajax_url' => admin_url('admin-ajax.php'),
                             "multiPassIcons" => $multipassIcons,
                             "customIcons" => isset($customIcons) ? $customIcons : [],
                             "isLoggedIn" => boolval(get_current_user_id() > 0),
+                            'frontNonce' => wp_create_nonce('frontNonce'),
                             "isSubscriptionOrder" => $isSubscriptionOrder,
                             "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
                             "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
