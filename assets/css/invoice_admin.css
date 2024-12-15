@@ -110,6 +110,10 @@ p.link-invoice-error {
     margin: 10px 0px;
 }
 
+.column-order_invoice {
+    text-align: center !important;
+}
+
 .column-order_invoice span {
     text-align: center;
     display: block;
