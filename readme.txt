@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 7.3.3
+Stable tag: 7.3.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.3.4 - 15-12-2024
+
+- Tweak - Replaced the headline text with the Invoice+ logo at the top of the column on the All Orders page.
+- Tweak - Renamed the getPayPlusPayload function to getHostedPayload to correct its inaccurate naming.
 
 = 7.3.3 - 12-12-2024
 

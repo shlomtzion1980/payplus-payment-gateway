@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.4] = 15-12-2024 - (Saiki K)
+
+- Tweak - Replaced the headline text with the Invoice+ logo at the top of the column on the All Orders page.
+- Tweak - Renamed the getPayPlusPayload function to getHostedPayload to correct its inaccurate naming.
+
 ## [7.3.3] = 12-12-2024 - (Powder)
 
 - Fix - PayPlus Embedded - Resolved an issue where coupons/discounts did not account for taxes on stores with exclusive prices and tax management enabled.
