@@ -284,6 +284,60 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
+    /**
+     * Determine if the payment gateway is available.
+     */
+    public function is_available()
+    {
+        // Ensure only the main gateway is available on the Add Payment Method page
+        if (is_add_payment_method_page()) {
+            add_action('wp_head', function () {
+                if (is_add_payment_method_page()) {
+                    echo '<style>
+                        .woocommerce-PaymentBox {
+                            display: none !important;
+                        }
+                    </style>';
+                }
+            });
+            return $this->id === 'payplus-payment-gateway';
+        }
+
+        // Default availability check
+        return parent::is_available();
+    }
+
+    /**
+     * Dynamically set the title for the payment gateway.
+     */
+    public function get_title()
+    {
+        // Check if we're on the Add Payment Method page
+        if (is_add_payment_method_page()) {
+            return __('Credit Card', 'payplus-payment-gateway');
+        }
+
+        // Default title
+        return $this->title;
+    }
+
+
+    /**
+     * Override the payment method description for the Add Payment Method page.
+     */
+    public function get_description()
+    {
+        // Check if we're on the Add Payment Method page
+        if (is_add_payment_method_page()) {
+            return 'This is the description for the Add Payment Method page. Customize this text as needed.';
+        }
+
+        // Default description
+        return parent::get_description();
+    }
+
+
+
     public function process_admin_options()
     {
         // Call parent method to handle saving settings.
