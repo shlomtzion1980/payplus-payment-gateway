@@ -906,6 +906,12 @@ jQuery(function ($) {
                                             }
                                         }
                                     } else {
+                                        window.onbeforeunload = null; // If `onbeforeunload` is set directly
+                                        window.removeEventListener(
+                                            "beforeunload",
+                                            wc_checkout_form.detachUnloadEventsOnSubmit()
+                                        );
+                                        // Then reload the page
                                         location.reload();
                                     }
                                 },
