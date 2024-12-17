@@ -2171,7 +2171,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         $check_payplus_generate_products_link = $this->payplus_generate_products_link($objectProducts->productsItems, $order_id);
 
-        // we need to add a fix here for if the payplus_payment_page_link exists we just do ipn call (custom-button-get-pp)
         if ($payplus_payment_page_link) {
             if ($this->checkPayemntPageTime($order_id, $check_payplus_generate_products_link)) {
                 $this->get_payment_page($payplus_payment_page_link);
@@ -2264,19 +2263,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($this->display_mode == 'iframe') {
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
             echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($this->iframe_height) . "px; border: 0;'></iframe>";
-            // if ($this->import_applepay_script && !wp_script_is('applePayScript', 'enqueued')) {
-            //     wp_enqueue_script(
-            //         'applePayScript',
-            //         PAYPLUS_PLUGIN_URL . 'assets/js/script.js',
-            //         array(),
-            //         PAYPLUS_VERSION,
-            //         true
-            //     );
-            // }
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
-        echo '<script type="text/javascript">  document.pp_iframe.submit()</script>';
+        echo '<script type="text/javascript">document.pp_iframe.submit()</script>';
     }
 
 
