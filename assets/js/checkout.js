@@ -903,13 +903,10 @@ jQuery(function ($) {
                                                     .removeClass("processing")
                                                     .unblock();
                                                 hf.SubmitPayment();
-                                            } else {
-                                                alert(
-                                                    "Whoops something went wrong, you were not charged, refresh the page and try again"
-                                                );
-                                                location.reload();
                                             }
                                         }
+                                    } else {
+                                        location.reload();
                                     }
                                 },
                             });
