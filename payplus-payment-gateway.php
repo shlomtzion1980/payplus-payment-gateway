@@ -317,8 +317,9 @@ class WC_PayPlus
             $runIpn = true;
             if ($current_hour >= $hour - 2 && !$isEligible) {
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
-                $payPlusCronTested = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested');
-                if ($paymentPageUid && !$payPlusCronTested) {
+                $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
+                if ($paymentPageUid && $payPlusCronTested < 3) {
+                    ++$payPlusCronTested;
                     if ($order->get_status() === 'cancelled') {
                         $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
                         if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
@@ -330,7 +331,7 @@ class WC_PayPlus
                         }
                     }
                     if ($runIpn) {
-                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => true]);
+                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
                         $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');

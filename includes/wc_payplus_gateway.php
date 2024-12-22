@@ -433,9 +433,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $calc = $current_minute - $min;
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
-                $payPlusCronTested = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested');
-                if ($paymentPageUid && !$payPlusCronTested) {
-                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => true]);
+                $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
+                if ($paymentPageUid && $payPlusCronTested < 3) {
+                    ++$payPlusCronTested;
+                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
                     echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
                     if ($order->get_status() === 'cancelled') {
                         $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
@@ -461,7 +462,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
                     }
                 }
-                echo esc_html("$order_id - Was already tested cron - tested exists.\n");
+                if ($payPlusCronTested >= 3) {
+                    echo esc_html("$order_id - Was already tested at least once - payplus_cron_tested = $payPlusCronTested.\n");
+                }
             }
         } else {
             echo "<pre>";
