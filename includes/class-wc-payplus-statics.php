@@ -624,12 +624,12 @@ class WC_PayPlus_Statics
             }
 
             $hostedResponse = WC_PayPlus_Statics::payPlusRemote($apiUrl, $payload, "post");
-            if ($isPlaceOrder) {
-                $moreInfo = json_decode($payload, true)['more_info'];
-                if (is_numeric($moreInfo)) {
-                    sleep(2); // wait for data to be updated in the system
-                }
-            }
+            // if ($isPlaceOrder) {
+            //     $moreInfo = json_decode($payload, true)['more_info'];
+            //     if (is_numeric($moreInfo)) {
+            //         sleep(2); // wait for data to be updated in the system
+            //     }
+            // }
 
             $hostedResponseArray = json_decode(wp_remote_retrieve_body($hostedResponse), true);
 

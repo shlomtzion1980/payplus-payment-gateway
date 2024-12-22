@@ -392,16 +392,16 @@ class PayplusInvoice
         $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');
-        $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+        $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
         $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $documentType, $payload);
         if (is_wp_error($response)) {
-            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
+            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($response), 'error');
             return false;
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if ($res->status === "success") {
                 $responeType = "_refund" . $documentType;
-                $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                 $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");
                 $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
                 $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
@@ -424,7 +424,7 @@ class PayplusInvoice
                 return true;
             } else {
                 $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
-                $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
+                $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                 return false;
             }
         }
@@ -1125,7 +1125,7 @@ class PayplusInvoice
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
                     $logCashPayment = !$isCashPayment ? 'No' : 'Yes';
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')' . ' is CashePayment: ' . $logCashPayment);
-                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
 
                     if (!$isCashPayment) {
                         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Doing post:  (' . $order_id . ')');
@@ -1134,12 +1134,12 @@ class PayplusInvoice
                     }
 
                     if (is_wp_error($response)) {
-                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($response, true), 'error');
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                     } else {
                         $res = json_decode(wp_remote_retrieve_body($response));
 
                         if ($res->status === "success") {
-                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                             $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
                             $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
                             if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
@@ -1170,7 +1170,7 @@ class PayplusInvoice
                         } else {
                             WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $res->error));
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
-                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, print_r($res, true), 'error');
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                         }
                     }
                 }

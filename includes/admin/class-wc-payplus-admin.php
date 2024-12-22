@@ -415,16 +415,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             $payload = wp_json_encode($payload);
-            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
             $response = WC_PayPlus_Statics::payPlusRemote($this->refund_url, $payload);
             if (is_wp_error($response)) {
-                $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
             } else {
                 $res = json_decode(wp_remote_retrieve_body($response));
                 if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_total_refunded_amount' => round($refunded_amount + $amount, 2)));
                     $this->payplus_update_order_payment($id, $amount);
-                    $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                     $order->add_order_note(sprintf('PayPlus Refund is Successful<br />Refund Transaction Number: %s<br />Amount: %s %s<br />Reason: %s', $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency(), 'refund ' . $method));
                     // Create refund
                     $refund = wc_create_refund(array(
@@ -453,7 +453,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                     echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                 } else {
-                    $this->payplus_add_log_all($handle, print_r($res, true), 'error');
+                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                     $order->add_order_note(sprintf('PayPlus Refund is Failed<br />Status: %s<br />Description: %s', $res->results->status, $res->results->description));
                     echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
                 }
@@ -707,7 +707,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             }
                             $payload = wp_json_encode($payload);
                             $this->payplus_add_log_all($handle, 'New IPN Fired (' . $order_id . ')');
-                            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+                            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
                             $data['order_id'] = $order_id;
                             $returnIpn = $this->requestPayPlusIpn($payload, $data, 1, $handle, true);
 
@@ -739,7 +739,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $payload['more_info'] = $order_id;
                     $payload = wp_json_encode($payload);
                     $this->payplus_add_log_all($handle, 'New IPN Fired (' . $order_id . ')');
-                    $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+                    $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
                     $this->requestPayPlusIpn($payload, array('order_id' => $order_id), 1);
                     WC_PayPlus_Meta_Data::update_meta($order, array('order_validated' => '1'));
                     $order->delete_meta_data('order_validated_error');
@@ -779,22 +779,22 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $payload = $this->generatePayloadLink($order_id, true);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
-            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
             $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
 
             if (is_wp_error($response)) {
-                $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
             } else {
 
                 $res = json_decode(wp_remote_retrieve_body($response));
                 if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
-                    $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                     $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_page_request_uid' => $res->data->page_request_uid));
                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_payment_page_link' => $res->data->payment_page_link));
                     $response = array("status" => true, "payment_response" => $res->data->payment_page_link);
                 } else {
-                    $this->payplus_add_log_all($handle, print_r($res, true), 'error');
+                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                     $response = (is_array($response)) ? $response['body'] : $response->body;
                     $response = array("status" => false, "payment_response" => $response);
                 }
@@ -837,7 +837,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             $payload['related_transaction'] = true;
-            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
             $payload = wp_json_encode($payload);
             $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
 
@@ -845,7 +845,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if ($res->results->status == "error" || $res->data->status_code !== "000") {
 
                 $transaction_uid = ($transaction_uid) ? $transaction_uid : $res->data->transaction_uid;
-                $this->payplus_add_log_all($handle, print_r($res, true), 'error');
+                $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                 $order->update_status($this->failure_order_status);
                 $order->add_order_note(sprintf('PayPlus IPN Failed<br/>Transaction UID: %s', $transaction_uid));
                 $order->add_meta_data('order_validated', "1");
@@ -853,7 +853,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
                 wp_die();
             } else if ($res->data->status_code === '000') {
-                $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
+                $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                 $inData = (array) $res->data;
 
                 $this->updateMetaData($order_id, $inData);
@@ -2021,12 +2021,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         }';
 
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
-            $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
 
             $response = WC_PayPlus_Statics::payPlusRemote($this->api_url . 'Transactions/ChargeByTransactionUID', $payload);
 
             if (is_wp_error($response)) {
-                $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                 echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
                 wp_die();
             } else {
@@ -2034,7 +2034,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $res = json_decode(wp_remote_retrieve_body($response));
 
                 if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
-                    $this->payplus_add_log_all($handle, print_r($response, true), 'completed');
+                    $this->payplus_add_log_all($handle, wp_json_encode($response), 'completed');
                     if ($this->payplus_check_all_product($order, "1")) {
                         $insertMeta['payplus_transaction_type'] = "1";
                     }
@@ -2070,7 +2070,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     wp_die();
                 } else {
-                    $this->payplus_add_log_all($handle, print_r($response, true), 'error');
+                    $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                     $order->add_order_note(sprintf('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', $res->results->status, $res->results->description));
                     $this->error_msg = 2;
                     echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
@@ -2263,7 +2263,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $apiURL = 'https://restapi.payplus.co.il/api/v1.0/';
         }
 
-        $this->payplus_add_log_all($handle, print_r($payload, true), 'payload');
+        $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
         $response = WC_PayPlus_Statics::payPlusRemote($apiURL . 'Transactions/ChargeByTransactionUID', $payload);
         $res = json_decode(wp_remote_retrieve_body($response));
         if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
@@ -2281,11 +2281,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
 
             $order->add_order_note(sprintf('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
-            $this->payplus_add_log_all($handle, print_r($res, true), 'completed');
+            $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
             $order->payment_complete();
         } else {
             $order->add_order_note(sprintf('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', $res->results->status, $res->results->description));
-            $this->payplus_add_log_all($handle, print_r($res, true), 'error');
+            $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
             $this->error_msg = 2;
         }
         add_filter('redirect_post_location', [$this, 'add_notice_query_var'], 99);
