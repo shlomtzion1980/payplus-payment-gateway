@@ -147,6 +147,7 @@ html[lang="en"]
 
 body #applePayButton {
     margin-top: 10px;
+    margin-bottom: 10px;
     border-radius: 3px !important;
     border: 0px;
 }
