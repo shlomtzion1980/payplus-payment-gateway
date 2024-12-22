@@ -114,7 +114,7 @@ html[lang="en"]
 
 @media (min-width: 767.98px) {
     .express-checkout {
-        margin: 0 auto 0 auto;
+        margin: 3% auto 0 auto;
         /* border-radius: 12px; */
         /* border: 1px solid #e3e6e9; */
         padding: 20px 10px 10px 10px;
@@ -126,7 +126,7 @@ html[lang="en"]
 
 @media (max-width: 767.98px) {
     .express-checkout {
-        margin: 0 auto 0 auto;
+        margin: 3% auto 0 auto;
         /* border-radius: 12px; */
         /* border: 1px solid #e3e6e9; */
         /* padding: 20px 10px 10px 10px; */
