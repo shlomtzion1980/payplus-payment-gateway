@@ -94,24 +94,25 @@ html[lang="en"]
 @media (min-width: 767.98px) {
     .express-checkout {
         margin: 5% auto;
-        border-radius: 12px;
-        border: 1px solid #e3e6e9;
+        /* border-radius: 12px; */
+        /* border: 1px solid #e3e6e9; */
         padding: 20px 10px 10px 10px;
         position: relative;
         display: block;
-        width: 48%;
+        width: 26%;
     }
 }
 
 @media (max-width: 767.98px) {
     .express-checkout {
         margin: 5% auto;
-        border-radius: 12px;
-        border: 1px solid #e3e6e9;
-        padding: 20px 10px 10px 10px;
+        /* border-radius: 12px; */
+        /* border: 1px solid #e3e6e9; */
+        /* padding: 20px 10px 10px 10px; */
+        padding-top: 20px;
         position: relative;
         display: block;
-        width: 92%;
+        width: 100%;
     }
 }
 
