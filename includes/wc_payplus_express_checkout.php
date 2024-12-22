@@ -95,10 +95,10 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $arr['identifier_express_checkout'] = $WC_PayPlus_Gateway->token_apple_pay;
         $arr['url_validation'] = $obj['urlValidation'];
         $arr = wp_json_encode($arr);
-        $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($arr, true), 'payload');
+        $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', wp_json_encode($arr), 'payload');
         $resp = WC_PayPlus_Statics::payPlusRemote($url, $arr);
         $res = json_decode(wp_remote_retrieve_body($resp));
-        $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', print_r($res, true), 'completed');
+        $WC_PayPlus_Gateway->payplus_add_log_all('payment_sessionOne_click_checkout', wp_json_encode($res), 'completed');
         if ($res) {
             echo wp_json_encode(array("payment_response" => $res, "status" => true));
             wp_die();
@@ -246,17 +246,17 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
 
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'New Payment Process Fired (' . $order_id . ')');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', '', 'before-payload');
-            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($payload, true), 'payload');
+            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', wp_json_encode($payload), 'payload');
 
             $response = WC_PayPlus_Statics::payPlusRemote($url, $payload);
 
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
-                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($response, true), 'error');
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', wp_json_encode($response), 'error');
             } else {
                 $res = json_decode(wp_remote_retrieve_body($response));
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', 'WS PayPlus Response');
-                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', print_r($response, true), 'completed');
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_payment', wp_json_encode($response), 'completed');
                 if ($res->results->status === "success") {
                     if ($res->data->transaction->status_code === '000') {
                         $order_id = $res->data->transaction->more_info;
@@ -374,14 +374,14 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
 
             $payload = wp_json_encode($payload);
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', '', 'before-payload');
-            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', print_r($payload, true), 'payload');
+            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', wp_json_encode($payload), 'payload');
             $response = WC_PayPlus_Statics::payPlusRemote($url, $payload);
             $res = json_decode(wp_remote_retrieve_body($response));
             if (is_wp_error($response)) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', 'WS PayPlus Response');
-                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', print_r($response, true), 'error');
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', wp_json_encode($response), 'error');
             } else {
-                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', print_r($res, true), 'completed');
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', wp_json_encode($res), 'completed');
                 if ($res->results->status === "success") {
                     if (property_exists($res->data, 'apple_pay_identifier')) {
                         update_option('payplus_apple_pay_identifier', $res->data->apple_pay_identifier);
@@ -825,6 +825,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
             echo '<div id="error-api-payplus"></div>';
             echo '</div>';
+            echo '<div class="border-with-word">
+            <span>' . __('Or', 'payplus-payment-gateway') . '</span>
+            </div>';
         }
 
         $output = str_replace(array("\r", "\n"), '', trim(ob_get_clean()));
