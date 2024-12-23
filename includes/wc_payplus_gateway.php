@@ -1872,14 +1872,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $productsItems[] = ($json) ? wp_json_encode($itemDetails) : (object) $itemDetails;
             $totalCartAmount += $productPrice;
         }
-
-        $shipping_splitted = WC()->session->get('shipping_splitted');
-        if ($shipping_splitted === null) {
-            $shipping_splitted = false;
-        }
         $shipping_methods = $order->get_shipping_methods();
-
-        if ($shipping_methods && !$shipping_splitted) {
+        if ($shipping_methods) {
             foreach ($shipping_methods as $shipping_method) {
                 $shipping_tax = 0;
                 $shipping_method_data = $shipping_method->get_data();
