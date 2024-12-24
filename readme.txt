@@ -90,6 +90,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 - Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
 - Added - Option to hide the number of payments for the Bit payment method.
+- Added - A special notice regarding the VAT change that will occur January 1st has been added for this version.
 - Tweak - Added security check to verify the order ID and improved performance of the PayPlus Embedded Subgateway.
 - Tweak - Adjusted the size and framing of Express Checkout buttons on the checkout page.
 - Tweak - PayPlus Cron and the PayPlus orders check button will now attempt to run at least 4 times before giving up on an order (up from 2 attempts).
