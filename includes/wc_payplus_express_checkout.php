@@ -826,7 +826,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             echo '<div id="error-api-payplus"></div>';
             echo '</div>';
             echo '<div class="border-with-word">
-            <span>' . __('Or', 'payplus-payment-gateway') . '</span>
+            <span>' . esc_html__('Or', 'payplus-payment-gateway') . '</span>
             </div>';
         }
 

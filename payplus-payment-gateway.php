@@ -96,12 +96,12 @@ class WC_PayPlus
     public function wc_payplus_check_version()
     {
         $previous_version = get_option('wc_payplus_version');
-        $display_count = get_option('wc_payplus_display_count', 0);
+        $display_count = get_option('wc_payplus_display_maam_count', 0);
 
-        if (version_compare($previous_version, '7.3.3', '<')) {
-            if ($display_count < 120) {
+        if (version_compare($previous_version, '7.3.7', '<')) {
+            if ($display_count < 320) {
                 add_action('admin_notices', [$this, 'wc_payplus_show_update_message']);
-                update_option('wc_payplus_display_count', $display_count + 1);
+                update_option('wc_payplus_display_maam_count', $display_count + 1);
             }
             update_option('wc_payplus_version', PAYPLUS_VERSION);
         }
@@ -110,25 +110,19 @@ class WC_PayPlus
     public function wc_payplus_show_update_message()
     {
 ?>
-        <div id="wc-payplus-update-message" class="notice notice-success is-dismissible">
+        <div id="wc-payplus-update-message" class="notice notice-error is-dismissible">
             <p> <?php
                 echo wp_kses_post(
-                    sprintf(
-                        __(
-                            "**PayPlus Payment Gateway Plugin - Version 7.3.2 Update**<br><br>
+                    __(
+                        '<strong style="font-size: 1.2em;">Dear Customers,</strong><br><br>
 
-            **Important Notice:**<br>
-            This update introduces a major refactoring of the invoice code to enhance performance and align with current WooCommerce standards.<br>
-            Additionally, the refund process has been refactored.<br><br>
+        <span style="font-size: 1.2em;"><strong>Attention!</strong> For users of the <strong>PayPlus</strong> plugin who calculate VAT via WordPress, it is crucial to update the VAT rate from 17% to 18% starting on January 1st.<br>
+        This update must be performed specifically on January 1st to ensure accurate calculations for transactions and payments.<br>
+        Please ensure this update is completed on this date.<br><br>
 
-            If you are updating from a version earlier than 7.2.0, you may encounter issues with refund document creation for orders created in those earlier versions.<br>
-            In such cases:<br>
-            1. Downgrade to version 7.2.9 to process refunds.<br>
-            2. Once refunds are complete, you can safely upgrade back to version 7.3.1.<br><br>
-
-            No settings will be lost during this process. Please note this only affects the refund process for orders created in versions prior to 7.2.0.",
-                            'payplus-payment-gateway'
-                        )
+        Thank you,<br>
+        <strong>The PayPlus Team</strong></span>',
+                        'payplus-payment-gateway'
                     )
                 );
                 ?>
@@ -318,7 +312,7 @@ class WC_PayPlus
             if ($current_hour >= $hour - 2 && !$isEligible) {
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
-                if ($paymentPageUid && $payPlusCronTested < 3) {
+                if ($paymentPageUid && $payPlusCronTested < 5) {
                     ++$payPlusCronTested;
                     if ($order->get_status() === 'cancelled') {
                         $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');

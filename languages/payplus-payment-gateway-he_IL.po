@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2024-12-22 08:40+0200\n"
-"PO-Revision-Date: 2024-12-22 08:40+0200\n"
+"POT-Creation-Date: 2024-12-24 11:11+0200\n"
+"PO-Revision-Date: 2024-12-24 11:11+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:23
 #: includes/admin/class-wc-payplus-admin-settings.php:28
-#: payplus-payment-gateway.php:695
+#: payplus-payment-gateway.php:690
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -154,7 +154,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:119
 #: includes/class-wc-payplus-form-fields.php:237
-#: payplus-payment-gateway.php:977
+#: payplus-payment-gateway.php:972
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -171,15 +171,15 @@ msgstr "ברירת מחדל גלובלית"
 #: includes/admin/class-wc-payplus-admin-settings.php:123
 #: includes/class-wc-payplus-form-fields.php:241
 #: includes/class-wc-payplus-statics.php:78
-#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:587
-#: payplus-payment-gateway.php:972 payplus-payment-gateway.php:1157
+#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:582
+#: payplus-payment-gateway.php:967 payplus-payment-gateway.php:1152
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:124
 #: includes/class-wc-payplus-form-fields.php:242
-#: payplus-payment-gateway.php:588 payplus-payment-gateway.php:973
-#: payplus-payment-gateway.php:1158
+#: payplus-payment-gateway.php:583 payplus-payment-gateway.php:968
+#: payplus-payment-gateway.php:1153
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -605,7 +605,7 @@ msgstr ""
 #: includes/admin/class-wc-payplus-admin.php:1095
 #: includes/class-wc-payplus-form-fields.php:110
 #: includes/class-wc-payplus-form-fields.php:111
-#: includes/wc_payplus_gateway.php:953 includes/wc_payplus_subgateways.php:45
+#: includes/wc_payplus_gateway.php:956 includes/wc_payplus_subgateways.php:45
 msgid "PayPal"
 msgstr "פייפאל"
 
@@ -666,7 +666,7 @@ msgid "Default"
 msgstr "ברירת מחדל woocommerce"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:484
-#: includes/wc_payplus_gateway.php:114 includes/wc_payplus_gateway.php:857
+#: includes/wc_payplus_gateway.php:114 includes/wc_payplus_gateway.php:860
 msgid "PayPlus"
 msgstr "פיי פלוס"
 
@@ -713,7 +713,7 @@ msgstr ""
 #: includes/admin/class-wc-payplus-admin-settings.php:537
 #: includes/class-wc-payplus-form-fields.php:89
 #: includes/class-wc-payplus-form-fields.php:90
-#: includes/wc_payplus_gateway.php:944 includes/wc_payplus_subgateways.php:42
+#: includes/wc_payplus_gateway.php:947 includes/wc_payplus_subgateways.php:42
 msgid "Google Pay"
 msgstr "גוגל פיי"
 
@@ -721,7 +721,7 @@ msgstr "גוגל פיי"
 #: includes/class-wc-payplus-form-fields.php:96
 #: includes/class-wc-payplus-form-fields.php:97
 #: includes/class-wc-payplus-form-fields.php:292
-#: includes/wc_payplus_gateway.php:947 includes/wc_payplus_subgateways.php:43
+#: includes/wc_payplus_gateway.php:950 includes/wc_payplus_subgateways.php:43
 msgid "Apple Pay"
 msgstr "אפל פיי"
 
@@ -799,7 +799,7 @@ msgid "Payment"
 msgstr "תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:411
-#: includes/wc_payplus_gateway.php:762 includes/wc_payplus_invoice.php:354
+#: includes/wc_payplus_gateway.php:765 includes/wc_payplus_invoice.php:354
 msgid "Refund for Order Number: "
 msgstr "זיכוי עבור הזמנה מספר: "
 
@@ -1129,7 +1129,7 @@ msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
 #: includes/admin/class-wc-payplus-admin.php:2317
-#: payplus-payment-gateway.php:677
+#: payplus-payment-gateway.php:672
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
@@ -1147,7 +1147,7 @@ msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:434
 #: includes/blocks/class-wc-payplus-blocks-support.php:436
-#: includes/wc_payplus_gateway.php:1397 payplus-payment-gateway.php:1236
+#: includes/wc_payplus_gateway.php:1400 payplus-payment-gateway.php:1231
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1219,13 +1219,13 @@ msgstr "פייפלוס חשבונית+"
 
 #: includes/class-wc-payplus-form-fields.php:82
 #: includes/class-wc-payplus-form-fields.php:83
-#: includes/wc_payplus_gateway.php:941 includes/wc_payplus_subgateways.php:41
+#: includes/wc_payplus_gateway.php:944 includes/wc_payplus_subgateways.php:41
 msgid "bit"
 msgstr "ביט"
 
 #: includes/class-wc-payplus-form-fields.php:103
 #: includes/class-wc-payplus-form-fields.php:104
-#: includes/wc_payplus_gateway.php:950 includes/wc_payplus_subgateways.php:44
+#: includes/wc_payplus_gateway.php:953 includes/wc_payplus_subgateways.php:44
 msgid "MULTIPASS"
 msgstr "מולטיפס"
 
@@ -1234,7 +1234,7 @@ msgid "Tav zahav"
 msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:118
-#: includes/wc_payplus_gateway.php:956 includes/wc_payplus_subgateways.php:46
+#: includes/wc_payplus_gateway.php:959 includes/wc_payplus_subgateways.php:46
 msgid "Tav Zahav"
 msgstr "תו הזהב"
 
@@ -1704,7 +1704,7 @@ msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
 #: includes/class-wc-payplus-hosted-fields.php:103
-#: includes/wc_payplus_gateway.php:1347 payplus-payment-gateway.php:833
+#: includes/wc_payplus_gateway.php:1350 payplus-payment-gateway.php:828
 msgid "Save credit card in my account"
 msgstr "שמור את כרטיס האשראי בחשבון שלי"
 
@@ -1844,7 +1844,7 @@ msgstr ""
 "בכרטיס/ים שמור/ים\" - בכותרת ובתיאור \"כרטיס/ים שמור/ים\"."
 
 #. translators: 1) Opening anchor tag 2) closing anchor tag
-#: includes/wc_payplus_gateway.php:660
+#: includes/wc_payplus_gateway.php:663
 #, php-format
 msgid ""
 "If your billing address has been changed for saved payment methods, be sure "
@@ -1854,7 +1854,7 @@ msgstr ""
 "%1$sשיטות תשלום שמורות%2$s שברשותך ומוסיף אותם מחדש."
 
 #. translators: %s is the current transaction type status
-#: includes/wc_payplus_gateway.php:743
+#: includes/wc_payplus_gateway.php:746
 #, php-format
 msgid ""
 "PayPlus Refund is Failed<br />You cannot refund transaction that not "
@@ -1864,7 +1864,7 @@ msgstr ""
 "ההזמנה הנוכחי: %s"
 
 #. translators: %1$s is the refunded amount, %2$s is the currency
-#: includes/wc_payplus_gateway.php:749
+#: includes/wc_payplus_gateway.php:752
 #, fuzzy, php-format
 #| msgid ""
 #| "PayPlus Refund is Failed<br />You cannot refund more then the refunded "
@@ -1876,7 +1876,7 @@ msgstr ""
 "זיכוי התשלום בפיי פלוס נכשל<br />אינך יכול לזכות סכום גבוהה מסכום ההזמנה "
 "המקורי. סכום שזוכה עד כה: %s %s"
 
-#: includes/wc_payplus_gateway.php:859
+#: includes/wc_payplus_gateway.php:862
 msgid ""
 "For more information about PayPlus and Plugin versions <a href=\"https://www."
 "payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</a>"
@@ -1884,7 +1884,7 @@ msgstr ""
 "למידע נוסף על גירסאות הפלאגין של פיי פלוס <a href=\"https://www.payplus.co."
 "il/wordpress\" target=\"_blank\">לחץ כאן</a>"
 
-#: includes/wc_payplus_gateway.php:867
+#: includes/wc_payplus_gateway.php:870
 msgid ""
 "This plugin was developed by <a href=\"https://www.payplus.co.il\">PayPlus "
 "LTD</a>"
@@ -1892,97 +1892,97 @@ msgstr ""
 "הפלאגין פותח ע\"י <a href=\"https://www.payplus.co.il/\" target=\"_blank"
 "\">פיי פלוס בע\"מ</a> - כל הזכויות שמורות"
 
-#: includes/wc_payplus_gateway.php:959 includes/wc_payplus_subgateways.php:47
+#: includes/wc_payplus_gateway.php:962 includes/wc_payplus_subgateways.php:47
 msgid "Valuecard"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:962 includes/wc_payplus_subgateways.php:48
+#: includes/wc_payplus_gateway.php:965 includes/wc_payplus_subgateways.php:48
 msgid "finitiOne"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:965
+#: includes/wc_payplus_gateway.php:968
 msgid "Embedded"
 msgstr "טופס מובנה"
 
-#: includes/wc_payplus_gateway.php:1423 includes/wc_payplus_gateway.php:1424
+#: includes/wc_payplus_gateway.php:1426 includes/wc_payplus_gateway.php:1427
 msgid "Error: user or other, please contact PayPlus support"
 msgstr "שגיאה בעת יצירת הטוקן"
 
-#: includes/wc_payplus_gateway.php:1439 includes/wc_payplus_gateway.php:1441
+#: includes/wc_payplus_gateway.php:1442 includes/wc_payplus_gateway.php:1444
 #, fuzzy, php-format
 #| msgid "Error: credit card declined: %s"
 msgid "Error: Credit card declined. %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1472
+#: includes/wc_payplus_gateway.php:1475
 #, php-format
 msgid "PayPlus Token Payment Successful<br/>Transaction Number: %s"
 msgstr "חיוב באמצעות טוקן בוצע בהצלחה בפיי פלוס<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:1479
+#: includes/wc_payplus_gateway.php:1482
 #, php-format
 msgid "PayPlus Token Payment Failed<br/>Transaction Number: %s"
 msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:1484
+#: includes/wc_payplus_gateway.php:1487
 #, php-format
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1863 includes/wc_payplus_invoice.php:776
+#: includes/wc_payplus_gateway.php:1866 includes/wc_payplus_invoice.php:776
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1895 includes/wc_payplus_invoice.php:738
+#: includes/wc_payplus_gateway.php:1892 includes/wc_payplus_invoice.php:738
 msgid "Shipping"
 msgstr "משלוח"
 
-#: includes/wc_payplus_gateway.php:1917 includes/wc_payplus_gateway.php:1918
-#: includes/wc_payplus_gateway.php:1938 includes/wc_payplus_gateway.php:1939
+#: includes/wc_payplus_gateway.php:1914 includes/wc_payplus_gateway.php:1915
+#: includes/wc_payplus_gateway.php:1935 includes/wc_payplus_gateway.php:1936
 #: includes/wc_payplus_invoice.php:765 includes/wc_payplus_invoice.php:766
 #: includes/wc_payplus_invoice.php:798 includes/wc_payplus_invoice.php:799
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
-#: includes/wc_payplus_gateway.php:2214
+#: includes/wc_payplus_gateway.php:2211
 #, php-format
 msgid "An error occurred: %s"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2220
+#: includes/wc_payplus_gateway.php:2217
 msgid ""
 "Error: The payment page failed to load - please check your page uid and "
 "domain settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2245 includes/wc_payplus_gateway.php:3200
-#: includes/wc_payplus_gateway.php:3208
+#: includes/wc_payplus_gateway.php:2242 includes/wc_payplus_gateway.php:3197
+#: includes/wc_payplus_gateway.php:3205
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:2767
+#: includes/wc_payplus_gateway.php:2764
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:2937
+#: includes/wc_payplus_gateway.php:2934
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:3231
+#: includes/wc_payplus_gateway.php:3228
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:3241
+#: includes/wc_payplus_gateway.php:3238
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:3286
+#: includes/wc_payplus_gateway.php:3283
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:3314 includes/wc_payplus_gateway.php:3320
+#: includes/wc_payplus_gateway.php:3311 includes/wc_payplus_gateway.php:3317
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
@@ -2222,66 +2222,34 @@ msgstr ""
 msgid "Invalid order ID"
 msgstr "תעודת זהות בעל הכרטיס"
 
-#: payplus-payment-gateway.php:118
-#, fuzzy
-#| msgid ""
-#| "**PayPlus Payment Gateway Plugin - Version 7.3.1 Update**<br><br>\n"
-#| "\n"
-#| "            **Important Notice:**<br>\n"
-#| "            This update introduces a major refactoring of the invoice "
-#| "code to enhance performance and align with current WooCommerce standards."
-#| "<br>\n"
-#| "            Additionally, the refund process has been refactored."
-#| "<br><br>\n"
-#| "\n"
-#| "            If you are updating from a version earlier than 7.2.0, you "
-#| "may encounter issues with refund document creation for orders created in "
-#| "those earlier versions.<br>\n"
-#| "            In such cases:<br>\n"
-#| "            1. Downgrade to version 7.3.0 to process refunds.<br>\n"
-#| "            2. Once refunds are complete, you can safely upgrade back to "
-#| "version 7.3.1.<br><br>\n"
-#| "\n"
-#| "            No settings will be lost during this process. Please note "
-#| "this only affects the refund process for orders created in versions prior "
-#| "to 7.2.0."
+#: payplus-payment-gateway.php:117
 msgid ""
-"**PayPlus Payment Gateway Plugin - Version 7.3.2 Update**<br><br>\n"
+"<strong style=\"font-size: 1.2em;\">Dear Customers,</strong><br><br>\n"
 "\n"
-"            **Important Notice:**<br>\n"
-"            This update introduces a major refactoring of the invoice code "
-"to enhance performance and align with current WooCommerce standards.<br>\n"
-"            Additionally, the refund process has been refactored.<br><br>\n"
+"        <span style=\"font-size: 1.2em;\"><strong>Attention!</strong> For "
+"users of the <strong>PayPlus</strong> plugin who calculate VAT via "
+"WordPress, it is crucial to update the VAT rate from 17% to 18% starting on "
+"January 1st.<br>\n"
+"        This update must be performed specifically on January 1st to ensure "
+"accurate calculations for transactions and payments.<br>\n"
+"        Please ensure this update is completed on this date.<br><br>\n"
 "\n"
-"            If you are updating from a version earlier than 7.2.0, you may "
-"encounter issues with refund document creation for orders created in those "
-"earlier versions.<br>\n"
-"            In such cases:<br>\n"
-"            1. Downgrade to version 7.2.9 to process refunds.<br>\n"
-"            2. Once refunds are complete, you can safely upgrade back to "
-"version 7.3.1.<br><br>\n"
-"\n"
-"            No settings will be lost during this process. Please note this "
-"only affects the refund process for orders created in versions prior to "
-"7.2.0."
+"        Thank you,<br>\n"
+"        <strong>The PayPlus Team</strong></span>"
 msgstr ""
-"**תוסף שער התשלום PayPlus - עדכון גרסה 7.3.0**<br><br>\n"
+"<strong style=\"font-size: 1.2em;\">לקוחות יקרים,</strong><br><br>\n"
 "\n"
-"**הודעה חשובה:**<br>  \n"
-"עדכון זה כולל שינוי משמעותי בקוד הפקת החשבוניות במטרה לשפר ביצועים ולהתאים "
-"לסטנדרטים הנוכחיים של WooCommerce.<br>  \n"
-"בנוסף, תהליך ההחזרים עבר עדכון ושינוי בקוד.<br><br>  \n"
+"        <span style=\"font-size: 1.2em;\"><strong>שימו לב!</strong> עבור "
+"לקוחות המשתמשים בתוסף <strong>PayPlus</strong> ובחישוב מע\"מ דרך WordPress, "
+"חשוב מאוד לעדכן את ערך המע\"מ ל-18% במקום 17% בדיוק ב-1 בינואר.<br>\n"
+"        יש לבצע עדכון זה באופן ספציפי בתאריך זה כדי להבטיח חישובים תקינים של "
+"עסקאות ותשלומים.<br>\n"
+"        אנא ודאו שהעדכון יבוצע בתאריך זה.<br><br>\n"
 "\n"
-"אם אתם מעדכנים מגרסה מוקדמת מ-7.2.0, ייתכן שתיתקלו בבעיות ביצירת מסמכי החזר "
-"עבור הזמנות שנוצרו בגרסאות מוקדמות אלו.<br>  \n"
-"במקרה כזה:<br>  \n"
-"1. חזרו לגרסה 7.2.9 לצורך ביצוע ההחזרים.<br>  \n"
-"2. לאחר השלמת ההחזרים, תוכלו לשדרג בבטחה חזרה לגרסה 7.3.0.<br><br>  \n"
-"\n"
-"ההגדרות שלכם לא יאבדו במהלך התהליך. שימו לב: בעיה זו משפיעה רק על תהליך "
-"ההחזרים עבור הזמנות שנוצרו בגרסאות מוקדמות מ-7.2.0."
+"        תודה,<br>\n"
+"        <strong>צוות PayPlus</strong></span>"
 
-#: payplus-payment-gateway.php:372
+#: payplus-payment-gateway.php:367
 #, fuzzy
 #| msgid ""
 #| "Sandbox mode is active and real transaction cannot be processed. Please "
@@ -2294,7 +2262,7 @@ msgstr ""
 "שים לב: מצב Sandbox פעיל ועסקאות אמיתיות לא יסלקו. אנא וודא להוריד סימון "
 "בתוסף לאחר סיום הבדיקות"
 
-#: payplus-payment-gateway.php:378
+#: payplus-payment-gateway.php:373
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2306,11 +2274,11 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:561
+#: payplus-payment-gateway.php:556
 msgid "Four last digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: payplus-payment-gateway.php:621
+#: payplus-payment-gateway.php:616
 msgid ""
 "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" "
 "target=\"_blank\">WooCommerce</a> to be activated."
@@ -2319,14 +2287,14 @@ msgstr ""
 "target=\"_blank\">WooCommerce</a> ונדרש שיהיה פעיל."
 
 #. translators: %1$s: Current PHP version, %2$s: Required PHP version
-#: payplus-payment-gateway.php:634
+#: payplus-payment-gateway.php:629
 #, php-format
 msgid ""
 "Your server is running PHP version %1$s but some features require at least "
 "%2$s."
 msgstr ""
 
-#: payplus-payment-gateway.php:642
+#: payplus-payment-gateway.php:637
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2337,29 +2305,29 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:695
+#: payplus-payment-gateway.php:690
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:1001 payplus-payment-gateway.php:1020
+#: payplus-payment-gateway.php:996 payplus-payment-gateway.php:1015
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:1039
+#: payplus-payment-gateway.php:1034
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:1062 payplus-payment-gateway.php:1079
+#: payplus-payment-gateway.php:1057 payplus-payment-gateway.php:1074
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1201 payplus-payment-gateway.php:1209
+#: payplus-payment-gateway.php:1196 payplus-payment-gateway.php:1204
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1224
+#: payplus-payment-gateway.php:1219
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
@@ -2422,6 +2390,66 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#, fuzzy
+#~| msgid ""
+#~| "**PayPlus Payment Gateway Plugin - Version 7.3.1 Update**<br><br>\n"
+#~| "\n"
+#~| "            **Important Notice:**<br>\n"
+#~| "            This update introduces a major refactoring of the invoice "
+#~| "code to enhance performance and align with current WooCommerce standards."
+#~| "<br>\n"
+#~| "            Additionally, the refund process has been refactored."
+#~| "<br><br>\n"
+#~| "\n"
+#~| "            If you are updating from a version earlier than 7.2.0, you "
+#~| "may encounter issues with refund document creation for orders created in "
+#~| "those earlier versions.<br>\n"
+#~| "            In such cases:<br>\n"
+#~| "            1. Downgrade to version 7.3.0 to process refunds.<br>\n"
+#~| "            2. Once refunds are complete, you can safely upgrade back to "
+#~| "version 7.3.1.<br><br>\n"
+#~| "\n"
+#~| "            No settings will be lost during this process. Please note "
+#~| "this only affects the refund process for orders created in versions "
+#~| "prior to 7.2.0."
+#~ msgid ""
+#~ "**PayPlus Payment Gateway Plugin - Version 7.3.2 Update**<br><br>\n"
+#~ "\n"
+#~ "            **Important Notice:**<br>\n"
+#~ "            This update introduces a major refactoring of the invoice "
+#~ "code to enhance performance and align with current WooCommerce standards."
+#~ "<br>\n"
+#~ "            Additionally, the refund process has been refactored."
+#~ "<br><br>\n"
+#~ "\n"
+#~ "            If you are updating from a version earlier than 7.2.0, you "
+#~ "may encounter issues with refund document creation for orders created in "
+#~ "those earlier versions.<br>\n"
+#~ "            In such cases:<br>\n"
+#~ "            1. Downgrade to version 7.2.9 to process refunds.<br>\n"
+#~ "            2. Once refunds are complete, you can safely upgrade back to "
+#~ "version 7.3.1.<br><br>\n"
+#~ "\n"
+#~ "            No settings will be lost during this process. Please note "
+#~ "this only affects the refund process for orders created in versions prior "
+#~ "to 7.2.0."
+#~ msgstr ""
+#~ "**תוסף שער התשלום PayPlus - עדכון גרסה 7.3.0**<br><br>\n"
+#~ "\n"
+#~ "**הודעה חשובה:**<br>  \n"
+#~ "עדכון זה כולל שינוי משמעותי בקוד הפקת החשבוניות במטרה לשפר ביצועים "
+#~ "ולהתאים לסטנדרטים הנוכחיים של WooCommerce.<br>  \n"
+#~ "בנוסף, תהליך ההחזרים עבר עדכון ושינוי בקוד.<br><br>  \n"
+#~ "\n"
+#~ "אם אתם מעדכנים מגרסה מוקדמת מ-7.2.0, ייתכן שתיתקלו בבעיות ביצירת מסמכי "
+#~ "החזר עבור הזמנות שנוצרו בגרסאות מוקדמות אלו.<br>  \n"
+#~ "במקרה כזה:<br>  \n"
+#~ "1. חזרו לגרסה 7.2.9 לצורך ביצוע ההחזרים.<br>  \n"
+#~ "2. לאחר השלמת ההחזרים, תוכלו לשדרג בבטחה חזרה לגרסה 7.3.0.<br><br>  \n"
+#~ "\n"
+#~ "ההגדרות שלכם לא יאבדו במהלך התהליך. שימו לב: בעיה זו משפיעה רק על תהליך "
+#~ "ההחזרים עבור הזמנות שנוצרו בגרסאות מוקדמות מ-7.2.0."
 
 #~ msgid "Invoice+ Documents"
 #~ msgstr "מסמכי חשבונית+"

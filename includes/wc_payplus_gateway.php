@@ -434,7 +434,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
-                if ($paymentPageUid && $payPlusCronTested < 3) {
+                if ($paymentPageUid && $payPlusCronTested < 5) {
                     ++$payPlusCronTested;
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
                     echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
