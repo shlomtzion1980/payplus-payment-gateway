@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.3.6 - 24-12-2024
+= 7.3.6 - 24-12-2024 =
 
 - Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
 - Added - Option to hide the number of payments for the Bit payment method.
@@ -95,18 +95,18 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak - Adjusted the size and framing of Express Checkout buttons on the checkout page.
 - Tweak - PayPlus Cron and the PayPlus orders check button will now attempt to run at least 4 times before giving up on an order (up from 2 attempts).
 
-= 7.3.5 - 15-12-2024
+= 7.3.5 - 15-12-2024 =
 
 - Tweak - Replaced the headline text with the Invoice+ logo at the top of the column on the All Orders page.
 - Tweak - Renamed the getPayPlusPayload function to getHostedPayload to correct its inaccurate naming.
 
-= 7.3.3 - 12-12-2024
+= 7.3.3 - 12-12-2024 =
 
 - Fix - PayPlus Embedded - Resolved an issue where coupons/discounts did not account for taxes on stores with exclusive prices and tax management enabled.
 - Tweak - PayPlus Embedded - Improved payload validation before payment, added error messages with reload functionality for payment failures, and implemented minor refactoring to enhance performance by reducing unnecessary checks.
 - Tweak - Alertify is now loaded locally to comply with WordPress plugin check requirements.
 
-= 7.3.2 - 10-12-2024
+= 7.3.2 - 10-12-2024 =
 
 * Fixed - Resolved issues with creating refunds for PayPal through Invoice+ after the refactor.
 * Logs  - Added logging for the invoice creation process.
@@ -126,109 +126,5 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 * Tweak - Improved plugin sanitation and adherence to WordPress standards via Plugin Check.
 * Refactored - Enhanced the process for Invoice+ refunds.
 * Removed  - Custom icons added via plugin settings using pasted links have been removed and replaced with the "Select Your Cards" feature.
-
-
-
-= 7.3.0 - 27-11-2024 = 
-
-* Fix   - Resolved - Addressed an issue where Invoice+ documents for orders paid using a PayPal payment plugin (other than PayPlus) were incorrectly labeled as "Other" These documents will now accurately display "PayPal" as the payment method when applicable.
-
-= 7.2.9 - 26-11-2024 = 
-
-* Added - An option to hide the number of payments on Google Pay and Apple Pay payment pages (e.g., to display only a single payment). This option can be configured in each payment method's settings.
-* Tweak - Restricted the optional callback in settings to accept only HTTP or HTTPS links.
-
-= 7.2.8 - 25-11-2024 = 
-
-* Fix   - PayPlus Embedded origin for testmode and production.
-
-= 7.2.7 - 25-11-2024 = 
-
-* Fix   - Small fix for refund invoices - removed usage of saved payloads.
-
-= 7.2.6 - 24-11-2024 = 
-
-* Fix   - Loading iframe issue in redirect and on the next page fixed.
-
-= 7.2.5 - 24-11-2024 = 
-
-* Added - PayPlus Embedded: An embedded credit card payment form that eliminates the need for a separate payment page during the checkout process. This form is preloaded on the checkout page, allowing customers to securely enter their payment details and complete the transaction seamlessly.
-
-The new feature can be enabled via the admin settings menu under "Subgateways." It can function as a standalone option or alongside existing payment pages. Note that PayPlus Embedded supports credit card payments exclusively.
-
-
-= 7.2.3 - 18-11-2024 = 
-
-* Added - PayPlus cron now processes "cancelled" or "pending" orders that are over 30 minutes old, created today, have a payment_page_uid, and do not have the cron test flag (to avoid retesting already tested orders).
-          Orders that were successful and cancelled manually will not be tested or updated via cron.
-
-= 7.2.1 - 14-11-2024 = 
-
-* Tweak - The Apple Pay script is now loaded locally from the plugin.
-
-= 7.2.0 - 10-11-2024 =
-
-* Add   - Hide "Create document" (Invoice+) option if `payplus_status` is "rejected".
-* Add   - Display payment status in the PayPlus metabox.
-* Add   - Logs for payloads in order meta.
-* Add   - Utilize saved logs for creating refunds (Invoice+), ensuring refund data for products matches the original invoice creation, rather than the current product or site settings.
-* Tweak - Express checkout shipping now supports minimum amount rules for displaying free/flat rate and is sorted.
-* Tweak - Improved icon resolution.
-* Fix   - Resolved missing setting error that occurred on some fresh installations.
-
-= 7.1.8 - 28-10-2024 =
-
-* Add   - Transaction UID handling to the payPlusIpn function.
-* Tweak - Callbacks are now consistently received locally and forwarded to the "Callback URL" when defined in plugin settings.
-
-= 7.1.7 - 27-10-2024 =
-
-* Fix   - Callback response.
-
-= 7.1.6 - 13-10-2024 =
-
-* Fix   - Subscription order renewals.
-* Fix   - Nonce verification on IPN response for certain users.
-* Add   - Option to force Apple Pay script from admin settings.
-* Add   - Updated shipping functions for express checkout.
-* Tweak - Improved menu translations.
-
-= 7.1.5 - 12-09-2024 =
-* Fix - Fixed post function user-agent.
-* Add - Added .pot file.
-
-= 7.1.4 - 11-09-2024 =
-* Add    - PayPlus orders validator button in the side menu (can be added via plugin advanced settings) and function added—similar to the cron function but manual—for admins only.
-* Add    - Show/Hide payment sub-gateways in the side menu (setting available in PayPlus advanced features).
-* Add    - Displaying manual payments (admin-created) in the PayPlus metabox.
-* Add    - Apple script is now added automatically to all iframes if needed in both checkouts.
-* Add    - Added support for free shipping minimum amount conditions for express checkout.
-* Fix    - Adjusted iframe width in both checkouts on mobile view; also fixed the close frame button to stay at the top of the frame.
-* Fix    - Resolved PHP warning generated from the IP check function, which was missing an `isset` check.
-* Fix    - When a translation doesn't exist for "API Mode" in admin settings, display it in English.
-* Fix    - Corrected behavior of product/item VAT sent to IPN or Invoice+ documents.
-* Fix    - Express Checkout did not display in the last two versions in the classic checkout due to a sanitation error.
-* Fix    - Fixed duplicate creation of invoice on "cod - cash on delivery" or "bacs - bank transfer" when "issue an automatic tax invoice" is checked in Invoice+.
-* Tweak  - Display multiple charge invoice documents on the orders page and inside the order page metabox.
-* Tweak  - Updated token payment error note (for token payments made from the admin).
-* Tweak  - Updated Alertify.js version.
-* Tweak  - Error message display on mobile "New Checkout Blocks" was too small.
-* Tweak  - Improved PayPlus IPN function to eliminate PHP warnings.
-* Tweak  - Updated some buttons and colors on the orders page.
-* Tweak  - Sanitation and security fixes according to "Plugin Check" plugin repository requirements.
-* Tweak  - Block/Disable editing custom fields option (available in PayPlus advanced features).
-* Tweak  - Fixed styling of the Express Checkout button in classic checkout.
-* Change - On subscription orders (orders that contain at least one subscription product), only credit card payments can be used. Now, only the credit card payment method will be displayed and available.
-
-= 7.1.1 =
-* Fix    - Resolved an issue where classic checkout fields were not displaying correctly due to multipass icons logic.
-* Fix    - Corrected missing CSS class on the order admin page.
-* Fix    - Fixed a redirect issue on the "Thank You" page for users with specific plugins by sanitizing URLs with ampersands.
-* Fix    - Addressed a bug where JS was not refreshing payment method fields and totals in classic checkout due to a commented line.
-* Fix    - Fixed an issue where invoices generated for token payments in certain flows were incorrectly labeled as “other” instead of displaying the correct details.
-* Add    - Added the ability for store managers or admins to make token payments through the edit orders page.
-* Add    - Introduced a PayPlus cron checker that, if activated, runs every hour. It checks for orders created in the last two hours with a “pending” status and processes IPNs if a payment page request UID is present.
-* Add    - Added new settings for token payments and the PayPlus cron checker.
-* Add    - Introduced an option to add custom icons below or instead of the default PayPlus icon in the Checkout Page Options.
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/CHANGELOG.md).
