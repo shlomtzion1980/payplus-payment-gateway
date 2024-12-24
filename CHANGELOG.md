@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.6] = 24-12-2024 - (Sung Jin-woo)
+
+- Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
+- Added - Option to hide the number of payments for the Bit payment method.
+- Tweak - Added security check to verify the order ID and improved performance of the PayPlus Embedded Subgateway.
+- Tweak - Adjusted the size and framing of Express Checkout buttons on the checkout page.
+- Tweak - PayPlus Cron and the PayPlus orders check button will now attempt to run at least 4 times before giving up on an order (up from 2 attempts).
+
 ## [7.3.5] = 15-12-2024 - (Saiki K)
 
 - Tweak - Replaced the headline text with the Invoice+ logo at the top of the column on the All Orders page.

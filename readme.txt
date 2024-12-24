@@ -2,9 +2,9 @@
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 3.0.1
-Tested up to: 6.7
+Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.3.5
+Stable tag: 7.3.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.3.6 - 24-12-2024
+
+- Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
+- Added - Option to hide the number of payments for the Bit payment method.
+- Tweak - Added security check to verify the order ID and improved performance of the PayPlus Embedded Subgateway.
+- Tweak - Adjusted the size and framing of Express Checkout buttons on the checkout page.
+- Tweak - PayPlus Cron and the PayPlus orders check button will now attempt to run at least 4 times before giving up on an order (up from 2 attempts).
 
 = 7.3.5 - 15-12-2024
 
