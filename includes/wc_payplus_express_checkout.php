@@ -809,7 +809,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             echo "<div class='line-express-left'>
              <span></span>
             </div>";
-            echo '<p class="title-express-checkout"><span>' . esc_html__('Express Checkout', 'payplus-payment-gateway') . '</span></p>';
+            echo '<p class="title-express-checkout"><span style="font-size: 18px">' . esc_html__('Express Checkout', 'payplus-payment-gateway') . '</span></p>';
             echo "<div class='line-express-right'>
                 <span></span>
             </div>";
@@ -826,7 +826,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             echo '<div id="error-api-payplus"></div>';
             echo '</div>';
             echo '<div class="border-with-word">
-            <span>' . esc_html__('Or', 'payplus-payment-gateway') . '</span>
+            <span style="font-size: 18px;" >' . esc_html__('Or', 'payplus-payment-gateway') . '</span>
             </div>';
         }
 
