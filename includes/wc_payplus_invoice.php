@@ -318,39 +318,33 @@ class PayplusInvoice
             $dual = -1;
         }
 
-        $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
-        $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
-        $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
+        $payload['customer'] = $payloadInvoiceData['customer'];
 
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
         }
         if (!empty($payplusTransactionUid)) {
-            $payload['transaction_uuid'] = $payloadInvoiceData ? $payloadInvoiceData['transaction_uuid'] : $payplusTransactionUid;
+            $payload['transaction_uuid'] = $payloadInvoiceData['transaction_uuid'];
         }
-        $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
 
-        $payloadInvoiceData && isset($payloadInvoiceData['customer']['balance_name']) ? $payplusBalanceNames[0] = $payloadInvoiceData['customer']['balance_name'] : $payplusBalanceNames = $objectProducts->balanceNames;
-
-        if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
-            if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
-                $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
-            }
+        if ($WC_PayPlus_Gateway->balance_name && isset($payloadInvoiceData['customer']['balance_name']) && !empty($payloadInvoiceData['customer']['balance_name'])) {
+            $payload['customer']['balance_name'] = $payloadInvoiceData['customer']['balance_name'];
         }
 
         if ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
-            $productsItems = $payloadInvoiceData ? $payloadInvoiceData['items'] : $objectProducts->productsItems;
-            $sum = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : $objectProducts->amount;
+            $productsItems = $payloadInvoiceData['items'];
+            $sum = $payloadInvoiceData['totalAmount'];
+            $payload['totalAmount'] = $payloadInvoiceData['totalAmount'];
         }
 
-        $payload['currency_code'] = $payloadInvoiceData ? $payloadInvoiceData['currency_code'] : $order->get_currency();
-        $payload['autocalculate_rate'] = $payloadInvoiceData ? $payloadInvoiceData['autocalculate_rate'] : true;
-        $payload['totalAmount'] = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : round($sum, $WC_PayPlus_Gateway->rounding_decimals);
-        $payload['language'] = $payloadInvoiceData ? $payloadInvoiceData['language'] : $payplus_invoice_option['payplus_langrage_invoice'];
+        $payload['currency_code'] = $payloadInvoiceData['currency_code'];
+        $payload['autocalculate_rate'] = $payloadInvoiceData['autocalculate_rate'];
+
+        $payload['language'] = $payloadInvoiceData['language'];
         $payload['more_info'] = $order_id;
 
         if (count($productsItems) && !$this->hide_products_invoice) {
-            $payload['items'] = $payloadInvoiceData ? $payloadInvoiceData['items'] : $productsItems;
+            $payload['items'] = $payloadInvoiceData['items'];
         } else {
             $sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
@@ -361,47 +355,25 @@ class PayplusInvoice
                 'price' => $sum,
                 "quantity" => 1,
             );
+            $payloadInvoiceData['payments'][0]['amount'] = $sum;
         }
 
-        $payload['send_document_email'] = $payloadInvoiceData ? $payloadInvoiceData['send_document_email'] : $this->payplus_invoice_send_document_email;
-        $payload['send_document_sms'] = $payloadInvoiceData ? $payloadInvoiceData['send_document_sms'] : $this->payplus_invoice_send_document_sms;
+        $payload['send_document_email'] = $payloadInvoiceData['send_document_email'];
+        $payload['send_document_sms'] = $payloadInvoiceData['send_document_sms'];
 
-        if (!empty($unique_identifier)) {
-            $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
-        }
+        !empty($unique_identifier) ? $payload['unique_identifier'] = $unique_identifier . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'] : null;
 
-        if (!count($resultApps)) {
-            $method_payment = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true) == "" ? 'other' : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true);
-            if ($method_payment == 'credit-card') {
-                $paymentArray['method_payment'] = 'credit-card';
-                $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
-                $paymentArray['brand_name'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
-                $paymentArray['price'] = ($dual * $sum) * 100;
-                $resultApps[] = (object) $paymentArray;
-            } else {
-                $method_payment = 'other';
-                $otherMethod = strtolower($order->get_payment_method_title());
-                $orOtherMethod = strtolower($order->get_payment_method());
-                $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
-
-                $found_in_other = array_filter($search_terms, function ($term) use ($otherMethod) {
-                    return strpos($otherMethod, $term) !== false;
-                });
-
-                $found_in_or_other = array_filter($search_terms, function ($term) use ($orOtherMethod) {
-                    return strpos($orOtherMethod, $term) !== false;
-                });
-
-                if (!empty($found_in_other) || !empty($found_in_or_other)) {
-                    $method_payment = 'paypal';
-                }
-                $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
-                $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
-                $resultApps[] = $objectInvoicePaymentNoPayplus;
+        if ($payloadInvoiceData['payments'][0]['payment_type'] !== 'credit-card' && empty($payplusApprovalNum)) {
+            if (in_array($payloadInvoiceData['payments'][0]['payment_type'], ['paypal', 'tav-zahav', 'multipass'])) {
+                $payplusApprovalNum = "";
+                $payloadInvoiceData['payments'][0]['transaction_number'] = $payplusApprovalNum;
+                $payloadInvoiceData['payments'][0]['transaction_id'] = $payplusApprovalNum;
             }
         }
 
-        $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
+        !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true)) ? $payloadInvoiceData['payments'][0]['number_of_payments'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true) : null;
+
+        $payload = array_merge($payload, ['payments' => $payloadInvoiceData['payments']]);
 
         return $payload;
     }
