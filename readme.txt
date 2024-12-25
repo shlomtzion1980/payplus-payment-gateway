@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.3.7
+Stable tag: 7.3.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.3.7 - 25-12-2024 =
+= 7.3.8 - 25-12-2024 =
 
 - Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
 - Tweak - Adjusted the margin and padding of Express Checkout buttons.

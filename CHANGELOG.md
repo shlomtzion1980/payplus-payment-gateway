@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.3.7] = 25-12-2024 - (Nico-Robin)
+## [7.3.8] = 25-12-2024 - (Nico-Robin)
 
 - Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
 - Tweak - Adjusted the margin and padding of Express Checkout buttons.
