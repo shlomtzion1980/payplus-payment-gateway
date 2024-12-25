@@ -86,6 +86,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.3.7 - 25-12-2024 =
+
+- Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
+- Tweak - Adjusted the margin and padding of Express Checkout buttons.
+
 = 7.3.6 - 24-12-2024 =
 
 - Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).

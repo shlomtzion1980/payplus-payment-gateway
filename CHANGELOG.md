@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.7] = 25-12-2024 - (Nico-Robin)
+
+- Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
+- Tweak - Adjusted the margin and padding of Express Checkout buttons.
+
 ## [7.3.6] = 24-12-2024 - (Sung Jin-woo)
 
 - Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
