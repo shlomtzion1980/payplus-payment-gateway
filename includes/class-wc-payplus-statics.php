@@ -269,6 +269,7 @@ class WC_PayPlus_Statics
                                 $brand = $responseArray['brand_name'] ?? $responseArray['data']['data']['card_information']['brand_id'] ?? null;
                                 $issuer = $responseArray['issuer_name'] ?? $responseArray['data']['data']['card_information']['clearing_id'] ?? null;
                                 $type = $payPlusType ? $payPlusType : $responseArray['type'] ?? $responseArray['data']['transaction']['type'] ?? null;
+                                $date = $responseArray['date'] ?? $responseArray['data']['transaction']['date'] ?? null;
                                 $number = $responseArray['number'] ?? $responseArray['data']['transaction']['number'] ?? null;
                                 $fourDigits = $responseArray['four_digits'] ?? $responseArray['data']['data']['card_information']['four_digits'] ?? null;
                                 $expMonth = $responseArray['expiry_month'] ?? $responseArray['data']['data']['card_information']['expiry_month'] ?? null;
@@ -282,7 +283,7 @@ class WC_PayPlus_Statics
                                 $status = $status === "approved" ? "Approved" : $status;
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
-                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $date));
                             } else {
                                 foreach ($responseArray['related_transactions'] as $transaction) {
                                     $amount = $transaction['amount'];
@@ -291,6 +292,7 @@ class WC_PayPlus_Statics
                                     $issuer = $transaction['issuer_name'] ?? $transaction['clearing_name'];
                                     $type = $transaction['type'];
                                     $number = $transaction['number'];
+                                    $date = $transaction['date'];
                                     $fourDigits = $transaction['four_digits'];
                                     $expMonth = $transaction['expiry_month'];
                                     $expYear = $transaction['expiry_year'];
@@ -303,7 +305,7 @@ class WC_PayPlus_Statics
                                     $status = $transaction['status'] ?? null;
                                     $status = $status === "rejected" ? "<span style='color: red;'>Rejected</span>" : $status;
                                     $status = $status === "approved" ? "Approved" : $status;
-                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge));
+                                    echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $date));
                                     echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                                 }
                                 echo esc_html(__('Total of payments: ', 'payplus-payment-gateway')) . esc_html($totalAmount);
@@ -328,7 +330,7 @@ class WC_PayPlus_Statics
                             $j5Charge = null;
                             $status = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_numberD') ? "Successful" : null;
                             $statusCode = $manualPayment['status_code'] ?? null;
-                            echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, true));
+                            echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, "", true));
                             echo '<br><span style="border: 1px solid #000;display: block;width: 100%;"></span></br>';
                         }
                     }
@@ -375,7 +377,7 @@ class WC_PayPlus_Statics
          * 
          * @return string
          */
-        public static function createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $paymentType = false)
+        public static function createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $date, $paymentType = false)
         {
             $type_text = ($type == "Approval" || $type == "Check") ? __('Pre-Authorization', 'payplus-payment-gateway') : __('Payment', 'payplus-payment-gateway');
             $type_text = $paymentType ? __('Manual Payment', 'payplus-payment-gateway') : $type_text;
@@ -384,6 +386,7 @@ class WC_PayPlus_Statics
                 '<div style="font-weight:600;">PayPlus %s %s</div>
                         <table class="payPlusMetaBox" style="border-collapse:collapse">
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Transaction#', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
+                            <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('DateTime', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Method', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Brand', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
                             <tr><td style="border-bottom:1px solid #000;vertical-align:top;">' . __('Issuer', 'payplus-payment-gateway') . '</td><td style="border-bottom:1px solid #000;vertical-align:top;">%s</td></tr>
@@ -401,6 +404,7 @@ class WC_PayPlus_Statics
                 $type_text,
                 $status,
                 $number,
+                $date,
                 $method,
                 $brand,
                 $issuer,
