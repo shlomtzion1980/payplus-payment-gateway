@@ -1873,10 +1873,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $totalCartAmount += $productPrice;
         }
 
+        // YourMoment Split Shipping
         $shipping_splitted = WC()->session->get('shipping_splitted');
         if ($shipping_splitted === null) {
             $shipping_splitted = false;
         }
+        // YourMoment Split Shipping
+
         $shipping_methods = $order->get_shipping_methods();
 
         if ($shipping_methods && !$shipping_splitted) {
@@ -1906,6 +1909,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
 
+        // YourMoment Split Shipping
         if ($shipping_splitted) {
             $orderTotal = $order->get_total();
             if ($totalCartAmount < $orderTotal) {
@@ -1919,6 +1923,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $totalCartAmount += $productPrice;
             }
         }
+        // YourMoment Split Shipping
 
         // coupons
 
