@@ -1906,6 +1906,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
 
+        if ($shipping_splitted) {
+            $orderTotal = $order->get_total();
+            if ($totalCartAmount < $orderTotal) {
+                $productPrice = $orderTotal - $totalCartAmount;
+                $itemDetails = [
+                    'name' => __('Shipping', 'payplus-payment-gateway'),
+                    'quantity' => 1,
+                    'price' => $productPrice,
+                ];
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                $totalCartAmount += $productPrice;
+            }
+        }
+
         // coupons
 
         if (!$isAdmin && $order->get_total_discount()) {
@@ -1946,20 +1960,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ];
             $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
             $totalCartAmount += $priceGift;
-        }
-
-        if ($shipping_splitted) {
-            $orderTotal = $order->get_total();
-            if ($totalCartAmount < $orderTotal) {
-                $productPrice = $orderTotal - $totalCartAmount;
-                $itemDetails = [
-                    'name' => __('Shipping', 'payplus-payment-gateway'),
-                    'quantity' => 1,
-                    'price' => $productPrice,
-                ];
-                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
-                $totalCartAmount += $productPrice;
-            }
         }
 
         $totalCartAmount = round($totalCartAmount, $this->rounding_decimals);
