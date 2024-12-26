@@ -145,7 +145,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
         $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
-        $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'));
+        $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'), new DateTimeZone('Asia/Jerusalem'));
         $this->rounding_decimals = ROUNDING_DECIMALS;
         $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
@@ -2373,6 +2373,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             $order_id = intval($response['transaction']['more_info']);
             $order = wc_get_order($order_id);
+            $datetime = current_datetime();
+            $LocalTime = $datetime->format('Y-m-d H:i:s');
             if ($order) {
                 $orderStatus = $order->get_status();
                 $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status! - callback will end.' : $orderStatus;
@@ -2380,6 +2382,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'payplus_callback_secured',
                     "
                     Time: $this->current_time
+                    IsraelTime: $LocalTime
                     Order: $order_id
                     HTTP_HASH: $payplusHash
                     PayPlus Generated Hash: $payplusGenHash
