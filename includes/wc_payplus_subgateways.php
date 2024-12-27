@@ -468,8 +468,10 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $hostedPayload = WC()->session->get('hostedPayload');
+        $hostedResponse = WC()->session->get('hostedResponse');
         wp_send_json_success(array(
-            'hostedPayload' => $hostedPayload
+            'hostedPayload' => $hostedPayload,
+            'hostedResponse' => $hostedResponse
         ));
     }
 
