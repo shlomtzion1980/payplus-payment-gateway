@@ -631,11 +631,6 @@ jQuery(function ($) {
                 hasSavedCCs.length === 0
               ) {
                 $(".container.hostedFields").show();
-              } else {
-                $("#payment_method_payplus-payment-gateway").prop(
-                  "checked",
-                  true
-                );
               }
             };
             hostedIsMain ? hideHostedFieldsListItem() : null;
@@ -832,6 +827,9 @@ jQuery(function ($) {
                 },
                 success: function (response) {
                   const hostedPayload = JSON.parse(response.data.hostedPayload);
+                  const hostedResponse = JSON.parse(
+                    response.data.hostedResponse
+                  );
                   if (
                     hostedPayload.more_info &&
                     !isNaN(hostedPayload.more_info)
