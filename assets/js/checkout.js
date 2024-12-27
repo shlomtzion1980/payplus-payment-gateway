@@ -58,14 +58,14 @@ jQuery(function ($) {
         $("#submit-payment").hide();
         $("div.container.hostedFields").show();
       }, 2000);
-    } /*else {
+    } else {
       setTimeout(function () {
         $(".payment_method_payplus-payment-gateway").css("display", "block");
         $("input#" + inputPayPlus).prop("checked", false);
         const mainPayPlus = "payment_method_payplus-payment-gateway";
         $("input#" + mainPayPlus).prop("checked", true);
       }, 2000);
-    }*/
+    }
     $(document).on("change", 'input[name="payment_method"]', function () {
       // Check if the hosted fields radio input is NOT checked
       if (!$("input#" + inputPayPlus).is(":checked")) {
@@ -624,6 +624,19 @@ jQuery(function ($) {
             const hideHostedFieldsListItem = () => {
               $(".woocommerce-SavedPaymentMethods-new").hide();
               $(".woocommerce-SavedPaymentMethods-saveNew").hide();
+              if (
+                jQuery(
+                  "#payment_method_payplus-payment-gateway-hostedfields"
+                ).is(":checked") &&
+                hasSavedCCs.length === 0
+              ) {
+                $(".container.hostedFields").show();
+              } else {
+                $("#payment_method_payplus-payment-gateway").prop(
+                  "checked",
+                  true
+                );
+              }
             };
             hostedIsMain ? hideHostedFieldsListItem() : null;
 
