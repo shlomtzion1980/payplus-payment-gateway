@@ -388,8 +388,31 @@ hf.Upon("pp_pageExpired", (e) => {
       console.log(xhr, status, error);
     },
   });
-  alert("Page Expired. Please refresh the page and try again.");
-  location.reload();
+  const popup = document.createElement("div");
+  popup.style.position = "fixed";
+  popup.style.top = "50%";
+  popup.style.left = "50%";
+  popup.style.transform = "translate(-50%, -50%)";
+  popup.style.backgroundColor = "#fff";
+  popup.style.padding = "20px";
+  popup.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
+  popup.style.zIndex = "10000";
+  popup.innerHTML = `
+      <p>${
+        pageLang !== "he-IL"
+          ? "Page Expired. Please refresh the page and try again."
+          : "תוקף הדף פג. אנא רענן/י את הדף ונסה/י שוב."
+      }</p>
+      <button id="popup-ok-button">${
+        pageLang !== "he-IL" ? "OK" : "אישור"
+      }</button>
+  `;
+  document.body.appendChild(popup);
+
+  document.getElementById("popup-ok-button").addEventListener("click", () => {
+    document.body.removeChild(popup);
+    location.reload();
+  });
 });
 
 hf.Upon("pp_noAttemptedRemaining", (e) => {
