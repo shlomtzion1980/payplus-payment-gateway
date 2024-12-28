@@ -367,7 +367,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
+        $order = wc_get_order($order_id);
+        if ($order) {
+            $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #$order_id") : null;
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
+        } else {
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
+        }
+
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
