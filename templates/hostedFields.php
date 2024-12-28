@@ -296,6 +296,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         height: 17px;
                         top: 2px;
                         display: initial;
+                        max-width: unset;
+                        max-height: unset;
                     }
                 }
 
@@ -590,9 +592,10 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                                                                         }
                                                                                     } else {
                                                                                             ?><img class="hf-image"
-                                    src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                                                        }
-                                                                                                                            ?>
+                                    src="<?php echo esc_url($ccImage); ?>"
+                                    alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
+                                                                                    }
+                                                                                        ?>
 
                         </div>
                     </div>
