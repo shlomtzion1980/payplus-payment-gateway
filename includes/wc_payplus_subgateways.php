@@ -473,14 +473,11 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $order_id = '000';
 
         WC()->session->set('hostedTimeStamp', false);
-        // WC()->session->set('hostedPayload', false);
         WC()->session->set('page_request_uid', false);
         WC()->session->set('hostedResponse', false);
         WC()->session->__unset('order_awaiting_payment');
         WC()->session->__unset('hostedFieldsUUID');
         WC()->session->set('hostedStarted', false);
-        // WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-        // $hostedClass = new WC_PayPlus_HostedFields($order_id, null, false);
         $this->payplus_add_log_all('hosted-fields-data', 'Regenerate hosted link - to 000');
         wp_send_json_success(array(
             'message' => 'regenerate sent',
