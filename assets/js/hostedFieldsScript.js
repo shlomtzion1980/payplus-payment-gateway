@@ -373,6 +373,21 @@ hf.Upon("pp_pageExpired", (e) => {
   console.log(e);
   jQuery("#submit-payment").prop("disabled", true);
   jQuery("#status").val("Page Expired");
+  jQuery.ajax({
+    type: "post",
+    dataType: "json",
+    url: payplus_script_checkout.ajax_url,
+    data: {
+      action: "regenerate-hosted-link",
+      _ajax_nonce: payplus_script_checkout.frontNonce,
+    },
+    success: function (response) {
+      console.log(response);
+    },
+    error: function (xhr, status, error) {
+      console.log(xhr, status, error);
+    },
+  });
   alert("Page Expired. Please refresh the page and try again.");
   location.reload();
 });

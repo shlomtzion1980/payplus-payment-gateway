@@ -320,32 +320,37 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $totalBeforeDiscount = $totalAmount - $shippingPrice;
 
             $coupons = $order->get_coupon_codes();
+            $discount_total = $order->get_discount_total();
 
             if (! empty($coupons)) {
+                $total_coupon_value = 0;
                 foreach ($coupons as $coupon_code) {
-                    // Get the WC_Coupon object
                     $coupon = new WC_Coupon($coupon_code);
+                    $total_coupon_value += $coupon->get_amount();
+                }
 
-                    // Get the coupon discount amount
+                foreach ($coupons as $coupon_code) {
+                    $coupon = new WC_Coupon($coupon_code);
                     $coupon_value = $coupon->get_amount();
-                }
+                    $discount_tax = 0;
+                    foreach ($order->get_items('coupon') as $item_id => $item) {
+                        $discount_tax += $item->get_discount_tax();
+                    }
 
-                $discount_tax = 0;
-                foreach ($order->get_items('coupon') as $item_id => $item) {
-                    $discount_tax += $item->get_discount_tax();
-                }
-
-                if ($coupon_value > 0) {
-                    $item = new stdClass();
-                    $item->name = "coupon_discount";
-                    $item->quantity = 1;
-                    $coupon_value > $totalBeforeDiscount ? $coupon_value = $totalBeforeDiscount : $coupon_value;
-                    $item->price = $wc_tax_enabled && !$isTaxIncluded ? - ($coupon_value + $discount_tax) :  -$coupon_value;
-                    $item->vat_type = !$wc_tax_enabled ? 1 : 0;
-                    $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
-                    $item->vat_type = $wc_tax_enabled && $isTaxIncluded ? 0 : $item->vat_type;
-                    $item->vat_type = $this->vat4All ? 0 : $item->vat_type;
-                    $data->items[] = $item;
+                    if ($coupon_value > 0) {
+                        $item = new stdClass();
+                        $item->name = "coupon_discount";
+                        $item->quantity = 1;
+                        $adjusted_coupon_value = ($coupon_value / $total_coupon_value) * $discount_total;
+                        $adjusted_coupon_value > $totalBeforeDiscount ? $adjusted_coupon_value = $totalBeforeDiscount : $adjusted_coupon_value;
+                        $item->price = $wc_tax_enabled && !$isTaxIncluded ? - ($adjusted_coupon_value + $discount_tax) :  -$adjusted_coupon_value;
+                        $item->price = number_format($item->price, 2, '.', '');
+                        $item->vat_type = !$wc_tax_enabled ? 1 : 0;
+                        $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
+                        $item->vat_type = $wc_tax_enabled && $isTaxIncluded ? 0 : $item->vat_type;
+                        $item->vat_type = $this->vat4All ? 0 : $item->vat_type;
+                        $data->items[] = $item;
+                    }
                 }
             }
         }
@@ -360,6 +365,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $data->amount = number_format($totalAmount, 2, '.', '');
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
+        $payload['more_info'] = $order_id;
         $payload = wp_json_encode($data);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]) : null;
 
@@ -369,7 +375,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $order = wc_get_order($order_id);
         if ($order) {
-            $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #$order_id") : null;
+            $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #:$order_id") : null;
+            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-after update Payload: \n$payload");
             $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
         } else {
             $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
