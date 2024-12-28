@@ -623,7 +623,7 @@ class WC_PayPlus_Statics
             $pageRequestUid = WC()->session->get('page_request_uid');
             $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-            if ($pageRequestUid && $hostedFieldsUUID) {
+            if ($pageRequestUid && $hostedFieldsUUID && $isPlaceOrder) {
                 $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
             }
 

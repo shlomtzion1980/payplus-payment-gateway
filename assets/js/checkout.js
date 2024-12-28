@@ -624,14 +624,15 @@ jQuery(function ($) {
             const hideHostedFieldsListItem = () => {
               $(".woocommerce-SavedPaymentMethods-new").hide();
               $(".woocommerce-SavedPaymentMethods-saveNew").hide();
-              if (
-                jQuery(
-                  "#payment_method_payplus-payment-gateway-hostedfields"
-                ).is(":checked") &&
-                hasSavedCCs.length === 0
-              ) {
-                $(".container.hostedFields").show();
-              }
+              setTimeout(function () {
+                if (
+                  $(
+                    "input#payment_method_payplus-payment-gateway-hostedfields"
+                  ).is(":checked")
+                ) {
+                  $(".container.hostedFields").show();
+                }
+              }, 3000);
             };
             hostedIsMain ? hideHostedFieldsListItem() : null;
 

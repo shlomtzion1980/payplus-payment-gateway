@@ -510,7 +510,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $order = wc_get_order($order_id);
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             $hostedClass = new WC_PayPlus_HostedFields($order_id, $order, true);
-            $hostedClass->hostedFieldsData($order_id);
         }
         return array(
             'result'   => 'success',
