@@ -376,10 +376,10 @@ hf.Upon("pp_pageExpired", (e) => {
   jQuery.ajax({
     type: "post",
     dataType: "json",
-    url: payplus_script_checkout.ajax_url,
+    url: payplus_script_hosted.ajax_url,
     data: {
       action: "regenerate-hosted-link",
-      _ajax_nonce: payplus_script_checkout.frontNonce,
+      _ajax_nonce: payplus_script_hosted.frontNonce,
     },
     success: function (response) {
       console.log(response);
