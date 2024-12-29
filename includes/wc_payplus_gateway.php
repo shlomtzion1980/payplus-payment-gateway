@@ -2417,7 +2417,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     Order: $order_id
                     HTTP_HASH: $payplusHash
                     PayPlus Generated Hash: $payplusGenHash
-                    Order Status: $orderStatusNote 
+                    Order Status note: $orderStatusNote 
+                    Order Status: $orderStatus
                     Transaction Type: {$response['transaction_type']}
                     PayPlus Transaction Callback: $json
                     "
