@@ -355,7 +355,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payplus_display_admin_notice()
     {
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - payplus_get_nav_option');
+            wp_die('Not allowed! - payplus_admin_notice');
         }
         // Only show the notice if the transient is set.
         if (get_transient('payplus_admin_notice')) {
