@@ -270,39 +270,19 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
             $totalBeforeDiscount = $totalAmount - $shippingPrice;
 
-            $coupons = $order->get_coupon_codes();
-            $discount_total = $order->get_discount_total();
+            $coupon_items = $order->get_items('coupon');
+            foreach ($coupon_items as $coupon_item_id => $coupon_item) {
+                // Retrieve details
+                $coupon_code = $coupon_item->get_code(); // The coupon code
+                $discount = $coupon_item->get_discount(); // Discount amount
+                $discount_tax = $coupon_item->get_discount_tax(); // Discount tax amount
 
-            if (! empty($coupons)) {
-                $total_coupon_value = 0;
-                foreach ($coupons as $coupon_code) {
-                    $coupon = new WC_Coupon($coupon_code);
-                    $total_coupon_value += $coupon->get_amount();
-                }
-
-                foreach ($coupons as $coupon_code) {
-                    $coupon = new WC_Coupon($coupon_code);
-                    $coupon_value = $coupon->get_amount();
-                    $discount_tax = 0;
-                    foreach ($order->get_items('coupon') as $item_id => $item) {
-                        $discount_tax += $item->get_discount_tax();
-                    }
-
-                    if ($coupon_value > 0) {
-                        $item = new stdClass();
-                        $item->name = "coupon_discount";
-                        $item->quantity = 1;
-                        $adjusted_coupon_value = ($coupon_value / $total_coupon_value) * $discount_total;
-                        $adjusted_coupon_value > $totalBeforeDiscount ? $adjusted_coupon_value = $totalBeforeDiscount : $adjusted_coupon_value;
-                        $item->price = $wc_tax_enabled && !$isTaxIncluded ? - ($adjusted_coupon_value + $discount_tax) :  -$adjusted_coupon_value;
-                        $item->price = number_format($item->price, 2, '.', '');
-                        $item->vat_type = !$wc_tax_enabled ? 1 : 0;
-                        $item->vat_type = $wc_tax_enabled && !$isTaxIncluded ? 1 : $item->vat_type;
-                        $item->vat_type = $wc_tax_enabled && $isTaxIncluded ? 0 : $item->vat_type;
-                        $item->vat_type = $this->vat4All ? 0 : $item->vat_type;
-                        $data->items[] = $item;
-                    }
-                }
+                $item = new stdClass();
+                $item->name = "coupon_discount_$coupon_code";
+                $item->quantity = 1;
+                $item->price = -number_format($discount + $discount_tax, 2, '.', '');
+                $item->vat_type = -$discount_tax > 0 ? 1 : 0;
+                $data->items[] = $item;
             }
         }
 
