@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.3.9] = 29-12-2024 - (Igris)
+
+- Tweak - Enhanced the callback function and improved the display of local time in the callback log.
+- Added - Support for split shipping for multiple customer developers.
+- Tweak - Refreshed selection of PayPlus Embedded when a coupon is added, ensuring the form is reselected and displayed correctly. 
+- Tweak - Adjusted logo placement when "Design checkout" is selected.
+- Tweak - Updated logo sizes on the checkout page for better display.
+- Tweak - Enhanced regeneration of the PayPlus Embedded link when the payment link expires.
+- Added - Support for multiple coupons and types in PayPlus Embedded, including "Fixed cart discount" and "Fixed product discount" (both checkouts).
+- Tweak - Added a "Page expired" message with a reload option in a popup.
+
 ## [7.3.8] = 25-12-2024 - (Nico-Robin)
 
 - Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
