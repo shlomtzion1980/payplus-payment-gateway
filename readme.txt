@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.3.9
+Stable tag: 7.4.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.3.9 - 29-12-2024 =
+= 7.4.0 - 29-12-2024 =
 
 - Tweak - Enhanced the callback function and improved the display of local time in the callback log.
 - Added - Support for split shipping for multiple customer developers.
@@ -96,6 +96,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak - Enhanced regeneration of the PayPlus Embedded link when the payment link expires.
 - Added - Support for multiple coupons and types in PayPlus Embedded, including "Fixed cart discount" and "Fixed product discount" (both checkouts).
 - Tweak - Added a "Page expired" message with a reload option in a popup.
+- Tweak - Added nonce verification for admin notices.
 
 = 7.3.8 - 25-12-2024 =
 

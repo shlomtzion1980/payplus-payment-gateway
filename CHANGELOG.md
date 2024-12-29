@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.3.9] = 29-12-2024 - (Igris)
+## [7.4.0] = 29-12-2024 - (Igris)
 
 - Tweak - Enhanced the callback function and improved the display of local time in the callback log.
 - Added - Support for split shipping for multiple customer developers.
@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Tweak - Enhanced regeneration of the PayPlus Embedded link when the payment link expires.
 - Added - Support for multiple coupons and types in PayPlus Embedded, including "Fixed cart discount" and "Fixed product discount" (both checkouts).
 - Tweak - Added a "Page expired" message with a reload option in a popup.
+- Tweak - Added nonce verification for admin notices.
 
 ## [7.3.8] = 25-12-2024 - (Nico-Robin)
 
