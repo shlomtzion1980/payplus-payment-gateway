@@ -471,8 +471,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $order = wc_get_order($order_id);
 
         if ($order && $payment_response === "success") {
-            // Mark the order as completed or paid
-            $order->payment_complete();
+
             WC()->cart->empty_cart();
 
             $redirect_to = $order->get_checkout_order_received_url();
