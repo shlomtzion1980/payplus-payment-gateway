@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.4.0] = 29-12-2024 - (Igris)
+## [7.4.1] = 29-12-2024 - (Igris)
 
 - Tweak - Enhanced the callback function and improved the display of local time in the callback log.
 - Added - Support for split shipping for multiple customer developers.
