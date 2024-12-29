@@ -354,6 +354,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function payplus_display_admin_notice()
     {
+        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
+            wp_die('Not allowed! - payplus_get_nav_option');
+        }
         // Only show the notice if the transient is set.
         if (get_transient('payplus_admin_notice')) {
             if (
@@ -365,7 +368,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if (!empty($this->callback_addr)) {
                     $alert = strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0 ? true : false;
 
-                    !$alert ? $message = __('Sorry we only support https:// or http:// the callback will not be fired.', 'payplus-payment-gateway') : $message = false;
+                    !$alert ? $message = __('Make sure that there is either - https:// or http:// or the callback will not be fired.', 'payplus-payment-gateway') : $message = false;
 
                     if ($message) { ?>
                         <div class="notice notice-error is-dismissible">
