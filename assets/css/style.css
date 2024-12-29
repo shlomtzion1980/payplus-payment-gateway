@@ -8,7 +8,7 @@
 }
 
 .checkout-payplus
-  li[class*="wc_payment_method payment_method_payplus-payment-gateway"] {
+  li[class*="wc_payment_method payment_method_payplus-payment-gateway-"] {
   display: flex;
 }
 

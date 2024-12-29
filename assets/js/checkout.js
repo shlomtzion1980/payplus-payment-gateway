@@ -628,17 +628,21 @@ jQuery(function ($) {
             const hideHostedFieldsListItem = () => {
               $(".woocommerce-SavedPaymentMethods-new").hide();
               $(".woocommerce-SavedPaymentMethods-saveNew").hide();
-              setTimeout(function () {
-                if (
-                  $(
-                    "input#payment_method_payplus-payment-gateway-hostedfields"
-                  ).is(":checked")
-                ) {
-                  $(".container.hostedFields").show();
-                }
-              }, 3000);
             };
             hostedIsMain ? hideHostedFieldsListItem() : null;
+
+            setTimeout(function () {
+              if (
+                $(
+                  "input#payment_method_payplus-payment-gateway-hostedfields"
+                ).is(":checked")
+              ) {
+                $(".container.hostedFields").show();
+                document.querySelector(
+                  "#payment > ul > li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields > div.pp_iframe_h > div"
+                ).style.display = "block";
+              }
+            }, 3000);
 
             var $paymentMethod = jQuery("#" + inputPayPlus);
 
