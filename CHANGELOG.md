@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.4.2] - 30-12-2024 - (Wheeljack)
+
+- Fix   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
+- Tweak - Removed $order->payment_complete(); from PayPlus Embedded as it is handled elsewhere.
+- Tweak - Adjusted icon positioning in "Design checkout" for right-to-left (RTL) languages.
+
 ## [7.4.1] = 29-12-2024 - (Igris)
 
 - Tweak - Enhanced the callback function and improved the display of local time in the callback log.
