@@ -88,7 +88,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.4.2 - 30-12-2024 =
 
-- Fix   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
+- Added   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
 - Tweak - Removed $order->payment_complete(); from PayPlus Embedded as it is handled elsewhere.
 - Tweak - Adjusted icon positioning in "Design checkout" for right-to-left (RTL) languages.
 
