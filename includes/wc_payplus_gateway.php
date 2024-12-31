@@ -2401,8 +2401,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 // Send the request
                 wp_remote_post($url, $args);
             }
-            // Wait for 5 seconds to make sure the order is updated by the payment gateway native process.
-            sleep(5);
+            // Wait for 2 seconds to make sure the order is updated by the payment gateway native process.
+            sleep(2);
             $order_id = intval($response['transaction']['more_info']);
             $order = wc_get_order($order_id);
             $datetime = current_datetime();
@@ -2526,7 +2526,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $payload['related_transaction'] = true;
                         $payload = wp_json_encode($payload);
                         $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-                        $this->requestPayPlusIpn($payload, $inData, 1, $handle);
+                        if ($order->get_status() === "pending") {
+                            $this->requestPayPlusIpn($payload, $inData, 1, $handle);
+                        }
                     }
                 } else {
                     $countProcess = intval($result->count_process);
