@@ -825,11 +825,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
             echo '<div id="error-api-payplus"></div>';
             echo '</div>';
-            if (!is_product()) {
-                echo '<div class="border-with-word">
-                <span style="font-size: 18px;">' . esc_html__('Or', 'payplus-payment-gateway') . '</span>
-                </div>';
-            }
+            echo '<div class="border-with-word">
+            <span style="font-size: 18px;" >' . esc_html__('Or', 'payplus-payment-gateway') . '</span>
+            </div>';
         }
 
         $output = str_replace(array("\r", "\n"), '', trim(ob_get_clean()));
