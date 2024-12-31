@@ -2488,7 +2488,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         )
                     );
                     $handle = 'payplus_callback_begin';
-                    $this->logOrderBegin($order_id, 'callback');
+                    // $this->logOrderBegin($order_id, 'callback');
                     $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
                     if ($this->get_check_user_agent() || (count($rowOrder) && $rowOrder[0]->status_code == $status_code)) {
@@ -2497,39 +2497,37 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         return false;
                     }
 
-                    if ($order) {
-                        if ($order->get_status() === "pending") {
-                            $dataInsert = array(
-                                'order_id' => $order_id,
-                                'status' => sanitize_text_field($order->get_status()),
-                                'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
-                            );
-                            $handle = 'payplus_callback';
-                            $data = $this->set_arrangement_callback($response);
-                            $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
-                            $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($data['order_id']));
-                            $this->payplus_add_log_all($handle, wp_json_encode($response), 'before-payload');
+                    if ($order->get_status() === "pending") {
+                        $dataInsert = array(
+                            'order_id' => $order_id,
+                            'status' => sanitize_text_field($order->get_status()),
+                            'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
+                        );
+                        $handle = 'payplus_callback';
+                        $data = $this->set_arrangement_callback($response);
+                        $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
+                        $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($data['order_id']));
+                        $this->payplus_add_log_all($handle, wp_json_encode($response), 'before-payload');
 
 
-                            $inData = array_merge($data, $response);
-                            $this->payplus_add_log_all($handle, wp_json_encode($inData), 'completed');
-                            $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($inData['order_id']));
-                            $page_request_uid = sanitize_text_field($inData['transaction']['payment_page_request_uid']);
-                            $transaction_uid = sanitize_text_field($inData['transaction']['uid']);
+                        $inData = array_merge($data, $response);
+                        $this->payplus_add_log_all($handle, wp_json_encode($inData), 'completed');
+                        $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($inData['order_id']));
+                        $page_request_uid = sanitize_text_field($inData['transaction']['payment_page_request_uid']);
+                        $transaction_uid = sanitize_text_field($inData['transaction']['uid']);
 
-                            if (!empty($page_request_uid)) {
-                                $payload['payment_request_uid'] = $page_request_uid;
-                            } elseif (!empty($transaction_uid)) {
-                                $payload['transaction_uid'] = $transaction_uid;
-                            } else {
-                                $payload['more_info'] = $order_id;
-                            }
-                            $payload['related_transaction'] = true;
-                            $payload = wp_json_encode($payload);
-                            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-
-                            $this->requestPayPlusIpn($payload, $inData, 1, $handle);
+                        if (!empty($page_request_uid)) {
+                            $payload['payment_request_uid'] = $page_request_uid;
+                        } elseif (!empty($transaction_uid)) {
+                            $payload['transaction_uid'] = $transaction_uid;
+                        } else {
+                            $payload['more_info'] = $order_id;
                         }
+                        $payload['related_transaction'] = true;
+                        $payload = wp_json_encode($payload);
+                        $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
+
+                        $this->requestPayPlusIpn($payload, $inData, 1, $handle);
                     }
                 } else {
                     $countProcess = intval($result->count_process);
