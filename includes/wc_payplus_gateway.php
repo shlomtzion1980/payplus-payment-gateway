@@ -427,7 +427,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "The following orders were created today and are in pending status: <br>";
             echo "(This will not cancel the scheduled cron event)<br><br>";
             echo "Orders: ";
-            print_r(implode(",", $orders) . "<br></br>");
+            echo esc_html(implode(",", $orders)) . "<br></br>";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
             foreach ($orders as $order_id) {
                 $order = wc_get_order($order_id);
@@ -522,8 +522,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             wp_send_json_error('Invalid JSON', 400);
         }
-        $postData = esc_html(wp_json_encode($postData));
-        error_log('Received PayPlus CRM update_payplus_payment_method POST: ' . print_r($postData, true) . " - " . print_r($message, true));
     }
 
     public function get_current_time()
@@ -1442,9 +1440,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 // Customize the error message here
                 $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
                 // Translators: %s will be replaced with the error message received from the payment gateway.
-                wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), 'error');
+                wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), 'error');
                 // Translators: %s will be replaced with the error message received from the payment gateway.
-                do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), print_r($error_message, true)), $order);
+                do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), $order);
                 $order->update_status('failed');
                 $this->store_payment_ip();
                 return [
@@ -1487,7 +1485,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $order->update_status($this->failure_order_status);
                     }
                     // Translators: %s will be replaced with the status description of the error received from the payment gateway.
-                    wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), print_r($response->data->status_description, true)), 'error');
+                    wc_add_notice(sprintf(__('Error: credit card declined: %s', 'payplus-payment-gateway'), esc_html($response->data->status_description)), 'error');
+
                     return;
                 }
             }
@@ -2269,7 +2268,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->get_payment_page($dataLink->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
-                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r((is_array($response) ? $response['body'] : $response->body), true));
+                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(is_array($response) ? $response['body'] : $response->body);
             }
         }
     }
@@ -2374,197 +2373,159 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     /**
      * @return false|void
      */
-    public function callback_response()
+    public function legacy_callback_response($order_id)
     {
 
         global $wpdb;
-        $indexRow = 0;
-        $json = file_get_contents('php://input');
+        $order = wc_get_order($order_id);
+        $json = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response');
         $response = json_decode($json, true);
-        $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
+        $indexRow = 0;
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
-        $handle = 'payplus_callback_begin';
-        $payplusHash = isset($_SERVER['HTTP_HASH']) ? sanitize_text_field($_SERVER['HTTP_HASH']) : ""; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
 
-        if ($payplusGenHash === $payplusHash) {
-            if ($this->callback_addr && $this->allowSendCallBack) {
-                $url = $this->callback_addr;
-                // Set up the request arguments
-                $args = array(
-                    'body'        => $json,
-                    'headers'     => array('Content-Type' => 'application/json'),
-                    'method'      => 'POST',
-                    'blocking'    => false, // Allows asynchronous (non-blocking) request
-                );
+        if ($this->callback_addr && $this->allowSendCallBack) {
+            $url = $this->callback_addr;
+            // Set up the request arguments
+            $args = array(
+                'body'        => $json,
+                'headers'     => array('Content-Type' => 'application/json'),
+                'method'      => 'POST',
+                'blocking'    => false, // Allows asynchronous (non-blocking) request
+            );
 
-                // Send the request
-                wp_remote_post($url, $args);
-            }
-            // Wait for 2 seconds to make sure the order is updated by the payment gateway native process.
-            sleep(2);
-            $order_id = intval($response['transaction']['more_info']);
-            $order = wc_get_order($order_id);
-            $datetime = current_datetime();
-            $LocalTime = $datetime->format('Y-m-d H:i:s');
-            if ($order) {
-                $orderStatus = $order->get_status();
-                $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status! - callback will end.' : $orderStatus;
-                $this->payplus_add_log_all(
-                    'payplus_callback_secured',
-                    "
-                    Time: $this->current_time
-                    IsraelTime: $LocalTime
-                    Order: $order_id
-                    HTTP_HASH: $payplusHash
-                    PayPlus Generated Hash: $payplusGenHash
-                    Order Status note: $orderStatusNote 
-                    Order Status: $orderStatus
-                    Transaction Type: {$response['transaction_type']}
-                    PayPlus Transaction Callback: $json
-                    "
-                );
-
-                $transactionUid = sanitize_text_field($response['transaction']['uid']);
-                $status_code = sanitize_text_field($response['transaction']['status_code']);
-
-                if ($order->get_status() === "pending") {
-                    if ($status_code === "000") {
-                        if ($response['transaction_type'] == "Charge") {
-                            if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
-                                $order->payment_complete();
-                                $this->payplus_add_log_all(
-                                    'payplus_callback_secured',
-                                    "Order # $order_id Running Woocommerce payment complete process."
-                                );
-                            }
-                            if ($this->successful_order_status !== 'default-woo') {
-                                WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
-                                $order->update_status($this->successful_order_status);
-                                $this->payplus_add_log_all(
-                                    'payplus_callback_secured',
-                                    "Updating order #$order_id status to: $this->successful_order_status"
-                                );
-                            }
-                        } else {
-                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
-                            $order->update_status('wc-on-hold');
-                            $this->payplus_add_log_all(
-                                'payplus_callback_secured',
-                                "Updating order #$order_id status to: wc-on-hold"
-                            );
-                        }
-                    }
-                }
-
-                $this->payplus_add_log_all(
-                    'payplus_callback_secured',
-                    "
-                    Callback continues: $order_id - doing database query now, status_code: $status_code
-                    "
-                );
-
-                $result = $wpdb->get_results($wpdb->prepare(
-                    "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
-                    $order_id,
-                    $status_code
-                ));
-                $result = $result[$indexRow];
-                if (!$result->rowCount) {
-                    $wpdb->insert(
-                        $tblname,
-                        array(
-                            'order_id' => $order_id,
-                            'function_begin' => 'callback_response',
-                            'status_code' => $status_code,
-                            'count_process' => 1,
-                        ),
-                        array(
-                            '%d', // order_id
-                            '%s', // function_begin
-                            '%s', // status_code
-                            '%d', // count_process
-                        )
-                    );
-                    $handle = 'payplus_callback_begin';
-                    // $this->logOrderBegin($order_id, 'callback');
-                    $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
-
-                    if ($this->get_check_user_agent() || (count($rowOrder) && $rowOrder[0]->status_code == $status_code)) {
-                        $this->payplus_add_log_all($handle, 'payplus_end_proces-' . $order_id);
-                        $this->payplus_add_log_all($handle, '', 'space');
-                        return false;
-                    }
-
-                    if ($order->get_status() === "pending") {
-                        $dataInsert = array(
-                            'order_id' => $order_id,
-                            'status' => sanitize_text_field($order->get_status()),
-                            'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
-                        );
-                        $handle = 'payplus_callback';
-                        $data = $this->set_arrangement_callback($response);
-                        $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
-                        $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($data['order_id']));
-                        $this->payplus_add_log_all($handle, wp_json_encode($response), 'before-payload');
-
-
-                        $inData = array_merge($data, $response);
-                        $this->payplus_add_log_all($handle, wp_json_encode($inData), 'completed');
-                        $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($inData['order_id']));
-                        $page_request_uid = sanitize_text_field($inData['transaction']['payment_page_request_uid']);
-                        $transaction_uid = sanitize_text_field($inData['transaction']['uid']);
-
-                        if (!empty($page_request_uid)) {
-                            $payload['payment_request_uid'] = $page_request_uid;
-                        } elseif (!empty($transaction_uid)) {
-                            $payload['transaction_uid'] = $transaction_uid;
-                        } else {
-                            $payload['more_info'] = $order_id;
-                        }
-                        $payload['related_transaction'] = true;
-                        $payload = wp_json_encode($payload);
-                        $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-
-                        $this->requestPayPlusIpn($payload, $inData, 1, $handle);
-                    }
-                } else {
-                    $countProcess = intval($result->count_process);
-                    $rowId = intval($result->rowId);
-                    $wpdb->update(
-                        $tblname,
-                        array(
-                            'count_process' => $countProcess + 1,
-                        ),
-                        array(
-                            'id' => $rowId,
-                        ),
-                        array('%d'),
-                        array('%d')
-                    );
-                }
-            }
+            // Send the request
+            wp_remote_post($url, $args);
         }
 
-        $response = array(
-            'status' => 'success',
-            'message' => 'PayPlus callback function ended.',
-        );
+        $order_id = intval($response['transaction']['more_info']);
+        $order = wc_get_order($order_id);
+        $datetime = current_datetime();
+        $LocalTime = $datetime->format('Y-m-d H:i:s');
+        if ($order) {
+            $orderStatus = $order->get_status();
+            $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status! - callback will end.' : $orderStatus;
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "Order # $order_id
+                Time: $this->current_time
+                IsraelTime: $LocalTime
+                Order: $order_id
+                Order Status note: $orderStatusNote 
+                Order Status: $orderStatus
+                Transaction Type: {$response['transaction_type']}
+                PayPlus Transaction Callback: $json"
+            );
 
-        $this->payplus_add_log_all(
-            'payplus_callback_secured',
-            "PayPlus callback function ended."
-        );
+            $transactionUid = sanitize_text_field($response['transaction']['uid']);
+            $status_code = sanitize_text_field($response['transaction']['status_code']);
 
-        wp_die(
-            wp_json_encode($response),
-            '',
-            array(
-                'response' => 200,
-                'content_type' => 'application/json'
-            )
-        );
+            if ($order->get_status() === "pending") {
+                if ($status_code === "000") {
+                    if ($response['transaction_type'] == "Charge") {
+                        if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
+                            $order->payment_complete();
+                            $this->payplus_add_log_all(
+                                'payplus_callback_secured',
+                                "Order # $order_id Running Woocommerce payment complete process."
+                            );
+                        }
+                        if ($this->successful_order_status !== 'default-woo') {
+                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
+                            $order->update_status($this->successful_order_status);
+                            $this->payplus_add_log_all(
+                                'payplus_callback_secured',
+                                "Updating order #$order_id status to: $this->successful_order_status"
+                            );
+                        }
+                    } else {
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
+                        $order->update_status('wc-on-hold');
+                        $this->payplus_add_log_all(
+                            'payplus_callback_secured',
+                            "Updating order #$order_id status to: wc-on-hold"
+                        );
+                    }
+                }
+            }
+
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "$order_id -Callback continues: doing database query now, status_code: $status_code"
+            );
+
+            $result = $wpdb->get_results($wpdb->prepare(
+                "SELECT id as rowId, count(*) as rowCount, count_process, function_begin FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND status_code = %s",
+                $order_id,
+                $status_code
+            ));
+            $result = $result[$indexRow];
+            if (!$result->rowCount) {
+                $wpdb->insert(
+                    $tblname,
+                    array(
+                        'order_id' => $order_id,
+                        'function_begin' => 'callback_response',
+                        'status_code' => $status_code,
+                        'count_process' => 1,
+                    ),
+                    array(
+                        '%d', // order_id
+                        '%s', // function_begin
+                        '%s', // status_code
+                        '%d', // count_process
+                    )
+                );
+
+                if ($order->get_status() === "pending") {
+                    $dataInsert = array(
+                        'order_id' => $order_id,
+                        'status' => sanitize_text_field($order->get_status()),
+                        'create_at_refURL_callback' => current_time('Y-m-d H:i:s'),
+                    );
+                    $handle = 'payplus_callback';
+                    $data = $this->set_arrangement_callback($response);
+                    $this->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')');
+                    $this->payplus_add_log_all($handle, 'more_info: ' . sanitize_text_field($data['order_id']));
+                    $this->payplus_add_log_all($handle, wp_json_encode($response), 'before-payload');
+
+
+                    $inData = array_merge($data, $response);
+                    $this->payplus_add_log_all($handle, wp_json_encode($inData), 'completed');
+                    $this->payplus_add_log_all($handle, 'more_info' . sanitize_text_field($inData['order_id']));
+                    $page_request_uid = sanitize_text_field($inData['transaction']['payment_page_request_uid']);
+                    $transaction_uid = sanitize_text_field($inData['transaction']['uid']);
+
+                    if (!empty($page_request_uid)) {
+                        $payload['payment_request_uid'] = $page_request_uid;
+                    } elseif (!empty($transaction_uid)) {
+                        $payload['transaction_uid'] = $transaction_uid;
+                    } else {
+                        $payload['more_info'] = $order_id;
+                    }
+                    $payload['related_transaction'] = true;
+                    $payload = wp_json_encode($payload);
+                    $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
+
+                    $this->requestPayPlusIpn($payload, $inData, 1, $handle);
+                }
+            } else {
+                $countProcess = intval($result->count_process);
+                $rowId = intval($result->rowId);
+                $wpdb->update(
+                    $tblname,
+                    array(
+                        'count_process' => $countProcess + 1,
+                    ),
+                    array(
+                        'id' => $rowId,
+                    ),
+                    array('%d'),
+                    array('%d')
+                );
+            }
+        }
     }
 
 
@@ -2827,7 +2788,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                     if ($res->results->status == "error" || $res->results->status == "rejected") {
 
-                        $this->payplus_add_log_all($handle, 'Error IPN Error: ' . print_r($res, true), 'error');
+                        $this->payplus_add_log_all($handle, 'Error IPN Error: ' . wp_json_encode($res), 'error');
                         $this->store_payment_ip();
                         if ($this->failure_order_status !== 'default-woo') {
                             $order->update_status($this->failure_order_status);
@@ -3266,7 +3227,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (is_wp_error($response)) {
             $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
-            echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r(($response), true));
+            echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html($response->get_error_message());
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
@@ -3274,7 +3235,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->get_payment_page($res->data->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
-                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(print_r((is_array($response) ? $response['body'] : $response->body), true));
+                echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(is_array($response) ? $response['body'] : $response->body);
             }
         }
     }
