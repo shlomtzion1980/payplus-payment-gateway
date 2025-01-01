@@ -33,6 +33,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $isSubscriptionOrder;
     public $isAutoPPCC;
     public $vat4All;
+    public $hostedFieldsSettings;
+    public $hideMainPayPlusGateway = false;
+
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
      *
@@ -57,6 +60,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     {
         $this->settings = get_option("woocommerce_{$this->name}_settings", []);
         $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
+        $this->hostedFieldsSettings = get_option("woocommerce_payplus-payment-gateway-hostedfields_settings");
+        $this->hideMainPayPlusGateway = isset($this->hostedFieldsSettings['hide_payplus_gateway']) && $this->hostedFieldsSettings['hide_payplus_gateway'] === 'yes' ? true : false;
         $this->displayMode = $this->settings['display_mode'] ?? null;
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
         $this->hideOtherPayments = boolval(isset($this->settings['hide_other_charge_methods']) && $this->settings['hide_other_charge_methods']) ?? null;
@@ -542,8 +547,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'description' => $this->get_setting('description'),
             'supports' => array_filter($this->gateway->supports, [$this->gateway, 'supports']),
             'showSaveOption' => $this->settings['create_pp_token'] == 'yes' ? true : false,
+            'hasSavedTokens' => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
+            'hideMainPayPlusGateway' => $this->hideMainPayPlusGateway,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
             'isSubscriptionOrder' => $isSubscriptionOrder,
             'isAutoPPCC' => $this->isAutoPPCC,
