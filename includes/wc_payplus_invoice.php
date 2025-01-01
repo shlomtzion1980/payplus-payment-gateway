@@ -241,7 +241,7 @@ class PayplusInvoice
 
         $customer = [];
         $order = wc_get_order($order_id);
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $address = trim(str_replace(["'", '"', "\\"], '', $order->get_billing_address_1() . ' ' . $order->get_billing_address_2()));
         $city = str_replace(["'", '"', "\\"], '', $order->get_billing_city());
         $postal_code = str_replace(["'", '"', "\\"], '', $order->get_billing_postcode());
@@ -303,7 +303,7 @@ class PayplusInvoice
             ? $this->payPlusParseInvoicePayload($order_id, $payPlusPayloadInvoice, $payplus_invoice_type_document_refund)
             : false;
 
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payload = array();
         $productsItems = [];
         $payplus_invoice_rounding_decimals = $WC_PayPlus_Gateway->rounding_decimals;
@@ -434,7 +434,7 @@ class PayplusInvoice
     {
         $order = wc_get_order($order_id);
         $payload = wp_json_encode($payload);
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
@@ -573,7 +573,7 @@ class PayplusInvoice
     public function payplus_check_vat_payment($order_id)
     {
         $handle = 'payplus_process_invoice';
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $customer_country_iso = $order->get_billing_country();
         $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'paying_vat:' . $WC_PayPlus_Gateway->paying_vat);
@@ -645,7 +645,7 @@ class PayplusInvoice
     public function payplus_get_products_by_order_id($order_id, $dual)
     {
 
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $order = wc_get_order($order_id);
         $tax_rate_shipping = $this->getRateshipping();
 
@@ -862,7 +862,7 @@ class PayplusInvoice
     public function payplus_set_vat_all_product($order_id, $productsItems)
     {
         $handle = 'payplus_process_invoice';
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payingVatAllOrder = $WC_PayPlus_Gateway->paying_vat_all_order === "yes";
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
         $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat == "1";
@@ -940,7 +940,7 @@ class PayplusInvoice
     public function payplus_set_object_payment($order_id, $resultApps)
     {
         $arr = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         foreach ($resultApps as $key => $resultApp) {
             $objectPayment = new stdClass();
             $objectPayment->order_id = $order_id;
@@ -1002,7 +1002,7 @@ class PayplusInvoice
         }
 
         $payload = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';
 
         $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send', true);
@@ -1247,7 +1247,7 @@ class PayplusInvoice
     public function payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual = 1, $total = 0)
     {
         $payments = array();
-        $WC_PayPlus_Gateway = new WC_PayPlus_Gateway();
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         if (count($resultApps)) {
             $sum = 0;
             for ($i = 0; $i < count($resultApps); $i++) {

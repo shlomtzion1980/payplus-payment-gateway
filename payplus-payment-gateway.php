@@ -407,7 +407,7 @@ class WC_PayPlus
     public function payplus_after_refund($order_id, $refund_id)
     {
         $order = wc_get_order($order_id);
-        $invoice_api = new PayplusInvoice();
+        $invoice_api = $this->invoice_api;
         $payment_method = $order->get_payment_method();
         if (strpos($payment_method, 'payplus') === false) {
             //$amount = WC_PayPlus_Meta_Data::get_meta($refund_id, '_refund_amount', true);
