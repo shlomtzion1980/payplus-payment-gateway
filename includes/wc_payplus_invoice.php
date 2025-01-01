@@ -626,7 +626,7 @@ class PayplusInvoice
             $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
             foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
                 $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
-                $payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value'];
+                isset($item['discount_value']) ? ($payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value']) : null;
             }
             foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
                 $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
