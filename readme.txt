@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.4.2
+Stable tag: 7.4.3
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,9 +86,16 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.4.3 - 01-01-2025 =
+
+- Tweak - Improved the callback function to avoid repeated executions by adding a proper WooCommerce delay and removing redundant executions.
+- Tweak - Removed the "-------- Or ---------" separator on express checkout in the product page.
+- Tweak - Ensured that refunds for orders paid in 2024 will include a 17% VAT.
+- Tweak - Removed expired admin notices.
+
 = 7.4.2 - 30-12-2024 =
 
-- Added   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
+- Added - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
 - Tweak - Removed $order->payment_complete(); from PayPlus Embedded as it is handled elsewhere.
 - Tweak - Adjusted icon positioning in "Design checkout" for right-to-left (RTL) languages.
 

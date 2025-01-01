@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.4.3] - 01-01-2025 - (Jungle.P)
+
+- Tweak - Improved the callback function to avoid repeated executions by adding a proper WooCommerce delay and removing redundant executions.
+- Tweak - Removed the "-------- Or ---------" separator on express checkout in the product page.
+- Tweak - Ensured that refunds for orders paid in 2024 will include a 17% VAT.
+- Tweak - Removed expired admin notices.
+
 ## [7.4.2] - 30-12-2024 - (Wheeljack)
 
 - Added   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
