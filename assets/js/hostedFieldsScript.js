@@ -398,20 +398,20 @@ hf.Upon("pp_pageExpired", (e) => {
   popup.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
   popup.style.zIndex = "10000";
   popup.innerHTML = `
-      <p>${
-        pageLang !== "he-IL"
-          ? "Page Expired. Please refresh the page and try again."
-          : "תוקף הדף פג. אנא רענן/י את הדף ונסה/י שוב."
-      }</p>
-      <button id="popup-ok-button">${
-        pageLang !== "he-IL" ? "OK" : "אישור"
-      }</button>
-  `;
+    <p>${
+      pageLang !== "he-IL"
+        ? "Page Expired. Please refresh the page and try again."
+        : "תוקף הדף פג. אנא רענן/י את הדף ונסה/י שוב."
+    }</p>
+    <button id="popup-ok-button">${
+      pageLang !== "he-IL" ? "OK" : "אישור"
+    }</button>
+`;
   document.body.appendChild(popup);
 
   document.getElementById("popup-ok-button").addEventListener("click", () => {
     document.body.removeChild(popup);
-    location.reload();
+    window.location.href = window.location.href; // Use this method to reload the page
   });
 });
 

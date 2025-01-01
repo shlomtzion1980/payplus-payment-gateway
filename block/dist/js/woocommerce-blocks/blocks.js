@@ -179,14 +179,18 @@ if (isCheckout || hasOrder) {
     loader.class = "blocks-payplus_loader";
 
     // Add loader content
-    loader.innerHTML = `
-          <div class="blocks-payplus_loader">
-              <div class="blocks-loader">
-                  <div class="blocks-loader-background">
-                      <div class="blocks-loader-text"></div>
-                  </div>
-              </div>
-          </div>`;
+    const loaderContent = document.createElement("div");
+    loaderContent.className = "blocks-payplus_loader";
+    const loaderInner = document.createElement("div");
+    loaderInner.className = "blocks-loader";
+    const loaderBackground = document.createElement("div");
+    loaderBackground.className = "blocks-loader-background";
+    const loaderText = document.createElement("div");
+    loaderText.className = "blocks-loader-text";
+    loaderBackground.appendChild(loaderText);
+    loaderInner.appendChild(loaderBackground);
+    loaderContent.appendChild(loaderInner);
+    loader.appendChild(loaderContent);
     console.log("isAutoPPCC: ", payPlusGateWay.isAutoPPCC);
     function startObserving(event) {
       console.log("observer started");
