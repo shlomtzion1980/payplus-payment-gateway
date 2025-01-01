@@ -318,6 +318,23 @@ class PayplusInvoice
             $dual = -1;
         }
 
+        // vat_percentage for vat change - 17% to 18%
+        $payPluseResponseArray = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response'), true);
+        $paid_date = $order->get_date_paid();
+        if ($paid_date) {
+            $paidYear = $paid_date->date('Y');
+        }
+
+        if ((isset($payPluseResponseArray['date']) && strpos($payPluseResponseArray['date'], '2024') !== false) || $paidYear == '2024') {
+            $payload['vat_percentage'] = 17;
+        }
+
+        $payPlusOrderPayments = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_order_payments', true), true);
+        if (isset($payPlusOrderPayments[0]['create_at']) && strpos($payPlusOrderPayments[0]['create_at'], '2024') !== false) {
+            $payload['vat_percentage'] = 17;
+        }
+        // vat_percentage for vat change - 17% to 18%
+
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
         $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
