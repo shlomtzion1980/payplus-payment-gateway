@@ -1201,10 +1201,15 @@ class WC_PayPlus
                 if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
                     wp_die('Not allowed! - payplus_check_exists_table');
                 }
-                global $wpdb;
-                $table_name = $wpdb->prefix . $table;
-                $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
-                $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $like_table_name)) != $table_name) ? true : false;
+                $transient_key = 'payplus_check_exists_table_' . $table;
+                $flag = get_transient($transient_key);
+                if ($flag === false) {
+                    global $wpdb;
+                    $table_name = $wpdb->prefix . $table;
+                    $like_table_name = '%' . $wpdb->esc_like($table_name) . '%';
+                    $flag = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $like_table_name)) != $table_name) ? true : false;
+                    set_transient($transient_key, $flag, HOUR_IN_SECONDS);
+                }
                 return $flag;
             }
             public static function payplus_get_admin_menu($nonce)

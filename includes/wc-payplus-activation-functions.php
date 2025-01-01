@@ -395,16 +395,8 @@ function payplus_check_table_exist_db($nameTable)
 {
     global $wpdb;
 
-    $transient_key = 'payplus_table_exists_' . $nameTable;
-    $table_exists = get_transient($transient_key);
-
-    if ($table_exists === false) {
-        $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
-        $table_exists = ($result == $nameTable);
-        set_transient($transient_key, $table_exists, 12 * HOUR_IN_SECONDS);
-    }
-
-    return $table_exists;
+    $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
+    return ($result == $nameTable);
 }
 
 /**
