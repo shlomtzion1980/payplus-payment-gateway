@@ -584,7 +584,7 @@ class WC_PayPlus
              */
             public function init()
             {
-
+                $isPayPlusEnabled = isset($this->payplus_payment_gateway_settings->enabled) && $this->payplus_payment_gateway_settings->enabled === 'yes';
                 load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
                 if (class_exists("WooCommerce")) {
                     $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
@@ -593,7 +593,9 @@ class WC_PayPlus
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
-                    require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
+                    if ($isPayPlusEnabled) {
+                        require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
+                    }
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
