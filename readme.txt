@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.4.3
+Stable tag: 7.4.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.4.4 - 06-01-2025 = 
+
+- Fix   - If the main VAT settings in Invoice+ are unchecked, the vat-type-exempt will now be sent.
+- Tweak - Resolved an issue where the Apple Pay script was loaded multiple times if the payment window was closed and reopened without refreshing.
+- Tweak - Refactored and removed unnecessary class calls and queries in the Invoices class for improved efficiency.
+- Tweak - Fixed PHP warnings that occurred in the invoice refund parser.
+- Added - PayPlus Hash Check button - checks the plugin integrity.
 
 = 7.4.3 - 01-01-2025 =
 

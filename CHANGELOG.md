@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.4.4] - 06-01-2025 - (Gol D. Roger)
+
+- Fix   - If the main VAT settings in Invoice+ are unchecked, the vat-type-exempt will now be sent.
+- Tweak - Resolved an issue where the Apple Pay script was loaded multiple times if the payment window was closed and reopened without refreshing.
+- Tweak - Refactored and removed unnecessary class calls and queries in the Invoices class for improved efficiency.
+- Tweak - Fixed PHP warnings that occurred in the invoice refund parser.
+- Added - PayPlus Hash Check button - checks the plugin integrity.
+
 ## [7.4.3] - 01-01-2025 - (Jungle.P)
 
 - Tweak - Improved the callback function to avoid repeated executions by adding a proper WooCommerce delay and removing redundant executions.

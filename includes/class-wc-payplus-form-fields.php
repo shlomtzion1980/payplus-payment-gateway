@@ -464,6 +464,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'show_payplus_integrity_check' => [
+                'title' => __('Show PayPlus Hash Check button', 'payplus-payment-gateway'),
+                'label' => __('Show PayPlus Hash Check button', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('Shows the PayPlus Hash check button.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'token_order_payment' => [
                 'title' => __('Enable/Disable token payment (Through Admin)', 'payplus-payment-gateway'),
                 'label' => __('Applicable for users that can edit orders.', 'payplus-payment-gateway'),

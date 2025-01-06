@@ -107,8 +107,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
         add_action('add_meta_boxes', [$this, 'payPlusMetaboxes']);
         add_action('admin_head', [$this, 'hide_delete_update_buttons_css']);
-        add_action('admin_menu', [$this, 'add_admin_menu_button']);
 
+        if (isset($this->allSettings['show_payplus_integrity_check']) && $this->allSettings['show_payplus_integrity_check'] === 'yes') {
+            add_action('admin_menu', [$this, 'add_admin_menu_button']);
+        }
 
         // remove query args after error shown
         add_filter('removable_query_args', [$this, 'add_removable_arg']);
