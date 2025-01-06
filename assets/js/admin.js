@@ -27,6 +27,11 @@ jQuery(function ($) {
     const keywordsEilat = $(
         "#woocommerce_payplus-payment-gateway_settings\\[keywords_eilat\\]"
     );
+
+    const payingVatAll = $(
+        "#woocommerce_payplus-payment-gateway_settings\\[paying_vat_all_order\\]"
+    );
+
     const deleteError = $(".payplus-delete-error");
     const createInvoiceManual = $(".create-invoice-manual");
     const invoiceManualList = $(".invoice-manual-list");
@@ -99,6 +104,65 @@ jQuery(function ($) {
         event.preventDefault();
         $(this).closest("tr").remove();
     });
+
+    if (payingVatAll && payingVatAll.prop("checked") === false) {
+        keywordsEilat.closest("tr").fadeOut();
+        changeVatInEliat.closest("tr").fadeOut();
+        $(
+            "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
+        )
+            .closest("tr")
+            .fadeOut();
+        $(
+            "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
+        )
+            .closest("tr")
+            .fadeOut();
+        $("#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]")
+            .closest("tr")
+            .fadeOut();
+    }
+    payingVatAll.change(function () {
+        if ($(this).prop("checked")) {
+            changeVatInEliat.closest("tr").fadeIn();
+            if (changeVatInEliat.prop("checked")) {
+                keywordsEilat.closest("tr").fadeIn();
+            }
+            $(
+                "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
+            )
+                .closest("tr")
+                .fadeIn();
+            $(
+                "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
+            )
+                .closest("tr")
+                .fadeIn();
+            $(
+                "#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
+            )
+                .closest("tr")
+                .fadeIn();
+        } else {
+            keywordsEilat.closest("tr").fadeOut();
+            changeVatInEliat.closest("tr").fadeOut();
+            $(
+                "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
+            )
+                .closest("tr")
+                .fadeOut();
+            $(
+                "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
+            )
+                .closest("tr")
+                .fadeOut();
+            $(
+                "#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
+            )
+                .closest("tr")
+                .fadeOut();
+        }
+    });
     /******     Eliat start **remove***/
     if (!changeVatInEliat.prop("checked")) {
         keywordsEilat.closest("tr").fadeOut();
@@ -130,6 +194,24 @@ jQuery(function ($) {
 
     /******    transaction Type  start ******/
     if (typeof payplus_script_payment !== "undefined") {
+        const wc_tax_enabled = payplus_script_payment.wc_tax_enabled;
+        let currentLanguage = payplus_script_payment.currentLanguage.substring(
+            0,
+            2
+        );
+
+        if (currentLanguage !== "en" && currentLanguage !== "he") {
+            currentLanguage = "en";
+        }
+        const taxMessage =
+            currentLanguage === "he"
+                ? "שימו לב: שיעורי המס והחישובים מופעלים באתר זה."
+                : "Attention: The tax rates and calculations are enabled on this site.";
+        wc_tax_enabled
+            ? payingVatAll
+                  .closest("table")
+                  .append('<p style="color: red;">' + taxMessage + "</p>")
+            : null;
         const transactionType = payplus_script_payment.transactionType;
         if (transactionType != 2) {
             checkAmountAuthorization.closest("tr").fadeOut();

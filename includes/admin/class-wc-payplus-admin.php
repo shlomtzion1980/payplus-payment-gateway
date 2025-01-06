@@ -2190,12 +2190,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             )
         );
         wp_enqueue_script('payplus-admin-payment');
-        wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
+        wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.js', ['jquery'], time(), true);
         wp_localize_script(
             'wc-payplus-gateway-admin',
             'payplus_script_payment',
             array(
                 'ajax_url' => admin_url('admin-ajax.php'),
+                'wc_tax_enabled' => wc_tax_enabled(),
+                'currentLanguage' => $current_language,
                 'error_payment_sum' => __('Total payment amounts are not equal to the order sum', 'payplus-payment-gateway'),
                 'error_payment_sum_withholding_tax' => __('The amount of receipts is not equal to the amount of withholding tax clearance', 'payplus-payment-gateway'),
                 'error_payment_select_doc' => __('No document type selected', 'payplus-payment-gateway'),
