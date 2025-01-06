@@ -1876,9 +1876,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         // YourMoment Split Shipping
-        $shipping_splitted = WC()->session->get('shipping_splitted');
-        if ($shipping_splitted === null) {
-            $shipping_splitted = false;
+        if (WC()->session && WC()->session->has_session()) {
+            $shipping_splitted = WC()->session->get('shipping_splitted');
+            // Handle the case where 'shipping_splitted' is null
+            if (is_null($shipping_splitted)) {
+                $shipping_splitted = false; // Or any default value you want to use
+            }
+        } else {
+            $shipping_splitted = false; // No session or session not active
         }
         // YourMoment Split Shipping
 
