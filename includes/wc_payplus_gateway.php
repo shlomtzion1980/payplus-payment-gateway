@@ -1561,7 +1561,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         if (count($items)) {
             foreach ($items as $item => $item_data) {
-                $transactionTypeValue = WC_PayPlus_Meta_Data::get_meta($item_data['product_id'], 'payplus_transaction_type', true);
+                $transactionTypeValue = get_post_meta($item_data['product_id'], 'payplus_transaction_type', true);
                 if ($transactionTypeValue == $checkChargemMethod) {
                     return true;
                 }
