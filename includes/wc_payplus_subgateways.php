@@ -507,6 +507,34 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         if ($order && $payment_response === "success") {
             WC()->cart->empty_cart();
             $redirect_to = $order->get_checkout_order_received_url();
+            $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_response');
+            if (!empty($payPlusResponse)) {
+                $payPlusResponse = json_decode($payPlusResponse, true);
+                $status_code = $payPlusResponse['status_code'];
+                $transactionType = $payPlusResponse['type'];
+                $transactionUid = $payPlusResponse['transaction_uid'];
+                $this->payplus_add_log_all('hosted-fields-data', 'Order status: ' . $order->get_status());
+                if (str_replace("wc-", "", $this->successful_order_status) !== str_replace("wc-", "", $order->get_status())) {
+                    if ($status_code === "000") {
+                        if ($transactionType == "Charge") {
+                            if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
+                                $order->payment_complete();
+                                $this->payplus_add_log_all('hosted-fields-data', 'process_payment->firePaymentComplete');
+                            }
+                            if ($this->successful_order_status !== 'default-woo') {
+                                WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
+                                $order->update_status($this->successful_order_status);
+                                $this->payplus_add_log_all('hosted-fields-data', 'process_payment->' . $this->successful_order_status);
+                            }
+                        } else {
+                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
+                            $order->update_status('wc-on-hold');
+                            $this->payplus_add_log_all('hosted-fields-data', 'process_payment->wc-on-hold');
+                        }
+                    }
+                }
+            }
 
             wp_send_json_success(array(
                 'redirect_url' => $redirect_to
