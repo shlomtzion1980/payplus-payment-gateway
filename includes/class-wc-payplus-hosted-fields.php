@@ -288,7 +288,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         if ($order_id !== "000" && isset($order) && $order) {
             WC()->session->set('order_awaiting_payment', $order_id);
             $shipping_items = $order->get_items('shipping');
-
+            if ($this->payPlusGateway->add_product_field_transaction_type) {
+                if ($this->payPlusGateway->payplus_check_all_product($order, "2")) {
+                    $data->charge_method = 2;
+                } elseif ($this->payPlusGateway->payplus_check_all_product($order, "1")) {
+                    $data->charge_method = 1;
+                }
+            }
             // Check if there are shipping items
             if (! empty($shipping_items)) {
 

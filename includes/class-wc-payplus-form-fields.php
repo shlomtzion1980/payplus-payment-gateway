@@ -428,6 +428,12 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Add Product Field Transaction Type', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => '',
+                'desc_tip' => true,
+                'description' => __('Add a field to the product page to choose the transaction type for the product.<br>
+                If this is enabled:<br><br>
+                The order is set to J5 - Approval transaction if at least one product is set to Approval.<br><br>
+                If all products are set to Charge and the main charge method is already J5, the order is set to J4 - Charge transaction.<br><br>
+                However, any Approval product always sets the transaction to Approval.', 'payplus-payment-gateway'),
                 'default' => 'no',
             ],
             'exist_company' => [
