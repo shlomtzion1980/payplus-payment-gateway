@@ -205,8 +205,8 @@ jQuery(function ($) {
         }
         const taxMessage =
             currentLanguage === "he"
-                ? "שימו לב: שיעורי המס והחישובים מופעלים באתר זה."
-                : "Attention: The tax rates and calculations are enabled on this site.";
+                ? "שימו לב: שיעורי המס והחישובים מופעלים באתר זה - ההגדרות הרשומות מעלה לא יהיו ברות השפעה."
+                : "Attention: The tax rates and calculations are enabled on this site - The fields above will not take affect.";
         wc_tax_enabled
             ? payingVatAll
                   .closest("table")
