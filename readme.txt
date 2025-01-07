@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.4.5
+Stable tag: 7.4.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.4.5 - 07-01-2025 = 
+= 7.4.6 - 07-01-2025 = 
+
+- Tweak - Add Product Field Transaction Type - Now works on PayPlus Embedded and main gateway.
+- Tweak - Add Product Field Transaction Type - Instructions updated.
+- Added - PayPlus Embedded now supports "Successful Order Status" and "Payment Completed" settings as well.
+- Tweak - In Invoice+ VAT Settings added indicator message WooCommerce taxes feature is enabled. 
+
+= 7.4.5 - 06-01-2025 = 
 
 - Fix   - If the main VAT settings in Invoice+ are unchecked, the vat-type-exempt will now be sent.
 - Tweak - Resolved an issue where the Apple Pay script was loaded multiple times if the payment window was closed and reopened without refreshing.
