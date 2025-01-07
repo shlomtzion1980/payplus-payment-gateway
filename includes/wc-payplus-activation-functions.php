@@ -76,7 +76,7 @@ function display_hash_check_notice()
 
 function verify_plugin_integrity($plugin_dir)
 {
-    $trunk_url = 'https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/';
+    $trunk_url = 'https://plugins.svn.wordpress.org/payplus-payment-gateway/tags/' . PAYPLUS_VERSION . '/';
     $hashes_file_url = $trunk_url . 'hashes.json';
 
     // Fetch the hashes.json file
