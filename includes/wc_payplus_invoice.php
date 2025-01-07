@@ -333,11 +333,11 @@ class PayplusInvoice
         if (isset($payPlusOrderPayments[0]['create_at']) && strpos($payPlusOrderPayments[0]['create_at'], '2024') !== false) {
             $payload['vat_percentage'] = 17;
         }
-        // vat_percentage for vat change - 17% to 18%
 
+        // vat_percentage for vat change - 17% to 18%
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
-        $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
+        $payload['customer'] = $payload['customer'];
 
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
@@ -624,10 +624,26 @@ class PayplusInvoice
                 unset($payPlusPayloadInvoice['unique_identifier']);
             }
             $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
+
             foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
                 $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
                 isset($item['discount_value']) ? ($payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value']) : null;
+                $sku_or_id = $item['barcode']; // Can be a SKU or ID
+                // Check if it's numeric (ID) or string (SKU)
+                if (is_numeric($sku_or_id)) {
+                    $product_id = wc_get_product($sku_or_id);
+                    $product = $product_id ? $product_id : null;
+                } else {
+                    $product_id = wc_get_product_id_by_sku($sku_or_id);
+                    $product = $product_id ? wc_get_product($product_id) : null;
+                }
+                if ($product) {
+                    $payPlusPayloadInvoice['items'][$key]['name'] = $product->get_name();
+                } else {
+                    $payPlusPayloadInvoice['items'][$key]['name'] = $item['name'];
+                }
             }
+
             foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
                 $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
             }
