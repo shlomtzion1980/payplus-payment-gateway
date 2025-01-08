@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.4.7] - 08-01-2025 - (Led) 
+## [7.4.9] - 08-01-2025 - (Zepplin) 
+
+- Fix - Enhanced the previous version to save payloads more efficiently and cleanly.
+
+## [7.4.8] - 08-01-2025 - (Led) 
 
 - Tweak - Improved the invoice refund process to avoid relying solely on the invoice payload, preventing issues with unicode conversion.
 

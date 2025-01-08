@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.4.7
+Stable tag: 7.4.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.4.7 - 08-01-2025 = 
+= 7.4.9 - 08-01-2025 =
+
+- Fix - Enhanced the previous version to save payloads more efficiently and cleanly.
+
+= 7.4.8 - 08-01-2025 = 
 
 - Tweak - Improved the invoice refund process to avoid relying solely on the invoice payload, preventing issues with unicode conversion.
 
