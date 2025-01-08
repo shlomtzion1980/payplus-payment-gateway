@@ -1920,7 +1920,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($shipping_splitted) {
             $orderTotal = $order->get_total();
             if ($totalCartAmount < $orderTotal) {
-                $productPrice = $orderTotal - $totalCartAmount;
+                $productPrice = number_format($orderTotal - $totalCartAmount, 2, '.', '');
                 $itemDetails = [
                     'name' => __('Shipping', 'payplus-payment-gateway'),
                     'quantity' => 1,
