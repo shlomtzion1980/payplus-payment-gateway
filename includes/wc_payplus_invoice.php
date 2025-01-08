@@ -337,7 +337,7 @@ class PayplusInvoice
         // vat_percentage for vat change - 17% to 18%
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
         $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
-        $payload['customer'] = $payload['customer'];
+        $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
 
         if (!empty($this->payplus_invoice_brand_uid)) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
@@ -490,19 +490,19 @@ class PayplusInvoice
             $payplus_document_type = "inv_refund_receipt";
             $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
             $payplus_document_type = "inv_receipt";
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => wp_json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => wp_json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
             $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => wp_json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
             $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => wp_json_encode($payload)]);
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
     }
@@ -624,25 +624,10 @@ class PayplusInvoice
                 unset($payPlusPayloadInvoice['unique_identifier']);
             }
             $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
-
             foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
                 $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
-
                 isset($item['discount_value']) ? ($payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value']) : null;
-                $sku_or_id = $item['barcode']; // Can be a SKU or ID
-                $product_id = wc_get_product($sku_or_id);
-                if ($product_id) {
-                } else {
-                    $product_id = wc_get_product_id_by_sku($sku_or_id);
-                }
-                $product = wc_get_product($product_id);
-                if ($product) {
-                    $payPlusPayloadInvoice['items'][$key]['name'] = $product->get_name();
-                } else {
-                    $sku_or_id === "order-shipping" ? $payPlusPayloadInvoice['items'][$key]['name'] = __('Shipping', 'payplus-payment-gateway') : $payPlusPayloadInvoice['items'][$key]['name'] = $item['name'];
-                }
             }
-
             foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
                 $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
             }
@@ -1185,8 +1170,9 @@ class PayplusInvoice
                         }
                     }
 
-                    $payload = wp_json_encode($payload);
+                    $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
+
                     $logCashPayment = !$isCashPayment ? 'No' : 'Yes';
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')' . ' is CashePayment: ' . $logCashPayment);
                     $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
