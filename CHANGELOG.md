@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.4.9] - 08-01-2025 - (Zepplin) 
+## [7.5.0] - 08-01-2025 - (Zepplin) 
 
 - Fix - Enhanced the previous version to save payloads more efficiently and cleanly.
 
