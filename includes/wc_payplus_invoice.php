@@ -624,10 +624,25 @@ class PayplusInvoice
                 unset($payPlusPayloadInvoice['unique_identifier']);
             }
             $payPlusPayloadInvoice['totalAmount'] = $isRefund ? -$payPlusPayloadInvoice['totalAmount'] : $payPlusPayloadInvoice['totalAmount'];
+
             foreach ($payPlusPayloadInvoice['items'] as $key => $item) {
                 $payPlusPayloadInvoice['items'][$key]['price'] = $isRefund ? -$item['price'] : $item['price'];
+
                 isset($item['discount_value']) ? ($payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value']) : null;
+                $sku_or_id = $item['barcode']; // Can be a SKU or ID
+                $product_id = wc_get_product($sku_or_id);
+                if ($product_id) {
+                } else {
+                    $product_id = wc_get_product_id_by_sku($sku_or_id);
+                }
+                $product = wc_get_product($product_id);
+                if ($product) {
+                    $payPlusPayloadInvoice['items'][$key]['name'] = $product->get_name();
+                } else {
+                    $sku_or_id === "order-shipping" ? $payPlusPayloadInvoice['items'][$key]['name'] = __('Shipping', 'payplus-payment-gateway') : $payPlusPayloadInvoice['items'][$key]['name'] = $item['name'];
+                }
             }
+
             foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
                 $payPlusPayloadInvoice['payments'][$key]['amount'] = $isRefund ? -$payment['amount'] : $payment['amount'];
             }
