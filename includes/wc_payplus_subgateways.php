@@ -66,6 +66,16 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     }
 
     /**
+     * Get the icon HTML with inline styles
+     */
+    public function get_icon()
+    {
+        $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
+        $style = 'max-width: 32px; max-height: 32px;'; // Example inline style
+        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+    }
+
+    /**
      * @return void
      */
     public function init_form_fields()
@@ -464,6 +474,16 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
+    }
+
+    /**
+     * Get the icon HTML with inline styles
+     */
+    public function get_icon()
+    {
+        $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
+        $style = 'max-width: 64px; max-height: 32px;'; // Example inline style
+        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
     }
 
     public function regenerateHostedLink()
