@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2025-01-09 11:23+0200\n"
-"PO-Revision-Date: 2025-01-09 12:49+0200\n"
+"PO-Revision-Date: 2025-01-09 13:07+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -595,11 +595,11 @@ msgstr "שמור לוגים לגבי פעילות הקשורה לתוסף הסל
 
 #: includes/admin/class-wc-payplus-admin-settings.php:416
 msgid "Do not create documents for the following methods:"
-msgstr ""
+msgstr "לא ליצור מסמכים לשיטות התשלום הבאות:"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:418
 msgid "Select methods that documents will not be created for."
-msgstr ""
+msgstr "בחירת שיטות תשלום עליהן הפקת מסמכים לא תופעל."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:421
 #: includes/admin/class-wc-payplus-admin.php:1136
