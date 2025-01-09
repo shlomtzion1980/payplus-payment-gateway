@@ -583,12 +583,14 @@ class WC_PayPlus_Statics
          */
         public static function payPlusRemote($url, $payload = [], $method = "post")
         {
-            $options = get_option('woocommerce_payplus-payment-gateway_settings');
-            $testMode = boolval($options['api_test_mode'] === 'yes');
-            $apiKey = $testMode === true ? $options['dev_api_key'] : $options['api_key'];
+            $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode  = boolval($options['api_test_mode'] === 'yes');
+            $apiKey    = $testMode === true ? $options['dev_api_key'] : $options['api_key'];
             $secretKey = $testMode === true ? $options['dev_secret_key'] : $options['secret_key'];
-
+            isset($options['enable_dev_mode']) && $options['enable_dev_mode'] === "yes"
+                ? $payload = apply_filters('payplus_remote_payload', $payload) : null;
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
+
             $args = array(
                 'body' => $payload,
                 'timeout' => '60',

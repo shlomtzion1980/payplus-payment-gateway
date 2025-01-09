@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-01-07 09:52+0200\n"
-"PO-Revision-Date: 2025-01-07 09:53+0200\n"
+"POT-Creation-Date: 2025-01-09 11:23+0200\n"
+"PO-Revision-Date: 2025-01-09 11:25+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -589,7 +589,7 @@ msgstr ""
 "להזמנות אשר שולמו במזומן (תשלום לשליח) או בהעברה בנקאית."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:410
-#: includes/class-wc-payplus-form-fields.php:563
+#: includes/class-wc-payplus-form-fields.php:570
 msgid "Logging"
 msgstr "שמור לוגים לגבי פעילות הקשורה לתוסף הסליקה של פייפלוס"
 
@@ -1735,10 +1735,18 @@ msgid "Disable custom fields editing in orders"
 msgstr ""
 
 #: includes/class-wc-payplus-form-fields.php:558
+msgid "Enable partners dev mode"
+msgstr "תמיכה בפיתוחי פרטנרים"
+
+#: includes/class-wc-payplus-form-fields.php:560
+msgid "Enable dev mode for PayPlus partners."
+msgstr "תמיכה בפיתוחים של פרטנרים של פייפלוס."
+
+#: includes/class-wc-payplus-form-fields.php:565
 msgid "Disable woocommerce scheduler"
 msgstr "השבת את מתזמן WooCommerce"
 
-#: includes/class-wc-payplus-form-fields.php:565
+#: includes/class-wc-payplus-form-fields.php:572
 msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
@@ -1978,19 +1986,19 @@ msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1868 includes/wc_payplus_invoice.php:825
+#: includes/wc_payplus_gateway.php:1868 includes/wc_payplus_invoice.php:840
 msgid "Round"
 msgstr ""
 
 #: includes/wc_payplus_gateway.php:1908 includes/wc_payplus_gateway.php:1925
-#: includes/wc_payplus_invoice.php:787
+#: includes/wc_payplus_invoice.php:642 includes/wc_payplus_invoice.php:802
 msgid "Shipping"
 msgstr "משלוח"
 
 #: includes/wc_payplus_gateway.php:1947 includes/wc_payplus_gateway.php:1948
 #: includes/wc_payplus_gateway.php:1968 includes/wc_payplus_gateway.php:1969
-#: includes/wc_payplus_invoice.php:814 includes/wc_payplus_invoice.php:815
-#: includes/wc_payplus_invoice.php:847 includes/wc_payplus_invoice.php:848
+#: includes/wc_payplus_invoice.php:829 includes/wc_payplus_invoice.php:830
+#: includes/wc_payplus_invoice.php:862 includes/wc_payplus_invoice.php:863
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
@@ -2046,19 +2054,19 @@ msgstr ""
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:1117 includes/wc_payplus_invoice.php:1135
-#: includes/wc_payplus_invoice.php:1157
+#: includes/wc_payplus_invoice.php:1132 includes/wc_payplus_invoice.php:1150
+#: includes/wc_payplus_invoice.php:1172
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:1169
+#: includes/wc_payplus_invoice.php:1184
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
 msgstr ""
 "לא נשלח מספר יתרה ליצירת חשבונית מכיוון שיש לך יותר ממוצר אחד עם מספר יתרה"
 
-#: includes/wc_payplus_invoice.php:1217
+#: includes/wc_payplus_invoice.php:1233
 msgid "Link Document  "
 msgstr "לינק מסמך "
 
@@ -2266,7 +2274,7 @@ msgid ""
 msgstr ""
 "ישים רק במידה ואופציית התשלומים מופעלת בדף התשלום. (מינימום 1 , מקסימום 99)"
 
-#: includes/wc_payplus_subgateways.php:525
+#: includes/wc_payplus_subgateways.php:553
 #, fuzzy
 #| msgid "Card holder ID"
 msgid "Invalid order ID"
@@ -2940,11 +2948,6 @@ msgstr ""
 
 #~ msgid "Devices Id"
 #~ msgstr "רשימת מכשירים"
-
-#, fuzzy
-#~| msgid "Invoice+ (PayPlus)"
-#~ msgid "Enable Devices PayPlus"
-#~ msgstr "חשבונית פלוס מבית פיי פלוס"
 
 #~ msgid "Setting  Devices"
 #~ msgstr "הגדרת מכשירים "

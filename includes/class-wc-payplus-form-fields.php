@@ -554,6 +554,13 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'type'    => 'checkbox',
                 'default' => 'yes',
             ],
+            'enable_dev_mode' => [
+                'title'   => __('Enable partners dev mode', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'description' => __('Enable dev mode for PayPlus partners.', 'payplus-payment-gateway'),
+                'type'    => 'checkbox',
+                'default' => 'no',
+            ],
             'disable_woocommerce_scheduler' => [
                 'title' => __('Disable woocommerce scheduler', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
