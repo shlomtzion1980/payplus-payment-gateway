@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2025-01-09 11:23+0200\n"
-"PO-Revision-Date: 2025-01-09 11:25+0200\n"
+"PO-Revision-Date: 2025-01-09 12:49+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -789,10 +789,8 @@ msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
 #: includes/admin/class-wc-payplus-admin.php:132
 #: includes/admin/class-wc-payplus-admin.php:133
-#, fuzzy
-#| msgid "PayPlus Gateway"
 msgid "PayPlus Hash Check"
-msgstr "פיי פלוס פתרונות תשלום"
+msgstr "בדיקת Hash לתוסף פייפלוס"
 
 #: includes/admin/class-wc-payplus-admin.php:308
 #: includes/class-wc-payplus-statics.php:382
@@ -1591,16 +1589,12 @@ msgstr "פיי פלוס  הגדרות מתקדמות"
 
 #: includes/class-wc-payplus-form-fields.php:474
 #: includes/class-wc-payplus-form-fields.php:475
-#, fuzzy
-#| msgid "Display PayPlus \"Orders Check Button\""
 msgid "Show PayPlus Hash Check button"
-msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד"
+msgstr "הצגת כפתור בדיקת hash פייפלוס"
 
 #: includes/class-wc-payplus-form-fields.php:478
-#, fuzzy
-#| msgid "Display PayPlus \"Orders Check Button\""
 msgid "Shows the PayPlus Hash check button."
-msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד"
+msgstr "הצגת כפתור בדיקת hash פייפלוס בתפריט הצד."
 
 #: includes/class-wc-payplus-form-fields.php:482
 msgid "Enable/Disable token payment (Through Admin)"
@@ -1732,7 +1726,7 @@ msgstr "הסתרת תפריט הצד של פייפלוס"
 
 #: includes/class-wc-payplus-form-fields.php:553
 msgid "Disable custom fields editing in orders"
-msgstr ""
+msgstr "חסימת עריכה של שדות מותאמים אישית (מומלץ)"
 
 #: includes/class-wc-payplus-form-fields.php:558
 msgid "Enable partners dev mode"
