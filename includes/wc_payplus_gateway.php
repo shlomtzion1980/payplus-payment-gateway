@@ -3264,7 +3264,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (isset($_REQUEST['status']) && sanitize_text_field(wp_unslash(($_REQUEST['status']))) == "approved" && isset($_REQUEST['status_code']) && sanitize_text_field(wp_unslash($_REQUEST['status_code'])) == "000" && isset($_REQUEST['token_uid']) && sanitize_text_field(wp_unslash($_REQUEST['token_uid']))) {
             wc_add_notice(__('Your new payment method has been added', 'payplus-payment-gateway'));
-            $this->payplus_add_log_all($handle, wp_json_encode($this->arr_clean($_REQUEST), 'completed'));
+            $this->payplus_add_log_all($handle, wp_json_encode(wc_clean($_REQUEST)), 'completed');
             $user_id = get_current_user_id();
             if (isset($_REQUEST['more_info'])) {
                 $user_id = explode("_", sanitize_text_field(wp_unslash($_REQUEST['more_info'])));
