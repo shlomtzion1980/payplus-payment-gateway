@@ -65,7 +65,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             }
         }
 
-        #submit-payment {
+        [id^="submit-payment-"] {
             background-color: var(--wp--preset--color--contrast);
             border-radius: 0.33rem;
             border-color: var(--wp--preset--color--contrast);
@@ -326,10 +326,10 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                     /* Optional, removes default opacity in some browsers */
                 }
 
-                input {
+                /* input {
                     background-color: white !important;
                     outline: unset;
-                }
+                } */
 
                 .form-control {
                     width: 100% !important;
@@ -592,10 +592,9 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                                                                         }
                                                                                     } else {
                                                                                             ?><img class="hf-image"
-                                    src="<?php echo esc_url($ccImage); ?>"
-                                    alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                    }
-                                                                                        ?>
+                                    src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
+                                                                                                                        }
+                                                                                                                            ?>
 
                         </div>
                     </div>
@@ -666,7 +665,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         </select>
                     </div>
                     <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
-                        id="submit-payment" class="btn btn-primary" />
+                        id="submit-payment-<?php echo $this->dPOK; ?>" class="btn btn-primary" />
                     <br />
                     <div class="payment-error-message">
                         <div class="loader-container">

@@ -346,11 +346,11 @@ jQuery(() => {
 
           // jQuery(".container.hostedFields").show();
           jQuery("#create-payment-form").hide();
-          jQuery("#submit-payment").attr(
-            "style",
-            "visibility: hidden;height: 0px !important;margin: 0 0 0 0 !important;"
-          );
-          jQuery("#submit-payment").next().hide();
+          // jQuery("#submit-payment").attr(
+          //   "style",
+          //   "visibility: hidden;height: 0px !important;margin: 0 0 0 0 !important;"
+          // );
+          // jQuery("#submit-payment").next().hide();
           //   jQuery("#id-number-wrapper").hide();
           // jQuery("#payments-wrapper").hide();
           jQuery("#payment-form").css("display", "flex");
@@ -371,7 +371,7 @@ jQuery(() => {
 
 hf.Upon("pp_pageExpired", (e) => {
   console.log(e);
-  jQuery("#submit-payment").prop("disabled", true);
+  // jQuery("#submit-payment").prop("disabled", true);
   jQuery("#status").val("Page Expired");
   jQuery.ajax({
     type: "post",
@@ -523,7 +523,6 @@ hf.Upon("pp_responseFromServer", (e) => {
 hf.Upon("pp_submitProcess", (e) => {
   // jQuery(".blocks-payplus_loader_hosted").fadeIn();
   // overlay();
-  jQuery("#submit-payment").prop("disabled", e.detail);
 });
 
 let $overlay; // Declare outside to store the overlay reference
