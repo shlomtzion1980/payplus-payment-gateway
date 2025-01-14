@@ -665,7 +665,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         </select>
                     </div>
                     <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
-                        id="submit-payment-<?php echo $this->dPOK; ?>" class="btn btn-primary" />
+                        id="submit-payment-<?php echo $this->dPOK; ?>" class="btn btn-primary"
+                        onclick="jQuery('form[name=\'checkout\']').trigger('submit');" />
                     <br />
                     <div class="payment-error-message">
                         <div class="loader-container">
