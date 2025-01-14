@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.1] - 14-01-2025 - (Talula)
+
+- Fix   - Adjusted the inline styling for PayPlus payment logos to ensure correct height and width. 
+- Fix   - Resolved an error when adding a payment method due to logging issues.
+- Tweak - Added and corrected missing Hebrew translations.
+
 ## [7.5.0] - 08-01-2025 - (Zepplin) 
 
 - Fix - Enhanced the previous version to save payloads more efficiently and cleanly.
