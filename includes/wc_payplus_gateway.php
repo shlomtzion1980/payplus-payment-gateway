@@ -100,7 +100,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     private $current_time;
     public $hostedFieldsOptions;
     public $isHostedEnabled;
-    private $dynamic_id;
 
     /**
      *
@@ -262,12 +261,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         add_filter('user_has_cap', [$this, 'payplus_disbale_page_delete'], 10, 3);
         add_filter('page_row_actions', [$this, 'payplus_remove_row_actions_post'], 10, 1);
-        add_filter('woocommerce_order_button_html', function () {
-            return ''; // Remove the default button.
-        });
-
-        add_action('wp_footer', [$this, 'custom_checkout_button_script']);
-
 
         /****** FILTER END ******/
 
@@ -289,43 +282,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_invoice_option['payplus_invoice_secret_key'] = $this->secret_key;
             update_option('payplus_invoice_option', $payplus_invoice_option);
         }
-    }
-
-
-    public function custom_checkout_button_script()
-    {
-?>
-        <script type="text/javascript">
-            document.addEventListener('DOMContentLoaded', function() {
-                const customButton = document.querySelector('[id^="custom-place-order-"]'); // Match your dynamic ID.
-
-                if (customButton) {
-                    customButton.addEventListener('click', function() {
-                        // Simulate the default place order button's click.
-                        const placeOrderButton = document.querySelector(
-                            '#place_order'); // WooCommerce's default button ID.
-                        if (placeOrderButton) {
-                            placeOrderButton.click();
-                        }
-                    });
-                }
-            });
-        </script>
-        <?php
-    }
-
-    public function add_custom_checkout_button()
-    {
-        // Inline styles for the button.
-        $button_style = 'display: block; width: 100%; background: #0070ba; color: #fff; font-size: 16px; padding: 15px; border: none; text-align: center; border-radius: 4px;';
-
-        // Generate a dynamic class name or ID (example: button timestamp).
-        $dynamic_class = 'custom-place-order-' . time();
-        $dynamic_id = 'custom-place-order-' . wp_rand(1000, 9999);
-        $this->dynamic_id = $dynamic_id;
-        echo '<button type="button" class="' . esc_attr($dynamic_class) . '" id="' . esc_attr($dynamic_id) . '" style="' . esc_attr($button_style) . '">
-    Complete Order
-</button>';
     }
 
     /**
@@ -1368,7 +1324,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payment_fields()
     {
         if ($this->supports('tokenization') && is_checkout()) {
-            add_action('woocommerce_review_order_after_submit', [$this, 'add_custom_checkout_button']);
             $this->tokenization_script();
             if ($this->create_pp_token) {
                 $this->saved_payment_methods();

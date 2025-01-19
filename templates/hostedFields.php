@@ -65,7 +65,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             }
         }
 
-        [id^="submit-payment-"] {
+        #submit-payment {
             background-color: var(--wp--preset--color--contrast);
             border-radius: 0.33rem;
             border-color: var(--wp--preset--color--contrast);
@@ -665,7 +665,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         </select>
                     </div>
                     <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
-                        id="submit-payment-<?php echo $this->dPOK; ?>" class="btn btn-primary"
+                        id="submit-payment" class="btn btn-primary"
                         onclick="jQuery('form[name=\'checkout\']').trigger('submit');" />
                     <br />
                     <div class="payment-error-message">
