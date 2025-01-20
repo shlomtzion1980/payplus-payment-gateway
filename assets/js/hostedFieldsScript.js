@@ -229,7 +229,10 @@ jQuery(() => {
         ? jQuery("#payments-wrapper").css("direction", "ltr")
         : null;
 
-    if (isCheckout) {
+    if (
+        isCheckout ||
+        (!isCheckout && !payplus_script_hosted.showSubmitButton)
+    ) {
         jQuery("#submit-payment").css("visibility", "hidden");
         jQuery("#submit-payment").css("display", "none");
     }

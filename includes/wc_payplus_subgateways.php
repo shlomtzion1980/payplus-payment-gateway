@@ -253,6 +253,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             unset($this->form_fields['hosted_fields_payments_amount']);
         }
         if ($this->id === 'payplus-payment-gateway-hostedfields') {
+            $this->form_fields['show_hide_submit_button'] = [
+                'title' => __('Show the PayPlus Embedded "Place Order" button', 'payplus-payment-gateway'),
+                'description' => __('Displays the PayPlus Embedded "Place Order" button inside the form. *Only for Woocommerce classic checkout page.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no'
+            ];
             unset($this->form_fields['display_mode']);
             unset($this->form_fields['iframe_height']);
             unset($this->form_fields['sub_hide_other_charge_methods']);
@@ -325,6 +331,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['display_mode'] = $subOptionsettings['display_mode'];
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
+        $this->settings['show_hide_submit_button'] = isset($subOptionsettings['show_hide_submit_button']) ? $subOptionsettings['show_hide_submit_button'] : 'no';
         $this->settings['hosted_fields_width'] = isset($subOptionsettings['hosted_fields_width']) ? $subOptionsettings['hosted_fields_width'] : 100;
         $this->settings['hosted_fields_payments_amount'] = isset($subOptionsettings['hosted_fields_payments_amount']) ? $subOptionsettings['hosted_fields_payments_amount'] : 3;
         $this->settings['hide_payplus_gateway'] = isset($subOptionsettings['hide_payplus_gateway']) ? $subOptionsettings['hide_payplus_gateway'] : 'no';

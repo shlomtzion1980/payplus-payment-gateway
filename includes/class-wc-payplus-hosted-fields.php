@@ -19,7 +19,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $isHideLoaderLogo;
     public $isHostedStarted;
     public $isPlaceOrder;
-    // public $hostedFieldsResponse;
+    public $showSubmitButton;
 
 
     /**
@@ -38,6 +38,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->order_id = $order_id;
         $this->order = $order;
         $this->isPlaceOrder = $isPlaceOrder;
+        $this->showSubmitButton = isset($this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button']) && $this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button'] === 'yes';
 
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
@@ -79,7 +80,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedResponseArray['results']['status'] === "error" ? $this->updateOrderId() : null;
 
         if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
-            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.js');
+            $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
             require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-error-handler.php';
@@ -90,7 +91,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 include $template_path;
             }
             wp_enqueue_script('payplus-hosted-fields-js', PAYPLUS_PLUGIN_URL . 'assets/js/payplus-hosted-fields/dist/payplus-hosted-fields.min.js', array('jquery'), '1.0', true);
-            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.js', array('jquery'), $script_version, true);
+            wp_register_script('payplus-hosted', PAYPLUS_PLUGIN_URL . 'assets/js/hostedFieldsScript.min.js', array('jquery'), $script_version, true);
             wp_localize_script(
                 'payplus-hosted',
                 'payplus_script_hosted',
@@ -102,6 +103,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     'ajax_url' => admin_url('admin-ajax.php'),
                     "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
                     'testMode' => $this->testMode,
+                    "showSubmitButton" => $this->showSubmitButton,
                     'allErrors' => $payPlusErrors->getAllTranslations(),
                     'frontNonce' => wp_create_nonce('frontNonce'),
                     'payPlusLogo' => PAYPLUS_PLUGIN_URL . 'assets/images/PayPlusLogo.svg',
