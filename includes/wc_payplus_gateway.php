@@ -2419,7 +2419,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 Order Status note: $orderStatusNote 
                 Order Status: $orderStatus
                 Transaction Type: {$response['transaction_type']}
-                PayPlus Transaction Callback: $json"
+                Find the PayPlus Transaction Callback inside the order itself."
             );
 
             $transactionUid = sanitize_text_field($response['transaction']['uid']);

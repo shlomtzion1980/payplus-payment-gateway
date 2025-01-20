@@ -588,14 +588,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                             if (is_array($hostedIcons) && !empty($hostedIcons)) {
                                 foreach ($hostedIcons as $hIcon) {
                             ?><img class="hf-image" style="height:19px" src="<?php echo esc_url($hIcon); ?>"
-                                        alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                        }
-                                                                                    } else {
-                                                                                            ?><img class="hf-image"
-                                    src="<?php echo esc_url($ccImage); ?>" alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php
-                                                                                                                        }
-                                                                                                                            ?>
-
+                                        alt="<?php echo esc_attr($ccImageAltText); ?>" /><?php }
+                                                                                    }  ?>
                         </div>
                     </div>
                     <div id="card-holder-name-wrapper" class="fld-wrapper">
