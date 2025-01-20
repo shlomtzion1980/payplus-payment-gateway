@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.5.1
+Stable tag: 7.5.2
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.5.2 - 20-01-2025 =
+
+- Added - Option to show or hide the "Place Order" button within the PayPlus Embedded form.
+- Tweak - Updated the Bit payment method logo.
+- Tweak - Adjusted the arrow display position for multiple payments in mobile view for PayPlus Embedded.
+- Added - Checkbox for "Partners Dev Mode" with initial support for one filter, more to be added soon.
 
 = 7.5.1 - 14-01-2025 =
 

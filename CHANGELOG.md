@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.2] - 20-01-2025 - (Beru)
+
+- Added - Option to show or hide the "Place Order" button within the PayPlus Embedded form.
+- Tweak - Updated the Bit payment method logo.
+- Tweak - Adjusted the arrow display position for multiple payments in mobile view for PayPlus Embedded.
+- Added - Checkbox for "Partners Dev Mode" with initial support for one filter, more to be added soon.
+
 ## [7.5.1] - 14-01-2025 - (Talula)
 
 - Fix   - Adjusted the inline styling for PayPlus payment logos to ensure correct height and width. 
