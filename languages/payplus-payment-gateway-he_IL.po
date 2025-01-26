@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-01-20 11:34+0200\n"
-"PO-Revision-Date: 2025-01-20 11:34+0200\n"
+"POT-Creation-Date: 2025-01-26 14:18+0200\n"
+"PO-Revision-Date: 2025-01-26 14:19+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:23
 #: includes/admin/class-wc-payplus-admin-settings.php:28
-#: payplus-payment-gateway.php:575
+#: payplus-payment-gateway.php:577
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -154,7 +154,7 @@ msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:119
 #: includes/class-wc-payplus-form-fields.php:237
-#: payplus-payment-gateway.php:862
+#: payplus-payment-gateway.php:865
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -171,15 +171,15 @@ msgstr "ברירת מחדל גלובלית"
 #: includes/admin/class-wc-payplus-admin-settings.php:123
 #: includes/class-wc-payplus-form-fields.php:241
 #: includes/class-wc-payplus-statics.php:78
-#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:467
-#: payplus-payment-gateway.php:857 payplus-payment-gateway.php:1102
+#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:469
+#: payplus-payment-gateway.php:860 payplus-payment-gateway.php:1105
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:124
 #: includes/class-wc-payplus-form-fields.php:242
-#: payplus-payment-gateway.php:468 payplus-payment-gateway.php:858
-#: payplus-payment-gateway.php:1103
+#: payplus-payment-gateway.php:470 payplus-payment-gateway.php:861
+#: payplus-payment-gateway.php:1106
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -517,7 +517,7 @@ msgid "Refund Invoice + Refund Receipt"
 msgstr "חשבונית זיכוי +קבלה לזיכוי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:335
-#: includes/admin/class-wc-payplus-admin-settings.php:655
+#: includes/admin/class-wc-payplus-admin-settings.php:664
 msgid "Order status for issuing an invoice"
 msgstr "סטטוס הזמנה להוצאת חשבונית"
 
@@ -740,10 +740,24 @@ msgid "Allow customers to create an account during checkout"
 msgstr "לאפשר ללקוחות ליצור חשבון בתהליך הצ'קאאוט"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:577
+msgid "Shipping according to Woocommerce Via JS - Overrides all next settings"
+msgstr ""
+"שילוח לפי תצוגת עמוד הצ'קאאוט של ווקומרס - דרך JS (דורס את ההגדרות הרשומות "
+"מטה)"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:578
+msgid ""
+"Same as what you see in classic checkout.(THIS OVERRIDES ALL OTHER SHIPPINGS "
+"SETTINGS! - AND IS FOR CLASSIC CHECKOUT!)"
+msgstr ""
+"אותו הדבר כמו בתצוגה של עמוד הצ'קאאוט של וורדפרס - לפי כתובת השילוח - לא "
+"מתייחס לכתובת הכרטיס (עובד רק בצ'קאאוט הקלאסי של ווקומרס!)"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:586
 msgid "Shipping according to Woocommerce settings"
 msgstr "שילוח לפי הגדרות ווקומרס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:578
+#: includes/admin/class-wc-payplus-admin-settings.php:587
 msgid ""
 "<br>Countries (Continents not supported):\n"
 "                    <br>Flat rate,\n"
@@ -762,28 +776,28 @@ msgstr ""
 "<br>אם יש לכם כללי משלוח מורכבים, הם עשויים שלא לעבוד עם תשלום מהיר. לכללים "
 "מורכבים השתמשו ב-\"סכום משלוח גלובלי\"."
 
-#: includes/admin/class-wc-payplus-admin-settings.php:591
+#: includes/admin/class-wc-payplus-admin-settings.php:600
 msgid "Global shipping amount"
 msgstr "סכום משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:599
+#: includes/admin/class-wc-payplus-admin-settings.php:608
 msgid "Global shipping Tax"
 msgstr "מס משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:602
+#: includes/admin/class-wc-payplus-admin-settings.php:611
 msgid "Taxable"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin-settings.php:603
+#: includes/admin/class-wc-payplus-admin-settings.php:612
 msgid "None"
 msgstr "ללא"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:612
-#: includes/admin/class-wc-payplus-admin-settings.php:678
+#: includes/admin/class-wc-payplus-admin-settings.php:621
+#: includes/admin/class-wc-payplus-admin-settings.php:687
 msgid "Select tax rate"
 msgstr "בחר שיעור מס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:634
+#: includes/admin/class-wc-payplus-admin-settings.php:643
 msgid "Language of the page"
 msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
@@ -1134,7 +1148,7 @@ msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
 #: includes/admin/class-wc-payplus-admin.php:2360
-#: payplus-payment-gateway.php:557
+#: payplus-payment-gateway.php:559
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
@@ -1152,7 +1166,7 @@ msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:431
 #: includes/blocks/class-wc-payplus-blocks-support.php:433
-#: includes/wc_payplus_gateway.php:1401 payplus-payment-gateway.php:1181
+#: includes/wc_payplus_gateway.php:1401 payplus-payment-gateway.php:1184
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1745,7 +1759,7 @@ msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
 #: includes/class-wc-payplus-hosted-fields.php:104
-#: includes/wc_payplus_gateway.php:1351 payplus-payment-gateway.php:718
+#: includes/wc_payplus_gateway.php:1351 payplus-payment-gateway.php:720
 msgid "Save credit card in my account"
 msgstr "שמור את כרטיס האשראי בחשבון שלי"
 
@@ -2285,7 +2299,7 @@ msgstr ""
 msgid "Invalid order ID"
 msgstr "תעודת זהות בעל הכרטיס"
 
-#: payplus-payment-gateway.php:115
+#: payplus-payment-gateway.php:117
 msgid ""
 "<strong style=\"font-size: 1.2em;\">Dear Customers,</strong><br><br>\n"
 "\n"
@@ -2312,7 +2326,7 @@ msgstr ""
 "        תודה,<br>\n"
 "        <strong>צוות PayPlus</strong></span>"
 
-#: payplus-payment-gateway.php:252
+#: payplus-payment-gateway.php:254
 #, fuzzy
 #| msgid ""
 #| "Sandbox mode is active and real transaction cannot be processed. Please "
@@ -2325,7 +2339,7 @@ msgstr ""
 "שים לב: מצב Sandbox פעיל ועסקאות אמיתיות לא יסלקו. אנא וודא להוריד סימון "
 "בתוסף לאחר סיום הבדיקות"
 
-#: payplus-payment-gateway.php:258
+#: payplus-payment-gateway.php:260
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2337,11 +2351,11 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:441
+#: payplus-payment-gateway.php:443
 msgid "Four last digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: payplus-payment-gateway.php:501
+#: payplus-payment-gateway.php:503
 msgid ""
 "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" "
 "target=\"_blank\">WooCommerce</a> to be activated."
@@ -2350,14 +2364,14 @@ msgstr ""
 "target=\"_blank\">WooCommerce</a> ונדרש שיהיה פעיל."
 
 #. translators: %1$s: Current PHP version, %2$s: Required PHP version
-#: payplus-payment-gateway.php:514
+#: payplus-payment-gateway.php:516
 #, php-format
 msgid ""
 "Your server is running PHP version %1$s but some features require at least "
 "%2$s."
 msgstr ""
 
-#: payplus-payment-gateway.php:522
+#: payplus-payment-gateway.php:524
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2368,29 +2382,29 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:575
+#: payplus-payment-gateway.php:577
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:886 payplus-payment-gateway.php:905
+#: payplus-payment-gateway.php:889 payplus-payment-gateway.php:908
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:924
+#: payplus-payment-gateway.php:927
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:947 payplus-payment-gateway.php:964
+#: payplus-payment-gateway.php:950 payplus-payment-gateway.php:967
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1146 payplus-payment-gateway.php:1154
+#: payplus-payment-gateway.php:1149 payplus-payment-gateway.php:1157
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1169
+#: payplus-payment-gateway.php:1172
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
@@ -2453,6 +2467,9 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Shipping according to Woocommerce Via JS"
+#~ msgstr "שילוח לפי הגדרות ווקומרס -מבוסס JS (רק לצ'קאאוט קלאסי)"
 
 #, fuzzy
 #~| msgid ""

@@ -464,7 +464,7 @@ function formattedShipping(countryCode, total, withTax = false) {
   let shippingWoo =
     document.getElementById("payplus_shipping_woo").value === "true";
   if (shippingWoo) {
-    allShipping = newPpShippingMethods; //document.getElementById("payplus_shipping").value;
+    allShipping = document.getElementById("payplus_shipping").value;
     allShipping = JSON.parse(allShipping);
     correctShipping(allShipping, Number(total), countryCode);
   } else {
@@ -484,6 +484,9 @@ function formattedShipping(countryCode, total, withTax = false) {
         },
       ],
     };
+  }
+  if(payplus_script.isShippingWooJs){
+    allShipping = newPpShippingMethods;
   }
 
   let newShippingOptionsForApple = [];
@@ -742,14 +745,13 @@ window.addEventListener("message", async function (event) {
       let shippingWoo =
         document.getElementById("payplus_shipping_woo").value === "true";
       if (shippingWoo) {
-        shipping = newPpShippingMethods;///document.getElementById("payplus_shipping");
-        if (shipping) {
-          // const encodedJson = shipping.value;
-          // const tempElement = document.createElement("textarea");
-          // tempElement.innerHTML = encodedJson;
-          // const decodedJson = tempElement.value;
-          shipping = newPpShippingMethods;
-          shipping = correctShipping(shipping, calc);
+        shipping = document.getElementById("payplus_shipping");
+        if (shipping.value) {
+          const encodedJson = shipping.value;
+          const tempElement = document.createElement("textarea");
+          tempElement.innerHTML = encodedJson;
+          const decodedJson = tempElement.value;
+          shipping = JSON.parse(decodedJson);
         } else {
           shipping = {
             all: [
@@ -779,6 +781,9 @@ window.addEventListener("message", async function (event) {
             },
           ],
         };
+      }
+      if(payplus_script.isShippingWooJs){
+        shipping = newPpShippingMethods;
       }
       if (window.location.host == "localhost") {
         displayMsgError(textError + "You cannot use a local server");

@@ -38,6 +38,7 @@ class WC_PayPlus
     public $hostedFieldsOptions;
     private $isHostedInitiated = false;
     public $secret_key;
+    public $shipping_woo_js;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -53,6 +54,7 @@ class WC_PayPlus
     {
         //ACTION
         $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->shipping_woo_js = property_exists($this->payplus_payment_gateway_settings, 'shipping_woo_js') && $this->payplus_payment_gateway_settings->shipping_woo_js === "yes" ? true : false;
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->isApplePayGateWayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
@@ -751,6 +753,7 @@ class WC_PayPlus
                                     "payment_url_google_pay_iframe" => $payment_url_google_pay_iframe,
                                     'ajax_url' => admin_url('admin-ajax.php'),
                                     'frontNonce' => wp_create_nonce('frontNonce'),
+                                    'isShippingWooJs' => $this->shipping_woo_js,
                                 ]
                             );
                             wp_enqueue_script('payplus-front-js');

@@ -573,6 +573,15 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'checkbox'
                 ];
                 $settings[$section][] = array(
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[shipping_woo_js]',
+                    'name' => __('Shipping according to Woocommerce Via JS - Overrides all next settings', 'payplus-payment-gateway'),
+                    'desc' => __('Same as what you see in classic checkout.(THIS OVERRIDES ALL OTHER SHIPPINGS SETTINGS! - AND IS FOR CLASSIC CHECKOUT!)', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'class' => 'shipping_woo_js',
+                    'label' => 'JS Shipping',
+
+                );
+                $settings[$section][] = array(
                     'id' => 'woocommerce_payplus-payment-gateway_settings[shipping_woo]',
                     'name' => __('Shipping according to Woocommerce settings', 'payplus-payment-gateway'),
                     'desc' => __('<br>Countries (Continents not supported):
