@@ -593,6 +593,9 @@ jQuery(function ($) {
                                 multiPassIcons(loopImages);
                             }
                             $(key).unblock();
+                            if (typeof newPpShippingMethods !== "undefined") {
+                                createNewShippingMethods ();
+                            }
                         });
                         if (payplus_script_checkout.isHostedFields) {
                             putHostedFields(inputPayPlus, hostedIsMain);

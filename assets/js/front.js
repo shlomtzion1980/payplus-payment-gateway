@@ -8,6 +8,49 @@ window.addEventListener("load", function () {
   }
 });
 
+
+let newPpShippingMethods = {};
+
+
+async function createNewShippingMethods () {  
+    newPpShippingMethods.all = [];
+    jQuery('#shipping_method li').each(function() {
+        const input = jQuery(this).find('input');
+        const label = jQuery(this).find('label');
+        const bdi = label.find('bdi');
+        // Extract ID from input
+        const inputId = input.attr('id');
+        const id = inputId ? parseInt(inputId.replace(/\D/g, '')) : null;
+        
+        // Extract title (remove cost part if exists)
+        let title = label.clone()    // Clone to avoid modifying original
+            .children()              // Get all children
+            .remove()               // Remove them
+            .end()                 // Go back to label
+            .text()                // Get text
+            .trim()               // Remove whitespace
+            .replace(':', '');    // Remove colon
+        
+        // Extract cost
+        let cost = '0.00';
+        if (bdi.length) {
+            cost = bdi.text()
+                .replace(/[₪$€£]/g, '')  // Remove currency symbols
+                .trim();
+        }
+        
+        newPpShippingMethods.all.push({
+            id: id,
+            title: title,
+            cost_without_tax: cost,
+            cost_with_tax: cost  // Since we're not calculating tax
+        });
+    });
+    
+  return newPpShippingMethods;
+}
+
+createNewShippingMethods();
 const googleButton = document.getElementById("googlePayButton");
 const appleButton1 = document.getElementById("applePayButton");
 let productID = googleButton
@@ -421,7 +464,7 @@ function formattedShipping(countryCode, total, withTax = false) {
   let shippingWoo =
     document.getElementById("payplus_shipping_woo").value === "true";
   if (shippingWoo) {
-    allShipping = document.getElementById("payplus_shipping").value;
+    allShipping = newPpShippingMethods; //document.getElementById("payplus_shipping").value;
     allShipping = JSON.parse(allShipping);
     correctShipping(allShipping, Number(total), countryCode);
   } else {
@@ -602,6 +645,7 @@ function checkArrayType(product) {
   }
 }
 
+
 window.addEventListener("message", async function (event) {
   let paymentData = event.data;
   const senderOrigin = event.origin;
@@ -698,13 +742,13 @@ window.addEventListener("message", async function (event) {
       let shippingWoo =
         document.getElementById("payplus_shipping_woo").value === "true";
       if (shippingWoo) {
-        shipping = document.getElementById("payplus_shipping");
-        if (shipping.value) {
-          const encodedJson = shipping.value;
-          const tempElement = document.createElement("textarea");
-          tempElement.innerHTML = encodedJson;
-          const decodedJson = tempElement.value;
-          shipping = JSON.parse(decodedJson);
+        shipping = newPpShippingMethods;///document.getElementById("payplus_shipping");
+        if (shipping) {
+          // const encodedJson = shipping.value;
+          // const tempElement = document.createElement("textarea");
+          // tempElement.innerHTML = encodedJson;
+          // const decodedJson = tempElement.value;
+          shipping = newPpShippingMethods;
           shipping = correctShipping(shipping, calc);
         } else {
           shipping = {
