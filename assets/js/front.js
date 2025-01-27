@@ -46,7 +46,6 @@ async function createNewShippingMethods() {
             cost_with_tax: cost, // Since we're not calculating tax
         });
     });
-    console.log(newPpShippingMethods);
     return newPpShippingMethods;
 }
 
