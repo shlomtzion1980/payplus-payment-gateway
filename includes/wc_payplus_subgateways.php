@@ -24,6 +24,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->hide_icon == "no") {
             $this->icon = PAYPLUS_PLUGIN_URL . $this->iconURL;
         }
+        $this->method_title = ''; // Set empty title to remove default
 
         $this->allPayment = array(
             __('Pay with bit via PayPlus', 'payplus-payment-gateway'),
@@ -66,13 +67,75 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     }
 
     /**
-     * Get the icon HTML with inline styles
+     * Override get_title to return empty string
      */
+    public function get_title()
+    {
+        return '';
+    }
+
     public function get_icon()
     {
+        if ($this->hide_icon == "yes") {
+            return '';
+        }
+
         $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
-        $style = 'max-width: 32px; max-height: 32px;'; // Example inline style
-        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+
+        // Define styles
+        $site_language = get_bloginfo('language');
+
+        $icon_style = 'margin-right: 0px;max-width: 64px; max-height: 32px; top: 10px;';
+        if ($site_language !== 'he-IL') {
+            $icon_style = 'margin-left: 0px;max-width: 64px; max-height: 32px; top: 10px;';
+        }
+        $label_style = 'display: inline-flex; align-items: center; gap: 8px;';
+        $text_style = 'margin-top: 17px;';
+
+        // Prepare icon and text elements
+        switch ($this->method_title_text) {
+            case 'PayPlus - bit':
+                $methodTitleText = esc_html__('PayPlus - bit', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Google Pay':
+                $methodTitleText = esc_html__('PayPlus - Google Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Apple Pay':
+                $methodTitleText = esc_html__('PayPlus - Apple Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - MULTIPASS':
+                $methodTitleText = esc_html__('PayPlus - MULTIPASS', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Tav Zahav':
+                $methodTitleText = esc_html__('PayPlus - Tav Zahav', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - finitiOne':
+                $methodTitleText = esc_html__('PayPlus - finitiOne', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Valuecard':
+                $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Embedded':
+                $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
+                break;
+        }
+        $icon = sprintf(
+            '<span style="%s"><img src="%s" alt="%s" style="%s"> <span style="%s">%s</span></span>',
+            esc_attr($label_style),
+            esc_url($icon_url),
+            esc_attr($methodTitleText),
+            esc_attr($icon_style),
+            esc_attr($text_style),
+            esc_html($methodTitleText)
+        );
+
+        return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
     }
 
     /**
@@ -484,13 +547,42 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     }
 
     /**
-     * Get the icon HTML with inline styles
+     * Override get_title to return empty string
      */
+    public function get_title()
+    {
+        return '';
+    }
+
     public function get_icon()
     {
+        if ($this->hide_icon == "yes") {
+            return '';
+        }
+
         $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
-        $style = 'max-width: 64px; max-height: 32px;'; // Example inline style
-        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+        $site_language = get_bloginfo('language');
+
+        // Define styles
+        $icon_style = 'margin-right: 0px;max-width: 64px; max-height: 32px; top: 10px;';
+        if ($site_language !== 'he-IL') {
+            $icon_style = 'margin-left: 0px;max-width: 64px; max-height: 32px; top: 10px;';
+        }
+        $label_style = 'display: inline-flex; align-items: center; gap: 8px;';
+        $text_style = 'margin-top: 17px;';
+
+        // Prepare icon and text elements
+        $icon = sprintf(
+            '<span style="%s"><img src="%s" alt="%s" style="%s"> <span style="%s">%s</span></span>',
+            esc_attr($label_style),
+            esc_url($icon_url),
+            esc_attr($this->method_title_text),
+            esc_attr($icon_style),
+            esc_attr($text_style),
+            esc_html($this->pay_with_text)
+        );
+
+        return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
     }
 
     public function regenerateHostedLink()
