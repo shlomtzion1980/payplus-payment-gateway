@@ -9,7 +9,6 @@ window.addEventListener("load", function () {
 });
 
 let newPpShippingMethods = {};
-
 async function createNewShippingMethods() {
     newPpShippingMethods.all = [];
     jQuery("#shipping_method li").each(function () {
@@ -49,7 +48,10 @@ async function createNewShippingMethods() {
     return newPpShippingMethods;
 }
 
-createNewShippingMethods();
+if (payplus_script.isShippingWooJs) {
+    createNewShippingMethods();
+}
+
 const googleButton = document.getElementById("googlePayButton");
 const appleButton1 = document.getElementById("applePayButton");
 let productID = googleButton
