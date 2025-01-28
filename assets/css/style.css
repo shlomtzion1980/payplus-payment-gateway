@@ -282,6 +282,9 @@ body #applePayButton {
 
     body .alertify .ajs-dialog {
         margin: 0 auto;
+        .ajs-commands {
+            top: 0 !important;
+        }
     }
 }
 
