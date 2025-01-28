@@ -2441,7 +2441,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             } else {
                 $this->payplus_add_log_all(
                     'payplus_callback_secured',
-                    $payPlusResponse
+                    "PayPlus Response: $payPlusResponse"
                 );
             }
 
