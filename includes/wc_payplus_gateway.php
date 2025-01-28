@@ -2428,6 +2428,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             if ($order->get_status() === "pending") {
                 if ($status_code === "000") {
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false);
+                }
+            }
+
+            if ($order->get_status() === "pending") {
+                if ($status_code === "000") {
                     if ($response['transaction_type'] == "Charge") {
                         if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
                             WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
