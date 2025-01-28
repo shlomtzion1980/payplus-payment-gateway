@@ -93,21 +93,6 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $text_style = 'margin-top: 17px;';
 
         // Prepare icon and text elements
-        $icon = sprintf(
-            '<span style="%s"><img src="%s" alt="%s" style="%s"> <span style="%s">%s</span></span>',
-            esc_attr($label_style),
-            esc_url($icon_url),
-            esc_attr($this->methodTitleText()),
-            esc_attr($icon_style),
-            esc_attr($text_style),
-            esc_html($this->methodTitleText())
-        );
-
-        return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
-    }
-
-    public function methodTitleText()
-    {
         switch ($this->method_title_text) {
             case 'PayPlus - bit':
                 $methodTitleText = esc_html__('PayPlus - bit', 'payplus-payment-gateway');
@@ -140,7 +125,17 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
                 break;
         }
-        return $methodTitleText;
+        $icon = sprintf(
+            '<span style="%s"><img src="%s" alt="%s" style="%s"> <span style="%s">%s</span></span>',
+            esc_attr($label_style),
+            esc_url($icon_url),
+            esc_attr($methodTitleText),
+            esc_attr($icon_style),
+            esc_attr($text_style),
+            esc_html($methodTitleText)
+        );
+
+        return apply_filters('woocommerce_gateway_icon', $icon, $this->id);
     }
 
     /**
@@ -148,7 +143,39 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
      */
     public function init_form_fields()
     {
-        $methodTitleText = $this->methodTitleText();
+        $methodTitleText = "";
+        switch ($this->method_title_text) {
+            case 'PayPlus - bit':
+                $methodTitleText = esc_html__('PayPlus - bit', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Google Pay':
+                $methodTitleText = esc_html__('PayPlus - Google Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Apple Pay':
+                $methodTitleText = esc_html__('PayPlus - Apple Pay', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - MULTIPASS':
+                $methodTitleText = esc_html__('PayPlus - MULTIPASS', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Tav Zahav':
+                $methodTitleText = esc_html__('PayPlus - Tav Zahav', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - finitiOne':
+                $methodTitleText = esc_html__('PayPlus - finitiOne', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - PayPal':
+                $methodTitleText = esc_html__('PayPlus - PayPal', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Valuecard':
+                $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Embedded':
+                $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
+                break;
+        }
         $payWithText = '';
         switch ($this->pay_with_text) {
             case 'Pay with bit':
