@@ -22,7 +22,6 @@ define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
 define('PAYPLUS_VERSION', '7.5.3');
 define('PAYPLUS_VERSION_DB', 'payplus_5_2');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
-
 class WC_PayPlus
 {
     protected static $instance = null;
