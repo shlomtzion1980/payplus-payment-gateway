@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.3] - 27-01-2025 - (Beer)
+
+- Added - Support for Express Checkout shipping in the classic checkout, consistent with the WooCommerce checkout page.
+
 ## [7.5.2] - 20-01-2025 - (Beru)
 
 - Added - Option to show or hide the "Place Order" button within the PayPlus Embedded form.
