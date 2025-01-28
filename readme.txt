@@ -86,6 +86,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.5.4 - 28-01-2025 =
+
+- Tweak - Adjusted the CSS for the popup iframe close button's top position on iPhones.
+
 = 7.5.3 - 27-01-2025 =
 
 - Added - Support for Express Checkout shipping in the classic checkout, consistent with the WooCommerce checkout page.

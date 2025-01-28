@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.4] - 28-01-2025 - (Asta)
+
+- Tweak - Adjusted the CSS for the popup iframe close button's top position on iPhones.
+
 ## [7.5.3] - 27-01-2025 - (Beer)
 
 - Added - Support for Express Checkout shipping in the classic checkout, consistent with the WooCommerce checkout page.
