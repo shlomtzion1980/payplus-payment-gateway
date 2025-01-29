@@ -672,7 +672,7 @@ jQuery(function ($) {
                                     "#payment > ul > li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields > div.pp_iframe_h > div"
                                 ).style.display = "block";
                             }
-                        }, 3000);
+                        }, 2000);
 
                         var $paymentMethod = jQuery("#" + inputPayPlus);
 
