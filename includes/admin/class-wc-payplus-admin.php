@@ -325,31 +325,32 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 esc_html($order->get_total())
             );
 
-            $responseArray = [
-                'payplus_response' => wp_json_encode($responseBody['data']),
-                'payplus_transaction_uid' => esc_html($responseBody['data']['transaction_uid']),
-                'payplus_type' => esc_html($responseBody['data']['type']),
-                'payplus_brand_name' => esc_html($responseBody['data']['brand_name']),
-                'payplus_method' => esc_html($responseBody['data']['method']),
-                'payplus_number' => esc_html($responseBody['data']['number']),
-                'payplus_number_of_payments' => esc_html($responseBody['data']['number_of_payments']),
-                'payplus_clearing_name' => esc_html($responseBody['data']['clearing_name']),
-                'payplus_credit_terms' => esc_html($responseBody['data']['credit_terms']),
-                'payplus_credit-card' => esc_html($responseBody['data']['amount']),
-                'payplus_customer_name' => esc_html($responseBody['data']['customer_name']),
-                'payplus_expiry_month' => esc_html($responseBody['data']['expiry_month']),
-                'payplus_expiry_year' => esc_html($responseBody['data']['expiry_year']),
-                'payplus_four_digits' => esc_html($responseBody['data']['four_digits']),
-                'payplus_issuer_id' => esc_html($responseBody['data']['issuer_id']),
-                'payplus_issuer_name' => esc_html($responseBody['data']['issuer_name']),
-                'payplus_more_info' => esc_html($responseBody['data']['more_info']),
-                'payplus_secure3D_tracking' => esc_html($responseBody['data']['secure3D_tracking']),
-                'payplus_status' => esc_html($responseBody['data']['status']),
-                'payplus_status_code' => esc_html($responseBody['data']['status_code']),
-                'payplus_status_description' => esc_html($responseBody['data']['status_description']),
-                'payplus_token_uid' => esc_html($responseBody['data']['token_uid']),
-                'payplus_voucher_num' => esc_html($responseBody['data']['voucher_num'])
-            ];
+            $responseArray = [];
+            if (isset($responseBody['data'])) {
+                $responseArray['payplus_response'] = wp_json_encode($responseBody['data']);
+                if (isset($responseBody['data']['transaction_uid'])) $responseArray['payplus_transaction_uid'] = esc_html($responseBody['data']['transaction_uid']);
+                if (isset($responseBody['data']['type'])) $responseArray['payplus_type'] = esc_html($responseBody['data']['type']);
+                if (isset($responseBody['data']['brand_name'])) $responseArray['payplus_brand_name'] = esc_html($responseBody['data']['brand_name']);
+                if (isset($responseBody['data']['method'])) $responseArray['payplus_method'] = esc_html($responseBody['data']['method']);
+                if (isset($responseBody['data']['number'])) $responseArray['payplus_number'] = esc_html($responseBody['data']['number']);
+                if (isset($responseBody['data']['number_of_payments'])) $responseArray['payplus_number_of_payments'] = esc_html($responseBody['data']['number_of_payments']);
+                if (isset($responseBody['data']['clearing_name'])) $responseArray['payplus_clearing_name'] = esc_html($responseBody['data']['clearing_name']);
+                if (isset($responseBody['data']['credit_terms'])) $responseArray['payplus_credit_terms'] = esc_html($responseBody['data']['credit_terms']);
+                if (isset($responseBody['data']['amount'])) $responseArray['payplus_credit-card'] = esc_html($responseBody['data']['amount']);
+                if (isset($responseBody['data']['customer_name'])) $responseArray['payplus_customer_name'] = esc_html($responseBody['data']['customer_name']);
+                if (isset($responseBody['data']['expiry_month'])) $responseArray['payplus_expiry_month'] = esc_html($responseBody['data']['expiry_month']);
+                if (isset($responseBody['data']['expiry_year'])) $responseArray['payplus_expiry_year'] = esc_html($responseBody['data']['expiry_year']);
+                if (isset($responseBody['data']['four_digits'])) $responseArray['payplus_four_digits'] = esc_html($responseBody['data']['four_digits']);
+                if (isset($responseBody['data']['issuer_id'])) $responseArray['payplus_issuer_id'] = esc_html($responseBody['data']['issuer_id']);
+                if (isset($responseBody['data']['issuer_name'])) $responseArray['payplus_issuer_name'] = esc_html($responseBody['data']['issuer_name']);
+                if (isset($responseBody['data']['more_info'])) $responseArray['payplus_more_info'] = esc_html($responseBody['data']['more_info']);
+                if (isset($responseBody['data']['secure3D_tracking'])) $responseArray['payplus_secure3D_tracking'] = esc_html($responseBody['data']['secure3D_tracking']);
+                if (isset($responseBody['data']['status'])) $responseArray['payplus_status'] = esc_html($responseBody['data']['status']);
+                if (isset($responseBody['data']['status_code'])) $responseArray['payplus_status_code'] = esc_html($responseBody['data']['status_code']);
+                if (isset($responseBody['data']['status_description'])) $responseArray['payplus_status_description'] = esc_html($responseBody['data']['status_description']);
+                if (isset($responseBody['data']['token_uid'])) $responseArray['payplus_token_uid'] = esc_html($responseBody['data']['token_uid']);
+                if (isset($responseBody['data']['voucher_num'])) $responseArray['payplus_voucher_num'] = esc_html($responseBody['data']['voucher_num']);
+            }
 
             $responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000" ? WC_PayPlus_Meta_Data::update_meta($order, $responseArray) : $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
 
