@@ -594,7 +594,7 @@ jQuery(function ($) {
                             }
                             $(key).unblock();
                             if (typeof newPpShippingMethods !== "undefined") {
-                                createNewShippingMethods ();
+                                createNewShippingMethods();
                             }
                         });
                         if (payplus_script_checkout.isHostedFields) {
@@ -901,33 +901,14 @@ jQuery(function ($) {
                                         hostedPayload.more_info &&
                                         !isNaN(hostedPayload.more_info)
                                     ) {
-                                        // console.log(hostedPayload);
-                                        let totalElement =
-                                            document.querySelector(
-                                                "#order_review > table > tfoot > tr.order-total > td > strong > span > bdi"
-                                            );
-                                        if (totalElement) {
-                                            let totalText =
-                                                totalElement.innerText;
-                                            let totalAmount = totalText.replace(
-                                                /[^0-9.]/g,
-                                                ""
-                                            );
-                                            //   console.log(totalAmount);
-                                            if (
-                                                Number(hostedPayload.amount) ===
-                                                Number(totalAmount)
-                                            ) {
-                                                overlay();
-                                                jQuery(
-                                                    ".blocks-payplus_loader_hosted"
-                                                ).fadeIn();
-                                                wc_checkout_form.$checkout_form
-                                                    .removeClass("processing")
-                                                    .unblock();
-                                                hf.SubmitPayment();
-                                            }
-                                        }
+                                        overlay();
+                                        jQuery(
+                                            ".blocks-payplus_loader_hosted"
+                                        ).fadeIn();
+                                        wc_checkout_form.$checkout_form
+                                            .removeClass("processing")
+                                            .unblock();
+                                        hf.SubmitPayment();
                                     } else {
                                         window.onbeforeunload = null; // If `onbeforeunload` is set directly
                                         window.removeEventListener(
