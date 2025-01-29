@@ -53,6 +53,11 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             padding: 15px;
             max-height: 62px;
 
+            @media screen and (max-width: 553px) {
+                flex-wrap: wrap;
+                max-height: unset;
+            }
+
             .topText {
                 color: #000000;
                 font-size: 16px;
@@ -61,6 +66,13 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             .creditCards {
                 img {
                     max-height: 60px;
+                }
+
+                @media screen and (max-width: 553px) {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    align-items: center;
                 }
             }
         }
@@ -86,6 +98,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             margin-right: auto !important;
             border-radius: 8px;
             width: 90%;
+            color: #fff;
+            background-color: #000000;
         }
 
         .expiry-wrapper {

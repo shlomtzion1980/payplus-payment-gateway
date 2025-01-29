@@ -1334,7 +1334,7 @@ jQuery(function ($) {
             var $hostedDiv = $("<div></div>", {
                 class: "payplus-checkout-image-container", // Optional: Add a class to the div
                 id: "payplus-checkout-image-div", // Optional: Add an ID to the div
-                style: "display: flex;",
+                style: "display: flex;flex-wrap: wrap;justify-content: center;", // Optional: Add inline styles
             });
             $.each(
                 payplus_script_checkout.customIcons,
