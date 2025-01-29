@@ -889,12 +889,15 @@ class PayplusInvoice
 
             if ($payingVatAllOrder) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-included';
+                $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'vat_type_code: Doing PayingVatAllOrder');
             }
             if ($changevatInEilat) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-exempt';
+                $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'vat_type_code: Doing changevatInEilat');
             }
             if ($OtherVatCountry) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-exempt';
+                $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'vat_type_code: Doing OTHER COUNTRY VAT');
             }
         }
         return $productsItems;
