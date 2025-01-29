@@ -2425,10 +2425,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             );
 
             $transactionUid = sanitize_text_field($response['transaction']['uid']);
-            $isMultiple = sanitize_text_field($response['transaction']['is_multiple']);
             $status_code = sanitize_text_field($response['transaction']['status_code']);
 
-            if (!$isMultiple && empty($payPlusResponse)) {
+            if (empty($payPlusResponse)) {
                 if ($status_code === "000") {
                     $this->payplus_add_log_all(
                         'payplus_callback_secured',
@@ -2436,13 +2435,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     );
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false);
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false, false);
                 }
-            } else {
-                $this->payplus_add_log_all(
-                    'payplus_callback_secured',
-                    "PayPlus Response: $payPlusResponse"
-                );
             }
 
             $this->payplus_add_log_all(

@@ -256,7 +256,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      * @param $order
      * @return void
      */
-    public function payplusIpn($order_id = null, $_wpnonce = null, $saveToken = false, $isHostedPayment = false)
+    public function payplusIpn($order_id = null, $_wpnonce = null, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true)
     {
 
         $this->isInitiated();
@@ -278,13 +278,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
-
-
         $url = $this->ipn_url;
 
         $payload['payment_request_uid'] = $payment_request_uid;
 
         $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
+
         $args = array(
             'body' => wp_json_encode($payload),
             'timeout' => '60',
@@ -356,27 +355,29 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $transactionUid = $responseBody['data']['transaction_uid'];
 
-            if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
-                if ($responseBody['data']['type'] === 'Charge') {
-                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
-                    $order->update_status('wc-processing');
-                    if ($this->saveOrderNote) {
-                        $order->add_order_note(
-                            $successNote
-                        );
+            if ($allowUpdateStatuses) {
+                if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
+                    if ($responseBody['data']['type'] === 'Charge') {
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
+                        $order->update_status('wc-processing');
+                        if ($this->saveOrderNote) {
+                            $order->add_order_note(
+                                $successNote
+                            );
+                        }
+                    } elseif ($responseBody['data']['type'] === 'Approval') {
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
+                        $order->update_status('wc-on-hold');
+                        if ($this->saveOrderNote) {
+                            $order->add_order_note(
+                                $successNote
+                            );
+                        }
                     }
-                } elseif ($responseBody['data']['type'] === 'Approval') {
-                    WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
-                    $order->update_status('wc-on-hold');
-                    if ($this->saveOrderNote) {
-                        $order->add_order_note(
-                            $successNote
-                        );
+                    if ($this->create_pp_token && $isHostedPayment && $saveToken) {
+                        $user_id = $order->get_user_id();
+                        $this->save_token($responseBody['data'], $user_id);
                     }
-                }
-                if ($this->create_pp_token && $isHostedPayment && $saveToken) {
-                    $user_id = $order->get_user_id();
-                    $this->save_token($responseBody['data'], $user_id);
                 }
             }
         } else {
