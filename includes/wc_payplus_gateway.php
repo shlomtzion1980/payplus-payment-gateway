@@ -423,7 +423,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
 
         $args = array(
-            'status'       => ['pending', 'cancelled', 'on-hold', 'failed'],
+            'status'       => ['pending', 'cancelled', 'failed'],
             'date_created' => $start_date . '...' . $end_date, // Correct range format for WooCommerce
             'return'       => 'ids', // Just return IDs to save memory
             'limit'        => -1, // Retrieve all orders
