@@ -167,7 +167,7 @@ class WC_PayPlus_Form_Fields
                     changed to a certain status will be synced to the IPN data.</h2>
                 <br>
 
-                <br>for example:<br>
+                <br>For example:<br>
 
                 <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
                 </p>

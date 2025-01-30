@@ -419,22 +419,24 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
         $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
 
+        echo "<pre>";
         if (isset($_GET['month'])) {
             // Get start and end dates for the given month
             $start_date = gmdate('Y-m-01 00:00:00', strtotime("$Y-$m-01"));
             $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
+            echo esc_html("Start date: $start_date\n");
+            echo esc_html("End date: $end_date\n");
+            $dateOrDates = $start_date . '...' . $end_date;
         } else {
-            $start_date = $current_time;
-            $end_date = $current_time;
+            $dateOrDates = $current_time;
+            echo esc_html("Date to check: " . substr($current_time, 0, 10) . "\n");
         }
 
-        echo "<pre>";
-        echo esc_html("Start date: $start_date\n");
-        echo esc_html("End date: $end_date\n");
+
 
         $args = array(
             'status'       => ['pending', 'cancelled', 'failed'],
-            'date_created' => $start_date . '...' . $end_date, // Correct range format for WooCommerce
+            'date_created' => $dateOrDates, // Correct range format for WooCommerce
             'return'       => 'ids', // Just return IDs to save memory
             'limit'        => -1, // Retrieve all orders
         );
