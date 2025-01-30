@@ -316,12 +316,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 <tr><td style="vertical-align:top;">Total</td><td style="vertical-align:top;">%s</td></tr>
             </table>',
                 esc_html($type_text),
-                esc_html($responseBody['data']['number']),
-                esc_html($responseBody['data']['four_digits']),
-                esc_html($responseBody['data']['expiry_month'] . "/" . $responseBody['data']['expiry_year']),
-                esc_html($responseBody['data']['voucher_num']),
-                esc_html($responseBody['data']['token_uid']),
-                esc_html($responseBody['data']['amount']),
+                isset($responseBody['data']['number']) ? esc_html($responseBody['data']['number']) : "",
+                isset($responseBody['data']['four_digits']) ? esc_html($responseBody['data']['four_digits']) : "",
+                isset($responseBody['data']['expiry_month']) && isset($responseBody['data']['expiry_year']) ? esc_html($responseBody['data']['expiry_month'] . "/" . $responseBody['data']['expiry_year']) : "",
+                isset($responseBody['data']['voucher_num']) ? esc_html($responseBody['data']['voucher_num']) : "",
+                isset($responseBody['data']['token_uid']) ? esc_html($responseBody['data']['token_uid']) : "",
+                isset($responseBody['data']['amount']) ? esc_html($responseBody['data']['amount']) : "",
                 esc_html($order->get_total())
             );
 

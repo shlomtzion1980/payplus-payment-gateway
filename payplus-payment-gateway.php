@@ -184,6 +184,7 @@ class WC_PayPlus
             'status' => ['pending', 'cancelled'],
             'date_created' => $current_time,
             'return' => 'ids', // Just return IDs to save memory
+            'limit'  => -1, // Retrieve all orders
         );
         $this->payplus_gateway = $this->get_main_payplus_gateway();
 

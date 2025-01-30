@@ -414,14 +414,22 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Extract the current hour and minute
         $current_hour = gmdate('H', strtotime($current_time));
         $current_minute = gmdate('i', strtotime($current_time));
+        $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : date('m');
+        $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : date('Y');
+
+        // Get start and end dates for the given month
+        $start_date = gmdate('Y-m-01 00:00:00', strtotime("$Y-$m-01"));
+        $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
 
         $args = array(
-            'status' => ['pending', 'cancelled'],
-            'date_created' => $current_time,
-            'return' => 'ids', // Just return IDs to save memory
+            'status'       => ['pending', 'cancelled', 'on-hold', 'failed'],
+            'date_created' => $start_date . '...' . $end_date, // Correct range format for WooCommerce
+            'return'       => 'ids', // Just return IDs to save memory
+            'limit'        => -1, // Retrieve all orders
         );
 
         $orders = array_reverse(wc_get_orders($args));
+
         if (count($orders)) {
             echo '<pre>';
             echo "The following orders were created today and are in pending status: <br>";
@@ -437,36 +445,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
-                if ($paymentPageUid && $payPlusCronTested < 5) {
-                    ++$payPlusCronTested;
+                if ($paymentPageUid) {
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
                     echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
-                    if ($order->get_status() === 'cancelled') {
-                        $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                        if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
-                            $responseStatus = json_decode($payPlusResponse, true)['status_code'];
-                            if ($responseStatus === "000") {
-                                echo esc_html("\n-=<Order: $order_id>=-\n");
-                                echo "---------------------------------------------------\n";
-                                echo "ATTENTION: The order was created and paid for succcessfully\n";
-                                echo "ATTENTION: The order was edited to cancelled manually.\n";
-                                echo "NOT Running ipn check.\n";
-                                echo "---------------------------------------------------\n";
-                                $runIpn = false;
-                            }
-                        }
-                    }
-                    if ($runIpn === true) {
-                        echo esc_html("Order #$order_id contains payment page uid - running ipn! - check order notes and status for results!");
-                        echo "\n";
-                        $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
-                        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-                        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
-                    }
-                }
-                if ($payPlusCronTested >= 3) {
-                    echo esc_html("$order_id - Was already tested at least once - payplus_cron_tested = $payPlusCronTested.\n");
+                    echo esc_html("Order #$order_id contains payment page uid - running ipn! - check order notes and status for results!");
+                    echo "\n";
+                    $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                } else {
+                    echo esc_html("Order #$order_id does not contain payment page uid! - skipping ipn!\n");
                 }
             }
         } else {
