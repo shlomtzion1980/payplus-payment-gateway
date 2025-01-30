@@ -137,9 +137,34 @@ class WC_PayPlus_Form_Fields
         if (current_user_can('edit_shop_orders')) {
             $nonce = wp_create_nonce('payPlusOrderChecker');
 ?>
-            <form method="post" action="">
-                <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-            </form>
+            <div class="wrap">
+                <h1>PayPlus Orders Validator</h1>
+                <p>Click the button below to run the PayPlus Orders Validator.</p>
+                <p>
+                    This will check all orders created within the last day are in "pending", "failed" or "cancelled" status and
+                    contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.
+                </p>
+                <h3>Click the button to run default process.</h3>
+                <p>
+                    To run with special options … add to the url :
+                    <br>
+                    query parameters allowed:
+                    <br>
+                    month - number 1 to 12
+                    <br>
+                    year - number
+                    <br>
+                    forceInvoice - boolean - true or false - will run ipn even if the response from payplus in the order exists and
+                    has a status of success.
+
+                    <br>for example:<br>
+
+                    <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
+                </p>
+                <form method="post" action="">
+                    <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+                </form>
+            </div>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing

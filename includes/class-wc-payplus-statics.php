@@ -583,6 +583,7 @@ class WC_PayPlus_Statics
          */
         public static function payPlusRemote($url, $payload = [], $method = "post")
         {
+            is_array($payload) ? $payload = wp_json_encode($payload) : $payload;
             $options   = get_option('woocommerce_payplus-payment-gateway_settings');
             $testMode  = boolval($options['api_test_mode'] === 'yes');
             $apiKey    = $testMode === true ? $options['dev_api_key'] : $options['api_key'];

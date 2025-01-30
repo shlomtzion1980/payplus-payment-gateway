@@ -414,8 +414,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Extract the current hour and minute
         $current_hour = gmdate('H', strtotime($current_time));
         $current_minute = gmdate('i', strtotime($current_time));
-        $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : date('m');
-        $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : date('Y');
+        $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : gmdate('m');
+        $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
 
         // Get start and end dates for the given month
@@ -451,27 +451,31 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
                     if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
                         $responseStatus = json_decode($payPlusResponse, true)['status_code'];
-                        if ($responseStatus === "000") {
+                        if ($responseStatus === "000" && !$forceInvoice) {
                             $runIpn = false;
-                            echo esc_html("Order #$order_id contains payment page uid! and has an a payplus response with success! - skipping ipn!\n");
+                            echo esc_html("Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!\n");
                         }
-                    }
-                    $forceInvoice ? $runIpn = true : null;
-                    if ($hasInvoice) {
-                        $runIpn = false;
-                        echo esc_html("Order #$order_id contains payment page uid! and has an invoice! - skipping ipn!\n");
+                    } else {
+                        $forceInvoice ? $runIpn = true : null;
+                        if ($hasInvoice) {
+                            $runIpn = false;
+                            echo esc_html("Order #$order_id contains payment page uid! and has an invoice! - SKIPPING IPN!\n");
+                        }
                     }
                     if ($runIpn) {
                         echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
-                        echo esc_html("Order #$order_id contains payment page uid - running ipn! - check order notes and status for results!");
+                        echo esc_html("Order #$order_id - RUNNING IPN! - Check order notes and status for results!");
                         echo "\n";
                         $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                        $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true);
+                        if ($ipnResponse) {
+                            echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                        }
                     }
                 } else {
-                    echo esc_html("Order #$order_id does not contain payment page uid! - skipping ipn!\n");
+                    echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING IPN!\n");
                 }
             }
         } else {

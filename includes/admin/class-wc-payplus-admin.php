@@ -254,9 +254,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
     /**
      * @param $order
-     * @return void
+     * @return void/bool
      */
-    public function payplusIpn($order_id = null, $_wpnonce = null, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true)
+    public function payplusIpn($order_id = null, $_wpnonce = null, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = false)
     {
 
         $this->isInitiated();
@@ -357,10 +357,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $transactionUid = $responseBody['data']['transaction_uid'];
 
             if ($allowUpdateStatuses) {
+                $status = "";
                 if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
                     if ($responseBody['data']['type'] === 'Charge') {
                         WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
                         $order->update_status('wc-processing');
+                        $status = 'processing';
                         if ($this->saveOrderNote) {
                             $order->add_order_note(
                                 $successNote
@@ -369,6 +371,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     } elseif ($responseBody['data']['type'] === 'Approval') {
                         WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
                         $order->update_status('wc-on-hold');
+                        $status = 'on-hold';
                         if ($this->saveOrderNote) {
                             $order->add_order_note(
                                 $successNote
@@ -384,6 +387,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         } else {
             $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
             $order->add_order_note('PayPlus IPN: ' . $note);
+        }
+        if ($allowReturn) {
+            return $status;
         }
     }
 
