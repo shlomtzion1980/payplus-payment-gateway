@@ -418,9 +418,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
 
-        // Get start and end dates for the given month
-        $start_date = gmdate('Y-m-01 00:00:00', strtotime("$Y-$m-01"));
-        $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
+        if (isset($_GET['month'])) {
+            // Get start and end dates for the given month
+            $start_date = gmdate('Y-m-01 00:00:00', strtotime("$Y-$m-01"));
+            $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
+        } else {
+            $start_date = $current_time;
+            $end_date = $current_time;
+        }
+
+        echo "<pre>";
+        echo "Start date: $start_date\n";
+        echo "End date: $end_date\n";
 
         $args = array(
             'status'       => ['pending', 'cancelled', 'failed'],
@@ -432,8 +441,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $orders = array_reverse(wc_get_orders($args));
 
         if (count($orders)) {
-            echo '<pre>';
-            echo "The following orders were created today and are in pending status: <br>";
+            echo "\nThe following orders will be processed: <br>";
             echo "(This will not cancel the scheduled cron event)<br><br>";
             echo "Orders: ";
             echo esc_html(implode(",", $orders)) . "<br></br>";

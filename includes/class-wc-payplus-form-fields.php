@@ -144,7 +144,6 @@ class WC_PayPlus_Form_Fields
                     This will check all orders created within the last day are in "pending", "failed" or "cancelled" status and
                     contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.
                 </p>
-                <h3>Click the button to run default process.</h3>
                 <p>
                     To run with special options … add to the url :
                     <br>
@@ -155,12 +154,13 @@ class WC_PayPlus_Form_Fields
                     year - number
                     <br>
                     forceInvoice - boolean - true or false - will run ipn even if the response from payplus in the order exists and
-                    has a status of success.
+                    has a status of success. Will not run if an invoice was already created.
 
                     <br>for example:<br>
 
                     <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
                 </p>
+                <h2>OR - JUST click the button below to run the default: Check ALL orders from today.</h2>
                 <form method="post" action="">
                     <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
                 </form>
