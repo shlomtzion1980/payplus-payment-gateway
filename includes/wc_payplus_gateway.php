@@ -417,6 +417,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : gmdate('m');
         $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
+        $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
 
         if (isset($_GET['month'])) {
             // Get start and end dates for the given month
@@ -456,13 +457,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if ($paymentPageUid) {
                     $hasInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
                     $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                    if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
+                    if (WC_PayPlus_Statics::pp_is_json($payPlusResponse) && !$forceAll) {
                         $responseStatus = json_decode($payPlusResponse, true)['status_code'];
                         if ($responseStatus === "000") {
                             $runIpn = false;
                             echo esc_html("Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!\n");
                         }
-                    } else {
+                    } elseif (!$forceAll) {
                         $forceInvoice ? $runIpn = true : null;
                         if ($hasInvoice) {
                             $runIpn = false;

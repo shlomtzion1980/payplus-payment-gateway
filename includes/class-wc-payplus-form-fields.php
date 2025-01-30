@@ -145,9 +145,11 @@ class WC_PayPlus_Form_Fields
                     contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.
                 </p>
                 <p>
+                    <strong>Advanced: </strong>
+                    <br>
                     To run with special options … add to the url :
                     <br>
-                    query parameters allowed:
+                    Usage of query parameters:
                     <br>
                     month - number 1 to 12
                     <br>
@@ -155,12 +157,21 @@ class WC_PayPlus_Form_Fields
                     <br>
                     forceInvoice - boolean - true or false - will run ipn even if the response from payplus in the order exists and
                     has a status of success. Will not run if an invoice was already created.
+                    <br>
+                    forceAll - boolean - true or false - will run ipn even if the response from payplus in the order exists and
 
-                    <br>for example:<br>
+                    forceAll must be joined with month.
+                    <br>
+                <h2>WARNING: The usage of forceAll is not recommended! - If forceAll is used then even orders that were
+                    manually
+                    changed to a certain status will be synced to the IPN data.</h2>
+                <br>
 
-                    <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
+                <br>for example:<br>
+
+                <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
                 </p>
-                <h2>OR - JUST click the button below to run the default: Check ALL orders from today.</h2>
+                <h2>RECOMMENDED: JUST click the button below to run the default: Check ALL orders from today.</h2>
                 <form method="post" action="">
                     <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
                 </form>
@@ -169,7 +180,7 @@ class WC_PayPlus_Form_Fields
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 echo '<pre>';
-                echo 'Running PayPlus Order checker... - you can check : payplus-orders-verify-log and payplus-ipn log for more information.';
+                echo 'Running PayPlus Order checker...';
                 $payPlusGateway = new WC_PayPlus_Gateway;
                 $payPlusGateway->payPlusOrdersCheck($nonce);
             }
