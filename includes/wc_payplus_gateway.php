@@ -458,7 +458,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
                     if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
                         $responseStatus = json_decode($payPlusResponse, true)['status_code'];
-                        if ($responseStatus === "000" && !$forceInvoice) {
+                        if ($responseStatus === "000") {
                             $runIpn = false;
                             echo esc_html("Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!\n");
                         }
