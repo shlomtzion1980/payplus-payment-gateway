@@ -429,8 +429,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         echo "<pre>";
-        echo "Start date: $start_date\n";
-        echo "End date: $end_date\n";
+        echo esc_html("Start date: $start_date\n");
+        echo esc_html("End date: $end_date\n");
 
         $args = array(
             'status'       => ['pending', 'cancelled', 'failed'],
