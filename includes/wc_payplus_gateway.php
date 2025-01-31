@@ -482,6 +482,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true);
                         if ($ipnResponse) {
                             echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                        } else {
+                            echo esc_html("Order #$order_id status did not change!\n\n");
                         }
                     }
                 } else {
