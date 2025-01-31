@@ -1226,7 +1226,6 @@ class PayplusInvoice
                             $insetData['payplus_invoice_type'] = $payplus_document_type;
                             $insetData['payplus_invoice_docUID'] = $res->details->docUID;
                             $insetData['payplus_invoice_numberD'] = $res->details->number;
-                            $insetData['payplus_invoice_numberD'] = $res->details->number;
                             $insetData['payplus_invoice_originalDocAddress'] = $res->details->originalDocAddress;
                             $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
                             $insetData['payplus_invoice_customer_uuid'] = $res->details->customer_uuid;

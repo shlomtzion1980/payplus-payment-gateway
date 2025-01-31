@@ -75,6 +75,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $api_url;
     public $payment_url;
     public $ipn_url;
+    public $invoice_search;
     public $refund_url;
     public $clearing_companies_url;
     public $issuers_companies_url;
@@ -218,6 +219,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->api_url = ($this->api_test_mode) ? PAYPLUS_PAYMENT_URL_DEV : PAYPLUS_PAYMENT_URL_PRODUCTION;
         $this->payment_url = $this->api_url . 'PaymentPages/generateLink';
         $this->ipn_url = $this->api_url . 'PaymentPages/ipn';
+        $this->invoice_search = $this->api_url . 'books/docs/list';
         $this->refund_url = $this->api_url . 'Transactions/RefundByTransactionUID';
         $this->clearing_companies_url = $this->api_url . 'ClearingCompanies';
         $this->issuers_companies_url = $this->api_url . 'issuerscompanies';

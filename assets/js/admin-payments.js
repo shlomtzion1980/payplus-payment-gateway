@@ -149,12 +149,46 @@ jQuery(document).ready(function ($) {
             top: "5px",
         });
         $("#custom-button-get-pp").fadeOut();
+        $("#get-invoice-plus-data").fadeOut();
         loader.fadeIn();
 
         var data = {
             action: "payplus_ipn",
             payment_request_uid: $("#custom-button-get-pp").val(),
             order_id: $("#custom-button-get-pp").data("value"),
+            _ajax_nonce: payplus_script_admin.payplusCustomAction,
+        };
+
+        $.post(ajaxurl, data, function (response) {
+            loader.fadeOut();
+            location.reload();
+        });
+    });
+
+    $("#get-invoice-plus-data").click(function () {
+        let loader = $("#order_data").find(".payplus_loader_gpp");
+        let side = "right";
+
+        // check if page is rtl or ltr and change the direction of the loader
+        if ($("body").hasClass("rtl")) {
+            side = "left";
+        }
+
+        loader.css(side, "5%");
+
+        loader.css({
+            position: "absolute",
+            top: "5px",
+        });
+        $("#custom-button-get-pp").fadeOut();
+        $("#get-invoice-plus-data").fadeOut();
+        loader.fadeIn();
+
+        var data = {
+            action: "invoice_plus_search",
+            transaction_uuid: $("#get-invoice-plus-data").val(),
+            order_id: $("#get-invoice-plus-data").data("value"),
+            get_invoice: true,
             _ajax_nonce: payplus_script_admin.payplusCustomAction,
         };
 

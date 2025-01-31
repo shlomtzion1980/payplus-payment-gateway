@@ -512,6 +512,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'show_get_payplus_data_buttons' => [
+                'title' => __('Always display Get PayPlus Data Buttons', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('Always display Get PayPlus Data Buttons - Regardless of orders status.', 'payplus-payment-gateway'),
+                'label' => __('Get PayPlus Data Buttons Always', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'show_payplus_integrity_check' => [
                 'title' => __('Show PayPlus Hash Check button', 'payplus-payment-gateway'),
                 'label' => __('Show PayPlus Hash Check button', 'payplus-payment-gateway'),
