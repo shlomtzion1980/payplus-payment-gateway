@@ -169,9 +169,9 @@ class WC_PayPlus_Form_Fields
                     <h2>WARNING: The usage of forceAll is not recommended! - If forceAll is used then even orders that were
                         manually
                         changed to a certain status will be synced to the IPN data.</h2>
-                    <br>
 
-                    <br>For example:<br>
+                    For example:
+                    <br>
 
                     <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
                     </p>

@@ -446,6 +446,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
             echo "(This will not cancel the scheduled cron event)<br><br>";
+            ob_start(); // Start output buffering
             echo "Orders: ";
             echo esc_html(implode(",", $orders)) . "<br></br>";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
@@ -494,6 +495,26 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "<pre>";
             wp_die('No orders matching the criteria were found.');
         }
+
+        $output = ob_get_clean(); // Get the buffered content and clean the buffer
+
+        // Display the output
+        echo esc_html($output);
+
+        // Add a button to save the output text
+        echo '<button id="saveOutputButton">Save Output</button>';
+
+        // Add JavaScript to handle the button click and save the output text
+        echo '<script>
+                        document.getElementById("saveOutputButton").addEventListener("click", function() {
+                            var outputText = ' . wp_json_encode($output) . ';
+                            var blob = new Blob([outputText], { type: "text/plain;charset=utf-8" });
+                            var link = document.createElement("a");
+                            link.href = URL.createObjectURL(blob);
+                            link.download = "output.txt";
+                            link.click();
+                        });
+                    </script>';
     }
 
     /**
