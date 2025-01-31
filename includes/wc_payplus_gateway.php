@@ -448,7 +448,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "(This will not cancel the scheduled cron event)<br><br>";
             ob_start(); // Start output buffering
             echo "Orders: ";
-            echo esc_html(implode(",", $orders)) . "<br></br>";
+            echo esc_html(implode(",", $orders)) . "\n";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
             foreach ($orders as $order_id) {
                 $order = wc_get_order($order_id);
