@@ -420,6 +420,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
         $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
+        $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true") : false;
 
         echo "<pre>";
         if (isset($_GET['month'])) {
@@ -434,10 +435,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo esc_html("Date to check: " . substr($current_time, 0, 10) . "\n");
         }
 
+        $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
+        $getInvoice = $invoiceReport ? true : false;
+
+        !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
 
 
         $args = array(
-            'status'       => ['pending', 'cancelled', 'failed'],
+            'status'       => $status,
             'date_created' => $dateOrDates, // Correct range format for WooCommerce
             'return'       => 'ids', // Just return IDs to save memory
             'limit'        => -1, // Retrieve all orders
@@ -477,20 +482,33 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
                     if ($runIpn) {
                         echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
-                        echo esc_html("Order #$order_id - RUNNING IPN! - Check order notes and status for results!");
+                        echo esc_html("Order #$order_id - $ipnMessage");
                         echo "\n";
                         $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                        $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true);
+
+                        $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice);
                         if ($ipnResponse) {
-                            echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                            if (is_array($ipnResponse)) {
+                                echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
+                            } else {
+                                if ($getInvoice) {
+                                    echo esc_html("Order #$order_id doesn't seem to have invoice+ docs...\n\n");
+                                } else {
+                                    echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                                }
+                            }
                         } else {
                             echo esc_html("Order #$order_id status did not change!\n\n");
                         }
                     }
                 } else {
-                    echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING IPN!\n");
+                    if ($getInvoice) {
+                        echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING Invoice+ Call!\n\n");
+                    } else {
+                        echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING IPN!\n");
+                    }
                 }
             }
         } else {

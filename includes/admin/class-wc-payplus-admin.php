@@ -269,7 +269,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $getInvoice = false,
         $moreInfo = false
     ) {
-
         $this->isInitiated();
 
         if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
@@ -292,7 +291,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
 
-        $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=0";
+        $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=5";
 
         $payload['payment_request_uid'] = $payment_request_uid;
 
@@ -354,6 +353,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $invoicePluseData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
 
             WC_PayPlus_Meta_Data::update_meta($order, $invoicePluseData);
+            if ($allowReturn) {
+                return $invoicePluseData;
+            }
         } else {
             if (!empty($responseBody['data'])) {
                 $type = $responseBody['data']['type'];
