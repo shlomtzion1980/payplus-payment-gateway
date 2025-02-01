@@ -490,7 +490,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                         $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice);
                         if ($ipnResponse) {
-                            if (is_array($ipnResponse)) {
+                            if ($getInvoice && is_array($ipnResponse)) {
                                 echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
                             } else {
                                 if ($getInvoice) {
