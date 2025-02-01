@@ -380,7 +380,9 @@ if (isCheckout || hasOrder) {
 
     iframe.src = paymentPageLink;
     let pp_iframes = document.querySelectorAll(".pp_iframe");
-    let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
+    let pp_iframe = document.querySelector(
+      `#radio-control-wc-payment-method-options-${activePaymentMethod}`
+    ).nextElementSibling.querySelector('.pp_iframe');
     if (
       ["samePageIframe", "popupIframe"].indexOf(gateWaySettings.displayMode) !==
       -1
