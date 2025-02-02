@@ -413,8 +413,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             wp_die('Sorry this page is not allowed! - payPlusOrdersCheck user privileges.');
         }
         $domain = explode("//", home_url())[1];
-        $fileName = str_replace("=true", "", str_replace("page=runPayPlusOrdersChecker&", "", parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)));
-        $fileName = "$domain.$fileName";
+        $query = isset($_SERVER['REQUEST_URI']) ? wp_parse_url(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), PHP_URL_QUERY) : "";
+        $fileName = str_replace("=true", "", str_replace("page=runPayPlusOrdersChecker&", "", $query));
+        $fileName = str_replace('&', '-', "$domain.$fileName");
 
         $current_time = current_time('Y-m-d H:i:s');
 
@@ -574,7 +575,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             var blob = new Blob([outputText], { type: "text/plain;charset=utf-8" });
                             var link = document.createElement("a");
                             link.href = URL.createObjectURL(blob);
-                            link.download = "' . $fileName . '.txt";
+                            link.download = "' . esc_html($fileName) . '.txt";
                             link.click();
                         });
                     </script>';
@@ -604,7 +605,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 var encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
                 var link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "' . $fileName . '.csv");
+                link.setAttribute("download", "' . esc_html($fileName) . '.csv");
                 document.body.appendChild(link);
                 link.click();
             });
