@@ -450,8 +450,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $status = $pendingOnly ? 'pending' : $status;
 
         $getInvoice = $invoiceReport ? true : false;
-
-
         !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
 
 
