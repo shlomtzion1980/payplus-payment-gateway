@@ -284,8 +284,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
         $order = wc_get_order($order_id);
-        $getInvoice = isset($_POST['get_invoice']) && $_POST['get_invoice'] ? true : $getInvoice;
-        $moreInfo = isset($_POST['get_invoice']) && $_POST['get_invoice'] ? $order_id : $moreInfo;
+        $getInvoice = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? true : $getInvoice;
+        $moreInfo = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? $order_id : $moreInfo;
         $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_transaction_uid');
 
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
@@ -447,7 +447,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 if (!isset($responseBody['data']['status'])) {
                     echo "No transaction data received.\n";
                 } else {
-                    echo "Transaction status received from PayPlus: {$responseBody['data']['status']}\n";
+                    echo esc_html("Transaction status received from PayPlus: {$responseBody['data']['status']}\n");
                 }
             }
             if ($allowReturn && isset($status)) {

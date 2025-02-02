@@ -458,16 +458,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $orders = array_reverse(wc_get_orders($args));
         $howManyOrders = count($orders);
+        $outPut = [];
 
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
-            echo "Total orders: $howManyOrders<br>";
+            echo esc_html("Total orders: $howManyOrders<br>");
             echo "(This will not cancel the scheduled cron event)<br><br>";
             ob_start(); // Start output buffering
             echo "Orders: ";
             echo esc_html(implode(",", $orders)) . "\n";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
             foreach ($orders as $order_id) {
+                $outPut[$order_id]['force_all'] = $forceAll;
+                $outPut[$order_id]['statuses'] = $status;
                 $order = wc_get_order($order_id);
                 $hour = $order->get_date_created()->date('H');
                 $min = $order->get_date_created()->date('i');
@@ -478,19 +481,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if ($paymentPageUid) {
                     $hasInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
                     $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                    if ($hasInvoice) {
+                        $outPut[$order_id]['has_invoice'] = $hasInvoice;
+                    }
                     if (WC_PayPlus_Statics::pp_is_json($payPlusResponse) && !$forceAll) {
                         $responseStatus = json_decode($payPlusResponse, true)['status_code'];
                         if ($responseStatus === "000") {
+                            $outPut[$order_id]['response_status'] = $responseStatus;
                             $runIpn = false;
                             echo esc_html("Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!\n");
+                            $outPut[$order_id]['message_response'] = "Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!";
                             $order_customer = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
                             $order_phone = $order->get_billing_phone();
                             echo esc_html("Order #$order_id Customer: $order_customer\n");
                             echo esc_html("Order #$order_id Phone: $order_phone\n");
+                            $outPut[$order_id]['customer'] = $order_customer;
+                            $outPut[$order_id]['phone'] = $order_phone;
                             if ($hasInvoice) {
                                 echo esc_html("The order has an invoice on PayPlus!\n\n");
+                                $outPut[$order_id]['message_invoice'] = "The order has an invoice on PayPlus!";
                             } else {
                                 echo esc_html("THE ORDER DOES NOT have an invoice on PayPlus!\n\n");
+                                $outPut[$order_id]['message_invoice'] = "THE ORDER DOES NOT have an invoice on PayPlus!";
                             }
                         }
                     } elseif (!$forceAll) {
@@ -498,10 +510,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if ($hasInvoice) {
                             $runIpn = false;
                             echo esc_html("Order #$order_id contains payment page uid! HAS AN INVOICE! - SKIPPING IPN!\n");
+                            $outPut[$order_id]['message_invoice'] = "Order #$order_id contains payment page uid! HAS AN INVOICE! - SKIPPING IPN!";
                         }
                     }
                     if ($runIpn) {
                         echo esc_html("Order #$order_id - $ipnMessage");
+                        $outPut[$order_id]['message'] = $ipnMessage;
                         echo "\n";
                         $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
@@ -511,22 +525,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if ($ipnResponse) {
                             if ($getInvoice && is_array($ipnResponse)) {
                                 echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
+                                $outPut[$order_id]['invoices'] = $ipnResponse;
                             } else {
                                 if ($getInvoice) {
                                     echo esc_html("Order #$order_id doesn't seem to have invoice+ docs...\n\n");
+                                    $outPut[$order_id]['message_invoices'] = "Order #$order_id doesn't seem to have invoice+ docs...";
                                 } else {
                                     echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                                    $outPut[$order_id]['status_change'] = $ipnResponse;
                                 }
                             }
                         } else {
                             echo esc_html("Order #$order_id status did not change!\n\n");
+                            $outPut[$order_id]['status_change'] = "Order #$order_id status did not change!";
                         }
                     }
                 } else {
                     if ($getInvoice) {
                         echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING Invoice+ Call!\n\n");
+                        $outPut[$order_id]['message_invoice'] = "Order #$order_id does not contain payment page uid! - SKIPPING Invoice+ Call!";
                     } else {
                         echo esc_html("Order #$order_id does not contain payment page uid! - SKIPPING IPN!\n");
+                        $outPut[$order_id]['message'] = "Order #$order_id does not contain payment page uid! - SKIPPING IPN!";
                     }
                 }
             }
@@ -536,7 +556,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $output = ob_get_clean(); // Get the buffered content and clean the buffer
-
         // Display the output
         echo esc_html($output);
 
@@ -554,6 +573,39 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             link.click();
                         });
                     </script>';
+        // Add a button to download the $outPut array in Excel format
+        echo '<button id="downloadExcelButton">Download Excel</button>';
+
+        // Add JavaScript to handle the button click and download the Excel file
+        echo '<script>
+            document.getElementById("downloadExcelButton").addEventListener("click", function() {
+                var outputData = ' . wp_json_encode($outPut) . ';
+                if (Object.keys(outputData).length === 0) {
+                    alert("No data available to download.");
+                    return;
+                }
+                var csvContent = "";
+                var headers = ["order_id"].concat(Object.keys(outputData[Object.keys(outputData)[0]])); // Add order_id as the first header
+                csvContent += headers.join(",") + "\\n"; // Add headers
+
+                Object.keys(outputData).forEach(function(orderId) {
+                    var order = outputData[orderId];
+                    var row = [orderId].concat(headers.slice(1).map(function(header) {
+                        return order[header] || "";
+                    })).join(",");
+                    csvContent += row + "\\n";
+                });
+
+                console.log(csvContent);
+
+                var encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+                var link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", "output.csv");
+                document.body.appendChild(link);
+                link.click();
+            });
+            </script>';
     }
 
     /**
