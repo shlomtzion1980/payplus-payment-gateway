@@ -466,9 +466,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
-            echo esc_html("Total orders: $howManyOrders\n");
             echo "This will not cancel the scheduled cron event\n\n";
             ob_start(); // Start output buffering
+            echo esc_html("Total orders: $howManyOrders\n");
             echo "Orders: ";
             echo esc_html(implode(",", $orders)) . "\n";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
