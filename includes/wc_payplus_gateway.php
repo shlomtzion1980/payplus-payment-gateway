@@ -421,6 +421,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
         $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
         $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true") : false;
+        $reportOnly = isset($_GET['reportOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['reportOnly'])) === "true" && isset($_GET['reportOnly'])) : false;
 
         echo "<pre>";
         if (isset($_GET['month'])) {
@@ -436,7 +437,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
+        $status = isset($_GET['onlyFailed']) && boolval(sanitize_text_field(wp_unslash($_GET['onlyFailed'])) === "true" && isset($_GET['onlyFailed'])) ? 'failed' : $status;
+
         $getInvoice = $invoiceReport ? true : false;
+
 
         !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
 
@@ -464,6 +468,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $calc = $current_minute - $min;
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                echo esc_html("\nOrder #$order_id CURRENT STATUS: " . $order->get_status() . "\n");
                 if ($paymentPageUid) {
                     $hasInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
                     $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
@@ -472,23 +477,31 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if ($responseStatus === "000") {
                             $runIpn = false;
                             echo esc_html("Order #$order_id contains payment page uid! and has a payplus_response object with success! [The order status was edited manually] - SKIPPING IPN!\n");
+                            $order_customer = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                            $order_phone = $order->get_billing_phone();
+                            echo esc_html("Order #$order_id Customer: $order_customer\n");
+                            echo esc_html("Order #$order_id Phone: $order_phone\n");
+                            if ($hasInvoice) {
+                                echo esc_html("The order has an invoice on PayPlus!\n\n");
+                            } else {
+                                echo esc_html("THE ORDER DOES NOT have an invoice on PayPlus!\n\n");
+                            }
                         }
                     } elseif (!$forceAll) {
                         $forceInvoice ? $runIpn = true : null;
                         if ($hasInvoice) {
                             $runIpn = false;
-                            echo esc_html("Order #$order_id contains payment page uid! and has an invoice! - SKIPPING IPN!\n");
+                            echo esc_html("Order #$order_id contains payment page uid! HAS AN INVOICE! - SKIPPING IPN!\n");
                         }
                     }
                     if ($runIpn) {
-                        echo esc_html("Order #$order_id status:" . $order->get_status() . "\n");
                         echo esc_html("Order #$order_id - $ipnMessage");
                         echo "\n";
                         $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
 
-                        $ipnResponse = $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice);
+                        $ipnResponse = !$reportOnly ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice) : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice);
                         if ($ipnResponse) {
                             if ($getInvoice && is_array($ipnResponse)) {
                                 echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
