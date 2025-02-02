@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.5] - 02-02-2025 - (Greed)
+
+- Fix - Resolved issue where PayPlus Embedded was stuck on loading for certain templates.
+- Tweak - If a callback arrives and the order contains no payplus_response, the callback will run IPN as well.
+- Tweak - Fixed/Cleaned PHP warnings of missing array keys in specific cases (warning messages only).
+- Tweak - Centered display of multiple icons on PayPlus Embedded and main gateway in mobile view to fit cases with many icons.
+- Tweak - Improved logging for PayPlus Embedded.
+- Added - For PayPlus Partners Only - PayPlus Orders Validator can now run in report mode only, and by month, year, and much more. (For more information, contact PayPlus and ask about the Partners program.)
+
 ## [7.5.4] - 28-01-2025 - (Asta)
 
 - Tweak - Adjusted the CSS for the popup iframe close button's top position on iPhones.
@@ -19,19 +28,19 @@ All notable changes to this project will be documented in this file.
 
 ## [7.5.1] - 14-01-2025 - (Talula)
 
-- Fix   - Adjusted the inline styling for PayPlus payment logos to ensure correct height and width. 
-- Fix   - Resolved an error when adding a payment method due to logging issues.
+- Fix - Adjusted the inline styling for PayPlus payment logos to ensure correct height and width.
+- Fix - Resolved an error when adding a payment method due to logging issues.
 - Tweak - Added and corrected missing Hebrew translations.
 
-## [7.5.0] - 08-01-2025 - (Zepplin) 
+## [7.5.0] - 08-01-2025 - (Zepplin)
 
 - Fix - Enhanced the previous version to save payloads more efficiently and cleanly.
 
-## [7.4.8] - 08-01-2025 - (Led) 
+## [7.4.8] - 08-01-2025 - (Led)
 
 - Tweak - Improved the invoice refund process to avoid relying solely on the invoice payload, preventing issues with unicode conversion.
 
-## [7.4.6] - 07-01-2025 - (Portgas D. Ace) 
+## [7.4.6] - 07-01-2025 - (Portgas D. Ace)
 
 - Tweak - Added support for the Transaction Type product field in both the PayPlus Embedded and main gateway.
 - Tweak - Updated instructions for the Transaction Type product field.
@@ -40,12 +49,12 @@ All notable changes to this project will be documented in this file.
 
 ## [7.4.5] - 06-01-2025 - (Gol D. Roger)
 
-- Fix   - If the main VAT settings in Invoice+ are unchecked, the vat-type-exempt will now be sent.
+- Fix - If the main VAT settings in Invoice+ are unchecked, the vat-type-exempt will now be sent.
 - Tweak - Resolved an issue where the Apple Pay script was loaded multiple times if the payment window was closed and reopened without refreshing.
 - Tweak - Refactored and removed unnecessary class calls and queries in the Invoices class for improved efficiency.
 - Tweak - Fixed PHP warnings that occurred in the invoice refund parser.
 - Added - PayPlus Hash Check button - checks the plugin integrity.
-- Fix   - Added check if session exists before using it in payplus_get_products_by_order_id() function.
+- Fix - Added check if session exists before using it in payplus_get_products_by_order_id() function.
 
 ## [7.4.3] - 01-01-2025 - (Jungle.P)
 
@@ -56,7 +65,7 @@ All notable changes to this project will be documented in this file.
 
 ## [7.4.2] - 30-12-2024 - (Wheeljack)
 
-- Added   - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
+- Added - PayPlus Embedded now supports multiple coupons with or without taxes, including "Percentage discount" and mixed types.
 - Tweak - Removed $order->payment_complete(); from PayPlus Embedded as it is handled elsewhere.
 - Tweak - Adjusted icon positioning in "Design checkout" for right-to-left (RTL) languages.
 
@@ -64,7 +73,7 @@ All notable changes to this project will be documented in this file.
 
 - Tweak - Enhanced the callback function and improved the display of local time in the callback log.
 - Added - Support for split shipping for multiple customer developers.
-- Tweak - Refreshed selection of PayPlus Embedded when a coupon is added, ensuring the form is reselected and displayed correctly. 
+- Tweak - Refreshed selection of PayPlus Embedded when a coupon is added, ensuring the form is reselected and displayed correctly.
 - Tweak - Adjusted logo placement when "Design checkout" is selected.
 - Tweak - Updated logo sizes on the checkout page for better display.
 - Tweak - Enhanced regeneration of the PayPlus Embedded link when the payment link expires.
@@ -74,12 +83,12 @@ All notable changes to this project will be documented in this file.
 
 ## [7.3.8] = 25-12-2024 - (Nico-Robin)
 
-- Fix   - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
+- Fix - Refund invoices were not created if the charge invoice was not created beforehand. This has been corrected.
 - Tweak - Adjusted the margin and padding of Express Checkout buttons.
 
 ## [7.3.6] = 24-12-2024 - (Sung Jin-woo)
 
-- Fix   - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
+- Fix - Only the main PayPlus gateway is now displayed when adding a payment method (to save a credit card token).
 - Added - Option to hide the number of payments for the Bit payment method.
 - Added - A special notice regarding the VAT change that will occur January 1st has been added for this version.
 - Tweak - Added security check to verify the order ID and improved performance of the PayPlus Embedded Subgateway.

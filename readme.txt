@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.5.4
+Stable tag: 7.5.5
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,15 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.5.5 - 02-02-2025 =
+
+- Fix   - Resolved issue where PayPlus Embedded was stuck on loading for certain templates.
+- Tweak - If a callback arrives and the order contains no payplus_response, the callback will run IPN as well.
+- Tweak - Fixed/Cleaned PHP warnings of missing array keys in specific cases (warning messages only).
+- Tweak - Centered display of multiple icons on PayPlus Embedded and main gateway in mobile view to fit cases with many icons.
+- Tweak - Improved logging for PayPlus Embedded.
+- Added - For PayPlus Partners Only - PayPlus Orders Validator can now run in report mode only, and by month, year, and much more. (For more information, contact PayPlus and ask about the Partners program.)
 
 = 7.5.4 - 28-01-2025 =
 
