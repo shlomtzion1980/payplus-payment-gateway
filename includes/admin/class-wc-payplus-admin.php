@@ -407,9 +407,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if (isset($responseBody['data']['token_uid'])) $responseArray['payplus_token_uid'] = esc_html($responseBody['data']['token_uid']);
                     if (isset($responseBody['data']['voucher_num'])) $responseArray['payplus_voucher_num'] = esc_html($responseBody['data']['voucher_num']);
                 }
-                if ($allowReturn) {
-                    echo "Transaction status received from PayPlus: {$responseBody['data']['status']}\n";
-                }
                 $responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000" ? WC_PayPlus_Meta_Data::update_meta($order, $responseArray) : $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
 
                 $transactionUid = $responseBody['data']['transaction_uid'];
@@ -445,6 +442,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             } else {
                 $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
                 $order->add_order_note('PayPlus IPN: ' . $note);
+            }
+            if ($allowReturn) {
+                if (!isset($responseBody['data']['status'])) {
+                    echo "No transaction data received.\n";
+                } else {
+                    echo "Transaction status received from PayPlus: {$responseBody['data']['status']}\n";
+                }
             }
             if ($allowReturn && isset($status)) {
                 return $status;
