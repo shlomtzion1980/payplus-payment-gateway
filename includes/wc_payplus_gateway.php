@@ -457,9 +457,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         );
 
         $orders = array_reverse(wc_get_orders($args));
+        $howManyOrders = count($orders);
 
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
+            echo "Total orders: $howManyOrders<br>";
             echo "(This will not cancel the scheduled cron event)<br><br>";
             ob_start(); // Start output buffering
             echo "Orders: ";
