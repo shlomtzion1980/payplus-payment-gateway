@@ -448,6 +448,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 return $status;
             }
         }
+        if ($allowReturn) {
+            echo "Transaction status received from PayPlus: {$responseBody['data']['status']}\n";
+        }
     }
 
     /**

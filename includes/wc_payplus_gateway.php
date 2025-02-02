@@ -437,7 +437,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
-        $status = isset($_GET['onlyFailed']) && boolval(sanitize_text_field(wp_unslash($_GET['onlyFailed'])) === "true" && isset($_GET['onlyFailed'])) ? 'failed' : $status;
+        $status = isset($_GET['failedOnly']) && boolval(sanitize_text_field(wp_unslash($_GET['failedOnly'])) === "true" && isset($_GET['failedOnly'])) ? 'failed' : $status;
 
         $getInvoice = $invoiceReport ? true : false;
 
