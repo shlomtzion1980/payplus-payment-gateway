@@ -101,6 +101,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     private $current_time;
     public $hostedFieldsOptions;
     public $isHostedEnabled;
+    public $enableDevMode;
 
     /**
      *
@@ -158,6 +159,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->single_quantity_per_line = $this->get_option('single_quantity_per_line');
 
         // - PayPlus Payment Options
+        $this->enableDevMode = $this->get_option('enable_dev_mode') == 'yes' ? true : false;
         $this->hide_icon = $this->get_option('hide_icon');
         $this->transaction_type = $this->get_option('transaction_type');
         $this->disable_woocommerce_scheduler = $this->get_option('disable_woocommerce_scheduler');
@@ -410,6 +412,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!current_user_can('edit_shop_orders')) {
             wp_die('Sorry this page is not allowed! - payPlusOrdersCheck user privileges.');
         }
+        $domain = explode("//", home_url())[1];
+        $fileName = str_replace("=true", "", str_replace("page=runPayPlusOrdersChecker&", "", parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY)));
+        $fileName = "$domain.$fileName";
 
         $current_time = current_time('Y-m-d H:i:s');
 
@@ -418,12 +423,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $current_minute = gmdate('i', strtotime($current_time));
         $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : gmdate('m');
         $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
-        $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
-        $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
-        $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true") : false;
-        $cancelledOnly = isset($_GET['cancelledOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['cancelledOnly'])) === "true" && isset($_GET['cancelledOnly'])) : false;
-        $pendingOnly = isset($_GET['pendingOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['pendingOnly'])) === "true" && isset($_GET['pendingOnly'])) : false;
-        $reportOnly = isset($_GET['reportOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['reportOnly'])) === "true" && isset($_GET['reportOnly'])) : false;
+        $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true" && $this->enableDevMode) : false;
+        $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && $this->enableDevMode) : false;
+        $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true" && $this->enableDevMode) : false;
+        $cancelledOnly = isset($_GET['cancelledOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['cancelledOnly'])) === "true" && $this->enableDevMode) : false;
+        $pendingOnly = isset($_GET['pendingOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['pendingOnly'])) === "true" && $this->enableDevMode) : false;
+        $reportOnly = isset($_GET['reportOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['reportOnly'])) === "true" && $this->enableDevMode) : false;
 
         echo "<pre>";
         if (isset($_GET['month'])) {
@@ -439,7 +444,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
-        $status = isset($_GET['failedOnly']) && boolval(sanitize_text_field(wp_unslash($_GET['failedOnly'])) === "true" && isset($_GET['failedOnly'])) ? 'failed' : $status;
+        $status = isset($_GET['failedOnly']) && boolval(sanitize_text_field(wp_unslash($_GET['failedOnly'])) === "true") ? 'failed' : $status;
         $status = $cancelledOnly ? 'cancelled' : $status;
         $status = $pendingOnly ? 'pending' : $status;
 
@@ -462,8 +467,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
-            echo esc_html("Total orders: $howManyOrders<br>");
-            echo "(This will not cancel the scheduled cron event)<br><br>";
+            echo esc_html("Total orders: $howManyOrders\n");
+            echo "This will not cancel the scheduled cron event\n\n";
             ob_start(); // Start output buffering
             echo "Orders: ";
             echo esc_html(implode(",", $orders)) . "\n";
@@ -569,7 +574,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             var blob = new Blob([outputText], { type: "text/plain;charset=utf-8" });
                             var link = document.createElement("a");
                             link.href = URL.createObjectURL(blob);
-                            link.download = "output.txt";
+                            link.download = "' . $fileName . '.txt";
                             link.click();
                         });
                     </script>';
@@ -599,7 +604,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 var encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
                 var link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
-                link.setAttribute("download", "output.csv");
+                link.setAttribute("download", "' . $fileName . '.csv");
                 document.body.appendChild(link);
                 link.click();
             });
