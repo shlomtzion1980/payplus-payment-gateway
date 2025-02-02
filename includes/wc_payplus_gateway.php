@@ -421,6 +421,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true") : false;
         $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && isset($_GET['month'])) : false;
         $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true") : false;
+        $cancelledOnly = isset($_GET['cancelledOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['cancelledOnly'])) === "true" && isset($_GET['cancelledOnly'])) : false;
+        $pendingOnly = isset($_GET['pendingOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['pendingOnly'])) === "true" && isset($_GET['pendingOnly'])) : false;
         $reportOnly = isset($_GET['reportOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['reportOnly'])) === "true" && isset($_GET['reportOnly'])) : false;
 
         echo "<pre>";
@@ -438,6 +440,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
         $status = isset($_GET['failedOnly']) && boolval(sanitize_text_field(wp_unslash($_GET['failedOnly'])) === "true" && isset($_GET['failedOnly'])) ? 'failed' : $status;
+        $status = $cancelledOnly ? 'cancelled' : $status;
+        $status = $pendingOnly ? 'pending' : $status;
 
         $getInvoice = $invoiceReport ? true : false;
 
