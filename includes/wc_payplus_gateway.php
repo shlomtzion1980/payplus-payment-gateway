@@ -595,9 +595,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     })).join(",");
                     csvContent += row + "\\n";
                 });
-
-                console.log(csvContent);
-
+                
                 var encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
                 var link = document.createElement("a");
                 link.setAttribute("href", encodedUri);
