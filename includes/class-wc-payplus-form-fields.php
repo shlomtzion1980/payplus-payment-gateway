@@ -137,58 +137,178 @@ class WC_PayPlus_Form_Fields
         if (current_user_can('edit_shop_orders')) {
             $nonce = wp_create_nonce('payPlusOrderChecker');
 ?>
-            <div class="wrap">
-                <h1>PayPlus Orders Validator</h1>
-                <p>Click the button below to run the PayPlus Orders Validator.</p>
+<div class="wrap">
+    <h1>PayPlus Orders Reports/Validator</h1>
+    <!-- <p>Click the button below to run the PayPlus Orders Validator.</p>
                 <p>
                     This will check all orders created within the last day are in "pending", "failed" or "cancelled" status and
                     contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.
-                </p>
-                <?php
+                </p> -->
+    <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
-
-                if (isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === "yes") { ?>
-                    <p>
-                        <strong>Advanced: </strong>
-                        <br>
-                        To run with special options … add to the url :
-                        <br>
-                        Usage of query parameters:
-                        <br>
-                        month - number 1 to 12
-                        <br>
-                        year - number
-                        <br>
-                        forceInvoice - boolean - true or false - will run ipn even if the response from payplus in the order exists and
-                        has a status of success. Will not run if an invoice was already created.
-                        <br>
-                        forceAll - boolean - true or false - will run ipn even if the response from payplus in the order exists and
-
-                        forceAll must be joined with month.
-                        <br>
-                    <h2>WARNING: The usage of forceAll is not recommended! - If forceAll is used then even orders that were
-                        manually
-                        changed to a certain status will be synced to the IPN data.</h2>
-
-                    For example:
-                    <br>
-
-                    <strong>https://wordpresspp.test/wp-admin/admin.php?page=runPayPlusOrdersChecker&month=10&year=2024&forceInvoice=true</strong>
-                    </p>
-                    <h2>RECOMMENDED: JUST click the button below to run the default: Check ALL orders from today.</h2>
-                <?php
-                } ?>
-                <form method="post" action="">
-                    <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-                </form>
-            </div>
+                ?>
+    <form method="post" action="" style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
+        <select name="month">
+            <?php for ($i = 1; $i <= 12; $i++) : ?>
+            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
+            </option>
+            <?php endfor; ?>
+        </select>
+        <select name="year">
+            <?php
+                        $currentYear = gmdate('Y');
+                        for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
+            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
+            <?php endfor; ?>
+        </select>
+        <select name="take">
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <input type="number" name="offset" value="0" min="0" />
+        <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
+            <span style="margin-right: 10px;">
+                <input type="radio" name="orderStatus" value="pendingOnly">
+                <label for="pendingOnly">Pending Only</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="radio" name="orderStatus" value="cancelledOnly">
+                <label for="cancelledOnly">Cancelled Only</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="radio" name="orderStatus" value="failedOnly">
+                <label for="failedOnly">Failed Only</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="checkbox" name="forceInvoice" value="true">
+                <label for="forceInvoice">Force Invoice</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="checkbox" name="getInvoice" value="true">
+                <label for="getInvoice">Get Invoices</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="checkbox" name="forceAll" value="true">
+                <label for="forceAll">Force All</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="checkbox" name="reportOnly" value="true" checked>
+                <label for="reportOnly">Report Only</label>
+            </span>
+            <span style="margin-right: 10px;">
+                <input type="checkbox" name="allStatuses" value="true">
+                <label for="allStatuses">All statuses</label>
+            </span>
+        </div>
+        <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
+        <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+    </form>
+</div>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 echo '<pre>';
                 echo 'Running PayPlus Order checker...';
-                $payPlusGateway = new WC_PayPlus_Gateway;
-                $payPlusGateway->payPlusOrdersCheck($nonce);
+                if (wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
+                    // Process the form data here
+                    $month = isset($_POST['month']) ? intval($_POST['month']) : gmdate('m');
+                    $year = isset($_POST['year']) ? intval($_POST['year']) : gmdate('Y');
+                    $take = isset($_POST['take']) ? intval($_POST['take']) : 10;
+                    $offset = isset($_POST['offset']) ? intval(wp_unslash($_POST['offset'])) : 0;
+                    $orderStatus = isset($_POST['orderStatus']) ? sanitize_text_field(wp_unslash($_POST['orderStatus'])) : false;
+                    $getInvoice = isset($_POST['getInvoice']) ? filter_var(wp_unslash($_POST['getInvoice']), FILTER_VALIDATE_BOOLEAN) : false;
+                    $forceInvoice = isset($_POST['forceInvoice']) ? filter_var(wp_unslash($_POST['forceInvoice']), FILTER_VALIDATE_BOOLEAN) : false;
+                    $forceAll = isset($_POST['forceAll']) ? filter_var(wp_unslash($_POST['forceAll']), FILTER_VALIDATE_BOOLEAN) : false;
+                    $reportOnly = isset($_POST['reportOnly']) ? filter_var(wp_unslash($_POST['reportOnly']), FILTER_VALIDATE_BOOLEAN) : false;
+                    $allStatuses = isset($_POST['allStatuses']) ? filter_var(wp_unslash($_POST['allStatuses']), FILTER_VALIDATE_BOOLEAN) : false;
+                    $failedOnly = $orderStatus === 'failedOnly';
+                    $cancelledOnly = $orderStatus === 'cancelledOnly';
+                    $pendingOnly = $orderStatus === 'pendingOnly';
+                    $status = !$allStatuses ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
+                    $status = $failedOnly ? 'failed' : $status;
+                    $status = $cancelledOnly ? 'cancelled' : $status;
+                    $status = $pendingOnly ? 'pending' : $status;
+
+                    $current_time = current_time('Y-m-d H:i:s');
+
+                    if (isset($_POST['month'])) {
+                        // Get start and end dates for the given month
+                        $start_date = gmdate('Y-m-01 00:00:00', strtotime("$year-$month-01"));
+                        $end_date = gmdate('Y-m-t 23:59:59', strtotime("$year-$month-01")); // Last day of the month
+                        echo esc_html("Start date: $start_date\n");
+                        echo esc_html("End date: $end_date\n");
+                        $dateOrDates = $start_date . '...' . $end_date;
+                    } else {
+                        $dateOrDates = $current_time;
+                        echo esc_html("Date to check: " . substr($current_time, 0, 10) . "\n");
+                    }
+
+                    $args = array(
+                        'status'       => $status,
+                        'date_created' => $dateOrDates, // Correct range format for WooCommerce
+                        'return'       => 'ids', // Just return IDs to save memory
+                        'limit'        => -1, // Retrieve all orders
+                    );
+
+                    $statuses = wp_json_encode($status);
+                    echo esc_html("Selected statuses: $statuses\n");
+
+                    if (isset($_POST['order_numbers']) && !empty($_POST['order_numbers'])) {
+                        $order_numbers = explode(',', sanitize_text_field(wp_unslash($_POST['order_numbers'])));
+                        $orders = array_reverse($order_numbers);
+                        $howManyOrders = count($orders);
+                        echo esc_html("\nTotal orders found: $howManyOrders\n");
+                        echo esc_html("Orders found: \n" . wp_json_encode($orders) . "\n");
+                    } else {
+                        $orders = array_reverse(wc_get_orders($args));
+                        $howManyOrders = count($orders);
+                        echo esc_html("\nTotal orders found: $howManyOrders\n");
+                        echo esc_html("Orders found: \n" . wp_json_encode($orders) . "\n");
+
+                        $take = isset($_POST['take']) ? intval($_POST['take']) : 0;
+                        $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
+
+                        if ($take > 0 && $offset >= 0) {
+                            $args['limit'] = $take;
+                            $args['offset'] = $offset;
+                            $orders = wc_get_orders($args);
+                        } else {
+                            $orders;
+                        }
+                        $selectedOrders = count($orders);
+                        echo esc_html("\nTotal orders selected: $selectedOrders\n\n");
+                        echo esc_html("Selected orders " . wp_json_encode(array_reverse($orders)) . "\n");
+                    }
+
+                    $sanitized_post = array_map('sanitize_text_field', wp_unslash($_POST));
+                    echo "\n" . wp_json_encode($sanitized_post);
+
+                    // Display a confirmation form before running the function
+                    if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
+                        $payPlusGateway = new WC_PayPlus_Gateway();
+                        $payPlusGateway->payPlusOrdersCheck($nonce, $forceInvoice, $forceAll, $allStatuses, $getInvoice, $reportOnly, $orders, $status, $howManyOrders);
+                    } else {
+                        echo '<form method="post">';
+                        echo '<input type="hidden" name="verifyPayPlusOrders" value="' . esc_attr($nonce) . '">';
+                        echo '<input type="hidden" name="month" value="' . esc_attr($month) . '">';
+                        echo '<input type="hidden" name="year" value="' . esc_attr($year) . '">';
+                        echo '<input type="hidden" name="take" value="' . esc_attr($take) . '">';
+                        echo '<input type="hidden" name="offset" value="' . esc_attr($offset) . '">';
+                        echo '<input type="hidden" name="orderStatus" value="' . esc_attr($orderStatus) . '">';
+                        echo '<input type="hidden" name="getInvoice" value="' . esc_attr($getInvoice) . '">';
+                        echo '<input type="hidden" name="forceInvoice" value="' . esc_attr($forceInvoice) . '">';
+                        echo '<input type="hidden" name="forceAll" value="' . esc_attr($forceAll) . '">';
+                        echo '<input type="hidden" name="reportOnly" value="' . esc_attr($reportOnly) . '">';
+                        echo '<input type="hidden" name="allStatuses" value="' . esc_attr($allStatuses) . '">';
+                        echo '<input type="hidden" name="order_numbers" value="' . esc_attr(implode(',', array_reverse($orders))) . '">';
+                        echo '<p>Are you sure you want to run the PayPlus Orders Validator?</p>';
+                        echo '<button type="submit" name="confirm" value="yes">Yes</button>';
+                        echo '<button type="submit" name="confirm" value="no">No</button>';
+                        echo '</form>';
+                    }
+                }
             }
         } else {
             wp_die('You do not have permission to perform this action.');

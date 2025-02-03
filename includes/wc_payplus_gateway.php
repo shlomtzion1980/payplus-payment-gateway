@@ -403,7 +403,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
-    public function payPlusOrdersCheck($nonce)
+    public function payPlusOrdersCheck($nonce, $forceInvoice, $forceAll, $allStatuses, $getInvoice, $reportOnly, $orders, $status, $howManyOrders)
     {
         if (!wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
             wp_die('Sorry this page is not allowed! - payPlusOrdersCheck');
@@ -412,56 +412,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!current_user_can('edit_shop_orders')) {
             wp_die('Sorry this page is not allowed! - payPlusOrdersCheck user privileges.');
         }
+
         $domain = explode("//", home_url())[1];
         $query = isset($_SERVER['REQUEST_URI']) ? wp_parse_url(sanitize_text_field(wp_unslash($_SERVER['REQUEST_URI'])), PHP_URL_QUERY) : "";
         $fileName = str_replace("=true", "", str_replace("page=runPayPlusOrdersChecker&", "", $query));
         $fileName = str_replace('&', '-', "$domain.$fileName");
 
-        $current_time = current_time('Y-m-d H:i:s');
-
-        // Extract the current hour and minute
-        $current_hour = gmdate('H', strtotime($current_time));
-        $current_minute = gmdate('i', strtotime($current_time));
-        $m = isset($_GET['month']) ? sanitize_text_field(wp_unslash($_GET['month'])) : gmdate('m');
-        $Y = isset($_GET['year']) ? sanitize_text_field(wp_unslash($_GET['year'])) : gmdate('Y');
-        $forceInvoice = isset($_GET['forceInvoice']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceInvoice'])) === "true" && $this->enableDevMode) : false;
-        $forceAll = isset($_GET['forceAll']) ? boolval(sanitize_text_field(wp_unslash($_GET['forceAll'])) === "true" && $this->enableDevMode) : false;
-        $invoiceReport = isset($_GET['invoiceReport']) ? boolval(sanitize_text_field(wp_unslash($_GET['invoiceReport'])) === "true" && $this->enableDevMode) : false;
-        $cancelledOnly = isset($_GET['cancelledOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['cancelledOnly'])) === "true" && $this->enableDevMode) : false;
-        $pendingOnly = isset($_GET['pendingOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['pendingOnly'])) === "true" && $this->enableDevMode) : false;
-        $reportOnly = isset($_GET['reportOnly']) ? boolval(sanitize_text_field(wp_unslash($_GET['reportOnly'])) === "true" && $this->enableDevMode) : false;
 
         echo "<pre>";
-        if (isset($_GET['month'])) {
-            // Get start and end dates for the given month
-            $start_date = gmdate('Y-m-01 00:00:00', strtotime("$Y-$m-01"));
-            $end_date = gmdate('Y-m-t 23:59:59', strtotime("$Y-$m-01")); // Last day of the month
-            echo esc_html("Start date: $start_date\n");
-            echo esc_html("End date: $end_date\n");
-            $dateOrDates = $start_date . '...' . $end_date;
-        } else {
-            $dateOrDates = $current_time;
-            echo esc_html("Date to check: " . substr($current_time, 0, 10) . "\n");
-        }
-
-        $status = !$invoiceReport ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
-        $status = isset($_GET['failedOnly']) && boolval(sanitize_text_field(wp_unslash($_GET['failedOnly'])) === "true") ? 'failed' : $status;
-        $status = $cancelledOnly ? 'cancelled' : $status;
-        $status = $pendingOnly ? 'pending' : $status;
-
-        $getInvoice = $invoiceReport ? true : false;
         !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
-
-
-        $args = array(
-            'status'       => $status,
-            'date_created' => $dateOrDates, // Correct range format for WooCommerce
-            'return'       => 'ids', // Just return IDs to save memory
-            'limit'        => -1, // Retrieve all orders
-        );
-
-        $orders = array_reverse(wc_get_orders($args));
-        $howManyOrders = count($orders);
         $outPut = [];
 
         if (count($orders)) {
@@ -476,9 +435,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $outPut[$order_id]['force_all'] = $forceAll;
                 $outPut[$order_id]['statuses'] = $status;
                 $order = wc_get_order($order_id);
-                $hour = $order->get_date_created()->date('H');
-                $min = $order->get_date_created()->date('i');
-                $calc = $current_minute - $min;
                 $runIpn = true;
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 echo esc_html("\nOrder #$order_id CURRENT STATUS: " . $order->get_status() . "\n");
