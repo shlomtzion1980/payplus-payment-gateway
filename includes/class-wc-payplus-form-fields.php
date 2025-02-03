@@ -146,67 +146,70 @@ class WC_PayPlus_Form_Fields
                 </p> -->
                 <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
+                $enableDevMode = isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === 'yes';
                 ?>
                 <form id="reportsForm" method="post" action=""
                     style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
-                    <select name="month">
-                        <?php for ($i = 1; $i <= 12; $i++) : ?>
-                            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
-                            </option>
-                        <?php endfor; ?>
-                    </select>
-                    <select name="year">
-                        <?php
-                        $currentYear = gmdate('Y');
-                        for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
-                            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
-                        <?php endfor; ?>
-                    </select>
-                    <select name="take">
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                    <input type="number" name="offset" value="0" min="0" />
-                    <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
-                        <h4>Filters:</h4>
-                        <span style="margin-right: 10px;">
-                            <input type="radio" name="orderStatus" value="pendingOnly">
-                            <label for="pendingOnly">Pending Only</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="radio" name="orderStatus" value="cancelledOnly">
-                            <label for="cancelledOnly">Cancelled Only</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="radio" name="orderStatus" value="failedOnly">
-                            <label for="failedOnly">Failed Only</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="radio" name="orderStatus" value="allStatuses">
-                            <label for="orderStatus">All statuses</label>
-                        </span>
-                        <h4>(Optional - Overrides the filters) Enter order ids comma sepearated: </h4>
-                        <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
-                        <h4>Actions:</h4>
-                        <span style="margin-right: 10px;">
-                            <input type="checkbox" name="forceInvoice" value="true">
-                            <label for="forceInvoice">Force Invoice</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="checkbox" name="getInvoice" value="true">
-                            <label for="getInvoice">Get Invoices</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="checkbox" name="forceAll" value="true">
-                            <label for="forceAll">Force All</label>
-                        </span>
-                        <span style="margin-right: 10px;">
-                            <input type="checkbox" name="reportOnly" value="true" checked>
-                            <label for="reportOnly">Report Only</label>
-                        </span>
-                    </div>
+                    <?php
+                    if ($enableDevMode) { ?>
+                        <select name="month">
+                            <?php for ($i = 1; $i <= 12; $i++) : ?>
+                                <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
+                                </option>
+                            <?php endfor; ?>
+                        </select>
+                        <select name="year">
+                            <?php
+                            $currentYear = gmdate('Y');
+                            for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
+                                <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
+                            <?php endfor; ?>
+                        </select>
+                        <select name="take">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <input type="number" name="offset" value="0" min="0" />
+                        <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
+                            <h4>Filters:</h4>
+                            <span style="margin-right: 10px;">
+                                <input type="radio" name="orderStatus" value="pendingOnly">
+                                <label for="pendingOnly">Pending Only</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="radio" name="orderStatus" value="cancelledOnly">
+                                <label for="cancelledOnly">Cancelled Only</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="radio" name="orderStatus" value="failedOnly">
+                                <label for="failedOnly">Failed Only</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="radio" name="orderStatus" value="allStatuses">
+                                <label for="orderStatus">All statuses</label>
+                            </span>
+                            <h4>(Optional - Overrides the filters) Enter order ids comma sepearated: </h4>
+                            <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
+                            <h4>Actions:</h4>
+                            <span style="margin-right: 10px;">
+                                <input type="checkbox" name="forceInvoice" value="true">
+                                <label for="forceInvoice">Force Invoice</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="checkbox" name="getInvoice" value="true">
+                                <label for="getInvoice">Get Invoices</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="checkbox" name="forceAll" value="true">
+                                <label for="forceAll">Force All</label>
+                            </span>
+                            <span style="margin-right: 10px;">
+                                <input type="checkbox" name="reportOnly" value="true" checked>
+                                <label for="reportOnly">Report Only</label>
+                            </span>
+                        </div> <?php } ?>
                     <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
                 </form>
             </div>
