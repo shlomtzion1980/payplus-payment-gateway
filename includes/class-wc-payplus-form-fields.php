@@ -137,75 +137,79 @@ class WC_PayPlus_Form_Fields
         if (current_user_can('edit_shop_orders')) {
             $nonce = wp_create_nonce('payPlusOrderChecker');
 ?>
-<div class="wrap">
-    <h1>PayPlus Orders Reports/Validator</h1>
-    <!-- <p>Click the button below to run the PayPlus Orders Validator.</p>
+            <div class="wrap">
+                <h1>PayPlus Orders Reports/Validator</h1>
+                <!-- <p>Click the button below to run the PayPlus Orders Validator.</p>
                 <p>
                     This will check all orders created within the last day are in "pending", "failed" or "cancelled" status and
                     contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.
                 </p> -->
-    <?php
+                <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
                 ?>
-    <form method="post" action="" style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
-        <select name="month">
-            <?php for ($i = 1; $i <= 12; $i++) : ?>
-            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
-            </option>
-            <?php endfor; ?>
-        </select>
-        <select name="year">
-            <?php
+                <form id="reportsForm" method="post" action=""
+                    style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
+                    <select name="month">
+                        <?php for ($i = 1; $i <= 12; $i++) : ?>
+                            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                    <select name="year">
+                        <?php
                         $currentYear = gmdate('Y');
                         for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
-            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
-            <?php endfor; ?>
-        </select>
-        <select name="take">
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-        </select>
-        <input type="number" name="offset" value="0" min="0" />
-        <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
-            <span style="margin-right: 10px;">
-                <input type="radio" name="orderStatus" value="pendingOnly">
-                <label for="pendingOnly">Pending Only</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="radio" name="orderStatus" value="cancelledOnly">
-                <label for="cancelledOnly">Cancelled Only</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="radio" name="orderStatus" value="failedOnly">
-                <label for="failedOnly">Failed Only</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="checkbox" name="forceInvoice" value="true">
-                <label for="forceInvoice">Force Invoice</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="checkbox" name="getInvoice" value="true">
-                <label for="getInvoice">Get Invoices</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="checkbox" name="forceAll" value="true">
-                <label for="forceAll">Force All</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="checkbox" name="reportOnly" value="true" checked>
-                <label for="reportOnly">Report Only</label>
-            </span>
-            <span style="margin-right: 10px;">
-                <input type="checkbox" name="allStatuses" value="true">
-                <label for="allStatuses">All statuses</label>
-            </span>
-        </div>
-        <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
-        <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-    </form>
-</div>
+                            <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <select name="take">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    <input type="number" name="offset" value="0" min="0" />
+                    <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
+                        <h4>Filters:</h4>
+                        <span style="margin-right: 10px;">
+                            <input type="radio" name="orderStatus" value="pendingOnly">
+                            <label for="pendingOnly">Pending Only</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="radio" name="orderStatus" value="cancelledOnly">
+                            <label for="cancelledOnly">Cancelled Only</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="radio" name="orderStatus" value="failedOnly">
+                            <label for="failedOnly">Failed Only</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="radio" name="orderStatus" value="allStatuses">
+                            <label for="orderStatus">All statuses</label>
+                        </span>
+                        <h4>(Optional - Overrides the filters) Enter order ids comma sepearated: </h4>
+                        <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
+                        <h4>Actions:</h4>
+                        <span style="margin-right: 10px;">
+                            <input type="checkbox" name="forceInvoice" value="true">
+                            <label for="forceInvoice">Force Invoice</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="checkbox" name="getInvoice" value="true">
+                            <label for="getInvoice">Get Invoices</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="checkbox" name="forceAll" value="true">
+                            <label for="forceAll">Force All</label>
+                        </span>
+                        <span style="margin-right: 10px;">
+                            <input type="checkbox" name="reportOnly" value="true" checked>
+                            <label for="reportOnly">Report Only</label>
+                        </span>
+                    </div>
+                    <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+                </form>
+            </div>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
@@ -222,8 +226,9 @@ class WC_PayPlus_Form_Fields
                     $forceInvoice = isset($_POST['forceInvoice']) ? filter_var(wp_unslash($_POST['forceInvoice']), FILTER_VALIDATE_BOOLEAN) : false;
                     $forceAll = isset($_POST['forceAll']) ? filter_var(wp_unslash($_POST['forceAll']), FILTER_VALIDATE_BOOLEAN) : false;
                     $reportOnly = isset($_POST['reportOnly']) ? filter_var(wp_unslash($_POST['reportOnly']), FILTER_VALIDATE_BOOLEAN) : false;
-                    $allStatuses = isset($_POST['allStatuses']) ? filter_var(wp_unslash($_POST['allStatuses']), FILTER_VALIDATE_BOOLEAN) : false;
+                    // $allStatuses = isset($_POST['allStatuses']) ? filter_var(wp_unslash($_POST['allStatuses']), FILTER_VALIDATE_BOOLEAN) : false;
                     $failedOnly = $orderStatus === 'failedOnly';
+                    $allStatuses = $orderStatus === 'allStatuses';
                     $cancelledOnly = $orderStatus === 'cancelledOnly';
                     $pendingOnly = $orderStatus === 'pendingOnly';
                     $status = !$allStatuses ? ['pending', 'cancelled', 'failed'] : ['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'];
@@ -287,9 +292,17 @@ class WC_PayPlus_Form_Fields
 
                     // Display a confirmation form before running the function
                     if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
+                        echo '<script type="text/javascript">
+                            document.getElementById("reportsForm").style.display = "none";
+                        </script>';
+
                         $payPlusGateway = new WC_PayPlus_Gateway();
                         $payPlusGateway->payPlusOrdersCheck($nonce, $forceInvoice, $forceAll, $allStatuses, $getInvoice, $reportOnly, $orders, $status, $howManyOrders);
+                        echo '<br></br><button onclick="window.history.go(-2)">Go Back</button>';
                     } else {
+                        echo '<script type="text/javascript">
+                            document.getElementById("reportsForm").style.display = "none";
+                        </script>';
                         echo '<form method="post">';
                         echo '<input type="hidden" name="verifyPayPlusOrders" value="' . esc_attr($nonce) . '">';
                         echo '<input type="hidden" name="month" value="' . esc_attr($month) . '">';
@@ -306,7 +319,8 @@ class WC_PayPlus_Form_Fields
                         echo '<p>Are you sure you want to run the PayPlus Orders Validator?</p>';
                         echo '<button type="submit" name="confirm" value="yes">Yes</button>';
                         echo '<button type="submit" name="confirm" value="no">No</button>';
-                        echo '</form>';
+                        echo '</form><br>';
+                        echo '<button onclick="history.back()">Go Back</button>';
                     }
                 }
             }
