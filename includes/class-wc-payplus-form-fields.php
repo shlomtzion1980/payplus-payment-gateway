@@ -147,44 +147,45 @@ class WC_PayPlus_Form_Fields
                 <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
                 $enableDevMode = isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === 'yes';
-                $orders_count_by_month = array();
-                $current_year = 2024;
-                $current_year = gmdate('Y');
-                $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
-                ?>
-                <form method="post" action="" id="selctedYearForm">
-                    <label for="year">Choose Year:</label>
-                    <select name="year" id="year">
-                        <?php for ($i = $current_year; $i >= $current_year - 5; $i--) : ?>
-                            <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_year, $i); ?>><?php echo esc_html($i); ?></option>
-                        <?php endfor; ?>
-                    </select>
-                    <button type="submit">Submit</button>
-                </form>
-                <?php
-                $current_year = $selected_year;
-                for ($month = 1; $month <= 12; $month++) {
-                    $start_date = gmdate('Y-m-01 00:00:00', strtotime("$current_year-$month-01"));
-                    $end_date = gmdate('Y-m-t 23:59:59', strtotime("$current_year-$month-01"));
-                    $args = array(
-                        'date_created' => $start_date . '...' . $end_date,
-                        'return'       => 'ids',
-                        'limit'        => -1,
-                    );
-                    $orders = wc_get_orders($args);
-                    $orders_count_by_month[$month] = array();
 
-                    foreach ($orders as $order_id) {
-                        $order = wc_get_order($order_id);
-                        $status = $order->get_status();
-                        if (!isset($orders_count_by_month[$month][$status])) {
-                            $orders_count_by_month[$month][$status] = array();
+                if ($enableDevMode) {
+                    $orders_count_by_month = array();
+                    $current_year = gmdate('Y');
+                    $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
+                ?>
+                    <form method="post" action="" id="selctedYearForm">
+                        <label for="year">Choose Year:</label>
+                        <select name="year" id="year">
+                            <?php for ($i = $current_year; $i >= $current_year - 5; $i--) : ?>
+                                <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_year, $i); ?>><?php echo esc_html($i); ?></option>
+                            <?php endfor; ?>
+                        </select>
+                        <button type="submit">Submit</button>
+                    </form>
+                    <?php
+                    $current_year = $selected_year;
+                    for ($month = 1; $month <= 12; $month++) {
+                        $start_date = gmdate('Y-m-01 00:00:00', strtotime("$current_year-$month-01"));
+                        $end_date = gmdate('Y-m-t 23:59:59', strtotime("$current_year-$month-01"));
+                        $args = array(
+                            'date_created' => $start_date . '...' . $end_date,
+                            'return'       => 'ids',
+                            'limit'        => -1,
+                        );
+                        $orders = wc_get_orders($args);
+                        $orders_count_by_month[$month] = array();
+
+                        foreach ($orders as $order_id) {
+                            $order = wc_get_order($order_id);
+                            $status = $order->get_status();
+                            if (!isset($orders_count_by_month[$month][$status])) {
+                                $orders_count_by_month[$month][$status] = array();
+                            }
+                            $orders_count_by_month[$month][$status][] = $order_id;
                         }
-                        $orders_count_by_month[$month][$status][] = $order_id;
                     }
-                }
-                echo '<pre>';
-                echo '<style>
+                    echo '<pre>';
+                    echo '<style>
                     table#pp_all_orders {
                         width: 90%;
                         border-collapse: collapse;
@@ -208,31 +209,31 @@ class WC_PayPlus_Form_Fields
                         margin-right: 10px;
                     }
                 </style>';
-                echo '<table id="pp_all_orders">';
-                echo '<tr><th>Month</th><th>Pending</th><th>Cancelled</th><th>Failed</th><th>Completed</th><th>Processing</th><th>On-Hold</th></tr>';
-                foreach ($orders_count_by_month as $month => $statuses) {
-                    echo '<tr>';
-                    echo '<td>' . esc_html(gmdate('F', mktime(0, 0, 0, $month, 10))) . '</td>';
-                    foreach (['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'] as $status) {
-                        echo '<td>';
-                        if (isset($statuses[$status])) {
-                            echo '<ul class="pp_orders">';
-                            echo '<li><input type="checkbox" class="select-all" data-status="' . esc_attr($status) . '"> Select All</li>';
-                            foreach ($statuses[$status] as $order_id) {
-                                echo '<li><input type="checkbox" name="order_ids[]" value="' . esc_attr($order_id) . '" class="order-checkbox-' . esc_attr($status) . '"> ' . esc_html($order_id) . '</li>';
+                    echo '<table id="pp_all_orders">';
+                    echo '<tr><th>Month</th><th>Pending</th><th>Cancelled</th><th>Failed</th><th>Completed</th><th>Processing</th><th>On-Hold</th></tr>';
+                    foreach ($orders_count_by_month as $month => $statuses) {
+                        echo '<tr>';
+                        echo '<td>' . esc_html(gmdate('F', mktime(0, 0, 0, $month, 10))) . '</td>';
+                        foreach (['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'] as $status) {
+                            echo '<td>';
+                            if (isset($statuses[$status])) {
+                                echo '<ul class="pp_orders">';
+                                echo '<li><input type="checkbox" class="select-all" data-status="' . esc_attr($status) . '"> Select All</li>';
+                                foreach ($statuses[$status] as $order_id) {
+                                    echo '<li><input type="checkbox" name="order_ids[]" value="' . esc_attr($order_id) . '" class="order-checkbox-' . esc_attr($status) . '"> ' . esc_html($order_id) . '</li>';
+                                }
+                                echo '</ul>';
+                            } else {
+                                echo '0';
                             }
-                            echo '</ul>';
-                        } else {
-                            echo '0';
+                            echo '</td>';
                         }
-                        echo '</td>';
+                        echo '</tr>';
                     }
-                    echo '</tr>';
-                }
-                echo '</table>';
-                echo '</pre>';
-                echo '<div id="selected-orders-summary"></div>';
-                echo '<script>
+                    echo '</table>';
+                    echo '</pre>';
+                    echo '<div id="selected-orders-summary"></div>';
+                    echo '<script>
                     document.querySelectorAll(".select-all").forEach(function(selectAllCheckbox) {
                         selectAllCheckbox.addEventListener("change", function() {
                             var status = this.getAttribute("data-status");
@@ -301,11 +302,9 @@ class WC_PayPlus_Form_Fields
                         }
                     }
                 </script>';
-                ?>
-                <form id="reportsForm" method="post" action=""
-                    style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
-                    <?php
-                    if ($enableDevMode) { ?>
+                    ?>
+                    <form id="reportsForm" method="post" action=""
+                        style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
                         <span id="timeFilters" style="display: flex;flex-direction: column;">
                             <select name="month">
                                 <?php for ($i = 1; $i <= 12; $i++) : ?>
@@ -374,7 +373,7 @@ class WC_PayPlus_Form_Fields
                             </span>
                         </div> <?php } ?>
                     <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-                </form>
+                    </form>
             </div>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
