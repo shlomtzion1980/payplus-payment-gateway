@@ -147,51 +147,214 @@ class WC_PayPlus_Form_Fields
                 <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
                 $enableDevMode = isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === 'yes';
+                $orders_count_by_month = array();
+                $current_year = 2024;
+                $current_year = gmdate('Y');
+                $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
+                ?>
+                <form method="post" action="" id="selctedYearForm">
+                    <label for="year">Choose Year:</label>
+                    <select name="year" id="year">
+                        <?php for ($i = $current_year; $i >= $current_year - 5; $i--) : ?>
+                            <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_year, $i); ?>><?php echo esc_html($i); ?></option>
+                        <?php endfor; ?>
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
+                <?php
+                $current_year = $selected_year;
+                for ($month = 1; $month <= 12; $month++) {
+                    $start_date = gmdate('Y-m-01 00:00:00', strtotime("$current_year-$month-01"));
+                    $end_date = gmdate('Y-m-t 23:59:59', strtotime("$current_year-$month-01"));
+                    $args = array(
+                        'date_created' => $start_date . '...' . $end_date,
+                        'return'       => 'ids',
+                        'limit'        => -1,
+                    );
+                    $orders = wc_get_orders($args);
+                    $orders_count_by_month[$month] = array();
+
+                    foreach ($orders as $order_id) {
+                        $order = wc_get_order($order_id);
+                        $status = $order->get_status();
+                        if (!isset($orders_count_by_month[$month][$status])) {
+                            $orders_count_by_month[$month][$status] = array();
+                        }
+                        $orders_count_by_month[$month][$status][] = $order_id;
+                    }
+                }
+                echo '<pre>';
+                echo '<style>
+                    table#pp_all_orders {
+                        width: 90%;
+                        border-collapse: collapse;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 8px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f2f2f2;
+                    }
+                    ul.pp_orders {
+                        list-style-type: none;
+                        padding: 0;
+                        margin: 0;
+                        display: flex;
+                        flex-wrap: wrap;
+                    }
+                    li {
+                        margin-right: 10px;
+                    }
+                </style>';
+                echo '<table id="pp_all_orders">';
+                echo '<tr><th>Month</th><th>Pending</th><th>Cancelled</th><th>Failed</th><th>Completed</th><th>Processing</th><th>On-Hold</th></tr>';
+                foreach ($orders_count_by_month as $month => $statuses) {
+                    echo '<tr>';
+                    echo '<td>' . esc_html(gmdate('F', mktime(0, 0, 0, $month, 10))) . '</td>';
+                    foreach (['pending', 'cancelled', 'failed', 'completed', 'processing', 'on-hold'] as $status) {
+                        echo '<td>';
+                        if (isset($statuses[$status])) {
+                            echo '<ul class="pp_orders">';
+                            echo '<li><input type="checkbox" class="select-all" data-status="' . esc_attr($status) . '"> Select All</li>';
+                            foreach ($statuses[$status] as $order_id) {
+                                echo '<li><input type="checkbox" name="order_ids[]" value="' . esc_attr($order_id) . '" class="order-checkbox-' . esc_attr($status) . '"> ' . esc_html($order_id) . '</li>';
+                            }
+                            echo '</ul>';
+                        } else {
+                            echo '0';
+                        }
+                        echo '</td>';
+                    }
+                    echo '</tr>';
+                }
+                echo '</table>';
+                echo '</pre>';
+                echo '<div id="selected-orders-summary"></div>';
+                echo '<script>
+                    document.querySelectorAll(".select-all").forEach(function(selectAllCheckbox) {
+                        selectAllCheckbox.addEventListener("change", function() {
+                            var status = this.getAttribute("data-status");
+                            var checkboxes = this.closest("td").querySelectorAll(".order-checkbox-" + status);
+                            checkboxes.forEach(function(checkbox) {
+                                checkbox.checked = selectAllCheckbox.checked;
+                            });
+                            updateSelectedOrdersSummary();
+                        });
+                    });
+
+                    document.querySelectorAll("input[name=\'order_ids[]\']").forEach(function(orderCheckbox) {
+                        orderCheckbox.addEventListener("change", updateSelectedOrdersSummary);
+                    });
+
+                    function updateSelectedOrdersSummary() {
+                        var summary = {};
+                        var selectedOrderIds = [];
+                        document.querySelectorAll("input[name=\'order_ids[]\']:checked").forEach(function(checkbox) {
+                            if (selectedOrderIds.length < 100) {
+                                var month = checkbox.closest("tr").querySelector("td:first-child").textContent;
+                                var status = checkbox.closest("ul").querySelector(".select-all").getAttribute("data-status");
+                                if (!summary[month]) {
+                                    summary[month] = {};
+                                }
+                                if (!summary[month][status]) {
+                                    summary[month][status] = [];
+                                }
+                                summary[month][status].push(checkbox.value);
+                                selectedOrderIds.push(checkbox.value);
+                            } else {
+                                checkbox.checked = false;
+                            }
+                        });
+
+                        var summaryDiv = document.getElementById("selected-orders-summary");
+                        summaryDiv.innerHTML = "<h3>Selected Orders Summary</h3>";
+                        for (var month in summary) {
+                            summaryDiv.innerHTML += "<p><strong>" + month + ":</strong></p>";
+                            for (var status in summary[month]) {
+                                summaryDiv.innerHTML += "<p>" + status + ": " + summary[month][status].join(", ") + "</p>";
+                            }
+                        }
+                        if (selectedOrderIds.length >= 100) {
+                            summaryDiv.innerHTML += "<p><strong style=\'color: red;\'>Total Selected Orders: " + selectedOrderIds.length + "/100</strong></p>";
+                        } else {
+                            summaryDiv.innerHTML += "<p><strong>Total Selected Orders: " + selectedOrderIds.length + "/100</strong></p>";
+                        }
+
+                        // Update the order_numbers textarea
+                        var orderNumbersTextarea = document.querySelector("textarea[name=\'order_numbers\']");
+                        orderNumbersTextarea.value = selectedOrderIds.join(", ");
+
+                        // Hide orderFilters and timeFilters if any orders are selected
+                        var orderFilters = document.getElementById("orderFilters");
+                        var timeFilters = document.getElementById("timeFilters");
+                        var orderNumbers = document.getElementById("orderNumbers");
+                        if (selectedOrderIds.length > 0) {
+                            orderFilters.style.display = "none";
+                            timeFilters.style.display = "none";
+                            orderNumbers.style.display = "none";
+                        } else {
+                            orderFilters.style.display = "flex";
+                            timeFilters.style.display = "flex";
+                            orderNumbers.style.display = "flex";
+                        }
+                    }
+                </script>';
                 ?>
                 <form id="reportsForm" method="post" action=""
                     style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
                     <?php
                     if ($enableDevMode) { ?>
-                        <select name="month">
-                            <?php for ($i = 1; $i <= 12; $i++) : ?>
-                                <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
-                                </option>
-                            <?php endfor; ?>
-                        </select>
-                        <select name="year">
-                            <?php
-                            $currentYear = gmdate('Y');
-                            for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
-                                <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
-                            <?php endfor; ?>
-                        </select>
-                        <select name="take">
-                            <option value="10">10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        <input type="number" name="offset" value="0" min="0" />
+                        <span id="timeFilters" style="display: flex;flex-direction: column;">
+                            <select name="month">
+                                <?php for ($i = 1; $i <= 12; $i++) : ?>
+                                    <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
+                                    </option>
+                                <?php endfor; ?>
+                            </select>
+                            <label for="year">Year</label>
+                            <select name="year">
+                                <?php
+                                $currentYear = gmdate('Y');
+                                for ($i = $currentYear; $i >= $currentYear - 5; $i--) : ?>
+                                    <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html($i); ?></option>
+                                <?php endfor; ?>
+                            </select>
+                            <label for="take">How many?</label>
+                            <select name="take" id="take">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            <label for="offset">Start from (Offset of 0 to 100)</label>
+                            <input type="number" name="offset" value="0" min="0" />
+                        </span>
                         <div class="checkBoxes" style="display: flex;flex-direction: column;padding: 10px;">
-                            <h4>Filters:</h4>
-                            <span style="margin-right: 10px;">
-                                <input type="radio" name="orderStatus" value="pendingOnly">
-                                <label for="pendingOnly">Pending Only</label>
+                            <span id="orderFilters" style="display: flex;flex-direction: column;">
+                                <h4>Filters:</h4>
+                                <span style="margin-right: 10px;">
+                                    <input type="radio" name="orderStatus" value="pendingOnly">
+                                    <label for="pendingOnly">Pending Only</label>
+                                </span>
+                                <span style="margin-right: 10px;">
+                                    <input type="radio" name="orderStatus" value="cancelledOnly">
+                                    <label for="cancelledOnly">Cancelled Only</label>
+                                </span>
+                                <span style="margin-right: 10px;">
+                                    <input type="radio" name="orderStatus" value="failedOnly">
+                                    <label for="failedOnly">Failed Only</label>
+                                </span>
+                                <span style="margin-right: 10px;">
+                                    <input type="radio" name="orderStatus" value="allStatuses">
+                                    <label for="orderStatus">All statuses</label>
+                                </span>
                             </span>
-                            <span style="margin-right: 10px;">
-                                <input type="radio" name="orderStatus" value="cancelledOnly">
-                                <label for="cancelledOnly">Cancelled Only</label>
-                            </span>
-                            <span style="margin-right: 10px;">
-                                <input type="radio" name="orderStatus" value="failedOnly">
-                                <label for="failedOnly">Failed Only</label>
-                            </span>
-                            <span style="margin-right: 10px;">
-                                <input type="radio" name="orderStatus" value="allStatuses">
-                                <label for="orderStatus">All statuses</label>
-                            </span>
-                            <h4>(Optional - Overrides the filters) Enter order ids comma sepearated: </h4>
-                            <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
+                            <div id="orderNumbers" style="display: flex;flex-direction: column;">
+                                <h4>(Optional - Overrides the filters) Enter order ids comma sepearated: </h4>
+                                <textarea name="order_numbers" placeholder="Enter order numbers, separated by commas"></textarea>
+                            </div>
                             <h4>Actions:</h4>
                             <span style="margin-right: 10px;">
                                 <input type="checkbox" name="forceInvoice" value="true">
@@ -297,8 +460,14 @@ class WC_PayPlus_Form_Fields
                     if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
                         echo '<script type="text/javascript">
                             document.getElementById("reportsForm").style.display = "none";
+                            document.getElementById("pp_all_orders").style.display = "none";
+                            document.getElementById("selctedYearForm").style.display = "none";
                         </script>';
-
+                        echo '<style>
+                        table#pp_all_orders, form#selctedYearForm {
+                            display: none;
+                        }
+                        </style>';
                         $payPlusGateway = new WC_PayPlus_Gateway();
                         $payPlusGateway->payPlusOrdersCheck($nonce, $forceInvoice, $forceAll, $allStatuses, $getInvoice, $reportOnly, $orders, $status, $howManyOrders);
                         echo '<br></br><button onclick="window.history.go(-2)">Go Back</button>';
@@ -306,6 +475,11 @@ class WC_PayPlus_Form_Fields
                         echo '<script type="text/javascript">
                             document.getElementById("reportsForm").style.display = "none";
                         </script>';
+                        echo '<style>
+                        table#pp_all_orders, form#selctedYearForm {
+                            display: none;
+                        }
+                        </style>';
                         echo '<form method="post">';
                         echo '<input type="hidden" name="verifyPayPlusOrders" value="' . esc_attr($nonce) . '">';
                         echo '<input type="hidden" name="month" value="' . esc_attr($month) . '">';

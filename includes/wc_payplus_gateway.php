@@ -422,7 +422,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<pre>";
         !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
         $outPut = [];
-
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
             echo "This will not cancel the scheduled cron event\n\n";
@@ -432,6 +431,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo esc_html(implode(",", $orders)) . "\n";
             $this->payplus_add_log_all('payplus-orders-verify-log', '~=> payPlusOrdersCheck <=~ process started: ' . wp_json_encode($orders), 'default');
             foreach ($orders as $order_id) {
+                $order_id = trim($order_id);
                 $outPut[$order_id]['force_all'] = $forceAll;
                 $outPut[$order_id]['statuses'] = $status;
                 $order = wc_get_order($order_id);
