@@ -11,6 +11,7 @@ jQuery(function ($) {
     const enableGooglePay = $(".enable_google_pay");
     const enableApplePay = $(".enable_apple_pay");
     const tokenApplePay = $(".apple_pay_identifier");
+    const shippingWooJs = $(".shipping_woo_js");
 
     const checkAmountAuthorization = $(
         "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
@@ -230,6 +231,27 @@ jQuery(function ($) {
     if (enableApplePay && enableApplePay.prop("checked") === false) {
         tokenApplePay.parents("tr").fadeOut();
     }
+
+    let hideOtherExpressShipping = () => {
+        globalShipping.closest("tr").fadeOut();
+        globalShippingTax.closest("tr").fadeOut();
+        globalShippingTaxRate.closest("tr").fadeOut();
+        shippingwoo.closest("tr").fadeOut();
+    };
+
+    shippingWooJs.prop("checked") ? hideOtherExpressShipping() : null;
+
+    shippingWooJs.change(function () {
+        if (shippingWooJs.prop("checked")) {
+            hideOtherExpressShipping();
+            shippingwoo.closest("tr").fadeOut();
+        } else {
+            globalShipping.closest("tr").fadeIn();
+            globalShippingTax.closest("tr").fadeIn();
+            globalShippingTaxRate.closest("tr").fadeIn();
+            shippingwoo.closest("tr").fadeIn();
+        }
+    });
 
     if (shippingwoo.prop("checked")) {
         globalShipping.closest("tr").fadeOut();

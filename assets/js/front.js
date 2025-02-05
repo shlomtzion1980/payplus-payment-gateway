@@ -533,9 +533,9 @@ function formattedShipping(countryCode, total, withTax = false) {
                 parseFloat(item.cost_without_tax || 0),
         }));
     }
-
     return { newShippingOptionsForApple, newShippingOptionsForPayPlus };
 }
+
 async function getTotalPriceCart() {
     return new Promise((resolve) => {
         const btnCart = jQuery(".single_add_to_cart_button");
