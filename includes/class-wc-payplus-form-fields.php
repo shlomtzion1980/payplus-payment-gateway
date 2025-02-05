@@ -371,9 +371,11 @@ class WC_PayPlus_Form_Fields
                                 <input type="checkbox" name="reportOnly" value="true" checked>
                                 <label for="reportOnly">Report Only</label>
                             </span>
-                        </div> <?php } ?>
-                    <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
-                    </form>
+                        </div><button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+                    </form> <?php } else { ?>
+                    <form method="post" action="">
+                        <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+                    </form> <?php } ?>
             </div>
 <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
