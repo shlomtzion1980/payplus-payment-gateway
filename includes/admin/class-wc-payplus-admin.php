@@ -2125,6 +2125,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $responseTotalAmount = !empty($payPlusResponse) && is_array(json_decode($payPlusResponse, true)) ? json_decode($payPlusResponse, true)['amount'] : false;
             $totalCartAmount = $responseTotalAmount ? $responseTotalAmount : $objectProducts->amount;
             $payplusRefunded = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_refunded', true);
+            $totalCartAmount = number_format($totalCartAmount, 2, '.', '');
 
             if (!$payplusRefunded) {
                 WC_PayPlus_Meta_Data::update_meta($order, array('payplus_refunded' => $order->get_total()));
