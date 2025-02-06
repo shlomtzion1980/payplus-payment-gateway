@@ -206,6 +206,7 @@ function updateApplePayConfig(
     currentShippingIdentifier = formattedtShippingArray.length
         ? formattedtShippingArray[0]?.identifier
         : "";
+    console.log(applePayConfig.shippingMethods);
 }
 
 function updateLineItems() {
@@ -811,7 +812,11 @@ window.addEventListener("message", async function (event) {
                     ],
                 };
             }
-            if (payplus_script.isShippingWooJs) {
+            if (
+                payplus_script.isShippingWooJs &&
+                newPpShippingMethods &&
+                newPpShippingMethods.all.length > 0
+            ) {
                 shipping = newPpShippingMethods;
             }
             if (window.location.host == "localhost") {
