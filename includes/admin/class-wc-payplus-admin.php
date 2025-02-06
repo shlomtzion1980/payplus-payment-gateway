@@ -2271,7 +2271,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             )
         );
         wp_enqueue_script('payplus-admin-payment');
-        wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.js', ['jquery'], time(), true);
+        wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
         wp_localize_script(
             'wc-payplus-gateway-admin',
             'payplus_script_payment',
