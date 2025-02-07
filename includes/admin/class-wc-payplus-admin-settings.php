@@ -564,7 +564,8 @@ class WC_PayPlus_Admin_Settings
                 $settings[$section][] = [
                     'name' => __('Display on product page', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_product]',
-                    'type' => 'checkbox'
+                    'type' => 'checkbox',
+                    'class' => 'enable_product',
                 ];
 
                 $settings[$section][] = [
