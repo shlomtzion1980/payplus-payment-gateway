@@ -157,7 +157,8 @@ class WC_PayPlus_Form_Fields
                         <label for="year">Choose Year:</label>
                         <select name="year" id="year">
                             <?php for ($i = $current_year; $i >= $current_year - 5; $i--) : ?>
-                                <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_year, $i); ?>><?php echo esc_html($i); ?></option>
+                                <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_year, $i); ?>>
+                                    <?php echo esc_html($i); ?></option>
                             <?php endfor; ?>
                         </select>
                         <button type="submit">Submit</button>
@@ -308,7 +309,8 @@ class WC_PayPlus_Form_Fields
                         <span id="timeFilters" style="display: flex;flex-direction: column;">
                             <select name="month">
                                 <?php for ($i = 1; $i <= 12; $i++) : ?>
-                                    <option value="<?php echo esc_attr($i); ?>"><?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
+                                    <option value="<?php echo esc_attr($i); ?>">
+                                        <?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?>
                                     </option>
                                 <?php endfor; ?>
                             </select>
@@ -371,7 +373,8 @@ class WC_PayPlus_Form_Fields
                                 <input type="checkbox" name="reportOnly" value="true" checked>
                                 <label for="reportOnly">Report Only</label>
                             </span>
-                        </div><button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
+                        </div><button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders
+                            verifier</button>
                     </form> <?php } else { ?>
                     <form method="post" action="">
                         <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
@@ -714,6 +717,14 @@ class WC_PayPlus_Form_Fields
                 'default' => '1',
                 'description' => __('Hide the other payment methods on the payment page.<br>Example: If you have Google Pay and Credit Cards - 
                 when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'enable_double_check_if_pruid_exists' => [
+                'title' => __('Double check ipn before opening a payment page.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => 'Double check ipn (Default: Unchecked)',
+                'description' => __('Before opening a payment page and if a PayPlus payment request uid already exists for this order, perform an ipn check.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'order_status_title' => [

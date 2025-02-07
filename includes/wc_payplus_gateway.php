@@ -102,6 +102,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $hostedFieldsOptions;
     public $isHostedEnabled;
     public $enableDevMode;
+    public $enableDoubleCheckIfPruidExists;
 
     /**
      *
@@ -152,6 +153,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->hide_custom_fields_buttons = $this->get_option('hide_custom_fields_buttons') == 'yes' ? true : false;
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->isHostedEnabled = boolval(isset($this->hostedFieldsOptions['enabled']) && $this->hostedFieldsOptions['enabled'] === "yes");
+        $this->enableDoubleCheckIfPruidExists = $this->get_option('enable_double_check_if_pruid_exists') == 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -1507,6 +1509,35 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $order->save_meta_data();
 
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
+
+        if ($this->enableDoubleCheckIfPruidExists) {
+            $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+
+            if (!empty($payplus_page_request_uid)) {
+                $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                $status = $PayPlusAdminPayments->payplusIpn(
+                    $order_id,
+                    $_wpnonce,
+                    $saveToken = false,
+                    $isHostedPayment = false,
+                    $allowUpdateStatuses = true,
+                    $allowReturn = false,
+                    $getInvoice = false,
+                    $moreInfo = false,
+                    $returnStatusOnly = true
+                );
+                if ($status === "processing" || $status === "on-hold") {
+                    $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
+                    $result = [
+                        'result' => 'success',
+                        'redirect' => $redirect_to
+                    ];
+                    return $result;
+                }
+            }
+        }
+
 
         if ($is_token) {
 

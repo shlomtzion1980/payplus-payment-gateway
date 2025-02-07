@@ -267,7 +267,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $allowUpdateStatuses = true,
         $allowReturn = false,
         $getInvoice = false,
-        $moreInfo = false
+        $moreInfo = false,
+        $returnStatusOnly = false
     ) {
         $this->isInitiated();
 
@@ -450,7 +451,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     echo esc_html("Transaction status received from PayPlus: {$responseBody['data']['status']}\n");
                 }
             }
-            if ($allowReturn && isset($status)) {
+            if ($allowReturn && isset($status) || $returnStatusOnly && isset($status)) {
                 return $status;
             }
         }
