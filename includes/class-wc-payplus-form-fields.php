@@ -147,11 +147,13 @@ class WC_PayPlus_Form_Fields
                 <?php
                 $payPlusSettings = get_option('woocommerce_payplus-payment-gateway_settings');
                 $enableDevMode = isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === 'yes';
+                $enableOrdersTable = isset($payPlusSettings['enable_orders_table']) && $payPlusSettings['enable_orders_table'] === 'yes';
 
-                if ($enableDevMode) {
+                if ($enableOrdersTable && $enableOrdersTable) {
                     $orders_count_by_month = array();
                     $current_year = gmdate('Y');
                     $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
+                    $selected_month = isset($_POST['month']) ? intval($_POST['month']) : gmdate('m');
                 ?>
                     <form method="post" action="" id="selctedYearForm">
                         <label for="year">Choose Year:</label>
@@ -161,30 +163,37 @@ class WC_PayPlus_Form_Fields
                                     <?php echo esc_html($i); ?></option>
                             <?php endfor; ?>
                         </select>
+                        <label for="month">Choose Month:</label>
+                        <select name="month" id="month">
+                            <?php for ($i = 1; $i <= 12; $i++) : ?>
+                                <option value="<?php echo esc_attr($i); ?>" <?php selected($selected_month, $i); ?>>
+                                    <?php echo esc_html(gmdate('F', mktime(0, 0, 0, $i, 10))); ?></option>
+                            <?php endfor; ?>
+                        </select>
                         <button type="submit">Submit</button>
                     </form>
                     <?php
                     $current_year = $selected_year;
-                    for ($month = 1; $month <= 12; $month++) {
-                        $start_date = gmdate('Y-m-01 00:00:00', strtotime("$current_year-$month-01"));
-                        $end_date = gmdate('Y-m-t 23:59:59', strtotime("$current_year-$month-01"));
-                        $args = array(
-                            'date_created' => $start_date . '...' . $end_date,
-                            'return'       => 'ids',
-                            'limit'        => -1,
-                        );
-                        $orders = wc_get_orders($args);
-                        $orders_count_by_month[$month] = array();
+                    $month = isset($_POST['month']) ? intval($_POST['month']) : $selected_month;
+                    $start_date = gmdate('Y-m-01 00:00:00', strtotime("$current_year-$month-01"));
+                    $end_date = gmdate('Y-m-t 23:59:59', strtotime("$current_year-$month-01"));
+                    $args = array(
+                        'date_created' => $start_date . '...' . $end_date,
+                        'return'       => 'ids',
+                        'limit'        => -1,
+                    );
+                    $orders = wc_get_orders($args);
+                    $orders_count_by_month[$month] = array();
 
-                        foreach ($orders as $order_id) {
-                            $order = wc_get_order($order_id);
-                            $status = $order->get_status();
-                            if (!isset($orders_count_by_month[$month][$status])) {
-                                $orders_count_by_month[$month][$status] = array();
-                            }
-                            $orders_count_by_month[$month][$status][] = $order_id;
+                    foreach ($orders as $order_id) {
+                        $order = wc_get_order($order_id);
+                        $status = $order->get_status();
+                        if (!isset($orders_count_by_month[$month][$status])) {
+                            $orders_count_by_month[$month][$status] = array();
                         }
+                        $orders_count_by_month[$month][$status][] = $order_id;
                     }
+
                     echo '<pre>';
                     echo '<style>
                     table#pp_all_orders {
@@ -303,6 +312,8 @@ class WC_PayPlus_Form_Fields
                         }
                     }
                 </script>';
+                }
+                if ($enableDevMode) {
                     ?>
                     <form id="reportsForm" method="post" action=""
                         style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
@@ -869,12 +880,19 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'desc_tip' => true,
             ],
             'payplus_orders_check_button' => [
-                'title' => __('Display PayPlus "Orders Check Button"', 'payplus-payment-gateway'),
-                'label' => __('Show PayPlus "Orders Check Button" on the side menu.', 'payplus-payment-gateway'),
+                'title' => __('Display PayPlus "Orders Validator Button"', 'payplus-payment-gateway'),
+                'label' => __('Show PayPlus "Orders Validator Button" on the side menu.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
-                'description' => __('The "PayPlus Orders Check" button checks all orders created within the last day are in "pending" status or "cancelled" and contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.', 'payplus-payment-gateway'),
+                'description' => __('The "PayPlus Orders Validator" button checks all orders created within the last day are in "pending" status or "cancelled" and contain "payplus_page_request_uid". It verifies the PayPlus IPN Process and sets the correct status if needded.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
+            ],
+            'enable_orders_table' => [
+                'title'   => __('Enable display of orders table select in PayPlus Orders Validator', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'description' => __('Display orders table on top of the PayPlus Orders Validator to select orders by month, year and status via checkboxes.', 'payplus-payment-gateway'),
+                'type'    => 'checkbox',
+                'default' => 'no',
             ],
             'payplus_show_sub_gateways_side_menu' => [
                 'title' => __('Display PayPlus Subgateways on the side menu', 'payplus-payment-gateway'),
