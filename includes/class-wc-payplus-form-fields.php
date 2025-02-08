@@ -155,6 +155,7 @@ class WC_PayPlus_Form_Fields
                     $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
                     $selected_month = isset($_POST['month']) ? intval($_POST['month']) : gmdate('m');
                 ?>
+                    <h2>Orders by Month - Table select</h2>
                     <form method="post" action="" id="selctedYearForm">
                         <label for="year">Choose Year:</label>
                         <select name="year" id="year">
@@ -318,6 +319,7 @@ class WC_PayPlus_Form_Fields
                     <form id="reportsForm" method="post" action=""
                         style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
                         <span id="timeFilters" style="display: flex;flex-direction: column;">
+                            <h2>Orders by Month - Filter select</h2>
                             <select name="month">
                                 <?php for ($i = 1; $i <= 12; $i++) : ?>
                                     <option value="<?php echo esc_attr($i); ?>">
