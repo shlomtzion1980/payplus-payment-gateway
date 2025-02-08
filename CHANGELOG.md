@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.6] - 09-02-2025 - (Agrippa)
+
+- Fix   - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
+- Fix   - Corrected rounding error that prevented charging with error message: "Cannot charge more than the total order amount on J5" on specific issues.
+- Tweak - PayPlus Orders Validator: When "Enable Partners Dev Mode" is enabled, orders can be selected by year and month. Additionally, a visual table is available when "Enable display of orders table select in PayPlus Orders Validator" is enabled.
+- Tweak - PayPlus Orders Validator: When "Enable Partners Dev Mode" is enabled, added "Actions" with the ability to run reports only, force all, get invoice, and force invoice.
+- Tweak - PayPlus Orders Validator: Will not mark orders as cron tested, allowing the cron to run on these orders if activated.
+- Add   - Prevention of double deals under the same order number for websites with heavy traffic and callback issues. The "Double check IPN" feature checks if an order already has a "payplus_page_request_uid" before attempting to start a new payment.
+
 ## [7.5.5] - 02-02-2025 - (Greed)
 
 - Fix - Resolved issue where PayPlus Embedded was stuck on loading for certain templates.
