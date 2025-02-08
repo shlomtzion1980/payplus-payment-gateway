@@ -317,7 +317,7 @@ class WC_PayPlus_Form_Fields
                 if ($enableDevMode) {
                     ?>
                     <form id="reportsForm" method="post" action=""
-                        style="display: flex;width: 10%;flex-direction: column;flex-wrap: wrap;">
+                        style="display: flex;width: 20%;flex-direction: column;flex-wrap: wrap;">
                         <span id="timeFilters" style="display: flex;flex-direction: column;">
                             <h2>Orders by Month - Filter select</h2>
                             <select name="month">
@@ -372,19 +372,19 @@ class WC_PayPlus_Form_Fields
                             <h4>Actions:</h4>
                             <span style="margin-right: 10px;">
                                 <input type="checkbox" name="forceInvoice" value="true">
-                                <label for="forceInvoice">Force Invoice</label>
+                                <label for="forceInvoice">Force Invoice (run IPN even if an invoice exists)</label>
                             </span>
                             <span style="margin-right: 10px;">
                                 <input type="checkbox" name="getInvoice" value="true">
-                                <label for="getInvoice">Get Invoices</label>
+                                <label for="getInvoice">Get Invoices (If exist)</label>
                             </span>
                             <span style="margin-right: 10px;">
                                 <input type="checkbox" name="forceAll" value="true">
-                                <label for="forceAll">Force All</label>
+                                <label for="forceAll">Force IPN (run IPN even if response exists)</label>
                             </span>
                             <span style="margin-right: 10px;">
                                 <input type="checkbox" name="reportOnly" value="true" checked>
-                                <label for="reportOnly">Report Only</label>
+                                <label for="reportOnly">Report Only (will not make any changes)</label>
                             </span>
                         </div><button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders
                             verifier</button>
@@ -397,7 +397,7 @@ class WC_PayPlus_Form_Fields
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 echo '<pre>';
-                echo 'Running PayPlus Order checker...';
+                echo "Running PayPlus Order checker...\n";
                 if (wp_verify_nonce($nonce, 'payPlusOrderChecker')) {
                     // Process the form data here
                     $month = isset($_POST['month']) ? intval($_POST['month']) : gmdate('m');
@@ -425,8 +425,7 @@ class WC_PayPlus_Form_Fields
                         // Get start and end dates for the given month
                         $start_date = gmdate('Y-m-01 00:00:00', strtotime("$year-$month-01"));
                         $end_date = gmdate('Y-m-t 23:59:59', strtotime("$year-$month-01")); // Last day of the month
-                        echo esc_html("Start date: $start_date\n");
-                        echo esc_html("End date: $end_date\n");
+
                         $dateOrDates = $start_date . '...' . $end_date;
                     } else {
                         $dateOrDates = $current_time;
@@ -440,8 +439,7 @@ class WC_PayPlus_Form_Fields
                         'limit'        => -1, // Retrieve all orders
                     );
 
-                    $statuses = wp_json_encode($status);
-                    echo esc_html("Selected statuses: $statuses\n");
+
 
                     if (isset($_POST['order_numbers']) && !empty($_POST['order_numbers'])) {
                         $order_numbers = explode(',', sanitize_text_field(wp_unslash($_POST['order_numbers'])));
@@ -450,6 +448,10 @@ class WC_PayPlus_Form_Fields
                         echo esc_html("\nTotal orders found: $howManyOrders\n");
                         echo esc_html("Orders found: \n" . wp_json_encode($orders) . "\n");
                     } else {
+                        echo esc_html("Start date: $start_date\n");
+                        echo esc_html("End date: $end_date\n");
+                        $statuses = wp_json_encode($status);
+                        echo esc_html("Selected statuses: $statuses\n");
                         $orders = array_reverse(wc_get_orders($args));
                         $howManyOrders = count($orders);
                         echo esc_html("\nTotal orders found: $howManyOrders\n");

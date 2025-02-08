@@ -422,7 +422,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
 
         echo "<pre>";
-        !$getInvoice ? $ipnMessage = "RUNNING IPN! - Check order notes and status for results!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
+        !$getInvoice ? $ipnMessage = "RUNNING IPN!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
         $outPut = [];
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
@@ -476,14 +476,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         }
                     }
                     if ($runIpn) {
-                        echo esc_html("Order #$order_id - $ipnMessage");
+                        echo esc_html("Order #$order_id - $ipnMessage\n");
+                        $order_customer = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
+                        $order_phone = $order->get_billing_phone();
+                        echo esc_html("Order #$order_id Customer: $order_customer\n");
+                        echo esc_html("Order #$order_id Phone: $order_phone\n");
                         $outPut[$order_id]['message'] = $ipnMessage;
-                        echo "\n";
                         $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
 
                         $ipnResponse = !$reportOnly ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice) : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice);
+                        if ($reportOnly) {
+                            echo "Report only mode.\n";
+                        }
                         if ($ipnResponse) {
                             if ($getInvoice && is_array($ipnResponse)) {
                                 echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
