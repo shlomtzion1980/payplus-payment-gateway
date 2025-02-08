@@ -149,7 +149,7 @@ class WC_PayPlus_Form_Fields
                 $enableDevMode = isset($payPlusSettings['enable_dev_mode']) && $payPlusSettings['enable_dev_mode'] === 'yes';
                 $enableOrdersTable = isset($payPlusSettings['enable_orders_table']) && $payPlusSettings['enable_orders_table'] === 'yes';
 
-                if ($enableOrdersTable && $enableOrdersTable) {
+                if ($enableDevMode && $enableOrdersTable) {
                     $orders_count_by_month = array();
                     $current_year = gmdate('Y');
                     $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
@@ -448,8 +448,10 @@ class WC_PayPlus_Form_Fields
                         echo esc_html("\nTotal orders found: $howManyOrders\n");
                         echo esc_html("Orders found: \n" . wp_json_encode($orders) . "\n");
                     } else {
-                        echo esc_html("Start date: $start_date\n");
-                        echo esc_html("End date: $end_date\n");
+                        if (isset($start_date) && isset($end_date)) {
+                            echo esc_html("Start date: $start_date\n");
+                            echo esc_html("End date: $end_date\n");
+                        }
                         $statuses = wp_json_encode($status);
                         echo esc_html("Selected statuses: $statuses\n");
                         $orders = array_reverse(wc_get_orders($args));
