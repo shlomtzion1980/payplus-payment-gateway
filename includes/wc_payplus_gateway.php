@@ -2646,7 +2646,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($response['transaction_type'] == "Charge") {
                         if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
                             WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
-                            $order->payment_complete();
+                            // $order->payment_complete();
                             $this->payplus_add_log_all(
                                 'payplus_callback_secured',
                                 "Order # $order_id Running Woocommerce payment complete process."
@@ -2654,7 +2654,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         }
                         if ($this->successful_order_status !== 'default-woo') {
                             WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
-                            $order->update_status($this->successful_order_status);
+                            // $order->update_status($this->successful_order_status);
                             $this->payplus_add_log_all(
                                 'payplus_callback_secured',
                                 "Updating order #$order_id status to: $this->successful_order_status"
@@ -2662,7 +2662,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         }
                     } else {
                         WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
-                        $order->update_status('wc-on-hold');
+                        // $order->update_status('wc-on-hold');
                         $this->payplus_add_log_all(
                             'payplus_callback_secured',
                             "Updating order #$order_id status to: wc-on-hold"
