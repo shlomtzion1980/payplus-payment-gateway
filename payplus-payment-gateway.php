@@ -1024,11 +1024,16 @@ class WC_PayPlus
                 $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
 
                 if ($payplusGenHash === $payplusHash) {
+                    $this->payplus_gateway = $this->get_main_payplus_gateway();
                     $order_id = intval($response['transaction']['more_info']);
                     $order = wc_get_order($order_id);
                     WC_PayPlus_Meta_Data::update_meta($order, ['payplus_callback_response' => $json]);
                     // Add a delayed event
-                    $this->schedule_delayed_event($order_id);
+                    $this->payplus_gateway->payplus_add_log_all(
+                        'payplus_callback_secured',
+                        "PayPlus order # $order_id STARTING CALLBACK FUNCTION:"
+                    );
+                    $this->payplus_gateway->legacy_callback_response($order_id);
                 }
                 $response = array(
                     'status' => 'success',
