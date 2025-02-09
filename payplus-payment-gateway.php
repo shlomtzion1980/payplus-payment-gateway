@@ -1031,7 +1031,7 @@ class WC_PayPlus
                     // Add a delayed event
                     $this->payplus_gateway->payplus_add_log_all(
                         'payplus_callback_secured',
-                        "PayPlus order # $order_id STARTING CALLBACK FUNCTION:"
+                        "\nPayPlus order # $order_id STARTING CALLBACK FUNCTION:"
                     );
                     $this->payplus_gateway->legacy_callback_response($order_id);
                     $response = array(

@@ -2533,8 +2533,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             wp_remote_post($url, $args);
         }
 
-        $order_id = intval($response['transaction']['more_info']);
-        $order = wc_get_order($order_id);
         $datetime = current_datetime();
         $LocalTime = $datetime->format('Y-m-d H:i:s');
         if ($order) {
