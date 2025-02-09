@@ -1034,20 +1034,20 @@ class WC_PayPlus
                         "PayPlus order # $order_id STARTING CALLBACK FUNCTION:"
                     );
                     $this->payplus_gateway->legacy_callback_response($order_id);
-                }
-                $response = array(
-                    'status' => 'success',
-                    'message' => 'PayPlus callback function ended.',
-                );
+                    $response = array(
+                        'status' => 'success',
+                        'message' => 'PayPlus callback function ended.',
+                    );
 
-                wp_die(
-                    wp_json_encode($response),
-                    '',
-                    array(
-                        'response' => 200,
-                        'content_type' => 'application/json'
-                    )
-                );
+                    wp_die(
+                        wp_json_encode($response),
+                        '',
+                        array(
+                            'response' => 200,
+                            'content_type' => 'application/json'
+                        )
+                    );
+                }
             }
 
             /**
