@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.5.6] - 09-02-2025 - (Agrippa)
+## [7.5.7] - 09-02-2025 - (Agrippa)
 
 - Fix   - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
 - Fix   - Corrected rounding error that prevented charging with error message: "Cannot charge more than the total order amount on J5" on specific issues.

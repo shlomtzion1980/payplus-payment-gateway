@@ -2645,7 +2645,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if ($status_code === "000") {
                     if ($response['transaction_type'] == "Charge") {
                         if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
+                            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'callback_process->firePaymentComplete', $transactionUid);
                             // $order->payment_complete();
                             $this->payplus_add_log_all(
                                 'payplus_callback_secured',
@@ -2653,7 +2653,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             );
                         }
                         if ($this->successful_order_status !== 'default-woo') {
-                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
+                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->' . $this->successful_order_status, $transactionUid);
                             // $order->update_status($this->successful_order_status);
                             $this->payplus_add_log_all(
                                 'payplus_callback_secured',
@@ -2661,7 +2661,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             );
                         }
                     } else {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
+                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->wc-on-hold', $transactionUid);
                         // $order->update_status('wc-on-hold');
                         $this->payplus_add_log_all(
                             'payplus_callback_secured',

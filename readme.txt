@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.5.6
+Stable tag: 7.5.7
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.5.6 - 09-02-2025 =
+= 7.5.7 - 09-02-2025 =
 
 - Fix   - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
 - Fix   - Corrected rounding error that prevented charging with error message: "Cannot charge more than the total order amount on J5" on specific issues.
