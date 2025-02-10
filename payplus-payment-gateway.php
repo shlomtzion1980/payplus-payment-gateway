@@ -222,7 +222,7 @@ class WC_PayPlus
                             $responseStatus = json_decode($payPlusResponse, true)['status_code'];
                             $hasInvoice = $this->invoice_api->payplus_get_invoice_enable() && boolval(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send') === "1");
                             if ($responseStatus === "000" && $hasInvoice) {
-                                $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - status = $status: ATTENTION: Order has successful response, was PROBABLY edited to cancelled manually - NOT Running IPN -\n");
+                                $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - status = $status: ATTENTION: Order has successful response,*PROBABLY* edited manually - NOT Running IPN -\n");
                                 $runIpn = false;
                             } else {
                                 $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - status = $status: ATTENTION: Order has successful response but no invoice - Running IPN\n");
@@ -231,7 +231,7 @@ class WC_PayPlus
                     }
                     if ($runIpn) {
                         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
-                        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - status = $status: created in the last two hours: current time: $current_hour:$current_minute created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
+                        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours - created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
                         $order->add_order_note('PayPlus Cron: Running IPN.');
