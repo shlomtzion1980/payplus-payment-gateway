@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.8] - 11-02-2025 - (Noelle)
+
+- Tweak - Enhanced PayPlus Cron: Now runs every 30 minutes, manages both Invoice+ and non-Invoice+ cancelled orders, and provides improved logging in both logs and order notes.
+- Tweak - Optimized callback feature for improved speed and efficiency.
+- Fix   - Resolved an issue where the custom icons length was undefined in JavaScript when no custom icons were selected for the checkout page.
+- Tweak - "Make Payment" button for J5 (Approval) orders with a "processing" status will be hidden, even if they are unpaid.
+
+
 ## [7.5.7] - 09-02-2025 - (Agrippa)
 
 - Fix   - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
