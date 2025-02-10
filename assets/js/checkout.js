@@ -1330,7 +1330,10 @@ jQuery(function ($) {
 
     // Add custom icons field if exists under cc method description
     function addCustomIcons() {
-        if (payplus_script_checkout?.customIcons[0]?.length > 0) {
+        if (
+            typeof payplus_script_checkout?.customIcons[0] !== "undefined" &&
+            payplus_script_checkout?.customIcons[0]?.length > 0
+        ) {
             var $hostedDiv = $("<div></div>", {
                 class: "payplus-checkout-image-container", // Optional: Add a class to the div
                 id: "payplus-checkout-image-div", // Optional: Add an ID to the div
