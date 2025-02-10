@@ -465,6 +465,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             } else {
                                 echo esc_html("THE ORDER DOES NOT have an invoice on PayPlus!\n\n");
                                 $outPut[$order_id]['message_invoice'] = "THE ORDER DOES NOT have an invoice on PayPlus!";
+                                $runIpn = true;
                             }
                         }
                     } elseif (!$forceAll) {
