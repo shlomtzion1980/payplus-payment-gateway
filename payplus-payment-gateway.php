@@ -197,7 +197,7 @@ class WC_PayPlus
             $calc = $current_minute - $min;
             $isEligible = boolval($current_hour === $hour && $calc < 30);
             $runIpn = true;
-            if ($current_hour >= $hour - 2 && !$isEligible) {
+            if ($current_hour >= $hour - 2) {
                 $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
                 if ($paymentPageUid && $payPlusCronTested < 5) {
