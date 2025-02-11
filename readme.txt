@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.5.7
+Stable tag: 7.5.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.5.8 - 11-02-2025 =
+
+- Tweak - Enhanced PayPlus Cron: Now runs every 30 minutes, manages both Invoice+ and non-Invoice+ cancelled orders, and provides improved logging in both logs and order notes.
+- Tweak - Optimized callback feature for improved speed and efficiency.
+- Fix   - Resolved an issue where the custom icons length was undefined in JavaScript when no custom icons were selected for the checkout page.
+- Tweak - "Make Payment" button for J5 (Approval) orders with a "processing" status will be hidden, even if they are unpaid.
 
 = 7.5.7 - 09-02-2025 =
 
