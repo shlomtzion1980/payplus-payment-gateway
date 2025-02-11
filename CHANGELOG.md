@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 - Tweak - Optimized callback feature for improved speed and efficiency.
 - Fix   - Resolved an issue where the custom icons length was undefined in JavaScript when no custom icons were selected for the checkout page.
 - Tweak - "Make Payment" button for J5 (Approval) orders with a "processing" status will be hidden, even if they are unpaid.
-
+- Fix   - Resolved rounding issue for J5 payment error when order products were removed and the total amount was adjusted.
 
 ## [7.5.7] - 09-02-2025 - (Agrippa)
 
