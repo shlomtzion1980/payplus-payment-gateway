@@ -79,7 +79,7 @@ class WC_PayPlus
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
-        add_action('payplus_hourly_cron_job', [$this, 'getPayplusCron']);
+        add_action('payplus_twice_hourly_cron_job', [$this, 'getPayplusCron']);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -88,12 +88,15 @@ class WC_PayPlus
 
         if (boolval($this->isPayPlus && isset($this->payplus_payment_gateway_settings->payplus_cron_service) && $this->payplus_payment_gateway_settings->payplus_cron_service === 'yes')) {
             $this->payPlusCronActivate();
-            // add_action('wp', 'payPlusCronActivate');
+            // Remove old cron function
+            $timestamp = wp_next_scheduled('payplus_hourly_cron_job');
+            if ($timestamp) {
+                wp_unschedule_event($timestamp, 'payplus_hourly_cron_job');
+            }
+            // Remove old cron function
         } else {
             $this->payPlusCronDeactivate();
-            // register_deactivation_hook(__FILE__, 'payPlusCronDeactivate');
         }
-        // remove_all_actions('admin_notices');
     }
 
     public function wc_payplus_check_version()
@@ -162,9 +165,9 @@ class WC_PayPlus
 
     public function payPlusCronDeactivate()
     {
-        $timestamp = wp_next_scheduled('payplus_hourly_cron_job');
+        $timestamp = wp_next_scheduled('payplus_twice_hourly_cron_job');
         if ($timestamp) {
-            wp_unschedule_event($timestamp, 'payplus_hourly_cron_job');
+            wp_unschedule_event($timestamp, 'payplus_twice_hourly_cron_job');
         }
     }
 
@@ -180,8 +183,8 @@ class WC_PayPlus
 
     public function payPlusCronActivate()
     {
-        if (!wp_next_scheduled('payplus_hourly_cron_job')) {
-            wp_schedule_event(time(), 'half_hour', 'payplus_hourly_cron_job');
+        if (!wp_next_scheduled('payplus_twice_hourly_cron_job')) {
+            wp_schedule_event(time(), 'half_hour', 'payplus_twice_hourly_cron_job');
         }
     }
 
