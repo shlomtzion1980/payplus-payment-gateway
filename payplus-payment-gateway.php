@@ -175,7 +175,7 @@ class WC_PayPlus
     {
         $schedules['half_hour'] = array(
             'interval' => 1800, // 30 minutes in seconds
-            'display'  => __('Every 30 Minutes'),
+            'display'  => __('Every 30 Minutes', 'payplus-payment-gateway'),
         );
         return $schedules;
     }
