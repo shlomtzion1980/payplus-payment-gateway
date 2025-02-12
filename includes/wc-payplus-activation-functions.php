@@ -389,14 +389,34 @@ function payplus_create_table_change_status_order()
 }
 
 /**
- * @return void
+ * Check if a database table exists and cache the result.
+ *
+ * @param string $nameTable The table name to check.
+ * @return bool True if the table exists, false otherwise.
  */
 function payplus_check_table_exist_db($nameTable)
 {
     global $wpdb;
 
-    $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
-    return ($result == $nameTable);
+    $cache_key = 'payplus_check_table_exist_' . $nameTable;
+
+    // Use wp_cache_get() if persistent cache exists, otherwise use get_transient()
+    $flag = wp_using_ext_object_cache() ? wp_cache_get($cache_key, 'payplus') : get_transient($cache_key);
+
+    // If cache is missing, run the query
+    if ($flag === false || $flag === null) {
+        $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
+        $flag = ($result == $nameTable);
+
+        // Store the result using the appropriate caching method
+        if (wp_using_ext_object_cache()) {
+            wp_cache_set($cache_key, $flag, 'payplus');
+        } else {
+            set_transient($cache_key, $flag, HOUR_IN_SECONDS);
+        }
+    }
+
+    return $flag;
 }
 
 /**
