@@ -593,14 +593,23 @@ class PayplusInvoice
     public function getRateShipping()
     {
         global $wpdb;
-        $tax_rate_shipping = 0;
-        $rates = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates");
+        $cache_key = 'woocommerce_tax_rate_shipping';
+        $tax_rate_shipping = wp_cache_get($cache_key);
 
-        if (count($rates)) {
-            if ($rates[0]->tax_rate_country == "" || $rates[0]->tax_rate_country == 'IL') {
-                $tax_rate_shipping = intval($rates[0]->tax_rate_shipping);
+        if ($tax_rate_shipping === false) {
+            $tax_rate_shipping = 0;
+            $rates = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates");
+
+            if (count($rates)) {
+                if ($rates[0]->tax_rate_country == "" || $rates[0]->tax_rate_country == 'IL') {
+                    $tax_rate_shipping = intval($rates[0]->tax_rate_shipping);
+                }
             }
+
+            wp_cache_set($cache_key, $tax_rate_shipping);
         }
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+        $WC_PayPlus_Gateway->payplus_add_log_all('db_cache_log', 'getRateShipping: ' . $tax_rate_shipping);
         return $tax_rate_shipping;
     }
 

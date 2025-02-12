@@ -395,8 +395,21 @@ function payplus_check_table_exist_db($nameTable)
 {
     global $wpdb;
 
+    // Check if the result is cached
+    $cache_key = 'payplus_table_exist_' . $nameTable;
+    $cached_result = wp_cache_get($cache_key);
+
+    if ($cached_result !== false) {
+        return $cached_result;
+    }
+
     $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $wpdb->esc_like($nameTable)));
-    return ($result == $nameTable);
+    $exists = ($result == $nameTable);
+
+    // Cache the result
+    wp_cache_set($cache_key, $exists);
+
+    return $exists;
 }
 
 /**
