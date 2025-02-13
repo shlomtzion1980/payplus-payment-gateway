@@ -593,14 +593,31 @@ class PayplusInvoice
     public function getRateShipping()
     {
         global $wpdb;
-        $tax_rate_shipping = 0;
-        $rates = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates");
 
-        if (count($rates)) {
-            if ($rates[0]->tax_rate_country == "" || $rates[0]->tax_rate_country == 'IL') {
-                $tax_rate_shipping = intval($rates[0]->tax_rate_shipping);
+        $cache_key = 'payplus_tax_rate_shipping';
+
+        // Use wp_cache_get() if persistent cache exists, otherwise use get_transient()
+        $tax_rate_shipping = wp_using_ext_object_cache() ? wp_cache_get($cache_key, 'payplus') : get_transient($cache_key);
+
+        // If cache is missing, run the query
+        if ($tax_rate_shipping === false || $tax_rate_shipping === null) {
+            $tax_rate_shipping = 0;
+            $rates = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}woocommerce_tax_rates");
+
+            if (count($rates)) {
+                if ($rates[0]->tax_rate_country == "" || $rates[0]->tax_rate_country == 'IL') {
+                    $tax_rate_shipping = intval($rates[0]->tax_rate_shipping);
+                }
+            }
+
+            // Store the result using the appropriate caching method
+            if (wp_using_ext_object_cache()) {
+                wp_cache_set($cache_key, $tax_rate_shipping, 'payplus');
+            } else {
+                set_transient($cache_key, $tax_rate_shipping, 5 * MINUTE_IN_SECONDS);
             }
         }
+
         return $tax_rate_shipping;
     }
 
