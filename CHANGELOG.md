@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.5.9] - 17-02-2025 - (Zora)
+
+- Added - Option to require a phone number for Google Pay Express Checkout.
+- Tweak - Translations to hebrew.
+- Tweak - Implemented wp_cache and transient to minimize several database queries.
+
 ## [7.5.8] - 11-02-2025 - (Noelle)
 
 - Tweak - Enhanced PayPlus Cron: Now runs every 30 minutes, manages both Invoice+ and non-Invoice+ cancelled orders, and provides improved logging in both logs and order notes.
