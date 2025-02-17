@@ -547,7 +547,7 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'woocommerce_payplus-payment-gateway_settings[require_phone]',
                     'type' => 'checkbox',
                     'class' => 'require_phone enable_checkout',
-                    'desc' => 'Require phone number with Google Pay',
+                    'desc' => __('Require phone number with Google Pay', 'payplus-payment-gateway'),
                 ];
                 $settings[$section][] = [
                     'name' => __('Apple Pay', 'payplus-payment-gateway'),

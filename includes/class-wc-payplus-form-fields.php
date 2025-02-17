@@ -740,7 +740,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Double check ipn', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
-                'label' => 'Double check ipn (Default: Unchecked)',
+                'label' => __('Double check ipn (Default: Unchecked)', 'payplus-payment-gateway'),
                 'description' => __('Before opening a payment page and if a PayPlus payment request uid already exists for this order, perform an ipn check.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],

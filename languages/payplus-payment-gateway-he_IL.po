@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-01-26 17:02+0200\n"
-"PO-Revision-Date: 2025-01-26 17:02+0200\n"
+"POT-Creation-Date: 2025-02-17 10:48+0200\n"
+"PO-Revision-Date: 2025-02-17 11:03+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:23
 #: includes/admin/class-wc-payplus-admin-settings.php:28
-#: payplus-payment-gateway.php:577
+#: payplus-payment-gateway.php:610
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -43,12 +43,12 @@ msgid "Choose card icons to be displayed (none for default)."
 msgstr "בחירת כרטיסי אשראי לתצוגה (ריק לברירת מחדל)."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:61
-#: includes/admin/class-wc-payplus-admin.php:1174
+#: includes/admin/class-wc-payplus-admin.php:1249
 msgid "American Express"
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:62
-#: includes/admin/class-wc-payplus-admin.php:1180
+#: includes/admin/class-wc-payplus-admin.php:1255
 msgid "Visa"
 msgstr ""
 
@@ -63,22 +63,22 @@ msgid "Isracard"
 msgstr "כרטיסי אשראי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:65
-#: includes/admin/class-wc-payplus-admin.php:1177
+#: includes/admin/class-wc-payplus-admin.php:1252
 msgid "Discover"
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:66
-#: includes/admin/class-wc-payplus-admin.php:1183
+#: includes/admin/class-wc-payplus-admin.php:1258
 msgid "Diners"
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:67
-#: includes/admin/class-wc-payplus-admin.php:1171
+#: includes/admin/class-wc-payplus-admin.php:1246
 msgid "Mastercard"
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:68
-#: includes/admin/class-wc-payplus-admin.php:1189
+#: includes/admin/class-wc-payplus-admin.php:1264
 msgid "Maestro"
 msgstr ""
 
@@ -98,18 +98,18 @@ msgstr "הגדרות בסיס לתוסף - הגדרה של אלו מאפשרת �
 
 #: includes/admin/class-wc-payplus-admin-settings.php:83
 #: includes/admin/class-wc-payplus-admin-settings.php:257
-#: includes/class-wc-payplus-form-fields.php:170
+#: includes/class-wc-payplus-form-fields.php:544
 #: includes/wc_payplus_subgateways.php:151
 msgid "Enable/Disable"
 msgstr "הפעלה/השבתה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:85
-#: includes/class-wc-payplus-form-fields.php:168
+#: includes/class-wc-payplus-form-fields.php:542
 msgid "Enable PayPlus+ Payment"
 msgstr "הפעלת תשלום פייפלוס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:90
-#: includes/class-wc-payplus-form-fields.php:194
+#: includes/class-wc-payplus-form-fields.php:568
 msgid "API Key"
 msgstr "(API Key) מפתח API"
 
@@ -120,22 +120,22 @@ msgid "PayPlus Api Key you can find in your account under Settings"
 msgstr "מזהה ה API Key שלך כפי שמופיע במסך הגדרות בחשבון שלך בפיי פלוס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:97
-#: includes/class-wc-payplus-form-fields.php:201
+#: includes/class-wc-payplus-form-fields.php:575
 msgid "Secret Key"
 msgstr "מפתח סודי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:99
-#: includes/class-wc-payplus-form-fields.php:203
+#: includes/class-wc-payplus-form-fields.php:577
 msgid "PayPlus Secret Key you can find in your account under Settings"
 msgstr "מזהה ה Secret Key שלך כפי שמופיע במסך הגדרות בחשבון שלך בפיי פלוס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:104
-#: includes/class-wc-payplus-form-fields.php:208
+#: includes/class-wc-payplus-form-fields.php:582
 msgid "Payment Page UID"
 msgstr "מזהה UID של הדף תשלום"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:106
-#: includes/class-wc-payplus-form-fields.php:210
+#: includes/class-wc-payplus-form-fields.php:584
 msgid ""
 "Your payment page UID can be found under Payment Pages in your side menu in "
 "PayPlus account"
@@ -153,15 +153,15 @@ msgid "Enable Test/Sandbox Mode"
 msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:119
-#: includes/class-wc-payplus-form-fields.php:237
-#: payplus-payment-gateway.php:865
+#: includes/class-wc-payplus-form-fields.php:611
+#: payplus-payment-gateway.php:898
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:122
-#: includes/class-wc-payplus-form-fields.php:240
-#: includes/class-wc-payplus-form-fields.php:333
-#: includes/class-wc-payplus-form-fields.php:345
+#: includes/class-wc-payplus-form-fields.php:614
+#: includes/class-wc-payplus-form-fields.php:707
+#: includes/class-wc-payplus-form-fields.php:719
 #: includes/wc_payplus_subgateways.php:170
 #: includes/wc_payplus_subgateways.php:195
 #: includes/wc_payplus_subgateways.php:236
@@ -169,51 +169,51 @@ msgid "Use global default"
 msgstr "ברירת מחדל גלובלית"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:123
-#: includes/class-wc-payplus-form-fields.php:241
+#: includes/class-wc-payplus-form-fields.php:615
 #: includes/class-wc-payplus-statics.php:78
-#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:469
-#: payplus-payment-gateway.php:860 payplus-payment-gateway.php:1105
+#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:502
+#: payplus-payment-gateway.php:893 payplus-payment-gateway.php:1143
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:124
-#: includes/class-wc-payplus-form-fields.php:242
-#: payplus-payment-gateway.php:470 payplus-payment-gateway.php:861
-#: payplus-payment-gateway.php:1106
+#: includes/class-wc-payplus-form-fields.php:616
+#: payplus-payment-gateway.php:503 payplus-payment-gateway.php:894
+#: payplus-payment-gateway.php:1144
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:130
-#: includes/class-wc-payplus-form-fields.php:312
+#: includes/class-wc-payplus-form-fields.php:686
 #: includes/wc_payplus_subgateways.php:167
 msgid "Display Mode"
 msgstr "תצוגת דף הסליקה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:133
-#: includes/class-wc-payplus-form-fields.php:317
+#: includes/class-wc-payplus-form-fields.php:691
 #: includes/wc_payplus_subgateways.php:171
 msgid "Redirect"
 msgstr "באמצעות הפנייה לדף הסליקה (Redirect)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:134
-#: includes/class-wc-payplus-form-fields.php:318
+#: includes/class-wc-payplus-form-fields.php:692
 msgid "iFrame on the next page"
 msgstr "דף סליקה באתרך בעמוד הבא (IFrame)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:135
-#: includes/class-wc-payplus-form-fields.php:319
+#: includes/class-wc-payplus-form-fields.php:693
 #: includes/wc_payplus_subgateways.php:173
 msgid "iFrame on the same page"
 msgstr "הצג את דף הסליקה באתר שלך ללא מעבר עמוד באמצעות (IFrame)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:136
-#: includes/class-wc-payplus-form-fields.php:320
+#: includes/class-wc-payplus-form-fields.php:694
 #: includes/wc_payplus_subgateways.php:174
 msgid "iFrame in a Popup"
 msgstr "הצג את דף הסליקה בחלון קופץ  (IFrame)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:142
-#: includes/class-wc-payplus-form-fields.php:325
+#: includes/class-wc-payplus-form-fields.php:699
 #: includes/wc_payplus_subgateways.php:179
 msgid "iFrame Height"
 msgstr "גובה ה IFrame"
@@ -225,7 +225,7 @@ msgid "Allow Saved Credit Cards"
 msgstr "שמירת כרטיסי אשראי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:150
-#: includes/class-wc-payplus-form-fields.php:277
+#: includes/class-wc-payplus-form-fields.php:651
 msgid "Enable Payment via Saved Cards"
 msgstr "הפעל אפשרות שמירת כרטיסי אשראי ללקוחות שלך"
 
@@ -247,22 +247,22 @@ msgstr ""
 "\" באתר."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:157
-#: includes/class-wc-payplus-form-fields.php:159
+#: includes/class-wc-payplus-form-fields.php:533
 msgid "Default Woo"
 msgstr "ברירת מחדל woocommerce"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:160
-#: includes/class-wc-payplus-form-fields.php:370
+#: includes/class-wc-payplus-form-fields.php:752
 msgid "Successful Order Status"
 msgstr "במידה והתשלום בוצע בהצלחה, הגדר את סטטוס ההזמנה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:167
-#: includes/class-wc-payplus-form-fields.php:376
+#: includes/class-wc-payplus-form-fields.php:758
 msgid "Payment Completed"
 msgstr "חיוב מוצלח"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:169
-#: includes/class-wc-payplus-form-fields.php:378
+#: includes/class-wc-payplus-form-fields.php:760
 msgid "Fire Payment Completed On Successful Charge"
 msgstr "הרץ פונקציית תשלום מוצלח מובנית של ווקומרס"
 
@@ -279,22 +279,22 @@ msgstr ""
 "הסתיימה בהצלחה (מעל אופציה זו)."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:176
-#: includes/class-wc-payplus-form-fields.php:515
+#: includes/class-wc-payplus-form-fields.php:912
 msgid "Transaction data in order notes"
 msgstr "שמירת מידע עסקאות בהערות הזמנה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:177
-#: includes/class-wc-payplus-form-fields.php:516
+#: includes/class-wc-payplus-form-fields.php:913
 msgid "Save PayPlus transaction data to the order notes"
 msgstr "שמירת מידע פייפלוס אודות עסקאות בהערות הזמנה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:184
-#: includes/class-wc-payplus-form-fields.php:523
+#: includes/class-wc-payplus-form-fields.php:920
 msgid "Show PayPlus Metabox"
 msgstr "הצגת תיבת מידע פייפלוס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:185
-#: includes/class-wc-payplus-form-fields.php:524
+#: includes/class-wc-payplus-form-fields.php:921
 msgid "Show the transaction data in the PayPlus dedicated metabox"
 msgstr ""
 "הצגת מידע פייפלוס אודות עסקאות בתיבת מידע ייעודית בעמוד ההזמנה בפאנל הניהול"
@@ -400,7 +400,7 @@ msgid "MegaLean"
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:244
-#: includes/admin/class-wc-payplus-admin.php:2171
+#: includes/admin/class-wc-payplus-admin.php:2253
 msgid "Invoice+ (PayPlus)"
 msgstr "חשבונית פלוס מבית פיי פלוס"
 
@@ -422,25 +422,25 @@ msgid "Type Documents"
 msgstr "בחירת סוג מסמך"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:274
-#: includes/admin/class-wc-payplus-admin.php:1016
+#: includes/admin/class-wc-payplus-admin.php:1091
 #: includes/class-wc-payplus-statics.php:20
 msgid "Tax Invoice"
 msgstr "חשבונית מס"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:275
-#: includes/admin/class-wc-payplus-admin.php:1017
+#: includes/admin/class-wc-payplus-admin.php:1092
 #: includes/class-wc-payplus-statics.php:23
 msgid "Tax Invoice Receipt "
 msgstr "חשבונית מס קבלה "
 
 #: includes/admin/class-wc-payplus-admin-settings.php:276
-#: includes/admin/class-wc-payplus-admin.php:1018
+#: includes/admin/class-wc-payplus-admin.php:1093
 #: includes/class-wc-payplus-statics.php:26
 msgid "Receipt"
 msgstr "קבלה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:277
-#: includes/admin/class-wc-payplus-admin.php:1019
+#: includes/admin/class-wc-payplus-admin.php:1094
 #: includes/class-wc-payplus-statics.php:29
 msgid "Donation Reciept"
 msgstr "קבלה על תרומה"
@@ -495,29 +495,29 @@ msgid "Document type for refund transaction"
 msgstr "סוג מסמך לעסקת החזר"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:326
-#: includes/admin/class-wc-payplus-admin.php:1769
+#: includes/admin/class-wc-payplus-admin.php:1849
 msgid "Type Documents Refund"
 msgstr "בחירת סוג מסמך להחזר"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:327
-#: includes/admin/class-wc-payplus-admin.php:1770
+#: includes/admin/class-wc-payplus-admin.php:1850
 #: includes/class-wc-payplus-statics.php:32
 msgid "Refund Invoice"
 msgstr "חשבונית זיכוי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:328
-#: includes/admin/class-wc-payplus-admin.php:1771
+#: includes/admin/class-wc-payplus-admin.php:1851
 #: includes/class-wc-payplus-statics.php:35
 msgid "Refund Receipt"
 msgstr "קבלה לזיכוי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:329
-#: includes/admin/class-wc-payplus-admin.php:1772
+#: includes/admin/class-wc-payplus-admin.php:1852
 msgid "Refund Invoice + Refund Receipt"
 msgstr "חשבונית זיכוי +קבלה לזיכוי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:335
-#: includes/admin/class-wc-payplus-admin-settings.php:664
+#: includes/admin/class-wc-payplus-admin-settings.php:670
 msgid "Order status for issuing an invoice"
 msgstr "סטטוס הזמנה להוצאת חשבונית"
 
@@ -548,17 +548,17 @@ msgid "Invoice creation: Automatic(Default) or Manual"
 msgstr "הפקת חשבוניות בצורה: ידנית או אוטומטית(ברירת מחדל)"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:377
-#: includes/class-wc-payplus-form-fields.php:247
+#: includes/class-wc-payplus-form-fields.php:621
 msgid "Allow amount change"
 msgstr "אפשרות לשינוי סכום החיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:381
-#: includes/class-wc-payplus-form-fields.php:251
+#: includes/class-wc-payplus-form-fields.php:625
 msgid "Transaction amount change"
 msgstr "שינוי סכום העסקה"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:382
-#: includes/class-wc-payplus-form-fields.php:252
+#: includes/class-wc-payplus-form-fields.php:626
 msgid ""
 "Choose this to be able to charge a different amount higher/lower than the "
 "order total (A number field will appear beside the \"Make Paymet\" button)"
@@ -589,7 +589,7 @@ msgstr ""
 "להזמנות אשר שולמו במזומן (תשלום לשליח) או בהעברה בנקאית."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:410
-#: includes/class-wc-payplus-form-fields.php:570
+#: includes/class-wc-payplus-form-fields.php:967
 msgid "Logging"
 msgstr "שמור לוגים לגבי פעילות הקשורה לתוסף הסליקה של פייפלוס"
 
@@ -602,10 +602,10 @@ msgid "Select methods that documents will not be created for."
 msgstr "בחירת שיטות תשלום עליהן הפקת מסמכים לא תופעל."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:421
-#: includes/admin/class-wc-payplus-admin.php:1136
+#: includes/admin/class-wc-payplus-admin.php:1211
 #: includes/class-wc-payplus-form-fields.php:110
 #: includes/class-wc-payplus-form-fields.php:111
-#: includes/wc_payplus_gateway.php:957 includes/wc_payplus_subgateways.php:45
+#: includes/wc_payplus_gateway.php:1057 includes/wc_payplus_subgateways.php:45
 msgid "PayPal"
 msgstr "פייפאל"
 
@@ -666,7 +666,7 @@ msgid "Default"
 msgstr "ברירת מחדל woocommerce"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:484
-#: includes/wc_payplus_gateway.php:114 includes/wc_payplus_gateway.php:861
+#: includes/wc_payplus_gateway.php:117 includes/wc_payplus_gateway.php:961
 msgid "PayPlus"
 msgstr "פיי פלוס"
 
@@ -710,42 +710,47 @@ msgstr ""
 "שפת החשבוניות או המסמכים שיצאו ללקוחות זרים (בהנחה שחברת החשבוניות שלכם "
 "תומכת בשפה זו)"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:537
+#: includes/admin/class-wc-payplus-admin-settings.php:536
 #: includes/class-wc-payplus-form-fields.php:89
 #: includes/class-wc-payplus-form-fields.php:90
-#: includes/wc_payplus_gateway.php:948 includes/wc_payplus_subgateways.php:42
+#: includes/wc_payplus_gateway.php:1048 includes/wc_payplus_subgateways.php:42
 msgid "Google Pay"
 msgstr "גוגל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:548
+#: includes/admin/class-wc-payplus-admin-settings.php:546
+#: includes/admin/class-wc-payplus-admin-settings.php:550
+msgid "Require phone number with Google Pay"
+msgstr "דרישת מספר טלפון בתשלום גוגל פיי"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:553
 #: includes/class-wc-payplus-form-fields.php:96
 #: includes/class-wc-payplus-form-fields.php:97
-#: includes/class-wc-payplus-form-fields.php:292
-#: includes/wc_payplus_gateway.php:951 includes/wc_payplus_subgateways.php:43
+#: includes/class-wc-payplus-form-fields.php:666
+#: includes/wc_payplus_gateway.php:1051 includes/wc_payplus_subgateways.php:43
 msgid "Apple Pay"
 msgstr "אפל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:559
+#: includes/admin/class-wc-payplus-admin-settings.php:564
 #, fuzzy
 #| msgid "Apple Pay"
 msgid "Token Apple Pay"
 msgstr "אפל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:565
+#: includes/admin/class-wc-payplus-admin-settings.php:570
 msgid "Display on product page"
 msgstr "הצגה בדף מוצר"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:571
+#: includes/admin/class-wc-payplus-admin-settings.php:577
 msgid "Allow customers to create an account during checkout"
 msgstr "לאפשר ללקוחות ליצור חשבון בתהליך הצ'קאאוט"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:577
+#: includes/admin/class-wc-payplus-admin-settings.php:583
 msgid "Shipping according to Woocommerce Via JS - Overrides all next settings"
 msgstr ""
 "שילוח לפי תצוגת עמוד הצ'קאאוט של ווקומרס - דרך JS (דורס את ההגדרות הרשומות "
 "מטה)"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:578
+#: includes/admin/class-wc-payplus-admin-settings.php:584
 msgid ""
 "Same as what you see in classic checkout.(THIS OVERRIDES ALL NEXT SHIPPINGS "
 "SETTINGS! - AND IS FOR CLASSIC CHECKOUT!)"
@@ -754,11 +759,11 @@ msgstr ""
 "מתייחס לכתובת הכרטיס (עובד רק בצ'קאאוט הקלאסי של ווקומרס!) - הגדרה זו דורסת "
 "את ההגדרות מטה!"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:586
+#: includes/admin/class-wc-payplus-admin-settings.php:592
 msgid "Shipping according to Woocommerce settings"
 msgstr "שילוח לפי הגדרות ווקומרס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:587
+#: includes/admin/class-wc-payplus-admin-settings.php:593
 msgid ""
 "<br>Countries (Continents not supported):\n"
 "                    <br>Flat rate,\n"
@@ -777,277 +782,277 @@ msgstr ""
 "<br>אם יש לכם כללי משלוח מורכבים, הם עשויים שלא לעבוד עם תשלום מהיר. לכללים "
 "מורכבים השתמשו ב-\"סכום משלוח גלובלי\"."
 
-#: includes/admin/class-wc-payplus-admin-settings.php:600
+#: includes/admin/class-wc-payplus-admin-settings.php:606
 msgid "Global shipping amount"
 msgstr "סכום משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:608
+#: includes/admin/class-wc-payplus-admin-settings.php:614
 msgid "Global shipping Tax"
 msgstr "מס משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:611
+#: includes/admin/class-wc-payplus-admin-settings.php:617
 msgid "Taxable"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin-settings.php:612
+#: includes/admin/class-wc-payplus-admin-settings.php:618
 msgid "None"
 msgstr "ללא"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:621
-#: includes/admin/class-wc-payplus-admin-settings.php:687
+#: includes/admin/class-wc-payplus-admin-settings.php:627
+#: includes/admin/class-wc-payplus-admin-settings.php:693
 msgid "Select tax rate"
 msgstr "בחר שיעור מס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:643
+#: includes/admin/class-wc-payplus-admin-settings.php:649
 msgid "Language of the page"
 msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:132
-#: includes/admin/class-wc-payplus-admin.php:133
+#: includes/admin/class-wc-payplus-admin.php:135
+#: includes/admin/class-wc-payplus-admin.php:136
 msgid "PayPlus Hash Check"
 msgstr "בדיקת Hash לתוסף פייפלוס"
 
-#: includes/admin/class-wc-payplus-admin.php:308
+#: includes/admin/class-wc-payplus-admin.php:365
 #: includes/class-wc-payplus-statics.php:382
 msgid "Pre-Authorization"
 msgstr "תפיסת-מסגרת"
 
-#: includes/admin/class-wc-payplus-admin.php:308
-#: includes/admin/class-wc-payplus-admin.php:1960
+#: includes/admin/class-wc-payplus-admin.php:365
+#: includes/admin/class-wc-payplus-admin.php:2040
 #: includes/class-wc-payplus-statics.php:382
 msgid "Payment"
 msgstr "תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:452
-#: includes/wc_payplus_gateway.php:766 includes/wc_payplus_invoice.php:377
+#: includes/admin/class-wc-payplus-admin.php:527
+#: includes/wc_payplus_gateway.php:866 includes/wc_payplus_invoice.php:377
 msgid "Refund for Order Number: "
 msgstr "זיכוי עבור הזמנה מספר: "
 
-#: includes/admin/class-wc-payplus-admin.php:1067
+#: includes/admin/class-wc-payplus-admin.php:1142
 msgid "Select a document type to create an invoice"
 msgstr "בחר סוג מסמך ליצירת חשבונית"
 
-#: includes/admin/class-wc-payplus-admin.php:1111
+#: includes/admin/class-wc-payplus-admin.php:1186
 msgid "Payment details"
 msgstr "פירוט תקבולים"
 
-#: includes/admin/class-wc-payplus-admin.php:1116
-#: includes/wc_payplus_gateway.php:317
+#: includes/admin/class-wc-payplus-admin.php:1191
+#: includes/wc_payplus_gateway.php:323
 msgid "Credit Card"
 msgstr "כרטיס אשראי"
 
-#: includes/admin/class-wc-payplus-admin.php:1120
+#: includes/admin/class-wc-payplus-admin.php:1195
 msgid "Cash"
 msgstr "מזומן"
 
-#: includes/admin/class-wc-payplus-admin.php:1124
+#: includes/admin/class-wc-payplus-admin.php:1199
 msgid "Check"
 msgstr "ציקים"
 
-#: includes/admin/class-wc-payplus-admin.php:1128
+#: includes/admin/class-wc-payplus-admin.php:1203
 msgid "Bank Transfer"
 msgstr "העברה בנקאית"
 
-#: includes/admin/class-wc-payplus-admin.php:1132
+#: includes/admin/class-wc-payplus-admin.php:1207
 msgid "Payment App"
 msgstr "אפליקציית תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:1140
+#: includes/admin/class-wc-payplus-admin.php:1215
 msgid "Withholding Tax"
 msgstr "ניכוי מס במקור"
 
-#: includes/admin/class-wc-payplus-admin.php:1144
-#: includes/admin/class-wc-payplus-admin.php:1192
-#: includes/admin/class-wc-payplus-admin.php:1209
+#: includes/admin/class-wc-payplus-admin.php:1219
+#: includes/admin/class-wc-payplus-admin.php:1267
+#: includes/admin/class-wc-payplus-admin.php:1284
 msgid "Other"
 msgstr "אחר"
 
-#: includes/admin/class-wc-payplus-admin.php:1153
-#: includes/admin/class-wc-payplus-admin.php:1156
-#: includes/admin/class-wc-payplus-admin.php:1278
-#: includes/admin/class-wc-payplus-admin.php:1281
-#: includes/admin/class-wc-payplus-admin.php:1316
-#: includes/admin/class-wc-payplus-admin.php:1319
-#: includes/admin/class-wc-payplus-admin.php:1368
-#: includes/admin/class-wc-payplus-admin.php:1371
-#: includes/admin/class-wc-payplus-admin.php:1417
-#: includes/admin/class-wc-payplus-admin.php:1420
-#: includes/admin/class-wc-payplus-admin.php:1471
-#: includes/admin/class-wc-payplus-admin.php:1474
-#: includes/admin/class-wc-payplus-admin.php:1515
-#: includes/admin/class-wc-payplus-admin.php:1518
+#: includes/admin/class-wc-payplus-admin.php:1228
+#: includes/admin/class-wc-payplus-admin.php:1231
+#: includes/admin/class-wc-payplus-admin.php:1353
+#: includes/admin/class-wc-payplus-admin.php:1356
+#: includes/admin/class-wc-payplus-admin.php:1391
+#: includes/admin/class-wc-payplus-admin.php:1394
+#: includes/admin/class-wc-payplus-admin.php:1443
+#: includes/admin/class-wc-payplus-admin.php:1446
+#: includes/admin/class-wc-payplus-admin.php:1492
+#: includes/admin/class-wc-payplus-admin.php:1495
+#: includes/admin/class-wc-payplus-admin.php:1546
 #: includes/admin/class-wc-payplus-admin.php:1549
-#: includes/admin/class-wc-payplus-admin.php:1552
+#: includes/admin/class-wc-payplus-admin.php:1590
+#: includes/admin/class-wc-payplus-admin.php:1593
+#: includes/admin/class-wc-payplus-admin.php:1624
 #: includes/admin/class-wc-payplus-admin.php:1627
+#: includes/admin/class-wc-payplus-admin.php:1702
 msgid "Date"
 msgstr "תאריך"
 
-#: includes/admin/class-wc-payplus-admin.php:1159
+#: includes/admin/class-wc-payplus-admin.php:1234
 msgid "Credit card number"
 msgstr "מידע על הכרטיס"
 
-#: includes/admin/class-wc-payplus-admin.php:1162
+#: includes/admin/class-wc-payplus-admin.php:1237
 msgid "Four Digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: includes/admin/class-wc-payplus-admin.php:1165
-#: includes/admin/class-wc-payplus-admin.php:1168
+#: includes/admin/class-wc-payplus-admin.php:1240
+#: includes/admin/class-wc-payplus-admin.php:1243
 msgid "Card Type"
 msgstr "סוג כרטיס"
 
-#: includes/admin/class-wc-payplus-admin.php:1186
+#: includes/admin/class-wc-payplus-admin.php:1261
 msgid "Jcb"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:1198
-#: includes/admin/class-wc-payplus-admin.php:1202
+#: includes/admin/class-wc-payplus-admin.php:1273
+#: includes/admin/class-wc-payplus-admin.php:1277
 msgid "Transaction type"
 msgstr "סוג עסקה"
 
-#: includes/admin/class-wc-payplus-admin.php:1204
+#: includes/admin/class-wc-payplus-admin.php:1279
 msgid "Normal"
 msgstr "רגיל"
 
-#: includes/admin/class-wc-payplus-admin.php:1205
-#: includes/admin/class-wc-payplus-admin.php:1233
-#: includes/class-wc-payplus-statics.php:396 templates/hostedFields.php:654
+#: includes/admin/class-wc-payplus-admin.php:1280
+#: includes/admin/class-wc-payplus-admin.php:1308
+#: includes/class-wc-payplus-statics.php:396 templates/hostedFields.php:668
 msgid "Payments"
 msgstr "תשלומים"
 
-#: includes/admin/class-wc-payplus-admin.php:1207
+#: includes/admin/class-wc-payplus-admin.php:1282
 #, fuzzy
 #| msgid "Refund Invoice"
 msgid "Credit"
 msgstr "חשבונית זיכוי"
 
-#: includes/admin/class-wc-payplus-admin.php:1208
+#: includes/admin/class-wc-payplus-admin.php:1283
 msgid "Delayed"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:1214
-#: includes/admin/class-wc-payplus-admin.php:1219
-#: includes/admin/class-wc-payplus-admin.php:1284
 #: includes/admin/class-wc-payplus-admin.php:1289
-#: includes/admin/class-wc-payplus-admin.php:1322
-#: includes/admin/class-wc-payplus-admin.php:1327
-#: includes/admin/class-wc-payplus-admin.php:1374
-#: includes/admin/class-wc-payplus-admin.php:1379
-#: includes/admin/class-wc-payplus-admin.php:1423
-#: includes/admin/class-wc-payplus-admin.php:1428
-#: includes/admin/class-wc-payplus-admin.php:1477
-#: includes/admin/class-wc-payplus-admin.php:1482
-#: includes/admin/class-wc-payplus-admin.php:1521
-#: includes/admin/class-wc-payplus-admin.php:1526
-#: includes/admin/class-wc-payplus-admin.php:1555
-#: includes/admin/class-wc-payplus-admin.php:1560
-#: includes/admin/class-wc-payplus-admin.php:1624
-#: includes/admin/class-wc-payplus-admin.php:1818
+#: includes/admin/class-wc-payplus-admin.php:1294
+#: includes/admin/class-wc-payplus-admin.php:1359
+#: includes/admin/class-wc-payplus-admin.php:1364
+#: includes/admin/class-wc-payplus-admin.php:1397
+#: includes/admin/class-wc-payplus-admin.php:1402
+#: includes/admin/class-wc-payplus-admin.php:1449
+#: includes/admin/class-wc-payplus-admin.php:1454
+#: includes/admin/class-wc-payplus-admin.php:1498
+#: includes/admin/class-wc-payplus-admin.php:1503
+#: includes/admin/class-wc-payplus-admin.php:1552
+#: includes/admin/class-wc-payplus-admin.php:1557
+#: includes/admin/class-wc-payplus-admin.php:1596
+#: includes/admin/class-wc-payplus-admin.php:1601
+#: includes/admin/class-wc-payplus-admin.php:1630
+#: includes/admin/class-wc-payplus-admin.php:1635
+#: includes/admin/class-wc-payplus-admin.php:1699
+#: includes/admin/class-wc-payplus-admin.php:1898
 msgid "Sum"
 msgstr "סכום"
 
-#: includes/admin/class-wc-payplus-admin.php:1223
-#: includes/admin/class-wc-payplus-admin.php:1293
-#: includes/admin/class-wc-payplus-admin.php:1331
-#: includes/admin/class-wc-payplus-admin.php:1383
-#: includes/admin/class-wc-payplus-admin.php:1432
-#: includes/admin/class-wc-payplus-admin.php:1486
-#: includes/admin/class-wc-payplus-admin.php:1530
-#: includes/admin/class-wc-payplus-admin.php:1564
+#: includes/admin/class-wc-payplus-admin.php:1298
+#: includes/admin/class-wc-payplus-admin.php:1368
+#: includes/admin/class-wc-payplus-admin.php:1406
+#: includes/admin/class-wc-payplus-admin.php:1458
+#: includes/admin/class-wc-payplus-admin.php:1507
+#: includes/admin/class-wc-payplus-admin.php:1561
+#: includes/admin/class-wc-payplus-admin.php:1605
+#: includes/admin/class-wc-payplus-admin.php:1639
 msgid "Full Amount"
 msgstr "סכום מלא"
 
-#: includes/admin/class-wc-payplus-admin.php:1250
-#: includes/admin/class-wc-payplus-admin.php:1252
+#: includes/admin/class-wc-payplus-admin.php:1325
+#: includes/admin/class-wc-payplus-admin.php:1327
 #, fuzzy
 #| msgid "Payment"
 msgid "First Payment"
 msgstr "ביצוע תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:1256
-#: includes/admin/class-wc-payplus-admin.php:1258
+#: includes/admin/class-wc-payplus-admin.php:1331
+#: includes/admin/class-wc-payplus-admin.php:1333
 #, fuzzy
 #| msgid "Add payment "
 msgid "Additional payments"
 msgstr "הוספה תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:1266
-#: includes/admin/class-wc-payplus-admin.php:1306
-#: includes/admin/class-wc-payplus-admin.php:1358
-#: includes/admin/class-wc-payplus-admin.php:1407
-#: includes/admin/class-wc-payplus-admin.php:1461
-#: includes/admin/class-wc-payplus-admin.php:1505
-#: includes/admin/class-wc-payplus-admin.php:1539
-#: includes/admin/class-wc-payplus-admin.php:1582
+#: includes/admin/class-wc-payplus-admin.php:1341
+#: includes/admin/class-wc-payplus-admin.php:1381
+#: includes/admin/class-wc-payplus-admin.php:1433
+#: includes/admin/class-wc-payplus-admin.php:1482
+#: includes/admin/class-wc-payplus-admin.php:1536
+#: includes/admin/class-wc-payplus-admin.php:1580
+#: includes/admin/class-wc-payplus-admin.php:1614
+#: includes/admin/class-wc-payplus-admin.php:1657
 msgid "Save payment"
 msgstr "שמור תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:1298
-#: includes/admin/class-wc-payplus-admin.php:1299
-#: includes/admin/class-wc-payplus-admin.php:1574
-#: includes/admin/class-wc-payplus-admin.php:1575
+#: includes/admin/class-wc-payplus-admin.php:1373
+#: includes/admin/class-wc-payplus-admin.php:1374
+#: includes/admin/class-wc-payplus-admin.php:1649
+#: includes/admin/class-wc-payplus-admin.php:1650
 msgid "Notes"
 msgstr "ערות"
 
-#: includes/admin/class-wc-payplus-admin.php:1335
-#: includes/admin/class-wc-payplus-admin.php:1336
-#: includes/admin/class-wc-payplus-admin.php:1387
-#: includes/admin/class-wc-payplus-admin.php:1388
+#: includes/admin/class-wc-payplus-admin.php:1410
+#: includes/admin/class-wc-payplus-admin.php:1411
+#: includes/admin/class-wc-payplus-admin.php:1462
+#: includes/admin/class-wc-payplus-admin.php:1463
 msgid "Bank number"
 msgstr "מספר בנק"
 
-#: includes/admin/class-wc-payplus-admin.php:1340
-#: includes/admin/class-wc-payplus-admin.php:1341
-#: includes/admin/class-wc-payplus-admin.php:1392
-#: includes/admin/class-wc-payplus-admin.php:1393
+#: includes/admin/class-wc-payplus-admin.php:1415
+#: includes/admin/class-wc-payplus-admin.php:1416
+#: includes/admin/class-wc-payplus-admin.php:1467
+#: includes/admin/class-wc-payplus-admin.php:1468
 msgid "Branch number"
 msgstr "מספר סניף"
 
-#: includes/admin/class-wc-payplus-admin.php:1345
-#: includes/admin/class-wc-payplus-admin.php:1346
-#: includes/admin/class-wc-payplus-admin.php:1398
-#: includes/admin/class-wc-payplus-admin.php:1399
+#: includes/admin/class-wc-payplus-admin.php:1420
+#: includes/admin/class-wc-payplus-admin.php:1421
+#: includes/admin/class-wc-payplus-admin.php:1473
+#: includes/admin/class-wc-payplus-admin.php:1474
 msgid "Account number"
 msgstr "מספר חשבון"
 
-#: includes/admin/class-wc-payplus-admin.php:1350
-#: includes/admin/class-wc-payplus-admin.php:1351
+#: includes/admin/class-wc-payplus-admin.php:1425
+#: includes/admin/class-wc-payplus-admin.php:1426
 msgid "Check number"
 msgstr "מספק צק"
 
-#: includes/admin/class-wc-payplus-admin.php:1436
-#: includes/admin/class-wc-payplus-admin.php:1439
+#: includes/admin/class-wc-payplus-admin.php:1511
+#: includes/admin/class-wc-payplus-admin.php:1514
 #: includes/class-wc-payplus-statics.php:393
 msgid "Type"
 msgstr "סוג"
 
-#: includes/admin/class-wc-payplus-admin.php:1452
-#: includes/admin/class-wc-payplus-admin.php:1453
-#: includes/admin/class-wc-payplus-admin.php:1496
-#: includes/admin/class-wc-payplus-admin.php:1497
-#: includes/admin/class-wc-payplus-admin.php:1568
-#: includes/admin/class-wc-payplus-admin.php:1569
+#: includes/admin/class-wc-payplus-admin.php:1527
+#: includes/admin/class-wc-payplus-admin.php:1528
+#: includes/admin/class-wc-payplus-admin.php:1571
+#: includes/admin/class-wc-payplus-admin.php:1572
+#: includes/admin/class-wc-payplus-admin.php:1643
+#: includes/admin/class-wc-payplus-admin.php:1644
 msgid "Transaction id"
 msgstr "מספר עסקה"
 
-#: includes/admin/class-wc-payplus-admin.php:1490
-#: includes/admin/class-wc-payplus-admin.php:1491
+#: includes/admin/class-wc-payplus-admin.php:1565
+#: includes/admin/class-wc-payplus-admin.php:1566
 msgid "Payer account"
 msgstr "חשבון משלם"
 
-#: includes/admin/class-wc-payplus-admin.php:1597
+#: includes/admin/class-wc-payplus-admin.php:1672
 msgid "Create Document"
 msgstr "יצירת מסמך"
 
-#: includes/admin/class-wc-payplus-admin.php:1625
+#: includes/admin/class-wc-payplus-admin.php:1700
 msgid "Details"
 msgstr "פרטים"
 
-#: includes/admin/class-wc-payplus-admin.php:1626
-#: includes/admin/class-wc-payplus-admin.php:1819
+#: includes/admin/class-wc-payplus-admin.php:1701
+#: includes/admin/class-wc-payplus-admin.php:1899
 msgid "Methods of Payment"
 msgstr "אמצעי תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:1727
+#: includes/admin/class-wc-payplus-admin.php:1804
 msgid ""
 "This button triggers an IPN process based on the payment page request UID, "
 "retrieving relevant data and updating the order accordingly. If the charge "
@@ -1058,116 +1063,122 @@ msgstr ""
 "הרלוונטיים ויעדכן את ההזמנה בהתאם. במקרה של חיוב או אישור מוצלח, סטטוס "
 "ההזמנה יעודכן אוטומטית לסטטוס ברירת המחדל. יש לשים לב להתנהגות זו."
 
-#: includes/admin/class-wc-payplus-admin.php:1804
+#: includes/admin/class-wc-payplus-admin.php:1806
+msgid ""
+"This button only syncs Invoice+ documents that exists to the WooCommerce "
+"order meta data - this will make the PayPlus metabox show these also."
+msgstr ""
+
+#: includes/admin/class-wc-payplus-admin.php:1884
 msgid "Pay With Token"
 msgstr "תשלום בטוקן"
 
-#: includes/admin/class-wc-payplus-admin.php:1816
+#: includes/admin/class-wc-payplus-admin.php:1896
 msgid "Refund amount"
 msgstr "סכום החזר"
 
-#: includes/admin/class-wc-payplus-admin.php:1817
+#: includes/admin/class-wc-payplus-admin.php:1897
 msgid "Amount already refunded"
 msgstr "הסכום כבר הוחזר"
 
-#: includes/admin/class-wc-payplus-admin.php:1859
+#: includes/admin/class-wc-payplus-admin.php:1939
 msgid "Refund"
 msgstr "החזר"
 
-#: includes/admin/class-wc-payplus-admin.php:1931
+#: includes/admin/class-wc-payplus-admin.php:2011
 msgid "Create Refund Document"
 msgstr "יצירת מסמך זיכוי"
 
-#: includes/admin/class-wc-payplus-admin.php:1942
+#: includes/admin/class-wc-payplus-admin.php:2022
 msgid "Transaction review"
 msgstr "בדיקת עסקה"
 
-#: includes/admin/class-wc-payplus-admin.php:2061
-#: includes/admin/class-wc-payplus-admin.php:2300
+#: includes/admin/class-wc-payplus-admin.php:2143
+#: includes/admin/class-wc-payplus-admin.php:2384
 msgid "Charge for Order Number: "
 msgstr "חיוב עבור הזמנה מספר: "
 
-#: includes/admin/class-wc-payplus-admin.php:2168
+#: includes/admin/class-wc-payplus-admin.php:2250
 msgid "Cannot charge more than original order sum!"
 msgstr "שגיאה מ-PayPlus: אינך יכול לחייב יותר מסכום החיוב המקורי!"
 
-#: includes/admin/class-wc-payplus-admin.php:2170
+#: includes/admin/class-wc-payplus-admin.php:2252
 msgid "PayPlus Page Error - Settings"
 msgstr "שגיאת עמוד PayPlus - הגדרות"
 
-#: includes/admin/class-wc-payplus-admin.php:2178
+#: includes/admin/class-wc-payplus-admin.php:2260
 msgid "Incorrect amount or amount greater than amount that can be refunded"
 msgstr "סכום שגוי או סכום גדול מהסכום שניתן להחזיר"
 
-#: includes/admin/class-wc-payplus-admin.php:2189
+#: includes/admin/class-wc-payplus-admin.php:2271
 msgid ""
 "Are you sure you want to charge this order with token of CC that ends with: "
 msgstr ""
 "האם את/ה בטוח/ה שהינך רוצה לבצע תשלום עם טוקן של כרטיס אשראי המסתיים בספרות: "
 
-#: includes/admin/class-wc-payplus-admin.php:2201
+#: includes/admin/class-wc-payplus-admin.php:2283
 msgid "Total payment amounts are not equal to the order sum"
 msgstr "סכום התשלומים אינו תואם את סך כל ההזמנה"
 
-#: includes/admin/class-wc-payplus-admin.php:2202
+#: includes/admin/class-wc-payplus-admin.php:2284
 msgid ""
 "The amount of receipts is not equal to the amount of withholding tax "
 "clearance"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:2203
+#: includes/admin/class-wc-payplus-admin.php:2285
 msgid "No document type selected"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin.php:2204
+#: includes/admin/class-wc-payplus-admin.php:2286
 msgid "Edit"
 msgstr "עדכון"
 
-#: includes/admin/class-wc-payplus-admin.php:2205
+#: includes/admin/class-wc-payplus-admin.php:2287
 msgid "Delete"
 msgstr "מחיקה"
 
-#: includes/admin/class-wc-payplus-admin.php:2206
+#: includes/admin/class-wc-payplus-admin.php:2288
 msgid "The payment item cannot be 0"
 msgstr "פריט התשלום אינו יכול להיות 0"
 
-#: includes/admin/class-wc-payplus-admin.php:2209
+#: includes/admin/class-wc-payplus-admin.php:2291
 msgid "Total payments"
 msgstr "סה\"כ תקבולים"
 
-#: includes/admin/class-wc-payplus-admin.php:2210
+#: includes/admin/class-wc-payplus-admin.php:2292
 msgid "Are you sure you want to delete this payment method?"
 msgstr "האם אתה בטוח שברצונך למחק אמצעי תשלום זה?"
 
-#: includes/admin/class-wc-payplus-admin.php:2236
+#: includes/admin/class-wc-payplus-admin.php:2319
 msgid "Charge Order Using PayPlus"
 msgstr "חיוב הזמנה באמצעות PayPlus"
 
-#: includes/admin/class-wc-payplus-admin.php:2239
+#: includes/admin/class-wc-payplus-admin.php:2322
 msgid "Make Payment"
 msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
-#: includes/admin/class-wc-payplus-admin.php:2360
-#: payplus-payment-gateway.php:559
+#: includes/admin/class-wc-payplus-admin.php:2444
+#: payplus-payment-gateway.php:592
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:2364
+#: includes/admin/class-wc-payplus-admin.php:2448
 msgid "user or other, please contact payplus support"
 msgstr "שגיאת משתמש, נא צור קשר עם בעל האתר"
 
-#: includes/admin/class-wc-payplus-admin.php:2367
+#: includes/admin/class-wc-payplus-admin.php:2451
 msgid "Credit card company declined, check credit card details and credit line"
 msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בדוק את הפרטים בלוגים"
 
-#: includes/admin/class-wc-payplus-admin.php:2370
+#: includes/admin/class-wc-payplus-admin.php:2454
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
 #: includes/blocks/class-wc-payplus-blocks-support.php:431
 #: includes/blocks/class-wc-payplus-blocks-support.php:433
-#: includes/wc_payplus_gateway.php:1401 payplus-payment-gateway.php:1184
+#: includes/wc_payplus_gateway.php:1501 payplus-payment-gateway.php:1222
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
@@ -1239,13 +1250,13 @@ msgstr "פייפלוס חשבונית+"
 
 #: includes/class-wc-payplus-form-fields.php:82
 #: includes/class-wc-payplus-form-fields.php:83
-#: includes/wc_payplus_gateway.php:945 includes/wc_payplus_subgateways.php:41
+#: includes/wc_payplus_gateway.php:1045 includes/wc_payplus_subgateways.php:41
 msgid "bit"
 msgstr "ביט"
 
 #: includes/class-wc-payplus-form-fields.php:103
 #: includes/class-wc-payplus-form-fields.php:104
-#: includes/wc_payplus_gateway.php:954 includes/wc_payplus_subgateways.php:44
+#: includes/wc_payplus_gateway.php:1054 includes/wc_payplus_subgateways.php:44
 msgid "MULTIPASS"
 msgstr "מולטיפס"
 
@@ -1254,140 +1265,138 @@ msgid "Tav zahav"
 msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:118
-#: includes/wc_payplus_gateway.php:960 includes/wc_payplus_subgateways.php:46
+#: includes/wc_payplus_gateway.php:1060 includes/wc_payplus_subgateways.php:46
 msgid "Tav Zahav"
 msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:126
 #: includes/class-wc-payplus-form-fields.php:127
-#, fuzzy
-#| msgid "Run PayPlus Orders Check"
 msgid "Run PayPlus orders validator"
 msgstr "בדיקת הזמנות פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:163
+#: includes/class-wc-payplus-form-fields.php:537
 msgid "PayPlus Plugin Settings"
 msgstr "הגדרות תוסף פיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:165
+#: includes/class-wc-payplus-form-fields.php:539
 msgid "Basic plugin settings - set these and you`re good to go!"
 msgstr "הגדרות בסיס - להתחלת עבודה מיידית קבעו הגדרות אלו ותוכלו להתחיל לסלוק!"
 
-#: includes/class-wc-payplus-form-fields.php:174
+#: includes/class-wc-payplus-form-fields.php:548
 #: includes/wc_payplus_subgateways.php:155
 msgid "Title"
 msgstr "כותרת"
 
-#: includes/class-wc-payplus-form-fields.php:176
+#: includes/class-wc-payplus-form-fields.php:550
 #: includes/wc_payplus_subgateways.php:157
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:177 templates/hostedFields.php:684
+#: includes/class-wc-payplus-form-fields.php:551 templates/hostedFields.php:698
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
-#: includes/class-wc-payplus-form-fields.php:181
+#: includes/class-wc-payplus-form-fields.php:555
 #: includes/wc_payplus_subgateways.php:162
 msgid "Description"
 msgstr "תיאור"
 
-#: includes/class-wc-payplus-form-fields.php:183
+#: includes/class-wc-payplus-form-fields.php:557
 msgid "Pay securely by Debit or Credit Card through PayPlus"
 msgstr "שלם בצורה מאובטחת בכרטיס אשראי עם פיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:186
+#: includes/class-wc-payplus-form-fields.php:560
 msgid "Plugin Environment"
 msgstr "סביבת חיבור תוסף"
 
-#: includes/class-wc-payplus-form-fields.php:188
+#: includes/class-wc-payplus-form-fields.php:562
 msgid "Production Mode"
 msgstr "מצב ייצור/פרודקשן"
 
-#: includes/class-wc-payplus-form-fields.php:188
+#: includes/class-wc-payplus-form-fields.php:562
 msgid "Sandbox/Test Mode"
 msgstr "ארגז חול/מצב פיתוח"
 
-#: includes/class-wc-payplus-form-fields.php:189
+#: includes/class-wc-payplus-form-fields.php:563
 msgid "Activate test mode"
 msgstr "הפעלת מצב בדיקות (ארגז חול)"
 
-#: includes/class-wc-payplus-form-fields.php:190
+#: includes/class-wc-payplus-form-fields.php:564
 msgid "Enable Sandbox Mode"
 msgstr "הפעל מצב בדיקות (סביבת פיתוח)"
 
-#: includes/class-wc-payplus-form-fields.php:196
+#: includes/class-wc-payplus-form-fields.php:570
 msgid "PayPlus API Key you can find in your account under Settings"
 msgstr "מזהה ה API Key שלך כפי שמופיע במסך הגדרות בחשבון שלך בפיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:215
+#: includes/class-wc-payplus-form-fields.php:589
 msgid "Development API Key"
 msgstr "מפתח פיתוח API"
 
-#: includes/class-wc-payplus-form-fields.php:217
+#: includes/class-wc-payplus-form-fields.php:591
 msgid "PayPlus Dev API Key you can find in your account under Settings"
 msgstr ""
 "מזהה ה API Key (סביבת פיתוח) שלך כפי שמופיע במסך הגדרות בחשבון שלך בפיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:223
+#: includes/class-wc-payplus-form-fields.php:597
 msgid "Devlopment Secret Key"
 msgstr "מפתח פיתוח סודי"
 
-#: includes/class-wc-payplus-form-fields.php:225
+#: includes/class-wc-payplus-form-fields.php:599
 msgid "PayPlus Dev Secret Key you can find in your account under Settings"
 msgstr ""
 "מזהה ה Secret Key  (סביבת פיתוח) שלך כפי שמופיע במסך הגדרות בחשבון שלך בפיי "
 "פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:230
+#: includes/class-wc-payplus-form-fields.php:604
 msgid "Development Payment Page UID"
 msgstr "מזהה UID פיתוח של הדף תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:232
+#: includes/class-wc-payplus-form-fields.php:606
 msgid ""
 "Your Dev payment page UID can be found under Payment Pages in your side menu "
 "in PayPlus account"
 msgstr ""
 "מזהה UID של דף תשלום פיתוח (ניתן לאתר בהגדרות דפי תשלום בחשבון הפייפלוס)"
 
-#: includes/class-wc-payplus-form-fields.php:255
+#: includes/class-wc-payplus-form-fields.php:629
 msgid "Checkout Page Options"
 msgstr "אפשרויות דף התשלום"
 
-#: includes/class-wc-payplus-form-fields.php:257
+#: includes/class-wc-payplus-form-fields.php:631
 msgid "Setup for the woocommerce checkout page."
 msgstr "הגדרות לעמוד התשלום של ווקומרס."
 
-#: includes/class-wc-payplus-form-fields.php:260
+#: includes/class-wc-payplus-form-fields.php:634
 msgid "Hide PayPlus Icon"
 msgstr "הסתרת סמל פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:262
-#: includes/class-wc-payplus-form-fields.php:263
+#: includes/class-wc-payplus-form-fields.php:636
+#: includes/class-wc-payplus-form-fields.php:637
 msgid "Hide PayPlus Icon In The Checkout Page"
 msgstr "הסתרת סמל פיי פלוס בעמוד התשלום (ווקומרס)"
 
-#: includes/class-wc-payplus-form-fields.php:268
+#: includes/class-wc-payplus-form-fields.php:642
 msgid "Design checkout"
 msgstr "תצוגת עמוד קופה מעוצבת"
 
-#: includes/class-wc-payplus-form-fields.php:270
+#: includes/class-wc-payplus-form-fields.php:644
 msgid ""
 "Place the payment icons on the left of the text - relevant for classic "
 "checkout page only."
 msgstr "שינוי מיקום צלמיות שיטת התשלום לפני הטקסט ולא אחריו - בעמוד תשלום."
 
-#: includes/class-wc-payplus-form-fields.php:272
+#: includes/class-wc-payplus-form-fields.php:646
 msgid "Change icon layout on checkout page."
 msgstr ""
 "שינוי תצוגת סמלים בעמוד צ'קאאוט - תצוגת הסמלים לפני הטקסט ולא אחריו (רלוונטי "
 "לעמוד תשלום קלאסי)"
 
-#: includes/class-wc-payplus-form-fields.php:275
+#: includes/class-wc-payplus-form-fields.php:649
 msgid "Saved Credit Cards"
 msgstr "שמירת כרטיסי אשראי"
 
-#: includes/class-wc-payplus-form-fields.php:280
+#: includes/class-wc-payplus-form-fields.php:654
 msgid ""
 "Allow customers to securely save credit card information as tokens for "
 "convenient future or recurring purchases.\n"
@@ -1398,87 +1407,87 @@ msgstr ""
 "לעסקאות עתידיות <br><br>ניתן לשמור כרטיסים או בעת רכישה או דרך \"החשבון שלי"
 "\" באתר."
 
-#: includes/class-wc-payplus-form-fields.php:284
+#: includes/class-wc-payplus-form-fields.php:658
 msgid "Add Data Parameter"
 msgstr "פרמטר Add Data"
 
-#: includes/class-wc-payplus-form-fields.php:286
+#: includes/class-wc-payplus-form-fields.php:660
 msgid ""
 "Relevant only if the clearing company demands \"add_data\" or \"x\" "
 "parameters"
 msgstr ""
 "רלוונטי רק במידה ומסלקת האשראי דורשת לשלוח בעסקה פרמטר \"add_data\" או \"x\""
 
-#: includes/class-wc-payplus-form-fields.php:288
+#: includes/class-wc-payplus-form-fields.php:662
 msgid "Send add data parameter on transaction"
 msgstr "שלח פרמטר Add Data בעת ביצוע עסקת חיוב"
 
-#: includes/class-wc-payplus-form-fields.php:294
+#: includes/class-wc-payplus-form-fields.php:668
 msgid "Add Apple Pay Script"
 msgstr "הוספת סקריפט אפל פיי"
 
-#: includes/class-wc-payplus-form-fields.php:295
+#: includes/class-wc-payplus-form-fields.php:669
 msgid "Include Apple Pay Script"
 msgstr "הוספת סקריפט אפל פיי"
 
-#: includes/class-wc-payplus-form-fields.php:307
+#: includes/class-wc-payplus-form-fields.php:681
 msgid "Payment Page Options"
 msgstr "אפשרויות דף התשלום"
 
-#: includes/class-wc-payplus-form-fields.php:309
+#: includes/class-wc-payplus-form-fields.php:683
 msgid "Setup for the PayPlus Payment Page."
 msgstr "הגדרות עמוד תשלום פייפלוס."
 
-#: includes/class-wc-payplus-form-fields.php:314
+#: includes/class-wc-payplus-form-fields.php:688
 msgid ""
 "Set the way the PayPlus Payment Page will be loaded in/from the wordpress "
 "checkout page."
-msgstr ""
+msgstr "הגדר את אופן טעינת דף התשלום של PayPlus בתוך/מעמוד התשלום של וורדפרס."
 
-#: includes/class-wc-payplus-form-fields.php:330
+#: includes/class-wc-payplus-form-fields.php:704
 msgid "Hide ID Field In Payment Page"
 msgstr "הסתרת שדה מספר זהות בדף הסליקה"
 
-#: includes/class-wc-payplus-form-fields.php:334
-#: includes/class-wc-payplus-form-fields.php:346
-#: includes/class-wc-payplus-form-fields.php:358
-#: includes/class-wc-payplus-form-fields.php:394
-#: includes/class-wc-payplus-form-fields.php:403
+#: includes/class-wc-payplus-form-fields.php:708
+#: includes/class-wc-payplus-form-fields.php:720
+#: includes/class-wc-payplus-form-fields.php:732
+#: includes/class-wc-payplus-form-fields.php:776
+#: includes/class-wc-payplus-form-fields.php:785
 #: includes/wc_payplus_subgateways.php:194
 #: includes/wc_payplus_subgateways.php:237
 msgid "Yes"
 msgstr "כן"
 
-#: includes/class-wc-payplus-form-fields.php:335
-#: includes/class-wc-payplus-form-fields.php:347
-#: includes/class-wc-payplus-form-fields.php:357
-#: includes/class-wc-payplus-form-fields.php:393
-#: includes/class-wc-payplus-form-fields.php:402
+#: includes/class-wc-payplus-form-fields.php:709
+#: includes/class-wc-payplus-form-fields.php:721
+#: includes/class-wc-payplus-form-fields.php:731
+#: includes/class-wc-payplus-form-fields.php:775
+#: includes/class-wc-payplus-form-fields.php:784
 #: includes/wc_payplus_subgateways.php:193
 #: includes/wc_payplus_subgateways.php:238
 msgid "No"
 msgstr "לא"
 
-#: includes/class-wc-payplus-form-fields.php:338
+#: includes/class-wc-payplus-form-fields.php:712
 msgid ""
 "Hide the identification field in the payment page - ID or Social Security..."
 msgstr "הסתרה של שדה ת.ז. בדף התשלום."
 
-#: includes/class-wc-payplus-form-fields.php:342
+#: includes/class-wc-payplus-form-fields.php:716
 #: includes/wc_payplus_subgateways.php:233
 msgid "Hide Number Of Payments In Payment Page"
 msgstr "הסתרת מספר תשלומים בדף התשלום"
 
-#: includes/class-wc-payplus-form-fields.php:350
+#: includes/class-wc-payplus-form-fields.php:724
 #: includes/wc_payplus_subgateways.php:241
 msgid "Hide the option to choose more than one payment."
 msgstr "הסתרה של האפשרות לבחור יותר מתשלום אחד."
 
-#: includes/class-wc-payplus-form-fields.php:354
+#: includes/class-wc-payplus-form-fields.php:728
 msgid "Hide Other Payment Methods On Payment Page"
 msgstr "הסתרת סוגי תשלום אחרים בדף התשלום"
 
-#: includes/class-wc-payplus-form-fields.php:361
+#: includes/class-wc-payplus-form-fields.php:735
 msgid ""
 "Hide the other payment methods on the payment page.<br>Example: If you have "
 "Google Pay and Credit Cards - \n"
@@ -1489,11 +1498,28 @@ msgstr ""
 "כרטיסי אשראי וגם Google Pay אם אפשרות זו דלוקה והלקוח בחר בתשלום של כרטיס "
 "אשראי,  דף התשלום שייפתח לא יציג בתוכו גם את Google Pay."
 
-#: includes/class-wc-payplus-form-fields.php:366
+#: includes/class-wc-payplus-form-fields.php:740
+msgid "Double check ipn"
+msgstr "ביצוע בדיקת IPN כפולה"
+
+#: includes/class-wc-payplus-form-fields.php:743
+msgid "Double check ipn (Default: Unchecked)"
+msgstr "ביצוע בדיקת IPN כפולה (ברירת מחדל: כבוי)"
+
+#: includes/class-wc-payplus-form-fields.php:744
+msgid ""
+"Before opening a payment page and if a PayPlus payment request uid already "
+"exists for this order, perform an ipn check."
+msgstr ""
+"במידה ולהזמנה היה כבר ניסיון תשלום (קיים payment page request uid) מריץ "
+"בדיקה עליו למניעת כפילות - מתאים לאתרים החווים האטה בשל טראפיק כבד או כמות "
+"גדולה של הזמנות - אין להדליק סתם."
+
+#: includes/class-wc-payplus-form-fields.php:748
 msgid "Order Settings"
 msgstr "הגדרות הזמנה"
 
-#: includes/class-wc-payplus-form-fields.php:379
+#: includes/class-wc-payplus-form-fields.php:761
 msgid ""
 "Only relevant if you are using the \"Default Woo\" in Successful Order "
 "Status option above this one."
@@ -1501,23 +1527,23 @@ msgstr ""
 "רלוונטי רק במידה והינכם משתמשים ב - \"ברירת מחדל woocommerce\" בסטטוס הזמנה "
 "הסתיימה בהצלחה (מעל אופציה זו)."
 
-#: includes/class-wc-payplus-form-fields.php:384
+#: includes/class-wc-payplus-form-fields.php:766
 msgid "Failure Order Status"
 msgstr "שינוי סטטוס הזמנה בעסקה שנכשלה"
 
-#: includes/class-wc-payplus-form-fields.php:390
+#: includes/class-wc-payplus-form-fields.php:772
 msgid "Successful Transaction E-mail Through PayPlus Servers"
 msgstr "שלח אימייל על עסקה מוצלחת ללקוח שלך באמצעות שרתי פיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:399
+#: includes/class-wc-payplus-form-fields.php:781
 msgid "Failure Transaction E-mail Through PayPlus Servers"
 msgstr "שלח אימייל על עסקה שנכשלה ללקוח שלך באמצעות שרתי פיי פלוס"
 
-#: includes/class-wc-payplus-form-fields.php:408
+#: includes/class-wc-payplus-form-fields.php:790
 msgid "Callback url"
 msgstr "כתובת לקבלת מידע לאחר ביצוע עסקה"
 
-#: includes/class-wc-payplus-form-fields.php:410
+#: includes/class-wc-payplus-form-fields.php:792
 msgid ""
 "To receive transaction information you need a web address<br>(Only http:// "
 "or https:// links are applicable)"
@@ -1525,26 +1551,26 @@ msgstr ""
 "כדי לקבל מידע עסקה נדרשת כתובת אינטרנט<br>(ניתן להשתמש רק בכתובות עם //:http "
 "או //:https)"
 
-#: includes/class-wc-payplus-form-fields.php:414
+#: includes/class-wc-payplus-form-fields.php:796
 msgid "Hide products from transaction data"
 msgstr "הסתרת מוצרים בביצוע עסקה בפייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:416
-#: includes/class-wc-payplus-form-fields.php:417
+#: includes/class-wc-payplus-form-fields.php:798
+#: includes/class-wc-payplus-form-fields.php:799
 msgid "Send all items as: \"General Product\" in PayPlus transaction data."
 msgstr "יצירת עסקה בפייפלוס ללא מידע מוצרים (יופיע רק מוצר כללי במידע העסקה)"
 
-#: includes/class-wc-payplus-form-fields.php:422
+#: includes/class-wc-payplus-form-fields.php:804
 msgid "Mark as \"paid\" successfully created subscription orders"
 msgstr ""
 "סמן כ\"בתשלום\" הזמנות מנוי שנוצרו בהצלחה\n"
 "בעקבות תוסף woocommerce subscriptions"
 
-#: includes/class-wc-payplus-form-fields.php:428
+#: includes/class-wc-payplus-form-fields.php:810
 msgid "Add Product Field Transaction Type"
 msgstr "הוסף שדה סוג עסקה בעדכון מוצר"
 
-#: includes/class-wc-payplus-form-fields.php:432
+#: includes/class-wc-payplus-form-fields.php:814
 msgid ""
 "Add a field to the product page to choose the transaction type for the "
 "product.<br>\n"
@@ -1563,11 +1589,11 @@ msgstr ""
 "תוגדר כ- J4 - עסקת חיוב.<br><br>\n"
 "עם זאת, כל מוצר שמוגדר לאישור תמיד יגדיר את העסקה לאישור."
 
-#: includes/class-wc-payplus-form-fields.php:440
+#: includes/class-wc-payplus-form-fields.php:822
 msgid "Display company name on the invoice"
 msgstr "להציג את שם החברה בחשבונית"
 
-#: includes/class-wc-payplus-form-fields.php:445
+#: includes/class-wc-payplus-form-fields.php:827
 msgid ""
 "If this option is selected,\n"
 "                       the name that will appear on the invoice will be "
@@ -1578,15 +1604,15 @@ msgstr ""
 "במידה ונבחרה אופציה זו, השם שיופיע על החשבונית יילקח משדה שם החברה ולא משדה "
 "שם פרטי. במידה ולא הוזן שם חברה, השם שירשם על החשבונית יהיה השם הפרטי"
 
-#: includes/class-wc-payplus-form-fields.php:450
+#: includes/class-wc-payplus-form-fields.php:832
 msgid "Display Balance Name"
 msgstr "הצג את שם היתרה"
 
-#: includes/class-wc-payplus-form-fields.php:456
+#: includes/class-wc-payplus-form-fields.php:838
 msgid "Block ip transactions"
 msgstr "חסום נסיונות חיוב מרובות לפי כתובת IP"
 
-#: includes/class-wc-payplus-form-fields.php:461
+#: includes/class-wc-payplus-form-fields.php:843
 msgid ""
 "If the client fails transactions more than the number\n"
 "                         of times you entered, his IP will be blocked for "
@@ -1594,32 +1620,48 @@ msgid ""
 msgstr ""
 "במידה והלקוח כשל בעסקאות יותר מכמות הפעמים שהזנתם, הIP שלו יחסם למשך שעה."
 
-#: includes/class-wc-payplus-form-fields.php:465
+#: includes/class-wc-payplus-form-fields.php:847
 msgid "Number of times per hour to block ip"
 msgstr "מס נסיונות החיוב בשעה לפני חסימת כתובת IP"
 
-#: includes/class-wc-payplus-form-fields.php:470
+#: includes/class-wc-payplus-form-fields.php:852
 msgid "PayPlus Advanced Features"
 msgstr "פיי פלוס  הגדרות מתקדמות"
 
-#: includes/class-wc-payplus-form-fields.php:474
-#: includes/class-wc-payplus-form-fields.php:475
+#: includes/class-wc-payplus-form-fields.php:856
+msgid "Always display Get PayPlus Data Buttons"
+msgstr "הצגת כפתורי פייפלוס בהזמנה תמיד (לא מומלץ)"
+
+#: includes/class-wc-payplus-form-fields.php:859
+msgid "Always display Get PayPlus Data Buttons - Regardless of orders status."
+msgstr ""
+"הצגת כפתורי אחזור מידע פייפלוס ועדכון מידע בעמוד ההזמנה תמיד - ללא קשר "
+"לסטטוס ההזמנה. (להפעיל רק אם את/ה יודע/ת מה את/ה עושה)"
+
+#: includes/class-wc-payplus-form-fields.php:860
+msgid "Get PayPlus Data Buttons Always"
+msgstr ""
+"הצגת כפתורי פייפלוס בעמוד ההזמנה תמיד (בלי התייחסות לסטטוס) [כבוי כברירת "
+"מחדל]"
+
+#: includes/class-wc-payplus-form-fields.php:864
+#: includes/class-wc-payplus-form-fields.php:865
 msgid "Show PayPlus Hash Check button"
 msgstr "הצגת כפתור בדיקת hash פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:478
+#: includes/class-wc-payplus-form-fields.php:868
 msgid "Shows the PayPlus Hash check button."
 msgstr "הצגת כפתור בדיקת hash פייפלוס בתפריט הצד."
 
-#: includes/class-wc-payplus-form-fields.php:482
+#: includes/class-wc-payplus-form-fields.php:872
 msgid "Enable/Disable token payment (Through Admin)"
 msgstr "הפעלה/כיבוי תשלום עם טוקן (דרך עריכת הזמנה באדמין)"
 
-#: includes/class-wc-payplus-form-fields.php:483
+#: includes/class-wc-payplus-form-fields.php:873
 msgid "Applicable for users that can edit orders."
 msgstr "רלוונטי רק למנהלים אשר יכולים לערוך הזמנות."
 
-#: includes/class-wc-payplus-form-fields.php:486
+#: includes/class-wc-payplus-form-fields.php:876
 msgid ""
 "If the user can edit orders, and there are saved tokens in the customer "
 "account. A token select and \"Pay With Token\" button will be shown."
@@ -1627,15 +1669,15 @@ msgstr ""
 "במידה והמשתמש הנוכחי יכול לערוך הזמנות ולבצע בהן שינויים , וללקוח קיימים "
 "טוקנים שמורים בכרטיס. יוצג כפתור \"Pay With Token\"."
 
-#: includes/class-wc-payplus-form-fields.php:490
+#: includes/class-wc-payplus-form-fields.php:880
 msgid "Activate PayPlus cron"
 msgstr "הפעלה של תהליך אוטומציה פייפלוס על השרת (cron)"
 
-#: includes/class-wc-payplus-form-fields.php:491
+#: includes/class-wc-payplus-form-fields.php:881
 msgid "Enable PayPlus orders cron service."
 msgstr "הפעלה/כיבוי של אוטומצית Cron פייפלוס."
 
-#: includes/class-wc-payplus-form-fields.php:494
+#: includes/class-wc-payplus-form-fields.php:884
 msgid ""
 "PayPlus cron processes \"cancelled\" or \"pending\" orders that are over 30 "
 "minutes old, created today, have a payment_page_uid, and do not have the "
@@ -1652,17 +1694,17 @@ msgstr ""
 "\"payplus_page_request_uid\". It verifies the PayPlus IPN Process and sets "
 "the correct status if needded."
 
-#: includes/class-wc-payplus-form-fields.php:499
-msgid "Display PayPlus \"Orders Check Button\""
+#: includes/class-wc-payplus-form-fields.php:889
+msgid "Display PayPlus \"Orders Validator Button\""
 msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד"
 
-#: includes/class-wc-payplus-form-fields.php:500
-msgid "Show PayPlus \"Orders Check Button\" on the side menu."
+#: includes/class-wc-payplus-form-fields.php:890
+msgid "Show PayPlus \"Orders Validator Button\" on the side menu."
 msgstr "הצגת כפתור \"בדיקת הזמנות פייפלוס\" בתפריט הצד."
 
-#: includes/class-wc-payplus-form-fields.php:503
+#: includes/class-wc-payplus-form-fields.php:893
 msgid ""
-"The \"PayPlus Orders Check\" button checks all orders created within the "
+"The \"PayPlus Orders Validator\" button checks all orders created within the "
 "last day are in \"pending\" status or \"cancelled\" and contain "
 "\"payplus_page_request_uid\". It verifies the PayPlus IPN Process and sets "
 "the correct status if needded."
@@ -1671,15 +1713,27 @@ msgstr ""
 "נמצאות בסטטוס \"בהמתנה\" או \"מבוטל\", ומכילות payplus_page_request_uid.\n"
 "הכפתור מאמת את תהליך ה-IPN של PayPlus ומעדכן את הסטטוס הנכון במידת הצורך."
 
-#: includes/class-wc-payplus-form-fields.php:507
+#: includes/class-wc-payplus-form-fields.php:897
+msgid "Enable display of orders table select in PayPlus Orders Validator"
+msgstr "הצגת טבלת בחירת הזמנות בעמוד \"בדיקת הזמנות\""
+
+#: includes/class-wc-payplus-form-fields.php:899
+msgid ""
+"Display orders table on top of the PayPlus Orders Validator to select orders "
+"by month, year and status via checkboxes."
+msgstr ""
+"הצגת טבלה של בחירת הזמנות לפי חודש וסטטוס בעמוד \"בדיקת הזמנות\" המאפשרת "
+"בחירה דרך צ'קבוקס."
+
+#: includes/class-wc-payplus-form-fields.php:904
 msgid "Display PayPlus Subgateways on the side menu"
 msgstr "הצגת כל שיטות התשלום של פייפלוס בתפריט הצד"
 
-#: includes/class-wc-payplus-form-fields.php:508
+#: includes/class-wc-payplus-form-fields.php:905
 msgid "Show all subgatways on the side menu."
 msgstr "הצגת כל שיטות התשלום של פייפלוס בתפריט הצד."
 
-#: includes/class-wc-payplus-form-fields.php:511
+#: includes/class-wc-payplus-form-fields.php:908
 msgid ""
 "If the side menu is displayed and this is enabled the subgateways will also "
 "be displayed."
@@ -1687,7 +1741,7 @@ msgstr ""
 "אם תפריט הצד של פייפלוס מוצג ואפשרות זו דלוקה, יוצגו בתפריט הצד כל \"שערי "
 "התשלום\" האפשריים של פייפלוס."
 
-#: includes/class-wc-payplus-form-fields.php:519
+#: includes/class-wc-payplus-form-fields.php:916
 msgid ""
 "Whenever a transaction is done add the payplus data to the order note."
 "<br>This data also appears in the PayPlus Data metabox."
@@ -1695,7 +1749,7 @@ msgstr ""
 "בכל פעם שעסקה מבוצעת - מידע העסקה יישמר בהערות ההזמנה (אותו מידע שמוצג בתיבת "
 "מידע פייפלוס)"
 
-#: includes/class-wc-payplus-form-fields.php:527
+#: includes/class-wc-payplus-form-fields.php:924
 msgid ""
 "Adds the PayPlus transaction data in a dedicated metabox on the side in the "
 "order page."
@@ -1703,15 +1757,15 @@ msgstr ""
 "מידע אודות העסקאות שנעשו דרך פייפלוס יופיע בתיבה ייעודית של פייפלוס בעמוד "
 "ההזמנה ויתעדכן בצורה דינמית."
 
-#: includes/class-wc-payplus-form-fields.php:531
+#: includes/class-wc-payplus-form-fields.php:928
 msgid "Legacy post meta support"
 msgstr "תמיכה בשדות מטה מדור קודם"
 
-#: includes/class-wc-payplus-form-fields.php:533
+#: includes/class-wc-payplus-form-fields.php:930
 msgid "Slower! (For stores that support HPOS with old fields used)"
 msgstr "איטי יותר! (עבור חנויות התומכות ב-HPOS)"
 
-#: includes/class-wc-payplus-form-fields.php:534
+#: includes/class-wc-payplus-form-fields.php:931
 msgid ""
 "Check this to view orders meta data created before HPOS was enabled on your "
 "store.<br>This doesn`t affect stores with no HPOS.<br>If you want to reduce "
@@ -1721,46 +1775,46 @@ msgstr ""
 "זו לא משפיעה על חנויות ללא תמיכה בשדות מהדור החדש <br> אם ברצונך להפחית "
 "קריאות מיותרות לדאטה בייס ויש תמיכה בשדות מהדור החדש, מומלץ לבטל את הבחירה."
 
-#: includes/class-wc-payplus-form-fields.php:539
+#: includes/class-wc-payplus-form-fields.php:936
 msgid "Hide the top menu"
 msgstr "הסתרת תפריט עליון"
 
-#: includes/class-wc-payplus-form-fields.php:541
-#: includes/class-wc-payplus-form-fields.php:543
+#: includes/class-wc-payplus-form-fields.php:938
+#: includes/class-wc-payplus-form-fields.php:940
 msgid "Hide the PayPlus top menu"
 msgstr "הסתרת התפריט העליון של פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:546
+#: includes/class-wc-payplus-form-fields.php:943
 msgid "Hide the side menu"
 msgstr "הסתרת תפריט צד"
 
-#: includes/class-wc-payplus-form-fields.php:548
-#: includes/class-wc-payplus-form-fields.php:550
+#: includes/class-wc-payplus-form-fields.php:945
+#: includes/class-wc-payplus-form-fields.php:947
 msgid "Hide the PayPlus side menu"
 msgstr "הסתרת תפריט הצד של פייפלוס"
 
-#: includes/class-wc-payplus-form-fields.php:553
+#: includes/class-wc-payplus-form-fields.php:950
 msgid "Disable custom fields editing in orders"
 msgstr "חסימת עריכה של שדות מותאמים אישית (מומלץ)"
 
-#: includes/class-wc-payplus-form-fields.php:558
+#: includes/class-wc-payplus-form-fields.php:955
 msgid "Enable partners dev mode"
 msgstr "תמיכה בפיתוחי פרטנרים"
 
-#: includes/class-wc-payplus-form-fields.php:560
+#: includes/class-wc-payplus-form-fields.php:957
 msgid "Enable dev mode for PayPlus partners."
 msgstr "תמיכה בפיתוחים של פרטנרים של פייפלוס."
 
-#: includes/class-wc-payplus-form-fields.php:565
+#: includes/class-wc-payplus-form-fields.php:962
 msgid "Disable woocommerce scheduler"
 msgstr "השבת את מתזמן WooCommerce"
 
-#: includes/class-wc-payplus-form-fields.php:572
+#: includes/class-wc-payplus-form-fields.php:969
 msgid "Log debug messages"
 msgstr "הפעל מצב הודעות לוגים"
 
 #: includes/class-wc-payplus-hosted-fields.php:104
-#: includes/wc_payplus_gateway.php:1351 payplus-payment-gateway.php:720
+#: includes/wc_payplus_gateway.php:1451 payplus-payment-gateway.php:753
 msgid "Save credit card in my account"
 msgstr "שמור את כרטיס האשראי בחשבון שלי"
 
@@ -1851,7 +1905,7 @@ msgctxt "Order status"
 msgid "Recurring subscription created"
 msgstr ""
 
-#: includes/wc-payplus-activation-functions.php:497
+#: includes/wc-payplus-activation-functions.php:517
 msgid "ID \\ VAT Number"
 msgstr "ת.ז / ע.מ / ח.פ"
 
@@ -1877,15 +1931,19 @@ msgid ""
 "checkout onboarding."
 msgstr ""
 
-#: includes/wc_payplus_express_checkout.php:830
+#: includes/wc_payplus_express_checkout.php:823
+msgid "Phone number here:"
+msgstr "הכנס/י מספר טלפון:"
+
+#: includes/wc_payplus_express_checkout.php:834
 msgid "Or"
 msgstr "או"
 
-#: includes/wc_payplus_gateway.php:115
+#: includes/wc_payplus_gateway.php:118
 msgid "PayPlus Credit Card Secure Payment"
 msgstr "תשלום מאובטח באמצעות פיי פלוס"
 
-#: includes/wc_payplus_gateway.php:371
+#: includes/wc_payplus_gateway.php:377
 #, fuzzy
 #| msgid ""
 #| "Sorry we only support https:// or http:// the callback will not be fired."
@@ -1895,7 +1953,7 @@ msgid ""
 msgstr ""
 "לא ניתן להשתמש בקישור ללא //:https או //:http שליחת מידע העסקה לא תתבצע."
 
-#: includes/wc_payplus_gateway.php:392
+#: includes/wc_payplus_gateway.php:398
 #, fuzzy
 #| msgid ""
 #| "It is recommended to change the names and description of the main payplus "
@@ -1910,7 +1968,7 @@ msgstr ""
 "בכרטיס/ים שמור/ים\" - בכותרת ובתיאור \"כרטיס/ים שמור/ים\"."
 
 #. translators: 1) Opening anchor tag 2) closing anchor tag
-#: includes/wc_payplus_gateway.php:664
+#: includes/wc_payplus_gateway.php:764
 #, php-format
 msgid ""
 "If your billing address has been changed for saved payment methods, be sure "
@@ -1920,7 +1978,7 @@ msgstr ""
 "%1$sשיטות תשלום שמורות%2$s שברשותך ומוסיף אותם מחדש."
 
 #. translators: %s is the current transaction type status
-#: includes/wc_payplus_gateway.php:747
+#: includes/wc_payplus_gateway.php:847
 #, php-format
 msgid ""
 "PayPlus Refund is Failed<br />You cannot refund transaction that not "
@@ -1930,7 +1988,7 @@ msgstr ""
 "ההזמנה הנוכחי: %s"
 
 #. translators: %1$s is the refunded amount, %2$s is the currency
-#: includes/wc_payplus_gateway.php:753
+#: includes/wc_payplus_gateway.php:853
 #, fuzzy, php-format
 #| msgid ""
 #| "PayPlus Refund is Failed<br />You cannot refund more then the refunded "
@@ -1942,7 +2000,7 @@ msgstr ""
 "זיכוי התשלום בפיי פלוס נכשל<br />אינך יכול לזכות סכום גבוהה מסכום ההזמנה "
 "המקורי. סכום שזוכה עד כה: %s %s"
 
-#: includes/wc_payplus_gateway.php:863
+#: includes/wc_payplus_gateway.php:963
 msgid ""
 "For more information about PayPlus and Plugin versions <a href=\"https://www."
 "payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</a>"
@@ -1950,7 +2008,7 @@ msgstr ""
 "למידע נוסף על גירסאות הפלאגין של פיי פלוס <a href=\"https://www.payplus.co."
 "il/wordpress\" target=\"_blank\">לחץ כאן</a>"
 
-#: includes/wc_payplus_gateway.php:871
+#: includes/wc_payplus_gateway.php:971
 msgid ""
 "This plugin was developed by <a href=\"https://www.payplus.co.il\">PayPlus "
 "LTD</a>"
@@ -1958,98 +2016,98 @@ msgstr ""
 "הפלאגין פותח ע\"י <a href=\"https://www.payplus.co.il/\" target=\"_blank"
 "\">פיי פלוס בע\"מ</a> - כל הזכויות שמורות"
 
-#: includes/wc_payplus_gateway.php:963 includes/wc_payplus_subgateways.php:47
+#: includes/wc_payplus_gateway.php:1063 includes/wc_payplus_subgateways.php:47
 msgid "Valuecard"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:966 includes/wc_payplus_subgateways.php:48
+#: includes/wc_payplus_gateway.php:1066 includes/wc_payplus_subgateways.php:48
 msgid "finitiOne"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:969
+#: includes/wc_payplus_gateway.php:1069
 msgid "Embedded"
 msgstr "טופס מובנה"
 
-#: includes/wc_payplus_gateway.php:1427 includes/wc_payplus_gateway.php:1428
+#: includes/wc_payplus_gateway.php:1556 includes/wc_payplus_gateway.php:1557
 msgid "Error: user or other, please contact PayPlus support"
 msgstr "שגיאה בעת יצירת הטוקן"
 
-#: includes/wc_payplus_gateway.php:1443 includes/wc_payplus_gateway.php:1445
+#: includes/wc_payplus_gateway.php:1572 includes/wc_payplus_gateway.php:1574
 #, fuzzy, php-format
 #| msgid "Error: credit card declined: %s"
 msgid "Error: Credit card declined. %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1476
+#: includes/wc_payplus_gateway.php:1605
 #, php-format
 msgid "PayPlus Token Payment Successful<br/>Transaction Number: %s"
 msgstr "חיוב באמצעות טוקן בוצע בהצלחה בפיי פלוס<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:1483
+#: includes/wc_payplus_gateway.php:1612
 #, php-format
 msgid "PayPlus Token Payment Failed<br/>Transaction Number: %s"
 msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:1488
+#: includes/wc_payplus_gateway.php:1617
 #, php-format
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:1868 includes/wc_payplus_invoice.php:840
+#: includes/wc_payplus_gateway.php:1997 includes/wc_payplus_invoice.php:857
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:1908 includes/wc_payplus_gateway.php:1926
-#: includes/wc_payplus_invoice.php:642 includes/wc_payplus_invoice.php:802
+#: includes/wc_payplus_gateway.php:2037 includes/wc_payplus_gateway.php:2096
+#: includes/wc_payplus_invoice.php:659 includes/wc_payplus_invoice.php:819
 msgid "Shipping"
 msgstr "משלוח"
 
-#: includes/wc_payplus_gateway.php:1950 includes/wc_payplus_gateway.php:1951
-#: includes/wc_payplus_gateway.php:1971 includes/wc_payplus_gateway.php:1972
-#: includes/wc_payplus_invoice.php:829 includes/wc_payplus_invoice.php:830
-#: includes/wc_payplus_invoice.php:862 includes/wc_payplus_invoice.php:863
+#: includes/wc_payplus_gateway.php:2059 includes/wc_payplus_gateway.php:2060
+#: includes/wc_payplus_gateway.php:2080 includes/wc_payplus_gateway.php:2081
+#: includes/wc_payplus_invoice.php:846 includes/wc_payplus_invoice.php:847
+#: includes/wc_payplus_invoice.php:879 includes/wc_payplus_invoice.php:880
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
-#: includes/wc_payplus_gateway.php:2248
+#: includes/wc_payplus_gateway.php:2375
 #, php-format
 msgid "An error occurred: %s"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2254
+#: includes/wc_payplus_gateway.php:2381
 msgid ""
 "Error: The payment page failed to load - please check your page uid and "
 "domain settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2279 includes/wc_payplus_gateway.php:3238
-#: includes/wc_payplus_gateway.php:3246
+#: includes/wc_payplus_gateway.php:2406 includes/wc_payplus_gateway.php:3379
+#: includes/wc_payplus_gateway.php:3387
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:2805
+#: includes/wc_payplus_gateway.php:2946
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:2975
+#: includes/wc_payplus_gateway.php:3116
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:3269
+#: includes/wc_payplus_gateway.php:3410
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:3279
+#: includes/wc_payplus_gateway.php:3420
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:3324
+#: includes/wc_payplus_gateway.php:3465
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:3352 includes/wc_payplus_gateway.php:3358
+#: includes/wc_payplus_gateway.php:3493 includes/wc_payplus_gateway.php:3499
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
@@ -2063,19 +2121,19 @@ msgstr ""
 msgid "Link Document Refund"
 msgstr "לינק מסמך החזר"
 
-#: includes/wc_payplus_invoice.php:1132 includes/wc_payplus_invoice.php:1150
-#: includes/wc_payplus_invoice.php:1172
+#: includes/wc_payplus_invoice.php:1149 includes/wc_payplus_invoice.php:1167
+#: includes/wc_payplus_invoice.php:1189
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:1184
+#: includes/wc_payplus_invoice.php:1201
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
 msgstr ""
 "לא נשלח מספר יתרה ליצירת חשבונית מכיוון שיש לך יותר ממוצר אחד עם מספר יתרה"
 
-#: includes/wc_payplus_invoice.php:1233
+#: includes/wc_payplus_invoice.php:1249
 msgid "Link Document  "
 msgstr "לינק מסמך "
 
@@ -2294,13 +2352,13 @@ msgid ""
 msgstr ""
 "מציג את כפתור \"לתשלום\" בגוף הטופס.  *רק בעמוד הצ'קאאוט הקלאסי של ווקומרס."
 
-#: includes/wc_payplus_subgateways.php:580
+#: includes/wc_payplus_subgateways.php:581
 #, fuzzy
 #| msgid "Card holder ID"
 msgid "Invalid order ID"
 msgstr "תעודת זהות בעל הכרטיס"
 
-#: payplus-payment-gateway.php:117
+#: payplus-payment-gateway.php:123
 msgid ""
 "<strong style=\"font-size: 1.2em;\">Dear Customers,</strong><br><br>\n"
 "\n"
@@ -2327,7 +2385,11 @@ msgstr ""
 "        תודה,<br>\n"
 "        <strong>צוות PayPlus</strong></span>"
 
-#: payplus-payment-gateway.php:254
+#: payplus-payment-gateway.php:178
+msgid "Every 30 Minutes"
+msgstr ""
+
+#: payplus-payment-gateway.php:287
 #, fuzzy
 #| msgid ""
 #| "Sandbox mode is active and real transaction cannot be processed. Please "
@@ -2340,7 +2402,7 @@ msgstr ""
 "שים לב: מצב Sandbox פעיל ועסקאות אמיתיות לא יסלקו. אנא וודא להוריד סימון "
 "בתוסף לאחר סיום הבדיקות"
 
-#: payplus-payment-gateway.php:260
+#: payplus-payment-gateway.php:293
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2352,11 +2414,11 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:443
+#: payplus-payment-gateway.php:476
 msgid "Four last digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: payplus-payment-gateway.php:503
+#: payplus-payment-gateway.php:536
 msgid ""
 "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" "
 "target=\"_blank\">WooCommerce</a> to be activated."
@@ -2365,14 +2427,14 @@ msgstr ""
 "target=\"_blank\">WooCommerce</a> ונדרש שיהיה פעיל."
 
 #. translators: %1$s: Current PHP version, %2$s: Required PHP version
-#: payplus-payment-gateway.php:516
+#: payplus-payment-gateway.php:549
 #, php-format
 msgid ""
 "Your server is running PHP version %1$s but some features require at least "
 "%2$s."
 msgstr ""
 
-#: payplus-payment-gateway.php:524
+#: payplus-payment-gateway.php:557
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -2383,67 +2445,67 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:577
+#: payplus-payment-gateway.php:610
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:889 payplus-payment-gateway.php:908
+#: payplus-payment-gateway.php:922 payplus-payment-gateway.php:941
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:927
+#: payplus-payment-gateway.php:960
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:950 payplus-payment-gateway.php:967
+#: payplus-payment-gateway.php:983 payplus-payment-gateway.php:1000
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:1149 payplus-payment-gateway.php:1157
+#: payplus-payment-gateway.php:1187 payplus-payment-gateway.php:1195
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:1172
+#: payplus-payment-gateway.php:1210
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:120
+#: templates/hostedFields.php:134
 msgid "Processing..."
 msgstr "בתהליך..."
 
-#: templates/hostedFields.php:585
+#: templates/hostedFields.php:599
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:596
+#: templates/hostedFields.php:610
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:600
+#: templates/hostedFields.php:614
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:604
+#: templates/hostedFields.php:618
 msgid "Invoice Name"
 msgstr "הנפק חשבונית / קבלה על שם"
 
-#: templates/hostedFields.php:609
+#: templates/hostedFields.php:623
 msgid "Phone"
 msgstr "טלפון"
 
-#: templates/hostedFields.php:633
+#: templates/hostedFields.php:647
 msgid "Card number"
 msgstr "מידע על הכרטיס"
 
-#: templates/hostedFields.php:661
+#: templates/hostedFields.php:675
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:681
+#: templates/hostedFields.php:695
 msgid "Powered by "
 msgstr ""
 
