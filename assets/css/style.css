@@ -170,6 +170,19 @@ html[lang="en"]
     position: relative;
     display: block;
     width: 100%;
+    @media (min-width: 767.98px) {
+        #phone-number {
+            width: 99%;
+        }
+    }
+}
+
+#phone-number {
+    width: 97%;
+    display: block;
+    text-align: center;
+    border: 3px solid #606061;
+    border-radius: 5px;
 }
 
 .border-with-word {

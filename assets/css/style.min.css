@@ -1,2 +1,304 @@
-.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type{align-items:center;display:flex;margin-bottom:1px;order:2}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway-"]{display:flex}.checkout-payplus li[class^="wc_payment_method payment_method_payplus-payment-gateway"] input[type=radio][name=payment_method]:not(:checked){display:unset!important}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway-hostedfields"]{display:ruby}html[dir=ltr] .checkout-payplus li[class^="wc_payment_method payment_method_payplus-payment-gateway"] label img{margin-right:15px!important}html[dir=rtl] .checkout-payplus li[class^="wc_payment_method payment_method_payplus-payment-gateway"] label img{margin-left:15px!important}.checkout-payplus #add_payment_method #payment ul.payment_methods li:not(.woocommerce-notice):after,.checkout-payplus #add_payment_method #payment ul.payment_methods li:not(.woocommerce-notice):before,.checkout-payplus .woocommerce-cart #payment ul.payment_methods li:not(.woocommerce-notice):after,.checkout-payplus .woocommerce-cart #payment ul.payment_methods li:not(.woocommerce-notice):before,.checkout-payplus .woocommerce-checkout #payment ul.payment_methods li:not(.woocommerce-notice):after,.checkout-payplus .woocommerce-checkout #payment ul.payment_methods li:not(.woocommerce-notice):before{content:unset!important;display:table}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type span{order:1}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img{margin-left:20px;max-height:32px;max-width:32px;order:-1}.checkout-payplus li[class^="wc_payment_method payment_method_payplus-payment-gateway"] input[type=radio][name=payment_method]:not(:checked){display:flex}#payment>ul>li[class^="wc_payment_method payment_method_payplus-payment-gateway-"] img{max-height:32px;max-width:32px}#payment>ul>li[class^="wc_payment_method payment_method_payplus-payment-gateway"] img{max-height:32px;max-width:64px}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] .payment-method-description{margin-top:0}.checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] input[type=radio][name=payment_method]~.payment_box{margin-top:.2rem}.checkout-payplus input[type=radio][name=payment_method]+label:before,.checkout-payplus input[type=radio][name=payment_method]:checked+label:before{order:-1;transform:none}.show-border{animation:borderChange .5s forwards}@keyframes borderChange{0%{border-color:grey}to{border-color:green}}html[lang=en-US] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img,html[lang=en] .checkout-payplus li[class*="wc_payment_method payment_method_payplus-payment-gateway"] label:first-of-type img{margin-left:0;margin-right:20px}.express-checkout-product{border:1px solid #f9f9f9;border-radius:12px;display:block;margin:5% auto;padding:20px 10px 10px;position:relative;width:100%}.border-with-word{align-items:center;display:flex;justify-content:center;position:relative;text-align:center}.border-with-word:after,.border-with-word:before{border-top:2px solid #cfcaca;content:"";flex:1;margin:0}.border-with-word span{background:transparent;padding:0 10px}@media (min-width:767.98px){.express-checkout{display:block;margin:3% auto 0;padding:30px 10px 10px;position:relative;width:264px}}@media (max-width:767.98px){.express-checkout{display:block;margin:3% auto 0;padding-top:20px;position:relative;width:100%}}.express-flex{display:flex;left:0;position:absolute;top:0;width:100%}body #applePayButton{border:0;border-radius:3px!important;margin-bottom:10px;margin-top:5px}.title-express-checkout{font-size:14px;margin:0;position:absolute;text-align:center;top:-12px;width:100%}.title-express-checkout span{background:#fff;color:#000;display:inline-block;padding:0 15px;text-align:center}#error-api-payplus p{color:red;font-size:14px;margin:0;text-align:center}#applePayButton.disabled,.express-checkout iframe.disabled{cursor:not-allowed;pointer-events:none}.express-checkout.disabled{opacity:.5}.express-checkout p{margin:0}@media screen and (min-width:568px){body .alertify .ajs-dialog{height:82%!important}}@media screen and (max-width:568px){body .alertify:not(.ajs-maximized) .ajs-modal{padding:0}body .alertify .ajs-dialog{margin:0 auto;.ajs-commands{top:0!important}}}
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type {
+    display: flex;
+    order: 2;
+    margin-bottom: 1px;
+    align-items: center;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway-"] {
+    display: flex;
+}
+
+.checkout-payplus
+    li[class^="wc_payment_method payment_method_payplus-payment-gateway"]
+    input[type="radio"][name="payment_method"]:not(:checked) {
+    display: unset !important;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway-hostedfields"] {
+    display: ruby;
+}
+
+html[dir="ltr"]
+    .checkout-payplus
+    li[class^="wc_payment_method payment_method_payplus-payment-gateway"]
+    label
+    img {
+    margin-right: 15px !important;
+}
+
+html[dir="rtl"]
+    .checkout-payplus
+    li[class^="wc_payment_method payment_method_payplus-payment-gateway"]
+    label
+    img {
+    margin-left: 15px !important;
+}
+
+.checkout-payplus
+    #add_payment_method
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::after,
+.checkout-payplus
+    #add_payment_method
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::before,
+.checkout-payplus
+    .woocommerce-cart
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::after,
+.checkout-payplus
+    .woocommerce-cart
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::before,
+.checkout-payplus
+    .woocommerce-checkout
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::after,
+.checkout-payplus
+    .woocommerce-checkout
+    #payment
+    ul.payment_methods
+    li:not(.woocommerce-notice)::before {
+    content: unset !important;
+    display: table;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    span {
+    order: 1;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img {
+    order: -1;
+    margin-left: 20px;
+    max-height: 32px;
+    max-width: 32px;
+}
+
+.checkout-payplus
+    li[class^="wc_payment_method payment_method_payplus-payment-gateway"]
+    input[type="radio"][name="payment_method"]:not(:checked) {
+    display: flex;
+    /* Your styles here */
+}
+
+#payment
+    > ul
+    > li[class^="wc_payment_method payment_method_payplus-payment-gateway-"]
+    img {
+    max-height: 32px;
+    max-width: 32px;
+}
+
+#payment
+    > ul
+    > li[class^="wc_payment_method payment_method_payplus-payment-gateway"]
+    img {
+    max-height: 32px;
+    max-width: 64px;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    .payment-method-description {
+    margin-top: 0;
+}
+
+.checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    input[type="radio"][name="payment_method"]
+    ~ .payment_box {
+    margin-top: 0.2rem;
+}
+
+.checkout-payplus input[type="radio"][name="payment_method"] + label::before,
+.checkout-payplus
+    input[type="radio"][name="payment_method"]:checked
+    + label::before {
+    order: -1;
+    transform: none;
+}
+
+.show-border {
+    animation: borderChange 0.5s forwards;
+}
+
+@keyframes borderChange {
+    0% {
+        border-color: grey;
+    }
+
+    100% {
+        border-color: green;
+    }
+}
+
+html[lang="en-US"]
+    .checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img,
+html[lang="en"]
+    .checkout-payplus
+    li[class*="wc_payment_method payment_method_payplus-payment-gateway"]
+    label:first-of-type
+    img {
+    margin-left: 0;
+    margin-right: 20px;
+}
+
+.express-checkout-product {
+    margin: 5% auto;
+    border-radius: 12px;
+    border: 1px solid #f9f9f9;
+    padding: 20px 10px 10px 10px;
+    position: relative;
+    display: block;
+    width: 100%;
+    @media (min-width: 767.98px) {
+        #phone-number {
+            width: 99%;
+        }
+    }
+}
+
+#phone-number {
+    width: 97%;
+    display: block;
+    text-align: center;
+    border: 3px solid #606061;
+    border-radius: 5px;
+}
+
+.border-with-word {
+    position: relative;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.border-with-word::before,
+.border-with-word::after {
+    content: "";
+    flex: 1;
+    border-top: 2px solid #cfcaca; /* Adjust the thickness and color of the border */
+    margin: 0 0; /* Adjust the gap around the text */
+}
+
+.border-with-word span {
+    background: transparent; /* Match the background color to your container */
+    padding: 0 10px; /* Optional: Add padding around the text */
+}
+
+@media (min-width: 767.98px) {
+    .express-checkout {
+        margin: 3% auto 0 auto;
+        /* border-radius: 12px; */
+        /* border: 1px solid #e3e6e9; */
+        padding: 30px 10px 10px 10px;
+        position: relative;
+        display: block;
+        width: 264px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .express-checkout {
+        margin: 3% auto 0 auto;
+        /* border-radius: 12px; */
+        /* border: 1px solid #e3e6e9; */
+        /* padding: 20px 10px 10px 10px; */
+        padding-top: 20px;
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+}
+
+.express-flex {
+    display: flex;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    left: 0px;
+}
+
+body #applePayButton {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    border-radius: 3px !important;
+    border: 0px;
+}
+
+.title-express-checkout {
+    margin: 0px;
+    position: absolute;
+    top: -12px;
+    font-size: 14px;
+    width: 100%;
+    text-align: center;
+}
+
+.title-express-checkout span {
+    background: #ffffff;
+    padding: 0px 15px;
+    text-align: center;
+    display: inline-block;
+    color: #000;
+}
+
+#error-api-payplus p {
+    font-size: 14px;
+    margin: 0;
+    color: red;
+    text-align: center;
+}
+
+.express-checkout iframe.disabled,
+#applePayButton.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.express-checkout.disabled {
+    opacity: 0.5;
+}
+
+.express-checkout p {
+    margin: 0px;
+}
+@media screen and (min-width: 568px) {
+    body .alertify .ajs-dialog {
+        height: 82% !important;
+    }
+}
+@media screen and (max-width: 568px) {
+    body .alertify:not(.ajs-maximized) .ajs-modal {
+        padding: 0px 0px;
+    }
+
+    body .alertify .ajs-dialog {
+        margin: 0 auto;
+        .ajs-commands {
+            top: 0 !important;
+        }
+    }
+}
+
 /*# sourceMappingURL=style.min.css.map */
