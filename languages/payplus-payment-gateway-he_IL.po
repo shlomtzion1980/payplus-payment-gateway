@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-02-17 11:08+0200\n"
-"PO-Revision-Date: 2025-02-17 11:09+0200\n"
+"POT-Creation-Date: 2025-02-17 12:24+0200\n"
+"PO-Revision-Date: 2025-02-17 12:26+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -737,6 +737,7 @@ msgid "Token Apple Pay"
 msgstr "אפל פיי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:570
+#: includes/admin/class-wc-payplus-admin.php:2296
 msgid "Display on product page"
 msgstr "הצגה בדף מוצר"
 
@@ -1094,7 +1095,7 @@ msgid "Transaction review"
 msgstr "בדיקת עסקה"
 
 #: includes/admin/class-wc-payplus-admin.php:2143
-#: includes/admin/class-wc-payplus-admin.php:2384
+#: includes/admin/class-wc-payplus-admin.php:2386
 msgid "Charge for Order Number: "
 msgstr "חיוב עבור הזמנה מספר: "
 
@@ -1150,29 +1151,37 @@ msgstr "סה\"כ תקבולים"
 msgid "Are you sure you want to delete this payment method?"
 msgstr "האם אתה בטוח שברצונך למחק אמצעי תשלום זה?"
 
-#: includes/admin/class-wc-payplus-admin.php:2319
+#: includes/admin/class-wc-payplus-admin.php:2297
+msgid ""
+"For Express in product page you ALSO need to select: Either Shipping by "
+"Woocommerce or Global the one you choose will be used in the product page."
+msgstr ""
+"לשילוח בעמוד מוצר יש צורך גם לבחור ב\"שילוח לפי הגדרות ווקומרס\" או במשלוח "
+"גלובלי (תקף רק כאשר \"שילוח לפי תצוגת עמוד הצ'קאאוט של ווקומרס\")"
+
+#: includes/admin/class-wc-payplus-admin.php:2321
 msgid "Charge Order Using PayPlus"
 msgstr "חיוב הזמנה באמצעות PayPlus"
 
-#: includes/admin/class-wc-payplus-admin.php:2322
+#: includes/admin/class-wc-payplus-admin.php:2324
 msgid "Make Payment"
 msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
-#: includes/admin/class-wc-payplus-admin.php:2444
+#: includes/admin/class-wc-payplus-admin.php:2446
 #: payplus-payment-gateway.php:592
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
-#: includes/admin/class-wc-payplus-admin.php:2448
+#: includes/admin/class-wc-payplus-admin.php:2450
 msgid "user or other, please contact payplus support"
 msgstr "שגיאת משתמש, נא צור קשר עם בעל האתר"
 
-#: includes/admin/class-wc-payplus-admin.php:2451
+#: includes/admin/class-wc-payplus-admin.php:2453
 msgid "Credit card company declined, check credit card details and credit line"
 msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בדוק את הפרטים בלוגים"
 
-#: includes/admin/class-wc-payplus-admin.php:2454
+#: includes/admin/class-wc-payplus-admin.php:2456
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 

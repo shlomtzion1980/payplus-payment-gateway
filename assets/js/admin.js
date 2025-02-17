@@ -96,8 +96,8 @@ jQuery(function ($) {
     subgateways.forEach(function (subgateway) {
         $(
             'tr[data-gateway_id="' +
-            subgateway +
-            '"] .payment-method-features-info'
+                subgateway +
+                '"] .payment-method-features-info'
         ).remove();
     });
     // end remove tooltips for subgateways //
@@ -194,6 +194,8 @@ jQuery(function ($) {
     });
     /******    block  end ******/
 
+    let enableExpressOnProductPageMessage = "";
+    let displayOnProductPage = "";
     /******    transaction Type  start ******/
     if (typeof payplus_script_payment !== "undefined") {
         const wc_tax_enabled = payplus_script_payment.wc_tax_enabled;
@@ -201,6 +203,9 @@ jQuery(function ($) {
             0,
             2
         );
+        enableExpressOnProductPageMessage =
+            payplus_script_payment.enableExpressOnProductPageMessage;
+        displayOnProductPage = payplus_script_payment.displayOnProductPage;
 
         if (currentLanguage !== "en" && currentLanguage !== "he") {
             currentLanguage = "en";
@@ -211,8 +216,8 @@ jQuery(function ($) {
                 : "Attention: The tax rates and calculations are enabled on this site - Some of fields above will not take affect.";
         wc_tax_enabled
             ? payingVatAll
-                .closest("table")
-                .append('<p style="color: red;">' + taxMessage + "</p>")
+                  .closest("table")
+                  .append('<p style="color: red;">' + taxMessage + "</p>")
             : null;
         const transactionType = payplus_script_payment.transactionType;
         if (transactionType != 2) {
@@ -241,25 +246,45 @@ jQuery(function ($) {
     };
 
     const enableExpressOnProductPageIsOn = () => {
-        console.log(enableExpressOnProductPage.closest("td").prev().text());
-        const newText = enableExpressOnProductPage.closest("td").prev().text() + "<br><span style='color: red;'>For Express in product page you ALSO need to select: Either Shipping by Woocommerce or Global the one you choose will be used in the product page.</span>";
+        const newText =
+            enableExpressOnProductPage.closest("td").prev().text() +
+            "<br><span style='color: red;'>" +
+            enableExpressOnProductPageMessage +
+            "</span>";
         enableExpressOnProductPage.closest("td").prev().html(newText);
     };
 
-    enableExpressOnProductPage.prop("checked") && shippingWooJs.prop("checked") ? enableExpressOnProductPageIsOn() : null;
+    enableExpressOnProductPage.prop("checked") && shippingWooJs.prop("checked")
+        ? enableExpressOnProductPageIsOn()
+        : null;
 
     enableExpressOnProductPage.change(function () {
-        if (enableExpressOnProductPage.prop("checked") && shippingWooJs.prop("checked")) {
+        if (
+            enableExpressOnProductPage.prop("checked") &&
+            shippingWooJs.prop("checked")
+        ) {
             enableExpressOnProductPageIsOn();
         } else {
-            enableExpressOnProductPage.closest("td").prev().html("Display on product page");
+            enableExpressOnProductPage
+                .closest("td")
+                .prev()
+                .html(displayOnProductPage);
         }
     });
 
     shippingWooJs.change(function () {
-        if (enableExpressOnProductPage.prop("checked") && !shippingWooJs.prop("checked")) {
-            enableExpressOnProductPage.closest("td").prev().html("Display on product page");
-        } else if (enableExpressOnProductPage.prop("checked") && shippingWooJs.prop("checked")) {
+        if (
+            enableExpressOnProductPage.prop("checked") &&
+            !shippingWooJs.prop("checked")
+        ) {
+            enableExpressOnProductPage
+                .closest("td")
+                .prev()
+                .html(displayOnProductPage);
+        } else if (
+            enableExpressOnProductPage.prop("checked") &&
+            shippingWooJs.prop("checked")
+        ) {
             enableExpressOnProductPageIsOn();
         }
     });
@@ -345,8 +370,8 @@ jQuery(function ($) {
                             .find(".error-express-checkout")
                             .html(
                                 "<b>payplus error : </b>" +
-                                response.response_initialized.results
-                                    .description
+                                    response.response_initialized.results
+                                        .description
                             );
                         slef.prop("checked", false);
                     }
@@ -376,7 +401,7 @@ jQuery(function ($) {
                         let description = response.response_initialized.results
                             .description.description
                             ? response.response_initialized.results.description
-                                .description
+                                  .description
                             : response.response_initialized.results.description;
                         elementFieldset
                             .find(".error-express-checkout")
@@ -1056,16 +1081,21 @@ function payplus_print_payments(data, index) {
 
     let html = `<tr class="row-payment-${data.row_id}">
         <td>
-        <a class="link-action" data-id=${data.row_id
-        } onclick="payplus_delete_element(${data.row_id})">${payplus_script_payment.btn_delete
-        }</a>
-        <a class="link-action" data-id=${data.row_id
-        } onclick="payplus_edit_element(${data.row_id})">${payplus_script_payment.btn_edit
-        }</a>
+        <a class="link-action" data-id=${
+            data.row_id
+        } onclick="payplus_delete_element(${data.row_id})">${
+        payplus_script_payment.btn_delete
+    }</a>
+        <a class="link-action" data-id=${
+            data.row_id
+        } onclick="payplus_edit_element(${data.row_id})">${
+        payplus_script_payment.btn_edit
+    }</a>
         </td>
          <td><span class="woocommerce-Price-amount amount"><bdi><span class="woocommerce-Price-currencySymbol">
-                    ${payplus_script_payment.currency_symbol
-        }</span>${pricePayment}</bdi></span>
+                    ${
+                        payplus_script_payment.currency_symbol
+                    }</span>${pricePayment}</bdi></span>
                  </td>
                     <td>${details}</td>
                   <td>${data.method_payment.replace("-", " ")}</td>
@@ -1089,8 +1119,9 @@ function payplus_print_payments_all() {
         if (payments) {
             table_payment.html("");
             if (payments.length) {
-                let html = `<strong>${payplus_script_payment.payplus_sum} : ${payplus_script_payment.currency_symbol
-                    }${payplus_get_sum_payments()}  </strong>`;
+                let html = `<strong>${payplus_script_payment.payplus_sum} : ${
+                    payplus_script_payment.currency_symbol
+                }${payplus_get_sum_payments()}  </strong>`;
                 for (let index = 0; index < payments.length; index++) {
                     payplus_print_payments(payments[index], index);
                 }

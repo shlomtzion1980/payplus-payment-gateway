@@ -2293,6 +2293,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'create_invoice_refund_nonce' => wp_create_nonce('create_invoice_refund_nonce'),
                 'create_invoice_nonce' => wp_create_nonce('create_invoice_nonce'),
                 "frontNonce" => wp_create_nonce('frontNonce'),
+                "displayOnProductPage" => __('Display on product page', 'payplus-payment-gateway'),
+                "enableExpressOnProductPageMessage" => __('For Express in product page you ALSO need to select: Either Shipping by Woocommerce or Global the one you choose will be used in the product page.', 'payplus-payment-gateway'),
             )
         );
         wp_enqueue_script('wc-payplus-gateway-admin');
