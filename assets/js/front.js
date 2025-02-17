@@ -676,6 +676,29 @@ window.addEventListener("message", async function (event) {
             const quantityObj = document.getElementsByClassName("qty");
             quantity = quantityObj ? quantityObj[0].value : 1;
         }
+        let phoneNumber = "";
+
+        // Check if the condition contains "required"
+        const phoneNumberField = document.getElementById("phone-number");
+        const condition =
+            phoneNumberField && phoneNumberField.required ? "required" : ""; // Check if the phone number field is required
+
+        if (condition.includes("required")) {
+            // Show the phone number input field and make it required
+            phoneNumberField.style.display = "block";
+            phoneNumberField.required = true;
+
+            // Collect the phone number from the input field
+            phoneNumber = phoneNumberField.value;
+            if (!phoneNumber) {
+                displayMsgError("Phone number is required.");
+                return;
+            }
+        } else {
+            // Hide the phone number input field and make it not required
+            phoneNumberField.style.display = "none";
+            phoneNumberField.required = false;
+        }
 
         if (paymentData.oneClickCheckoutGooglePay === "ProcessPayment") {
             paymentData = paymentData.data.paymentData;
@@ -693,6 +716,7 @@ window.addEventListener("message", async function (event) {
                 contact: {
                     customer_name: paymentData.shippingAddress.name,
                     email: paymentData.email,
+                    phone: phoneNumber, // Include the phone number if required
                     address: paymentData.shippingAddress.address1,
                     city: paymentData.shippingAddress.locality,
                     country_ISO: paymentData.shippingAddress.countryCode,

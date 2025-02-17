@@ -818,6 +818,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $date = new DateTime();
                 $current_timestamp = $date->getTimestamp();
                 $bi = base64_encode(site_url());
+                $requirePhone = $WC_PayPlus_Gateway->get_option('require_phone') == 'yes' ? true : false;
+                !$requirePhone ? $required = "" : $required = "required";
+                echo "<input type='text' id='phone-number' name='phone-number' placeholder='Phone Number' style='display: block;text-align: center;width: 97%;display: none;' $required>";
                 echo '<iframe class="' . esc_attr($disabled) . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . esc_attr($WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick) . '?var=' . esc_attr($current_timestamp) . '&wb=' . esc_attr($bi) . '" style="width: 100%; height: 50px; display: block;" frameborder="0" data-product-id="' . esc_attr($productId) . '"></iframe>';
             }
             if ($WC_PayPlus_Gateway->enable_apple_pay) {

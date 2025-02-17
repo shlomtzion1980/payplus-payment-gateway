@@ -532,7 +532,6 @@ class WC_PayPlus_Admin_Settings
                     'desc' => '',
                     'id' => 'payplus-express-checkout'
                 );
-
                 $settings[$section][] = [
                     'name' => __('Google Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_google_pay]',
@@ -543,7 +542,13 @@ class WC_PayPlus_Admin_Settings
                                 <div class="spinner-icon"></div>
                                 </div>',
                 ];
-
+                $settings[$section][] = [
+                    'name' => __('Require phone number with Google Pay', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[require_phone]',
+                    'type' => 'checkbox',
+                    'class' => 'require_phone enable_checkout',
+                    'desc' => 'Require phone number with Google Pay',
+                ];
                 $settings[$section][] = [
                     'name' => __('Apple Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_apple_pay]',
