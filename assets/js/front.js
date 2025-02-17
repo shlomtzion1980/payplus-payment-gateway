@@ -691,7 +691,7 @@ window.addEventListener("message", async function (event) {
             // Collect the phone number from the input field
             phoneNumber = phoneNumberField.value;
             if (!phoneNumber) {
-                displayMsgError("Phone number is required.");
+                displayMsgError(payplus_script.requirePhoneText);
                 return;
             }
         } else {

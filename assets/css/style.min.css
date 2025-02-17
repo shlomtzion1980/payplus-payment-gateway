@@ -178,7 +178,10 @@ html[lang="en"]
 }
 
 #phone-number {
-    width: 97%;
+    width: 96.5%;
+    @media (max-width: 767.98px) {
+        width: 97%;
+    }
     display: block;
     text-align: center;
     border: 3px solid #606061;
