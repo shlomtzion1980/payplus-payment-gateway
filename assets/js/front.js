@@ -688,6 +688,9 @@ window.addEventListener("message", async function (event) {
             phoneNumberField.style.display = "block";
             phoneNumberField.required = true;
 
+            // Add event listener for input validation
+            phoneNumberField.addEventListener("input", validatePhoneNumber);
+
             // Collect the phone number from the input field
             phoneNumber = phoneNumberField.value;
             if (!phoneNumber) {
@@ -892,5 +895,26 @@ window.addEventListener("message", async function (event) {
         }
     }
 });
+
+function validatePhoneNumber(event) {
+    const phoneNumberField = event.target;
+    let phoneNumber = phoneNumberField.value;
+
+    // Sanitize the phone number by removing unwanted characters
+    phoneNumber = phoneNumber.replace(/[^0-9+()-\s]/g, "");
+
+    // Set the sanitized value back to the input field
+    phoneNumberField.value = phoneNumber;
+
+    // Validate the phone number format (example: must be 10-15 digits)
+    const phoneNumberPattern = /^[0-9+()-\s]{10,15}$/;
+    if (!phoneNumberPattern.test(phoneNumber)) {
+        phoneNumberField.classList.add("invalid");
+        phoneNumberField.classList.remove("valid");
+    } else {
+        phoneNumberField.classList.remove("invalid");
+        phoneNumberField.classList.add("valid");
+    }
+}
 
 setInterval(checkClassChange, 100);
