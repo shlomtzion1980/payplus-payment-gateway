@@ -408,7 +408,10 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 wp_redirect($linkRedirect);
             }
-        } elseif (isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit') {
+        } elseif (
+            isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' ||
+            isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'credit-card'
+        ) {
             $order_id = isset($_GET['success_order_id']) ? intval($_GET['success_order_id']) : 0;
             $order = wc_get_order($order_id);
             if ($order) {
