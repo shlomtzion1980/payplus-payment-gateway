@@ -323,8 +323,9 @@ class WC_PayPlus
         $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
 
         if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
-            wp_die("This order #$order_id was received and will be or was taken care of - however - the Cart hash has been mismatched - If you are the rightfull owner of this order you will be 
-            able to view it's progress in your account.", 'Error', array('response' => 400));
+            $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
+            wp_redirect($redirect_to);
+            return;
         }
 
         $tblname = $wpdb->prefix . 'payplus_payment_process';
