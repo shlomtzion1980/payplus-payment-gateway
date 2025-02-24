@@ -300,13 +300,12 @@ class WC_PayPlus
      */
     public function ipn_response()
     {
-        if (!wp_verify_nonce(sanitize_key($this->_wpnonce), '_wp_payplusIpn')) {
-            check_ajax_referer('payload_link', '_wpnonce');
-        }
-
-        global $wpdb;
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST);
+
+        if (!wp_verify_nonce(sanitize_key($REQUEST['_wpnonce']), 'payload_link')) {
+            check_ajax_referer('payload_link', '_wpnonce');
+        }
 
         if (isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true") {
             $REQUEST = json_decode(stripslashes($REQUEST['jsonData']), true)['data'];
@@ -319,9 +318,9 @@ class WC_PayPlus
         $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
         $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
         $received_salt = isset($REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_3'])) : '';
-
         $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
 
+        global $wpdb;
         if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
             $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
             wp_redirect($redirect_to);
