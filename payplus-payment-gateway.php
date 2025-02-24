@@ -312,6 +312,21 @@ class WC_PayPlus
             $REQUEST = json_decode(stripslashes($REQUEST['jsonData']), true)['data'];
         }
 
+        $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
+        $order = wc_get_order($order_id);
+
+        $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
+        $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
+        $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
+        $received_salt = isset($REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_3'])) : '';
+
+        $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
+
+        if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
+            wp_die("This order #$order_id was received and will be or was taken care of - however - the Cart hash has been mismatched - If you are the rightfull owner of this order you will be 
+            able to view it's progress in your account.", 'Error', array('response' => 400));
+        }
+
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
         $indexRow = 0;
@@ -326,7 +341,10 @@ class WC_PayPlus
                 $this->payplus_gateway->store_payment_ip();
             }
 
-            $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : '';
+            //to be removed
+            // $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : '';
+            // $order = wc_get_order($order_id);
+
 
             $result = $wpdb->get_results($wpdb->prepare(
                 "SELECT id as rowId, count(*) as rowCount, count_process FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND ( status_code = %d )",
