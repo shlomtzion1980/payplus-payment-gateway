@@ -155,7 +155,7 @@ class WC_PayPlus_Form_Fields
                     $selected_year = isset($_POST['year']) ? intval($_POST['year']) : $current_year;
                     $selected_month = isset($_POST['month']) ? intval($_POST['month']) : gmdate('m');
                 ?>
-                    <h2>Orders by Month - Table select</h2>
+                    <h2>Orders by Month - Table select - Current month displayed: <?php echo esc_html(gmdate('F', mktime(0, 0, 0, $selected_month, 10))); ?></h2>
                     <form method="post" action="" id="selctedYearForm">
                         <label for="year">Choose Year:</label>
                         <select name="year" id="year">
@@ -305,7 +305,7 @@ class WC_PayPlus_Form_Fields
                         if (selectedOrderIds.length > 0) {
                             orderFilters.style.display = "none";
                             timeFilters.style.display = "none";
-                            orderNumbers.style.display = "none";
+                            orderNumbers.style.display = "flex";
                         } else {
                             orderFilters.style.display = "flex";
                             timeFilters.style.display = "flex";
