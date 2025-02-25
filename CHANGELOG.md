@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.6.0] - 25-02-2025 - (Liebe)
+
+- Tweak - Updated translations for new express checkout settings.
+- Tweak - Added sanitation and validation for express checkout data.
+- Fix   - Resolved issue where "Use global default" wasn't working in subgateways (Display mode).
+- Fix   - Fixed nonce issue occurring with 3D Secure transactions when redirected to the thank you page - nonce didn't pass.
+- Tweak - Enhanced security for nonce exploit issue on the thank you page.
+
 ## [7.5.9] - 17-02-2025 - (Zora)
 
 - Added - Option to require a phone number for Google Pay Express Checkout.

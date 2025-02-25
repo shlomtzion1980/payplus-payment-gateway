@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.5.9
+Stable tag: 7.6.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.6.0 - 25-02-2025 =
+
+- Tweak - Updated translations for new express checkout settings.
+- Tweak - Added sanitation and validation for express checkout data.
+- Fix   - Resolved issue where "Use global default" wasn't working in subgateways (Display mode).
+- Fix   - Fixed nonce issue occurring with 3D Secure transactions when redirected to the thank you page - nonce didn't pass.
+- Tweak - Enhanced security for nonce exploit issue on the thank you page.
 
 = 7.5.9 - 17-02-2025 =
 
