@@ -341,11 +341,6 @@ class WC_PayPlus
                 $this->payplus_gateway->store_payment_ip();
             }
 
-            //to be removed
-            // $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : '';
-            // $order = wc_get_order($order_id);
-
-
             $result = $wpdb->get_results($wpdb->prepare(
                 "SELECT id as rowId, count(*) as rowCount, count_process FROM {$wpdb->prefix}payplus_payment_process WHERE order_id = %d AND ( status_code = %d )",
                 $order_id,
