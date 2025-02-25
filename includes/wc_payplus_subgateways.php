@@ -322,13 +322,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         }
 
         $subOptionsettings = get_option($this->get_option_key(), $defaultOptions);
-
+        $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->settings = get_option('woocommerce_payplus-payment-gateway_settings', $defaultOptions);
-
         $this->enabled = $this->settings['enabled'] = $subOptionsettings['enabled'];
         $this->settings['description'] = $subOptionsettings['description'];
         $this->settings['title'] = (!empty($subOptionsettings['title'])) ? $subOptionsettings['title'] : $methodDescriptionText;
-        $this->settings['display_mode'] = $subOptionsettings['display_mode'];
+        $this->settings['display_mode'] = $subOptionsettings['display_mode'] === "default" ? $this->allSettings['display_mode'] : $subOptionsettings['display_mode'];
         $this->settings['hide_icon'] = $subOptionsettings['hide_icon'];
         $this->settings['iframe_height'] = $subOptionsettings['iframe_height'];
         $this->settings['show_hide_submit_button'] = isset($subOptionsettings['show_hide_submit_button']) ? $subOptionsettings['show_hide_submit_button'] : 'no';
