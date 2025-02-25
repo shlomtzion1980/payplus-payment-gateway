@@ -92,7 +92,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak - Added sanitation and validation for express checkout data.
 - Fix   - Resolved issue where "Use global default" wasn't working in subgateways (Display mode).
 - Fix   - Fixed nonce issue occurring with 3D Secure transactions when redirected to the thank you page - nonce didn't pass.
-- Tweak - Enhanced security for nonce exploit issue on the thank you page.
+- Tweak - Enhanced security for nonce exploit issue on the thank you page - with option to disable from settings.
 
 = 7.5.9 - 17-02-2025 =
 

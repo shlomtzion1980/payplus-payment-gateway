@@ -39,6 +39,7 @@ class WC_PayPlus
     private $isHostedInitiated = false;
     public $secret_key;
     public $shipping_woo_js;
+    public $cartHashCheck;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -54,6 +55,7 @@ class WC_PayPlus
     {
         //ACTION
         $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
+        $this->cartHashCheck = boolval(property_exists($this->payplus_payment_gateway_settings, 'disable_cart_hash_check') && $this->payplus_payment_gateway_settings->disable_cart_hash_check === 'yes');
         $this->shipping_woo_js = property_exists($this->payplus_payment_gateway_settings, 'shipping_woo_js') && $this->payplus_payment_gateway_settings->shipping_woo_js === "yes" ? true : false;
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
@@ -314,19 +316,23 @@ class WC_PayPlus
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
 
-        $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
-        $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
-        $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
-        $received_salt = isset($REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_3'])) : '';
-        $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
+        if (!$this->cartHashCheck) {
+            $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
+            $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
+            $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
+            $received_salt = isset($REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_3'])) : '';
+            $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
 
-        global $wpdb;
-        if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
-            $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
-            wp_redirect($redirect_to);
-            return;
+
+            if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
+                $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
+                wp_redirect($redirect_to);
+                return;
+            }
         }
 
+
+        global $wpdb;
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
         $indexRow = 0;
