@@ -2832,17 +2832,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($type == "Charge") {
                 if ($this->fire_completed) {
                     $order->payment_complete();
-                    $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
+                    // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
                 }
                 $order = wc_get_order($order_id);
                 if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
                     $order->update_status($this->successful_order_status);
-                    $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
+                    // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
                     $order->save();
                 }
             } else {
                 $order->update_status('wc-on-hold');
-                $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
+                // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
                 $order->save();
             }
 

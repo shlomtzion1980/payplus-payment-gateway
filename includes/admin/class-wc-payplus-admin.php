@@ -442,8 +442,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                 }
             } else {
-                $note = $responseBody['data']['status'] ?? $responseBody['results']['description'] . ' - If token payment - token doesn`t fit billing or no payment.';
-                $note = !$isCron ? $note : 'Cron job: ' . $responseBody['data']['status'] ?? $responseBody['results']['description'];
+                $result = $responseBody['data']['status'] ?? $responseBody['results']['description'];
+                $note = $result . ' - If token payment - token doesn`t fit billing or no payment.';
+                $note = !$isCron ? $note : 'Cron job: ' . $result;
                 $note = "Cron job: " ? "$note - No transaction data." : $note;
                 $order->add_order_note('PayPlus IPN: ' . $note);
             }
