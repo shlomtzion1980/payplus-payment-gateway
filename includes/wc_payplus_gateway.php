@@ -423,6 +423,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         echo "<pre>";
         !$getInvoice ? $ipnMessage = "RUNNING IPN!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
+        $reportOnly && !$getInvoice ? $ipnMessage = "RUNNING IPN! - Report only mode!" : null;
         $outPut = [];
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
@@ -446,7 +447,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($hasInvoice) {
                         $outPut[$order_id]['has_invoice'] = $hasInvoice;
                     }
-                    if (WC_PayPlus_Statics::pp_is_json($payPlusResponse) && !$forceAll) {
+                    if (WC_PayPlus_Statics::pp_is_json($payPlusResponse)) {
                         $responseStatus = json_decode($payPlusResponse, true)['status_code'];
                         if ($responseStatus === "000") {
                             $outPut[$order_id]['response_status'] = $responseStatus;
@@ -468,14 +469,22 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 $runIpn = true;
                             }
                         }
-                    } elseif (!$forceAll) {
                         $forceInvoice ? $runIpn = true : null;
-                        if ($hasInvoice) {
-                            $runIpn = false;
+                        if (!$forceInvoice && $hasInvoice) {
+                            $runIpn = false;    
                             echo esc_html("Order #$order_id contains payment page uid! HAS AN INVOICE! - SKIPPING IPN!\n");
                             $outPut[$order_id]['message_invoice'] = "Order #$order_id contains payment page uid! HAS AN INVOICE! - SKIPPING IPN!";
+                        } else {
+                            if (!$reportOnly) {
+                                echo esc_html("Order #$order_id with forceinvoice ! - RUNNING invoice+ process!\n");
+                                $this->invoice_api->payplus_invoice_create_order($order_id);
+                            } else {
+                                echo esc_html("Order #$order_id with forceinvoice & report only! - NOT RUNNING invoice+ process!\n");
+                            }
                         }
-                    }
+                    } 
+                    
+                    $runIpn = $forceAll ? true : $runIpn;
                     if ($runIpn) {
                         echo esc_html("Order #$order_id - $ipnMessage\n");
                         $order_customer = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
@@ -500,7 +509,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     echo esc_html("Order #$order_id doesn't seem to have invoice+ docs...\n\n");
                                     $outPut[$order_id]['message_invoices'] = "Order #$order_id doesn't seem to have invoice+ docs...";
                                 } else {
-                                    echo esc_html("Order #$order_id status changed to: $ipnResponse\n\n");
+                                    echo esc_html("Order ipn data was updated, #$order_id status is: $ipnResponse\n\n");
                                     $outPut[$order_id]['status_change'] = $ipnResponse;
                                 }
                             }

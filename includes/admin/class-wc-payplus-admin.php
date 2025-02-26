@@ -1806,6 +1806,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if ($this->isInvoiceEnable) {
                         echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
                     }
+                    // for future use
+                    // echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ doc</button>';
                     echo "<div class='payplus_loader_gpp'>
                         <div class='loader'>
                           <div class='loader-background'><div class='text'></div></div>
