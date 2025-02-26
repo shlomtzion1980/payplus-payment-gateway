@@ -303,7 +303,7 @@ class WC_PayPlus
     public function ipn_response()
     {
         $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST);
+        $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
         if (!wp_verify_nonce(sanitize_key($REQUEST['_wpnonce']), 'payload_link')) {
             check_ajax_referer('payload_link', '_wpnonce');
