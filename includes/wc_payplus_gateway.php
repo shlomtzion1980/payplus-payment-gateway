@@ -2909,9 +2909,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $userID = 0;
         $order = wc_get_order($order_id);
 
-        // Get customer ID
-        $customerId = $order->get_user_id();
-
         WC_PayPlus_Meta_Data::update_meta($order, array('payplus_function_end' => $handleLog));
         $this->updateOrderPayplus($order_id, $handleLog);
 
