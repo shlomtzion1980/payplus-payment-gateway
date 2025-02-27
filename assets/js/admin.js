@@ -11,8 +11,10 @@ jQuery(function ($) {
     const enableGooglePay = $(".enable_google_pay");
     const enableApplePay = $(".enable_apple_pay");
     const tokenApplePay = $(".apple_pay_identifier");
+    const googlePayPageUid = $(".google_pay_page_uid");
     const shippingWooJs = $(".shipping_woo_js");
     const enableExpressOnProductPage = $(".enable_product");
+    const mainPageUid = payplus_script_admin.mainPageUid;
 
     const checkAmountAuthorization = $(
         "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
@@ -238,6 +240,10 @@ jQuery(function ($) {
         tokenApplePay.parents("tr").fadeOut();
     }
 
+    if(enableGooglePay && enableGooglePay.prop("checked") === false) {
+        googlePayPageUid.parents("tr").fadeOut();
+    }
+
     let hideOtherExpressShipping = () => {
         globalShipping.closest("tr").fadeOut();
         globalShippingTax.closest("tr").fadeOut();
@@ -374,6 +380,11 @@ jQuery(function ($) {
                                         .description
                             );
                         slef.prop("checked", false);
+                    } else {
+                        googlePayPageUid.parents("tr").fadeIn();
+                        googlePayPageUid.val(
+                            mainPageUid
+                        );
                     }
                 },
             });

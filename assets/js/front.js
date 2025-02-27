@@ -911,9 +911,11 @@ function validatePhoneNumber(event) {
     if (!phoneNumberPattern.test(phoneNumber)) {
         phoneNumberField.classList.add("invalid");
         phoneNumberField.classList.remove("valid");
+        jQuery("#error-api-payplus").html(`<p>${payplus_script.requirePhoneText}<p>`);
     } else {
         phoneNumberField.classList.remove("invalid");
         phoneNumberField.classList.add("valid");
+        jQuery("#error-api-payplus").html(`<p>${payplus_script.successPhoneText}<p>`);
     }
 }
 

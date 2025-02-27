@@ -87,6 +87,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $global_shipping_tax;
     public $global_shipping_tax_rate;
     public $token_apple_pay;
+    public $google_apple_pay_page_uid;
     public $enable_google_pay;
     public $enable_apple_pay;
     public $enable_product;
@@ -239,6 +240,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->global_shipping_tax = $this->get_option('global_shipping_tax');
         $this->global_shipping_tax_rate = $this->get_option('global_shipping_tax_rate');
         $this->token_apple_pay = $this->get_option('apple_pay_identifier');
+        $this->google_apple_pay_page_uid = $this->get_option('google_apple_pay_page_uid');
         $this->enable_google_pay = $this->get_option('enable_google_pay') == 'yes' ? true : false;
         $this->enable_apple_pay = $this->get_option('enable_apple_pay') == 'yes' ? true : false;
         $this->enable_product = $this->get_option('enable_product') == 'yes' ? true : false;

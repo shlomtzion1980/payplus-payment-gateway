@@ -823,8 +823,10 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $requirePhone = $WC_PayPlus_Gateway->get_option('require_phone') === 'yes' ? true : false;
                 !$requirePhone ? $required = "" : $required = "required";
                 $phoneNumberPlaceHolder = esc_html__('Phone number here:', 'payplus-payment-gateway');
+                echo "<div class='express-checkout-buttons'>";
                 echo "<input type='text' id='phone-number' name='phone-number' placeholder='" . esc_attr($phoneNumberPlaceHolder) . "' style='display: none;' " . esc_attr($required) . ">";
                 echo '<iframe class="' . esc_attr($disabled) . '" allow="payment *" sandbox="allow-forms allow-scripts allow-same-origin allow-popups" allowpaymentrequest id="googlePayButton" src="' . esc_attr($WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick) . '?var=' . esc_attr($current_timestamp) . '&wb=' . esc_attr($bi) . '" style="width: 100%; height: 50px; display: block;" frameborder="0" data-product-id="' . esc_attr($productId) . '"></iframe>';
+                echo '</div>';
             }
             if ($WC_PayPlus_Gateway->enable_apple_pay) {
                 echo '<button   lang="en" id="applePayButton" data-product-id="' . esc_attr($productId) . '" onclick="handleApplePayClick(event);" class="apple-pay-button apple-pay-button-with-text apple-pay-button-black-with-text ' . esc_attr($disabled) . '" style="padding: 18px;width:100%; display:none"></button>';

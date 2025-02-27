@@ -810,6 +810,7 @@ class WC_PayPlus
                                     'frontNonce' => wp_create_nonce('frontNonce'),
                                     'isShippingWooJs' => $this->shipping_woo_js,
                                     'requirePhoneText' => __('Phone number is required.', 'payplus-payment-gateway'),
+                                    'successPhoneText' => __('Click again to continue!', 'payplus-payment-gateway'),
                                 ]
                             );
                             wp_enqueue_script('payplus-front-js');

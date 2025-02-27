@@ -2270,6 +2270,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplusGenerateLinkPayment" => wp_create_nonce('payplus_generate_link_payment'),
                 "payplusCustomAction" => wp_create_nonce('payplus_payplus_ipn'),
                 "frontNonce" => wp_create_nonce('frontNonce'),
+                "mainPageUid" => $this->api_test_mode === "yes" ? $this->allSettings['dev_payment_page_id'] : $this->allSettings['payment_page_id'],
                 "isApplePayEnabled" => $this->isApplePayEnabled,
                 "tokenPaymentConfirmMessage" => __('Are you sure you want to charge this order with token of CC that ends with: ', 'payplus-payment-gateway'),
             )

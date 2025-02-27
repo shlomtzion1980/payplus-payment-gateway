@@ -543,6 +543,13 @@ class WC_PayPlus_Admin_Settings
                                 </div>',
                 ];
                 $settings[$section][] = [
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[google_pay_page_uid]',
+                    'name' => __('Active page UID Google Pay', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'class' => 'google_pay_page_uid',
+                    'custom_attributes' => array('readonly' => 'readonly'),
+                ];
+                $settings[$section][] = [
                     'name' => __('Require phone number with Google Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[require_phone]',
                     'type' => 'checkbox',

@@ -162,6 +162,12 @@ html[lang="en"]
     margin-right: 20px;
 }
 
+.express-checkout-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .express-checkout-product {
     margin: 5% auto;
     border-radius: 12px;
@@ -170,11 +176,6 @@ html[lang="en"]
     position: relative;
     display: block;
     width: 100%;
-    @media (min-width: 767.98px) {
-        #phone-number {
-            width: 98.5%;
-        }
-    }
 }
 
 #phone-number.invalid {
@@ -214,9 +215,6 @@ html[lang="en"]
 #phone-number {
     width: 96.5%;
     position: relative;
-    @media (max-width: 767.98px) {
-        width: 97%;
-    }
     display: block;
     text-align: center;
     border: 3px solid #606061;
