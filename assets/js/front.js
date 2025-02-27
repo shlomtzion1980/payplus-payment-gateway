@@ -916,6 +916,7 @@ function validatePhoneNumber(event) {
         phoneNumberField.classList.remove("invalid");
         phoneNumberField.classList.add("valid");
         jQuery("#error-api-payplus").html(`<p>${payplus_script.successPhoneText}<p>`);
+        jQuery("#error-api-payplus").children("p").css("color", "green");
     }
 }
 
