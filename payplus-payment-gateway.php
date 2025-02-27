@@ -305,8 +305,14 @@ class WC_PayPlus
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-        if (!wp_verify_nonce(sanitize_key($REQUEST['_wpnonce']), 'payload_link')) {
+        // Sanitize the nonce
+        $nonce = isset($REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($REQUEST['_wpnonce'])) : '';
+
+        // Verify the nonce
+        if (!wp_verify_nonce($nonce, 'payload_link')) {
             check_ajax_referer('payload_link', '_wpnonce');
+            // wp_die(__('Nonce verification failed', 'payplus-payment-gateway'), __('Error', 'payplus-payment-gateway'), array('response' => 403));
+            // ˆˆ^ needs more testing before i remove the check_ajax_referer and replace it with wp_die
         }
 
         if (isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true") {
