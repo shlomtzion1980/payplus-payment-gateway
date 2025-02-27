@@ -39,7 +39,7 @@ class WC_PayPlus
     private $isHostedInitiated = false;
     public $secret_key;
     public $shipping_woo_js;
-    public $cartHashCheck;
+    public $disableCartHashCheck;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -55,7 +55,7 @@ class WC_PayPlus
     {
         //ACTION
         $this->payplus_payment_gateway_settings = (object) get_option('woocommerce_payplus-payment-gateway_settings');
-        $this->cartHashCheck = boolval(property_exists($this->payplus_payment_gateway_settings, 'disable_cart_hash_check') && $this->payplus_payment_gateway_settings->disable_cart_hash_check === 'yes');
+        $this->disableCartHashCheck = boolval(property_exists($this->payplus_payment_gateway_settings, 'disable_cart_hash_check') && $this->payplus_payment_gateway_settings->disable_cart_hash_check === 'yes');
         $this->shipping_woo_js = property_exists($this->payplus_payment_gateway_settings, 'shipping_woo_js') && $this->payplus_payment_gateway_settings->shipping_woo_js === "yes" ? true : false;
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
@@ -322,7 +322,7 @@ class WC_PayPlus
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
 
-        if (!$this->cartHashCheck) {
+        if (!$this->disableCartHashCheck) {
             $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
             $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
             $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
