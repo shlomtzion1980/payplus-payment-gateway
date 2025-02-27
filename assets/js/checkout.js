@@ -668,9 +668,10 @@ jQuery(function ($) {
                                 ).is(":checked")
                             ) {
                                 $(".container.hostedFields").show();
-                                document.querySelector(
-                                    "#payment > ul > li.wc_payment_method.payment_method_payplus-payment-gateway-hostedfields > div.pp_iframe_h > div"
-                                ).style.display = "block";
+                                const ppIframeH = document.querySelector(".pp_iframe_h");
+                                if (ppIframeH) {
+                                    ppIframeH.style.display = "block";
+                                }
                             }
                         }, 2000);
 
