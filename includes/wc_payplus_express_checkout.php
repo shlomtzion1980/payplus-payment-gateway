@@ -373,6 +373,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
 
             $payload = wp_json_encode($payload);
+
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', '', 'before-payload');
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', wp_json_encode($payload), 'payload');
             $response = WC_PayPlus_Statics::payPlusRemote($url, $payload);
@@ -394,7 +395,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                         $payplus_payment_gateway_settings['enable_apple_pay'] = "yes";
                     }
                     update_option('woocommerce_payplus-payment-gateway_settings', $payplus_payment_gateway_settings);
-                    echo wp_json_encode(array("response_initialized" => $resObj, "status" => true));
+                    $result = $resObj ?? $res;
+                    echo wp_json_encode(array("response_initialized" => $result, "status" => true));
                 } else {
                     echo wp_json_encode(array("response_initialized" => $res, "status" => false));
                 }
