@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.6.1] - 01-03-2025 - (Fang)
+
+- Tweak - Express Checkout Initialization now displays the payment page UID for the activated feature.
+- Tweak - PayPlus Orders Reports/Validator in "Partners mode" now includes a "Create invoice" option.
+- Tweak - Express Checkout buttons and phone field are now centered, with improved validation message colors and translations.
+- Tweak - Enhanced IPN Response with improved NONCE and Cart Hash testing even more.
+
 ## [7.6.0] - 25-02-2025 - (Liebe)
 
 - Tweak - Updated translations for new express checkout settings.

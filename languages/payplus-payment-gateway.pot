@@ -1054,7 +1054,7 @@ msgstr ""
 
 #: includes/class-wc-payplus-form-fields.php:125
 #: includes/class-wc-payplus-form-fields.php:126
-msgid "Run PayPlus orders validator"
+msgid "Run PayPlus Orders Reports/Validator"
 msgstr ""
 
 #: includes/class-wc-payplus-form-fields.php:162

@@ -1284,7 +1284,7 @@ msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:126
 #: includes/class-wc-payplus-form-fields.php:127
-msgid "Run PayPlus orders validator"
+msgid "Run PayPlus Orders Reports/Validator"
 msgstr "בדיקת הזמנות פייפלוס"
 
 #: includes/class-wc-payplus-form-fields.php:537

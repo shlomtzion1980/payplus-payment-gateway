@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.6.0
+Stable tag: 7.6.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.6.1 - 01-03-2025 =
+
+- Tweak - Express Checkout Initialization now displays the payment page UID for the activated feature.
+- Tweak - PayPlus Orders Reports/Validator in "Partners mode" now includes a "Create invoice" option.
+- Tweak - Express Checkout buttons and phone field are now centered, with improved validation message colors and translations.
+- Tweak - Enhanced IPN Response with improved NONCE and Cart Hash testing even more.
 
 = 7.6.0 - 25-02-2025 =
 

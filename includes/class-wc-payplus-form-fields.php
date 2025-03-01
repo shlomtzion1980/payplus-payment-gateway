@@ -123,8 +123,8 @@ class WC_PayPlus_Form_Fields
         if ($showOrdersButton) {
             add_submenu_page(
                 'payplus-payment-gateway', //Page Title
-                __('Run PayPlus orders validator', 'payplus-payment-gateway'),
-                __('Run PayPlus orders validator', 'payplus-payment-gateway'),
+                __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
+                __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
                 'administrator', //Capability
                 'runPayPlusOrdersChecker', //Page slug
                 [__CLASS__, 'runPayPlusOrdersChecker']
