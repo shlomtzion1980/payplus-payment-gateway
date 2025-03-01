@@ -648,16 +648,10 @@ class PayplusInvoice
                 isset($item['discount_value']) ? ($payPlusPayloadInvoice['items'][$key]['discount_value'] = $isRefund ? -$item['discount_value'] : $item['discount_value']) : null;
                 $sku_or_id = $item['barcode']; // Can be a SKU or ID
                 $product_id = wc_get_product($sku_or_id);
-                if ($product_id) {
-                } else {
+                if (!$product_id) {
                     $product_id = wc_get_product_id_by_sku($sku_or_id);
                 }
-                $product = wc_get_product($product_id);
-                if ($product) {
-                    $payPlusPayloadInvoice['items'][$key]['name'] = $product->get_name();
-                } else {
-                    $sku_or_id === "order-shipping" ? $payPlusPayloadInvoice['items'][$key]['name'] = __('Shipping', 'payplus-payment-gateway') : $payPlusPayloadInvoice['items'][$key]['name'] = $item['name'];
-                }
+                $sku_or_id === "order-shipping" ? $payPlusPayloadInvoice['items'][$key]['name'] = __('Shipping', 'payplus-payment-gateway') : $payPlusPayloadInvoice['items'][$key]['name'] = $item['name'];
             }
 
             foreach ($payPlusPayloadInvoice['payments'] as $key => $payment) {
@@ -1038,7 +1032,7 @@ class PayplusInvoice
             $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_invoice_failed', "Failed to run because of nonce : payplus_process_invoice for order:  $order_id\n");
             wp_die('Not allowed! - payplus_invoice_create_order');
         }
-        
+
         $payload = array();
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';
