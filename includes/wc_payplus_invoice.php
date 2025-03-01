@@ -448,7 +448,7 @@ class PayplusInvoice
                 $responeType = "_refund" . $documentType;
                 $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                 $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");
-                $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsJson;
+                $refundsArray = !empty($refundsJson) ? json_decode($refundsJson, true) : [];
                 $refundsArray[$res->details->number]['link'] = $res->details->originalDocAddress;
                 $refundsArray[$res->details->number]['type'] = $nameDocment;
                 $insetData["payplus_refunds"] = wp_json_encode($refundsArray);
