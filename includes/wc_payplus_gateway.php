@@ -2587,7 +2587,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $LocalTime = $datetime->format('Y-m-d H:i:s');
         if ($order) {
             $orderStatus = $order->get_status();
-            $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status! - callback will end.' : $orderStatus;
+            $orderStatusNote = $orderStatus === 'processing' ? 'Order is on processing status!' : $orderStatus;
             $this->payplus_add_log_all(
                 'payplus_callback_secured',
                 "Order # $order_id
@@ -2617,7 +2617,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             $this->payplus_add_log_all(
                 'payplus_callback_secured',
-                "$order_id -Callback continues: doing database query now, status_code: $status_code"
+                "$order_id - Doing database query now, status_code: $status_code"
             );
 
             $result = $wpdb->get_results($wpdb->prepare(
@@ -2672,7 +2672,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $payload['related_transaction'] = true;
                     $payload = wp_json_encode($payload);
                     $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-
                     $this->requestPayPlusIpn($payload, $inData, 1, $handle);
                 }
             } else {
