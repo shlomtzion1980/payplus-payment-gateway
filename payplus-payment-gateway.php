@@ -302,16 +302,29 @@ class WC_PayPlus
      */
     public function ipn_response()
     {
-        $this->payplus_gateway = $this->get_main_payplus_gateway();
-        $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-        $nonce = isset($REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($REQUEST['_wpnonce'])) : '';
-
+        $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, 'payload_link')) {
-            check_ajax_referer('payload_link', '_wpnonce');
-            // wp_die(__('Nonce verification failed', 'payplus-payment-gateway'), __('Error', 'payplus-payment-gateway'), array('response' => 403));
-            // ˆˆ^ needs more testing before i remove the check_ajax_referer and replace it with wp_die
+            $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : false;
+            if ($order_id) {
+                //failed nonce check, will be redirected to regular thank you page with ipn
+                $order = wc_get_order($order_id);
+                $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                if (empty($payPlusResponse)) {
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+                }
+                $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
+                wp_redirect($redirect_to);
+                exit;
+            } else {
+                // no order id
+                wp_die('Invalid request');
+            }
         }
+
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+        $REQUEST = $this->payplus_gateway->arr_clean($_REQUEST);
 
         if (isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true") {
             $REQUEST = json_decode(stripslashes($REQUEST['jsonData']), true)['data'];
@@ -320,21 +333,20 @@ class WC_PayPlus
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
 
+        // runs cart check if all nonce checks passed and cart hash check is not disabled.
         if (!$this->disableCartHashCheck) {
             $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
             $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
-            $received_cart_hash = isset($REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_2'])) : '';
-            $received_salt = isset($REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($REQUEST['more_info_3'])) : '';
+            $received_cart_hash = isset($_REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info_2'])) : '';
+            $received_salt = isset($_REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info_3'])) : '';
             $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
-
 
             if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 wp_redirect($redirect_to);
-                return;
+                exit;
             }
         }
-
 
         global $wpdb;
         $tblname = $wpdb->prefix . 'payplus_payment_process';
