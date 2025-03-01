@@ -32,7 +32,7 @@ if (isCheckout || hasOrder) {
 
   function isMyScriptLoaded(url) {
     var scripts = document.getElementsByTagName("script");
-    for (var i = scripts.length; i--; ) {
+    for (var i = scripts.length; i--;) {
       if (scripts[i].src == url) {
         return false;
       }
@@ -94,15 +94,15 @@ if (isCheckout || hasOrder) {
             icon:
               t.icon !== ""
                 ? (0, e.createElement)("img", {
-                    style: {
-                      width: "64px",
-                      height: "32px",
-                      maxHeight: "100%",
-                      margin: "0px 10px",
-                      objectPosition: "center",
-                    },
-                    src: t.icon,
-                  })
+                  style: {
+                    width: "64px",
+                    height: "32px",
+                    maxHeight: "100%",
+                    margin: "0px 10px",
+                    objectPosition: "center",
+                  },
+                  src: t.icon,
+                })
                 : divCustomIcons,
           }),
           (0, e.createElement)(
@@ -212,7 +212,7 @@ if (isCheckout || hasOrder) {
           multiPassIcons(loopImages, element);
           loopImages = false;
         }
-      }, 1000);
+      }, 3000);
 
       payPlusCC = document.querySelector(
         "#radio-control-wc-payment-method-options-payplus-payment-gateway"
@@ -261,8 +261,8 @@ if (isCheckout || hasOrder) {
             pp_iframe.innerHTML =
               getPaymentResult.paymentDetails.errorMessage !== undefined
                 ? getPaymentResult.paymentDetails.errorMessage +
-                  "<br>" +
-                  "Click this to close."
+                "<br>" +
+                "Click this to close."
                 : getPaymentResult.message + "<br>" + "Click this to close.";
             pp_iframe.addEventListener("click", (e) => {
               e.preventDefault();
@@ -315,7 +315,7 @@ if (isCheckout || hasOrder) {
           if (activePaymentMethod.search("payplus-payment-gateway") === 0) {
             const gateWaySettings =
               window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
-                activePaymentMethod + "-settings"
+              activePaymentMethod + "-settings"
               ];
             const isIframe =
               ["samePageIframe", "popupIframe"].indexOf(
@@ -368,7 +368,7 @@ if (isCheckout || hasOrder) {
     const activePaymentMethod = payment.getActivePaymentMethod();
     const gateWaySettings =
       window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
-        activePaymentMethod + "-settings"
+      activePaymentMethod + "-settings"
       ];
     var iframe = document.createElement("iframe");
     // Set the attributes for the iframe
@@ -402,7 +402,7 @@ if (isCheckout || hasOrder) {
       }
       gateWaySettings.displayMode =
         window.innerWidth <= 768 &&
-        gateWaySettings.displayMode === "samePageIframe"
+          gateWaySettings.displayMode === "samePageIframe"
           ? "popupIframe"
           : gateWaySettings.displayMode;
       switch (gateWaySettings.displayMode) {
