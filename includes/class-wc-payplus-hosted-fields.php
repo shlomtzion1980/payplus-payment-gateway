@@ -341,6 +341,25 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 $item->vat_type = -$discount_tax > 0 ? 1 : 0;
                 $data->items[] = $item;
             }
+
+            $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');
+            $updated_as_fee = $order->get_meta('ywgc_gift_card_updated_as_fee');
+            $priceGift = 0;
+            $allProductSku = "";
+            if ($gift_cards && $updated_as_fee == false) {
+
+                foreach ($gift_cards as $key => $gift) {
+                    $productPrice = -1 * ($gift);
+                    $allProductSku .= (empty($allProductSku)) ? " ( " . $key : ' , ' . $key;
+                    $priceGift += round($productPrice, ROUNDING_DECIMALS);
+                }
+
+                $item = new stdClass();
+                $item->name = "coupon_discount_$allProductSku";
+                $item->quantity = 1;
+                $item->price = number_format($priceGift, 2, '.', '');
+                $data->items[] = $item;
+            }
         }
 
         $totalAmount = 0;
