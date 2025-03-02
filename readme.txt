@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.6.1 - 01-03-2025 =
+= 7.6.1 - 02-03-2025 =
 
 - Tweak - Express Checkout Initialization now displays the payment page UID for the activated feature.
 - Tweak - PayPlus Orders Reports/Validator in "Partners mode" now includes a "Create invoice" option.

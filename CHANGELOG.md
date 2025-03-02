@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.6.1] - 01-03-2025 - (Fang)
+## [7.6.1] - 02-03-2025 - (Fang)
 
 - Tweak - Express Checkout Initialization now displays the payment page UID for the activated feature.
 - Tweak - PayPlus Orders Reports/Validator in "Partners mode" now includes a "Create invoice" option.
