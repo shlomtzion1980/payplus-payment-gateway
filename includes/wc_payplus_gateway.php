@@ -263,6 +263,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         add_action('woocommerce_customer_save_address', [$this, 'show_update_card_notice'], 10, 2);
         add_action('woocommerce_api_update_payplus_payment_method', [$this, 'updatePaymentMethodHook']);
 
+        // Hook the custom function to the scheduled event
+        add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
+
         /****** ACTION END ******/
 
         /****** FILTER START ******/
@@ -1632,6 +1635,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
 
+        // Schedule the custom function to run 2 minutes after process_payment() finishes
+        if (!wp_next_scheduled('payplus_after_process_payment_event', array($order_id))) {
+            wp_schedule_single_event(time() + 120, 'payplus_after_process_payment_event', array($order_id));
+        }
+
         $result = [
             'result' => 'success',
             'redirect' => $redirect_to,
@@ -1641,6 +1649,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $result['payplus_iframe'] = $this->receipt_page($order_id, null, false, '', 0, true);
         }
         return $result;
+    }
+
+    /**
+     * Custom function to run 2 minutes after process_payment() finishes
+     *
+     * @param int $order_id
+     */
+    public function payplus_after_process_payment_function($order_id)
+    {
+        if ($this->id === "payplus-payment-gateway") {
+            $order = wc_get_order($order_id);
+            $this->payplus_add_log_all('payplus_after_process_payment_event', 'Running for order #' . $order_id . ' Checking order status: ' . $order->get_status());
+            $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+            if (empty($payPlusResponse) && $order->get_status() === 'pending') {
+                $this->payplus_add_log_all('payplus_after_process_payment_event', 'Order #' . $order_id . ' Running IPN!');
+                $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+            } else {
+                $this->payplus_add_log_all('payplus_after_process_payment_event', 'No need to run for order #' . $order_id . ' already contains payplus_response and status is ' . $order->get_status());
+            }
+        }
     }
 
     /**
