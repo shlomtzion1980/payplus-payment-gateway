@@ -333,6 +333,13 @@ class WC_PayPlus
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
 
+        $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+        if (empty($payPlusResponse) || $order->get_status() === "pending") {
+            $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+            $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+        }
+
         // runs cart check if all nonce checks passed and cart hash check is not disabled.
         if (!$this->disableCartHashCheck) {
             $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
