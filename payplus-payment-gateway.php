@@ -307,8 +307,9 @@ class WC_PayPlus
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : false;
             if ($order_id) {
                 //failed nonce check, will be redirected to regular thank you page with ipn
+                $order = wc_get_order($order_id);
                 $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                if (empty($payPlusResponse)) {
+                if (empty($payPlusResponse) || $order->get_status() === "pending") {
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
