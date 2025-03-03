@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.6.3] - 03-03-2025 - (Swoop)
+
+- Tweak - Enhanced security for IPN responses.
+
 ## [7.6.2] - 03-03-2025 - (Slag)
 
 - Tweak - Enhanced order IPN event to run 2 minutes after the payment page is triggered when using classic checkout.
