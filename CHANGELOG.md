@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.6.3] - 03-03-2025 - (Swoop)
+## [7.6.4] - 03-03-2025 - (Swoop)
 
 - Tweak - Enhanced security for IPN responses.
 
