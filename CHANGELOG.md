@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.6.2] - 03-03-2025 - (Slag)
+
+- Tweak - Enhanced order IPN event to run 2 minutes after the payment page is triggered when using classic checkout.
+- Added - Compatibility with "YITH WooCommerce Gift Cards" (free version) in PayPlus Embedded.
+- Fix   - Resolved a JS visual bug on the "Orders page" where a variable was defined in the wrong place.
+
+
 ## [7.6.1] - 02-03-2025 - (Fang)
 
 - Tweak - Express Checkout Initialization now displays the payment page UID for the activated feature.
