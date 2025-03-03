@@ -1662,7 +1662,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $order = wc_get_order($order_id);
             $this->payplus_add_log_all('payplus_after_process_payment_event', 'Running for order #' . $order_id . ' Checking order status: ' . $order->get_status());
             $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-            if (empty($payPlusResponse) && $order->get_status() === 'pending') {
+            if (empty($payPlusResponse) || $order->get_status() === 'pending') {
                 $this->payplus_add_log_all('payplus_after_process_payment_event', 'Order #' . $order_id . ' Running IPN!');
                 $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                 $_wpnonce = wp_create_nonce('_wp_payplusIpn');
