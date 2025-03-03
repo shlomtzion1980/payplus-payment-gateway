@@ -297,6 +297,18 @@ class WC_PayPlus
         }
     }
 
+    public function checkRunIpnResponse($order_id, $order, $number)
+    {
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+        $this->payplus_gateway->payplus_add_log_all('payplus_ipn_response', "$order_id: checkRunIpnResponse - number: $number\n");
+        $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+        if (empty($payPlusResponse) || $order->get_status() === "pending") {
+            $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+            $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+        }
+    }
+
     /**
      * @return void
      */
@@ -307,14 +319,9 @@ class WC_PayPlus
             $order_id = isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : false;
             if ($order_id) {
                 //failed nonce check, will be redirected to regular thank you page with ipn
-                $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 $order = wc_get_order($order_id);
-                $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                if (empty($payPlusResponse) || $order->get_status() === "pending") {
-                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
-                }
+                $this->checkRunIpnResponse($order_id, $order, 1);
+                $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 wp_redirect($redirect_to);
                 exit;
             } else {
@@ -333,12 +340,11 @@ class WC_PayPlus
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
 
-        $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-        if (empty($payPlusResponse) || $order->get_status() === "pending") {
-            $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-            $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
-        }
+        // $current_url = home_url(add_query_arg(null, null));
+        // $order_key = $order->get_order_key();
+        // $isRightKey = strpos($current_url, 'key=' . $order_key) !== false;
+
+        $this->checkRunIpnResponse($order_id, $order, 2);
 
         // runs cart check if all nonce checks passed and cart hash check is not disabled.
         if (!$this->disableCartHashCheck) {
