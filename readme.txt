@@ -86,7 +86,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.6.6 - 05-03-2025 +
+= 7.6.7 - 06-03-2025 =
+
+- Added - Support for payments using EMV POS devices (Admin Only).
+
+= 7.6.6 - 05-03-2025 =
 
 - Fix   - Resloved status updates issues - orders updated twice on not at all.
 

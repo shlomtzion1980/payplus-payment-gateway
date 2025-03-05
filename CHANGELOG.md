@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.6.7] - 06-03-2025 - (EMV)
+
+- Added - Support for payments using EMV POS devices (Admin Only).
 
 ## [7.6.6] - 05-03-2025 - (Dumb)
 
