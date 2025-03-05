@@ -744,6 +744,14 @@ class WC_PayPlus_Form_Fields
                 'description' => __('Before opening a payment page and if a PayPlus payment request uid already exists for this order, perform an ipn check.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'update_statuses_in_ipn' => [
+                'title' => __('Update statuses in ipn response', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => __('Update statuses in ipn response (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('In ipn response check status (This will run with or without the callback status update)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'order_status_title' => [
                 'title' => __('Order Settings', 'payplus-payment-gateway'),
                 'type' => 'title',

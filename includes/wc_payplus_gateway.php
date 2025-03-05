@@ -1636,9 +1636,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         // Schedule the custom function to run 2 minutes after process_payment() finishes
-        if (!wp_next_scheduled('payplus_after_process_payment_event', array($order_id))) {
-            wp_schedule_single_event(time() + 120, 'payplus_after_process_payment_event', array($order_id));
-        }
+        // if (!wp_next_scheduled('payplus_after_process_payment_event', array($order_id))) {
+        //     wp_schedule_single_event(time() + 120, 'payplus_after_process_payment_event', array($order_id));
+        // }
 
         $result = [
             'result' => 'success',
