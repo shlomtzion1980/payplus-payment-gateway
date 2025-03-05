@@ -264,8 +264,9 @@ class WC_PayPlus_Statics
                         $totalAmount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'];
                         if (!is_null($totalAmount)) {
                             if (!isset($responseArray['related_transactions'])) {
+                                $emvMethod = isset($responseArray['data']['data']['card_information']) ? "credit-card" : null;
                                 $amount = $responseArray['amount'] ?? $responseArray['data']['transaction']['amount'] ?? null;
-                                $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'] ?? null;
+                                $method = $responseArray['method'] ?? $responseArray['data']['transaction']['alternative_method_name'] ?? $emvMethod;
                                 $brand = $responseArray['brand_name'] ?? $responseArray['data']['data']['card_information']['brand_id'] ?? null;
                                 $issuer = $responseArray['issuer_name'] ?? $responseArray['data']['data']['card_information']['clearing_id'] ?? null;
                                 $type = $payPlusType ? $payPlusType : $responseArray['type'] ?? $responseArray['data']['transaction']['type'] ?? null;
@@ -281,6 +282,7 @@ class WC_PayPlus_Statics
                                 $status = $responseArray['status'] ?? $responseArray['data']['transaction']['status'] ?? null;
                                 $status = $status === "rejected" ? "<span style='color: red;'>Rejected</span>" : $status;
                                 $status = $status === "approved" ? "Approved" : $status;
+                                $status = isset($responseArray['data']['transaction']['approval_number']) ? "Approved" : $status;
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
                                 echo wp_kses_post(WC_PayPlus_Statics::createPayPlusDataBox($statusCode, $status, $amount, $method, $brand, $issuer, $type, $number, $fourDigits, $expMonth, $expYear, $numOfPayments, $voucherNum, $voucherId, $tokeUid, $j5Charge, $date));
