@@ -2219,7 +2219,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
         $returnUrl = add_query_arg('wc-api', 'payplus_gateway', $this->get_return_url($order));
-        $redirectSuccess = ($isAdmin) ? $returnUrl . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $returnUrl . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
+        $redirectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
         $setInvoice = '';
         $payingVat = '';
         $invoiceLanguage = '';
