@@ -243,6 +243,7 @@ jQuery(document).ready(function ($) {
                         payplus_script_admin.payplusGenerateLinkPayment,
                 },
                 success: function (response) {
+                    console.log(response);
                     if ($this.attr("id") === "payment-payplus-dashboard-emv") {
                         //for device transaction.
                         const parsedResponse = JSON.parse(response.body);
@@ -251,6 +252,15 @@ jQuery(document).ready(function ($) {
                             parsedResponse?.results?.code === 0
                         ) {
                             location.reload();
+                        } else if (
+                            parsedResponse?.results?.status === "error" &&
+                            parsedResponse?.results?.code === 1
+                        ) {
+                            alert(parsedResponse?.results?.description);
+                            $this
+                                .parent(".payment-order-ajax")
+                                .find(".payplus_loader")
+                                .fadeOut();
                         }
                         //for device transaction.
                     } else {
