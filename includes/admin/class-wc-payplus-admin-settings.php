@@ -420,6 +420,7 @@ class WC_PayPlus_Admin_Settings
                     'options' => [
                         'paypal' => esc_html__('PayPal', 'payplus-payment-gateway'),
                         'bacs' => esc_html__('Direct bank transfer', 'payplus-payment-gateway'),
+                        'cod' => esc_html__('Cash on Delivery', 'payplus-payment-gateway'),
                     ]
                 );
                 $settings[$section][] = array(

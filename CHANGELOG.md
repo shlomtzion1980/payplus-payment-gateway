@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [7.6.7] - 06-03-2025 - (EMV)
 
 - Added - Support for payments using EMV POS devices (Admin Only).
+- Added - Ability to block creation of invoice+ documents for "bacs" - Direct bank transfer.
 
 ## [7.6.6] - 05-03-2025 - (Dumb)
 
