@@ -419,6 +419,7 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'multiselect',
                     'options' => [
                         'paypal' => esc_html__('PayPal', 'payplus-payment-gateway'),
+                        'bacs' => esc_html__('Direct bank transfer', 'payplus-payment-gateway'),
                     ]
                 );
                 $settings[$section][] = array(

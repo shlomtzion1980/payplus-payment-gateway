@@ -1123,7 +1123,10 @@ class PayplusInvoice
                             if (!empty($found_in_other) || !empty($found_in_or_other)) {
                                 $method_payment = 'paypal';
                             }
-                            if (isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create'])) {
+                            if (
+                                isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create']) ||
+                                isset($this->payplus_invoice_option['do-not-create']) && in_array($order->get_payment_method(), $this->payplus_invoice_option['do-not-create'])
+                            ) {
                                 $order->add_order_note('This payment method is set as: Not to create documents');
                                 return;
                             }
