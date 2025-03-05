@@ -2311,7 +2311,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $totalCartAmount = $objectProducts->amount;
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
 
-        $cart_hash = WC()->cart->get_cart_hash();
+        $cart_hash = WC()->cart && WC()->cart->get_cart_hash() ? WC()->cart->get_cart_hash() : $order_id;
         $salt = bin2hex(random_bytes(16));
         $cart_hash_with_salt = hash('sha256', $cart_hash . $salt);
         WC_PayPlus_Meta_Data::update_meta($order, ['cart_hash' => $cart_hash_with_salt, 'cart_salt' => $salt]);
