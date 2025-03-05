@@ -2063,8 +2063,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             <div class="payment-order-ajax">
                 <button id="payment-payplus-dashboard" data-id="<?php echo esc_attr($orderId) ?>"
                     class="button  button-primary"><?php echo esc_html__("Payment", "payplus-payment-gateway") ?></button>
-                <button id="payment-payplus-dashboard-emv" data-id="<?php echo esc_attr($orderId) ?>"
-                    class="button  button-primary"><?php echo esc_html__("EMV - Payment", "payplus-payment-gateway") ?></button>
+                <?php if (isset($this->device_uid) && strlen($this->device_uid)) {
+                ?><button id="payment-payplus-dashboard-emv" data-id="<?php echo esc_attr($orderId) ?>"
+                        class="button  button-primary"><?php echo esc_html__("EMV - Payment", "payplus-payment-gateway") ?></button>
+                <?php
+                } ?>
                 <div class="payplus_loader">
                     <div class="loader">
                         <div class="loader-background">
