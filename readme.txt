@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.6.6
+Stable tag: 7.6.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,10 +86,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-= 7.6.7 - 06-03-2025 =
+= 7.6.8 - 09-03-2025 =
 
 - Added - Support for payments using EMV POS devices (Admin Only).
 - Added - Invoice+: Ability to block creation of documents for "bacs" - Direct bank transfer and "cod" - Cash on Delivery when in automatic mode.
+
+= 7.6.7 - 06-03-2025 =
+
+- Fix   - Resolved subscription renewal failure caused by a missing cart.
 
 = 7.6.6 - 05-03-2025 =
 

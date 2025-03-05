@@ -2,10 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.6.7] - 06-03-2025 - (EMV)
+## [7.6.8] - 09-03-2025 - (EMV)
 
 - Added - Support for payments using EMV POS devices (Admin Only).
 - Added - Invoice+: Ability to block creation of documents for "bacs" - Direct bank transfer and "cod" - Cash on Delivery when in automatic mode.
+
+## [7.6.7] - 06-03-2025 - (Haku)
+
+- Fix   - Resolved subscription renewal failure caused by a missing cart.
 
 ## [7.6.6] - 05-03-2025 - (Dumb)
 
