@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+
+## [7.6.6] - 05-03-2025 - (Dumb)
+
+- Fix   - Resloved status updates issues - orders updated twice on not at all.
+
 ## [7.6.5] - 04-03-2025 - (Snarl)
 
 - Fix   - Resolved an issue with an undefined JavaScript variable.
