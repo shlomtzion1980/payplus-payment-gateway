@@ -220,39 +220,62 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $(document).on("click", "#payment-payplus-dashboard", function (event) {
-        event.preventDefault();
-        let orderId = $(this).attr("data-id");
-        let $this = $(this);
-        $this.parent(".payment-order-ajax").find(".payplus_loader").fadeIn();
-        $.ajax({
-            type: "post",
-            dataType: "json",
-            url: payplus_script_admin.ajax_url,
-            data: {
-                action: "generate-link-payment",
-                order_id: orderId,
-                _ajax_nonce: payplus_script_admin.payplusGenerateLinkPayment,
-            },
-            success: function (response) {
-                $("#box-payplus-payment").fadeIn();
-                $this
-                    .parent(".payment-order-ajax")
-                    .find(".payplus_loader")
-                    .fadeOut();
+    $(document).on(
+        "click",
+        "#payment-payplus-dashboard, #payment-payplus-dashboard-emv",
+        function (event) {
+            event.preventDefault();
+            let orderId = $(this).attr("data-id");
+            let $this = $(this);
+            $this
+                .parent(".payment-order-ajax")
+                .find(".payplus_loader")
+                .fadeIn();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: payplus_script_admin.ajax_url,
+                data: {
+                    action: "generate-link-payment",
+                    order_id: orderId,
+                    button: $this.attr("id"),
+                    _ajax_nonce:
+                        payplus_script_admin.payplusGenerateLinkPayment,
+                },
+                success: function (response) {
+                    if ($this.attr("id") === "payment-payplus-dashboard-emv") {
+                        //for device transaction.
+                        const parsedResponse = JSON.parse(response.body);
+                        if (
+                            parsedResponse?.results?.status === "success" &&
+                            parsedResponse?.results?.code === 0
+                        ) {
+                            location.reload();
+                        }
+                        //for device transaction.
+                    } else {
+                        $("#box-payplus-payment").fadeIn();
+                        $this
+                            .parent(".payment-order-ajax")
+                            .find(".payplus_loader")
+                            .fadeOut();
 
-                if (response.status) {
-                    $this.fadeOut();
-                    $("#box-payplus-payment iframe").attr(
-                        "src",
-                        response.payment_response
-                    );
-                } else {
-                    $("#box-payplus-payment").text(response.payment_response);
-                }
-            },
-        });
-    });
+                        if (response.status) {
+                            $this.fadeOut();
+                            $("#box-payplus-payment iframe").attr(
+                                "src",
+                                response.payment_response
+                            );
+                        } else {
+                            $("#box-payplus-payment").text(
+                                response.payment_response
+                            );
+                        }
+                    }
+                },
+            });
+        }
+    );
     $("#order-payment-payplus").click(function (event) {
         event.preventDefault();
         let orderId = $(this).attr("data-id");
@@ -460,6 +483,9 @@ if (
         jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
             .closest("tr")
             .show();
+        jQuery("#woocommerce_payplus-payment-gateway_dev_device_uid")
+            .closest("tr")
+            .show();
         jQuery("#woocommerce_payplus-payment-gateway_dev_secret_key")
             .closest("tr")
             .find("label")
@@ -472,6 +498,10 @@ if (
             .closest("tr")
             .find("label")
             .css({ color: "#34aa54" });
+        jQuery("#woocommerce_payplus-payment-gateway_dev_device_uid")
+            .closest("tr")
+            .find("label")
+            .css({ color: "#34aa54" });
         jQuery("#woocommerce_payplus-payment-gateway_api_key")
             .closest("tr")
             .hide();
@@ -479,6 +509,9 @@ if (
             .closest("tr")
             .hide();
         jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+            .closest("tr")
+            .hide();
+        jQuery("#woocommerce_payplus-payment-gateway_device_uid")
             .closest("tr")
             .hide();
     }
@@ -493,6 +526,9 @@ if (
         jQuery("#woocommerce_payplus-payment-gateway_dev_payment_page_id")
             .closest("tr")
             .hide();
+        jQuery("#woocommerce_payplus-payment-gateway_dev_device_uid")
+            .closest("tr")
+            .hide();
         jQuery("#woocommerce_payplus-payment-gateway_api_key")
             .closest("tr")
             .show();
@@ -500,6 +536,9 @@ if (
             .closest("tr")
             .show();
         jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+            .closest("tr")
+            .show();
+        jQuery("#woocommerce_payplus-payment-gateway_device_uid")
             .closest("tr")
             .show();
         jQuery("#woocommerce_payplus-payment-gateway_secret_key")
@@ -511,6 +550,10 @@ if (
             .find("label")
             .css({ color: "#34aa54" });
         jQuery("#woocommerce_payplus-payment-gateway_payment_page_id")
+            .closest("tr")
+            .find("label")
+            .css({ color: "#34aa54" });
+        jQuery("#woocommerce_payplus-payment-gateway_device_uid")
             .closest("tr")
             .find("label")
             .css({ color: "#34aa54" });

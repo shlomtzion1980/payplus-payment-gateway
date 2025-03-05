@@ -895,25 +895,47 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order->set_payment_method_title('Pay with Debit or Credit Card');
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $payload = $this->generatePayloadLink($order_id, true);
+            $deviceTransaction = isset($_POST['button']) && $_POST['button'] === "payment-payplus-dashboard-emv" ? true : false;
+            if ($deviceTransaction) {
+                $payload = json_decode($payload, true);
+                $payload['credit_terms'] = 1;
+                $payload['device_uid'] = $this->device_uid;
+                $chargeMethod = $payload['charge_method'];
+                unset($payload['payment_page_uid']);
+            }
+            $paymentUrl = !$deviceTransaction ? $this->payment_url : $this->devicePaymentUrl;
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
             $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-            $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
+            $response = WC_PayPlus_Statics::payPlusRemote($paymentUrl, $payload);
 
             if (is_wp_error($response)) {
                 $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
             } else {
-
                 $res = json_decode(wp_remote_retrieve_body($response));
-                if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
-                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
-                    $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_page_request_uid' => $res->data->page_request_uid));
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_payment_page_link' => $res->data->payment_page_link));
-                    $response = array("status" => true, "payment_response" => $res->data->payment_page_link);
+                if ($deviceTransaction) {
+                    if ($res->results->status === "success" && $res->results->code === 0) {
+                        WC_PayPlus_Meta_Data::update_meta($order, [
+                            'payplus_response' => wp_json_encode($res),
+                            'payplus_transaction_uid' => $res->data->transaction->uid,
+                            'payplus_method' => 'credit-card',
+                            'payplus_four_digits' => $res->data->data->card_information->four_digits,
+                            'payplus_brand_name' => $res->data->data->card_information->brand_name,
+                        ]);
+                        $type = $chargeMethod === 1 ? "Charge" : "Approval";
+                        $this->updateOrderStatus($order_id, $type, $res = null);
+                    }
                 } else {
-                    $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
-                    $response = (is_array($response)) ? $response['body'] : $response->body;
-                    $response = array("status" => false, "payment_response" => $response);
+                    if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
+                        $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
+                        $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
+                        WC_PayPlus_Meta_Data::update_meta($order, array('payplus_page_request_uid' => $res->data->page_request_uid));
+                        WC_PayPlus_Meta_Data::update_meta($order, array('payplus_payment_page_link' => $res->data->payment_page_link));
+                        $response = array("status" => true, "payment_response" => $res->data->payment_page_link);
+                    } else {
+                        $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
+                        $response = (is_array($response)) ? $response['body'] : $response->body;
+                        $response = array("status" => false, "payment_response" => $response);
+                    }
                 }
             }
         }
@@ -1726,7 +1748,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                 if (is_array($payments)) {
                     foreach ($payments as $key => $payment) {
-                        $payment->method_payment = property_exists($payment, 'method_payment') ? $payment->method_payment : $payment->method;
+                        $payment->method_payment = property_exists($payment, 'method_payment') ? $payment->method_payment : $payment->method ?? 'credit-card';
                         $payment->create_at = property_exists($payment, 'create_at') ? $payment->create_at : $payment->date;
                         $payment->price = property_exists($payment, 'price') ? $payment->price : $payment->amount * 100;
                         $create_at = explode(' ', $payment->create_at);
@@ -2041,6 +2063,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             <div class="payment-order-ajax">
                 <button id="payment-payplus-dashboard" data-id="<?php echo esc_attr($orderId) ?>"
                     class="button  button-primary"><?php echo esc_html__("Payment", "payplus-payment-gateway") ?></button>
+                <button id="payment-payplus-dashboard-emv" data-id="<?php echo esc_attr($orderId) ?>"
+                    class="button  button-primary"><?php echo esc_html__("EMV - Payment", "payplus-payment-gateway") ?></button>
                 <div class="payplus_loader">
                     <div class="loader">
                         <div class="loader-background">
@@ -2244,7 +2268,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $transactionType = $this->get_option('transaction_type');
 
         wp_enqueue_style('payplus', PAYPLUS_PLUGIN_URL . 'assets/css/admin.min.css', [], PAYPLUS_VERSION);
-        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.min.js', ['jquery'], time(), true);
+        wp_register_script('payplus-admin-payment', PAYPLUS_PLUGIN_URL . '/assets/js/admin-payments.js', ['jquery'], time(), true);
         wp_localize_script(
             'payplus-admin-payment',
             'payplus_script_admin',

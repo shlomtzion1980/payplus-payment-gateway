@@ -34,6 +34,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $api_key;
     public $transaction_type;
     public $secret_key;
+    public $device_uid;
     public $payment_page_id;
     public $disable_woocommerce_scheduler;
     public $initial_invoice;
@@ -74,6 +75,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $add_payment_res_url;
     public $api_url;
     public $payment_url;
+    public $devicePaymentUrl;
     public $ipn_url;
     public $invoice_search;
     public $refund_url;
@@ -148,6 +150,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->block_ip_transactions_hour = $this->get_option('block_ip_transactions_hour');
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
+        $this->device_uid = $this->api_test_mode ? $this->get_option('dev_device_uid') ?? null : $this->get_option('device_uid');
         $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
         $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'), new DateTimeZone('Asia/Jerusalem'));
         $this->rounding_decimals = ROUNDING_DECIMALS;
@@ -223,6 +226,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $this->api_url = ($this->api_test_mode) ? PAYPLUS_PAYMENT_URL_DEV : PAYPLUS_PAYMENT_URL_PRODUCTION;
         $this->payment_url = $this->api_url . 'PaymentPages/generateLink';
+        $this->devicePaymentUrl = $this->api_url . 'Device/TransactionByDevice';
         $this->ipn_url = $this->api_url . 'PaymentPages/ipn';
         $this->invoice_search = $this->api_url . 'books/docs/list';
         $this->refund_url = $this->api_url . 'Transactions/RefundByTransactionUID';
