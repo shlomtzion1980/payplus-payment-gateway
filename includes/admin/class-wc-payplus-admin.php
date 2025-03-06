@@ -916,6 +916,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if ($res->results->status === "success" && $res->results->code === 0) {
                         WC_PayPlus_Meta_Data::update_meta($order, [
                             'payplus_response' => wp_json_encode($res),
+                            'payplus_response_emv' => wp_json_encode($res->data->transaction),
                             'payplus_transaction_uid' => $res->data->transaction->uid,
                             'payplus_method' => 'credit-card',
                             'payplus_four_digits' => $res->data->data->card_information->four_digits,
@@ -1747,6 +1748,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 ];
 
                 if (is_array($payments)) {
+                    $emvResponse = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_response_emv');
+                    $emvResponse ? $payments[0] = json_decode($emvResponse) : null;
                     foreach ($payments as $key => $payment) {
                         $payment->method_payment = property_exists($payment, 'method_payment') ? $payment->method_payment : $payment->method ?? 'credit-card';
                         $payment->create_at = property_exists($payment, 'create_at') ? $payment->create_at : $payment->date;
