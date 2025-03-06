@@ -432,7 +432,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         echo "<pre>";
         !$getInvoice ? $ipnMessage = "RUNNING IPN!" : $ipnMessage = "RUNNING Invoice+ call! - Check order notes and status for results!";
-        $reportOnly && !$getInvoice ? $ipnMessage = "RUNNING IPN! - Report only mode!" : null;
+        $reportOnly && !$getInvoice ? $ipnMessage = "IPN - Report only mode!" : null;
         $outPut = [];
         if (count($orders)) {
             echo "\nThe following orders will be processed: <br>";
@@ -488,7 +488,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 echo esc_html("Order #$order_id with forceinvoice ! - RUNNING invoice+ process!\n");
                                 $this->invoice_api->payplus_invoice_create_order($order_id);
                             } else {
-                                echo esc_html("Order #$order_id with forceinvoice & report only! - NOT RUNNING invoice+ process!\n");
+                                echo esc_html("Order #$order_id with forceinvoice & report only! - RUNNING invoice+ process ONLY!\n");
+                                $this->invoice_api->payplus_invoice_create_order($order_id);
                             }
                         }
                     }
