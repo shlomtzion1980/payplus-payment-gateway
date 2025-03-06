@@ -1907,8 +1907,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                     ?>
                 </select>
-                <button id="makeTokenPayment" data-token="<?php echo esc_attr($token); ?>"
-                    data-id="<?php echo esc_attr((int)$orderId); ?>">
+                <button id="makeTokenPayment" data-id="<?php echo esc_attr((int)$orderId); ?>">
                     <?php echo esc_html__('Pay With Token', 'payplus-payment-gateway'); ?>
                 </button>
             <?php
