@@ -88,30 +88,30 @@ hf.SetMainFields({
     .SetRecaptcha("#recaptcha")
     .SetHostedFieldsStyles(
         "::placeholder {color: #A2ADB5;} .hf-inp-name-cc {font-size:1rem !important;text-align: " +
-            direction +
-            "; background-image: url(" +
-            origin +
-            "/wp-content/plugins/payplus-payment-gateway/assets/images/lock.svg);background-repeat: no-repeat;background-position: " +
-            opposite +
-            " center;} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
-            direction +
-            "; background-image: url(" +
-            origin +
-            "/wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg);background-repeat: no-repeat;background-position: " +
-            opposite +
-            "} .hf-inp-name-expirym {text-align: " +
-            direction +
-            "; font-size: 1rem} .hf-inp-name-expiryy {text-align: " +
-            direction +
-            "; font-size: 1rem; " +
-            viImage +
-            "} .hf-inp-name-expiry {text-align: " +
-            direction +
-            "; font-size: 1rem; " +
-            viImage +
-            ";background-repeat: no-repeat;background-position: " +
-            opposite +
-            " center;}"
+        direction +
+        "; background-image: url(" +
+        origin +
+        "/wp-content/plugins/payplus-payment-gateway/assets/images/lock.svg);background-repeat: no-repeat;background-position: " +
+        opposite +
+        " center;} .hf-inp-name-cvv {font-size:1rem !important;text-align: " +
+        direction +
+        "; background-image: url(" +
+        origin +
+        "/wp-content/plugins/payplus-payment-gateway/assets/images/cvv.svg);background-repeat: no-repeat;background-position: " +
+        opposite +
+        "} .hf-inp-name-expirym {text-align: " +
+        direction +
+        "; font-size: 1rem} .hf-inp-name-expiryy {text-align: " +
+        direction +
+        "; font-size: 1rem; " +
+        viImage +
+        "} .hf-inp-name-expiry {text-align: " +
+        direction +
+        "; font-size: 1rem; " +
+        viImage +
+        ";background-repeat: no-repeat;background-position: " +
+        opposite +
+        " center;}"
     );
 
 function putHostedFields() {
@@ -178,7 +178,7 @@ function showError(message, code) {
 
     code !== null
         ? (errorCode.innerText =
-              code.toString().length > 0 ? errorCodePrefix + code : code)
+            code.toString().length > 0 ? errorCodePrefix + code : code)
         : null;
 
     const isCheckout = !document.querySelector(
@@ -297,20 +297,23 @@ jQuery(() => {
                                         newDiv.style.alignItems = "center";
                                         paymentForm.style.marginBottom = "4%";
                                         paymentForm.style.width = "99%";
-                                        var $checkbox = jQuery(
-                                            '<p class="hf-save form-row">' +
+
+                                        if (!jQuery(".hf-save").length) {
+                                            var $checkbox = jQuery(
+                                                '<p class="hf-save form-row">' +
                                                 '<label for="save_token_checkbox">' +
                                                 '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
                                                 " " +
                                                 payplus_script_hosted.saveCreditCard +
                                                 "</label>" +
                                                 "</p>"
-                                        );
+                                            );
 
-                                        payplus_script_hosted.isLoggedIn &&
-                                        payplus_script_hosted.isSavingCerditCards
-                                            ? $hostedDiv.append($checkbox)
-                                            : null;
+                                            payplus_script_hosted.isLoggedIn &&
+                                                payplus_script_hosted.isSavingCerditCards
+                                                ? $hostedDiv.append($checkbox)
+                                                : null;
+                                        }
 
                                         inputElement.addEventListener(
                                             "click",
@@ -340,7 +343,7 @@ jQuery(() => {
                                                                 input.checked &&
                                                                 event.target
                                                                     .id !==
-                                                                    "save_token_checkbox"
+                                                                "save_token_checkbox"
                                                             ) {
                                                                 newDiv.style.display =
                                                                     "none";
@@ -422,14 +425,12 @@ hf.Upon("pp_pageExpired", (e) => {
     popup.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
     popup.style.zIndex = "10000";
     popup.innerHTML = `
-    <p>${
-        pageLang !== "he-IL"
+    <p>${pageLang !== "he-IL"
             ? "Page Expired. Please refresh the page and try again."
             : "תוקף הדף פג. אנא רענן/י את הדף ונסה/י שוב."
-    }</p>
-    <button id="popup-ok-button">${
-        pageLang !== "he-IL" ? "OK" : "אישור"
-    }</button>
+        }</p>
+    <button id="popup-ok-button">${pageLang !== "he-IL" ? "OK" : "אישור"
+        }</button>
 `;
     document.body.appendChild(popup);
 
@@ -529,8 +530,8 @@ hf.Upon("pp_responseFromServer", (e) => {
                         } else {
                             alert(
                                 "Order completion failed(Please try again): " +
-                                    (final_response.message ||
-                                        final_response.data.message)
+                                (final_response.message ||
+                                    final_response.data.message)
                             );
                             location.reload();
                         }
