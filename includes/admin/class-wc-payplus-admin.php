@@ -332,47 +332,51 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $response = !$getInvoice && !$moreInfo ? wp_remote_post($url, $args) : wp_remote_get($url, $headers);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
+        $sameDate = $responseBody['details']['items'][0]['doc_date'] === $order->get_date_created()->date('Y-m-d');
+        $sameAmount = number_format($order->get_total(), 2, '.', '') === number_format($responseBody['details']['totals']['total_payments'], 2, '.', '');
 
         if ($getInvoice) {
-            $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
+            if ($sameDate) {
+                $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
 
-            $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");
-            foreach ($responseBody['details']['items'] as $item => $doc) {
-                if ($doc['doc_amount'] < 0 || strpos($doc['type'], 'refund') !== false) {
-                    $refundsArray = isset($refundsArray) ? $refundsArray : [];
-                    $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsArray;
-                    $refundsArray[$doc['number']]['link'] = $doc['original_doc'];
-                    $refundsArray[$doc['number']]['type'] = $doc['type'];
-                    $invoicePluseData["payplus_refunds"] = wp_json_encode($refundsArray);
-                }
+                $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");
+                foreach ($responseBody['details']['items'] as $item => $doc) {
+                    if ($doc['doc_amount'] < 0 || strpos($doc['type'], 'refund') !== false) {
+                        $refundsArray = isset($refundsArray) ? $refundsArray : [];
+                        $refundsArray = !empty($refundsJson) > 0 ? json_decode($refundsJson, true) : $refundsArray;
+                        $refundsArray[$doc['number']]['link'] = $doc['original_doc'];
+                        $refundsArray[$doc['number']]['type'] = $doc['type'];
+                        $invoicePluseData["payplus_refunds"] = wp_json_encode($refundsArray);
+                    }
 
-                $payPlusInvoiceTypes[$doc['type']][$doc['number']] = $doc['original_doc'];
-                $invoicePluseData['payplus_invoice_originalDocAddress'] = $doc['original_doc'];
+                    $payPlusInvoiceTypes[$doc['type']][$doc['number']] = $doc['original_doc'];
+                    $invoicePluseData['payplus_invoice_originalDocAddress'] = $doc['original_doc'];
 
-                if ($item === array_key_last($responseBody['details']['items'])) {
-                    $invoicePluseData['payplus_invoice_type'] = $doc['type'];
-                    $invoicePluseData['payplus_invoice_docUID'] = $doc['uuid'];
-                    $invoicePluseData['payplus_invoice_numberD'] = $doc['number'];
-                }
-            }
-
-            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
-                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
-            } else {
-                $exists = 0;
-                $keys = ['inv_receipt', 'inv_tax'];
-                foreach ($payPlusInvoiceTypes as $key => $value) {
-                    if (in_array($key, $keys)) {
-                        $exists++;
+                    if ($item === array_key_last($responseBody['details']['items'])) {
+                        $invoicePluseData['payplus_invoice_type'] = $doc['type'];
+                        $invoicePluseData['payplus_invoice_docUID'] = $doc['uuid'];
+                        $invoicePluseData['payplus_invoice_numberD'] = $doc['number'];
                     }
                 }
-                $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
-            }
-            $invoicePluseData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
 
-            WC_PayPlus_Meta_Data::update_meta($order, $invoicePluseData);
-            if ($allowReturn) {
-                return $invoicePluseData;
+                if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
+                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                } else {
+                    $exists = 0;
+                    $keys = ['inv_receipt', 'inv_tax'];
+                    foreach ($payPlusInvoiceTypes as $key => $value) {
+                        if (in_array($key, $keys)) {
+                            $exists++;
+                        }
+                    }
+                    $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                }
+                $invoicePluseData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
+
+                WC_PayPlus_Meta_Data::update_meta($order, $invoicePluseData);
+                if ($allowReturn) {
+                    return $invoicePluseData;
+                }
             }
         } else {
             if (!empty($responseBody['data'])) {
@@ -1852,7 +1856,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         } elseif ($this->isInvoiceEnable && empty($checkInvoiceSend) && $this->showInvoicePlusButtons) {
             echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
             if (!$this->isInvoiceManual) {
-                echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="position: absolute;' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
+                echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="position: absolute;' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
             }
             echo $payPlusLoader;
         }
