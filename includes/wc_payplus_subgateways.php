@@ -72,7 +72,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     {
         $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
         $style = 'max-width: 32px; max-height: 32px;'; // Example inline style
-        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+        return $this->hide_icon === "yes" ? "" : '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
     }
 
     /**
@@ -489,7 +489,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     {
         $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
         $style = 'max-width: 64px; max-height: 32px;'; // Example inline style
-        return '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+        return $this->hide_icon === "yes" ? "" : '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
     }
 
     public function regenerateHostedLink()
