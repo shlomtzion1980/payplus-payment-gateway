@@ -876,7 +876,7 @@ class WC_PayPlus_Form_Fields
             'disable_cart_hash_check' => [
                 'title' => __('Disable cart hash check security feature', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'default' => 'no',
+                'default' => 'yes',
                 'description' => __('Disable cart hash check security feature.', 'payplus-payment-gateway'),
                 'label' => __('Disable cart hash check security feature', 'payplus-payment-gateway'),
                 'desc_tip' => true,
