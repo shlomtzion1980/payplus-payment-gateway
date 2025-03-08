@@ -323,6 +323,9 @@ class WC_PayPlus
                 //failed nonce check, will be redirected to regular thank you page with ipn
                 $order = wc_get_order($order_id);
                 $this->updateStatusesIpn ? $this->checkRunIpnResponse($order_id, $order, 1) : null;
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 wp_redirect($redirect_to);
                 exit;
@@ -357,6 +360,9 @@ class WC_PayPlus
             $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
 
             if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 wp_redirect($redirect_to);
                 exit;
