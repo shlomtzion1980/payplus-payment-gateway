@@ -333,10 +333,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $response = !$getInvoice && !$moreInfo ? wp_remote_post($url, $args) : wp_remote_get($url, $headers);
         $responseBody = json_decode(wp_remote_retrieve_body($response), true);
         $sameDate = $responseBody['details']['items'][0]['doc_date'] === $order->get_date_created()->date('Y-m-d');
-        $sameAmount = number_format($order->get_total(), 2, '.', '') === number_format($responseBody['details']['totals']['total_payments'], 2, '.', '');
+        $sameAmount = number_format($order->get_total(), 2, '.', '') === number_format($responseBody['details']['items'][0]['total_amount_to_pay'], 2, '.', '');
 
         if ($getInvoice) {
-            if ($sameDate) {
+            if ($sameAmount) {
                 $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
 
                 $refundsJson = WC_PayPlus_Meta_Data::get_meta($order, "payplus_refunds");

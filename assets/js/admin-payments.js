@@ -166,6 +166,9 @@ jQuery(document).ready(function ($) {
     });
 
     $("#create-invoice-plus-doc").click(function () {
+        if (!confirm("WARNING: This will create an invoice no matter what the order STATUS is... Are you sure you want to create the invoice?")) {
+            return;
+        }
         let loader = $("#order_data").find(".payplus_loader_gpp");
         let side = "right";
 
@@ -199,6 +202,9 @@ jQuery(document).ready(function ($) {
     });
 
     $("#get-invoice-plus-data").click(function () {
+        if (!confirm("ATTENTION: This only pulls existing information, only visual data, this does not create any document.")) {
+            return;
+        }
         let loader = $("#order_data").find(".payplus_loader_gpp");
         let side = "right";
 
