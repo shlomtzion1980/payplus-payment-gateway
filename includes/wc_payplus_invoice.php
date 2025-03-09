@@ -1163,7 +1163,6 @@ class PayplusInvoice
                     if ($j5) {
                         $j5Amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
                         if ($j5Amount && ($j5Amount != $payload['totalAmount'])) {
-
                             $payload['items'] = [];
                             $payload['items'][] = [
                                 'name' => __('General product', 'payplus-payment-gateway'),
@@ -1176,7 +1175,7 @@ class PayplusInvoice
                             $totalJ5ItemsAmount = 0;
                             foreach ($payload['items'] as $item) {
                                 if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
-                                    $totalJ5ItemsAmount += ($item['price'] - $item['discount_value']) * $item['quantity'];
+                                    $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
                                 } else {
                                     $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
                                 }
