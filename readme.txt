@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.7.1
 Requires PHP: 7.4
-Stable tag: 7.6.8
+Stable tag: 7.6.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.6.9 - 10-03-2025 =
+
+- Fix   - [Invoice+] - Resolved issue where J5 transactions with adjusted amounts (more or less than the original) did not create an invoice when coupons were used. This is now possible.
+- Fix   - [Invoice+] - Edited J5 orders (Items and Total) will create an Invoice+ document that accurately reflects the order details instead of just showing "General Product".
+- Tweak - [Invoice+] - Subscription orders renewals Invoice+ docs will show correct payment method instead of other.
 
 = 7.6.8 - 09-03-2025 =
 
