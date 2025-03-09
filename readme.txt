@@ -89,18 +89,18 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 = 7.6.8 - 09-03-2025 =
 
 - Added - Support for payments using EMV POS devices (Admin Only).
-- Added - Invoice+: Ability to block creation of documents for "bacs" - Direct bank transfer and "cod" - Cash on Delivery when in automatic mode.
-- Fix   - PHP warning of array to string.
-- Tweak - ForceInvoice can run with ReportOnly IPN on Orders Validator.
-- Added - Create Invoice+ Auto Doc button - If for any reason no matter what a doc wasn't created, this button will create the document without chaning status. (According to doc settings)
-- Added - Show Create Invoice+ Auto... button via checkbox in Invoice+ settings.
-- Added - Bank Wire Transfer method to Invoice+ type payment instead of showing "other".
-- Added - Cash On Delivery method to Invoice+ type payment instead of showing "other".
-- Added - Cheque/Check method to Invoice+ type payment instead of showing "other".
-- Fix   - Hide payment method logo for subgateways wasn't working.
-- Fix   - On some themes in "Blocks Checkout" the save payment method checkbox appeared twice... not anymore.
-- Tweak - Empty cart if exists on ipn_response without nonce but after successful payment.
-- Tweak - Subscriptions renewal payments will also contain "payplus_response" and display the data in the metabox.
+- Added - Invoice+: Option to block document creation for "bacs" (Direct bank transfer) and "cod" (Cash on Delivery) in automatic mode.
+- Fix   - Resolved PHP warning related to array to string conversion.
+- Tweak - ForceInvoice can now run with ReportOnly IPN on Orders Validator.
+- Added - Create Invoice+ Auto Doc button: This button will create the document without changing status if it wasn't created for any reason, according to document settings.
+- Added - Show Create Invoice+ Auto Doc button via checkbox in Invoice+ settings.
+- Added - Bank Wire Transfer method to Invoice+ payment types instead of showing "other".
+- Added - Cash On Delivery method to Invoice+ payment types instead of showing "other".
+- Added - Cheque/Check method to Invoice+ payment types instead of showing "other".
+- Fix   - Resolved issue where the payment method logo for subgateways was not hidden.
+- Fix   - Corrected issue where the save payment method checkbox appeared twice in "Blocks Checkout" on some themes.
+- Tweak - Empty cart if it exists on ipn_response without nonce but after successful payment.
+- Tweak - Subscription renewal payments will now include "payplus_response" and display the data in the metabox.
 
 = 7.6.7 - 06-03-2025 =
 

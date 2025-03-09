@@ -2,10 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.6.8] - 09-03-2025 - (EMV)
+## [7.6.8] - 09-03-2025 - (Kakashi)
 
 - Added - Support for payments using EMV POS devices (Admin Only).
-- Added - Invoice+: Ability to block creation of documents for "bacs" - Direct bank transfer and "cod" - Cash on Delivery when in automatic mode.
+- Added - Invoice+: Option to block document creation for "bacs" (Direct bank transfer) and "cod" (Cash on Delivery) in automatic mode.
+- Fix   - Resolved PHP warning related to array to string conversion.
+- Tweak - ForceInvoice can now run with ReportOnly IPN on Orders Validator.
+- Added - Create Invoice+ Auto Doc button: This button will create the document without changing status if it wasn't created for any reason, according to document settings.
+- Added - Show Create Invoice+ Auto Doc button via checkbox in Invoice+ settings.
+- Added - Bank Wire Transfer method to Invoice+ payment types instead of showing "other".
+- Added - Cash On Delivery method to Invoice+ payment types instead of showing "other".
+- Added - Cheque/Check method to Invoice+ payment types instead of showing "other".
+- Fix   - Resolved issue where the payment method logo for subgateways was not hidden.
+- Fix   - Corrected issue where the save payment method checkbox appeared twice in "Blocks Checkout" on some themes.
+- Tweak - Empty cart if it exists on ipn_response without nonce but after successful payment.
+- Tweak - Subscription renewal payments will now include "payplus_response" and display the data in the metabox.
 
 ## [7.6.7] - 06-03-2025 - (Haku)
 
