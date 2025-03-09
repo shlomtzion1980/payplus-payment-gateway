@@ -1040,7 +1040,7 @@ class PayplusInvoice
         $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send', true);
         $payplusErrorInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_error_invoice', true);
         $payplusTransactionUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid', true);
-
+        $j5Amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
         $invoice_manual = $this->payplus_get_create_invoice_manual();
 
         $order = wc_get_order($order_id);
@@ -1146,7 +1146,6 @@ class PayplusInvoice
                         $payload['items'] = $productsItems;
                         $payload['totalAmount'] = $dual * $totalCartAmount;
                     } else {
-
                         $payload['items'][] = [
                             'name' => __('General product', 'payplus-payment-gateway'),
                             'quantity' => 1,
@@ -1161,26 +1160,33 @@ class PayplusInvoice
                     $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
                     if ($j5) {
-                        $j5Amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
-                        if ($j5Amount && ($j5Amount != $payload['totalAmount'])) {
-                            $payload['items'] = [];
-                            $payload['items'][] = [
-                                'name' => __('General product', 'payplus-payment-gateway'),
-                                'quantity' => 1,
-                                'price' => $j5Amount,
-                            ];
-                            $payload['totalAmount'] = $dual * $j5Amount;
-                            $payload['payments'][0]['amount'] = $dual * $j5Amount;
-                        } elseif ($j5Amount) {
-                            $totalJ5ItemsAmount = 0;
-                            foreach ($payload['items'] as $item) {
-                                if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
-                                    $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
-                                } else {
-                                    $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
-                                }
+                        $payload['items'] = $productsItems;
+                        $totalJ5ItemsAmount = 0;
+
+                        foreach ($payload['items'] as $item) {
+                            if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
+                                $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
+                            } else {
+                                $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
                             }
-                            $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
+                        }
+
+                        if ($j5Amount) {
+                            $j5Amount = number_format($j5Amount, 2, '.', '');
+                            $totalJ5ItemsAmount = number_format($totalJ5ItemsAmount, 2, '.', '');
+                            $payload['totalAmount'] = $dual * $j5Amount;
+                            if ($j5Amount && (abs($j5Amount - $totalJ5ItemsAmount) >  0.02)) {
+                                $payload['items'] = [];
+                                $payload['items'][] = [
+                                    'name' => __('General product', 'payplus-payment-gateway'),
+                                    'quantity' => 1,
+                                    'price' => $j5Amount,
+                                ];
+                                $payload['payments'][0]['amount'] = $dual * $j5Amount;
+                            } elseif ($j5Amount) {
+                                $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
+                                $payload['totalAmount'] = $dual * $totalJ5ItemsAmount;
+                            }
                         }
                     }
 
