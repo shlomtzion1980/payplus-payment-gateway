@@ -19,6 +19,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         'payplus-payment-gateway-hostedfields',
     );
     public $applePaySettings;
+    public $hostedFieldsSettings;
     public $isApplePayEnabled;
     public $isInvoiceEnable;
     public $useDedicatedMetaBox;
@@ -89,6 +90,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->saveOrderNote = isset($this->settings['payplus_data_save_order_note']) ? boolval($this->settings['payplus_data_save_order_note'] === 'yes') : null;
         $this->showPayPlusDataMetabox = isset($this->allSettings['show_payplus_data_metabox']) ? boolval($this->allSettings['show_payplus_data_metabox'] === 'yes') : null;
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        $this->hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->isApplePayEnabled = boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes");
         // make payment button for j2\j5
         add_action('woocommerce_order_actions_end', [$this, 'make_payment_button'], 10, 1);
@@ -2101,7 +2103,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 <iframe scrolling="no" src="" style="width: 100%;height: 900px"></iframe>
             </div>
 
-<?php
+        <?php
         }
         $output = ob_get_clean();
         echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -2257,6 +2259,35 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
+    public function wc_payplus_show_updates_message()
+    {
+        ?>
+        <div id="wc-payplus-updates-message" class="notice notice-success is-dismissible">
+            <p> <?php
+                echo wp_kses_post(
+                    __(
+                        '<strong style="font-size: 1.2em;">Hello!</strong><br><br>
+
+        <span style="font-size: 1.2em;"><strong>We noticed you are not using our new PayPlus Embedded feature.</strong> It integrates seamlessly into the checkout page, just like a payment page!<br><br>
+        <strong>Why use or switch to PayPlus Embedded?</strong><br>
+        - It is faster!<br>
+        - It can operate with or without the standard payment page, handling credit card transactions.<br>
+        - It offers the same security as our payment page.<br>
+        - It can fully replace the traditional credit card payment page.<br>
+        - It is easily configured from the plugin settings with no additional activation or charges.<br>
+        -' . " Don't " . 'like it? or not satisfied? You can always turn it off.<br><br>
+        
+        Thank you,<br><br>
+        <strong>The PayPlus Team</strong></span>',
+                        'payplus-payment-gateway'
+                    )
+                );
+                ?>
+            </p>
+        </div>
+<?php
+    }
+
     /**
      * @return void
      */
@@ -2272,6 +2303,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
             $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
             $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
+            $currentSection === "payplus-payment-gateway"
+                ? ($this->hostedFieldsSettings['enabled'] !== "yes" ? add_action('admin_notices', [$this, 'wc_payplus_show_updates_message']) : null)
+                : null;
         }
 
         if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
