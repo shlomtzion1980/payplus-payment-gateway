@@ -1164,7 +1164,7 @@ class PayplusInvoice
                         $totalJ5ItemsAmount = 0;
 
                         foreach ($payload['items'] as $item) {
-                            if ($item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
+                            if (isset($item['discount_value']) && isset($item['discount_type']) && $item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
                                 $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
                             } else {
                                 $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
