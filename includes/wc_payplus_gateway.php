@@ -3553,6 +3553,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     delete_post_meta($order->get_id(), 'payplus_error_sub');
                     if ($this->recurring_order_set_to_paid === "yes") {
                         $order->payment_complete();
+                        $order->update_status('completed');
                     } else if ($this->successful_order_status !== 'default-woo') {
                         $order->update_status($this->successful_order_status);
                     } else {
