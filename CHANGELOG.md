@@ -4,9 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [7.6.9] - 10-03-2025 - (Zabuza)
 
-- Fix   - [Invoice+] - Resolved issue (payments-total-not-equal-to-calculated-total) where J5 transactions with adjusted amounts (more or less than the original) did not create an invoice when coupons were used. This is now possible.
+- Fix   - [Invoice+] - Resolved issue (payments-total-not-equal-to-calculated-total) where J5 transactions with adjusted amounts for items (more or less than the original) did not create an invoice when coupons were used. This is now possible.
 - Fix   - [Invoice+] - Edited J5 orders (Items and Total) will create an Invoice+ document that accurately reflects the order details instead of just showing "General Product".
-- Tweak - [Invoice+] - Subscription orders renewals Invoice+ docs will show correct payment method instead of other.
+- Tweak - [Invoice+] - Subscription orders renewals Invoice+ docs will show correct payment method instead of "other".
 
 ## [7.6.8] - 09-03-2025 - (Kakashi)
 
