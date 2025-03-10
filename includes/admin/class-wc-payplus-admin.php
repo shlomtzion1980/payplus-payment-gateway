@@ -24,6 +24,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public $isInvoiceEnable;
     public $useDedicatedMetaBox;
     public $showInvoicePlusButtons;
+    public $showInvoicePlusCreateButton;
+    public $showInvoicePlusGetButton;
     public $isInvoiceManual;
     public $invoiceDisplayOnly;
     public $saveOrderNote;
@@ -83,7 +85,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $payPlusInvoiceOptions = get_option('payplus_invoice_option');
         $this->isInvoiceEnable = isset($payPlusInvoiceOptions['payplus_invoice_enable']) && $payPlusInvoiceOptions['payplus_invoice_enable'] === 'yes' ? true : false;
         $this->useDedicatedMetaBox = isset($payPlusInvoiceOptions['dedicated_invoice_metabox']) && $payPlusInvoiceOptions['dedicated_invoice_metabox'] === 'yes' ? true : false;
-        $this->showInvoicePlusButtons = isset($payPlusInvoiceOptions['show_invoice_plus_buttons']) && $payPlusInvoiceOptions['show_invoice_plus_buttons'] === 'yes' ? true : false;
+        $this->showInvoicePlusCreateButton = isset($payPlusInvoiceOptions['show_invoice_plus_create_button']) && $payPlusInvoiceOptions['show_invoice_plus_create_button'] === 'yes' ? true : false;
+        $this->showInvoicePlusGetButton = isset($payPlusInvoiceOptions['show_invoice_plus_get_button']) && $payPlusInvoiceOptions['show_invoice_plus_get_button'] === 'yes' ? true : false;
         $this->isInvoiceManual = isset($payPlusInvoiceOptions['create-invoice-manual']) && $payPlusInvoiceOptions['create-invoice-manual'] === 'yes' ? true : false;
         $this->invoiceDisplayOnly = isset($payPlusInvoiceOptions['display_only_invoice_docs']) && $payPlusInvoiceOptions['display_only_invoice_docs'] === 'yes' ? true : false;
         $this->allSettings = get_option('woocommerce_payplus-payment-gateway_settings');
@@ -1855,9 +1858,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     echo wp_kses_post($payPlusLoader);
                 }
             }
-        } elseif ($this->isInvoiceEnable && empty($checkInvoiceSend) && $this->showInvoicePlusButtons) {
-            echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
-            if (!$this->isInvoiceManual) {
+        } elseif ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
+            if ($this->showInvoicePlusGetButton) {
+                echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
+            }
+            if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
                 echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="position: absolute;' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
             }
             echo wp_kses_post($payPlusLoader);

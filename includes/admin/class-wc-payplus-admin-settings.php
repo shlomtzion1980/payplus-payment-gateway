@@ -424,8 +424,15 @@ class WC_PayPlus_Admin_Settings
                     ]
                 );
                 $settings[$section][] = array(
-                    'name' => __('Show Invoice+ Get/Create buttons', 'payplus-payment-gateway'),
-                    'id' => 'payplus_invoice_option[show_invoice_plus_buttons]',
+                    'name' => __('Show Invoice+ Create button', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[show_invoice_plus_create_button]',
+                    'type' => 'checkbox',
+                    'default' => 'no',
+                    'class' => 'payplus-display'
+                );
+                $settings[$section][] = array(
+                    'name' => __('Show Invoice+ Get button', 'payplus-payment-gateway'),
+                    'id' => 'payplus_invoice_option[show_invoice_plus_get_button]',
                     'type' => 'checkbox',
                     'default' => 'no',
                     'class' => 'payplus-display'
