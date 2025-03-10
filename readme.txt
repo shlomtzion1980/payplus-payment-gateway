@@ -86,6 +86,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.7.0 - 11-03-2025 =
+
+- Fix   - Subscription orders with the "Mark as paid" option enabled will now correctly be set to "completed" status upon successful renewal.
+
 = 7.6.9 - 10-03-2025 =
 
 - Fix   - [Invoice+] - Resolved issue (payments-total-not-equal-to-calculated-total) where J5 transactions with adjusted amounts for items (more or less than the original) did not create an invoice when coupons were used. This is now possible.
