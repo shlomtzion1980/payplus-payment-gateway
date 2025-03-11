@@ -2308,9 +2308,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
             $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
             $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
-            $currentSection === "payplus-payment-gateway"
-                ? ($this->hostedFieldsSettings['enabled'] !== "yes" ? add_action('admin_notices', [$this, 'wc_payplus_show_updates_message']) : null)
-                : null;
+            if ($currentSection === "payplus-payment-gateway") {
+                $display_count = get_option('wc_payplus_display_embedded_count', 0);
+                if ($display_count < 10) {
+                    add_action('admin_notices', [$this, 'wc_payplus_show_updates_message']);
+                    update_option('wc_payplus_display_embedded_count', $display_count + 1);
+                }
+            }
         }
 
         if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
