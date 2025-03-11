@@ -2274,13 +2274,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         '<strong style="font-size: 1.2em;">Hello!</strong><br><br>
 
         <span style="font-size: 1.2em;"><strong>We noticed you are not using our new PayPlus Embedded feature.</strong> It integrates seamlessly into the checkout page, just like a payment page!<br><br>
-        <strong>Why use or switch to PayPlus Embedded?</strong><br>
+        <strong>Why use or switch to PayPlus Embedded?</strong><br><br>
+        - It is a secured payment form that is embedded directly into the checkout page (no loading necessary).<br>
         - It is faster!<br>
         - It can operate with or without the standard payment page, handling credit card transactions.<br>
         - It offers the same security as our payment page.<br>
         - It can fully replace the traditional credit card payment page.<br>
-        - It is easily configured from the plugin settings with no additional activation or charges.<br>
-        -' . " Don't " . 'like it? or not satisfied? You can always turn it off.<br><br>
+        - It is easily configured from the plugin settings with no additional activation or charges.<br><br>
         
         Thank you,<br><br>
         <strong>The PayPlus Team</strong></span>',
