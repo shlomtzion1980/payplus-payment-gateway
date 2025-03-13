@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [7.7.0] - 11-03-2025 - (Gaara)
 
 - Fix   - Subscription orders with the "Mark as paid" option enabled will now correctly be set to "completed" status upon successful renewal.
+- Tweak - Disabled cart hash verification for additional testing due to issues on certain payment method pages.
 
 ## [7.6.9] - 10-03-2025 - (Zabuza)
 

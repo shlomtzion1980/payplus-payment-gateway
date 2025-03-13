@@ -2316,11 +2316,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $totalCartAmount = $objectProducts->amount;
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
 
-        $cart_hash = WC()->cart && WC()->cart->get_cart_hash() ? WC()->cart->get_cart_hash() : $order_id;
-        $salt = bin2hex(random_bytes(16));
-        $cart_hash_with_salt = hash('sha256', $cart_hash . $salt);
-        WC_PayPlus_Meta_Data::update_meta($order, ['cart_hash' => $cart_hash_with_salt, 'cart_salt' => $salt]);
-
         $payload = '{
             "payment_page_uid": "' . $this->payment_page_id . '",
             ' . $addChargeLine . '
@@ -2350,14 +2345,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . ($this->hide_payments_field > 0 ? '"hide_payments_field": ' . ($this->hide_payments_field == 1 ? 'true' : 'false') . ',' : '') . '
             ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
             "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
-            $json_move_token . ',
-            "cart_hash": "' . $cart_hash_with_salt . '",
-            "cart_salt": "' . $salt . '"
-        }';
+            $json_move_token . '}';
         $payloadArray = json_decode($payload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
-        $payloadArray['more_info_2'] = $cart_hash_with_salt;
-        $payloadArray['more_info_3'] = $salt;
         $payload = wp_json_encode($payloadArray);
         return $payload;
     }
