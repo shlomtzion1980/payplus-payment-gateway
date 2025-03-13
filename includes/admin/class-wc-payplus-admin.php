@@ -2311,8 +2311,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if ($currentSection === "payplus-payment-gateway") {
                 $display_count = get_option('wc_payplus_display_embedded_count', 0);
                 if ($display_count < 10) {
-                    add_action('admin_notices', [$this, 'wc_payplus_show_updates_message']);
-                    update_option('wc_payplus_display_embedded_count', $display_count + 1);
+                    $this->hostedFieldsSettings['enabled'] !== "yes" ? add_action('admin_notices', [$this, 'wc_payplus_show_updates_message']) : null;
+                    $this->hostedFieldsSettings['enabled'] !== "yes" ? update_option('wc_payplus_display_embedded_count', $display_count + 1) : null;
                 }
             }
         }
