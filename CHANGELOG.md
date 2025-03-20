@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.1] - 23-03-2025 - (Ippo)
+
 ## [7.7.0] - 11-03-2025 - (Gaara)
 
 - Fix   - Subscription orders with the "Mark as paid" option enabled will now correctly be set to "completed" status upon successful renewal.
