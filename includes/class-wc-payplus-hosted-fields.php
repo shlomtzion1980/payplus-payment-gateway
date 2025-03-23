@@ -171,7 +171,45 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $wc_tax_enabled = wc_tax_enabled();
         $isTaxIncluded = wc_prices_include_tax();
 
-        if (count($cart)) {
+        if (isset($order) && $order) {
+            $order_items = $order->get_items();
+
+            foreach ($order_items as $item_id => $item) {
+                $productId = $item['product_id'];
+                $product = $item->get_product();
+                $product_name = $item->get_name();
+                $product_quantity = $item->get_quantity();
+                $product_total = $item->get_total();
+                $product_subtotal = $item->get_subtotal();
+                $product_sku = ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId;
+                $product_price = $product ? $product->get_price() : 0;
+
+                // Check if the product is a variation
+                if ($product && $product->is_type('variation')) {
+                    $parent_product = wc_get_product($product->get_parent_id());
+                    $product_name = $parent_product->get_name() . ' - ' . wc_get_formatted_variation($product->get_variation_attributes(), true);
+                    $product_sku = $product_sku ? $product_sku : $parent_product->get_sku();
+                }
+
+                $productVat = 0;
+
+                if ($wc_tax_enabled) {
+                    $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
+                    $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                    $productVat = $this->vat4All ? 0 : $productVat;
+                }
+
+                $products[] = array(
+                    'title' => $product_name,
+                    'priceProductWithTax' => number_format(wc_get_price_including_tax($product), 2, '.', ''),
+                    'priceProductWithoutTax' => number_format(wc_get_price_excluding_tax($product), 2, '.', ''),
+                    'barcode' => $product_sku,
+                    'quantity' => $product_quantity,
+                    'vat_type' => $productVat,
+                    'org_product_tax' => $product->get_tax_status(),
+                );
+            }
+        } elseif (count($cart)) {
             foreach ($cart as $cart_item_key => $cart_item) {
                 $productId = $cart_item['product_id'];
 
@@ -179,15 +217,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                     $product = new WC_Product_Variable($productId);
                     $productData = $product->get_available_variation($cart_item['variation_id']);
                     $tax = (WC()->cart->get_total_tax()) ? WC()->cart->get_total_tax() / $cart_item['quantity'] : 0;
-                    $tax = round($tax, $this->payPlusGateway->rounding_decimals);
-                    $priceProductWithTax = round($productData['display_price'] + $tax, ROUNDING_DECIMALS);
-                    $priceProductWithoutTax = round($productData['display_price'], ROUNDING_DECIMALS);
+                    $tax = number_format($tax, 2, '.', '');
+                    $priceProductWithTax = number_format($productData['display_price'] + $tax, 2, '.', '');
+                    $priceProductWithoutTax = number_format($productData['display_price'], 2, '.', '');
                 } else {
                     $product = new WC_Product($productId);
-                    $priceProductWithTax = round(wc_get_price_including_tax($product), ROUNDING_DECIMALS);
-                    $priceProductWithoutTax = round(wc_get_price_excluding_tax($product), ROUNDING_DECIMALS);
+                    $priceProductWithTax = number_format(wc_get_price_including_tax($product), 2, '.', '');
+                    $priceProductWithoutTax = number_format(wc_get_price_excluding_tax($product), 2, '.', '');
                 }
-
 
                 $productVat = 0;
 
@@ -209,7 +246,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             }
 
             if (WC()->cart->get_total_discount()) {
-                $discountPrice = round(floatval(WC()->cart->get_discount_total()), ROUNDING_DECIMALS);
+                $discountPrice = number_format(floatval(WC()->cart->get_discount_total()), 2, '.', '');
             }
         }
 
@@ -351,7 +388,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 foreach ($gift_cards as $key => $gift) {
                     $productPrice = -1 * ($gift);
                     $allProductSku .= (empty($allProductSku)) ? " ( " . $key : ' , ' . $key;
-                    $priceGift += round($productPrice, ROUNDING_DECIMALS);
+                    $priceGift += number_format($productPrice,  2, '.', '');
                 }
 
                 $item = new stdClass();

@@ -128,7 +128,45 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $wc_tax_enabled = wc_tax_enabled();
         $isTaxIncluded = wc_prices_include_tax();
 
-        if (count($cart)) {
+        if (isset($order) && $order) {
+            $order_items = $order->get_items();
+
+            foreach ($order_items as $item_id => $item) {
+                $productId = $item['product_id'];
+                $product = $item->get_product();
+                $product_name = $item->get_name();
+                $product_quantity = $item->get_quantity();
+                $product_total = $item->get_total();
+                $product_subtotal = $item->get_subtotal();
+                $product_sku = ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId;
+                $product_price = $product ? $product->get_price() : 0;
+
+                // Check if the product is a variation
+                if ($product && $product->is_type('variation')) {
+                    $parent_product = wc_get_product($product->get_parent_id());
+                    $product_name = $parent_product->get_name() . ' - ' . wc_get_formatted_variation($product->get_variation_attributes(), true);
+                    $product_sku = $product_sku ? $product_sku : $parent_product->get_sku();
+                }
+
+                $productVat = 0;
+
+                if ($wc_tax_enabled) {
+                    $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
+                    $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
+                    $productVat = $this->vat4All ? 0 : $productVat;
+                }
+
+                $products[] = array(
+                    'title' => $product_name,
+                    'priceProductWithTax' => number_format(wc_get_price_including_tax($product), 2, '.', ''),
+                    'priceProductWithoutTax' => number_format(wc_get_price_excluding_tax($product), 2, '.', ''),
+                    'barcode' => $product_sku,
+                    'quantity' => $product_quantity,
+                    'vat_type' => $productVat,
+                    'org_product_tax' => $product->get_tax_status(),
+                );
+            }
+        } elseif (count($cart)) {
             foreach ($cart as $cart_item_key => $cart_item) {
                 $productId = $cart_item['product_id'];
 
