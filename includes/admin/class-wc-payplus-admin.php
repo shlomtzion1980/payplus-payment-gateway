@@ -1828,7 +1828,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             </tbody>
         </table>
         <div id="payplus_sum_payment"></div>
-        <?php
+    <?php
     }
 
     /**
@@ -1848,25 +1848,30 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                           <div class='loader-background'><div class='text'></div></div>
                         </div>
                       </div>";
-
-        if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
-            if (!empty($payplusResponse) || !empty($pageRequestUid)) {
-                $payplusResponse = json_decode($payplusResponse, true);
-                $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
-                if (!empty($pageRequestUid)) {
-                    echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
-                    echo wp_kses_post($payPlusLoader);
+    ?>
+        <div class="payplus-order-buttons">
+            <?php
+            if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
+                if (!empty($payplusResponse) || !empty($pageRequestUid)) {
+                    $payplusResponse = json_decode($payplusResponse, true);
+                    $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
+                    if (!empty($pageRequestUid)) {
+                        echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
+                        echo wp_kses_post($payPlusLoader);
+                    }
                 }
             }
-        } elseif ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
-            if ($this->showInvoicePlusGetButton) {
-                echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
+            if ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
+                if ($this->showInvoicePlusGetButton) {
+                    echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="position: absolute;' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
+                }
+                if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
+                    echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="position: absolute;' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
+                }
+                echo wp_kses_post($payPlusLoader);
             }
-            if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
-                echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="position: absolute;' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
-            }
-            echo wp_kses_post($payPlusLoader);
-        }
+            ?></div>
+        <?php
     }
 
     /**

@@ -668,7 +668,8 @@ jQuery(function ($) {
                                 ).is(":checked")
                             ) {
                                 $(".container.hostedFields").show();
-                                const ppIframeH = document.querySelector(".pp_iframe_h");
+                                const ppIframeH =
+                                    document.querySelector(".pp_iframe_h");
                                 if (ppIframeH) {
                                     ppIframeH.style.display = "block";
                                 }
@@ -1345,6 +1346,7 @@ jQuery(function ($) {
                 function (index, value) {
                     var $img = $("<img>", {
                         src: value,
+                        class: "payplus-checkout-image", // Optional: Add a class to the image
                         alt: "Image " + (index + 1), // Optional: Set alt text for accessibility
                         style: "max-width: 100%; max-height:35px;object-fit: contain;", // Optional: Set inline styles
                     });

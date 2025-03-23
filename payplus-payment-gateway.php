@@ -762,6 +762,7 @@ class WC_PayPlus
             public function load_checkout_assets()
             {
                 $script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/js/front.min.js');
+                $css_script_version = filemtime(plugin_dir_path(__FILE__) . 'assets/css/style.min.css');
                 $importAapplepayScript = null;
                 $isModbile = (wp_is_mobile()) ? true : false;
                 $multipassIcons = WC_PayPlus_Statics::getMultiPassIcons();
@@ -833,7 +834,7 @@ class WC_PayPlus
                     ) {
                         $this->payplus_gateway = $this->get_main_payplus_gateway();
                         add_filter('body_class', [$this, 'payplus_body_classes']);
-                        wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $script_version);
+                        wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $css_script_version);
 
                         if ($isEnableOneClick) {
                             $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;

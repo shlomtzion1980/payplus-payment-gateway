@@ -134,6 +134,18 @@ html[dir="rtl"]
     transform: none;
 }
 
+.payplus-checkout-image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.payplus-checkout-image {
+    max-width: 100%;
+    max-height: 35px;
+    object-fit: contain;
+}
+
 .show-border {
     animation: borderChange 0.5s forwards;
 }
