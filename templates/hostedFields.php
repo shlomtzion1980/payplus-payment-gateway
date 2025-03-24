@@ -583,7 +583,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
 </head>
 
 <body>
-    <div class="container hostedFields">
+    <div class="container hostedFields" style="display: none !important;">
         <br />
         <div id="payment-form">
             <div class="hf-main">
