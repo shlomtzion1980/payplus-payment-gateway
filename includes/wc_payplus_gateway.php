@@ -2090,6 +2090,50 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $totalCartAmount += $productPrice;
             }
         }
+
+        if ($this->enableDevMode) {
+            // YourMoment Split Shipping
+            if ($shipping_splitted) {
+                $orderTotal = $order->get_total();
+                if ($order->get_total_discount()) {
+                    /* 
+                    This condition runs when the shipping is splitted and the order has the discount applied.
+                    -- What we did was to get the total shipping cost from the order total.
+                        - We performed a calculation to get the total shipping cost from the order total
+                        - Then we pushed the shipping price to the items array. 
+                        - Once we got the total shipping cost, we added just the shipping cost to the total cart amount. 
+                          The discount will be calculated by the payplus plugin itself.
+                    */
+                    $productCouponPrice = ($order->get_total_discount());
+                    if ($this->rounding_decimals != 0 && $wc_tax_enabled) {
+                        $productCouponPrice += $order->get_discount_tax();
+                    }
+                    $productCouponPrice = round($productCouponPrice, $this->rounding_decimals);
+                    $shippingTC = number_format(($orderTotal + $productCouponPrice) - $totalCartAmount, 2, '.', '');
+
+                    $itemDetails = [
+                        'name' => __('Shipping', 'payplus-payment-gateway'),
+                        'quantity' => 1,
+                        'price' => round($shippingTC, $this->rounding_decimals),
+                    ];
+                    $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                    $totalCartAmount += $shippingTC;
+                }
+                if ($totalCartAmount < $orderTotal) {
+                    if (!$order->get_total_discount()) {
+                        $productPrice = number_format($orderTotal - $totalCartAmount, 2, '.', '');
+                        $itemDetails = [
+                            'name' => __('Shipping', 'payplus-payment-gateway'),
+                            'quantity' => 1,
+                            'price' => $productPrice,
+                        ];
+                        $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                        $totalCartAmount += $productPrice;
+                    }
+                }
+            }
+            // YourMoment Split Shipping
+        }
         // coupons
 
         if (!$isAdmin && $order->get_total_discount()) {
@@ -2130,52 +2174,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ];
             $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
             $totalCartAmount += $priceGift;
-        }
-
-        if ($this->enableDevMode) {
-            // YourMoment Split Shipping
-            if ($shipping_splitted) {
-                $orderTotal = $order->get_total();
-                // Only for admin
-                // if(current_user_can('administrator')) {
-                if ($order->get_total_discount()) {
-                    /* 
-                    This condition runs when the shipping is splitted and the order has the discount applied.
-                    -- What we did was to get the total shipping cost from the order total.
-                        - We performed a calculation to get the total shipping cost from the order total
-                        - Then we pushed the shipping price to the items array. 
-                        - Once we got the total shipping cost, we added just the shipping cost to the total cart amount. 
-                          The discount will be calculated by the payplus plugin itself.
-                    */
-                    $productCouponPrice = ($order->get_total_discount());
-                    if ($this->rounding_decimals != 0 && $wc_tax_enabled) {
-                        $productCouponPrice += $order->get_discount_tax();
-                    }
-                    $productCouponPrice = round($productCouponPrice, $this->rounding_decimals);
-                    $shippingTC = number_format(($orderTotal + $productCouponPrice) - $totalCartAmount, 2, '.', '');
-
-                    $itemDetails = [
-                        'name' => __('Shipping', 'payplus-payment-gateway'),
-                        'quantity' => 1,
-                        'price' => round($shippingTC, $this->rounding_decimals),
-                    ];
-                    $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
-                    $totalCartAmount += $shippingTC;
-                }
-                if ($totalCartAmount < $orderTotal) {
-                    if (!$order->get_total_discount()) {
-                        $productPrice = number_format($orderTotal - $totalCartAmount, 2, '.', '');
-                        $itemDetails = [
-                            'name' => __('Shipping', 'payplus-payment-gateway'),
-                            'quantity' => 1,
-                            'price' => $productPrice,
-                        ];
-                        $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
-                        $totalCartAmount += $productPrice;
-                    }
-                }
-            }
-            // YourMoment Split Shipping
         }
 
         $totalCartAmount = round($totalCartAmount, $this->rounding_decimals);
