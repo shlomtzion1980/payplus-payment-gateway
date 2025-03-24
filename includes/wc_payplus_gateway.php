@@ -106,6 +106,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $isHostedEnabled;
     public $enableDevMode;
     public $enableDoubleCheckIfPruidExists;
+    protected $pwGiftCardData; // Store gift card data
 
     /**
      *
@@ -276,6 +277,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         add_filter('user_has_cap', [$this, 'payplus_disbale_page_delete'], 10, 3);
         add_filter('page_row_actions', [$this, 'payplus_remove_row_actions_post'], 10, 1);
+        add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
 
         /****** FILTER END ******/
 
@@ -297,6 +299,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_invoice_option['payplus_invoice_secret_key'] = $this->secret_key;
             update_option('payplus_invoice_option', $payplus_invoice_option);
         }
+    }
+
+    public function modify_gift_card_session_data($session_data, $gift_card_number)
+    {
+        // Modify session data if necessary
+        $this->pwGiftCardData = $session_data;
+        return $session_data;
     }
 
     /**
@@ -2152,6 +2161,25 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'price' => round($productCouponPrice, $this->rounding_decimals),
             ];
             $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+        }
+
+        if (isset($this->pwGiftCardData) && isset($this->pwGiftCardData['gift_cards']) && is_array($this->pwGiftCardData['gift_cards'])) {
+            foreach ($this->pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
+                $priceGift = 0;
+                $productPrice = -1 * ($giftCard);
+                $allProductSku .= (empty($allProductSku)) ? " ( " . $giftCardId . ")" : ' , ' . $giftCardId;
+                $priceGift += round($productPrice, $this->rounding_decimals);
+
+                $itemDetails = [
+                    'name' => __('PW Gift Card', 'payplus-payment-gateway'),
+                    'barcode' => $giftCardId,
+                    'quantity' => 1,
+                    'price' => $priceGift,
+                ];
+
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                $totalCartAmount += $priceGift;
+            }
         }
 
         $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');

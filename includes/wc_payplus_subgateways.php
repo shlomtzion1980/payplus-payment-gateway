@@ -13,6 +13,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     public $hide_other_charge_methods;
     public $allPayment;
     public $allTypePayment;
+    public $pwGiftCardData; // Store gift card data
 
     /**
      *
@@ -54,6 +55,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
 
         $this->default_charge_method = $this->payplus_default_charge_method;
         add_action('woocommerce_receipt_' . $this->id, [$this, 'receipt_page']);
+        add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
+
         if ($this->settings['enabled'] === null) {
             $this->enabled = 'no';
         }
@@ -63,6 +66,13 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         } else {
             $this->settings['sub_hide_other_charge_methods'] = "2";
         }
+    }
+
+    public function modify_gift_card_session_data($session_data, $gift_card_number)
+    {
+        // Modify session data if necessary
+        $this->pwGiftCardData = $session_data;
+        return $session_data;
     }
 
     /**
@@ -581,9 +591,10 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             );
         }
         $order = wc_get_order($order_id);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             WC()->session->set('order_awaiting_payment', $order_id);
-            $hostedClass = new WC_PayPlus_HostedFields($order_id, $order, true);
+            $hostedClass = new WC_PayPlus_HostedFields($order_id, $order, true, $this->pwGiftCardData);
         }
         return array(
             'result'   => 'success',

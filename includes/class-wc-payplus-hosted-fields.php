@@ -20,12 +20,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $isHostedStarted;
     public $isPlaceOrder;
     public $showSubmitButton;
+    public $pwGiftCardData;
 
 
     /**
      *
      */
-    public function __construct($order_id = "000", $order = null, $isPlaceOrder = false)
+    public function __construct($order_id = "000", $order = null, $isPlaceOrder = false, $pwGiftCardData = false)
     {
         $this->payPlusGateway = $this->get_main_payplus_gateway();
         $this->isHideLoaderLogo = boolval(isset($this->payPlusGateway->hostedFieldsOptions['hide_loader_logo']) && $this->payPlusGateway->hostedFieldsOptions['hide_loader_logo'] === 'yes');
@@ -39,6 +40,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->order = $order;
         $this->isPlaceOrder = $isPlaceOrder;
         $this->showSubmitButton = isset($this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button']) && $this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button'] === 'yes';
+        if ($pwGiftCardData) {
+            $this->pwGiftCardData = $pwGiftCardData;
+        }
 
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
@@ -172,6 +176,23 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $isTaxIncluded = wc_prices_include_tax();
 
         if (isset($order) && $order) {
+            $products = [];
+            if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards'])) {
+                foreach ($this->pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
+                    $priceGift = 0;
+                    $productPrice = -1 * ($giftCard);
+                    $priceGift += number_format($productPrice, 2, '.', '');
+
+                    $giftCards = [
+                        'title' => __('PW Gift Card', 'payplus-payment-gateway'),
+                        'barcode' => $giftCardId,
+                        'quantity' => 1,
+                        'priceProductWithTax' => $priceGift,
+                    ];
+
+                    $products[] = $giftCards;
+                }
+            }
             $objectProducts = $this->payPlusGateway->payplus_get_products_by_order_id($order_id);
             foreach ($objectProducts->productsItems as $item) {
                 $product = json_decode($item, true);
