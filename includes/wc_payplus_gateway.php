@@ -2051,7 +2051,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         // YourMoment Split Shipping
-        if ((isset($options['enable_dev_mode']) && $options['enable_dev_mode'] === "yes") && (WC()->session && WC()->session->has_session())) {
+        if ($this->enableDevMode && (WC()->session && WC()->session->has_session())) {
             $shipping_splitted = WC()->session->get('shipping_splitted');
             // Handle the case where 'shipping_splitted' is null
             if (is_null($shipping_splitted)) {
@@ -2132,7 +2132,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $totalCartAmount += $priceGift;
         }
 
-        if (isset($options['enable_dev_mode']) && $options['enable_dev_mode'] === "yes") {
+        if ($this->enableDevMode) {
             // YourMoment Split Shipping
             if ($shipping_splitted) {
                 $orderTotal = $order->get_total();
