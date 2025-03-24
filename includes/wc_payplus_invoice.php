@@ -1081,7 +1081,17 @@ class PayplusInvoice
                         $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
                     }
 
-                    $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+                    $payplusPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload');
+                    if (!empty($payplusPayload)) {
+                        $payloadArray = json_decode($payplusPayload, true);
+                        $itemsAsJson['productsItems'] = array_map(function ($item) {
+                            return json_encode($item);
+                        }, $payloadArray['items']);
+                        $itemsAsJson['amount'] = $payloadArray['amount'];
+                        $objectProducts = (object)$itemsAsJson;
+                    } else {
+                        $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+                    }
 
                     $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
                     $payplusBalanceNames = $objectProducts->balanceNames;
