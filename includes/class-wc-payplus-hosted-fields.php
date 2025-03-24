@@ -172,41 +172,21 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $isTaxIncluded = wc_prices_include_tax();
 
         if (isset($order) && $order) {
-            $order_items = $order->get_items();
-
-            foreach ($order_items as $item_id => $item) {
-                $productId = $item['product_id'];
-                $product = $item->get_product();
-                $product_name = $item->get_name();
-                $product_quantity = $item->get_quantity();
-                $product_total = $item->get_total();
-                $product_subtotal = $item->get_subtotal();
-                $product_sku = ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId;
-                $product_price = $product ? $product->get_price() : 0;
-
-                // Check if the product is a variation
-                if ($product && $product->is_type('variation')) {
-                    $parent_product = wc_get_product($product->get_parent_id());
-                    $product_name = $parent_product->get_name() . ' - ' . wc_get_formatted_variation($product->get_variation_attributes(), true);
-                    $product_sku = $product_sku ? $product_sku : $parent_product->get_sku();
-                }
-
-                $productVat = 0;
-
-                if ($wc_tax_enabled) {
-                    $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
-                    $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
-                    $productVat = $this->vat4All ? 0 : $productVat;
-                }
+            $objectProducts = $this->payPlusGateway->payplus_get_products_by_order_id($order_id);
+            foreach ($objectProducts->productsItems as $item) {
+                $product = json_decode($item, true);
+                $productId = isset($product['barcode']) ? $product['barcode'] : str_replace(' ', '', $product['name']);
+                $product_name = $product['name'];
+                $product_quantity = $product['quantity'];
+                $product_total = $product['price'];
+                $productVat = isset($product['vat_type']) ? $product['vat_type'] : 0;
 
                 $products[] = array(
                     'title' => $product_name,
-                    'priceProductWithTax' => number_format(wc_get_price_including_tax($product), 2, '.', ''),
-                    'priceProductWithoutTax' => number_format(wc_get_price_excluding_tax($product), 2, '.', ''),
-                    'barcode' => $product_sku,
+                    'priceProductWithTax' => number_format($product_total, 2, '.', ''),
+                    'barcode' => $productId,
                     'quantity' => $product_quantity,
                     'vat_type' => $productVat,
-                    'org_product_tax' => $product->get_tax_status(),
                 );
             }
         } elseif (count($cart)) {
@@ -323,80 +303,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order_id = $order_id === "000" ? $this->updateOrderId($randomHash) : $order_id;
         $data->more_info = $order_id;
 
-        $shippingPrice = 0;
         if ($order_id !== "000" && isset($order) && $order) {
             WC()->session->set('order_awaiting_payment', $order_id);
-            $shipping_items = $order->get_items('shipping');
-            if ($this->payPlusGateway->add_product_field_transaction_type) {
-                if ($this->payPlusGateway->payplus_check_all_product($order, "2")) {
-                    $data->charge_method = 2;
-                } elseif ($this->payPlusGateway->payplus_check_all_product($order, "1")) {
-                    $data->charge_method = 1;
-                }
-            }
-            // Check if there are shipping items
-            if (! empty($shipping_items)) {
-
-                foreach ($shipping_items as $shipping_item) {
-                    // Get the shipping method ID (e.g., 'flat_rate:1')
-                    $method_id = $shipping_item->get_method_id();
-
-                    // Get the shipping method title (e.g., 'Flat Rate')
-                    $method_title = $shipping_item->get_method_title();
-                    $shipping_cost = $shipping_item->get_total();
-                    $shipping_taxes = $shipping_item->get_taxes();
-
-                    $shipping_tax_total = $wc_tax_enabled ? array_sum($shipping_taxes['total']) : 0;
-
-                    $item = new stdClass();
-                    $item->name = $method_title;
-                    $item->quantity = 1;
-                    $item->price = $shipping_cost + array_sum($shipping_taxes['total']);
-                    $shippingPrice = $item->price;
-                    $item->vat_type = $shipping_tax_total > 0 ? 1 : 0;
-                    $data->items[] = $item;
-                }
-            }
-
-            $totalAmount = 0;
-            foreach ($data->items as $item) {
-                $totalAmount += $item->price * $item->quantity;
-            }
-            $totalBeforeDiscount = $totalAmount - $shippingPrice;
-
-            $coupon_items = $order->get_items('coupon');
-            foreach ($coupon_items as $coupon_item_id => $coupon_item) {
-                // Retrieve details
-                $coupon_code = $coupon_item->get_code(); // The coupon code
-                $discount = $coupon_item->get_discount(); // Discount amount
-                $discount_tax = $coupon_item->get_discount_tax(); // Discount tax amount
-
-                $item = new stdClass();
-                $item->name = "coupon_discount_$coupon_code";
-                $item->quantity = 1;
-                $item->price = -number_format($discount + $discount_tax, 2, '.', '');
-                $item->vat_type = -$discount_tax > 0 ? 1 : 0;
-                $data->items[] = $item;
-            }
-
-            $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');
-            $updated_as_fee = $order->get_meta('ywgc_gift_card_updated_as_fee');
-            $priceGift = 0;
-            $allProductSku = "";
-            if ($gift_cards && $updated_as_fee == false) {
-
-                foreach ($gift_cards as $key => $gift) {
-                    $productPrice = -1 * ($gift);
-                    $allProductSku .= (empty($allProductSku)) ? " ( " . $key : ' , ' . $key;
-                    $priceGift += number_format($productPrice,  2, '.', '');
-                }
-
-                $item = new stdClass();
-                $item->name = "coupon_discount_$allProductSku";
-                $item->quantity = 1;
-                $item->price = number_format($priceGift, 2, '.', '');
-                $data->items[] = $item;
-            }
         }
 
         $totalAmount = 0;
