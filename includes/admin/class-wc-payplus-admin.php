@@ -927,6 +927,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payload['device_uid'] = $this->device_uid;
                 $chargeMethod = $payload['charge_method'];
                 unset($payload['payment_page_uid']);
+                ///check this!
             }
             $paymentUrl = !$deviceTransaction ? $this->payment_url : $this->devicePaymentUrl;
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);

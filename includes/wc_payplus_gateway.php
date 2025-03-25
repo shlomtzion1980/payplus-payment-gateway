@@ -2378,7 +2378,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $json_move_token . '}';
         $payloadArray = json_decode($payload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
-        $payload = wp_json_encode($payloadArray);
+        $payload = wp_json_encode($payloadArray, JSON_UNESCAPED_UNICODE);
         return $payload;
     }
 

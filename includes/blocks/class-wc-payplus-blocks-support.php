@@ -271,7 +271,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $data->amount = number_format($totalAmount, 2, '.', '');
 
-        $payload = wp_json_encode($data);
+        $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]) : null;
         if (WC()->session->get('hostedPayload') === $payload) {
             // WC()->session->set('hostedStarted', false);
