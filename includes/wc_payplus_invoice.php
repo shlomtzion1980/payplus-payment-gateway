@@ -1082,11 +1082,25 @@ class PayplusInvoice
                     }
 
                     $payplusPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload');
-                    if (!empty($payplusPayload)) {
+                    $payPlusPwGiftCards = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+                    if (!empty($payPlusPwGiftCards) && !empty($payplusPayload)) {
                         $payloadArray = json_decode($payplusPayload, true);
-                        $itemsAsJson['productsItems'] = array_map(function ($item) {
-                            return json_encode($item);
-                        }, $payloadArray['items']);
+                        $itemsAsJson = [];
+                        foreach ($payloadArray['items'] as $key => $item) {
+                            $itemsAsJson['productsItems'][$key]['name'] = $item['name'];
+                            $itemsAsJson['productsItems'][$key]['price'] = $item['price'];
+                            $itemsAsJson['productsItems'][$key]['barcode'] = $item['barcode'];
+                            $itemsAsJson['productsItems'][$key]['quantity'] = $item['quantity'];
+                            if (isset($item['vat_type'])) {
+                                $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type'];
+                            } else {
+                                isset($item['vat_type_code']) ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type_code'] : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                            }
+                            $itemsAsJson['productsItems'][$key]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-exempt';
+                            if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
+                                $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                            }
+                        }
                         $itemsAsJson['amount'] = $payloadArray['amount'];
                         $objectProducts = (object)$itemsAsJson;
                     } else {
@@ -1094,7 +1108,7 @@ class PayplusInvoice
                     }
 
                     $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
-                    $payplusBalanceNames = $objectProducts->balanceNames;
+                    $payplusBalanceNames = isset($objectProducts->balanceNames) ? $objectProducts->balanceNames : null;
                     $productsItems = $objectProducts->productsItems;
                     $payload['currency_code'] = $order->get_currency();
                     $payload['autocalculate_rate'] = true;

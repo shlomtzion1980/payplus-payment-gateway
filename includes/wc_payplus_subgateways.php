@@ -591,7 +591,9 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             );
         }
         $order = wc_get_order($order_id);
-        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
+        if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
+        }
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             WC()->session->set('order_awaiting_payment', $order_id);
             $hostedClass = new WC_PayPlus_HostedFields($order_id, $order, true, $this->pwGiftCardData);

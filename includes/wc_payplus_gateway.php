@@ -1533,6 +1533,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
 
+        if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
+        }
+
         $objectLogging = new stdClass();
         $objectLogging->keyHandle = 'payplus_payment_using_token';
         $objectLogging->msg = array();

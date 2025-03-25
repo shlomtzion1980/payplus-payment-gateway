@@ -1893,21 +1893,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $resultApps = $this->payPlusInvoice->payplus_get_payments($orderId, 'otherClub');
         $checkInvoiceRefundSend = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_send_refund', true);
         $sum = 0;
-
-        // $payplusPayload = WC_PayPlus_Meta_Data::get_meta($orderId, 'payplus_payload', true);
-        // echo '<pre>';
-        // $payloadArray = json_decode($payplusPayload, true);
-        // print_r($payloadArray);
-        // $itemsAsJson['productsItems'] = array_map(function ($item) {
-        //     return json_encode(wp_unslash($item));
-        // }, $payloadArray['items']);
-        // $itemsAsJson['amount'] = $payloadArray['amount'];
-        // $objectProducts = (object)$itemsAsJson;
-
-        // print_r($objectProducts);
-        // $objectProducts = $this->payplus_get_products_by_order_id($orderId);
-        // print_r($objectProducts);
-        // die;
         $sumTransactionRefund = array_reduce($resultApps, function ($sum, $item) {
             return $sum + $item->invoice_refund;
         });
