@@ -924,10 +924,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             if ($deviceTransaction) {
                 $payload = json_decode($payload, true);
                 $payload['credit_terms'] = 1;
+                $payload['products'] = $payload['items'];
+                unset($payload['items']);
                 $payload['device_uid'] = $this->device_uid;
                 $chargeMethod = $payload['charge_method'];
                 unset($payload['payment_page_uid']);
-                ///check this!
+                $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
             }
             $paymentUrl = !$deviceTransaction ? $this->payment_url : $this->devicePaymentUrl;
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
