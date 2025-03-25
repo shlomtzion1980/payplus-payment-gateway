@@ -349,7 +349,7 @@ class PayplusInvoice
 
         $payloadInvoiceData && isset($payloadInvoiceData['customer']['balance_name']) ? $payplusBalanceNames[0] = $payloadInvoiceData['customer']['balance_name'] : $payplusBalanceNames = $objectProducts->balanceNames;
 
-        if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
+        if ($WC_PayPlus_Gateway->balance_name && isset($payplusBalanceNames) && count($payplusBalanceNames)) {
             if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
                 $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
             }
@@ -1223,7 +1223,7 @@ class PayplusInvoice
                         $payload['payments'][0]['amount'] = $dual * $order->get_total();
                     }
 
-                    if ($WC_PayPlus_Gateway->balance_name && count($payplusBalanceNames)) {
+                    if (isset($WC_PayPlus_Gateway->balance_name) && $WC_PayPlus_Gateway->balance_name && isset($payplusBalanceNames) && count($payplusBalanceNames)) {
                         if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
                             $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
                         } else {
