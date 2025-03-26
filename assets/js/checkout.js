@@ -10,6 +10,7 @@ jQuery(function ($) {
     let payPlusMain = "payment_method_payplus-payment-gateway";
     let payPlusHosted = "payment_method_payplus-payment-gateway-hostedfields";
     let inputPayPlus = payPlusHosted;
+    var $hostedDiv = jQuery("body > div.container.hostedFields");
 
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = Object.keys(payplus_script_checkout.hasSavedTokens);
@@ -38,7 +39,6 @@ jQuery(function ($) {
 
     if (payplus_script_checkout.isHostedFields) {
         // Add save token checkbox to hosted fields container //
-        var $hostedDiv = jQuery("body > div.container.hostedFields");
         var $checkbox = $(
             '<p class="hf-save form-row">' +
                 '<label for="save_token_checkbox">' +
@@ -55,12 +55,14 @@ jQuery(function ($) {
             : null;
 
         if (hasSavedCCs.length === 0) {
+            console.log("No saved cards");
             setTimeout(function () {
-                $("input#" + inputPayPlus).prop("checked", true);
+                // $("input#" + inputPayPlus).prop("checked", true);
                 // $("#submit-payment").hide();
-                $("div.container.hostedFields").show();
+                // $("div.container.hostedFields").show();
             }, 2000);
         } else {
+            console.log("Saved cards");
             setTimeout(function () {
                 $(".payment_method_payplus-payment-gateway").css(
                     "display",
@@ -68,7 +70,7 @@ jQuery(function ($) {
                 );
                 $("input#" + inputPayPlus).prop("checked", false);
                 if ($("input#" + inputPayPlus).prop("checked")) {
-                    $("div.container.hostedFields").show();
+                    // $("div.container.hostedFields").show();
                     //   $("#submit-payment").hide();
                 }
                 const mainPayPlus = "payment_method_payplus-payment-gateway";
@@ -79,7 +81,7 @@ jQuery(function ($) {
             // Check if the hosted fields radio input is NOT checked
             if (!$("input#" + inputPayPlus).is(":checked")) {
                 // $("#submit-payment").hide();
-                $("div.container.hostedFields").show();
+                // $("div.container.hostedFields").show();
                 $(".container.hostedFields").hide();
                 // $("button#place_order").show();
             } else {
@@ -601,6 +603,7 @@ jQuery(function ($) {
                             putHostedFields(inputPayPlus, hostedIsMain);
                         }
                         wc_checkout_form.fragments = data.fragments;
+                        console.log($hostedDiv.parent().attr("class"));
                     }
                     var coupons = [];
                     var couponCode;
