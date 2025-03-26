@@ -597,6 +597,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             WC()->session->set('order_awaiting_payment', $order_id);
             $hostedClass = new WC_PayPlus_HostedFields($order_id, $order, true, $this->pwGiftCardData);
+            $this->pwGiftCardData = false;
         }
         return array(
             'result'   => 'success',

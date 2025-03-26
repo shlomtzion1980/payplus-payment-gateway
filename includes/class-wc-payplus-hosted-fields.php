@@ -192,6 +192,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
                     $products[] = $giftCards;
                 }
+                $this->pwGiftCardData['gift_cards'] = false;
             }
             $objectProducts = $this->payPlusGateway->payplus_get_products_by_order_id($order_id);
             foreach ($objectProducts->productsItems as $item) {
