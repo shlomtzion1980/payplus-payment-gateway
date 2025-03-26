@@ -11,6 +11,7 @@ jQuery(function ($) {
     let payPlusHosted = "payment_method_payplus-payment-gateway-hostedfields";
     let inputPayPlus = payPlusHosted;
     var $hostedDiv = jQuery("body > div.container.hostedFields");
+    let firstTime = true;
 
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = Object.keys(payplus_script_checkout.hasSavedTokens);
@@ -39,61 +40,56 @@ jQuery(function ($) {
 
     function hostedFieldsSetup() {
         if (payplus_script_checkout.isHostedFields) {
-            console.log($hostedDiv.parent().attr("class"));
-            // Add save token checkbox to hosted fields container //
-            var $checkbox = $(
-                '<p class="hf-save form-row">' +
-                    '<label for="save_token_checkbox">' +
-                    '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
-                    " " +
-                    payplus_script_checkout.saveCreditCard +
-                    "</label>" +
-                    "</p>"
-            );
+            if(firstTime){
+                firstTime = false;
+                console.log($hostedDiv.parent().attr("class"));
+                // Add save token checkbox to hosted fields container //
+                var $checkbox = $(
+                    '<p class="hf-save form-row">' +
+                        '<label for="save_token_checkbox">' +
+                        '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
+                        " " +
+                        payplus_script_checkout.saveCreditCard +
+                        "</label>" +
+                        "</p>"
+                );
 
-            payplus_script_checkout.isLoggedIn &&
-            payplus_script_checkout.isSavingCerditCards
-                ? $hostedDiv.append($checkbox)
-                : null;
+                payplus_script_checkout.isLoggedIn &&
+                payplus_script_checkout.isSavingCerditCards
+                    ? $hostedDiv.append($checkbox)
+                    : null;
 
-            if (hasSavedCCs.length === 0) {
-                console.log("No saved cards");
-                setTimeout(function () {
-                    $("input#" + inputPayPlus).prop("checked", true);
-                    // $("#submit-payment").hide();
-                    $("div.container.hostedFields").show();
-                }, 2000);
-            } /*else {
-                console.log("Saved cards");
-                setTimeout(function () {
-                    $(".payment_method_payplus-payment-gateway").css(
-                        "display",
-                        "block"
-                    );
-                    $("input#" + inputPayPlus).prop("checked", false);
-                    if ($("input#" + inputPayPlus).prop("checked")) {
-                        alert("showing");
+                if (hasSavedCCs.length === 0) {
+                    console.log("No saved cards");
+                    setTimeout(function () {
+                        $("input#" + inputPayPlus).prop("checked", true);
                         $("div.container.hostedFields").show();
-                        //   $("#submit-payment").hide();
-                    }
-                    const mainPayPlus =
-                        "payment_method_payplus-payment-gateway";
-                    $("input#" + mainPayPlus).prop("checked", true);
-                }, 2000);
-            }*/
+                    }, 1000);
+                } else {
+                    console.log("Saved cards");
+                    setTimeout(function () {
+                        $(".payment_method_payplus-payment-gateway").css(
+                            "display",
+                            "block"
+                        );
+                        $("input#" + inputPayPlus).removeAttr("checked");
+                        $(".container.hostedFields").hide();
+                        $(".payment_box.payment_method_payplus-payment-gateway-hostedfields").hide();
+                        const mainPayPlus =
+                            "payment_method_payplus-payment-gateway";
+                        $("input#" + mainPayPlus).prop("checked", true);
+                    }, 1000);
+                }
+            }
             $(document).on(
                 "change",
                 'input[name="payment_method"]',
                 function () {
                     // Check if the hosted fields radio input is NOT checked
                     if (!$("input#" + inputPayPlus).is(":checked")) {
-                        // $("#submit-payment").hide();
-                        // $("div.container.hostedFields").show();
                         $(".container.hostedFields").hide();
-                        // $("button#place_order").show();
                     } else {
                         $("div.container.hostedFields").show();
-                        // $("#submit-payment").hide();
                     }
                 }
             );
