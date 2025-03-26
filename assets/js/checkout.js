@@ -37,58 +37,67 @@ jQuery(function ($) {
         });
     }
 
-    if (payplus_script_checkout.isHostedFields) {
-        // Add save token checkbox to hosted fields container //
-        var $checkbox = $(
-            '<p class="hf-save form-row">' +
-                '<label for="save_token_checkbox">' +
-                '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
-                " " +
-                payplus_script_checkout.saveCreditCard +
-                "</label>" +
-                "</p>"
-        );
+    function hostedFieldsSetup() {
+        if (payplus_script_checkout.isHostedFields) {
+            console.log($hostedDiv.parent().attr("class"));
+            // Add save token checkbox to hosted fields container //
+            var $checkbox = $(
+                '<p class="hf-save form-row">' +
+                    '<label for="save_token_checkbox">' +
+                    '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
+                    " " +
+                    payplus_script_checkout.saveCreditCard +
+                    "</label>" +
+                    "</p>"
+            );
 
-        payplus_script_checkout.isLoggedIn &&
-        payplus_script_checkout.isSavingCerditCards
-            ? $hostedDiv.append($checkbox)
-            : null;
+            payplus_script_checkout.isLoggedIn &&
+            payplus_script_checkout.isSavingCerditCards
+                ? $hostedDiv.append($checkbox)
+                : null;
 
-        if (hasSavedCCs.length === 0) {
-            console.log("No saved cards");
-            setTimeout(function () {
-                // $("input#" + inputPayPlus).prop("checked", true);
-                // $("#submit-payment").hide();
-                // $("div.container.hostedFields").show();
-            }, 2000);
-        } else {
-            console.log("Saved cards");
-            setTimeout(function () {
-                $(".payment_method_payplus-payment-gateway").css(
-                    "display",
-                    "block"
-                );
-                $("input#" + inputPayPlus).prop("checked", false);
-                if ($("input#" + inputPayPlus).prop("checked")) {
-                    // $("div.container.hostedFields").show();
-                    //   $("#submit-payment").hide();
+            if (hasSavedCCs.length === 0) {
+                console.log("No saved cards");
+                setTimeout(function () {
+                    $("input#" + inputPayPlus).prop("checked", true);
+                    // $("#submit-payment").hide();
+                    $("div.container.hostedFields").show();
+                }, 2000);
+            } /*else {
+                console.log("Saved cards");
+                setTimeout(function () {
+                    $(".payment_method_payplus-payment-gateway").css(
+                        "display",
+                        "block"
+                    );
+                    $("input#" + inputPayPlus).prop("checked", false);
+                    if ($("input#" + inputPayPlus).prop("checked")) {
+                        alert("showing");
+                        $("div.container.hostedFields").show();
+                        //   $("#submit-payment").hide();
+                    }
+                    const mainPayPlus =
+                        "payment_method_payplus-payment-gateway";
+                    $("input#" + mainPayPlus).prop("checked", true);
+                }, 2000);
+            }*/
+            $(document).on(
+                "change",
+                'input[name="payment_method"]',
+                function () {
+                    // Check if the hosted fields radio input is NOT checked
+                    if (!$("input#" + inputPayPlus).is(":checked")) {
+                        // $("#submit-payment").hide();
+                        // $("div.container.hostedFields").show();
+                        $(".container.hostedFields").hide();
+                        // $("button#place_order").show();
+                    } else {
+                        $("div.container.hostedFields").show();
+                        // $("#submit-payment").hide();
+                    }
                 }
-                const mainPayPlus = "payment_method_payplus-payment-gateway";
-                $("input#" + mainPayPlus).prop("checked", true);
-            }, 2000);
+            );
         }
-        $(document).on("change", 'input[name="payment_method"]', function () {
-            // Check if the hosted fields radio input is NOT checked
-            if (!$("input#" + inputPayPlus).is(":checked")) {
-                // $("#submit-payment").hide();
-                // $("div.container.hostedFields").show();
-                $(".container.hostedFields").hide();
-                // $("button#place_order").show();
-            } else {
-                $("div.container.hostedFields").show();
-                // $("#submit-payment").hide();
-            }
-        });
     }
 
     var wc_checkout_form = {
@@ -603,7 +612,11 @@ jQuery(function ($) {
                             putHostedFields(inputPayPlus, hostedIsMain);
                         }
                         wc_checkout_form.fragments = data.fragments;
-                        console.log($hostedDiv.parent().attr("class"));
+                        if (
+                            $hostedDiv.parent().attr("class") === "pp_iframe_h"
+                        ) {
+                            hostedFieldsSetup();
+                        }
                     }
                     var coupons = [];
                     var couponCode;
