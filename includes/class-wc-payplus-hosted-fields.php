@@ -192,7 +192,6 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
                     $products[] = $giftCards;
                 }
-                $this->pwGiftCardData['gift_cards'] = false;
             }
             $objectProducts = $this->payPlusGateway->payplus_get_products_by_order_id($order_id);
             foreach ($objectProducts->productsItems as $item) {
@@ -315,7 +314,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $item->quantity = $product['quantity'];
             $item->barcode = $product['barcode'];
             $item->price = $product['priceProductWithTax'];
-            isset($product['vat_type']) ? $item->vat_type = $product['vat_type'] : $payingVat;
+            isset($product['vat_type']) ? $item->vat_type = $product['vat_type'] : $item->vat_type = $payingVat;
             $data->items[] = $item;
         }
 
