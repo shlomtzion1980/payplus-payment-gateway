@@ -442,19 +442,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $status = "";
                     if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
                         if ($responseBody['data']['type'] === 'Charge') {
-                            // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-processing', $transactionUid);
-                            // $order->update_status('wc-processing');
-                            // $status = 'processing';
-                            // if ($this->saveOrderNote) {
-                            //     $order->add_order_note(
-                            //         $successNote
-                            //     );
-                            // }
                             if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
                                 $order->payment_complete();
                             }
-
                             if ($this->successful_order_status !== 'default-woo') {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
                                 $order->update_status($this->successful_order_status);
