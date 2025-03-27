@@ -277,7 +277,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         add_filter('user_has_cap', [$this, 'payplus_disbale_page_delete'], 10, 3);
         add_filter('page_row_actions', [$this, 'payplus_remove_row_actions_post'], 10, 1);
-        add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
 
         /****** FILTER END ******/
 
@@ -299,13 +298,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_invoice_option['payplus_invoice_secret_key'] = $this->secret_key;
             update_option('payplus_invoice_option', $payplus_invoice_option);
         }
-    }
-
-    public function modify_gift_card_session_data($session_data, $gift_card_number)
-    {
-        // Modify session data if necessary
-        $this->pwGiftCardData = $session_data;
-        return $session_data;
     }
 
     /**
@@ -1532,6 +1524,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
+
+        $payplus_instance = WC_PayPlus::get_instance();
+        $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);

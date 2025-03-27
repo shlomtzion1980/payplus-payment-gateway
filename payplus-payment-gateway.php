@@ -41,6 +41,7 @@ class WC_PayPlus
     public $shipping_woo_js;
     public $disableCartHashCheck;
     public $updateStatusesIpn;
+    public $pwGiftCardData;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -89,6 +90,7 @@ class WC_PayPlus
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
         add_filter('cron_schedules', [$this, 'payplus_add_custom_cron_schedule']);
+        add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
 
         if (boolval($this->isPayPlus && isset($this->payplus_payment_gateway_settings->payplus_cron_service) && $this->payplus_payment_gateway_settings->payplus_cron_service === 'yes')) {
             $this->payPlusCronActivate();
@@ -101,6 +103,13 @@ class WC_PayPlus
         } else {
             $this->payPlusCronDeactivate();
         }
+    }
+
+    public function modify_gift_card_session_data($session_data, $gift_card_number)
+    {
+        // Modify session data if necessary
+        $this->pwGiftCardData = $session_data;
+        return $session_data;
     }
 
     public function wc_payplus_check_version()

@@ -314,7 +314,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $item->quantity = $product['quantity'];
             $item->barcode = $product['barcode'];
             $item->price = $product['priceProductWithTax'];
-            isset($product['vat_type']) ? $item->vat_type = $product['vat_type'] : $item->vat_type = $payingVat;
+            isset($product['vat_type']) ? $item->vat_type = $product['vat_type'] : $payingVat;
             $data->items[] = $item;
         }
 
