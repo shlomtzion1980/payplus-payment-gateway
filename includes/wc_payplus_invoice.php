@@ -32,6 +32,8 @@ class PayplusInvoice
     private $invoice_notes_no;
     private $invoiceDisplayOnly;
     private $_wpnonce;
+    public $couponAsProduct;
+
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
      *
@@ -48,9 +50,8 @@ class PayplusInvoice
         $this->payplus_gateway_option = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->payplus_invoice_option = get_option('payplus_invoice_option');
         $this->invoiceDisplayOnly = isset($this->payplus_invoice_option['display_only_invoice_docs']) && $this->payplus_invoice_option['display_only_invoice_docs'] === 'yes' ? true : false;
-
+        $this->couponAsProduct = isset($this->payplus_invoice_option['coupon_as_product']) && $this->payplus_invoice_option['coupon_as_product'] === 'yes' ? true : false;
         $this->hide_products_invoice = isset($this->payplus_invoice_option['hide_products_invoice']) ? boolval($this->payplus_invoice_option['hide_products_invoice'] === 'yes') : null;
-
         $this->invoice_notes_no = isset($this->payplus_invoice_option['invoices_notes_no']) && $this->payplus_invoice_option['invoices_notes_no'] === 'yes' ? true : false;
 
         $this->payplus_invoice_api_key = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? $this->payplus_gateway_option['dev_api_key'] ?? null : $this->payplus_gateway_option['api_key'] ?? null;
@@ -681,7 +682,7 @@ class PayplusInvoice
         $allProductSku = "";
         $temptax = payplus_woocommerce_get_tax_rates($order);
         $isAdmin = is_admin();
-        $items = $order->get_items(['line_item', 'fee', 'coupon']);
+        $items = $this->couponAsProduct ? $order->get_items(['line_item', 'fee', 'coupon']) : $order->get_items(['line_item', 'fee']);
         $tax = 1;
         $wc_tax_enabled = wc_tax_enabled();
         $isTaxIncluded = wc_prices_include_tax();
@@ -709,7 +710,7 @@ class PayplusInvoice
                 'autop' => false
             ));
 
-            if ($item_data['type'] == "coupon") {
+            if ($this->couponAsProduct && $item_data['type'] === "coupon") {
                 $allProductSku .= (empty($allProductSku)) ? " ( " . $name : ' , ' . $name;
             } else {
                 if ($item_data['type'] == "fee") {
@@ -735,7 +736,7 @@ class PayplusInvoice
                         }
                         $productPrice *= $dual;
                         $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
-                        if ($isAdmin && $item_data->get_subtotal() !== $item_data->get_total()) {
+                        if (!$this->couponAsProduct && $item_data->get_subtotal() !== $item_data->get_total()) {
                             $discount = (($item_data->get_subtotal() - $item_data->get_total()) * $tax);
                             if ($dual == -1) {
                                 $discount *= $dual;
@@ -823,10 +824,9 @@ class PayplusInvoice
             }
             $productsItems[] = $itemDetails;
             $totalCartAmount += $productPrice;
-            // }
-
         }
-        if (!$isAdmin && $order->get_total_discount()) {
+
+        if ($this->couponAsProduct && $order->get_total_discount()) {
             $productCouponPrice = ($order->get_total_discount());
             if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
                 $productCouponPrice += $order->get_discount_tax();
@@ -844,6 +844,7 @@ class PayplusInvoice
             ];
             $productsItems[] = $itemDetails;
         }
+
         if ($WC_PayPlus_Gateway->rounding_decimals == 0 && $order->get_total_tax()) {
             $productPrice = round($order->get_total_tax(), $WC_PayPlus_Gateway->rounding_decimals);
             $productPrice *= $dual;
@@ -1086,25 +1087,32 @@ class PayplusInvoice
                     if (!empty($payPlusPwGiftCards) && !empty($payplusPayload)) {
                         $payloadArray = json_decode($payplusPayload, true);
                         $itemsAsJson = [];
+                        $totalPWAmount = 0;
                         foreach ($payloadArray['items'] as $key => $item) {
-                            $itemsAsJson['productsItems'][$key]['name'] = $item['name'];
-                            $itemsAsJson['productsItems'][$key]['price'] = $item['price'];
-                            $itemsAsJson['productsItems'][$key]['barcode'] = $item['barcode'];
-                            $itemsAsJson['productsItems'][$key]['quantity'] = $item['quantity'];
-                            if (isset($item['vat_type'])) {
-                                $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type'];
-                            } else {
-                                isset($item['vat_type_code']) ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type_code'] : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                            if (strpos($item['name'], 'PW Gift Card') !== false) {
+                                $itemsAsJson['productsItems'][$key]['name'] = $item['name'];
+                                $itemsAsJson['productsItems'][$key]['price'] = $item['price'];
+                                $itemsAsJson['productsItems'][$key]['barcode'] = $item['barcode'];
+                                $itemsAsJson['productsItems'][$key]['quantity'] = $item['quantity'];
+                                if (isset($item['vat_type'])) {
+                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type'];
+                                } else {
+                                    isset($item['vat_type_code']) ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type_code'] : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                                }
+                                $itemsAsJson['productsItems'][$key]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-exempt';
+                                if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
+                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                                }
+                                $totalPWAmount += $item['price'];
                             }
-                            $itemsAsJson['productsItems'][$key]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-exempt';
-                            if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
-                                $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
-                            }
+                            $objectProductsPW = (object)$itemsAsJson;
                         }
-                        $itemsAsJson['amount'] = $payloadArray['amount'];
-                        $objectProducts = (object)$itemsAsJson;
-                    } else {
-                        $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+                    }
+
+                    $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+                    if (isset($objectProductsPW)) {
+                        $objectProducts = (object) array_merge_recursive((array) $objectProducts, (array) $objectProductsPW);
+                        $objectProducts->amount += $totalPWAmount;
                     }
 
                     $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);

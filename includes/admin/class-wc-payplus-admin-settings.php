@@ -493,6 +493,15 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 ];
                 $settings[$section][] = [
+                    'title' => __('Coupon as product', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Display coupons as products with negative value in document.', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'desc_tip' => true,
+                    'id' => 'payplus_invoice_option[coupon_as_product]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
                     'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [
