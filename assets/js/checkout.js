@@ -40,7 +40,7 @@ jQuery(function ($) {
 
     function hostedFieldsSetup() {
         if (payplus_script_checkout.isHostedFields) {
-            if(firstTime){
+            if (firstTime) {
                 firstTime = false;
                 console.log($hostedDiv.parent().attr("class"));
                 // Add save token checkbox to hosted fields container //
@@ -60,13 +60,11 @@ jQuery(function ($) {
                     : null;
 
                 if (hasSavedCCs.length === 0) {
-                    console.log("No saved cards");
                     setTimeout(function () {
                         $("input#" + inputPayPlus).prop("checked", true);
                         $("div.container.hostedFields").show();
                     }, 1000);
                 } else {
-                    console.log("Saved cards");
                     setTimeout(function () {
                         $(".payment_method_payplus-payment-gateway").css(
                             "display",
@@ -74,7 +72,9 @@ jQuery(function ($) {
                         );
                         $("input#" + inputPayPlus).removeAttr("checked");
                         $(".container.hostedFields").hide();
-                        $(".payment_box.payment_method_payplus-payment-gateway-hostedfields").hide();
+                        $(
+                            ".payment_box.payment_method_payplus-payment-gateway-hostedfields"
+                        ).hide();
                         const mainPayPlus =
                             "payment_method_payplus-payment-gateway";
                         $("input#" + mainPayPlus).prop("checked", true);
