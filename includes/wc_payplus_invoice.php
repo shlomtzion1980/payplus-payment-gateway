@@ -1191,6 +1191,22 @@ class PayplusInvoice
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
                     $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
+                    if (isset($payload['payments'][0]['payment_app']) && $payload['payments'][0]['payment_app'] === "-1") {
+                        $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                        $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
+                        if (is_array($payPlusResponse)) {
+                            $payments = [];
+                            $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'];
+                            for ($c = 0; $c < $numberOfPayments; $c++) {
+                                isset($payPlusResponse['method']) ? $payments[$c]['payment_type'] = $payPlusResponse['method'] : null;
+                                isset($payPlusResponse['amount']) ? $payments[$c]['amount'] = $payPlusResponse['amount'] : null;
+                                isset($payPlusResponse['brand_name']) ? $payments[$c]['card_type'] = $payPlusResponse['brand_name'] : null;
+                                isset($payPlusResponse['four_digits']) ? $payments[$c]['four_digits'] =  $payPlusResponse['four_digits'] : null;
+                            }
+                            $payload['payments'] = $payments;
+                        }
+                    }
+
                     if ($j5Amount) {
                         $payload['items'] = $productsItems;
                         $totalJ5ItemsAmount = 0;
