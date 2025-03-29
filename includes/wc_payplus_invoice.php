@@ -1196,7 +1196,7 @@ class PayplusInvoice
                         $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
                         if (is_array($payPlusResponse)) {
                             $payments = [];
-                            $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'];
+                            $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'] ?? 1;
                             for ($c = 0; $c < $numberOfPayments; $c++) {
                                 isset($payPlusResponse['method']) ? $payments[$c]['payment_type'] = $payPlusResponse['method'] : null;
                                 isset($payPlusResponse['amount']) ? $payments[$c]['amount'] = $payPlusResponse['amount'] : null;
