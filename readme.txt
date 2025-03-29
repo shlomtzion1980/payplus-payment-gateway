@@ -88,7 +88,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.7.1 - 23-03-2025 =
 
-- Tweak - Adjusted custom icon sizes for better display.
+- Tweak - Adjusted custom icon (payplus gateway on checkout) sizes for better display.
 - Added - Support for percentage-based coupons.
 - Fix   - Corrected implementation of Partners mode for certain integrations.
 - Tweak - Resolved display issues with PayPlus Embedded.

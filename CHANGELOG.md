@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [7.7.1] - 30-03-2025 - (Ippo)
 
-- Tweak - Adjusted custom icon sizes for better display.
+- Tweak - Adjusted custom icons (payplus gateway on checkout) sizes for better display.
 - Added - Support for percentage-based coupons.
 - Fix   - Corrected implementation of Partners mode for certain integrations.
 - Tweak - Resolved display issues with PayPlus Embedded.
