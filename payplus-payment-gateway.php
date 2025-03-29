@@ -70,8 +70,6 @@ class WC_PayPlus
         $this->secret_key = boolval($this->payplus_payment_gateway_settings->api_test_mode === "yes") ? $this->payplus_payment_gateway_settings->dev_secret_key ?? null : $this->payplus_payment_gateway_settings->secret_key;
 
         add_action('admin_init', [$this, 'check_environment']);
-        // add_action('admin_init', [$this, 'wc_payplus_check_version']);
-
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('plugins_loaded', [$this, 'init']);
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
@@ -353,30 +351,7 @@ class WC_PayPlus
 
         $order_id = isset($REQUEST['more_info']) ? sanitize_text_field(wp_unslash($REQUEST['more_info'])) : '';
         $order = wc_get_order($order_id);
-
-        // $current_url = home_url(add_query_arg(null, null));
-        // $order_key = $order->get_order_key();
-        // $isRightKey = strpos($current_url, 'key=' . $order_key) !== false;
-
         $this->updateStatusesIpn ? $this->checkRunIpnResponse($order_id, $order, 2) : null;
-
-        // runs cart check if all nonce checks passed and cart hash check is not disabled.
-        // if (!$this->disableCartHashCheck) {
-        //     $stored_cart_hash = WC_PayPlus_Meta_Data::get_meta($order_id, 'cart_hash', true);
-        //     $stored_salt = WC_PayPlus_Meta_Data::get_meta($order_id, 'more_info_3', true);
-        //     $received_cart_hash = isset($_REQUEST['more_info_2']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info_2'])) : '';
-        //     $received_salt = isset($_REQUEST['more_info_3']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info_3'])) : '';
-        //     $calculated_hash = hash('sha256', WC()->cart->get_cart_hash() . $received_salt);
-
-        //     if ($stored_cart_hash !== $received_cart_hash || $calculated_hash !== $received_cart_hash) {
-        //         if (WC()->cart) {
-        //             WC()->cart->empty_cart();
-        //         }
-        //         $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
-        //         wp_redirect($redirect_to);
-        //         exit;
-        //     }
-        // }
 
         global $wpdb;
         $tblname = $wpdb->prefix . 'payplus_payment_process';
@@ -1391,5 +1366,4 @@ class WC_PayPlus
         register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
         register_activation_hook(__FILE__, 'payplusGenerateErrorPage');
         register_activation_hook(__FILE__, 'display_hash_check_notice');
-        // register_activation_hook(__FILE__, 'cron_activate');
         register_deactivation_hook(__FILE__, 'payplus_cron_deactivate');

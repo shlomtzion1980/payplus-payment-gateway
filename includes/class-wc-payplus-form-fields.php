@@ -683,13 +683,6 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'yes'
             ],
-            // 'auto_load_payplus_cc_method' => [
-            //     'title' => __('Auto load PayPlus credit card payment method', 'payplus-payment-gateway'),
-            //     'type' => 'checkbox',
-            //     'label' => __('Auto load PP CC', 'payplus-payment-gateway'),
-            //     'description' => __('If customer already entered their addresses auto load the credit card method of payplus - if the customer cancels he can choose a different one.', 'payplus-payment-gateway'),
-            //     'desc_tip' => true,
-            // ],
             'payment_page_title' => [
                 'title' => __('Payment Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
@@ -873,14 +866,6 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
-            // 'disable_cart_hash_check' => [
-            //     'title' => __('Disable cart hash check security feature', 'payplus-payment-gateway'),
-            //     'type' => 'checkbox',
-            //     'default' => 'yes',
-            //     'description' => __('Disable cart hash check security feature.', 'payplus-payment-gateway'),
-            //     'label' => __('Disable cart hash check security feature', 'payplus-payment-gateway'),
-            //     'desc_tip' => true,
-            // ],
             'show_get_payplus_data_buttons' => [
                 'title' => __('Always display Get PayPlus Data Buttons', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

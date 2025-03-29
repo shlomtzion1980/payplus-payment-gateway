@@ -76,9 +76,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         foreach (array_keys($gateways) as $payPlusGateWay) {
             $this->settings['gateways'][] = strpos($payPlusGateWay, 'payplus-payment-gateway') === 0 ? $payPlusGateWay : null;
         }
-        // $this->settings['gateways'] = array_filter($this->settings['gateways'], function ($item) {
-        //     return $item !== "payplus-payment-gateway-hostedfields";
-        // });
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
     }

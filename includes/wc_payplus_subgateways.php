@@ -216,12 +216,6 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'type' => 'checkbox',
                 'default' => 'no'
             ],
-            // 'hosted_fields_width' => [
-            //     'title' => __('Set width for Embedded container (%)', 'payplus-payment-gateway'),
-            //     'description' => __('This sets the width of the Embedded container in percentage (Max is 100 of the container).', 'payplus-payment-gateway'),
-            //     'type' => 'number',
-            //     'default' => '100'
-            // ],
             'hosted_fields_payments_amount' => [
                 'class' => 'hostedNumberOfpayments',
                 'title' => __('Max number of payments:', 'payplus-payment-gateway'),

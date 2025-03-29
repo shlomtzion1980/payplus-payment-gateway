@@ -14,11 +14,6 @@ class WC_PayPlus_Admin_Settings
     public static function getAdminTabs()
     {
         return $adminTabs = array(
-            // 'payplus-payment-gateway-setup-wizard' => array(
-            //     'name' => __('Basic Settings', 'payplus-payment-gateway'),
-            //     'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-setup-wizard',
-            //     'img' => "<img style='height: 75%' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payPlusSettings.svg'>",
-            // ),
             'payplus-payment-gateway' => array(
                 'name' => __('Settings', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway',
@@ -34,11 +29,6 @@ class WC_PayPlus_Admin_Settings
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "expressCheckout.png'>",
             ),
-            // 'payplus-error-setting' => array(
-            //     'name' => __('Error Page', 'payplus-payment-gateway'),
-            //     'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-error-setting',
-            //     'img' => "",
-            // ),
         );
     }
 

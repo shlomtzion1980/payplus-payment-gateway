@@ -1648,11 +1648,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
 
-        // Schedule the custom function to run 2 minutes after process_payment() finishes
-        // if (!wp_next_scheduled('payplus_after_process_payment_event', array($order_id))) {
-        //     wp_schedule_single_event(time() + 120, 'payplus_after_process_payment_event', array($order_id));
-        // }
-
         $result = [
             'result' => 'success',
             'redirect' => $redirect_to,
@@ -2023,9 +2018,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if (!empty($metaAll) && $this->send_variations) {
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($metaAll));
                 }
-
-                // $itemDetails['vat_type'] = $item_data->get_tax_status() == 'none' || !$wc_tax_enabled ? 2 : 0;
-                // $itemDetails['vat_type'] = $this->paying_vat_all_order === "yes" ? 0 : $itemDetails['vat_type'];
 
                 $itemDetails['vat_type'] = 0;
 
@@ -3614,27 +3606,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }, $req);
         return $REQUEST;
     }
-
-    // /**
-    //  * @return string|void
-    //  */
-    // public function payplus_ip()
-    // {
-
-    //     foreach (array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED', 'HTTP_X_CLUSTER_CLIENT_IP', 'HTTP_FORWARDED_FOR', 'HTTP_FORWARDED', 'REMOTE_ADDR') as $key) {
-
-    //         if (array_key_exists($key, $_SERVER) === true) {
-
-    //             foreach (explode(',', $_SERVER[$key]) as $ip) {
-
-    //                 if (filter_var($ip, FILTER_VALIDATE_IP) !== false) {
-
-    //                     return $ip;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
 
     /**
      * @param $handle
