@@ -866,13 +866,13 @@ class PayplusInvoice
 
             foreach ($gift_cards as $key => $gift) {
                 $productPrice = -1 * ($gift) * $dual;
-                $allProductSku .= (empty($allProductSku)) ? " ( " . $key : ' , ' . $key;
+                $allProductSku .= (empty($allProductSku)) ? $key : ' , ' . $key;
                 $priceGift += round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
             }
 
             $itemDetails = [
-                'name' => ($allProductSku) ? $allProductSku . " ) " : __('Discount coupons', 'payplus-payment-gateway'),
-                'barcode' => __('Discount coupons', 'payplus-payment-gateway'),
+                'name' => __('Yith Gift Card', 'payplus-payment-gateway'),
+                'barcode' => $allProductSku,
                 'quantity' => 1,
                 'price' => $priceGift,
             ];
