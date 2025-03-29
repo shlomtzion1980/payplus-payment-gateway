@@ -96,6 +96,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Added - Compatibility with the PW Gift Cards Plugin for PayPlus Embedded and Credit Card payments on "Classic Checkout" (PW Gift Cards are not supported in "Blocks Checkout").
 - Tweak - Added an option in Invoice+ settings to choose whether coupons are presented as a discount line or as a product.
 - Fix   - Resolved the "invalid-app-name" issue during Invoice+ document creation by using the payload object instead of deprecated database queries.
+- Fix   - Resolved All POS EMV Invoices came out with "General Product".
 
 = 7.7.0 - 11-03-2025 =
 

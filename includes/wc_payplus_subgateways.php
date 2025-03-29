@@ -205,8 +205,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => 'yes'
             ],
             'hide_payplus_gateway' => [
-                'title' => __('Hide PayPlus gateway (No saved tokens)', 'payplus-payment-gateway'),
-                'description' => __('Hide PayPlus gateway if current user has no saved tokens', 'payplus-payment-gateway'),
+                'title' => __('Hide PayPlus gateway (Payment page)', 'payplus-payment-gateway'),
+                'description' => __('Hide PayPlus gateway (Payment page)', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no'
             ],
