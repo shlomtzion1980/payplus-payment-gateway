@@ -1114,7 +1114,8 @@ class PayplusInvoice
                             }
                             $objectProductsPW = (object)$itemsAsJson;
                         }
-                    } elseif (!empty($pwGiftCardData) && is_array($pwGiftCardData)) {
+                    } elseif (!empty($pwGiftCardData) && is_array($pwGiftCardData) || !empty($payPlusPwGiftCards) && empty($pwGiftCardData)) {
+                        empty($pwGiftCardData) ? $pwGiftCardData = json_decode($payPlusPwGiftCards, true) : null;
                         $c = 0;
                         $totalPWAmount = 0;
                         foreach ($pwGiftCardData['gift_cards'] as $key => $item) {
