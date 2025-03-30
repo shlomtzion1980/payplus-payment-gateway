@@ -582,3 +582,7 @@ final class WC_PayPlus_Gateway_HostedFields_Block extends WC_Gateway_Payplus_Pay
 {
     protected $name = 'payplus-payment-gateway-hostedfields';
 }
+final class WC_PayPlus_Gateway_POS_EMV_Block extends WC_Gateway_Payplus_Payment_Block
+{
+    protected $name = 'payplus-payment-gateway-pos-emv';
+}

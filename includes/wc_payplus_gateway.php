@@ -612,7 +612,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             'tavzahav' => 'woocommerce_payplus-payment-gateway-tavzahav_settings',
             'valuecard' => 'woocommerce_payplus-payment-gateway-valuecard_settings',
             'finitone' => 'woocommerce_payplus-payment-gateway-finitione_settings',
-            'hostedFields' => 'woocommerce_payplus-payment-gateway-hostedfields_settings'
+            'hostedFields' => 'woocommerce_payplus-payment-gateway-hostedfields_settings',
+            'posEmv' => 'woocommerce_payplus-payment-gateway-pos-emv_settings'
         ];
 
         // Get the raw POST body
