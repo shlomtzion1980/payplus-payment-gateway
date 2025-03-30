@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.2] - 01-04-2025 - (LifeLine)
+
+- Fix   - Resolved an issue where POS EMV refunds were not processing as expected.
+- Tweak - Improved the payment payload generation function while ensuring compatibility with legacy systems.
+- Fix   - Addressed a problem where Invoice+ documents displayed incorrect details and amounts when Coupons and PW Gift Cards were used together in a transaction, including cases with zero-amount payment invoices.
+- Tweak - Enabled support for generating Invoice+ documents for PW Gift Cards at a later time.
+
 ## [7.7.1] - 30-03-2025 - (Ippo)
 
 - Tweak - Adjusted custom icons (payplus gateway on checkout) sizes for better display.
