@@ -898,22 +898,18 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     }
 
     /**
-     * @return void|string
+     * @return void
      */
-    public function ajax_payplus_generate_link_payment($oid, $_wpnonce)
+    public function ajax_payplus_generate_link_payment()
     {
+        check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
 
-        if (isset($_wpnonce) && !wp_verify_nonce($_wpnonce, 'ajax_payplus_generate_link_payment')) {
-            check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
-            if (!current_user_can('edit_shop_orders')) {
-                wp_send_json_error('You do not have permission to edit orders.');
-                wp_die();
-            }
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
         }
 
         $response = array("payment_response" => "", "status" => false);
-        isset($oid) && is_int($oid) ? $_POST['order_id'] = $oid : null;
-        isset($oid) && is_int($oid) ? $_POST['button'] = "payment-payplus-dashboard-emv" : null;
 
         if (!empty($_POST)) {
             $this->isInitiated();
@@ -959,7 +955,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             'payplus_type' => $type,
                         ]);
                         $this->updateOrderStatus($order_id, $type, $res = null);
-                        return "success";
                     }
                 } else {
                     if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
