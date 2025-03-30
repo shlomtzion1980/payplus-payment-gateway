@@ -896,12 +896,22 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
-    public function removeErrorInvoice($order_id)
+    public function deleteMetaData($order_id, $metaKey)
     {
         $order = wc_get_order($order_id);
         if ($order) {
-            $order->delete_meta_data('payplus_error_invoice'); // Replace 'meta_key_to_delete' with the actual meta key
+            $order->delete_meta_data($metaKey); // Replace 'meta_key_to_delete' with the actual meta key
             $order->save(); // Save the order to persist the changes
+        }
+    }
+
+    public function displayMetaData($order_id, $metaKey)
+    {
+        $order = wc_get_order($order_id);
+        if ($order) {
+            $metaData = $order->get_meta_data(); // Replace 'meta_key_to_delete' with the actual meta key
+            echo wp_json_encode($metaData); // Display the meta data
+            exit;
         }
     }
 
@@ -916,8 +926,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_send_json_error('You do not have permission to edit orders.');
             wp_die();
         }
-        $this->removeErrorInvoice(3746);
-        die;
+
         $response = array("payment_response" => "", "status" => false);
 
         if (!empty($_POST)) {
@@ -2340,6 +2349,22 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
             $order_id = intval($_GET['post']);
+        }
+
+        if (!isset($order_id)) {
+            if (isset($_GET['id']) && $_GET['id'] !== "") {
+                $order_id = intval($_GET['id']);
+            }
+        }
+
+        if (isset($_GET['deleteMetaData']) && $_GET['deleteMetaData'] !== "") {
+            $metaKey = sanitize_text_field(wp_unslash($_GET['deleteMetaData']));
+            $this->deleteMetaData($order_id, $metaKey);
+        }
+
+        if (isset($_GET['displayMetaData']) && $_GET['displayMetaData'] !== "") {
+            $metaKey = sanitize_text_field(wp_unslash($_GET['displayMetaData']));
+            $this->displayMetaData($order_id, $metaKey);
         }
 
         if (!empty($order_id)) {
