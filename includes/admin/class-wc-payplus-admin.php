@@ -944,6 +944,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $res = json_decode(wp_remote_retrieve_body($response));
                 if ($deviceTransaction) {
                     if ($res->results->status === "success" && $res->results->code === 0) {
+                        $type = $chargeMethod === 1 ? "Charge" : "Approval";
                         WC_PayPlus_Meta_Data::update_meta($order, [
                             'payplus_response' => wp_json_encode($res),
                             'payplus_response_emv' => wp_json_encode($res->data->transaction),
@@ -951,8 +952,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             'payplus_method' => 'credit-card',
                             'payplus_four_digits' => $res->data->data->card_information->four_digits,
                             'payplus_brand_name' => $res->data->data->card_information->brand_name,
+                            'payplus_type' => $type,
                         ]);
-                        $type = $chargeMethod === 1 ? "Charge" : "Approval";
                         $this->updateOrderStatus($order_id, $type, $res = null);
                     }
                 } else {
