@@ -107,6 +107,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enableDevMode;
     public $enableDoubleCheckIfPruidExists;
     protected $pwGiftCardData; // Store gift card data
+    public $useLegacyPayload;
 
     /**
      *
@@ -159,6 +160,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings');
         $this->isHostedEnabled = boolval(isset($this->hostedFieldsOptions['enabled']) && $this->hostedFieldsOptions['enabled'] === "yes");
         $this->enableDoubleCheckIfPruidExists = $this->get_option('enable_double_check_if_pruid_exists') == 'yes' ? true : false;
+        $this->useLegacyPayload = $this->get_option('use_legacy_payload') == 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -2349,11 +2351,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
         $secure3D = isset($token) && $token !== null ? ["activate" => false] : "";
 
-        $cart_hash = WC()->cart && WC()->cart->get_cart_hash() ? WC()->cart->get_cart_hash() : $order_id;
-        $salt = bin2hex(random_bytes(16));
-        $cart_hash_with_salt = hash('sha256', $cart_hash . $salt);
-        WC_PayPlus_Meta_Data::update_meta($order, ['cart_hash' => $cart_hash_with_salt, 'cart_salt' => $salt]);
-
         $payload['payment_page_uid'] = $this->payment_page_id;
         $payload['charge_method'] = $chargeMethod;
         $payload['expiry_datetime'] = "30";
@@ -2373,8 +2370,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
 
         $payload['more_info'] = $custom_more_info ? (string)$custom_more_info : (string)$order_id;
-        $payload['more_info_2'] = $cart_hash_with_salt;
-        $payload['more_info_3'] = $salt;
         $payload['more_info_4'] = PAYPLUS_VERSION;
 
         $tokenPayload = $token ? (is_object($token) ? $token->get_token() : $token) : "";
@@ -2391,10 +2386,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         !empty($addData) ? $payload['add_data'] = $addData : null;
         !empty($hidePaymentFields) ? $payload['hide_payments_field'] = $hidePaymentFields : null;
         $this->hide_identification_id > 0 ? $payload['hide_identification_id'] = ($this->hide_identification_id == 1 ? true : false) : null;
-        print_r(wp_json_encode($payload));
-        echo "\n";
 
-        $payload = '{
+        $legacyPayload = '{
             "payment_page_uid": "' . $this->payment_page_id . '",
             ' . $addChargeLine . '
             "expiry_datetime": "30",
@@ -2423,19 +2416,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . ($this->hide_payments_field > 0 ? '"hide_payments_field": ' . ($this->hide_payments_field == 1 ? 'true' : 'false') . ',' : '') . '
             ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
             "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
-            $json_move_token . ',
-            "cart_hash": "' . $cart_hash_with_salt . '",
-            "cart_salt": "' . $salt . '"
-        }';
-
-        $payloadArray = json_decode($payload, true);
+            $json_move_token . '}';
+        $payloadArray = json_decode($legacyPayload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
-        $payloadArray['more_info_2'] = $cart_hash_with_salt;
-        $payloadArray['more_info_3'] = $salt;
-        $payload = wp_json_encode($payloadArray);
-        print_r($payload);
-        die;
-        $payload = wp_json_encode($payload);
+
+        $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray) : $payload = wp_json_encode($payload);
         return $payload;
     }
 

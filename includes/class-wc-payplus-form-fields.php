@@ -758,6 +758,14 @@ class WC_PayPlus_Form_Fields
                 'description' => __('In ipn response check status (This will run with or without the callback status update)', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'use_legacy_payload' => [
+                'title' => __('Use legacy payload function', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => __('Use legacy payload function (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('If you are experiencing problems with opening payment pages recently (since the payload refactor) use this.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'order_status_title' => [
                 'title' => __('Order Settings', 'payplus-payment-gateway'),
                 'type' => 'title',
