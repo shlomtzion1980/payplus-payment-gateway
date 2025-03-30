@@ -57,7 +57,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
         global $pagenow;
         $postKey = array_key_exists('post', $_GET) ? 'post' : 'id';
-
         $isPageOrder = ('post.php' === $pagenow || 'admin.php' === $pagenow) && isset($_GET[$postKey]) &&
             ('shop_order' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
                 || 'shop_subscription' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
@@ -897,6 +896,15 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         wp_die();
     }
 
+    public function removeErrorInvoice($order_id)
+    {
+        $order = wc_get_order($order_id);
+        if ($order) {
+            $order->delete_meta_data('payplus_error_invoice'); // Replace 'meta_key_to_delete' with the actual meta key
+            $order->save(); // Save the order to persist the changes
+        }
+    }
+
     /**
      * @return void
      */
@@ -908,7 +916,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_send_json_error('You do not have permission to edit orders.');
             wp_die();
         }
-
+        $this->removeErrorInvoice(3746);
+        die;
         $response = array("payment_response" => "", "status" => false);
 
         if (!empty($_POST)) {
