@@ -86,6 +86,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.7.2 - 01-04-2025 =
+
+- Fix   - Addressed an issue with POS EMV refunds where the refund process failed to execute.
+
 = 7.7.1 - 30-03-2025 =
 
 - Tweak - Adjusted custom icon (payplus gateway on checkout) sizes for better display.
