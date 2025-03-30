@@ -2239,8 +2239,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         }
 
-        $Customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
-        $payloadCustomer = count($customer) ? $customer : "";
+        $customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
         $returnUrl = add_query_arg('wc-api', 'payplus_gateway', $this->get_return_url($order));
         $redirectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
         $setInvoice = '';
@@ -2249,62 +2248,49 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $addChargeLine = '';
         if ($subscription) {
             $addChargeLine = '"charge_method": 1,';
-            $chargeMethod = 1;
         } else if ($this->settings['transaction_type'] != "0") {
             $addChargeLine = '"charge_method": ' . $this->settings['transaction_type'] . ',';
-            $chargeMethod = intval($this->settings['transaction_type']);
         }
         if (!$subscription && $this->add_product_field_transaction_type) {
             if ($this->payplus_check_all_product($order, "2")) {
                 $addChargeLine = '"charge_method": 2,';
-                $chargeMethod = 2;
             } elseif ($this->payplus_check_all_product($order, "1")) {
                 $addChargeLine = '"charge_method": 1,';
-                $chargeMethod = 1;
             }
         }
 
         if ($this->invoice_api->payplus_get_invoice_enable()) {
             $flagInvoice = 'false';
             $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
-            $initialInvoice = false;
         } elseif ($this->initial_invoice == "1") {
             $flagInvoice = 'true';
             $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
-            $initialInvoice = true;
         } elseif ($this->initial_invoice == "2") {
             $flagInvoice = 'false';
             $setInvoice = '"initial_invoice": ' . $flagInvoice . ',';
-            $initialInvoice = false;
         }
         if ($this->paying_vat_all_order == "yes") {
             $payingVat = '"paying_vat": true,';
-            $paying_vat = true;
         }
         // Paying Vat & Invoices
         if ($this->paying_vat == "0") {
             $payingVat = '"paying_vat": true,';
-            $paying_vat = true;
         } else if ($this->paying_vat == "1") {
             $payingVat = '"paying_vat": false,';
-            $paying_vat = false;
         } else if ($this->paying_vat == "2") {
             if (trim(strtolower($customer_country_iso)) != trim(strtolower($this->paying_vat_iso_code))) {
                 $payingVat = '"paying_vat": false,';
-                $paying_vat = false;
                 if (!empty($this->foreign_invoices_lang)) {
                     $invoiceLanguage = '"invoice_language": "' . strtolower($this->foreign_invoices_lang) . '",';
-                    $invoiceLang = strtolower($this->foreign_invoices_lang);
                 }
             } else {
                 $payingVat = '"paying_vat": true,';
-                $paying_vat = true;
             }
         }
         if ($this->change_vat_in_eilat) {
+
             if ($this->payplus_check_is_vat_eilat($order_id)) {
                 $payingVat = '"paying_vat": false,';
-                $paying_vat = false;
             }
         }
 
@@ -2342,57 +2328,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $json_move_token = "";
         if ($move_token) {
             $json_move_token = ',"move_token": true';
-            $moveToken = true;
         }
 
         $totalCartAmount = $objectProducts->amount;
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
-        $secure3D = isset($token) && $token !== null ? ["activate" => false] : "";
-
-        $cart_hash = WC()->cart && WC()->cart->get_cart_hash() ? WC()->cart->get_cart_hash() : $order_id;
-        $salt = bin2hex(random_bytes(16));
-        $cart_hash_with_salt = hash('sha256', $cart_hash . $salt);
-        WC_PayPlus_Meta_Data::update_meta($order, ['cart_hash' => $cart_hash_with_salt, 'cart_salt' => $salt]);
-
-        $payload['payment_page_uid'] = $this->payment_page_id;
-        $payload['charge_method'] = $chargeMethod;
-        $payload['expiry_datetime'] = "30";
-        $payload['hide_other_charge_methods'] = $hideOtherChargeMethods === 'true' ? true : false;
-        $payload['language_code'] = trim(strtolower($langCode[0]));
-        $payload['refURL_success'] = $redirectSuccess . '&charge_method=' . $this->default_charge_method;
-        $payload['refURL_failure'] = $this->response_error_url;
-        $payload['refURL_callback'] = $callback;
-        $payload['charge_default'] = $this->default_charge_method;
-        $payload['paying_vat'] = $paying_vat;
-        $payload['customer'] = $payloadCustomer;
-        $payload['amount'] = $totalCartAmount;
-        $payload['currency_code'] = $order->get_currency();
-        $payload['sendEmailApproval'] = $this->sendEmailApproval == 1 ? true : false;
-        $payload['sendEmailFailure'] = $this->sendEmailFailure == 1 ? true : false;
-        $payload['create_token'] = $bSaveToken ? true : false;
-
-
-        $payload['more_info'] = $custom_more_info ? (string)$custom_more_info : (string)$order_id;
-        $payload['more_info_2'] = $cart_hash_with_salt;
-        $payload['more_info_3'] = $salt;
-        $payload['more_info_4'] = PAYPLUS_VERSION;
-
-        $tokenPayload = $token ? (is_object($token) ? $token->get_token() : $token) : "";
-        $hidePaymentFields = $this->hide_payments_field > 0 ? ($this->hide_payments_field == 1 ? true : false) : "";
-        $addData = $this->send_add_data ? $order_id : "";
-
-        $move_token ? $payload['move_token'] = true : null;
-        isset($initialInvoice) ? $payload['initial_invoice'] = $initialInvoice : null;
-        !$this->send_products ? $payload['items'] = array_map('json_decode', $objectProducts->productsItems) : null;
-        isset($invoiceLang) ? $payload['invoice_language'] = $invoiceLang : null;
-        !empty($tokenPayload) ? $payload['token'] = $tokenPayload : null;
-        !empty($secure3D) ? $payload['secure3d'] = $secure3D : null;
-        !empty($external_recurring_payment) ? $payload['external_recurring_payment'] = $this->getRecurring($external_recurring_id, $order_id) : null;
-        !empty($addData) ? $payload['add_data'] = $addData : null;
-        !empty($hidePaymentFields) ? $payload['hide_payments_field'] = $hidePaymentFields : null;
-        $this->hide_identification_id > 0 ? $payload['hide_identification_id'] = ($this->hide_identification_id == 1 ? true : false) : null;
-        print_r(wp_json_encode($payload));
-        echo "\n";
 
         $payload = '{
             "payment_page_uid": "' . $this->payment_page_id . '",
@@ -2404,7 +2343,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             "refURL_failure": "' . $this->response_error_url . '",
             "refURL_callback": "' . $callback . '",
             "charge_default":"' . $this->default_charge_method . '",
-            ' . $payingVat . $Customer
+            ' . $payingVat . $customer
             . (!$this->send_products ? '
             "items": [
                 ' . implode(",", $objectProducts->productsItems) . '
@@ -2423,19 +2362,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . ($this->hide_payments_field > 0 ? '"hide_payments_field": ' . ($this->hide_payments_field == 1 ? 'true' : 'false') . ',' : '') . '
             ' . ($this->hide_identification_id > 0 ? '"hide_identification_id": ' . ($this->hide_identification_id == 1 ? 'true' : 'false') . ',' : '') . '
             "more_info": "' . ($custom_more_info ? $custom_more_info : $order_id) . '"' .
-            $json_move_token . ',
-            "cart_hash": "' . $cart_hash_with_salt . '",
-            "cart_salt": "' . $salt . '"
-        }';
-
+            $json_move_token . '}';
         $payloadArray = json_decode($payload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
-        $payloadArray['more_info_2'] = $cart_hash_with_salt;
-        $payloadArray['more_info_3'] = $salt;
-        $payload = wp_json_encode($payloadArray);
-        print_r($payload);
-        die;
-        $payload = wp_json_encode($payload);
+        $payload = wp_json_encode($payloadArray, JSON_UNESCAPED_UNICODE);
         return $payload;
     }
 
