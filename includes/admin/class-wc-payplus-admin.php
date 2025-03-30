@@ -924,6 +924,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payload = $this->generatePayloadLink($order_id, true);
             $deviceTransaction = isset($_POST['button']) && $_POST['button'] === "payment-payplus-dashboard-emv" ? true : false;
             if ($deviceTransaction) {
+                $order->set_payment_method_title('Pay with Debit or Credit Card Via POS EMV');
                 $payload = json_decode($payload, true);
                 $payload['credit_terms'] = 1;
                 $payload['products'] = $payload['items'];
