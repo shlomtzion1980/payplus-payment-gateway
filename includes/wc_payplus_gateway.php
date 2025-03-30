@@ -272,7 +272,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         // Hook the custom function to the scheduled event
         add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
-
+        add_action('woocommerce_checkout_order_processed', [$this, 'pwGiftCardsOnNoPayment'], 10, 3);
         /****** ACTION END ******/
 
         /****** FILTER START ******/
@@ -299,6 +299,23 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_invoice_option['payplus_invoice_api_key'] = $this->api_key;
             $payplus_invoice_option['payplus_invoice_secret_key'] = $this->secret_key;
             update_option('payplus_invoice_option', $payplus_invoice_option);
+        }
+    }
+
+    function pwGiftCardsOnNoPayment($order_id, $posted_data, $order)
+    {
+        // Check if the order total is 0
+        if ($order->get_total() == 0) {
+            $payplus_instance = WC_PayPlus::get_instance();
+            $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
+
+            if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
+                WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
+            }
+
+            // Add custom meta data
+            $order->update_meta_data('_custom_meta_key', 'Custom meta value for zero total orders');
+            $order->save();
         }
     }
 
