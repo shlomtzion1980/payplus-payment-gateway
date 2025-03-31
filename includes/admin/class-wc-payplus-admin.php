@@ -918,9 +918,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     /**
      * @return void|string
      */
-    public function ajax_payplus_generate_link_payment($oid, $_wpnonce)
+    public function ajax_payplus_generate_link_payment($oid = null, $_wpnonce = null)
     {
-
         if (isset($_wpnonce) && !wp_verify_nonce($_wpnonce, 'ajax_payplus_generate_link_payment')) {
             check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
             if (!current_user_can('edit_shop_orders')) {
