@@ -949,6 +949,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payload = json_decode($payload, true);
                 $payload['credit_terms'] = 1;
                 $payload['products'] = $payload['items'];
+                $payload['more_info'] = $order_id;
                 unset($payload['items']);
                 $payload['device_uid'] = $this->device_uid;
                 $chargeMethod = $payload['charge_method'];
