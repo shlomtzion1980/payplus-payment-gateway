@@ -523,6 +523,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'hideMainPayPlusGateway' => $this->hideMainPayPlusGateway,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
             'isSubscriptionOrder' => $isSubscriptionOrder,
+            'isLoggedIn' => is_user_logged_in(),
             'isAutoPPCC' => $this->isAutoPPCC,
             'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION : false,
             "{$this->name}-settings" => [

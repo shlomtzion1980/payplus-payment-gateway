@@ -26,12 +26,23 @@ jQuery(function ($) {
             var classes = $(this).attr("class").split(/\s+/);
             classes.forEach(
                 function (className) {
-                    if (
-                        className.startsWith(
-                            "payment_method_payplus-payment-gateway-"
-                        )
-                    ) {
-                        $(this).remove();
+                    if (payplus_script_checkout.isLoggedIn) {
+                        if (
+                            className.startsWith(
+                                "payment_method_payplus-payment-gateway-"
+                            ) &&
+                            className !== "payment_method_payplus-payment-gateway-hostedfields"
+                        ) {
+                            $(this).remove();
+                        }
+                    } else {
+                        if (
+                            className.startsWith(
+                                "payment_method_payplus-payment-gateway-"
+                            )
+                        ) {
+                            $(this).remove();
+                        }
                     }
                 }.bind(this)
             );
@@ -46,16 +57,16 @@ jQuery(function ($) {
                 // Add save token checkbox to hosted fields container //
                 var $checkbox = $(
                     '<p class="hf-save form-row">' +
-                        '<label for="save_token_checkbox">' +
-                        '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
-                        " " +
-                        payplus_script_checkout.saveCreditCard +
-                        "</label>" +
-                        "</p>"
+                    '<label for="save_token_checkbox">' +
+                    '<input type="checkbox" name="wc-save-token" id="save_token_checkbox" value="1" style="margin:0 10px 0 10px;"/>' +
+                    " " +
+                    payplus_script_checkout.saveCreditCard +
+                    "</label>" +
+                    "</p>"
                 );
 
                 payplus_script_checkout.isLoggedIn &&
-                payplus_script_checkout.isSavingCerditCards
+                    payplus_script_checkout.isSavingCerditCards
                     ? $hostedDiv.append($checkbox)
                     : null;
 
@@ -236,8 +247,8 @@ jQuery(function ($) {
 
             if ($(".payment_methods input.input-radio").length > 1) {
                 var target_payment_box = $(
-                        "div.payment_box." + $(this).attr("ID")
-                    ),
+                    "div.payment_box." + $(this).attr("ID")
+                ),
                     is_checked = $(this).is(":checked");
 
                 if (is_checked && !target_payment_box.is(":visible")) {
@@ -445,8 +456,8 @@ jQuery(function ($) {
                 typeof args !== "undefined"
                     ? args
                     : {
-                          update_shipping_method: true,
-                      };
+                        update_shipping_method: true,
+                    };
 
             var country = $("#billing_country").val(),
                 state = $("#billing_state").val(),
@@ -765,8 +776,8 @@ jQuery(function ($) {
                         if (data.messages) {
                             $form.prepend(
                                 '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-updateOrderReview">' +
-                                    data.messages +
-                                    "</div>"
+                                data.messages +
+                                "</div>"
                             ); // eslint-disable-line max-len
                         } else {
                             $form.prepend(data);
@@ -845,7 +856,7 @@ jQuery(function ($) {
                 $form.triggerHandler("checkout_place_order") !== false &&
                 $form.triggerHandler(
                     "checkout_place_order_" +
-                        wc_checkout_form.get_payment_method()
+                    wc_checkout_form.get_payment_method()
                 ) !== false
             ) {
                 $form.addClass("processing");
@@ -971,11 +982,11 @@ jQuery(function ($) {
                                 ) {
                                     if (
                                         -1 ===
-                                            result.redirect.indexOf(
-                                                "https://"
-                                            ) ||
+                                        result.redirect.indexOf(
+                                            "https://"
+                                        ) ||
                                         -1 ===
-                                            result.redirect.indexOf("http://")
+                                        result.redirect.indexOf("http://")
                                     ) {
                                         window.location = result.redirect;
                                     } else {
@@ -1008,8 +1019,8 @@ jQuery(function ($) {
                                 } else {
                                     wc_checkout_form.submit_error(
                                         '<div class="woocommerce-error">' +
-                                            wc_checkout_params.i18n_checkout_error +
-                                            "</div>"
+                                        wc_checkout_params.i18n_checkout_error +
+                                        "</div>"
                                     ); // eslint-disable-line max-len
                                 }
                             }
@@ -1021,8 +1032,8 @@ jQuery(function ($) {
 
                         wc_checkout_form.submit_error(
                             '<div class="woocommerce-error">' +
-                                errorThrown +
-                                "</div>"
+                            errorThrown +
+                            "</div>"
                         );
                     },
                 });
@@ -1036,8 +1047,8 @@ jQuery(function ($) {
             ).remove();
             wc_checkout_form.$checkout_form.prepend(
                 '<div class="woocommerce-NoticeGroup woocommerce-NoticeGroup-checkout">' +
-                    error_message +
-                    "</div>"
+                error_message +
+                "</div>"
             ); // eslint-disable-line max-len
             wc_checkout_form.$checkout_form.removeClass("processing").unblock();
             wc_checkout_form.$checkout_form
@@ -1126,8 +1137,8 @@ jQuery(function ($) {
             e.preventDefault();
 
             var container = $(this).parents(
-                    ".woocommerce-checkout-review-order"
-                ),
+                ".woocommerce-checkout-review-order"
+            ),
                 coupon = $(this).data("coupon");
 
             container.addClass("processing").block({

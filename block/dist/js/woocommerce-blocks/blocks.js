@@ -48,6 +48,10 @@ if (isCheckout || hasOrder) {
     ? ["payplus-payment-gateway"]
     : gateways;
 
+  gateways = payPlusGateWay.isSubscriptionOrder && payPlusGateWay.isLoggedIn
+    ? ["payplus-payment-gateway", "payplus-payment-gateway-hostedfields"]
+    : gateways;
+
   let customIcons = [];
 
   const w = window.React;
