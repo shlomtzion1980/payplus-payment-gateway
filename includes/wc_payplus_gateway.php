@@ -2367,6 +2367,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $totalCartAmount = $objectProducts->amount;
         $secure3d = (isset($token) && $token !== null) ? '"secure3d": {"activate":false},' : "";
         $secure3D = isset($token) && $token !== null ? ["activate" => false] : "";
+        $tokenPayload = $token ? (is_object($token) ? $token->get_token() : $token) : "";
+        $hidePaymentFields = $this->hide_payments_field > 0 ? ($this->hide_payments_field == 1 ? true : false) : "";
+        $addData = $this->send_add_data ? $order_id : "";
 
         $payload['payment_page_uid'] = $this->payment_page_id;
         $payload['charge_method'] = $chargeMethod;
@@ -2379,30 +2382,23 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payload['charge_default'] = $this->default_charge_method;
         $payload['paying_vat'] = $paying_vat;
         $payload['customer'] = $payloadCustomer;
-        $payload['amount'] = $totalCartAmount;
+        !$this->send_products ? $payload['items'] = array_map('json_decode', $objectProducts->productsItems) : null;
+        !empty($tokenPayload) ? $payload['token'] = $tokenPayload : null;
+        !empty($secure3D) ? $payload['secure3d'] = $secure3D : null;
+        !$this->send_products ? $payload['amount'] = $totalCartAmount : $payload['amount'] = $totallCart;
         $payload['currency_code'] = $order->get_currency();
         $payload['sendEmailApproval'] = $this->sendEmailApproval == 1 ? true : false;
         $payload['sendEmailFailure'] = $this->sendEmailFailure == 1 ? true : false;
         $payload['create_token'] = $bSaveToken ? true : false;
-
-
-        $payload['more_info'] = $custom_more_info ? (string)$custom_more_info : (string)$order_id;
-        $payload['more_info_4'] = PAYPLUS_VERSION;
-
-        $tokenPayload = $token ? (is_object($token) ? $token->get_token() : $token) : "";
-        $hidePaymentFields = $this->hide_payments_field > 0 ? ($this->hide_payments_field == 1 ? true : false) : "";
-        $addData = $this->send_add_data ? $order_id : "";
-
-        $move_token ? $payload['move_token'] = true : null;
         isset($initialInvoice) ? $payload['initial_invoice'] = $initialInvoice : null;
-        !$this->send_products ? $payload['items'] = array_map('json_decode', $objectProducts->productsItems) : null;
         isset($invoiceLang) ? $payload['invoice_language'] = $invoiceLang : null;
-        !empty($tokenPayload) ? $payload['token'] = $tokenPayload : null;
-        !empty($secure3D) ? $payload['secure3d'] = $secure3D : null;
         !empty($external_recurring_payment) ? $payload['external_recurring_payment'] = $this->getRecurring($external_recurring_id, $order_id) : null;
-        !empty($addData) ? $payload['add_data'] = $addData : null;
+        !empty($addData) ? $payload['add_data'] = (string) $addData : null;
         !empty($hidePaymentFields) ? $payload['hide_payments_field'] = $hidePaymentFields : null;
         $this->hide_identification_id > 0 ? $payload['hide_identification_id'] = ($this->hide_identification_id == 1 ? true : false) : null;
+        $payload['more_info'] = $custom_more_info ? (string)$custom_more_info : (string)$order_id;
+        $move_token ? $payload['move_token'] = true : null;
+        $payload['more_info_4'] = PAYPLUS_VERSION;
 
         $legacyPayload = '{
             "payment_page_uid": "' . $this->payment_page_id . '",
@@ -2436,6 +2432,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $json_move_token . '}';
         $payloadArray = json_decode($legacyPayload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
+
+        $this->payplus_add_log_all("generate_payment_page", "New payload: \n" . wp_json_encode($payload) . "\n");
+        $this->payplus_add_log_all("generate_payment_page", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
 
         $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray) : $payload = wp_json_encode($payload);
         return $payload;
