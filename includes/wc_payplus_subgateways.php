@@ -455,6 +455,35 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
     public $pay_with_text = 'Pay with Tav finitiOne';
 }
 
+class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
+{
+    public $id = 'payplus-payment-gateway-pos-emv';
+    public $method_title_text = 'PayPlus - POS EMV';
+    public $default_description_settings_text = 'POS EMV payment via PayPlus';
+    public $method_description_text = 'Pay with POS EMV via PayPlus';
+    public $payplus_default_charge_method = 'posEmv';
+    public $iconURL = 'assets/images/finitioneLogo.png';
+    public $pay_with_text = 'Pay with Tav finitiOne';
+
+    public function process_payment($order_id)
+    {
+        $adminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
+        $response = $adminPayments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
+        $order = wc_get_order($order_id);
+        $redirect_to = $order->get_checkout_order_received_url();
+        $response === "success" ?
+            $result = [
+                'result' => 'success',
+                'redirect' => $redirect_to,
+            ] : $result = [
+                'result' => 'failure',
+                'redirect' => $redirect_to,
+            ];
+        return $result;
+    }
+}
+
 class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
 {
     public $id = 'payplus-payment-gateway-hostedfields';
