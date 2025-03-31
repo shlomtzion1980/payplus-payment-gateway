@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 - Tweak - Improved the payment payload generation function while ensuring compatibility with legacy systems.
 - Fix   - Addressed a problem where Invoice+ documents displayed incorrect details and amounts when Coupons and PW Gift Cards were used together in a transaction, including cases with zero-amount payment invoices.
 - Tweak - Enabled support for generating Invoice+ documents for PW Gift Cards at a later time.
+- Added - Support for subscriptions in PayPlus Embedded for logged-in users.
+- Tweak - The close iframe button in blocks checkout now consistently appears in black.
+- Tweak - Initial refactor of the generatePayloadLink function, now renamed to generatePaymentLink. Both the new and "legacy" payloads are supported. If issues arise with the new payload, you can revert to the "legacy" payload by enabling the "Use legacy payload function" checkbox in the plugin settings.
 
 ## [7.7.1] - 30-03-2025 - (Ippo)
 

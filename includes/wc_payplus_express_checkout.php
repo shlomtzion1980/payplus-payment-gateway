@@ -226,7 +226,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
             $order->calculate_totals();
             $order_id = $order->save();
-            $payload = $WC_PayPlus_Gateway->generatePayloadLink($order_id);
+            $payload = $WC_PayPlus_Gateway->generatePaymentLink($order_id);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
             $payload = json_decode($payload, true);
 

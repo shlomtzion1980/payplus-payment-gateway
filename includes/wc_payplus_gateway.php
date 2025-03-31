@@ -2245,7 +2245,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      * @param $custom_more_info
      * @return string
      */
-    public function generatePayloadLink($order_id, $isAdmin = false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false, $options = [])
+    public function generatePaymentLink($order_id, $isAdmin = false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false, $options = [])
     {
         $order = wc_get_order($order_id);
         $langCode = explode("_", get_locale());
@@ -2394,7 +2394,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         isset($invoiceLang) ? $payload['invoice_language'] = $invoiceLang : null;
         !empty($external_recurring_payment) ? $payload['external_recurring_payment'] = $this->getRecurring($external_recurring_id, $order_id) : null;
         !empty($addData) ? $payload['add_data'] = (string) $addData : null;
-        !empty($hidePaymentFields) ? $payload['hide_payments_field'] = $hidePaymentFields : null;
+        $this->hide_payments_field > 0 ? $payload['hide_payments_field'] = $hidePaymentFields : null;
         $this->hide_identification_id > 0 ? $payload['hide_identification_id'] = ($this->hide_identification_id == 1 ? true : false) : null;
         $payload['more_info'] = $custom_more_info ? (string)$custom_more_info : (string)$order_id;
         $move_token ? $payload['move_token'] = true : null;
@@ -2433,8 +2433,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payloadArray = json_decode($legacyPayload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
 
-        $this->payplus_add_log_all("generate_payment_page", "New payload: \n" . wp_json_encode($payload) . "\n");
-        $this->payplus_add_log_all("generate_payment_page", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
+        $this->payplus_add_log_all("generate_payment_link_refactor_log", "New payload: \n" . wp_json_encode($payload) . "\n");
+        $this->payplus_add_log_all("generate_payment_link_refactor_log", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
 
         $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray) : $payload = wp_json_encode($payload);
         return $payload;
@@ -2515,7 +2515,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
 
         $options = $isSubscriptionOrder ? ['isSubscriptionOrder' => true] : [];
-        $payload = $this->generatePayloadLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
+        $payload = $this->generatePaymentLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $this->payplus_add_log_all($handle, 'Payload data before Sending to PayPlus');
         $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');

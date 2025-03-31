@@ -123,6 +123,7 @@ if (isCheckout || hasOrder) {
                   fontSize: "20px",
                   right: "0px",
                   border: "none",
+                  color: "black",
                   backgroundColor: "transparent",
                   display: "none",
                 },
