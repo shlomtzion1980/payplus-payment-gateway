@@ -1331,7 +1331,7 @@ class PayplusInvoice
                              <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
                             }
                         } else {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('r_invoice' => $res->error));
+                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $res->error));
                             $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
                             $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
                         }
