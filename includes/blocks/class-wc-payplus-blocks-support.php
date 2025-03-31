@@ -349,7 +349,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
             $gatewaySettings = get_option("woocommerce_{$context->payment_method}_settings");
 
-            if ($token) {
+            if ($token || $context->payment_method === 'payplus-payment-gateway-pos-emv') {
                 return;
             }
 

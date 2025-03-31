@@ -35,6 +35,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Pay with Tav Zahav via PayPlus', 'payplus-payment-gateway'),
             __('Pay with Valuecard via PayPlus', 'payplus-payment-gateway'),
             __('Pay with finitiOne via PayPlus', 'payplus-payment-gateway'),
+            __('Pay with PayPlus - POS EMV', 'payplus-payment-gateway'),
             __('Pay with PayPlus Embedded', 'payplus-payment-gateway')
 
         );
@@ -47,6 +48,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Tav Zahav', 'payplus-payment-gateway'),
             __('Valuecard', 'payplus-payment-gateway'),
             __('finitiOne', 'payplus-payment-gateway'),
+            __('PayPlus - POS EMV', 'payplus-payment-gateway'),
             __('hostedFields', 'payplus-payment-gateway')
         );
 
@@ -111,6 +113,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'PayPlus - Valuecard':
                 $methodTitleText = esc_html__('PayPlus - Valuecard', 'payplus-payment-gateway');
                 break;
+            case 'PayPlus - POS EMV':
+                $methodTitleText = esc_html__('PayPlus - POS EMV', 'payplus-payment-gateway');
+                break;
             case 'PayPlus - Embedded':
                 $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
                 break;
@@ -140,6 +145,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 break;
             case 'Pay with Tav finitiOne':
                 $payWithText = esc_html__('Pay with Tav finitiOne', 'payplus-payment-gateway');
+                break;
+            case 'Pay with PayPlus - POS EMV':
+                $payWithText = esc_html__('Pay with PayPlus - POS EMV', 'payplus-payment-gateway');
                 break;
             case 'Pay with Embedded':
                 $payWithText = esc_html__('Pay with Embedded', 'payplus-payment-gateway');
@@ -312,6 +320,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'Pay with finitiOne via PayPlus':
                 $methodDescriptionText = esc_html__('Pay with finitiOne via PayPlus', 'payplus-payment-gateway');
                 break;
+            case 'Pay with PayPlus - POS EMV':
+                $methodDescriptionText = esc_html__('Pay with PayPlus - POS EMV', 'payplus-payment-gateway');
+                break;
             case 'Pay with PayPlus Embedded':
                 $methodDescriptionText = esc_html__('Pay with PayPlus Embedded', 'payplus-payment-gateway');
                 break;
@@ -460,10 +471,20 @@ class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
     public $id = 'payplus-payment-gateway-pos-emv';
     public $method_title_text = 'PayPlus - POS EMV';
     public $default_description_settings_text = 'POS EMV payment via PayPlus';
-    public $method_description_text = 'Pay with POS EMV via PayPlus';
+    public $method_description_text = 'Pay with PayPlus - POS EMV';
     public $payplus_default_charge_method = 'posEmv';
-    public $iconURL = 'assets/images/finitioneLogo.png';
-    public $pay_with_text = 'Pay with Tav finitiOne';
+    public $iconURL = 'assets/images/PayPlusLogo.svg';
+    public $pay_with_text = 'Pay with PayPlus - POS EMV';
+
+    /**
+     * Get the icon HTML with inline styles
+     */
+    public function get_icon()
+    {
+        $icon_url = PAYPLUS_PLUGIN_URL . $this->iconURL;
+        $style = 'max-width: 64px; max-height: 32px;'; // Example inline style
+        return $this->hide_icon === "yes" ? "" : '<img src="' . esc_url($icon_url) . '" alt="' . esc_attr($this->method_title_text) . '" style="' . esc_attr($style) . '" />';
+    }
 
     public function process_payment($order_id)
     {

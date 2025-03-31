@@ -95,6 +95,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Added - Support for subscriptions in PayPlus Embedded for logged-in users.
 - Tweak - The close iframe button in blocks checkout now consistently appears in black.
 - Tweak - Initial refactor of the generatePayloadLink function, now renamed to generatePaymentLink. Both the new and "legacy" payloads are supported. If issues arise with the new payload, you can revert to the "legacy" payload by enabling the "Use legacy payload function" checkbox in the plugin settings.
+- Added - Feature: Pay with POS EMV as a subgateway from the checkout page.
 
 = 7.7.1 - 30-03-2025 =
 
