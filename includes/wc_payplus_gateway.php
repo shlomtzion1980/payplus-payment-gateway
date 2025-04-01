@@ -273,6 +273,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Hook the custom function to the scheduled event
         add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
         add_action('woocommerce_checkout_order_processed', [$this, 'pwGiftCardsOnNoPayment'], 10, 3);
+        // add_action('woocommerce_payment_complete', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
         /****** ACTION END ******/
 
         /****** FILTER START ******/
@@ -302,7 +303,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
-    function pwGiftCardsOnNoPayment($order_id, $posted_data, $order)
+    public function payplusCheckPaymentGatewayId($order_id)
+    {
+        $order = wc_get_order($order_id);
+
+        // Get the payment gateway ID
+        $payment_gateway_id = $order->get_payment_method();
+
+        // Check if the payment gateway ID matches your target ID
+        if ($payment_gateway_id === 'pos_card') {
+            // Perform your custom logic here
+            error_log('Order #' . $order_id . ' was paid using the POS Card gateway.');
+        }
+    }
+
+    public function pwGiftCardsOnNoPayment($order_id, $posted_data, $order)
     {
         // Check if the order total is 0
         if ($order->get_total() == 0) {
