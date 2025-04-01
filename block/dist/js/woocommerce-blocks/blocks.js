@@ -317,7 +317,7 @@ if (isCheckout || hasOrder) {
             return;
           }
 
-          if (activePaymentMethod.search("payplus-payment-gateway") === 0) {
+          if (activePaymentMethod.search("payplus-payment-gateway") === 0 && activePaymentMethod.search("payplus-payment-gateway-pos-emv") !== 0) {
             const gateWaySettings =
               window.wc.wcSettings.getPaymentMethodData(activePaymentMethod)[
               activePaymentMethod + "-settings"

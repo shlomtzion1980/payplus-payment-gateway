@@ -374,6 +374,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 "payplus-payment-gateway-valuecard" => 'valuecard',
                 "payplus-payment-gateway-tavzahav" => 'tav-zahav',
                 "payplus-payment-gateway-finitione" => 'finitione',
+                "payplus-payment-gateway-pos-emv" => 'posEmv',
                 "payplus-payment-gateway-hostedfields" => 'hostedFields'
             ];
             $chargeDefault = $names[$context->payment_method];
@@ -448,7 +449,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function get_payment_method_script_handles()
     {
-        $script_path = '/block/dist/js/woocommerce-blocks/blocks.min.js';
+        $script_path = '/block/dist/js/woocommerce-blocks/blocks.js';
         $style_path = 'block/dist/css/woocommerce-blocks/style.css'; // Add path to your CSS file
 
         $script_asset = array(

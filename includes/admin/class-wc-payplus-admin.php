@@ -35,6 +35,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     private $_wpnonce;
     public $api_test_mode;
     public $showGetPayPlusDataButton;
+    public $pwGiftCardData;
 
     /**
      * @return null
@@ -943,11 +944,38 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order->set_payment_method_title('Pay with Debit or Credit Card');
             $this->payplus_add_log_all($handle, 'New Payment Process Fired (' . $order_id . ')');
             $payload = $this->generatePaymentLink($order_id, true);
+            $payplus_instance = WC_PayPlus::get_instance();
+            $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
+
+            if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
+                WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
+            }
+            if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards'])) {
+                $products = [];
+                foreach ($this->pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
+                    $priceGift = 0;
+                    $productPrice = -1 * ($giftCard);
+                    $priceGift += number_format($productPrice, 2, '.', '');
+
+                    $giftCards = [
+                        'name' => __('PW Gift Card', 'payplus-payment-gateway'),
+                        'barcode' => $giftCardId,
+                        'quantity' => 1,
+                        'price' => $priceGift,
+                    ];
+
+                    $products[] = $giftCards;
+                }
+            }
             $deviceTransaction = isset($_POST['button']) && $_POST['button'] === "payment-payplus-dashboard-emv" ? true : false;
             if ($deviceTransaction) {
                 $order->set_payment_method_title('Pay with Debit or Credit Card Via POS EMV');
                 $payload = json_decode($payload, true);
                 $payload['credit_terms'] = 1;
+                if (isset($products) && is_array($products) && count($products) > 0) {
+                    $payload['items'] = array_merge($payload['items'], $products);
+                }
+
                 $payload['products'] = $payload['items'];
                 $payload['more_info'] = $order_id;
                 unset($payload['items']);
