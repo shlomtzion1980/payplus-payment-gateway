@@ -2393,7 +2393,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payload['create_token'] = $bSaveToken ? true : false;
         isset($initialInvoice) ? $payload['initial_invoice'] = $initialInvoice : null;
         isset($invoiceLang) ? $payload['invoice_language'] = $invoiceLang : null;
-        !empty($external_recurring_payment) ? $payload['external_recurring_payment'] = $this->getRecurring($external_recurring_id, $order_id) : null;
+        !empty($external_recurring_payment) ? $payload['external_recurring_payment'] = json_decode($this->getRecurring($external_recurring_id, $order_id), true) : null;
         !empty($addData) ? $payload['add_data'] = (string) $addData : null;
         $this->hide_payments_field > 0 ? $payload['hide_payments_field'] = $hidePaymentFields : null;
         $this->hide_identification_id > 0 ? $payload['hide_identification_id'] = ($this->hide_identification_id == 1 ? true : false) : null;
