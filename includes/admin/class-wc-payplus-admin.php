@@ -980,7 +980,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
                 $payload['amount'] = floatval(number_format($payload['amount'], 2, '.', ''));
                 $payload['products'] = $payload['items'];
-                $payload['more_info'] = $order_id;
+                $payload['extra_info'] = $order_id;
                 unset($payload['items']);
                 $payload['device_uid'] = $this->device_uid;
                 $chargeMethod = $payload['charge_method'];
