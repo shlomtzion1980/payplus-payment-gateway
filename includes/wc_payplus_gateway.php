@@ -153,6 +153,25 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
         $this->device_uid = $this->api_test_mode ? $this->get_option('dev_device_uid') ?? null : $this->get_option('device_uid');
+        $cstoreId = 13;
+        if (strlen($this->device_uid) > 0 && isset($cstoreId)) {
+            $currentDevice = $this->device_uid;
+            if (strpos($this->device_uid, ',') !== false) {
+                $devices = explode(',', $this->device_uid);
+
+                foreach ($devices as $device) {
+                    list($storeId, $deviceId) = explode(':', $device);
+                    if ($cstoreId == $storeId) {
+                        $currentDevice = $deviceId;
+                        break;
+                    }
+                }
+            }
+            $this->device_uid = $currentDevice;
+        }
+        // Example usage: Log the storeId and deviceId
+        print_r("Store ID: $cstoreId, Device ID: $this->device_uid");
+        die;
         $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
         $this->current_time = wp_date('Y-m-d H:i:s', current_time('timestamp'), new DateTimeZone('Asia/Jerusalem'));
         $this->rounding_decimals = ROUNDING_DECIMALS;
