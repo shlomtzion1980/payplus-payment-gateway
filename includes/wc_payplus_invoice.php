@@ -1094,6 +1094,7 @@ class PayplusInvoice
                         $payloadArray = json_decode($payplusPayload, true);
                         $itemsAsJson = [];
                         $totalPWAmount = 0;
+                        isset($payloadArray['products']) ? $payloadArray['items'] = $payloadArray['products'] : null;
                         foreach ($payloadArray['items'] as $key => $item) {
                             if (strpos($item['name'], 'PW Gift Card') !== false) {
                                 $totalCartAmount == 0 ? $item['price'] = 0 : null;

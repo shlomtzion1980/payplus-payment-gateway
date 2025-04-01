@@ -952,10 +952,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
             if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards'])) {
                 $products = [];
+                $totalGiftCards = 0;
                 foreach ($this->pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
                     $priceGift = 0;
                     $productPrice = -1 * ($giftCard);
-                    $priceGift += number_format($productPrice, 2, '.', '');
+                    $priceGift += floatval(number_format($productPrice, 2, '.', ''));
 
                     $giftCards = [
                         'name' => __('PW Gift Card', 'payplus-payment-gateway'),
@@ -965,6 +966,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     ];
 
                     $products[] = $giftCards;
+                    $totalGiftCards += $priceGift;
                 }
             }
             $deviceTransaction = isset($_POST['button']) && $_POST['button'] === "payment-payplus-dashboard-emv" ? true : false;
@@ -974,8 +976,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payload['credit_terms'] = 1;
                 if (isset($products) && is_array($products) && count($products) > 0) {
                     $payload['items'] = array_merge($payload['items'], $products);
+                    $payload['amount'] += $totalGiftCards;
                 }
-
+                $payload['amount'] = floatval(number_format($payload['amount'], 2, '.', ''));
                 $payload['products'] = $payload['items'];
                 $payload['more_info'] = $order_id;
                 unset($payload['items']);
