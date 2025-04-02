@@ -274,7 +274,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Hook the custom function to the scheduled event
         add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
         add_action('woocommerce_checkout_order_processed', [$this, 'pwGiftCardsOnNoPayment'], 10, 3);
-        // add_action('woocommerce_payment_complete', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
+        add_action('woocommerce_order_status_changed', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
 
         /****** ACTION END ******/
 
@@ -335,7 +335,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $WC_PayPlus_Admin_Payments = new WC_PayPlus_Admin_Payments;
 
         // Check if the payment gateway ID matches your target ID
-        if ($payment_gateway_id === 'pos_card') {
+        if ($payment_gateway_id === 'pos_card' || $payment_gateway_id === 'pos_chip_and_pin') {
             // Perform your custom logic here
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
