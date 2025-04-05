@@ -333,13 +333,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Get the payment gateway ID
         $payment_gateway_id = $order->get_payment_method();
         $WC_PayPlus_Admin_Payments = new WC_PayPlus_Admin_Payments;
-
         // Check if the payment gateway ID matches your target ID
         if ($payment_gateway_id === 'pos_card' || $payment_gateway_id === 'pos_chip_and_pin') {
-            // Perform your custom logic here
+            $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
-            $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
-            error_log('Order #' . $order_id . ' was paid using the POS Card gateway.');
+            $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
+            print_r($emvResponse);
+            die;
         }
     }
 

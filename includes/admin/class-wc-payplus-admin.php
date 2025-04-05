@@ -981,6 +981,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payload['amount'] = floatval(number_format($payload['amount'], 2, '.', ''));
                 $payload['products'] = $payload['items'];
                 $payload['extra_info'] = $order_id;
+                $payload['more_info'] = $order_id;
                 unset($payload['items']);
                 $payload['device_uid'] = $this->device_uid;
                 $chargeMethod = $payload['charge_method'];
@@ -1010,6 +1011,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         ]);
                         $this->updateOrderStatus($order_id, $type, $res = null);
                         return "success";
+                    } else {
+                        return "error";
                     }
                 } else {
                     if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
@@ -1026,7 +1029,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
             }
         }
-        echo wp_json_encode($response);
+        echo wp_json_encode($response, JSON_UNESCAPED_UNICODE);
         wp_die();
     }
     /**
