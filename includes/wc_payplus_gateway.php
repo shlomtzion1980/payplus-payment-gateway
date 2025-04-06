@@ -274,7 +274,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Hook the custom function to the scheduled event
         add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
         add_action('woocommerce_checkout_order_processed', [$this, 'pwGiftCardsOnNoPayment'], 10, 3);
-        add_action('woocommerce_order_status_changed', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
+        // add_action('woocommerce_order_status_changed', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
 
         /****** ACTION END ******/
 
