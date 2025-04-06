@@ -338,8 +338,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
-            print_r($emvResponse);
-            die;
         }
     }
 
