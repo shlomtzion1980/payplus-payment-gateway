@@ -108,6 +108,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enableDoubleCheckIfPruidExists;
     protected $pwGiftCardData; // Store gift card data
     public $useLegacyPayload;
+    public $isPosOverrideGateways;
+    public $posOverrideGateways;
 
     /**
      *
@@ -152,6 +154,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->block_ip_transactions_hour = $this->get_option('block_ip_transactions_hour');
         $this->api_key = $this->api_test_mode ? $this->get_option('dev_api_key') ?? null : $this->get_option('api_key');
         $this->secret_key = $this->api_test_mode ? $this->get_option('dev_secret_key') ?? null : $this->get_option('secret_key');
+        $this->isPosOverrideGateways = $this->get_option('pos_override') == 'yes' ? true : false;
+        $this->posOverrideGateways = $this->get_option('pos_override_gateways');
         $this->device_uid = $this->api_test_mode ? $this->get_option('dev_device_uid') ?? null : $this->get_option('device_uid');
         $this->device_uid = $this->getPayPlusDeviceId($this->device_uid);
         $this->payment_page_id = $this->api_test_mode ? $this->get_option('dev_payment_page_id') ?? null : $this->get_option('payment_page_id');
@@ -274,7 +278,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Hook the custom function to the scheduled event
         add_action('payplus_after_process_payment_event', array($this, 'payplus_after_process_payment_function'));
         add_action('woocommerce_checkout_order_processed', [$this, 'pwGiftCardsOnNoPayment'], 10, 3);
-        // add_action('woocommerce_order_status_changed', [$this, 'payplusCheckPaymentGatewayId'], 10, 1);
+        $this->isPosOverrideGateways ? add_action('woocommerce_order_status_changed', [$this, 'payplusCheckPaymentGatewayId'], 10, 1) : null;
 
         /****** ACTION END ******/
 
@@ -333,8 +337,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Get the payment gateway ID
         $payment_gateway_id = $order->get_payment_method();
         $WC_PayPlus_Admin_Payments = new WC_PayPlus_Admin_Payments;
+        $gatewaysToOverride = !empty($this->posOverrideGateways) ? explode(',', $this->posOverrideGateways) : [];
         // Check if the payment gateway ID matches your target ID
-        if ($payment_gateway_id === 'pos_card' || $payment_gateway_id === 'pos_chip_and_pin') {
+        if (is_array($gatewaysToOverride) && in_array($payment_gateway_id, $gatewaysToOverride)) {
             $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
