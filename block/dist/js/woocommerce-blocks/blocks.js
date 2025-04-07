@@ -224,12 +224,22 @@ if (isCheckout || hasOrder) {
       );
 
       const observer = new MutationObserver((mutationsList, observer) => {
+        const activePaymentMethod = payment.getActivePaymentMethod();
+        if (
+          activePaymentMethod.search(
+            "payplus-payment-gateway-hostedfields"
+          ) === 0
+        ) {
+          const ppIframeElement = document.getElementsByClassName("pp_iframe_h")[0];
+          if (ppIframeElement) {
+            ppIframeElement.style.display = "flex";
+          }
+        }
         if (hideMainPayPlusGateway) {
           const parentDiv = document
             .querySelector(
               "#radio-control-wc-payment-method-options-payplus-payment-gateway"
-            )
-            .closest(".wc-block-components-radio-control-accordion-option");
+            )?.closest(".wc-block-components-radio-control-accordion-option");
           if (parentDiv) {
             parentDiv.style.display = "none";
           }
@@ -289,8 +299,6 @@ if (isCheckout || hasOrder) {
         }
         if (store.isComplete()) {
           observer.disconnect();
-          const activePaymentMethod = payment.getActivePaymentMethod();
-
           if (
             activePaymentMethod.search(
               "payplus-payment-gateway-hostedfields"
