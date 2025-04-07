@@ -1221,9 +1221,10 @@ class PayplusInvoice
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
                     $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
 
+                    $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                    $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
+
                     if (isset($payload['payments'][0]['payment_app']) && $payload['payments'][0]['payment_app'] === "-1") {
-                        $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                        $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
                         if (is_array($payPlusResponse)) {
                             $payments = [];
                             $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'] ?? 1;
@@ -1235,6 +1236,13 @@ class PayplusInvoice
                             }
                             $payload['payments'] = $payments;
                         }
+                    }
+
+                    if (is_array($payPlusResponse)) {
+                        isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['payments'] = $payPlusResponse['number_of_payments'] : null;
+                        isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['transaction_type'] = 'payments' : 'normal';
+                        isset($payPlusResponse['first_payment_amount']) ? $payload['payments'][0]['first_payment'] = $payPlusResponse['first_payment_amount'] : null;
+                        isset($payPlusResponse['rest_payments_amount']) ? $payload['payments'][0]['subsequent_payments'] = $payPlusResponse['rest_payments_amount'] : null;
                     }
 
                     if ($j5Amount) {
