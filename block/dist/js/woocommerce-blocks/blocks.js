@@ -77,7 +77,7 @@ if (isCheckout || hasOrder) {
   let isCustomeIcons = !!payPlusGateWay.customIcons[0]?.length;
   const hasSavedTokens = Object.keys(payPlusGateWay.hasSavedTokens).length > 0;
   const hideMainPayPlusGateway =
-    payPlusGateWay.hideMainPayPlusGateway && hasSavedTokens;
+    payPlusGateWay.hideMainPayPlusGateway;
 
   (() => {
     ("use strict");
