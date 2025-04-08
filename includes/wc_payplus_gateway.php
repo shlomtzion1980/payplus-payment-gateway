@@ -340,7 +340,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $gatewaysToOverride = !empty($this->posOverrideGateways) ? explode(',', $this->posOverrideGateways) : [];
         // Check if the payment gateway ID matches your target ID
         if (is_array($gatewaysToOverride) && in_array($payment_gateway_id, $gatewaysToOverride)) {
-            $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
+            // $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
         }
