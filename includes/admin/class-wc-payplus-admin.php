@@ -932,6 +932,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $response = array("payment_response" => "", "status" => false);
         isset($oid) && is_int($oid) ? $_POST['order_id'] = $oid : null;
         isset($oid) && is_int($oid) ? $_POST['button'] = "payment-payplus-dashboard-emv" : null;
+        isset($oid) && is_int($oid) ? $isPosAction = true : $isPosAction = false;
 
         if (!empty($_POST)) {
             $this->isInitiated();
@@ -1010,9 +1011,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             'payplus_type' => $type,
                         ]);
                         $this->updateOrderStatus($order_id, $type, $res = null);
-                        return "success";
+                        if ($isPosAction) {
+                            return "success";
+                        }
                     } else {
-                        return "error";
+                        if ($isPosAction) {
+                            return "error";
+                        }
                     }
                 } else {
                     if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
