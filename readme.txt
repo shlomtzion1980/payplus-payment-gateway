@@ -2,7 +2,7 @@
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 3.0.1
-Tested up to: 6.7.1
+Tested up to: 6.8
 Requires PHP: 7.4
 Stable tag: 7.7.2
 PlugIn URL: https://www.payplus.co.il/wordpress
