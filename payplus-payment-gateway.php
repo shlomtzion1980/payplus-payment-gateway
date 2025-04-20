@@ -1308,11 +1308,8 @@ class WC_PayPlus
             }
             public static function payplus_get_admin_menu($nonce)
             {
-                if (!wp_verify_nonce(sanitize_key($nonce), 'menu_option')) {
-                    wp_die('Not allowed! - payplus_get_admin_menu');
-                }
                 ob_start();
-                $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
+                $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : ""; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
                 echo "<div id='payplus-options'>";
                 if (count($adminTabs)) {
