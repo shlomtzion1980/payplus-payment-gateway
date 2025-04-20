@@ -436,16 +436,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
     public function payplus_display_admin_notice()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - payplus_admin_notice');
-        }
         // Only show the notice if the transient is set.
         if (get_transient('payplus_admin_notice')) {
             if (
-                isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
-                $_GET['page'] === 'wc-settings' &&
-                $_GET['tab'] === 'checkout' &&
-                $_GET['section'] === 'payplus-payment-gateway'
+                isset($_GET['page'], $_GET['tab'], $_GET['section']) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['page'] === 'wc-settings' && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['tab'] === 'checkout' && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['section'] === 'payplus-payment-gateway' // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             ) {
                 if (!empty($this->callback_addr)) {
                     $alert = strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0 ? true : false;
@@ -464,10 +461,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             // Display the notice.
             if (
-                isset($_GET['page'], $_GET['tab'], $_GET['section']) &&
-                $_GET['page'] === 'wc-settings' &&
-                $_GET['tab'] === 'checkout' &&
-                $_GET['section'] === 'payplus-payment-gateway-hostedfields'
+                isset($_GET['page'], $_GET['tab'], $_GET['section']) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['page'] === 'wc-settings' && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['tab'] === 'checkout' && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $_GET['section'] === 'payplus-payment-gateway-hostedfields' // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             ) {
                 ?>
                 <div class="notice notice-success is-dismissible">
@@ -1014,10 +1011,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_get_nav_option()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - payplus_get_nav_option');
-        }
-        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : ""; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $adminTabs = WC_PayPlus_Admin_Settings::getAdminTabs();
         if (count($adminTabs)) {
             echo "<nav class='nav-tab-wrapper tab-option-payplus'>";
@@ -1042,9 +1036,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function admin_options()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - admin_options');
-        }
         $title = esc_html(__('PayPlus', 'payplus-payment-gateway') . " ( " . PAYPLUS_VERSION . " )");
         $desc = wp_kses(
             __('For more information about PayPlus and Plugin versions <a href="https://www.payplus.co.il/wordpress" target="_blank">www.payplus.co.il/wordpress</a>', 'payplus-payment-gateway'),
@@ -1058,7 +1049,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $credit = __('This plugin was developed by <a href="https://www.payplus.co.il">PayPlus LTD</a>', 'payplus-payment-gateway');
         ob_start();
 
-        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : "";
+        $currentSection = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : ""; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $this->generate_settings_html();
         $settings = ob_get_clean();
 
@@ -3528,6 +3519,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function add_payment_method()
     {
         $handle = 'payplus_add_payment_method';
+        $success_url = $this->add_payment_res_url; // Your base success URL
+        $nonce_action = 'payplus_add_payment_method_response';
+        $nonce_name = '_wpnonce_add_pm'; // Choose a name for the nonce query parameter
+        $success_url_with_nonce = add_query_arg($nonce_name, wp_create_nonce($nonce_action), $success_url);
         $this->payplus_add_log_all($handle, 'New Add Payment Method Fired');
 
         $current_user = wp_get_current_user();
@@ -3563,7 +3558,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             "charge_method": 5,
             "language_code": "' . $langCode[0] . '",
             "expiry_datetime": "30",
-            "refURL_success": "' . $this->add_payment_res_url . '",
+            "refURL_success": "' . $success_url_with_nonce . '",
             "refURL_failure": "' . wc_get_endpoint_url('add-payment-method') . '",
             "refURL_callback": null,
             "customer": ' . $customerData . ',
@@ -3602,9 +3597,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function add_payment_ipn_response()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayNonce')) {
-            wp_die('Not allowed! - add_payment_ipn_response');
+        $nonce_action = 'payplus_add_payment_method_response';
+        $nonce_name = '_wpnonce_add_pm'; // Must match the name used in add_query_arg
+        $nonce = wp_create_nonce($nonce_action);
+
+        // Verify the nonce passed in the URL query parameters
+        if (!isset($_GET[$nonce_name]) || !wp_verify_nonce(sanitize_key($_GET[$nonce_name]), $nonce_action)) {
+            wp_die('Security check failed!'); // Or handle the error appropriately
         }
+
         $handle = 'payplus_add_payment_ipn';
         $this->payplus_add_log_all($handle, 'New Token Has Been Generated');
 
