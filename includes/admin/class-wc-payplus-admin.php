@@ -52,16 +52,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function __construct()
     {
-        $this->_wpnonce = wp_create_nonce('PayPlusGateWayAdminNonce');
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            wp_die('Not allowed! - __construct - class-wp-payplus-admin.php');
-        }
         global $pagenow;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
         $postKey = array_key_exists('post', $_GET) ? 'post' : 'id';
-        $isPageOrder = ('post.php' === $pagenow || 'admin.php' === $pagenow) && isset($_GET[$postKey]) &&
-            ('shop_order' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
-                || 'shop_subscription' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey])))
-                || 'shop_order_placehold' === get_post_type(sanitize_text_field(wp_unslash($_GET[$postKey]))));
+        $isPageOrder = false;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
+        if (('post.php' === $pagenow || 'admin.php' === $pagenow) && isset($_GET[$postKey])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
+            $post_id = sanitize_text_field(wp_unslash($_GET[$postKey]));
+            $post_type = get_post_type($post_id);
+            $isPageOrder = in_array($post_type, ['shop_order', 'shop_subscription', 'shop_order_placehold']);
+        }
 
         $sections = $this->arrPayment;
         $sections[] = 'payplus-payment-gateway-setup-wizard';
@@ -71,7 +72,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         if (
             $isPageOrder
-            || (('admin.php' === $pagenow) && isset($_GET['section']) && in_array($_GET['section'], $sections))
+            || (('admin.php' === $pagenow) && isset($_GET['section']) && in_array($_GET['section'], $sections)) // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
         ) {
 
             add_action('admin_enqueue_scripts', [$this, 'load_admin_assets']);
@@ -2381,15 +2382,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function load_admin_assets()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            wp_die('Not allowed! - load_admin_assets');
-        }
         $enabled = false;
         $isInvoice = false;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
         if (!empty($_GET) && !empty($_GET['section'])) {
-            $currentSection = sanitize_text_field(wp_unslash($_GET['section']));
+            $currentSection = sanitize_text_field(wp_unslash($_GET['section'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $currentPayment = get_option('woocommerce_' . $currentSection . '_settings');
             $enabled = (isset($currentPayment['enabled']) && $currentPayment['enabled'] === "yes") ? false : true;
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $isInvoice = (!empty($_GET['invoicepayplus']) && $_GET['invoicepayplus'] === "1") ? true : false;
             if ($currentSection === "payplus-payment-gateway") {
                 $display_count = get_option('wc_payplus_display_embedded_count', 0);
@@ -2400,24 +2400,15 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (isset($_GET['post']) && isset($_GET['action']) && $_GET['action'] === 'edit') {
-            $order_id = intval($_GET['post']);
+            $order_id = intval($_GET['post']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         }
 
         if (!isset($order_id)) {
-            if (isset($_GET['id']) && $_GET['id'] !== "") {
-                $order_id = intval($_GET['id']);
+            if (isset($_GET['id']) && $_GET['id'] !== "") { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $order_id = intval($_GET['id']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             }
-        }
-
-        if (isset($_GET['deleteMetaData']) && $_GET['deleteMetaData'] !== "") {
-            $metaKey = sanitize_text_field(wp_unslash($_GET['deleteMetaData']));
-            $this->deleteMetaData($order_id, $metaKey);
-        }
-
-        if (isset($_GET['displayMetaData']) && $_GET['displayMetaData'] !== "") {
-            $metaKey = sanitize_text_field(wp_unslash($_GET['displayMetaData']));
-            $this->displayMetaData($order_id, $metaKey);
         }
 
         if (!empty($order_id)) {
@@ -2630,26 +2621,33 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function admin_notices()
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            wp_die('Not allowed! - admin_notices');
-        }
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (!isset($_GET['error_msg'])) {
             return;
         }
 
+        // Optional but recommended: Validate the input
+        $error_code = filter_input(INPUT_GET, 'error_msg', FILTER_VALIDATE_INT);
+        if ($error_code === false || $error_code === null) { // Check if it's not a valid integer or not set
+            return; // Or handle as an invalid code
+        }
+
+
         $title = __('PayPlus Payment Gateway', 'payplus-payment-gateway');
         $class = 'notice-error';
-        switch ($_GET['error_msg']) {
+        // Use the validated $error_code
+        switch ($error_code) {
             case 1:
                 $message = esc_html__('user or other, please contact payplus support', 'payplus-payment-gateway');
                 break;
             case 2:
                 $message = esc_html__('Credit card company declined, check credit card details and credit line', 'payplus-payment-gateway');
                 break;
-            default:
+            default: // Handles 0 or any other integer value
                 $message = esc_html__('PayPlus Payment Successful', 'payplus-payment-gateway');
                 $class = 'notice-success';
         }
+        // Output is escaped
         echo "<div class='notice " . esc_attr($class) . " is-dismissible'><p><b>" . esc_html($title) . ":</b>" . esc_html($message) . "</p></div>";
     }
 
