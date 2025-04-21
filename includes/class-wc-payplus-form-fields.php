@@ -698,6 +698,14 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'yes'
             ],
+            'hide_main_pp_checkout' => [
+                'title' => __('Hide PayPlus Gateway', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'description' => __('Hide PayPlus Payment Gateway In The Checkout Page (Default: Unchecked)', 'payplus-payment-gateway'),
+                'label' => __('Hide PayPlus Payment Gateway In The Checkout Page (Default: Unchecked)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'payment_page_title' => [
                 'title' => __('Payment Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
