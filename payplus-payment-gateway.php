@@ -1295,9 +1295,6 @@ class WC_PayPlus
              */
             public static function payplus_check_exists_table($wpnonce, $table = 'payplus_order')
             {
-                if (!wp_verify_nonce(sanitize_key($wpnonce), 'PayPlusGateWayNonce')) {
-                    wp_die('Not allowed! - payplus_check_exists_table');
-                }
                 $transient_key = 'payplus_check_exists_table_' . $table;
                 $flag = get_transient($transient_key);
                 if ($flag === false) {

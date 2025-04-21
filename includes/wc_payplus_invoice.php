@@ -1028,12 +1028,6 @@ class PayplusInvoice
      */
     public function payplus_invoice_create_order($order_id, $typeInvoice = false, $isCashPayment = false)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayInvoiceNonce')) {
-            $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_process_invoice_failed', "Failed to run because of nonce : payplus_process_invoice for order:  $order_id\n");
-            wp_die('Not allowed! - payplus_invoice_create_order');
-        }
-
         $payload = array();
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';

@@ -3599,7 +3599,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $nonce_action = 'payplus_add_payment_method_response';
         $nonce_name = '_wpnonce_add_pm'; // Must match the name used in add_query_arg
-        $nonce = wp_create_nonce($nonce_action);
 
         // Verify the nonce passed in the URL query parameters
         if (!isset($_GET[$nonce_name]) || !wp_verify_nonce(sanitize_key($_GET[$nonce_name]), $nonce_action)) {
