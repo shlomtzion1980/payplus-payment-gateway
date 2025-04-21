@@ -53,6 +53,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function __construct()
     {
         global $pagenow;
+        $this->_wpnonce = wp_create_nonce('PayPlusGateWayAdminNonce');
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET for page context only. Input is sanitized.
         $postKey = array_key_exists('post', $_GET) ? 'post' : 'id';
         $isPageOrder = false;
