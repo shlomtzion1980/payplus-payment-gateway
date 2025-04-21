@@ -494,11 +494,20 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function payplus_admin_classes($classes)
     {
-        if (!wp_verify_nonce($this->_wpnonce, 'PayPlusGateWayAdminNonce')) {
-            wp_die('Not allowed! - payplus_admin_classes');
-        }
-        if (isset($_GET['section']) && $_GET['section'] === 'payplus-error-setting') {
-            $classes .= "payplus-error-setting";
+        // No nonce check needed here as we are only reading for display.
+
+        // Check if the 'section' parameter exists in the URL
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading section for display class only, input is sanitized.
+        if (isset($_GET['section'])) {
+            // Sanitize the input from $_GET before using it
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading section for display class only, input is sanitized.
+            $current_section = sanitize_text_field(wp_unslash($_GET['section']));
+
+            // Now use the sanitized value for comparison
+            if ($current_section === 'payplus-error-setting') {
+                // Ensure there's a space before adding the class
+                $classes .= " payplus-error-setting";
+            }
         }
         return $classes;
     }
