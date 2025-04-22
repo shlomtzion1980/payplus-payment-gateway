@@ -161,6 +161,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         ));
         $cart = WC()->cart;
         $discount = $cart->get_cart_discount_total();
+        $applied_coupons = $cart->get_applied_coupons();
+        $discountNames = $applied_coupons ? implode(", ", $applied_coupons) : false;
+
         $taxDiscount = $cart->get_cart_discount_tax_total();
         if (!empty($_POST)) {
             $obj = isset($_POST['obj']) ?  WC_PayPlus_Statics::sanitize_object($_POST['obj']) : null; // phpcs:ignore 
@@ -216,7 +219,7 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             }
             if ($discount) {
                 $item_fee = new WC_Order_Item_Fee();
-                $item_fee->set_name("discount");
+                $discountNames ? $item_fee->set_name("Coupons: $discountNames") : $item_fee->set_name('Discount');
                 $item_fee->set_amount(-1 * $discount);
                 $is_taxable_settings = (get_option('woocommerce_calc_taxes') == 'yes');
                 $tax = $paying_vat && ($is_taxable_settings) ? 'taxable' : 'none';
