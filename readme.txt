@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.7.2
+Stable tag: 7.7.3
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,6 +86,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+= 7.7.3 - 27-04-2025 =
+
+- Tweak - Express Checkout payments now display specific coupon names instead of "discount".
+- Tweak - Updated nonce usage for improved security.
+- Added - New setting to hide the enabled PayPlus Payment Gateway on the classic checkout page using JavaScript (intended for customers using only POS EMV).
+- Added - Setting to block automatic Invoice+ document creation for POS EMV, POS card, and Chip and Pin gateways.
+
 = 7.7.2 - 14-04-2025 =
 
 - Fix   - Resolved an issue where POS EMV refunds were not processing as expected.
@@ -96,7 +103,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak - The close iframe button in blocks checkout now consistently appears in black.
 - Tweak - Initial refactor of the generatePayloadLink function, now renamed to generatePaymentLink. Both the new and "legacy" payloads are supported. If issues arise with the new payload, you can revert to the "legacy" payload by enabling the "Use legacy payload function" checkbox in the plugin settings.
 - Added - Feature: Pay with POS EMV as a subgateway from the checkout page.
-- Added - Payment details are now included in Invoice+ documents.
+- Added - Multiple payments details are now included in Invoice+ documents.
 - Tweak - Verified compatibility with WordPress version 6.8.
 - Fix   - Resolved an issue with new checkout blocks where "PayPlus Embedded" was unnecessarily hidden based on tokens.
 - Tweak - Updated translations for recently added plugin settings.
