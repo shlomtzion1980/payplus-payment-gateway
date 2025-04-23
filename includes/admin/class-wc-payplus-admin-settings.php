@@ -411,6 +411,8 @@ class WC_PayPlus_Admin_Settings
                         'paypal' => esc_html__('PayPal', 'payplus-payment-gateway'),
                         'bacs' => esc_html__('Direct bank transfer', 'payplus-payment-gateway'),
                         'cod' => esc_html__('Cash on Delivery', 'payplus-payment-gateway'),
+                        'pos_card' => esc_html__('POS Card', 'payplus-payment-gateway'),
+                        'pos_chip_and_pin' => esc_html__('POS chip and pin', 'payplus-payment-gateway'),
                     ]
                 );
                 $settings[$section][] = array(

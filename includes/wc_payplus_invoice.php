@@ -1186,7 +1186,7 @@ class PayplusInvoice
                                 isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create']) ||
                                 isset($this->payplus_invoice_option['do-not-create']) && in_array($order->get_payment_method(), $this->payplus_invoice_option['do-not-create'])
                             ) {
-                                $order->add_order_note('This payment method is set as: Not to create documents');
+                                $order->add_order_note('This payment method is set as: Not to create documents automatically');
                                 return;
                             }
                             $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
