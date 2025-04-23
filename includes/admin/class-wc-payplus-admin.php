@@ -315,7 +315,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=5";
 
-        $payload['payment_request_uid'] = $payment_request_uid;
+        !empty($payment_request_uid) ? $payload['payment_request_uid'] = $payment_request_uid : $payload['transaction_uid'] = $transactionUid;
 
         $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : "";
 
@@ -1933,10 +1933,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         <div class="payplus-order-buttons">
             <?php
             if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
-                if (!empty($payplusResponse) || !empty($pageRequestUid)) {
+                if (!empty($payplusResponse) || !empty($pageRequestUid) || !empty($transactionUid)) {
                     $payplusResponse = json_decode($payplusResponse, true);
                     $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
-                    if (!empty($pageRequestUid)) {
+                    if (!empty($pageRequestUid) || !empty($transactionUid)) {
                         echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
                         echo wp_kses_post($payPlusLoader);
                     }
