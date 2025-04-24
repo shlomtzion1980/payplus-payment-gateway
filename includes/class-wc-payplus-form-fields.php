@@ -620,21 +620,6 @@ class WC_PayPlus_Form_Fields
                 'default' => '',
                 'desc_tip' => true,
             ],
-            'pos_override' => [
-                'title' => __('POS Override', 'payplus-payment-gateway'),
-                'type' => 'checkbox',
-                'label' => __('Override the payment gateway with the payplus EMV POS device (happens after status change)', 'payplus-payment-gateway'),
-                'default' => 'no',
-                'desc_tip' => true,
-                'description' => __('If you have a PayPlus POS device and want to use it for payments with unsupported POS plugins, check this box.', 'payplus-payment-gateway'),
-            ],
-            'pos_override_gateways' => [
-                'title' => __('POS Override Gateways - divide by commas', 'payplus-payment-gateway'),
-                'type' => 'text',
-                'default' => 'pos_card,pos_chip_and_pin',
-                'desc_tip' => true,
-                'description' => __('POS Override Gateways - divide by commas - the payment gateways that will be overridden by the PayPlus EMV POS device.', 'payplus-payment-gateway'),
-            ],
             'transaction_type' => [
                 'title' => __('Transactions Type', 'payplus-payment-gateway'),
                 'type' => 'select',
@@ -1014,6 +999,21 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'label' => __('Log debug messages', 'payplus-payment-gateway'),
                 'default' => 'yes',
                 'custom_attributes' => array('disabled' => 'disabled'),
+            ],
+            'pos_override' => [
+                'title' => __('POS Override', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Use PayPlus EMV POS for selected gateway(s)', 'payplus-payment-gateway'),
+                'default' => 'no',
+                'desc_tip' => true,
+                'description' => __('If you have a PayPlus POS device and want to use it for payments with unsupported POS Gateways, check this box (happens after status change).', 'payplus-payment-gateway'),
+            ],
+            'pos_override_gateways' => [
+                'title' => __('POS Override Gateways - divide by commas', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => '',
+                'desc_tip' => true,
+                'description' => __('POS Override Gateways - divide by commas - the payment gateways that will be overridden by the PayPlus EMV POS device.', 'payplus-payment-gateway'),
             ],
         ];
         return $formFields;
