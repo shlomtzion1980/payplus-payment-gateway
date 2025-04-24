@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Tweak - Express Checkout payments now display specific coupon names instead of "discount".
 - Tweak - Updated nonce usage for improved security.
 - Added - New setting to hide the enabled PayPlus Payment Gateway on the classic checkout page using JavaScript (intended for customers using only POS EMV).
-- Added - Setting to block automatic Invoice+ document creation for POS EMV, POS card, and Chip and Pin gateways.
+- Added - Setting to block automatic Invoice+ document creation for POS gateways.
 
 ## [7.7.2] - 14-04-2025 - (LifeLine)
 
