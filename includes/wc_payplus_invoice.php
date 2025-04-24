@@ -12,6 +12,7 @@ class PayplusInvoice
     private $payplus_invoice_api_key;
     private $payplus_invoice_secret_key;
     private $payplus_invoice_brand_uid;
+    private $payplus_invoice_emv_pos_brand_uid;
     private $payplus_website_code;
     private $payplus_invoice_type_document;
     private $payplus_invoice_type_document_refund;
@@ -59,8 +60,12 @@ class PayplusInvoice
 
         $this->payplus_invoice_brand_uid = (isset($this->payplus_invoice_option['payplus_invoice_brand_uid'])) ?
             $this->payplus_invoice_option['payplus_invoice_brand_uid'] : EMPTY_STRING_PAYPLUS;
-
         $this->payplus_invoice_brand_uid = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? (isset($this->payplus_invoice_option['payplus_invoice_brand_uid_sandbox']) ? $this->payplus_invoice_option['payplus_invoice_brand_uid_sandbox'] : null) : $this->payplus_invoice_brand_uid;
+
+        $this->payplus_invoice_emv_pos_brand_uid = (isset($this->payplus_invoice_option['payplus_invoice_emv_pos_brand_uid'])) ?
+            $this->payplus_invoice_option['payplus_invoice_emv_pos_brand_uid'] : EMPTY_STRING_PAYPLUS;
+
+        $this->payplus_invoice_emv_pos_brand_uid = isset($this->payplus_gateway_option['api_test_mode']) && $this->payplus_gateway_option['api_test_mode'] === 'yes' ? (isset($this->payplus_invoice_option['payplus_invoice_emv_pos_brand_uid_sandbox']) ? $this->payplus_invoice_option['payplus_invoice_emv_pos_brand_uid_sandbox'] : null) : $this->payplus_invoice_emv_pos_brand_uid;
 
         $this->payplus_create_invoice_automatic = (isset($this->payplus_invoice_option['create-invoice-automatic'])
             && $this->payplus_invoice_option['create-invoice-automatic'] == "yes") ?
@@ -340,9 +345,14 @@ class PayplusInvoice
         $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
         $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
 
-        if (!empty($this->payplus_invoice_brand_uid)) {
+        $isEmv = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
+        if (!empty($this->payplus_invoice_brand_uid) && !$isEmv) {
             $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
         }
+        if (!empty($this->payplus_invoice_emv_pos_brand_uid) && $isEmv) {
+            $payload['brand_uuid'] = $this->payplus_invoice_emv_pos_brand_uid;
+        }
+
         if (!empty($payplusTransactionUid)) {
             $payload['transaction_uuid'] = $payloadInvoiceData ? $payloadInvoiceData['transaction_uuid'] : $payplusTransactionUid;
         }
@@ -1072,8 +1082,15 @@ class PayplusInvoice
                     if (!empty($payplusTransactionUid)) {
                         $payload['transaction_uuid'] = $payplusTransactionUid;
                     }
-                    if (!empty($this->payplus_invoice_brand_uid)) {
+
+                    $isEmv = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
+
+                    if (!empty($this->payplus_invoice_brand_uid) && !$isEmv) {
                         $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
+                    }
+
+                    if (!empty($this->payplus_invoice_emv_pos_brand_uid) && $isEmv) {
+                        $payload['brand_uuid'] = $this->payplus_invoice_emv_pos_brand_uid;
                     }
 
                     $payplusPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload');

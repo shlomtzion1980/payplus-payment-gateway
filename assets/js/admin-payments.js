@@ -166,7 +166,11 @@ jQuery(document).ready(function ($) {
     });
 
     $("#create-invoice-plus-doc").click(function () {
-        if (!confirm("WARNING: This will create an invoice no matter what the order STATUS is... Are you sure you want to create the invoice?")) {
+        if (
+            !confirm(
+                "WARNING: This will create an invoice no matter what the order STATUS is... Are you sure you want to create the invoice?"
+            )
+        ) {
             return;
         }
         let loader = $("#order_data").find(".payplus_loader_gpp");
@@ -202,7 +206,11 @@ jQuery(document).ready(function ($) {
     });
 
     $("#get-invoice-plus-data").click(function () {
-        if (!confirm("ATTENTION: This only pulls existing information, only visual data, this does not create any document.")) {
+        if (
+            !confirm(
+                "ATTENTION: This only pulls existing information, only visual data, this does not create any document."
+            )
+        ) {
             return;
         }
         let loader = $("#order_data").find(".payplus_loader_gpp");
@@ -351,9 +359,9 @@ jQuery(document).ready(function ($) {
     $("#payplus-token-payment").click(function (event) {
         event.preventDefault();
         let payplusChargeAmount = $(this)
-            .closest(".delayed-payment")
-            .find("#payplus_charge_amount")
-            .val(),
+                .closest(".delayed-payment")
+                .find("#payplus_charge_amount")
+                .val(),
             payplusOrderId = $(this)
                 .closest(".delayed-payment")
                 .find("#payplus_order_id")
@@ -615,11 +623,19 @@ if (
     var brandUidDevParentTr = jQuery(
         "#payplus_invoice_option\\[payplus_invoice_brand_uid_sandbox\\]"
     ).closest("tr");
+    var emvPosBrandUidParentTr = jQuery(
+        "#payplus_invoice_option\\[payplus_invoice_emv_pos_brand_uid\\]"
+    ).closest("tr");
+    var emvPosBrandUidDevParentTr = jQuery(
+        "#payplus_invoice_option\\[payplus_invoice_emv_pos_brand_uid_sandbox\\]"
+    ).closest("tr");
 
     if (payplus_script_admin.testMode === "yes") {
         brandUidParentTr.hide();
+        emvPosBrandUidParentTr.hide();
     } else {
         brandUidDevParentTr.hide();
+        emvPosBrandUidDevParentTr.hide();
     }
 
     jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").change(
@@ -657,15 +673,15 @@ if (
         jQuery("#woocommerce_payplus-payment-gateway_transaction_type").val()
     ) !== 2
         ? jQuery(
-            "#woocommerce_payplus-payment-gateway_check_amount_authorization"
-        )
-            .closest("tr")
-            .fadeOut()
+              "#woocommerce_payplus-payment-gateway_check_amount_authorization"
+          )
+              .closest("tr")
+              .fadeOut()
         : jQuery(
-            "#woocommerce_payplus-payment-gateway_check_amount_authorization"
-        )
-            .closest("tr")
-            .fadeIn();
+              "#woocommerce_payplus-payment-gateway_check_amount_authorization"
+          )
+              .closest("tr")
+              .fadeIn();
     //display API mode
     if (
         jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").val() ===
@@ -675,8 +691,8 @@ if (
         modeMessage["he"] = "מצב נוכחי: מצב ארגז חול(פיתוח)";
         currentMode = jQuery(
             "<tr><td style='color: red;' id='currentMode'>" +
-            modeMessage[currentLanguage] +
-            "</td></tr></tr>"
+                modeMessage[currentLanguage] +
+                "</td></tr></tr>"
         );
         showDevs();
     } else {
@@ -689,8 +705,8 @@ if (
             modeMessage["he"] = "מצב נוכחי: מצב ייצור";
             currentMode = jQuery(
                 "<tr><td id='currentMode'>" +
-                modeMessage[currentLanguage] +
-                "</td></tr></tr>"
+                    modeMessage[currentLanguage] +
+                    "</td></tr></tr>"
             );
             showProds();
         }
@@ -737,8 +753,8 @@ function payplusMenusDisplay() {
 
         transactionTypeMessage = jQuery(
             "<tr><td id='warningMessage'>" +
-            message[currentLanguage] +
-            "</td></tr></tr>"
+                message[currentLanguage] +
+                "</td></tr></tr>"
         );
         $firstInputWithId.closest("tr").before(transactionTypeMessage);
     }
@@ -823,8 +839,8 @@ function payplusMenusDisplay() {
                 : iframes["payplus-faq"];
         let $settingsContainer = jQuery(
             '<div id="settingsContainer"><div class="tab-section-payplus" id="tab-payplus-gateway"></div><div class="right-tab-section-payplus hideIt"><h2>' +
-            iframeHeadline +
-            "</h2></div>"
+                iframeHeadline +
+                "</h2></div>"
         );
         //Add all existing tables to .tab-section-payplus
         $settingsContainer
