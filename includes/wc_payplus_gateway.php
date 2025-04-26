@@ -342,9 +342,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (is_array($gatewaysToOverride) && in_array($payment_gateway_id, $gatewaysToOverride)) {
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
+
             if ($emvResponse === "error" || $emvResponse === "חיבור לתוכנה נכשל") {
                 $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
                 $order->save();
+                wp_die($emvResponse);
             }
         }
     }

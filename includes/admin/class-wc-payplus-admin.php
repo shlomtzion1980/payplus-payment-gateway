@@ -1029,7 +1029,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     } else {
                         $isPosAction && $isProcessPayment && $res->results->status === "error" && $res->results->code === 1 ? wp_die($res->results->description) : null;
                         if ($isPosAction) {
-                            return "error";
+                            return $res->results->description;
                         }
                     }
                 } else {
