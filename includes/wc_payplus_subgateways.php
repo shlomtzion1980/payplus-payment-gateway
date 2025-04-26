@@ -477,6 +477,18 @@ class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
     public $pay_with_text = 'Pay with PayPlus - POS EMV';
 
     /**
+     * @return void
+     */
+    public function init_form_fields()
+    {
+        parent::init_form_fields(); // Call parent to initialize fields first
+        // Override the 'enabled' field default
+        if (isset($this->form_fields['enabled'])) {
+            $this->form_fields['enabled']['default'] = 'yes';
+        }
+    }
+
+    /**
      * Get the icon HTML with inline styles
      */
     public function get_icon()
@@ -645,3 +657,20 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         );
     }
 }
+
+/**
+ * Filter available payment gateways to hide POS EMV on checkout.
+ *
+ * @param array $available_gateways Existing available gateways.
+ * @return array Filtered available gateways.
+ */
+function payplus_filter_pos_emv_gateway($available_gateways)
+{
+    // Check if it's the checkout page and the gateway exists
+    if (function_exists('is_checkout') && is_checkout() && !is_wc_endpoint_url() && isset($available_gateways['payplus-payment-gateway-pos-emv'])) {
+        // Remove the POS EMV gateway from the list for checkout display
+        unset($available_gateways['payplus-payment-gateway-pos-emv']);
+    }
+    return $available_gateways;
+}
+add_filter('woocommerce_available_payment_gateways', 'payplus_filter_pos_emv_gateway', 20); // Use priority 20 to run after default checks
