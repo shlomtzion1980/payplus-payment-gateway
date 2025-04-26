@@ -490,7 +490,7 @@ class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
     {
         $adminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
-        $response = $adminPayments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
+        $response = $adminPayments->ajax_payplus_generate_link_payment($order_id, $_wpnonce, true);
         $order = wc_get_order($order_id);
         $redirect_to = $order->get_checkout_order_received_url();
         $response === "success" ?

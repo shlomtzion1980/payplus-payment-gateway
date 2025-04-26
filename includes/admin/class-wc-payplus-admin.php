@@ -930,7 +930,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     /**
      * @return void|string
      */
-    public function ajax_payplus_generate_link_payment($oid = null, $_wpnonce = null)
+    public function ajax_payplus_generate_link_payment($oid = null, $_wpnonce = null, $isProcessPayment = false)
     {
         if (isset($_wpnonce) && !wp_verify_nonce($_wpnonce, 'ajax_payplus_generate_link_payment')) {
             check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
@@ -1003,6 +1003,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $paymentUrl = !$deviceTransaction ? $this->payment_url : $this->devicePaymentUrl;
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
             $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
+
             $response = WC_PayPlus_Statics::payPlusRemote($paymentUrl, $payload);
 
             if (is_wp_error($response)) {
@@ -1026,6 +1027,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             return "success";
                         }
                     } else {
+                        $isPosAction && $isProcessPayment && $res->results->status === "error" && $res->results->code === 1 ? wp_die($res->results->description) : null;
                         if ($isPosAction) {
                             return "error";
                         }
