@@ -78,6 +78,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
+        // Filter out the specific gateway
+        $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-pos-emv']));
     }
 
     /**
