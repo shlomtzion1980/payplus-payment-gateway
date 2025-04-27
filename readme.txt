@@ -88,10 +88,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 = 7.7.3 - 27-04-2025 =
 
-- Tweak - Express Checkout payments now display specific coupon names instead of "discount".
-- Tweak - Updated nonce usage for improved security.
-- Added - New setting to hide the enabled PayPlus Payment Gateway on the classic checkout page using JavaScript (intended for customers using only POS EMV).
-- Added - Setting to block automatic Invoice+ document creation for POS gateways.
+- Tweak - Express Checkout now displays specific coupon names instead of a generic "discount" label (when applicable).
+- Tweak - Enhanced security through updated nonce implementation.
+- Added - Option to hide the main PayPlus gateway on the classic checkout page (useful for merchants primarily using POS EMV).
+- Added - Setting to prevent automatic Invoice+ document creation for other POS gateways transactions (when using POS Override).
+- Added - EMV POS payment option is now hidden during standard customer checkout even when activated.
+- Added - Support for including the "Brand" field in EMV POS documents.
+- Tweak - Improved error handling for EMV POS transactions.
 
 = 7.7.2 - 14-04-2025 =
 
