@@ -346,7 +346,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($emvResponse === "error" || $emvResponse === "חיבור לתוכנה נכשל") {
                 $order->update_status('wc-pending', __('Payment pending.', 'payplus-payment-gateway'));
                 $order->save();
-                wp_die($emvResponse);
+                wp_die(esc_html($emvResponse));
             }
         }
     }
