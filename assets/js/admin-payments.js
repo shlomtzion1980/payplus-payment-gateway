@@ -37,9 +37,83 @@ jQuery(document).ready(function ($) {
             success: function (response) {
                 // Handle the successful response
                 // For example, display a message or update the UI
-                console.log("AJAX Success:", response);
+                // Remove any existing popup first
+                $("#payplus-response-popup").remove();
+
+                // Create popup elements
+                const $popupOverlay = $('<div id="payplus-response-popup"></div>').css({
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    zIndex: 10000, // Ensure it's on top
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '20px'
+                });
+
+                const $popupContent = $('<div></div>').css({
+                    backgroundColor: '#fff',
+                    padding: '30px',
+                    borderRadius: '5px',
+                    maxHeight: '80vh',
+                    maxWidth: '80vw',
+                    overflow: 'auto',
+                    position: 'relative',
+                    boxSizing: 'border-box'
+                });
+
+                const $closeButton = $('<span class="close-popup">&times;</span>').css({
+                    position: 'absolute',
+                    top: '10px',
+                    right: '15px',
+                    fontSize: '24px',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    lineHeight: '1'
+                });
+
+                const $preFormattedJson = $('<pre></pre>').css({
+                    whiteSpace: 'pre-wrap', // Ensure wrapping
+                    wordWrap: 'break-word', // Break long words/strings
+                    margin: 0 // Reset default margin
+                });
+
+                // Format and set the JSON content
+                try {
+                    const formattedJson = JSON.stringify(response, null, 2); // Pretty print JSON
+                    $preFormattedJson.text(formattedJson);
+                } catch (e) {
+                    console.error("Error stringifying JSON response:", e);
+                    $preFormattedJson.text("Error displaying response. See console for details.");
+                }
+
+                // Assemble the popup
+                $popupContent.append($closeButton);
+                $popupContent.append($preFormattedJson);
+                $popupOverlay.append($popupContent);
+
+                // Add close functionality
+                $closeButton.on('click', function() {
+                    $popupOverlay.fadeOut(function() { $(this).remove(); });
+                });
+                // Optional: Close when clicking the overlay background
+                $popupOverlay.on('click', function(e) {
+                    if (e.target === this) { // Only if clicking the overlay itself
+                         $popupOverlay.fadeOut(function() { $(this).remove(); });
+                    }
+                });
+
+                // Append to body and show
+                $('body').append($popupOverlay);
+                $popupOverlay.fadeIn();
+
+                // Original logic based on response status (can still run alongside the popup)
                 if (response && response.success) {
-                    alert("Meta data displayed/processed successfully."); // Replace with actual UI update
+                    // alert("Meta data displayed/processed successfully."); // Replace with actual UI update
                     // Potentially reload or update part of the page based on the response
                 } else {
                     alert(
