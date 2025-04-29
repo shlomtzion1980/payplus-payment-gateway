@@ -473,17 +473,20 @@ class WC_PayPlus_Form_Fields
                         echo esc_html("\nTotal orders selected: $selectedOrders\n\n");
                         echo esc_html("Selected orders " . wp_json_encode(array_reverse($orders)) . "\n");
                     }
-
+       
                     $sanitized_post = array_map('sanitize_text_field', wp_unslash($_POST));
-                    echo "\n" . wp_json_encode($sanitized_post);
+                    echo "verifyPayPlusOrders:\n" . wp_json_encode($sanitized_post);
 
                     // Display a confirmation form before running the function
                     if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
-                        echo '<script type="text/javascript">
+                        ?><script type="text/javascript">
+                        if(document.getElementById("reportsForm") !== null){
                             document.getElementById("reportsForm").style.display = "none";
                             document.getElementById("pp_all_orders").style.display = "none";
                             document.getElementById("selctedYearForm").style.display = "none";
-                        </script>';
+                        }
+                        </script>;
+                        <?php
                         echo '<style>
                         table#pp_all_orders, form#selctedYearForm {
                             display: none;
@@ -494,7 +497,9 @@ class WC_PayPlus_Form_Fields
                         echo '<br></br><button onclick="window.history.go(-2)">Go Back</button>';
                     } else {
                         echo '<script type="text/javascript">
+                        if(document.getElementById("reportsForm") !== null){
                             document.getElementById("reportsForm").style.display = "none";
+                        }
                         </script>';
                         echo '<style>
                         table#pp_all_orders, form#selctedYearForm {
@@ -514,10 +519,17 @@ class WC_PayPlus_Form_Fields
                         echo '<input type="hidden" name="reportOnly" value="' . esc_attr($reportOnly) . '">';
                         echo '<input type="hidden" name="allStatuses" value="' . esc_attr($allStatuses) . '">';
                         echo '<input type="hidden" name="order_numbers" value="' . esc_attr(implode(',', array_reverse($orders))) . '">';
-                        echo '<p>Are you sure you want to run the PayPlus Orders Validator?</p>';
-                        echo '<button type="submit" name="confirm" value="yes">Yes</button>';
-                        echo '<button type="submit" name="confirm" value="no">No</button>';
-                        echo '</form><br>';
+                        if($selectedOrders === 0) {
+                            echo '</div>';
+                            echo '</form><br>';
+                        } else {
+                            echo '<p>Are you sure you want to run the PayPlus Orders Validator?</p>';
+                            echo '<div id="confirmContainer">';
+                            echo '<button type="submit" name="confirm" value="yes">Yes</button>';
+                            echo '<button type="submit" name="confirm" value="no">No</button>';
+                            echo '</div>';
+                            echo '</form><br>';
+                        }
                         echo '<button onclick="history.back()">Go Back</button>';
                     }
                 }
