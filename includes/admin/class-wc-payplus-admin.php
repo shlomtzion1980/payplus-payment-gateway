@@ -114,12 +114,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('wp_ajax_payplus_ipn', [$this, 'payplusIpn']);
         add_action('wp_ajax_invoice_plus_search', [$this, 'payplusIpn']);
         add_action('wp_ajax_invoice_plus_create', [$this, 'payplusIpn']);
+        add_action('wp_ajax_display-meta-data', [$this, 'displayMetaData']);
         add_action('wp_ajax_make-token-payment', [$this, 'makeTokenPayment']);
 
         add_action('woocommerce_admin_order_totals_after_total', [$this, 'payplus_woocommerce_admin_order_totals_after_total'], 10, 1);
         // Place "Get Order Details" button from PayPlus if the order is marked as unpaid - allows to get the order details from PayPlus if exists and
         // updates the order status to processing if the payment was successful and adds order note!
-        add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
+        // add_action('woocommerce_admin_order_data_after_order_details', [$this, 'add_custom_button_to_order'], 10, 1);
         add_action('add_meta_boxes', [$this, 'payPlusMetaboxes']);
         add_action('admin_head', [$this, 'hide_delete_update_buttons_css']);
 
@@ -246,7 +247,84 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     ['metaBoxType' => 'payplus']
                 );
             }
+            add_meta_box(
+                'payplus_buttons_metabox', // Unique ID for the metabox
+                "<img style='height: 35px;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg'> Actions", // Title with logo
+                [$this, 'display_payplus_buttons_metabox'], // Callback function
+                $screen->id, // Screen ID
+                'side', // Context
+                'default', // Priority
+                ['metaBoxType' => 'payplusButtons'] // Custom argument for the callback
+            );
         }
+    }
+
+    /**
+     * Displays the content for the PayPlus Actions metabox.
+     * Includes the 'Display Meta Data' button.
+     *
+     * @param WP_Post $post The post object associated with the metabox.
+     */
+    public function display_payplus_buttons_metabox($post)
+    {
+        // Ensure $post is a valid WP_Post object and has an ID
+        $order = wc_get_order($post->ID);
+        if ($order) {
+            $payPlusLoader = "<div class='payplus_loader_gpp'>
+            <div class='loader'>
+              <div class='loader-background'><div class='text'></div></div>
+            </div>
+          </div>";
+            echo wp_kses_post($payPlusLoader);
+?>
+            <p>
+                <button type="button" class="button" id="display-payplus-meta-data" data-order-id="<?php echo esc_attr($post->ID); ?>">
+                    <?php esc_html_e('Display Meta Data', 'payplus-payment-gateway'); ?>
+                </button>
+                <?php wp_nonce_field('payplus_display_meta_action_' . $post->ID, 'payplus_display_meta_nonce'); ?>
+            </p>
+        <?php
+            // You can add other action buttons specific to this metabox here.
+
+        } else {
+            // Fallback message if post data isn't available
+            echo '<p>' . esc_html__('Order data not available.', 'payplus-payment-gateway') . '</p>';
+        }
+        $payplusResponse = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_response', true);
+        $pageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_page_request_uid', true);
+        $hostedPageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_hosted_page_request_uid', true);
+        $transactionUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_uid', true);
+        $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_check_invoice_send', true);
+        $rtl = is_rtl() ? 'left' : 'right';
+        $payPlusLoader = "<div class='payplus_loader_gpp'>
+                        <div class='loader'>
+                          <div class='loader-background'><div class='text'></div></div>
+                        </div>
+                      </div>";
+        ?>
+        <div class="payplus-order-buttons">
+            <?php
+            if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
+                if (!empty($payplusResponse) || !empty($pageRequestUid) || !empty($transactionUid)) {
+                    $payplusResponse = json_decode($payplusResponse, true);
+                    $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
+                    if (!empty($pageRequestUid) || !empty($transactionUid)) {
+                        echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
+                        echo wp_kses_post($payPlusLoader);
+                    }
+                }
+            }
+            if ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
+                if ($this->showInvoicePlusGetButton) {
+                    echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
+                }
+                if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
+                    echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
+                }
+                echo wp_kses_post($payPlusLoader);
+            }
+            ?></div>
+    <?php
     }
 
     public function display_invoice_order_metabox($post, $metaBox)
@@ -917,13 +995,41 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         }
     }
 
-    public function displayMetaData($order_id, $metaKey)
+    public function displayMetaData()
     {
+        // Get and sanitize the order ID first
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+
+        // Verify the nonce using the sanitized order ID
+        check_ajax_referer('payplus_display_meta_action_' . $order_id, 'payplus_display_meta_nonce');
+
+        if (!$order_id) {
+            wp_send_json_error('Invalid order ID.');
+        }
+
         $order = wc_get_order($order_id);
         if ($order) {
-            $metaData = $order->get_meta_data(); // Replace 'meta_key_to_delete' with the actual meta key
-            echo wp_json_encode($metaData); // Display the meta data
-            exit;
+            $metaData = $order->get_meta_data();
+            $formattedMetaData = [];
+            foreach ($metaData as $meta_item) {
+                $data = $meta_item->get_data();
+                $key = $data['key'];
+                // Apply wp_unslash first to remove WP's escaping
+                $value = wp_unslash($data['value']);
+
+                // Attempt to decode if it looks like a JSON string
+                if (is_string($value) && (strpos($value, '{') === 0 || strpos($value, '[') === 0)) {
+                    $decoded_value = json_decode($value, true);
+                    // Use the decoded value if decoding was successful and resulted in an array/object
+                    if (json_last_error() === JSON_ERROR_NONE && (is_array($decoded_value) || is_object($decoded_value))) {
+                        $value = $decoded_value;
+                    }
+                }
+                $formattedMetaData[$key] = $value;
+            }
+            wp_send_json_success($formattedMetaData); // Send success response with potentially decoded meta data
+        } else {
+            wp_send_json_error('Order not found.'); // Send error response if order doesn't exist
         }
     }
 
@@ -1264,7 +1370,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
-?>
+    ?>
         <div class="flex-row">
             <div class="flex-item">
                 <select id="select-type-invoice-<?php echo esc_attr($orderId); ?>" class="select-type-invoice"
