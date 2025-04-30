@@ -276,55 +276,54 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             </div>
           </div>";
             echo wp_kses_post($payPlusLoader);
-?>
-            <p>
-                <button type="button" class="button" id="display-payplus-meta-data" data-order-id="<?php echo esc_attr($post->ID); ?>">
-                    <?php esc_html_e('Display Meta Data', 'payplus-payment-gateway'); ?>
-                </button>
-                <?php wp_nonce_field('payplus_display_meta_action_' . $post->ID, 'payplus_display_meta_nonce'); ?>
-            </p>
+            $payplusResponse = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_response', true);
+            $pageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_page_request_uid', true);
+            $hostedPageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_hosted_page_request_uid', true);
+            $transactionUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_uid', true);
+            $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_check_invoice_send', true);
+            $rtl = is_rtl() ? 'left' : 'right';
+            $payPlusLoader = "<div class='payplus_loader_gpp'>
+                            <div class='loader'>
+                              <div class='loader-background'><div class='text'></div></div>
+                            </div>
+                          </div>";
+    ?>
+            <div class="payplus-order-buttons" style="display: flex; flex-direction: column; align-items: center;">
+                <p>
+                    <button type="button" class="button" id="display-payplus-meta-data" data-order-id="<?php echo esc_attr($post->ID); ?>">
+                        <?php esc_html_e('Display Meta Data', 'payplus-payment-gateway'); ?>
+                    </button>
+                    <?php wp_nonce_field('payplus_display_meta_action_' . $post->ID, 'payplus_display_meta_nonce'); ?>
+                </p>
+                <?php
+                if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
+                    if (!empty($payplusResponse) || !empty($pageRequestUid) || !empty($transactionUid)) {
+                        $payplusResponse = json_decode($payplusResponse, true);
+                        $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
+                        if (!empty($pageRequestUid) || !empty($transactionUid)) {
+                            echo '<p><button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" >Get PayPlus Data</button></p>';
+                            echo wp_kses_post($payPlusLoader);
+                        }
+                    }
+                }
+                if ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
+                    if ($this->showInvoicePlusGetButton) {
+                        echo '<p><button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" >Get Invoice+ Data</button></p>';
+                    }
+                    if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
+                        echo '<p><button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" >Create Invoice+ Auto Doc</button></p>';
+                    }
+                    echo wp_kses_post($payPlusLoader);
+                }
+                ?>
+            </div>
         <?php
             // You can add other action buttons specific to this metabox here.
-
         } else {
             // Fallback message if post data isn't available
             echo '<p>' . esc_html__('Order data not available.', 'payplus-payment-gateway') . '</p>';
         }
-        $payplusResponse = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_response', true);
-        $pageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_page_request_uid', true);
-        $hostedPageRequestUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_hosted_page_request_uid', true);
-        $transactionUid = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_transaction_uid', true);
-        $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($post->ID, 'payplus_check_invoice_send', true);
-        $rtl = is_rtl() ? 'left' : 'right';
-        $payPlusLoader = "<div class='payplus_loader_gpp'>
-                        <div class='loader'>
-                          <div class='loader-background'><div class='text'></div></div>
-                        </div>
-                      </div>";
-        ?>
-        <div class="payplus-order-buttons">
-            <?php
-            if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
-                if (!empty($payplusResponse) || !empty($pageRequestUid) || !empty($transactionUid)) {
-                    $payplusResponse = json_decode($payplusResponse, true);
-                    $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
-                    if (!empty($pageRequestUid) || !empty($transactionUid)) {
-                        echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
-                        echo wp_kses_post($payPlusLoader);
-                    }
-                }
-            }
-            if ($this->isInvoiceEnable && empty($checkInvoiceSend)) {
-                if ($this->showInvoicePlusGetButton) {
-                    echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('This button only syncs Invoice+ documents that exists to the WooCommerce order meta data - this will make the PayPlus metabox show these also.', 'payplus-payment-gateway')) . '" class="button" id="get-invoice-plus-data" style="' . esc_attr($rtl) . ': 10%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get Invoice+ Data</button>';
-                }
-                if (!$this->isInvoiceManual && $this->showInvoicePlusCreateButton) {
-                    echo '<button type="button" data-value="' . esc_attr($post->ID) . '" value="' . esc_attr($transactionUid) . '" title="' . esc_attr(__('Create the Invoice+ doc for this method type (according to settings), WITHOUT changing the STATUS or effecting the order in any way.', 'payplus-payment-gateway')) . '" class="button" id="create-invoice-plus-doc" style="' . esc_attr($rtl) . ': 20%; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Create Invoice+ Auto Doc</button>';
-                }
-                echo wp_kses_post($payPlusLoader);
-            }
-            ?></div>
-    <?php
+
     }
 
     public function display_invoice_order_metabox($post, $metaBox)
