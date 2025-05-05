@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.4] - 05-05-2025 - (Kaiju)
+
+- Added - Introduced a dedicated metabox to consolidate PayPlus action buttons.
+- Tweak - Refreshed the visual design of PayPlus action buttons.
+- Tweak - The "Yes/No" button in PayPlus Orders Reports/Validator is now hidden if no orders are found.
+- Fix   - Addressed a null reference error for `$objectProducts` that appeared in debug logs.
+
 ## [7.7.3] - 27-04-2025 - (Sharks)
 
 - Tweak - Express Checkout now displays specific coupon names instead of a generic "discount" label (when applicable).

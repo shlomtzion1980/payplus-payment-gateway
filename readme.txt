@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.7.3
+Stable tag: 7.7.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.7.4 - 05-05-2025 =
+
+- Added - Introduced a dedicated metabox to consolidate PayPlus action buttons.
+- Tweak - Refreshed the visual design of PayPlus action buttons.
+- Tweak - The "Yes/No" button in PayPlus Orders Reports/Validator is now hidden if no orders are found.
+- Fix   - Addressed a null reference error for `$objectProducts` that appeared in debug logs.
 
 = 7.7.3 - 27-04-2025 =
 
