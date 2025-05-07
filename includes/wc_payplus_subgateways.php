@@ -36,7 +36,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Pay with Valuecard via PayPlus', 'payplus-payment-gateway'),
             __('Pay with finitiOne via PayPlus', 'payplus-payment-gateway'),
             __('Pay with PayPlus - POS EMV', 'payplus-payment-gateway'),
-            __('Pay with PayPlus Embedded', 'payplus-payment-gateway')
+            __('Pay with PayPlus Embedded', 'payplus-payment-gateway'),
+            __('Pay with Wire Transfer via PayPlus', 'payplus-payment-gateway')
 
         );
         $this->allTypePayment = array(
@@ -151,6 +152,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 break;
             case 'Pay with Embedded':
                 $payWithText = esc_html__('Pay with Embedded', 'payplus-payment-gateway');
+                break;
+            case 'Pay with Wire Transfer':
+                $payWithText = esc_html__('Pay with Wire Transfer', 'payplus-payment-gateway');
                 break;
         }
         $this->form_fields = [
@@ -326,6 +330,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             case 'Pay with PayPlus Embedded':
                 $methodDescriptionText = esc_html__('Pay with PayPlus Embedded', 'payplus-payment-gateway');
                 break;
+            case 'Pay with Wire Transfer via PayPlus':
+                $methodDescriptionText = esc_html__('Pay with Wire Transfer via PayPlus', 'payplus-payment-gateway');
+                break;
         }
 
         $subOptionsettings = get_option($this->get_option_key(), $defaultOptions);
@@ -465,6 +472,18 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
     public $iconURL = 'assets/images/finitioneLogo.png';
     public $pay_with_text = 'Pay with Tav finitiOne';
 }
+
+class WC_PayPlus_Gateway_WireTransfer extends WC_PayPlus_Subgateway
+{
+    public $id = 'payplus-payment-gateway-wire-transfer';
+    public $method_title_text = 'PayPlus - Wire Transfer';
+    public $default_description_settings_text = 'Wire Transfer payment via PayPlus';
+    public $method_description_text = 'Pay with Wire Transfer via PayPlus';
+    public $payplus_default_charge_method = 'wire-transfers';
+    public $iconURL = 'assets/images/wireTransferLogo.png';
+    public $pay_with_text = 'Pay with Wire Transfer';
+}
+
 
 class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
 {
