@@ -1184,6 +1184,7 @@ class PayplusInvoice
                             $method_payment = ($order->get_payment_method() === "bacs") ? 'bank-transfer' : $method_payment;
                             $method_payment = ($order->get_payment_method() === "cod") ? 'cash' : $method_payment;
                             $method_payment = ($order->get_payment_method() === "cheque") ? 'payment-check' : $method_payment;
+                            $method_payment = ($order->get_payment_method() === "wire-transfers") ? 'bank-transfer' : $method_payment;
                             $otherMethod = strtolower($order->get_payment_method_title());
                             $orOtherMethod = strtolower($order->get_payment_method());
                             $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
@@ -1394,10 +1395,10 @@ class PayplusInvoice
                 $create_at = property_exists($resultApp, 'create_at') ? $resultApp->create_at : null;
                 $paymentType = 'payment-app';
                 $typePayment = array();
-                if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax'))) {
+                if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax', 'wire-transfers'))) {
                     $paymentType = $resultApp->method_payment;
                 }
-                $arrTypeNotApp = array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax');
+                $arrTypeNotApp = array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax', 'wire-transfers');
                 $typeAll = array('multipass', 'credit-card', 'google-pay', 'apple-pay', 'tav-zahav', 'valuecard', 'finitione');
                 $typePayment['payment_type'] = $paymentType;
                 $amount = round($dual * floatval($resultApp->price / 100), $WC_PayPlus_Gateway->rounding_decimals);

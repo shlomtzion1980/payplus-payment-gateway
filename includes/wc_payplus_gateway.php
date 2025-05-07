@@ -1118,8 +1118,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ),
             "wire-transfers" => array(
                 "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "wire-transfers.png",
-                "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-wire-transfer",
-                "section" => "payplus-payment-gateway-wire-transfer",
+                "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-wire-transfers",
+                "section" => "payplus-payment-gateway-wire-transfers",
                 "style" => "max-height: 100%;"
             ),
         );

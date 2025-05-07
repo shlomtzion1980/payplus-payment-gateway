@@ -377,7 +377,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 "payplus-payment-gateway-tavzahav" => 'tav-zahav',
                 "payplus-payment-gateway-finitione" => 'finitione',
                 "payplus-payment-gateway-pos-emv" => 'posEmv',
-                "payplus-payment-gateway-wire-transfer" => 'wire-transfers',
+                "payplus-payment-gateway-wire-transfers" => 'wire-transfers',
                 "payplus-payment-gateway-hostedfields" => 'hostedFields'
             ];
             $chargeDefault = $names[$context->payment_method];
@@ -594,5 +594,5 @@ final class WC_PayPlus_Gateway_POS_EMV_Block extends WC_Gateway_Payplus_Payment_
 
 final class WC_Gateway_Payplus_WireTransfer_Block extends WC_Gateway_Payplus_Payment_Block
 {
-    protected $name = 'payplus-payment-gateway-wire-transfer';
+    protected $name = 'payplus-payment-gateway-wire-transfers';
 }

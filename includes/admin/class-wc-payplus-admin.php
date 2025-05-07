@@ -18,7 +18,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         'payplus-payment-gateway-finitione',
         'payplus-payment-gateway-hostedfields',
         'payplus-payment-gateway-pos-emv',
-        'payplus-payment-gateway-wire-transfer',
+        'payplus-payment-gateway-wire-transfers',
     );
     public $applePaySettings;
     public $hostedFieldsSettings;

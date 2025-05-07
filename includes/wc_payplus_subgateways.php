@@ -480,7 +480,7 @@ class WC_PayPlus_Gateway_FinitiOne extends WC_PayPlus_Subgateway
 
 class WC_PayPlus_Gateway_WireTransfer extends WC_PayPlus_Subgateway
 {
-    public $id = 'payplus-payment-gateway-wire-transfer';
+    public $id = 'payplus-payment-gateway-wire-transfers';
     public $method_title_text = 'PayPlus - Wire Transfer';
     public $default_description_settings_text = 'Wire Transfer payment via PayPlus';
     public $method_description_text = 'Pay with Wire Transfer via PayPlus';
