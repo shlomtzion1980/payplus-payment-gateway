@@ -50,6 +50,8 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
             __('Valuecard', 'payplus-payment-gateway'),
             __('finitiOne', 'payplus-payment-gateway'),
             __('PayPlus - POS EMV', 'payplus-payment-gateway'),
+            __('PayPlus Embedded', 'payplus-payment-gateway'),
+            __('Wire Transfer', 'payplus-payment-gateway'),
             __('hostedFields', 'payplus-payment-gateway')
         );
 
@@ -116,6 +118,9 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 break;
             case 'PayPlus - POS EMV':
                 $methodTitleText = esc_html__('PayPlus - POS EMV', 'payplus-payment-gateway');
+                break;
+            case 'PayPlus - Wire Transfer':
+                $methodTitleText = esc_html__('PayPlus - Wire Transfer', 'payplus-payment-gateway');
                 break;
             case 'PayPlus - Embedded':
                 $methodTitleText = esc_html__('PayPlus - Embedded', 'payplus-payment-gateway');
