@@ -480,7 +480,7 @@ class WC_PayPlus_Gateway_WireTransfer extends WC_PayPlus_Subgateway
     public $default_description_settings_text = 'Wire Transfer payment via PayPlus';
     public $method_description_text = 'Pay with Wire Transfer via PayPlus';
     public $payplus_default_charge_method = 'wire-transfers';
-    public $iconURL = 'assets/images/wireTransferLogo.png';
+    public $iconURL = 'assets/images/wire-transfers.png';
     public $pay_with_text = 'Pay with Wire Transfer';
 }
 

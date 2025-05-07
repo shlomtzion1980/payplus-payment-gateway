@@ -1110,6 +1110,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 "section" => "payplus-payment-gateway-hostedfields",
                 "style" => "max-height: 100%;"
             ),
+            "posEmv" => array(
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "PayPlusLogo.svg",
+                "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-pos-emv",
+                "section" => "payplus-payment-gateway-pos-emv",
+                "style" => "max-height: 100%;"
+            ),
+            "wire-transfers" => array(
+                "icon" => PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "wire-transfers.png",
+                "link" => "?page=wc-settings&tab=checkout&section=payplus-payment-gateway-wire-transfer",
+                "section" => "payplus-payment-gateway-wire-transfer",
+                "style" => "max-height: 100%;"
+            ),
         );
 
         echo "<div id='payplus-options'>";
@@ -1147,6 +1159,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         break;
                     case 'hostedFields':
                         $translatedKey = esc_html__('Embedded', 'payplus-payment-gateway');
+                        break;
+                    case 'posEmv':
+                        $translatedKey = esc_html__('POS EMV', 'payplus-payment-gateway');
+                        break;
+                    case 'wire-transfers':
+                        $translatedKey = esc_html__('Wire Transfer', 'payplus-payment-gateway');
                         break;
                 }
                 if ($currentSection === $value['section']) {
