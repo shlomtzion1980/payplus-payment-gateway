@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.5] - 11-05-2025 - (HoneyBody)
+
+- Added - Support for Wire Transfers as a PayPlus subgateway.
+- Added - Dedicated admin settings menus for POS EMV and Wire Transfers.
+
 ## [7.7.4] - 05-05-2025 - (Kaiju)
 
 - Added - Introduced a dedicated metabox to consolidate PayPlus action buttons.
