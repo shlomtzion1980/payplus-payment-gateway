@@ -512,6 +512,15 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 ];
                 $settings[$section][] = [
+                    'title' => __('Do not create documents for zero-total orders', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Checking this will prevent document creation for zero-total orders.(Consult your accountant regarding the use of this feature)', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'desc_tip' => true,
+                    'id' => 'payplus_invoice_option[zero_total_dont_create]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
                     'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [

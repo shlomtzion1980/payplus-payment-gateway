@@ -814,7 +814,7 @@ class PayplusInvoice
             if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
                 $shipping_tax = $order->get_shipping_tax();
             }
-            $productPrice = ($shipping_total + $shipping_tax) * $dual;
+            $productPrice = floatval($order->get_total()) !== 0.0 ? ($shipping_total + $shipping_tax) * $dual : 0.00;
 
             $description = "";
             if ($shipping_method_data['method_id'] === "woo-ups-pickups") {
@@ -1050,6 +1050,13 @@ class PayplusInvoice
 
         $order = wc_get_order($order_id);
 
+        if (isset($this->payplus_invoice_option['zero_total_dont_create']) && $this->payplus_invoice_option['zero_total_dont_create'] == "yes") {
+            if (floatval($order->get_total()) === 0.0) {
+                $order->add_order_note(__('Invoice not created: Order total is zero and "Do not create documents for zero-total orders" is enabled.', 'payplus-payment-gateway'));
+                return;
+            }
+        }
+
         if ($payplusErrorInvoice !== "unique-identifier-exists") {
             if (!$checkInvoiceSend && $this->payplus_get_invoice_enable()) {
 
@@ -1139,7 +1146,6 @@ class PayplusInvoice
                             $itemsAsJson['productsItems'][$c]['barcode'] = $key;
                             $itemsAsJson['productsItems'][$c]['quantity'] = 1;
                             $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
-
                             $itemsAsJson['productsItems'][$c]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-exempt';
                             if ($itemsAsJson['productsItems'][$c]['vat_type_code'] === null) {
                                 $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
@@ -1164,9 +1170,7 @@ class PayplusInvoice
                     $payload['totalAmount'] = $dual * $totalCartAmount;
                     $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
                     $payload['more_info'] = $order_id;
-
                     $payload['unique_identifier'] = $payplusUniqueIdentifier;
-
                     $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
                     $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 

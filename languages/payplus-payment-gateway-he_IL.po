@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-05-11 09:49+0300\n"
-"PO-Revision-Date: 2025-05-11 09:50+0300\n"
+"POT-Creation-Date: 2025-05-14 12:09+0300\n"
+"PO-Revision-Date: 2025-05-14 12:10+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -29,7 +29,7 @@ msgid "Settings"
 msgstr "הגדרות"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:28
-#: includes/admin/class-wc-payplus-admin-settings.php:565
+#: includes/admin/class-wc-payplus-admin-settings.php:574
 #: includes/wc_payplus_express_checkout.php:817
 msgid "Express Checkout"
 msgstr "קופה מהירה"
@@ -531,7 +531,7 @@ msgid "Refund Invoice + Refund Receipt"
 msgstr "חשבונית זיכוי +קבלה לזיכוי"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:343
-#: includes/admin/class-wc-payplus-admin-settings.php:712
+#: includes/admin/class-wc-payplus-admin-settings.php:721
 msgid "Order status for issuing an invoice"
 msgstr "סטטוס הזמנה להוצאת חשבונית"
 
@@ -706,53 +706,65 @@ msgid "Display coupons as products with negative value in document."
 msgstr "הצגת קופונים כמוצרים עם ערך שלילי בחשבונית."
 
 #: includes/admin/class-wc-payplus-admin-settings.php:515
+msgid "Do not create documents for zero-total orders"
+msgstr "לא ליצור מסמכים עבור הזמנות עם סכום כולל אפס"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:517
+msgid ""
+"Checking this will prevent document creation for zero-total orders.(Consult "
+"your accountant regarding the use of this feature)"
+msgstr ""
+"סימון אפשרות זו ימנע יצירת מסמכים עבור הזמנות עם סכום כולל אפס. (מומלץ "
+"להתייעץ עם רואה החשבון שלך לגבי השימוש באפשרות זו)"
+
+#: includes/admin/class-wc-payplus-admin-settings.php:524
 msgid "Calculate VAT According to:"
 msgstr "חישוב מע\"מ לפי:"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:518
+#: includes/admin/class-wc-payplus-admin-settings.php:527
 #, fuzzy
 #| msgid "Default Woo"
 msgid "Default"
 msgstr "ברירת מחדל woocommerce"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:519
+#: includes/admin/class-wc-payplus-admin-settings.php:528
 #: includes/wc_payplus_gateway.php:124 includes/wc_payplus_gateway.php:1041
 msgid "PayPlus"
 msgstr "פיי פלוס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:520
+#: includes/admin/class-wc-payplus-admin-settings.php:529
 msgid "WooCommerce"
 msgstr "ווקומרס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:522
+#: includes/admin/class-wc-payplus-admin-settings.php:531
 msgid "If you don`t know what to do here leave it on default :)"
 msgstr "אם אין לך מושג, השאר/י על Default"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:528
+#: includes/admin/class-wc-payplus-admin-settings.php:537
 msgid "Invoice For Foreign Customers"
 msgstr "חשבוניות ומסמכים ללקוחות זרים"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:531
+#: includes/admin/class-wc-payplus-admin-settings.php:540
 msgid "Paying VAT"
 msgstr "משלם מע\"מ"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:532
+#: includes/admin/class-wc-payplus-admin-settings.php:541
 msgid "Exempt VAT"
 msgstr "פטור מע\"מ"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:533
+#: includes/admin/class-wc-payplus-admin-settings.php:542
 msgid "Exempt VAT If Customer Billing ISO Country Is Different Than..."
 msgstr "פטור מע\"מ במידה וכתובת החיוב הלקוח שונה מ..."
 
-#: includes/admin/class-wc-payplus-admin-settings.php:540
+#: includes/admin/class-wc-payplus-admin-settings.php:549
 msgid "Your Business VAT Registration Country ISO Code"
 msgstr "המדינה שהעסק שלך רשום ומשלם מע\"מ היא"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:547
+#: includes/admin/class-wc-payplus-admin-settings.php:556
 msgid "Custom checkout field name for vat number"
 msgstr "שם שדה למספר מע\"מ או ת.ז"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:554
+#: includes/admin/class-wc-payplus-admin-settings.php:563
 msgid ""
 "The language of the invoices or documents issued to foreign customers "
 "(assuming your invoicing company supports this language)"
@@ -760,23 +772,23 @@ msgstr ""
 "שפת החשבוניות או המסמכים שיצאו ללקוחות זרים (בהנחה שחברת החשבוניות שלכם "
 "תומכת בשפה זו)"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:571
+#: includes/admin/class-wc-payplus-admin-settings.php:580
 #: includes/class-wc-payplus-form-fields.php:89
 #: includes/class-wc-payplus-form-fields.php:90
 #: includes/wc_payplus_gateway.php:1140 includes/wc_payplus_subgateways.php:45
 msgid "Google Pay"
 msgstr "גוגל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:582
+#: includes/admin/class-wc-payplus-admin-settings.php:591
 msgid "Active page UID Google Pay"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin-settings.php:588
-#: includes/admin/class-wc-payplus-admin-settings.php:592
+#: includes/admin/class-wc-payplus-admin-settings.php:597
+#: includes/admin/class-wc-payplus-admin-settings.php:601
 msgid "Require phone number with Google Pay"
 msgstr "דרישת מספר טלפון בתשלום גוגל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:595
+#: includes/admin/class-wc-payplus-admin-settings.php:604
 #: includes/class-wc-payplus-form-fields.php:96
 #: includes/class-wc-payplus-form-fields.php:97
 #: includes/class-wc-payplus-form-fields.php:691
@@ -784,28 +796,28 @@ msgstr "דרישת מספר טלפון בתשלום גוגל פיי"
 msgid "Apple Pay"
 msgstr "אפל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:606
+#: includes/admin/class-wc-payplus-admin-settings.php:615
 #, fuzzy
 #| msgid "Apple Pay"
 msgid "Token Apple Pay"
 msgstr "אפל פיי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:612
+#: includes/admin/class-wc-payplus-admin-settings.php:621
 #: includes/admin/class-wc-payplus-admin.php:2593
 msgid "Display on product page"
 msgstr "הצגה בדף מוצר"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:619
+#: includes/admin/class-wc-payplus-admin-settings.php:628
 msgid "Allow customers to create an account during checkout"
 msgstr "לאפשר ללקוחות ליצור חשבון בתהליך הצ'קאאוט"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:625
+#: includes/admin/class-wc-payplus-admin-settings.php:634
 msgid "Shipping according to Woocommerce Via JS - Overrides all next settings"
 msgstr ""
 "שילוח לפי תצוגת עמוד הצ'קאאוט של ווקומרס - דרך JS (דורס את ההגדרות הרשומות "
 "מטה)"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:626
+#: includes/admin/class-wc-payplus-admin-settings.php:635
 msgid ""
 "Same as what you see in classic checkout.(THIS OVERRIDES ALL NEXT SHIPPINGS "
 "SETTINGS! - AND IS FOR CLASSIC CHECKOUT!)"
@@ -814,11 +826,11 @@ msgstr ""
 "מתייחס לכתובת הכרטיס (עובד רק בצ'קאאוט הקלאסי של ווקומרס!) - הגדרה זו דורסת "
 "את ההגדרות מטה!"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:634
+#: includes/admin/class-wc-payplus-admin-settings.php:643
 msgid "Shipping according to Woocommerce settings"
 msgstr "שילוח לפי הגדרות ווקומרס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:635
+#: includes/admin/class-wc-payplus-admin-settings.php:644
 msgid ""
 "<br>Countries (Continents not supported):\n"
 "                    <br>Flat rate,\n"
@@ -837,28 +849,28 @@ msgstr ""
 "<br>אם יש לכם כללי משלוח מורכבים, הם עשויים שלא לעבוד עם תשלום מהיר. לכללים "
 "מורכבים השתמשו ב-\"סכום משלוח גלובלי\"."
 
-#: includes/admin/class-wc-payplus-admin-settings.php:648
+#: includes/admin/class-wc-payplus-admin-settings.php:657
 msgid "Global shipping amount"
 msgstr "סכום משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:656
+#: includes/admin/class-wc-payplus-admin-settings.php:665
 msgid "Global shipping Tax"
 msgstr "מס משלוח גלובלי"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:659
+#: includes/admin/class-wc-payplus-admin-settings.php:668
 msgid "Taxable"
 msgstr ""
 
-#: includes/admin/class-wc-payplus-admin-settings.php:660
+#: includes/admin/class-wc-payplus-admin-settings.php:669
 msgid "None"
 msgstr "ללא"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:669
-#: includes/admin/class-wc-payplus-admin-settings.php:735
+#: includes/admin/class-wc-payplus-admin-settings.php:678
+#: includes/admin/class-wc-payplus-admin-settings.php:744
 msgid "Select tax rate"
 msgstr "בחר שיעור מס"
 
-#: includes/admin/class-wc-payplus-admin-settings.php:691
+#: includes/admin/class-wc-payplus-admin-settings.php:700
 msgid "Language of the page"
 msgstr "בחירת שפה לתרגום  דף שגיאת תשלום"
 
@@ -2365,19 +2377,27 @@ msgstr "לינק מסמך החזר"
 msgid "Yith Gift Card"
 msgstr "כרטיס אשראי"
 
-#: includes/wc_payplus_invoice.php:1224 includes/wc_payplus_invoice.php:1278
-#: includes/wc_payplus_invoice.php:1292
+#: includes/wc_payplus_invoice.php:1055
+msgid ""
+"Invoice not created: Order total is zero and \"Do not create documents for "
+"zero-total orders\" is enabled."
+msgstr ""
+"חשבונית לא נוצרה: סכום ההזמנה הוא אפס והאפשרות \"לא ליצור מסמכים עבור הזמנות "
+"עם סכום כולל אפס\" מסומנת (בהגדרות חשבונית+)."
+
+#: includes/wc_payplus_invoice.php:1228 includes/wc_payplus_invoice.php:1282
+#: includes/wc_payplus_invoice.php:1296
 msgid "General product"
 msgstr "מוצר כללי"
 
-#: includes/wc_payplus_invoice.php:1304
+#: includes/wc_payplus_invoice.php:1308
 msgid ""
 "We will not send a balance number to create an invoice because you have more "
 "than one product with a balance number"
 msgstr ""
 "לא נשלח מספר יתרה ליצירת חשבונית מכיוון שיש לך יותר ממוצר אחד עם מספר יתרה"
 
-#: includes/wc_payplus_invoice.php:1352
+#: includes/wc_payplus_invoice.php:1356
 msgid "Link Document  "
 msgstr "לינק מסמך "
 
