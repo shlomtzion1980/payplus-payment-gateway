@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.7.5
+Stable tag: 7.7.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+= 7.7.6 - 18-05-2025 =
+
+- Added - Invoice+: The option to "Do not create documents for zero-total orders" in Invoice+ settings (Consult your accountant regarding the use of this feature).
+- Fix   - Invoice+: Resolved issue where invoices for zero-total orders (using gift cards) with shipping costs incorrectly displayed the shipping amount instead of zero.
 
 = 7.7.5 - 11-05-2025 =
 

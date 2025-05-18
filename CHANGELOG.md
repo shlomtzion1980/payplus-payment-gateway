@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.6] - 18-05-2025 - (Bundy)
+
+- Added - Invoice+: The option to "Do not create documents for zero-total orders" in Invoice+ settings (Consult your accountant regarding the use of this feature).
+- Fix   - Invoice+: Resolved issue where invoices for zero-total orders (using gift cards) with shipping costs incorrectly displayed the shipping amount instead of zero.
+
 ## [7.7.5] - 11-05-2025 - (HoneyBody)
 
 - Added - Support for Wire Transfers as a PayPlus subgateway.
@@ -23,7 +28,6 @@ All notable changes to this project will be documented in this file.
 - Added - EMV POS payment option is now hidden during standard customer checkout even when activated.
 - Added - Support for including the "Brand" field in EMV POS documents.
 - Tweak - Improved error handling for EMV POS transactions.
-
 
 ## [7.7.2] - 14-04-2025 - (LifeLine)
 
