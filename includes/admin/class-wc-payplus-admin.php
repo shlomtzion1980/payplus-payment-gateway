@@ -295,7 +295,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 ?>
             <div class="payplus-order-buttons" style="display: flex; flex-direction: column; align-items: center;">
                 <p>
-                    <button type="button" class="button" id="display-payplus-meta-data" data-order-id="<?php echo esc_attr($order_id); ?>">
+                    <button type="button" class="button" id="display-payplus-meta-data"
+                        data-order-id="<?php echo esc_attr($order_id); ?>">
                         <?php esc_html_e('Display Meta Data', 'payplus-payment-gateway'); ?>
                     </button>
                     <?php wp_nonce_field('payplus_display_meta_action_' . $order_id, 'payplus_display_meta_nonce'); ?>
@@ -389,10 +390,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $getInvoice = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? true : $getInvoice;
         $moreInfo = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? $order_id : $moreInfo;
-        $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_transaction_uid');
+        $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid');
         $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN:', 'default');
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
-        $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order, 'payplus_page_request_uid');
+        $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
+        !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
 
         $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=5";
 
