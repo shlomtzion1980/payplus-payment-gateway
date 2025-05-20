@@ -394,7 +394,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN:', 'default');
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
-        !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
+        !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) && isset(json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid']) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
 
         $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=5";
 
