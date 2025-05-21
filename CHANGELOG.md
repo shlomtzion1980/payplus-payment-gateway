@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.7] - 20-05-2023 - (EuroVision)
+
+- Tweak - Improved the handling of payplus_page_request_uid by payPlusIpn function.
+
 ## [7.7.6] - 18-05-2025 - (Bundy)
 
 - Added - Invoice+: The option to "Do not create documents for zero-total orders" in Invoice+ settings (Consult your accountant regarding the use of this feature).
