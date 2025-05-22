@@ -2536,7 +2536,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function receipt_page($order_id, $token = null, $subscription = false, $custom_more_info = '', $subscription_amount = 0, $inline = false, $move_token = false)
     {
         $order = wc_get_order($order_id);
-        $handle = 'payplus_process_payment';
+        $handle = 'payplus_process_payment_receipt_page';
         $handle .= ($subscription) ? '_subscription' : '';
         $date = new DateTime();
         $dateNow = $date->format('Y-m-d H:i');
@@ -2587,6 +2587,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if (isset($res->data)) {
+                if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
+                    $metaData = array(
+                        'payplus_page_request_uid' => $res->data->page_request_uid,
+                        'payplus_payment_page_link' => $res->data->payment_page_link,
+                        'payplus_generate_products_link' => $check_payplus_generate_products_link,
+                        'payplus_time_link' => $dateNow,
+                    );
+                    WC_PayPlus_Meta_Data::update_meta($order, $metaData);
+                } 
                 try {
                     if (property_exists($res->data, 'page_request_uid')) {
                         $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
@@ -2605,24 +2614,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 return;
             }
 
-
+            // this is when display mode is iframe on the same page,popup iframe or token //
             if ($token || $inline) {
                 return $res;
             }
-
-            $dataLink = $res->data;
-
-            if (isset($dataLink->payment_page_link) && $this->validateUrl($dataLink->payment_page_link)) {
-                $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
-                $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $dataLink->payment_page_link . "\n" . $this->payplus_get_space());
-                $insertMeta = array(
-                    'payplus_page_request_uid' => $dataLink->page_request_uid,
-                    'payplus_payment_page_link' => $dataLink->payment_page_link,
-                    'payplus_generate_products_link' => $check_payplus_generate_products_link,
-                    'payplus_time_link' => $dateNow,
-                );
-                WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
-                $this->get_payment_page($dataLink->payment_page_link);
+            
+            // this is when display mode is redirect or next page iframe //
+            if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
+                $this->payplus_add_log_all($handle, wp_json_encode($res), "\n Response: completed");
+                $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
+                $this->get_payment_page($res->data->payment_page_link);
             } else {
                 $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                 echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(is_array($response) ? $response['body'] : $response->body);
