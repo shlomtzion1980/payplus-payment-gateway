@@ -251,10 +251,10 @@ class WC_PayPlus_Statics
                     $responsePayPlus = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true);
                     $manualOrderPayments = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_order_payments', true) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_order_payments', true), true) : false;
                     $responseArray = json_decode($responsePayPlus, true);
-                    if (json_last_error() !== JSON_ERROR_NONE) {
+                    if (!empty($responsePayPlus) && json_last_error() !== JSON_ERROR_NONE) {
                         $error_message = json_last_error_msg();
                         $fixedJson = WC_PayPlus_Statics::fixMalformedJson($responsePayPlus);
-                        $payPlusFixedJson = ['payplus_response' => $fixedJson];
+                        $payPlusFixedJson = ['payplus_responses' => $fixedJson];
                         $order = wc_get_order($order_id);
                         WC_PayPlus_Meta_Data::update_meta($order, $payPlusFixedJson);
                         $responseArray = json_decode($fixedJson, true);

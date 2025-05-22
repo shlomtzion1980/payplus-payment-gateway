@@ -1694,16 +1694,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->updateMetaData($order_id, (array) $response->data);
                 if ($response->data->type == "Charge") {
                     if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
+                        // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
                         $order->payment_complete();
                     }
 
                     if ($this->successful_order_status !== 'default-woo') {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
+                        // WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->' . $this->successful_order_status, $transactionUid);
                         $order->update_status($this->successful_order_status);
                     }
                 } else {
-                    WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
+                    // WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
                     $order->update_status('wc-on-hold');
                 }
                 // Translators: %s will be replaced with the transaction number received from the payment gateway.
@@ -2863,35 +2863,35 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 );
             }
 
-            if ($order->get_status() === "pending") {
-                if ($status_code === "000") {
-                    if ($response['transaction_type'] == "Charge") {
-                        if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'callback_process->firePaymentComplete', $transactionUid);
-                            // $order->payment_complete();
-                            $this->payplus_add_log_all(
-                                'payplus_callback_secured',
-                                "Order # $order_id Running Woocommerce payment complete process."
-                            );
-                        }
-                        if ($this->successful_order_status !== 'default-woo') {
-                            WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->' . $this->successful_order_status, $transactionUid);
-                            // $order->update_status($this->successful_order_status);
-                            $this->payplus_add_log_all(
-                                'payplus_callback_secured',
-                                "Updating order #$order_id status to: $this->successful_order_status"
-                            );
-                        }
-                    } else {
-                        WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->wc-on-hold', $transactionUid);
-                        // $order->update_status('wc-on-hold');
-                        $this->payplus_add_log_all(
-                            'payplus_callback_secured',
-                            "Updating order #$order_id status to: wc-on-hold"
-                        );
-                    }
-                }
-            }
+            // if ($order->get_status() === "pending") {
+            //     if ($status_code === "000") {
+            //         if ($response['transaction_type'] == "Charge") {
+            //             if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+            //                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'callback_process->firePaymentComplete', $transactionUid);
+            //                 // $order->payment_complete();
+            //                 $this->payplus_add_log_all(
+            //                     'payplus_callback_secured',
+            //                     "Order # $order_id Running Woocommerce payment complete process."
+            //                 );
+            //             }
+            //             if ($this->successful_order_status !== 'default-woo') {
+            //                 WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->' . $this->successful_order_status, $transactionUid);
+            //                 // $order->update_status($this->successful_order_status);
+            //                 $this->payplus_add_log_all(
+            //                     'payplus_callback_secured',
+            //                     "Updating order #$order_id status to: $this->successful_order_status"
+            //                 );
+            //             }
+            //         } else {
+            //             WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->wc-on-hold', $transactionUid);
+            //             // $order->update_status('wc-on-hold');
+            //             $this->payplus_add_log_all(
+            //                 'payplus_callback_secured',
+            //                 "Updating order #$order_id status to: wc-on-hold"
+            //             );
+            //         }
+            //     }
+            // }
         }
     }
 
@@ -2986,14 +2986,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'Result: ' . wp_json_encode($data));
 
         if ($data['type'] === 'Approval' && $data['status_code'] === '000') {
-            WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->wc-on-hold', $transaction_uid);
+            // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->wc-on-hold', $transaction_uid);
             $order->update_status('wc-on-hold');
         } elseif ($data['type'] === 'Charge' && $data['status_code'] === '000') {
             if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->firePaymentComplete', $transaction_uid);
+                // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->firePaymentComplete', $transaction_uid);
                 $order->payment_complete();
             } elseif ($this->successful_order_status !== 'default-woo') {
-                WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->' . $this->successful_order_status, $transaction_uid);
+                // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->' . $this->successful_order_status, $transaction_uid);
                 $order->update_status($this->successful_order_status);
             }
         }
