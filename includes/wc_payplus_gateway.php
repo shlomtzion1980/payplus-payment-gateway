@@ -225,7 +225,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->import_applepay_script = boolval(boolval(isset($this->allSettings['enable_apple_pay']) && $this->allSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
 
         $payPlusErrorPage = get_option('error_page_payplus');
-        $payplusLinkError = isset($payPlusErrorPage) ? get_permalink($payPlusErrorPage) : null;
+        $payplusLinkError = isset($payPlusErrorPage) ? get_permalink($payPlusErrorPage) : site_url() . "/error-payment-payplus/";
 
         $this->payplus_generate_key_dashboard = $this->payplus_generate_key_dashboard();
         $this->response_error_url = $payplusLinkError;

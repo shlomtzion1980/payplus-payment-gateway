@@ -688,7 +688,7 @@ class WC_PayPlus
                     add_action('woocommerce_after_checkout_validation', [$this, 'payplus_validation_cart_checkout'], 10, 2);
                     add_action('wp_enqueue_scripts', [$this, 'load_checkout_assets']);
                     add_action('woocommerce_api_callback_response', [$this, 'callback_response']);
-                    add_action('payplus_delayed_event', [$this, 'handle_delayed_event']);
+                    // add_action('payplus_delayed_event', [$this, 'handle_delayed_event']);
 
                     if (WP_DEBUG_LOG) {
                         add_action('woocommerce_api_callback_response_hash', [$this, 'callback_response_hash']);

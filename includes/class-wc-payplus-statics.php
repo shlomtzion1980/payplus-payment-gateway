@@ -579,11 +579,11 @@ class WC_PayPlus_Statics
 
         /**
          * @param $url
-         * @param $payload
+         * @param array|string $payload
          * @param $method
          * @return array|WP_Error
          */
-        public static function payPlusRemote($url, $payload = [], $method = "post")
+        public static function payPlusRemote($url, $payload, $method = "post")
         {
             is_array($payload) ? $payload = wp_json_encode($payload) : $payload;
             $options   = get_option('woocommerce_payplus-payment-gateway_settings');
