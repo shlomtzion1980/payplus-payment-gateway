@@ -590,8 +590,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 }
                             }
                         } else {
-                            echo esc_html("Order #$order_id status did not change!\n\n");
-                            $outPut[$order_id]['status_change'] = "Order #$order_id status did not change!";
+                            if ($reportOnly) {
+                                echo esc_html("Order #$order_id status did not change!\n\n");
+                                $outPut[$order_id]['status_change'] = "Order #$order_id status did not change!";
+                            }
                         }
                     }
                 } else {
