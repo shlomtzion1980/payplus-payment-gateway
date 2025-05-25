@@ -1708,6 +1708,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     // WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment->wc-on-hold', $transactionUid);
                     $order->update_status('wc-on-hold');
                 }
+                $order->save(); // Ensure the order is saved after payment completion
                 // Translators: %s will be replaced with the transaction number received from the payment gateway.
                 $order->add_order_note(sprintf(__('PayPlus Token Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $response->data->number));
                 // Add payments data to the DB
@@ -2597,7 +2598,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'payplus_time_link' => $dateNow,
                     );
                     WC_PayPlus_Meta_Data::update_meta($order, $metaData);
-                } 
+                }
                 try {
                     if (property_exists($res->data, 'page_request_uid')) {
                         $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
@@ -2620,7 +2621,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($token || $inline) {
                 return $res;
             }
-            
+
             // this is when display mode is redirect or next page iframe //
             if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
                 $this->payplus_add_log_all($handle, wp_json_encode($res), "\n Response: completed");
@@ -2733,32 +2734,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     /**
      * @return false|void
      */
-    public function legacy_callback_response($order_id)
+    public function legacy_callback_response($order_id, $json = false)
     {
 
         global $wpdb;
         $order = wc_get_order($order_id);
-        $json = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response');
+        if (!$json) {
+            $json = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response');
+        }
         $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
         $response = json_decode($json, true);
         $indexRow = 0;
         $tblname = $wpdb->prefix . 'payplus_payment_process';
         $tblname = esc_sql($tblname);
-
-        if ($this->callback_addr && $this->allowSendCallBack) {
-            $url = $this->callback_addr;
-            // Set up the request arguments
-            $args = array(
-                'body'        => $json,
-                'headers'     => array('Content-Type' => 'application/json'),
-                'method'      => 'POST',
-                'blocking'    => false, // Allows asynchronous (non-blocking) request
-            );
-
-            // Send the request
-            wp_remote_post($url, $args);
-        }
-
         $datetime = current_datetime();
         $LocalTime = $datetime->format('Y-m-d H:i:s');
         if ($order) {
@@ -2866,35 +2854,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 );
             }
 
-            // if ($order->get_status() === "pending") {
-            //     if ($status_code === "000") {
-            //         if ($response['transaction_type'] == "Charge") {
-            //             if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-            //                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'callback_process->firePaymentComplete', $transactionUid);
-            //                 // $order->payment_complete();
-            //                 $this->payplus_add_log_all(
-            //                     'payplus_callback_secured',
-            //                     "Order # $order_id Running Woocommerce payment complete process."
-            //                 );
-            //             }
-            //             if ($this->successful_order_status !== 'default-woo') {
-            //                 WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->' . $this->successful_order_status, $transactionUid);
-            //                 // $order->update_status($this->successful_order_status);
-            //                 $this->payplus_add_log_all(
-            //                     'payplus_callback_secured',
-            //                     "Updating order #$order_id status to: $this->successful_order_status"
-            //                 );
-            //             }
-            //         } else {
-            //             WC_PayPlus_Meta_Data::sendMoreInfo($order,  'callback_process->wc-on-hold', $transactionUid);
-            //             // $order->update_status('wc-on-hold');
-            //             $this->payplus_add_log_all(
-            //                 'payplus_callback_secured',
-            //                 "Updating order #$order_id status to: wc-on-hold"
-            //             );
-            //         }
-            //     }
-            // }
+            if ($this->callback_addr && $this->allowSendCallBack) {
+                $url = $this->callback_addr;
+                // Set up the request arguments
+                $args = array(
+                    'body'        => $json,
+                    'headers'     => array('Content-Type' => 'application/json'),
+                    'method'      => 'POST',
+                    'blocking'    => false, // Allows asynchronous (non-blocking) request
+                );
+
+                // Send the request
+                wp_remote_post($url, $args);
+            }
         }
     }
 
@@ -3035,6 +3007,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $indexRow = 0;
         $order = wc_get_order($order_id);
+        $status = $order->get_status();
+        if ($status === 'processing' || $status === 'completed' || $status === 'wc-processing' || $status === 'wc-completed') {
+            return $order;
+        }
         if (isset($res->data->recurring_type)) {
             if ($this->recurring_order_set_to_paid == 'yes') {
                 $order->payment_complete();
@@ -3046,19 +3022,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($type == "Charge") {
                 if ($this->fire_completed) {
                     $order->payment_complete();
-                    // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
+                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
                 }
                 $order = wc_get_order($order_id);
                 if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
                     $order->update_status($this->successful_order_status);
-                    // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
-                    $order->save();
+                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
                 }
             } else {
                 $order->update_status('wc-on-hold');
-                // $this->payplus_add_log_all('payplus_request_ipn', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
-                $order->save();
+                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
             }
+            $order->save();
 
             $data = array('status' => $order->get_status(), 'update_at' => current_time('Y-m-d H:i:s'));
             $where = array('order_id' => $order_id);
@@ -3143,7 +3118,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     PayPlus Error <br>  ' . $error . '        </div>';
                     $order->add_order_note($html);
                 } else {
-
+                    $this->payplus_add_log_all('payplus_callback_secured', $order_id . ' requestPayPlusIpn->Response: ' . wp_remote_retrieve_body($response) . "\n");
                     $res = json_decode(wp_remote_retrieve_body($response));
                     $orderPayplus = $this->getOrderPayplus($order_id);
                     $payplus_function_end = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_function_end', true);
@@ -3182,6 +3157,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                             $this->logOrderBegin($order_id, __FUNCTION__ . ':start');
                             $this->updateMetaData($order_id, $inData);
+                            $this->payplus_add_log_all('payplus_callback_secured', $order_id . " requestPayPlusIpn->updating statuses now: \n");
                             $returnStatus = $this->updateOrderStatus($order_id, $type, $res);
                             $this->logOrderBegin($order_id, __FUNCTION__ . ':end');
 

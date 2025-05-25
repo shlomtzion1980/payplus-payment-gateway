@@ -1137,7 +1137,7 @@ class WC_PayPlus
                         'payplus_callback_secured',
                         "\nPayPlus order # $order_id STARTING CALLBACK FUNCTION:"
                     );
-                    $this->payplus_gateway->legacy_callback_response($order_id);
+                    $this->payplus_gateway->legacy_callback_response($order_id, $json);
                     $response = array(
                         'status' => 'success',
                         'message' => 'PayPlus callback function ended.',
