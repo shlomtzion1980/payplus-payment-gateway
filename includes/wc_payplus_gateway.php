@@ -106,6 +106,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $isHostedEnabled;
     public $enableDevMode;
     public $enableDoubleCheckIfPruidExists;
+    public $updateStatusesIpn;
     protected $pwGiftCardData; // Store gift card data
     public $useLegacyPayload;
     public $isPosOverrideGateways;
@@ -166,6 +167,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->isHostedEnabled = boolval(isset($this->hostedFieldsOptions['enabled']) && $this->hostedFieldsOptions['enabled'] === "yes");
         $this->enableDoubleCheckIfPruidExists = $this->get_option('enable_double_check_if_pruid_exists') == 'yes' ? true : false;
         $this->useLegacyPayload = $this->get_option('use_legacy_payload') == 'yes' ? true : false;
+        $this->updateStatusesIpn = $this->get_option('update_statuses_in_ipn') === 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -3007,6 +3009,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $indexRow = 0;
         $order = wc_get_order($order_id);
+        if ($this->updateStatusesIpn) {
+            $this->payplus_add_log_all('payplus_callback_secured', "NOT UPDATING STATUS IN CALLBACK BECAUSE: updateStatusesIpn is true. \n");
+            return $order;
+        }
         $status = $order->get_status();
         if ($status === 'processing' || $status === 'completed' || $status === 'wc-processing' || $status === 'wc-completed') {
             return $order;
