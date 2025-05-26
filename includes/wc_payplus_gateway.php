@@ -2696,14 +2696,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $data['expiry_year'] = $response['data']['card_information']['expiry_year'] ?? null;
         $data['expiry_month'] = $response['data']['card_information']['expiry_month'] ?? null;
         $data['four_digits'] = $response['data']['card_information']['four_digits'] ?? null;
-        $data['clearing_name'] = $response['data']['card_information']['clearing_id'] ?
-            $this->payplus_get_clearing_companies($response['data']['card_information']['clearing_id']) : null;
+        // $data['clearing_name'] = $response['data']['card_information']['clearing_id'] ?
+        //     $this->payplus_get_clearing_companies($response['data']['card_information']['clearing_id']) : null;
         $issuer_id = $response['data']['card_information']['issuer_id'];
         $data['issuer_id'] = $issuer_id ? $issuer_id : null;
-        $data['issuer_name'] = $issuer_id ? $this->payplus_get_issuers_companies($issuer_id) : null;
+        // $data['issuer_name'] = $issuer_id ? $this->payplus_get_issuers_companies($issuer_id) : null;
         $brand_id = $response['data']['card_information']['brand_id'];
         $data['brand_id'] = $brand_id ?? null;
-        $data['brand_name'] = $brand_id ? $this->payplus_get_brands_list($brand_id) : null;
+        // $data['brand_name'] = $brand_id ? $this->payplus_get_brands_list($brand_id) : null;
         $data['approval_num'] = $response['transaction']['approval_number'] ?? null;
         $data['credit_terms'] = $response['transaction']['credit_terms'] ?? null;
         $data['currency'] = $response['transaction']['currency'] ?? null;
