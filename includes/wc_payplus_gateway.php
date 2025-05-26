@@ -2504,8 +2504,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payloadArray = json_decode($legacyPayload, true);
         $payloadArray['more_info_4'] = PAYPLUS_VERSION;
 
-        $this->payplus_add_log_all("generate_payment_link_refactor_log", "New payload: \n" . wp_json_encode($payload) . "\n");
-        $this->payplus_add_log_all("generate_payment_link_refactor_log", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
+        // $this->payplus_add_log_all("generate_payment_link_refactor_log", "New payload: \n" . wp_json_encode($payload) . "\n");
+        // $this->payplus_add_log_all("generate_payment_link_refactor_log", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
 
         $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray) : $payload = wp_json_encode($payload);
         return $payload;
@@ -2589,13 +2589,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payload = $this->generatePaymentLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
         $this->payplus_add_log_all($handle, 'Payload data before Sending to PayPlus');
-        $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
+        $this->payplus_add_log_all($handle, wp_json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
         $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
 
-        $this->payplus_add_log_all($handle, 'WS PayPlus Response');
-
         if (is_wp_error($response)) {
-            $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
+            $this->payplus_add_log_all($handle, wp_json_encode($response));
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if (isset($res->data)) {
@@ -2817,6 +2815,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 );
 
                 if ($order->get_status() === "pending") {
+                    $this->payplus_add_log_all('payplus_callback_secured', "$order_id - Order status is pending - we are in legacy callback response - updating order status");
                     $dataInsert = array(
                         'order_id' => $order_id,
                         'status' => sanitize_text_field($order->get_status()),
