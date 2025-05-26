@@ -86,6 +86,16 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+== 7.7.8 - 27-05-2023 =
+
+- Tweak - Improved the `payPlusRemote()` function to better handle `$payload` issues.
+- Tweak - Removed outdated logs and deprecated API calls.
+- Tweak - Optimized payment page logic to reuse existing pages when possible, reducing unnecessary API requests.
+- Tweak - Corrected inaccurate status reporting in "Orders Reports/Validator".
+- Tweak - Streamlined `callback_response` by removing redundant functions and passing data directly instead of using SQL.
+- Added - When "Update status in IPN" is enabled, the callback function will skip status updates and related checks.
+- Added - Disallow voucher payment for shipping - Enforce a minimum amount for non-voucher payments: voucher payments can no longer be used to pay for shipping, preventing customers from covering delivery costs with vouchers.
+
 = 7.7.7 - 20-05-2023 =
 
 - Tweak - Improved the handling of payplus_page_request_uid by payPlusIpn function.

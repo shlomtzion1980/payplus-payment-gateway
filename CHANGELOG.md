@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.8] - 27-05-2023 - (duckPOS)
+
+- Tweak - Improved the `payPlusRemote()` function to better handle `$payload` issues.
+- Tweak - Removed outdated logs and deprecated API calls.
+- Tweak - Optimized payment page logic to reuse existing pages when possible, reducing unnecessary API requests.
+- Tweak - Corrected inaccurate status reporting in "Orders Reports/Validator".
+- Tweak - Streamlined `callback_response` by removing redundant functions and passing data directly instead of using SQL.
+- Added - When "Update status in IPN" is enabled, the callback function will skip status updates and related checks.
+- Added - Disallow voucher payment for shipping - Enforce a minimum amount for non-voucher payments: voucher payments can no longer be used to pay for shipping, preventing customers from covering delivery costs with vouchers.
+
 ## [7.7.7] - 20-05-2023 - (EuroVision)
 
 - Tweak - Improved the handling of payplus_page_request_uid by payPlusIpn function.
@@ -9,7 +19,7 @@ All notable changes to this project will be documented in this file.
 ## [7.7.6] - 18-05-2025 - (Bundy)
 
 - Added - Invoice+: The option to "Do not create documents for zero-total orders" in Invoice+ settings (Consult your accountant regarding the use of this feature).
-- Fix   - Invoice+: Resolved issue where invoices for zero-total orders (using gift cards) with shipping costs incorrectly displayed the shipping amount instead of zero.
+- Fix - Invoice+: Resolved issue where invoices for zero-total orders (using gift cards) with shipping costs incorrectly displayed the shipping amount instead of zero.
 
 ## [7.7.5] - 11-05-2025 - (HoneyBody)
 
@@ -21,7 +31,7 @@ All notable changes to this project will be documented in this file.
 - Added - Introduced a dedicated metabox to consolidate PayPlus action buttons.
 - Tweak - Refreshed the visual design of PayPlus action buttons.
 - Tweak - The "Yes/No" button in PayPlus Orders Reports/Validator is now hidden if no orders are found.
-- Fix   - Addressed a null reference error for `$objectProducts` that appeared in debug logs.
+- Fix - Addressed a null reference error for `$objectProducts` that appeared in debug logs.
 
 ## [7.7.3] - 27-04-2025 - (Sharks)
 
@@ -35,9 +45,9 @@ All notable changes to this project will be documented in this file.
 
 ## [7.7.2] - 14-04-2025 - (LifeLine)
 
-- Fix   - Resolved an issue where POS EMV refunds were not processing as expected.
+- Fix - Resolved an issue where POS EMV refunds were not processing as expected.
 - Tweak - Improved the payment payload generation function while ensuring compatibility with legacy systems.
-- Fix   - Addressed a problem where Invoice+ documents displayed incorrect details and amounts when Coupons and PW Gift Cards were used together in a transaction, including cases with zero-amount payment invoices.
+- Fix - Addressed a problem where Invoice+ documents displayed incorrect details and amounts when Coupons and PW Gift Cards were used together in a transaction, including cases with zero-amount payment invoices.
 - Tweak - Enabled support for generating Invoice+ documents for PW Gift Cards at a later time.
 - Added - Support for subscriptions in PayPlus Embedded for logged-in users.
 - Tweak - The close iframe button in blocks checkout now consistently appears in black.
@@ -45,59 +55,59 @@ All notable changes to this project will be documented in this file.
 - Added - Feature: Pay with POS EMV as a subgateway from the checkout page.
 - Added - Multiple payments details are now included in Invoice+ documents.
 - Tweak - Verified compatibility with WordPress version 6.8.
-- Fix   - Resolved an issue with new checkout blocks where "PayPlus Embedded" was unnecessarily hidden based on tokens.
+- Fix - Resolved an issue with new checkout blocks where "PayPlus Embedded" was unnecessarily hidden based on tokens.
 - Tweak - Updated translations for recently added plugin settings.
 
 ## [7.7.1] - 30-03-2025 - (Ippo)
 
 - Tweak - Adjusted custom icons (payplus gateway on checkout) sizes for better display.
 - Added - Support for percentage-based coupons.
-- Fix   - Corrected implementation of Partners mode for certain integrations.
+- Fix - Corrected implementation of Partners mode for certain integrations.
 - Tweak - Resolved display issues with PayPlus Embedded.
 - Added - Support for Partner coupons and the option for dual delivery warehouses.
 - Added - Compatibility with the PW Gift Cards Plugin for PayPlus Embedded and Credit Card payments on "Classic Checkout" (PW Gift Cards are not supported in "Blocks Checkout").
 - Tweak - Added an option in Invoice+ settings to choose whether coupons are presented as a discount line or as a product.
-- Fix   - Resolved the "invalid-app-name" issue during Invoice+ document creation by using the payload object instead of deprecated database queries.
-- Fix   - Resolved all POS EMV Invoices came out with "General Product".
+- Fix - Resolved the "invalid-app-name" issue during Invoice+ document creation by using the payload object instead of deprecated database queries.
+- Fix - Resolved all POS EMV Invoices came out with "General Product".
 
 ## [7.7.0] - 11-03-2025 - (Gaara)
 
-- Fix   - Subscription orders with the "Mark as paid" option enabled will now correctly be set to "completed" status upon successful renewal.
+- Fix - Subscription orders with the "Mark as paid" option enabled will now correctly be set to "completed" status upon successful renewal.
 - Tweak - Disabled cart hash verification for additional testing due to issues on certain payment method pages.
 
 ## [7.6.9] - 10-03-2025 - (Zabuza)
 
-- Fix   - [Invoice+] - Resolved issue (payments-total-not-equal-to-calculated-total) where J5 transactions with adjusted amounts for items (more or less than the original) did not create an invoice when coupons were used. This is now possible.
-- Fix   - [Invoice+] - Edited J5 orders (Items and Total) will create an Invoice+ document that accurately reflects the order details instead of just showing "General Product".
+- Fix - [Invoice+] - Resolved issue (payments-total-not-equal-to-calculated-total) where J5 transactions with adjusted amounts for items (more or less than the original) did not create an invoice when coupons were used. This is now possible.
+- Fix - [Invoice+] - Edited J5 orders (Items and Total) will create an Invoice+ document that accurately reflects the order details instead of just showing "General Product".
 - Tweak - [Invoice+] - Subscription orders renewals Invoice+ docs will show correct payment method instead of "other".
 
 ## [7.6.8] - 09-03-2025 - (Kakashi)
 
 - Added - Support for payments using EMV POS devices (Admin Only).
 - Added - Invoice+: Option to block document creation for "bacs" (Direct bank transfer) and "cod" (Cash on Delivery) in automatic mode.
-- Fix   - Resolved PHP warning related to array to string conversion.
+- Fix - Resolved PHP warning related to array to string conversion.
 - Tweak - ForceInvoice can now run with ReportOnly IPN on Orders Validator.
 - Added - Create Invoice+ Auto Doc button: This button will create the document without changing status if it wasn't created for any reason, according to document settings.
 - Added - Show Create Invoice+ Auto Doc button via checkbox in Invoice+ settings.
 - Added - Bank Wire Transfer method to Invoice+ payment types instead of showing "other".
 - Added - Cash On Delivery method to Invoice+ payment types instead of showing "other".
 - Added - Cheque/Check method to Invoice+ payment types instead of showing "other".
-- Fix   - Resolved issue where the payment method logo for subgateways was not hidden.
-- Fix   - Corrected issue where the save payment method checkbox appeared twice in "Blocks Checkout" on some themes.
+- Fix - Resolved issue where the payment method logo for subgateways was not hidden.
+- Fix - Corrected issue where the save payment method checkbox appeared twice in "Blocks Checkout" on some themes.
 - Tweak - Empty cart if it exists on ipn_response without nonce but after successful payment.
 - Tweak - Subscription renewal payments will now include "payplus_response" and display the data in the metabox.
 
 ## [7.6.7] - 06-03-2025 - (Haku)
 
-- Fix   - Resolved subscription renewal failure caused by a missing cart.
+- Fix - Resolved subscription renewal failure caused by a missing cart.
 
 ## [7.6.6] - 05-03-2025 - (Dumb)
 
-- Fix   - Resloved status updates issues - orders updated twice on not at all.
+- Fix - Resloved status updates issues - orders updated twice on not at all.
 
 ## [7.6.5] - 04-03-2025 - (Snarl)
 
-- Fix   - Resolved an issue with an undefined JavaScript variable.
+- Fix - Resolved an issue with an undefined JavaScript variable.
 
 ## [7.6.4] - 03-03-2025 - (Swoop)
 
@@ -107,8 +117,7 @@ All notable changes to this project will be documented in this file.
 
 - Tweak - Enhanced order IPN event to run 2 minutes after the payment page is triggered when using classic checkout.
 - Added - Compatibility with "YITH WooCommerce Gift Cards" (free version) in PayPlus Embedded.
-- Fix   - Resolved a JS visual bug on the "Orders page" where a variable was defined in the wrong place.
-
+- Fix - Resolved a JS visual bug on the "Orders page" where a variable was defined in the wrong place.
 
 ## [7.6.1] - 02-03-2025 - (Fang)
 
@@ -121,8 +130,8 @@ All notable changes to this project will be documented in this file.
 
 - Tweak - Updated translations for new express checkout settings.
 - Tweak - Added sanitation and validation for express checkout data.
-- Fix   - Resolved issue where "Use global default" wasn't working in subgateways (Display mode).
-- Fix   - Fixed nonce issue occurring with 3D Secure transactions when redirected to the thank you page - nonce didn't pass.
+- Fix - Resolved issue where "Use global default" wasn't working in subgateways (Display mode).
+- Fix - Fixed nonce issue occurring with 3D Secure transactions when redirected to the thank you page - nonce didn't pass.
 - Tweak - Enhanced security for nonce exploit issue on the thank you page - with option to disable from settings.
 
 ## [7.5.9] - 17-02-2025 - (Zora)
@@ -135,18 +144,18 @@ All notable changes to this project will be documented in this file.
 
 - Tweak - Enhanced PayPlus Cron: Now runs every 30 minutes, manages both Invoice+ and non-Invoice+ cancelled orders, and provides improved logging in both logs and order notes.
 - Tweak - Optimized callback feature for improved speed and efficiency.
-- Fix   - Resolved an issue where the custom icons length was undefined in JavaScript when no custom icons were selected for the checkout page.
+- Fix - Resolved an issue where the custom icons length was undefined in JavaScript when no custom icons were selected for the checkout page.
 - Tweak - "Make Payment" button for J5 (Approval) orders with a "processing" status will be hidden, even if they are unpaid.
-- Fix   - Resolved rounding issue for J5 payment error when order products were removed and the total amount was adjusted.
+- Fix - Resolved rounding issue for J5 payment error when order products were removed and the total amount was adjusted.
 
 ## [7.5.7] - 09-02-2025 - (Agrippa)
 
-- Fix   - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
-- Fix   - Corrected rounding error that prevented charging with error message: "Cannot charge more than the total order amount on J5" on specific issues.
+- Fix - Resolved shipping issue with Express Checkout on the product page wasn't working when "Shipping by WooCommerce Via JS" was activated. Now it works in combination with the one of the other options.
+- Fix - Corrected rounding error that prevented charging with error message: "Cannot charge more than the total order amount on J5" on specific issues.
 - Tweak - PayPlus Orders Validator: When "Enable Partners Dev Mode" is enabled, orders can be selected by year and month. Additionally, a visual table is available when "Enable display of orders table select in PayPlus Orders Validator" is enabled.
 - Tweak - PayPlus Orders Validator: When "Enable Partners Dev Mode" is enabled, added "Actions" with the ability to run reports only, force all, get invoice, and force invoice.
 - Tweak - PayPlus Orders Validator: Will not mark orders as cron tested, allowing the cron to run on these orders if activated.
-- Add   - Prevention of double deals under the same order number for websites with heavy traffic and callback issues. The "Double check IPN" feature checks if an order already has a "payplus_page_request_uid" before attempting to start a new payment.
+- Add - Prevention of double deals under the same order number for websites with heavy traffic and callback issues. The "Double check IPN" feature checks if an order already has a "payplus_page_request_uid" before attempting to start a new payment.
 
 ## [7.5.5] - 02-02-2025 - (Greed)
 
