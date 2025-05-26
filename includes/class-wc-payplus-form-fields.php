@@ -393,7 +393,7 @@ class WC_PayPlus_Form_Fields
                         <button name="verifyPayPlusOrders" value="<?php echo esc_attr($nonce); ?>">Run PayPlus orders verifier</button>
                     </form> <?php } ?>
             </div>
-<?php
+            <?php
             if (isset($_POST['verifyPayPlusOrders'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 $nonce = sanitize_text_field(wp_unslash($_POST['verifyPayPlusOrders'])); // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 echo '<pre>';
@@ -473,20 +473,20 @@ class WC_PayPlus_Form_Fields
                         echo esc_html("\nTotal orders selected: $selectedOrders\n\n");
                         echo esc_html("Selected orders " . wp_json_encode(array_reverse($orders)) . "\n");
                     }
-       
+
                     $sanitized_post = array_map('sanitize_text_field', wp_unslash($_POST));
                     echo "verifyPayPlusOrders:\n" . wp_json_encode($sanitized_post);
 
                     // Display a confirmation form before running the function
                     if (isset($_POST['confirm']) && $_POST['confirm'] === 'yes') {
-                        ?><script type="text/javascript">
-                        if(document.getElementById("reportsForm") !== null){
-                            document.getElementById("reportsForm").style.display = "none";
-                            document.getElementById("pp_all_orders").style.display = "none";
-                            document.getElementById("selctedYearForm").style.display = "none";
-                        }
+            ?><script type="text/javascript">
+                            if (document.getElementById("reportsForm") !== null) {
+                                document.getElementById("reportsForm").style.display = "none";
+                                document.getElementById("pp_all_orders").style.display = "none";
+                                document.getElementById("selctedYearForm").style.display = "none";
+                            }
                         </script>;
-                        <?php
+<?php
                         echo '<style>
                         table#pp_all_orders, form#selctedYearForm {
                             display: none;
@@ -519,7 +519,7 @@ class WC_PayPlus_Form_Fields
                         echo '<input type="hidden" name="reportOnly" value="' . esc_attr($reportOnly) . '">';
                         echo '<input type="hidden" name="allStatuses" value="' . esc_attr($allStatuses) . '">';
                         echo '<input type="hidden" name="order_numbers" value="' . esc_attr(implode(',', array_reverse($orders))) . '">';
-                        if($selectedOrders === 0) {
+                        if ($selectedOrders === 0) {
                             echo '</div>';
                             echo '</form><br>';
                         } else {
@@ -893,6 +893,14 @@ class WC_PayPlus_Form_Fields
             'advanced_title' => [
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
+            ],
+            'non_voucher_minimum_amount' => [
+                'title' => __('Disallow voucher payment for shipping', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('Allow only credit cards payment for the delivery amount.', 'payplus-payment-gateway'),
+                'label' => __('Allow only credit cards payment for the delivery amount.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
             ],
             'show_get_payplus_data_buttons' => [
                 'title' => __('Always display Get PayPlus Data Buttons', 'payplus-payment-gateway'),

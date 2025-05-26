@@ -2435,6 +2435,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $hidePaymentFields = $this->hide_payments_field > 0 ? ($this->hide_payments_field == 1 ? true : false) : "";
         $addData = $this->send_add_data ? $order_id : "";
 
+        if ((isset($this->settings['non_voucher_minimum_amount']) && $this->settings['non_voucher_minimum_amount'] === "yes")) {
+            $shipping_total = $order->get_shipping_total();
+            $shipping_tax = $order->get_shipping_tax();
+            $delivery_price = $shipping_total + $shipping_tax;
+            $payload['non_voucher_minimum_amount'] = $delivery_price;
+        }
+
         $payload['payment_page_uid'] = $this->payment_page_id;
         $payload['charge_method'] = $chargeMethod;
         $payload['expiry_datetime'] = "30";
@@ -2821,6 +2828,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $this->payplus_add_log_all($handle, 'more_info: ' . sanitize_text_field($data['order_id']));
                     $this->payplus_add_log_all($handle, wp_json_encode($response), 'before-payload');
 
+                    $response = $response ?: [];
+                    $data = $data ?: [];
 
                     $inData = array_merge($data, $response);
                     $this->payplus_add_log_all($handle, wp_json_encode($inData), 'completed');
