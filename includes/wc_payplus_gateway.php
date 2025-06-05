@@ -2660,6 +2660,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
+        echo '<script type="text/javascript">document.getElementById("pp_iframe").style.display = "block";</script>';
         echo '<script type="text/javascript">document.pp_iframe.submit()</script>';
     }
 
