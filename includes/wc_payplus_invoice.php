@@ -342,7 +342,7 @@ class PayplusInvoice
 
         // vat_percentage for vat change - 17% to 18%
         $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
-        $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+        $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
         $payload['customer'] = $payloadInvoiceData ? $payloadInvoiceData['customer'] : $payload['customer'];
 
         $isEmv = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
@@ -791,7 +791,7 @@ class PayplusInvoice
                     $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
                 }
 
-                if (isset($WC_PayPlus_Gateway->paying_vat_all_order) && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes")) {
+                if (isset($WC_PayPlus_Gateway->settings['paying_vat_all_order']) && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes")) {
                     $itemDetails['vat_type_code'] = 'vat-type-included';
                 } else {
                     $itemDetails['vat_type_code'] = 'vat-type-exempt';
@@ -800,6 +800,9 @@ class PayplusInvoice
                 if ($wc_tax_enabled) {
                     $itemDetails['vat_type_code'] = $product->get_tax_status() === 'taxable' ? 'vat-type-included' : 'vat-type-exempt';
                     $itemDetails['vat_type_code'] = $product->get_tax_status() === 'none' ? 'vat-type-exempt' : $itemDetails['vat_type_code'];
+                }
+                if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                    $itemDetails['vat_type_code'] = 'vat-type-included';
                 }
 
                 $productsItems[] = $itemDetails;
@@ -904,9 +907,9 @@ class PayplusInvoice
     {
         $handle = 'payplus_process_invoice';
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        $payingVatAllOrder = $WC_PayPlus_Gateway->paying_vat_all_order === "yes";
+        $payingVatAllOrder = $WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes";
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
-        $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat == "1";
+        $OtherVatCountry = $this->payplus_check_vat_payment($order_id);
         foreach ($productsItems as $key => $productsItem) {
 
             if ($payingVatAllOrder) {
@@ -917,6 +920,9 @@ class PayplusInvoice
             }
             if ($OtherVatCountry) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-exempt';
+            }
+            if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                $productsItems[$key]['vat_type_code'] = 'vat-type-included';
             }
         }
         return $productsItems;
@@ -1084,7 +1090,10 @@ class PayplusInvoice
                     $date = $date->format('m-d-Y H:i');
                     $order = wc_get_order($order_id);
                     $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
-                    $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->paying_vat_all_order === "yes") ? $payload['customer']['paying_vat'] = true : null;
+                    $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
+                    if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                        $payload['customer']['paying_vat'] = true;
+                    }
 
                     if (!empty($payplusTransactionUid)) {
                         $payload['transaction_uuid'] = $payplusTransactionUid;
@@ -1129,6 +1138,9 @@ class PayplusInvoice
                                 if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
                                     $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
                                 }
+                                if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included';
+                                }
                                 $totalPWAmount += $item['price'];
                             }
                             $objectProductsPW = (object)$itemsAsJson;
@@ -1149,6 +1161,9 @@ class PayplusInvoice
                             $itemsAsJson['productsItems'][$c]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-exempt';
                             if ($itemsAsJson['productsItems'][$c]['vat_type_code'] === null) {
                                 $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
+                            }
+                            if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                                $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included';
                             }
                             $totalPWAmount += -$item;
                             ++$c;
