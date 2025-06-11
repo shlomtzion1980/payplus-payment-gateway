@@ -560,8 +560,10 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-vat'
                 ];
                 $settings[$section][] = [
-                    'title' => __('Every order is allways with VAT no matter what', 'payplus-payment-gateway'),
+                    'title' => __('Every order is allways with VAT NO MATTER WHAT!', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
+                    'desc' => __('This will make every order with VAT, even if the customer is not paying VAT', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
                     'default' => '',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[allways_pay_vat]',
                     'class' => 'payplus-vat',
