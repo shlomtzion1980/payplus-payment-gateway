@@ -909,8 +909,12 @@ class PayplusInvoice
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payingVatAllOrder = $WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes";
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
-        $order = wc_get_order($order_id);
-        $OtherVatCountry = boolval($order->get_billing_country() !== "IL");
+        if ($WC_PayPlus_Gateway->settings['new_vat_order'] === "yes") {
+            $order = wc_get_order($order_id);
+            $OtherVatCountry = boolval($order->get_billing_country() !== "IL");
+        } else {
+            $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat == "1";
+        }
 
         foreach ($productsItems as $key => $productsItem) {
             if ($payingVatAllOrder) {

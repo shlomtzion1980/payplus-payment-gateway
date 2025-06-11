@@ -567,6 +567,13 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-vat',
                 ];
                 $settings[$section][] = [
+                    'title' => __('Use new/other - "Other country vat settings" (Default: Unchecked)', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'default' => '',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[new_vat_order]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
                     'title' => __('The language of the invoices or documents issued to foreign customers (assuming your invoicing company supports this language)', 'payplus-payment-gateway'),
                     'type' => 'text',
                     'default' => 'HE',
