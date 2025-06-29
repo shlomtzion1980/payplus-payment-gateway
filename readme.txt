@@ -86,9 +86,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 7.7.9 - 29-06-2023 =
+== 7.8.0 - 29-06-2023 =
 
 - Added - Do not create invoices+ documents option for Stripe payment gateway.
+
+== 7.7.9 - 11-06-2025 = 
+
+- Added - Separate VAT configuration options for international customers.
 
 == 7.7.8 - 27-05-2023 =
 
