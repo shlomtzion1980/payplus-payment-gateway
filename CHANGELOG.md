@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.7.9] - 29-06-2023 - (Metro)
+
+- Added - Do not create invoices+ documents option for Stripe payment gateway.
+
 ## [7.7.8] - 27-05-2023 - (duckPOS)
 
 - Tweak - Improved the `payPlusRemote()` function to better handle `$payload` issues.
