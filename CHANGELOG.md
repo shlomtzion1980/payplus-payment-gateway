@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.8.0] - 29-06-2023 - (MeDew)
+## [7.8.0] - 29-06-2025 - (MeDew)
 
 - Added - Do not create invoices+ documents option for Stripe payment gateway.
 
@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 - Added - Separate VAT configuration options for international customers.
 
-## [7.7.8] - 27-05-2023 - (duckPOS)
+## [7.7.8] - 27-05-2025 - (duckPOS)
 
 - Tweak - Improved the `payPlusRemote()` function to better handle `$payload` issues.
 - Tweak - Removed outdated logs and deprecated API calls.
@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file.
 - Added - When "Update status in IPN" is enabled, the callback function will skip status updates and related checks.
 - Added - Disallow voucher payment for shipping - Enforce a minimum amount for non-voucher payments: voucher payments can no longer be used to pay for shipping, preventing customers from covering delivery costs with vouchers.
 
-## [7.7.7] - 20-05-2023 - (EuroVision)
+## [7.7.7] - 20-05-2025 - (EuroVision)
 
 - Tweak - Improved the handling of payplus_page_request_uid by payPlusIpn function.
 
