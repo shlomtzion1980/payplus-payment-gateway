@@ -43,6 +43,7 @@ class WC_PayPlus
     public $updateStatusesIpn;
     public $hidePayPlusGatewayNMW;
     public $pwGiftCardData;
+    public $iframeAutoHeight;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -70,6 +71,7 @@ class WC_PayPlus
         $this->isPayPlus = boolval(property_exists($this->payplus_payment_gateway_settings, 'enabled') && $this->payplus_payment_gateway_settings->enabled === 'yes');
         $this->secret_key = boolval($this->payplus_payment_gateway_settings->api_test_mode === "yes") ? $this->payplus_payment_gateway_settings->dev_secret_key ?? null : $this->payplus_payment_gateway_settings->secret_key;
         $this->hidePayPlusGatewayNMW = boolval(property_exists($this->payplus_payment_gateway_settings, 'hide_main_pp_checkout') && $this->payplus_payment_gateway_settings->hide_main_pp_checkout === 'yes');
+        $this->iframeAutoHeight = boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_auto_height') && $this->payplus_payment_gateway_settings->iframe_auto_height === 'yes');
 
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
@@ -773,7 +775,7 @@ class WC_PayPlus
                         }
                     }
 
-                    wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=2' . PAYPLUS_VERSION;
+                    wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.js?ver=2' . PAYPLUS_VERSION;
                     if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                         if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
                             $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION;
@@ -791,6 +793,7 @@ class WC_PayPlus
                             "isLoggedIn" => boolval(get_current_user_id() > 0),
                             'frontNonce' => wp_create_nonce('frontNonce'),
                             "isSubscriptionOrder" => $isSubscriptionOrder,
+                            "iframeAutoHeight" => $this->iframeAutoHeight,
                             "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
                             "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,
                             "hostedFieldsWidth" => isset($this->hostedFieldsOptions['hosted_fields_width']) ? $this->hostedFieldsOptions['hosted_fields_width'] : 100,
@@ -890,10 +893,11 @@ class WC_PayPlus
             public function payplus_view_iframe_payment()
             {
                 $height = $this->payplus_payment_gateway_settings->iframe_height;
+                isset($this->payplus_payment_gateway_settings->iframe_auto_height) && $this->payplus_payment_gateway_settings->iframe_auto_height === "yes" ? $iframeAutoHeight = "max-height: 100vh;height: 90%;" : $iframeAutoHeight = "";
                 ob_start();
                     ?>
         <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>" style="<?php echo $iframeAutoHeight; ?>"></div>
         <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
                 $html = ob_get_clean();

@@ -7,6 +7,7 @@ jQuery(function ($) {
     }
 
     let hostedIsMain = payplus_script_checkout.hostedFieldsIsMain;
+    let iframeAutoHeight = payplus_script_checkout.iframeAutoHeight;
     let payPlusMain = "payment_method_payplus-payment-gateway";
     let payPlusHosted = "payment_method_payplus-payment-gateway-hostedfields";
     let inputPayPlus = payPlusHosted;
@@ -1277,7 +1278,12 @@ jQuery(function ($) {
         iframe.id = "pp_iframe";
         iframe.name = "payplus-iframe";
         iframe.src = src;
-        iframe.height = height;
+        if(iframeAutoHeight) {
+            iframe.height = "90%";
+            iframe.maxHeight = "100vh";
+        } else {
+            iframe.height = height;
+        }
         iframe.width = width;
         iframe.setAttribute("style", `border:0px`);
         iframe.setAttribute("allowpaymentrequest", "allowpaymentrequest");
