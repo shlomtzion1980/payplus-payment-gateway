@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.1] - 06-07-2025 - (Rocky)
+
+- Added - Option to: Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above) - Only for classic checkout!
+
 ## [7.8.0] - 29-06-2025 - (MeDew)
 
 - Added - Do not create invoices+ documents option for Stripe payment gateway.

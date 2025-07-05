@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.8.0
+Stable tag: 7.8.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 7.8.1 - 06-07-2025 = 
+
+- Added - Option to: Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above) - Only for classic checkout!
 
 == 7.8.0 - 29-06-2025 =
 
