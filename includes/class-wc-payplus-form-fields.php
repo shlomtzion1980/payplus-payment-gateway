@@ -727,7 +727,7 @@ class WC_PayPlus_Form_Fields
                 'default' => 600,
             ],
             'iframe_auto_height' => [
-                'title' => __('Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above)', 'payplus-payment-gateway'),
+                'title' => __('Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above) - Only for classic checkout!', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'description' => __('Automatically adjust the iFrame height based on the screen size and zoom level. This will override the Iframe Height setting above.', 'payplus-payment-gateway'),
                 'desc_tip' => true,

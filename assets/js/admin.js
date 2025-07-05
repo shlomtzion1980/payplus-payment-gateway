@@ -19,7 +19,7 @@ jQuery(function ($) {
         "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
     );
     const blockIpTransactions = $(
-        "#woocommerce_payplus-payment-gateway_block_ip_transactions"
+        "#woocommerce_payplus-payment-gateway_block_ip_transactions" 
     );
     const blockIpTransactionsHour = $(
         "#woocommerce_payplus-payment-gateway_block_ip_transactions_hour"
@@ -34,6 +34,10 @@ jQuery(function ($) {
     const payingVatAll = $(
         "#woocommerce_payplus-payment-gateway_settings\\[paying_vat_all_order\\]"
     );
+
+    const iframeHeight = $("#woocommerce_payplus-payment-gateway_iframe_height");
+
+    const iframeAutoHeight = $("#woocommerce_payplus-payment-gateway_iframe_auto_height");
 
     const deleteError = $(".payplus-delete-error");
     const createInvoiceManual = $(".create-invoice-manual");
@@ -108,65 +112,25 @@ jQuery(function ($) {
         $(this).closest("tr").remove();
     });
 
-    // if (payingVatAll && payingVatAll.prop("checked") === false) {
-    //     keywordsEilat.closest("tr").fadeOut();
-    //     changeVatInEliat.closest("tr").fadeOut();
-    //     $(
-    //         "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
-    //     )
-    //         .closest("tr")
-    //         .fadeOut();
-    //     $(
-    //         "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
-    //     )
-    //         .closest("tr")
-    //         .fadeOut();
-    //     $("#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]")
-    //         .closest("tr")
-    //         .fadeOut();
-    // }
-    // payingVatAll.change(function () {
-    //     if ($(this).prop("checked")) {
-    //         changeVatInEliat.closest("tr").fadeIn();
-    //         if (changeVatInEliat.prop("checked")) {
-    //             keywordsEilat.closest("tr").fadeIn();
-    //         }
-    //         $(
-    //             "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeIn();
-    //         $(
-    //             "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeIn();
-    //         $(
-    //             "#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeIn();
-    //     } else {
-    //         keywordsEilat.closest("tr").fadeOut();
-    //         changeVatInEliat.closest("tr").fadeOut();
-    //         $(
-    //             "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeOut();
-    //         $(
-    //             "select#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeOut();
-    //         $(
-    //             "#woocommerce_payplus-payment-gateway_settings\\[vat_number_field\\]"
-    //         )
-    //             .closest("tr")
-    //             .fadeOut();
-    //     }
-    // });
-    /******     Eliat start **remove***/
+    // Hide or show iframeHeight row based on iframeAutoHeight checkbox state
+    function toggleIframeHeightRow() {
+        if (iframeAutoHeight.prop("checked")) {
+            iframeHeight.closest("tr").hide();
+        } else {
+            iframeHeight.closest("tr").show();
+        }
+    }
+
+    // Ensure DOM is ready before running on page load
+    $(document).ready(function () {
+        toggleIframeHeightRow();
+    });
+
+    // Run on change
+    iframeAutoHeight.change(function () {
+        toggleIframeHeightRow();
+    });
+
     if (!changeVatInEliat.prop("checked")) {
         keywordsEilat.closest("tr").fadeOut();
     }
