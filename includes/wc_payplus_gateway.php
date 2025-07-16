@@ -2597,15 +2597,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
             if (isset($res->data)) {
-                if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
-                    $metaData = array(
-                        'payplus_page_request_uid' => $res->data->page_request_uid,
-                        'payplus_payment_page_link' => $res->data->payment_page_link,
-                        'payplus_generate_products_link' => $check_payplus_generate_products_link,
-                        'payplus_time_link' => $dateNow,
-                    );
-                    WC_PayPlus_Meta_Data::update_meta($order, $metaData);
-                }
                 try {
                     if (property_exists($res->data, 'page_request_uid')) {
                         $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
