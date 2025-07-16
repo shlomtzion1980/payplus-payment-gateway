@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.2] - 06-07-2025 - (Sylvester)
+- Fix   - Resolved an issue where, on classic checkout, standard payment pages would always open via redirect on subsequent accesses, disregarding the configured page settings.
+
 ## [7.8.1] - 06-07-2025 - (Rocky)
 
 - Added - Option to: Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above) - Only for classic checkout!
