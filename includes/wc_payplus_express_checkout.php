@@ -930,8 +930,8 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                                 $new_array[] = array(
                                     "id" => $shipping_method->instance_id,
                                     "title" => $shipping_title,
-                                    "cost_without_tax" => strval(round($shipping_cost, ROUNDING_DECIMALS)),
-                                    "cost_with_tax" => get_option('woocommerce_calc_taxes') == 'yes' ? strval(round($shipping_price_with_tax, ROUNDING_DECIMALS)) : strval(round($shipping_cost, ROUNDING_DECIMALS)),
+                                    "cost_without_tax" => strval($shipping_cost),
+                                    "cost_with_tax" => get_option('woocommerce_calc_taxes') == 'yes' ? strval($shipping_price_with_tax) : strval($shipping_cost),
                                 );
                             }
                         }
