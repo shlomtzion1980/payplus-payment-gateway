@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2025-07-05 18:02+0300\n"
-"PO-Revision-Date: 2025-07-05 18:04+0300\n"
+"POT-Creation-Date: 2025-07-17 16:46+0300\n"
+"PO-Revision-Date: 2025-07-17 16:46+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -15,8 +15,9 @@ msgstr ""
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
 "X-Poedit-WPHeader: payplus-payment-gateway.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: "
-"__;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
 "X-Poedit-SearchPath-0: languages\n"
 "X-Poedit-SearchPath-1: .\n"
 "X-Poedit-SearchPathExcluded-0: *.js\n"
@@ -772,7 +773,7 @@ msgstr "הזמנה תמיד כוללת מע״מ – בלי יוצא מן הכל�
 #: includes/admin/class-wc-payplus-admin-settings.php:566
 msgid ""
 "This will make every order with VAT, even if the customer is not paying VAT"
-msgstr "זה יגרום לכך שכל הזמנה תחויב במע״מ, גם אם הלקוח לא משלם מע״מ."
+msgstr "זה יגרום לכך שכל הזמנה תחויב במע״מ, גם אם הלקוח לא משלם מע״מ"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:573
 msgid "Use new/other - \"Other country vat settings\" (Default: Unchecked)"
@@ -930,13 +931,13 @@ msgid "Order data not available."
 msgstr ""
 
 #: includes/admin/class-wc-payplus-admin.php:475
-#: includes/class-wc-payplus-statics.php:384
+#: includes/class-wc-payplus-statics.php:385
 msgid "Pre-Authorization"
 msgstr "תפיסת-מסגרת"
 
 #: includes/admin/class-wc-payplus-admin.php:475
 #: includes/admin/class-wc-payplus-admin.php:2291
-#: includes/class-wc-payplus-statics.php:384
+#: includes/class-wc-payplus-statics.php:385
 msgid "Payment"
 msgstr "תשלום"
 
@@ -1040,7 +1041,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1522
 #: includes/admin/class-wc-payplus-admin.php:1550
-#: includes/class-wc-payplus-statics.php:398 templates/hostedFields.php:668
+#: includes/class-wc-payplus-statics.php:399 templates/hostedFields.php:668
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1146,7 +1147,7 @@ msgstr "מספק צק"
 
 #: includes/admin/class-wc-payplus-admin.php:1753
 #: includes/admin/class-wc-payplus-admin.php:1756
-#: includes/class-wc-payplus-statics.php:395
+#: includes/class-wc-payplus-statics.php:396
 msgid "Type"
 msgstr "סוג"
 
@@ -2106,59 +2107,59 @@ msgstr "החזרים"
 msgid "Total of payments: "
 msgstr "סה\"כ תקבולים: "
 
-#: includes/class-wc-payplus-statics.php:385
+#: includes/class-wc-payplus-statics.php:386
 #, fuzzy
 #| msgid "Make Payment"
 msgid "Manual Payment"
 msgstr "ביצוע תשלום"
 
-#: includes/class-wc-payplus-statics.php:390
+#: includes/class-wc-payplus-statics.php:391
 msgid "Transaction#"
 msgstr "עסקה"
 
-#: includes/class-wc-payplus-statics.php:391
+#: includes/class-wc-payplus-statics.php:392
 #, fuzzy
 #| msgid "Date"
 msgid "DateTime"
 msgstr "תאריך"
 
-#: includes/class-wc-payplus-statics.php:392
+#: includes/class-wc-payplus-statics.php:393
 msgid "Method"
 msgstr "שיטה"
 
-#: includes/class-wc-payplus-statics.php:393
+#: includes/class-wc-payplus-statics.php:394
 msgid "Brand"
 msgstr "חברה"
 
-#: includes/class-wc-payplus-statics.php:394
+#: includes/class-wc-payplus-statics.php:395
 msgid "Issuer"
 msgstr "מנפיק"
 
-#: includes/class-wc-payplus-statics.php:396
+#: includes/class-wc-payplus-statics.php:397
 msgid "Last Digits"
 msgstr "ספרות אחרונות"
 
-#: includes/class-wc-payplus-statics.php:397
+#: includes/class-wc-payplus-statics.php:398
 msgid "Expiry Date"
 msgstr "תאריך תפוגה"
 
-#: includes/class-wc-payplus-statics.php:399
+#: includes/class-wc-payplus-statics.php:400
 msgid "Voucher #"
 msgstr "מס ואוצ'ר"
 
-#: includes/class-wc-payplus-statics.php:400
-msgid "Voucher ID"
-msgstr "ID ואוצ'ר"
-
 #: includes/class-wc-payplus-statics.php:401
+msgid "Approval #"
+msgstr "מספר אישור"
+
+#: includes/class-wc-payplus-statics.php:402
 msgid "Token"
 msgstr "טוקן"
 
-#: includes/class-wc-payplus-statics.php:402
+#: includes/class-wc-payplus-statics.php:403
 msgid "Total:"
 msgstr "סה\"כ:"
 
-#: includes/class-wc-payplus-statics.php:403
+#: includes/class-wc-payplus-statics.php:404
 msgid "Status:"
 msgstr "סטטוס:"
 
@@ -2283,12 +2284,11 @@ msgstr ""
 
 #: includes/wc_payplus_gateway.php:1047
 msgid ""
-"For more information about PayPlus and Plugin versions <a href=\"https://"
-"www.payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</"
-"a>"
+"For more information about PayPlus and Plugin versions <a href=\"https://www."
+"payplus.co.il/wordpress\" target=\"_blank\">www.payplus.co.il/wordpress</a>"
 msgstr ""
-"למידע נוסף על גירסאות הפלאגין של פיי פלוס <a href=\"https://"
-"www.payplus.co.il/wordpress\" target=\"_blank\">לחץ כאן</a>"
+"למידע נוסף על גירסאות הפלאגין של פיי פלוס <a href=\"https://www.payplus.co."
+"il/wordpress\" target=\"_blank\">לחץ כאן</a>"
 
 #: includes/wc_payplus_gateway.php:1055
 msgid ""
@@ -2359,45 +2359,45 @@ msgstr "משלוח"
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
-#: includes/wc_payplus_gateway.php:2616
+#: includes/wc_payplus_gateway.php:2607
 #, php-format
 msgid "An error occurred: %s"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2622
+#: includes/wc_payplus_gateway.php:2613
 msgid ""
 "Error: The payment page failed to load - please check your page uid and "
 "domain settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2639 includes/wc_payplus_gateway.php:3595
-#: includes/wc_payplus_gateway.php:3603
+#: includes/wc_payplus_gateway.php:2630 includes/wc_payplus_gateway.php:3586
+#: includes/wc_payplus_gateway.php:3594
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:3157
+#: includes/wc_payplus_gateway.php:3148
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:3328
+#: includes/wc_payplus_gateway.php:3319
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:3631
+#: includes/wc_payplus_gateway.php:3622
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:3641
+#: includes/wc_payplus_gateway.php:3632
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:3686
+#: includes/wc_payplus_gateway.php:3677
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:3717 includes/wc_payplus_gateway.php:3723
+#: includes/wc_payplus_gateway.php:3708 includes/wc_payplus_gateway.php:3714
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
@@ -2876,6 +2876,9 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Voucher ID"
+#~ msgstr "ID ואוצ'ר"
 
 #~ msgid ""
 #~ "Override the payment gateway with the payplus EMV POS device (happens "
