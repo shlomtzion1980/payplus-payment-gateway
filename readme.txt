@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 7.8.3 - 17-07-2025 =
 
 - Fix   - Corrected price rounding errors in Express checkout that occurred on certain system configurations.
+- Tweak - Replaced Voucher ID with Approval Number in the PayPlus metabox within order details (Voucher ID was previously showing the same value as voucher number).
 
 == 7.8.2 - 16-07-2025 =
 
