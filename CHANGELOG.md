@@ -5,11 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [7.8.3] - 17-07-2025 - (Aleppo)
 
 - Fix   - Corrected price rounding errors in Express checkout that occurred on certain system configurations.
+- Tweak - Replaced Voucher ID with Approval Number in the PayPlus metabox within order details (Voucher ID was previously showing the same value as voucher number).
 
 ## [7.8.2] - 16-07-2025 - (Sylvester)
 
 - Fix   - Resolved an issue where, on classic checkout, standard payment pages would always open via redirect on subsequent accesses, disregarding the configured page settings.
-- Tweak - Replaced Voucher ID with Approval Number in the PayPlus metabox within order details (Voucher ID was previously showing the same value as voucher number).
 
 ## [7.8.1] - 06-07-2025 - (Rocky)
 
