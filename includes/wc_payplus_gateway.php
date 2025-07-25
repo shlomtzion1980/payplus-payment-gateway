@@ -353,6 +353,72 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
+        public function cancel_pending_giftcard_orders_for_current_user($giftCardData = null) {
+        
+        $user_id = get_current_user_id();
+        if (!$user_id) {
+            return;
+        }
+
+        $args = array(
+            'customer_id' => $user_id,
+            'status'      => 'pending',
+            'limit'       => -1,
+            'orderby'     => 'date',
+            'order'       => 'DESC',
+            'return'      => 'ids',
+        );
+
+        $orders = wc_get_orders($args);
+
+        foreach ($orders as $order_id) {
+            $order = wc_get_order($order_id);
+
+            // Check for gift cards in meta
+            $pw_gift_cards = $order->get_meta('payplus_pw_gift_cards');
+            $gift_cards = $order->get_meta('_ywgc_applied_gift_cards');
+            $has_gift_card = false;
+
+            // Check PayPlus gift cards
+            if ($pw_gift_cards) {
+                $pwGiftCardData = json_decode($giftCardData, true);
+                $pw_gift_cards_data = json_decode($pw_gift_cards, true);
+                if (!empty($pw_gift_cards_data['gift_cards'])) {
+                    foreach ($pw_gift_cards_data['gift_cards'] as $key => $amount) {
+                        if(isset($pwGiftCardData['gift_cards'][$key])) {
+                            if (floatval($amount) > 0) {
+                                $has_gift_card = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Check YITH WooCommerce Gift Cards
+            if (!$has_gift_card && is_array($gift_cards)) {
+                foreach ($gift_cards as $amount) {
+                    if (floatval($amount) > 0) {
+                        $has_gift_card = true;
+                        break;
+                    }
+                }
+            }
+
+            // If order has gift card(s) with amount and is not paid, cancel it
+            if ($has_gift_card && $order->get_status() === 'pending' && $order->get_total() > 0) {
+                $order->update_status('cancelled', __('Order cancelled automatically: pending order with gift card not paid.', 'payplus-payment-gateway'));
+                $order->save();
+                $isCancelled = true;
+            }
+        }
+        if (isset($isCancelled) && $isCancelled) {
+            wc_add_notice(__('In order to use the unredeemed gift card, the pending order must be cancelled. You can now use it again!', 'payplus-payment-gateway'), 'error');
+            wp_safe_redirect( $_SERVER['REQUEST_URI'] );
+            exit;
+        }
+    }
+
     public function pwGiftCardsOnNoPayment($order_id, $posted_data, $order)
     {
         // Check if the order total is 0
@@ -1611,6 +1677,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
+            $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         }
 
