@@ -417,9 +417,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
         if (isset($isCancelled) && $isCancelled) {
-            wc_add_notice(__('The gift card balance needed to be refreshed. Please try the payment process again.', 'payplus-payment-gateway'), 'error');
-            wp_safe_redirect( $_SERVER['REQUEST_URI'] );
-            exit;
+            wc_add_notice(__('Since the last payment attempt was not completed, the gift card balance needed to be refreshed. Please try the payment process again now.', 'payplus-payment-gateway'), 'error');
+            return false;
         }
     }
 
@@ -1681,7 +1680,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
-            $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
+            $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
+            if ($cancelledResponse === false) {
+                wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
+                return [
+                    'result' => 'fail',
+                    'redirect' => '',
+                ];
+            }
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         }
 
