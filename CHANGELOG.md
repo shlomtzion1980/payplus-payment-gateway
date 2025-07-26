@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [7.8.4] - 27-07-2025 - (Druze)
 
 - Feature - Previously, PW Gift Cards were redeemed as soon as an order payment was initiated, causing the gift card balance to be deducted even if the payment was not completed or failed. Now, with a new checkbox option, the plugin will refresh and restore the gift card balance for unpaid or failed orders when the same gift card is used again.
+- Feature - The same gift card balance restoration logic now also applies to PayPlus Embedded.
 - Added   - Display Approval ID in the PayPlus Metabox on the order page.
 - Fix     - Resolved a display overflow issue in the PayPlus Metabox on the order page for Tokens: Long tokens now break correctly instead of overflowing.
 

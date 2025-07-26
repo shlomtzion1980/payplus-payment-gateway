@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.8.3
+Stable tag: 7.8.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 7.8.4 - 27-07-2025 = 
 
 - Feature - Previously, PW Gift Cards were redeemed as soon as an order payment was initiated, causing the gift card balance to be deducted even if the payment was not completed or failed. Now, with a new checkbox option, the plugin will refresh and restore the gift card balance for unpaid or failed orders when the same gift card is used again.
+- Feature - The same gift card balance restoration logic now also applies to PayPlus Embedded.
 - Added   - Display Approval ID in the PayPlus Metabox on the order page.
 - Fix     - Resolved a display overflow issue in the PayPlus Metabox on the order page for Tokens: Long tokens now break correctly instead of overflowing.
 
