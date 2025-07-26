@@ -362,7 +362,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $args = array(
             'customer_id' => $user_id,
-            'status'      => 'pending',
+            'status'      => array('pending', 'failed'),
             'limit'       => -1,
             'orderby'     => 'date',
             'order'       => 'DESC',
@@ -384,7 +384,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $pwGiftCardData = json_decode($giftCardData, true);
                 $pw_gift_cards_data = json_decode($pw_gift_cards, true);
                 if (!empty($pw_gift_cards_data['gift_cards'])) {
-                    foreach ($pw_gift_cards_data['gift_cards'] as $key => $amount) {
+                    foreach ($pw_gift_cards_data['gift_cards'] as $key => $amount) { 
                         if(isset($pwGiftCardData['gift_cards'][$key])) {
                             if (floatval($amount) > 0) {
                                 $has_gift_card = true;
@@ -406,14 +406,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
 
             // If order has gift card(s) with amount and is not paid, cancel it
-            if ($has_gift_card && $order->get_status() === 'pending' && $order->get_total() > 0) {
-                $order->update_status('cancelled', __('Order cancelled automatically: pending order with gift card not paid.', 'payplus-payment-gateway'));
+            if (
+                $has_gift_card &&
+                in_array($order->get_status(), ['pending', 'failed']) &&
+                $order->get_total() > 0
+            ) {
+                $order->update_status('cancelled', __('Order cancelled automatically: pending or failed order with gift card not paid.', 'payplus-payment-gateway'));
                 $order->save();
                 $isCancelled = true;
             }
         }
         if (isset($isCancelled) && $isCancelled) {
-            wc_add_notice(__('In order to use the unredeemed gift card, the pending order must be cancelled. You can now use it again!', 'payplus-payment-gateway'), 'error');
+            wc_add_notice(__('The gift card balance needed to be refreshed. Please try the payment process again.', 'payplus-payment-gateway'), 'error');
             wp_safe_redirect( $_SERVER['REQUEST_URI'] );
             exit;
         }
