@@ -901,6 +901,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'pw_gift_card_auto_cancel_unpaid_order' => [
+                'title' => __('Auto Cancel (PWGiftCards) Unpaid Orders', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => __('Auto Cancel Unpaid Orders with PW-Gift Cards when another payment attempt is made', 'payplus-payment-gateway'),
+                'description' => __('Automatically cancel orders if a payment attempt fails - THIS WILL REDEEM THE GIFT CARD BALANCE', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'non_voucher_minimum_amount' => [
                 'title' => __('Disallow voucher payment for shipping', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

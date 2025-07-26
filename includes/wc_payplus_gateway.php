@@ -111,6 +111,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $useLegacyPayload;
     public $isPosOverrideGateways;
     public $posOverrideGateways;
+    public $pw_gift_card_auto_cancel_unpaid_order;
 
     /**
      *
@@ -168,6 +169,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->enableDoubleCheckIfPruidExists = $this->get_option('enable_double_check_if_pruid_exists') == 'yes' ? true : false;
         $this->useLegacyPayload = $this->get_option('use_legacy_payload') == 'yes' ? true : false;
         $this->updateStatusesIpn = $this->get_option('update_statuses_in_ipn') === 'yes' ? true : false;
+        $this->pw_gift_card_auto_cancel_unpaid_order = $this->get_option('pw_gift_card_auto_cancel_unpaid_order') == 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -1680,13 +1682,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
-            $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
-            if ($cancelledResponse === false) {
-                wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
-                return [
-                    'result' => 'fail',
-                    'redirect' => '',
-                ];
+            if($this->pw_gift_card_auto_cancel_unpaid_order){
+                $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
+                if ($cancelledResponse === false) {
+                    wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
+                    return [
+                        'result' => 'fail',
+                        'redirect' => '',
+                    ];
+                }
             }
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         }
