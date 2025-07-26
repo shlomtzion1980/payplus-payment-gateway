@@ -158,6 +158,23 @@ class WC_PayPlus
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $pwGiftCardData = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+        $decodedCardData = json_decode($pwGiftCardData, true);
+        
+        if (!empty($pwGiftCardData) && is_array($decodedCardData)) {
+            // Get the first value from the $pwGiftCardData array
+            $firstGiftCard = reset($decodedCardData['gift_cards']);
+            if ($this->payplus_gateway->pw_gift_card_auto_cancel_unpaid_order && floatval($firstGiftCard) == 0) {
+                $cancelledResponse = $this->payplus_gateway->cancel_pending_giftcard_orders_for_current_user($pwGiftCardData, $order_id);
+                if ($cancelledResponse === false) {
+                    wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
+                    wp_send_json_error([
+                        'result' => 'fail',
+                        'redirect' => '',
+                    ]);
+                }
+            }
+        }
         $order = wc_get_order($order_id);
         if ($order) {
             $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
