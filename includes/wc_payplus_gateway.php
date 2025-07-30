@@ -340,10 +340,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         // Get the payment gateway ID
         $payment_gateway_id = $order->get_payment_method();
-        $WC_PayPlus_Admin_Payments = new WC_PayPlus_Admin_Payments;
         $gatewaysToOverride = !empty($this->posOverrideGateways) ? explode(',', $this->posOverrideGateways) : [];
         // Check if the payment gateway ID matches your target ID
         if (is_array($gatewaysToOverride) && in_array($payment_gateway_id, $gatewaysToOverride)) {
+            $WC_PayPlus_Admin_Payments = new WC_PayPlus_Admin_Payments();
             $_wpnonce = wp_create_nonce('ajax_payplus_generate_link_payment');
             $emvResponse = $WC_PayPlus_Admin_Payments->ajax_payplus_generate_link_payment($order_id, $_wpnonce);
 
@@ -355,8 +355,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
-        public function cancel_pending_giftcard_orders_for_current_user($giftCardData = null) {
-        
+    public function cancel_pending_giftcard_orders_for_current_user($giftCardData = null)
+    {
+
         $user_id = get_current_user_id();
         if (!$user_id) {
             return;
@@ -386,8 +387,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $pwGiftCardData = json_decode($giftCardData, true);
                 $pw_gift_cards_data = json_decode($pw_gift_cards, true);
                 if (!empty($pw_gift_cards_data['gift_cards'])) {
-                    foreach ($pw_gift_cards_data['gift_cards'] as $key => $amount) { 
-                        if(isset($pwGiftCardData['gift_cards'][$key])) {
+                    foreach ($pw_gift_cards_data['gift_cards'] as $key => $amount) {
+                        if (isset($pwGiftCardData['gift_cards'][$key])) {
                             if (floatval($amount) > 0) {
                                 $has_gift_card = true;
                                 break;
@@ -1682,7 +1683,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
-            if($this->pw_gift_card_auto_cancel_unpaid_order){
+            if ($this->pw_gift_card_auto_cancel_unpaid_order) {
                 $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
                 if ($cancelledResponse === false) {
                     wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
