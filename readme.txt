@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 3.0.1
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.8.4
+Stable tag: 7.8.5
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 7.8.5 - 30-07-2025 =
+
+- Tweak   - Improved 3D Secure background and sizing for PayPlus Embedded on mobile devices to ensure proper display.
+- Fix     - The "Do not create invoices+" option now correctly prevents invoice creation for both charges and refunds, not just charges.
+- Fix     - Resolved an issue where the Invoice+ cash on delivery refund feature generated multiple duplicate documents instead of a single one when the "POS Override" option was enabled.
 
 == 7.8.4 - 27-07-2025 = 
 

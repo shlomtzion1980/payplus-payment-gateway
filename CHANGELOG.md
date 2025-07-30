@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.5] - 30-07-2025 - (Commerce)
+
+- Tweak   - Improved 3D Secure background and sizing for PayPlus Embedded on mobile devices to ensure proper display.
+- Fix     - The "Do not create invoices+" option now correctly prevents invoice creation for both charges and refunds, not just charges.
+- Fix     - Resolved an issue where the Invoice+ cash on delivery refund feature generated multiple duplicate documents instead of a single one when the "POS Override" option was enabled.
+
 ## [7.8.4] - 27-07-2025 - (Druze)
 
 - Feature - Previously, PW Gift Cards were redeemed as soon as an order payment was initiated, causing the gift card balance to be deducted even if the payment was not completed or failed. Now, with a new checkbox option, the plugin will refresh and restore the gift card balance for unpaid or failed orders when the same gift card is used again.

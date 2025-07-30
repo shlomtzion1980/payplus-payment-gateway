@@ -4,7 +4,7 @@
  * Plugin Name: PayPlus Payment Gateway
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
- * Version: 7.8.4
+ * Version: 7.8.5
  * Tested up to: 6.8
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
@@ -19,8 +19,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '7.8.4');
-define('PAYPLUS_VERSION_DB', 'payplus_7_8_4');
+define('PAYPLUS_VERSION', '7.8.5');
+define('PAYPLUS_VERSION_DB', 'payplus_7_8_5');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
 {
@@ -160,7 +160,7 @@ class WC_PayPlus
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $pwGiftCardData = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
         $decodedCardData = json_decode($pwGiftCardData, true);
-        
+
         if (!empty($pwGiftCardData) && is_array($decodedCardData)) {
             // Get the first value from the $pwGiftCardData array
             $firstGiftCard = reset($decodedCardData['gift_cards']);
