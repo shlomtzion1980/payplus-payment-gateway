@@ -220,6 +220,13 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             border-radius: 15px;
             width: 33% !important;
             height: 70% !important;
+            background: white;
+        }
+
+        @media screen and (max-width: 600px) {
+            .hsted-Flds--r-secure3ds-iframe {
+                width: 85% !important;
+            }
         }
 
         .pp_iframe_h {
