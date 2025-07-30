@@ -499,6 +499,7 @@ class PayplusInvoice
         $order = wc_get_order($order_id);
         $typePaymentMethod = $order->get_payment_method();
         if (isset($this->payplus_invoice_option['do-not-create']) && in_array($typePaymentMethod, $this->payplus_invoice_option['do-not-create'])) {
+            $order->add_order_note('This payment method is set as: Not to create documents automatically');
             return;
         }
         if ($payplus_invoice_type_document_refund === "inv_refund_receipt") {
