@@ -219,6 +219,47 @@ function showError(message, code) {
 }
 
 jQuery(() => {
+
+    if (window.innerWidth < 768) {
+        // CSS to inject
+        const css = `
+            .iframe-wrapper {
+                width: 100%;
+                max-width: 100%;
+                overflow: hidden;
+                position: relative;
+            }
+            .hsted-Flds--r-secure3ds-iframe {
+                transform: scale(0.65);
+                transform-origin: top left;
+                width: 150% !important;
+                height: 500px;
+                border: none;
+                left: 5px !important;
+            }
+        `;
+
+        // Inject the CSS
+        jQuery('<style>').text(css).appendTo('head');
+
+        // Create the observer
+        const observer = new MutationObserver(function (mutationsList) {
+            jQuery('.hsted-Flds--r-secure3ds-iframe').each(function () {
+                const $iframe = jQuery(this);
+                if (!$iframe.parent().hasClass('iframe-wrapper')) {
+                    $iframe.wrap('<div class="iframe-wrapper"></div>');
+                }
+            });
+        });
+
+        // Start observing the body for added nodes
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        console.log("MutationObserver started");
+    }
+
     const isCheckout = !document.querySelector(
         'div[data-block-name="woocommerce/checkout"]'
     )
