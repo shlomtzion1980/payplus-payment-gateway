@@ -289,6 +289,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
 
                         @media screen and (min-width: 567px) {
                             appearance: none;
+                            font-family: 'AlmoniMLv5AAA' !important;
                             /* Remove default arrow (Webkit) */
                             -moz-appearance: none;
                             /* Remove default arrow (Firefox) */
@@ -353,6 +354,8 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                 } */
 
                 .form-control {
+                    font-family: 'AlmoniMLv5AAA' !important;
+                    max-width: 100% !important;
                     width: 100% !important;
                     padding: 0.5rem 0.75rem !important;
                     font-size: 1rem !important;
@@ -365,6 +368,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                 }
 
                 .forms-control {
+                    max-width: 100% !important;
                     width: 100% !important;
                     padding: 0.5rem 0.75rem !important;
                     font-size: 1rem !important;
@@ -563,6 +567,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             border-radius: 8px !important;
             background-color: white;
             outline: none;
+            font-family: 'AlmoniMLv5AAA' !important;
         }
 
         #payments-wrapper {
