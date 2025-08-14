@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.6] - 06-08-2025 - (Lennon)
+
+- Tweak   - Enhanced the 3D Secure iframe content and positioning in PayPlus Embedded for mobile devices, ensuring correct display in both RTL and LTR languages.
+
 ## [7.8.5] - 30-07-2025 - (Commerce)
 
 - Tweak   - Improved 3D Secure background and sizing for PayPlus Embedded on mobile devices to ensure proper display.
