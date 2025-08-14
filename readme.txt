@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 7.8.7 - 14-08-2025 =
 
 - Added   - Introduced PayPlus Invoice+ Runner manager - enables batch processing of today's orders to generate invoices for orders missing them.
+- Added   - Included PayPlus Invoice+ Runner cron functionality in Invoice+ settings - once activated it will automatically executes every 30 minutes to generate invoices, functioning similarly to the manual manager.
 
 == 7.8.6 - 06-08-2025 =
 
