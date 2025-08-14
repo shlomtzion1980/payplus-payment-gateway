@@ -376,10 +376,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_die();
         }
 
-
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
         $order = wc_get_order($order_id);
+
+        // Add validation to ensure order exists
+        if (!$order) {
+            $this->payplus_add_log_all('payplus-ipn', 'Invalid order ID: ' . $order_id, 'error');
+            wp_send_json_error('Invalid order ID: ' . $order_id);
+            wp_die();
+        }
 
         $createInvoice = isset($_POST['create_invoice']) && sanitize_text_field(wp_unslash($_POST['create_invoice']));
         if ($createInvoice) {
