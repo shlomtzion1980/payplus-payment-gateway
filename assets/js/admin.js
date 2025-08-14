@@ -1223,3 +1223,129 @@ function payplus_obj_isObjectEmpty(obj) {
     return Object.keys(obj).length > 0;
 }
 //==================invoice not automatic  ======================
+
+//==================PayPlus Invoice Runner Management======================
+jQuery(document).ready(function($) {
+    // PayPlus Invoice Runner Management functionality
+    $('#run-payplus-invoice-runner').on('click', function() {
+        var button = $(this);
+        var resultDiv = $('#payplus-runner-result');
+        var loadingDiv = $('#payplus-runner-loading');
+        var nonce = button.data('nonce');
+        
+        // Validate nonce exists
+        if (!nonce) {
+            resultDiv.html('<div class="notice notice-error"><p>' + payplus_admin_vars.security_token_missing + '</p></div>');
+            return;
+        }
+
+        button.prop('disabled', true);
+        loadingDiv.show();
+        resultDiv.html('');
+
+        $.ajax({
+            url: ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'run_payplus_invoice_runner',
+                nonce: nonce
+            },
+            timeout: 120000, // 2 minutes timeout
+            success: function(response) {
+                try {
+                    var data = JSON.parse(response);
+                    if (data.success) {
+                        var html = '<div class="notice notice-success"><p>' + data.message + '</p></div>';
+
+                        // Add detailed results if available
+                        if (data.data) {
+                            var results = data.data;
+                            html += '<div class="payplus-results-detail" style="margin-top: 20px;">';
+                            html += '<h3>' + payplus_admin_vars.detailed_results + '</h3>';
+                            html += '<table class="widefat fixed striped">';
+                            html += '<thead><tr>';
+                            html += '<th style="width: 20%;">' + payplus_admin_vars.metric + '</th>';
+                            html += '<th>' + payplus_admin_vars.value + '</th>';
+                            html += '</tr></thead><tbody>';
+                            html += '<tr><td>' + payplus_admin_vars.started_at + '</td><td>' + results.started_at + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.completed_at + '</td><td>' + results.completed_at + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.total_orders_checked + '</td><td>' + results.total_orders_checked + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.payplus_orders_found + '</td><td>' + results.payplus_orders_found + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.invoices_created + '</td><td><strong style="color: green;">' + results.invoices_created + '</strong></td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.invoices_already_exist + '</td><td>' + results.invoices_already_exist + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.skipped_non_payplus + '</td><td>' + results.skipped_non_payplus + '</td></tr>';
+                            html += '<tr><td>' + payplus_admin_vars.errors + '</td><td>' + (results.errors ? results.errors.length : 0) + '</td></tr>';
+                            html += '</tbody></table>';
+
+                            // Show errors if any
+                            if (results.errors && results.errors.length > 0) {
+                                html += '<h4 style="color: red; margin-top: 20px;">' + payplus_admin_vars.errors_encountered + '</h4>';
+                                html += '<ul style="color: red;">';
+                                for (var i = 0; i < results.errors.length; i++) {
+                                    html += '<li>' + $('<div>').text(results.errors[i]).html() + '</li>';
+                                }
+                                html += '</ul>';
+                            }
+
+                            // Show processed orders details
+                            if (results.processed_orders && results.processed_orders.length > 0) {
+                                html += '<h4 style="margin-top: 20px;">' + payplus_admin_vars.order_processing_details + '</h4>';
+                                html += '<table class="widefat fixed striped">';
+                                html += '<thead><tr>';
+                                html += '<th>' + payplus_admin_vars.order_id + '</th>';
+                                html += '<th>' + payplus_admin_vars.payment_method + '</th>';
+                                html += '<th>' + payplus_admin_vars.status + '</th>';
+                                html += '<th>' + payplus_admin_vars.reason + '</th>';
+                                html += '</tr></thead><tbody>';
+
+                                for (var i = 0; i < Math.min(results.processed_orders.length, 50); i++) { // Limit to 50 for display
+                                    var order = results.processed_orders[i];
+                                    var statusColor = '';
+                                    if (order.status === 'invoice_created') statusColor = 'color: green; font-weight: bold;';
+                                    else if (order.status === 'error') statusColor = 'color: red; font-weight: bold;';
+
+                                    html += '<tr>';
+                                    html += '<td><a href="' + payplus_admin_vars.admin_url + 'post.php?action=edit&post=' + order.order_id + '" target="_blank">#' + order.order_id + '</a></td>';
+                                    html += '<td>' + $('<div>').text(order.payment_method).html() + '</td>';
+                                    html += '<td style="' + statusColor + '">' + $('<div>').text(order.status).html() + '</td>';
+                                    html += '<td>' + $('<div>').text(order.reason).html() + '</td>';
+                                    html += '</tr>';
+                                }
+
+                                if (results.processed_orders.length > 50) {
+                                    html += '<tr><td colspan="4"><em>' + payplus_admin_vars.more_orders_message + '</em></td></tr>';
+                                }
+
+                                html += '</tbody></table>';
+                            }
+
+                            html += '</div>';
+                        }
+
+                        resultDiv.html(html);
+                    } else {
+                        resultDiv.html('<div class="notice notice-error"><p>' + $('<div>').text(data.message).html() + '</p></div>');
+                    }
+                } catch (e) {
+                    resultDiv.html('<div class="notice notice-error"><p>' + payplus_admin_vars.error_parsing_response + '</p></div>');
+                }
+            },
+            error: function(xhr, status, error) {
+                var message = payplus_admin_vars.runner_error;
+                if (status === 'timeout') {
+                    message = payplus_admin_vars.request_timeout;
+                } else if (xhr.status === 403) {
+                    message = payplus_admin_vars.security_verification_failed;
+                } else if (xhr.status === 405) {
+                    message = payplus_admin_vars.invalid_request_method;
+                }
+                resultDiv.html('<div class="notice notice-error"><p>' + message + '</p></div>');
+            },
+            complete: function() {
+                button.prop('disabled', false);
+                loadingDiv.hide();
+            }
+        });
+    });
+});
+//==================PayPlus Invoice Runner Management End==================

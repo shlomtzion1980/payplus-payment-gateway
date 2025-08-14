@@ -76,6 +76,7 @@ class WC_PayPlus
 
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
         add_action('plugins_loaded', [$this, 'init']);
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
@@ -83,6 +84,7 @@ class WC_PayPlus
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_nopriv_make-hosted-payment', [$this, 'hostedPayment']);
+        add_action('wp_ajax_run_payplus_invoice_runner', [$this, 'ajax_run_payplus_invoice_runner']);
 
         //end custom hook
 
@@ -105,6 +107,53 @@ class WC_PayPlus
             // Remove old cron function
         } else {
             $this->payPlusCronDeactivate();
+        }
+    }
+
+    /**
+     * Enqueue admin scripts on appropriate pages
+     */
+    public function enqueue_admin_scripts($hook)
+    {
+        // Check if we're on the PayPlus Invoice Runner admin page
+        if (isset($_GET['page']) && $_GET['page'] === 'payplus-invoice-runner-admin') {
+            // Enqueue admin script and localize variables
+            wp_enqueue_script(
+                'payplus-invoice-runner-admin',
+                PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js',
+                array('jquery'),
+                PAYPLUS_VERSION,
+                true
+            );
+
+            // Localize script with translated strings and admin URL
+            wp_localize_script('payplus-invoice-runner-admin', 'payplus_admin_vars', array(
+                'security_token_missing' => __('Security token missing. Please refresh the page and try again.', 'payplus-payment-gateway'),
+                'detailed_results' => __('Detailed Results', 'payplus-payment-gateway'),
+                'metric' => __('Metric', 'payplus-payment-gateway'),
+                'value' => __('Value', 'payplus-payment-gateway'),
+                'started_at' => __('Started At', 'payplus-payment-gateway'),
+                'completed_at' => __('Completed At', 'payplus-payment-gateway'),
+                'total_orders_checked' => __('Total Orders Checked', 'payplus-payment-gateway'),
+                'payplus_orders_found' => __('PayPlus Orders Found', 'payplus-payment-gateway'),
+                'invoices_created' => __('Invoices Created', 'payplus-payment-gateway'),
+                'invoices_already_exist' => __('Invoices Already Exist', 'payplus-payment-gateway'),
+                'skipped_non_payplus' => __('Non-PayPlus Orders Skipped', 'payplus-payment-gateway'),
+                'errors' => __('Errors', 'payplus-payment-gateway'),
+                'errors_encountered' => __('Errors Encountered:', 'payplus-payment-gateway'),
+                'order_processing_details' => __('Order Processing Details:', 'payplus-payment-gateway'),
+                'order_id' => __('Order ID', 'payplus-payment-gateway'),
+                'payment_method' => __('Payment Method', 'payplus-payment-gateway'),
+                'status' => __('Status', 'payplus-payment-gateway'),
+                'reason' => __('Reason', 'payplus-payment-gateway'),
+                'more_orders_message' => __('... and more orders. Check logs for complete details.', 'payplus-payment-gateway'),
+                'error_parsing_response' => __('Error parsing server response. Please check the server logs.', 'payplus-payment-gateway'),
+                'runner_error' => __('An error occurred while running the runner.', 'payplus-payment-gateway'),
+                'request_timeout' => __('Request timed out. The runner may still be running in the background.', 'payplus-payment-gateway'),
+                'security_verification_failed' => __('Security verification failed. Please refresh the page and try again.', 'payplus-payment-gateway'),
+                'invalid_request_method' => __('Invalid request method.', 'payplus-payment-gateway'),
+                'admin_url' => admin_url()
+            ));
         }
     }
 
@@ -150,7 +199,7 @@ class WC_PayPlus
                 ?>
             </p>
         </div>
-        <?php
+    <?php
     }
 
     public function hostedPayment()
@@ -220,7 +269,224 @@ class WC_PayPlus
             wp_schedule_event(time(), 'half_hour', 'payplus_twice_hourly_cron_job');
         }
     }
+    /**
+     * Ajax handler for running the PayPlus invoice runner manually
+     */
+    public function ajax_run_payplus_invoice_runner()
+    {
+        // Check if this is a POST request
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            wp_die(wp_json_encode(['success' => false, 'message' => 'Invalid request method']), '', ['response' => 405]);
+        }
 
+        // Verify user capabilities
+        if (!current_user_can('manage_options')) {
+            wp_die(wp_json_encode(['success' => false, 'message' => 'Insufficient permissions. Only administrators can run this function.']), '', ['response' => 403]);
+        }
+
+        // Verify nonce for security
+        if (!isset($_POST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'payplus_invoice_runner_nonce')) {
+            wp_die(wp_json_encode(['success' => false, 'message' => 'Security verification failed. Please refresh the page and try again.']), '', ['response' => 403]);
+        }
+
+        // Additional check: verify the action parameter
+        if (!isset($_POST['action']) || sanitize_text_field(wp_unslash($_POST['action'])) !== 'run_payplus_invoice_runner') {
+            wp_die(wp_json_encode(['success' => false, 'message' => 'Invalid action parameter']), '', ['response' => 400]);
+        }
+
+        // Run the invoice runner function and capture results
+        $results = $this->getPayplusInvoiceRunner();
+
+        // Format the response message
+        $message = sprintf(
+            __('Invoice runner completed successfully! Processed %d orders total. PayPlus orders found: %d. Invoices created: %d. Invoices already existed: %d. Non-PayPlus orders skipped: %d.', 'payplus-payment-gateway'),
+            $results['total_orders_checked'],
+            $results['payplus_orders_found'],
+            $results['invoices_created'],
+            $results['invoices_already_exist'],
+            $results['skipped_non_payplus']
+        );
+
+        if (!empty($results['errors'])) {
+            $message .= ' ' . sprintf(__('Errors encountered: %d', 'payplus-payment-gateway'), count($results['errors']));
+        }
+
+        wp_die(wp_json_encode([
+            'success' => true,
+            'message' => $message,
+            'data' => $results
+        ]), '', ['response' => 200]);
+    }
+
+
+    /**
+     * Runner function to check and create missing PayPlus invoices for processing orders
+     *
+     * @return array
+     */
+    public function getPayplusInvoiceRunner()
+    {
+        $current_time = current_time('Y-m-d H:i:s');
+        $results = [
+            'started_at' => $current_time,
+            'total_orders_checked' => 0,
+            'payplus_orders_found' => 0,
+            'invoices_already_exist' => 0,
+            'invoices_created' => 0,
+            'skipped_non_payplus' => 0,
+            'processed_orders' => [],
+            'errors' => []
+        ];
+
+        $args = array(
+            'status' => ['processing'],
+            'date_created' => '>=' . date('Y-m-d 00:00:00'), // Only orders created today
+            'return' => 'ids', // Just return IDs to save memory
+            'limit'  => -1, // Retrieve all orders
+        );
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+
+        $orders = wc_get_orders($args);
+        $results['total_orders_checked'] = count($orders);
+
+        $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', 'getPayplusInvoiceRunner process started:' . "\n" . 'Checking orders with status "processing" for missing invoices.' . "\nOrders:" . wp_json_encode($orders), 'default');
+
+        foreach ($orders as $order_id) {
+            $order = wc_get_order($order_id);
+
+            // Check if order uses PayPlus payment method
+            $payment_method = $order->get_payment_method();
+
+            // Process all orders regardless of payment method
+            $payPlusInvoiceOptions = get_option('payplus_invoice_option');
+            // Check if payment method is in do-not-create list
+            if (
+                isset($payPlusInvoiceOptions['do-not-create']) &&
+                is_array($payPlusInvoiceOptions['do-not-create']) &&
+                in_array($payment_method, $payPlusInvoiceOptions['do-not-create'])
+            ) {
+
+                $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: Payment method '$payment_method' is in do-not-create list - skipping invoice creation.\n");
+                $results['skipped_non_payplus']++;
+                $results['processed_orders'][] = [
+                    'order_id' => $order_id,
+                    'payment_method' => $payment_method,
+                    'status' => 'skipped',
+                    'reason' => 'Payment method in do-not-create invoice docs list'
+                ];
+                continue;
+            }
+
+            $results['payplus_orders_found']++;
+
+            // Check if invoice already exists
+            $invoice_sent = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
+            $invoice_sent_refund = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send_refund');
+
+            $has_invoice = ($invoice_sent === "1" || $invoice_sent === true) ||
+                ($invoice_sent_refund === "1" || $invoice_sent_refund === true);
+
+            if (!$has_invoice) {
+                $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: No invoice found - Creating invoice for processing order.\n");
+
+                try {
+                    // Create invoice using the invoice API
+                    if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+                        $this->invoice_api->payplus_invoice_create_order($order_id);
+                        $order->add_order_note('PayPlus Invoice Runner: Invoice created automatically.');
+                        $results['invoices_created']++;
+                        $results['processed_orders'][] = [
+                            'order_id' => $order_id,
+                            'payment_method' => $payment_method,
+                            'status' => 'invoice_created',
+                            'reason' => 'Invoice created successfully'
+                        ];
+                    } else {
+                        $results['errors'][] = "Order $order_id: Invoice API not available or not enabled";
+                        $results['processed_orders'][] = [
+                            'order_id' => $order_id,
+                            'payment_method' => $payment_method,
+                            'status' => 'error',
+                            'reason' => 'Invoice API not available or not enabled'
+                        ];
+                    }
+                } catch (Exception $e) {
+                    $error_msg = "Order $order_id: Error creating invoice - " . $e->getMessage();
+                    $results['errors'][] = $error_msg;
+                    $results['processed_orders'][] = [
+                        'order_id' => $order_id,
+                        'payment_method' => $payment_method,
+                        'status' => 'error',
+                        'reason' => $e->getMessage()
+                    ];
+                }
+            } else {
+                $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: Invoice already exists - skipping.\n");
+                $results['invoices_already_exist']++;
+                $results['processed_orders'][] = [
+                    'order_id' => $order_id,
+                    'payment_method' => $payment_method,
+                    'status' => 'skipped',
+                    'reason' => 'Invoice already exists'
+                ];
+            }
+        }
+
+        $results['completed_at'] = current_time('Y-m-d H:i:s');
+        $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', 'getPayplusInvoiceRunner process completed.', 'default');
+
+        return $results;
+    }
+
+    /**
+     * Admin page for PayPlus Invoice Runner Management
+     */
+    public static function payplus_invoice_runner_admin_page()
+    {
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
+
+    ?>
+        <div class="wrap">
+            <h1><?php echo esc_html__('PayPlus Invoice Runner Management', 'payplus-payment-gateway'); ?></h1>
+            <p><?php echo esc_html__('Use the button below to manually run the PayPlus invoice runner to check and create missing invoices for processing orders.', 'payplus-payment-gateway'); ?></p>
+
+            <div id="payplus-runner-result" style="margin: 20px 0;"></div>
+
+            <?php wp_nonce_field('payplus_invoice_runner_form', 'payplus_invoice_runner_form_nonce'); ?>
+
+            <button type="button" id="run-payplus-invoice-runner" class="button button-primary" data-nonce="<?php echo esc_attr(wp_create_nonce('payplus_invoice_runner_nonce')); ?>">
+                <?php echo esc_html__('Run Invoice Runner Now', 'payplus-payment-gateway'); ?>
+            </button>
+
+            <div id="payplus-runner-loading" style="display: none; margin-top: 10px;">
+                <span class="spinner is-active"></span>
+                <?php echo esc_html__('Running invoice runner...', 'payplus-payment-gateway'); ?>
+            </div>
+        </div>
+
+        <style>
+            .payplus-results-detail table {
+                margin-top: 15px;
+            }
+
+            .payplus-results-detail th {
+                background-color: #f9f9f9;
+                font-weight: bold;
+            }
+
+            .payplus-results-detail td {
+                padding: 8px 12px;
+            }
+
+            #run-payplus-invoice-runner:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        </style>
+        <?php
+    }
     public function getPayplusCron()
     {
         $current_time = current_time('Y-m-d H:i:s');

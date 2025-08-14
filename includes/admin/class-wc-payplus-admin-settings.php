@@ -583,6 +583,15 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'woocommerce_payplus-payment-gateway_settings[foreign_invoices_lang]',
                     'class' => 'payplus-languages-class',
                 ];
+                $settings[$section][] = [
+                    'title' => __('Show Invoice Runner Management Button', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Display the Invoice Runner Management button in admin menus. This allows manual processing of invoices for orders.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'default' => 'no',
+                    'id' => 'payplus_invoice_option[show_invoice_runner_button]',
+                    'class' => 'payplus-display'
+                ];
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-invoice');
                 break;
             case 'payplus-express-checkout':
