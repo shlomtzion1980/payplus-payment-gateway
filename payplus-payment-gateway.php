@@ -90,6 +90,7 @@ class WC_PayPlus
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('payplus_twice_hourly_cron_job', [$this, 'getPayplusCron']);
+        add_action('payplus_invoice_runner_cron_job', [$this, 'getPayplusInvoiceRunnerCron']);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -107,6 +108,16 @@ class WC_PayPlus
             // Remove old cron function
         } else {
             $this->payPlusCronDeactivate();
+        }
+
+        // Invoice Runner Cron Management
+        $payplus_invoice_option = get_option('payplus_invoice_option');
+        $invoiceRunnerCronEnabled = boolval(isset($payplus_invoice_option['enable_invoice_runner_cron']) && ($payplus_invoice_option['enable_invoice_runner_cron'] === 'yes' || $payplus_invoice_option['enable_invoice_runner_cron'] === 'on'));
+
+        if ($invoiceRunnerCronEnabled) {
+            $this->payPlusInvoiceRunnerCronActivate();
+        } else {
+            $this->payPlusInvoiceRunnerCronDeactivate();
         }
     }
 
@@ -269,6 +280,57 @@ class WC_PayPlus
             wp_schedule_event(time(), 'half_hour', 'payplus_twice_hourly_cron_job');
         }
     }
+
+    /**
+     * Activate PayPlus Invoice Runner Cron Job
+     */
+    public function payPlusInvoiceRunnerCronActivate()
+    {
+        if (!wp_next_scheduled('payplus_invoice_runner_cron_job')) {
+            wp_schedule_event(time(), 'half_hour', 'payplus_invoice_runner_cron_job');
+        }
+    }
+
+    /**
+     * Deactivate PayPlus Invoice Runner Cron Job
+     */
+    public function payPlusInvoiceRunnerCronDeactivate()
+    {
+        $timestamp = wp_next_scheduled('payplus_invoice_runner_cron_job');
+        if ($timestamp) {
+            wp_unschedule_event($timestamp, 'payplus_invoice_runner_cron_job');
+        }
+    }
+
+    /**
+     * Cron job handler for running the PayPlus invoice runner automatically
+     */
+    public function getPayplusInvoiceRunnerCron()
+    {
+        $this->payplus_gateway = $this->get_main_payplus_gateway();
+        $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', 'getPayplusInvoiceRunnerCron: Starting automatic cron job execution.', 'default');
+
+        $results = $this->getPayplusInvoiceRunner();
+
+        $log_message = sprintf(
+            'Cron execution completed. Processed %d orders total. PayPlus orders found: %d. Invoices created: %d. Invoices already existed: %d. Non-PayPlus orders skipped: %d.',
+            $results['total_orders_checked'],
+            $results['payplus_orders_found'],
+            $results['invoices_created'],
+            $results['invoices_already_exist'],
+            $results['skipped_non_payplus']
+        );
+
+        if (!empty($results['errors'])) {
+            $log_message .= ' Errors encountered: ' . count($results['errors']);
+            foreach ($results['errors'] as $error) {
+                $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', 'Cron Error: ' . $error, 'default');
+            }
+        }
+
+        $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', $log_message, 'default');
+    }
+
     /**
      * Ajax handler for running the PayPlus invoice runner manually
      */

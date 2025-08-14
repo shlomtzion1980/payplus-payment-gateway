@@ -555,4 +555,16 @@ function payplus_cron_deactivate()
     if ($timestamp) {
         wp_unschedule_event($timestamp, 'payplus_hourly_cron_job');
     }
+
+    // Also clean up the new twice hourly cron job
+    $timestamp_twice_hourly = wp_next_scheduled('payplus_twice_hourly_cron_job');
+    if ($timestamp_twice_hourly) {
+        wp_unschedule_event($timestamp_twice_hourly, 'payplus_twice_hourly_cron_job');
+    }
+
+    // Clean up the invoice runner cron job
+    $timestamp_invoice_runner = wp_next_scheduled('payplus_invoice_runner_cron_job');
+    if ($timestamp_invoice_runner) {
+        wp_unschedule_event($timestamp_invoice_runner, 'payplus_invoice_runner_cron_job');
+    }
 }
