@@ -382,9 +382,13 @@ class WC_PayPlus
             // Check if invoice already exists
             $invoice_sent = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
             $invoice_sent_refund = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send_refund');
+            $invoice_error = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_error_invoice');
+            $invoice_doc_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_docUID');
 
             $has_invoice = ($invoice_sent === "1" || $invoice_sent === true) ||
-                ($invoice_sent_refund === "1" || $invoice_sent_refund === true);
+                ($invoice_sent_refund === "1" || $invoice_sent_refund === true) ||
+                (!empty($invoice_error) && strpos($invoice_error, 'unique-identifier-exists') !== false) ||
+                (!empty($invoice_doc_uid));
 
             if (!$has_invoice) {
                 $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: No invoice found - Creating invoice for processing order.\n");
