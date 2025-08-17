@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.8] - 17-08-2025 - (a-ha)
+
+- Fix     - Resolved Plugin Check warnings and errors.
+- Fix     - Resolved Payplus Embedded css issue.
+
 ## [7.8.7] - 17-08-2025 - (Ozzy)
 
 - Added   - Introduced PayPlus Invoice+ Runner manager - enables batch processing of today's orders to generate invoices for orders missing them.

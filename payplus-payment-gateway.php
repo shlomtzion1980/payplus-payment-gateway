@@ -4,7 +4,7 @@
  * Plugin Name: PayPlus Payment Gateway
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
- * Version: 7.8.7
+ * Version: 7.8.8
  * Tested up to: 6.8
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
@@ -19,8 +19,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '7.8.7');
-define('PAYPLUS_VERSION_DB', 'payplus_7_8_7');
+define('PAYPLUS_VERSION', '7.8.8');
+define('PAYPLUS_VERSION_DB', 'payplus_7_8_8');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
 {
@@ -126,8 +126,24 @@ class WC_PayPlus
      */
     public function enqueue_admin_scripts($hook)
     {
-        // Check if we're on the PayPlus Invoice Runner admin page
-        if (isset($_GET['page']) && $_GET['page'] === 'payplus-invoice-runner-admin') {
+        // Check if we're on the PayPlus Invoice Runner admin page using multiple methods
+        $is_invoice_runner_page = false;
+
+        // Method 1: Check the hook parameter
+        if (strpos($hook, 'payplus-invoice-runner-admin') !== false) {
+            $is_invoice_runner_page = true;
+        }
+
+        // Method 2: Check current screen
+        $current_screen = get_current_screen();
+        if ($current_screen && (
+            $current_screen->id === 'admin_page_payplus-invoice-runner-admin' ||
+            strpos($current_screen->id, 'payplus-invoice-runner-admin') !== false
+        )) {
+            $is_invoice_runner_page = true;
+        }
+
+        if ($is_invoice_runner_page) {
             // Enqueue admin script and localize variables
             wp_enqueue_script(
                 'payplus-invoice-runner-admin',
@@ -337,7 +353,7 @@ class WC_PayPlus
     public function ajax_run_payplus_invoice_runner()
     {
         // Check if this is a POST request
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        if (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
             wp_die(wp_json_encode(['success' => false, 'message' => 'Invalid request method']), '', ['response' => 405]);
         }
 
@@ -361,7 +377,7 @@ class WC_PayPlus
 
         // Format the response message
         $message = sprintf(
-            __('Invoice runner completed successfully! Processed %d orders total. PayPlus orders found: %d. Invoices created: %d. Invoices already existed: %d. Non-PayPlus orders skipped: %d.', 'payplus-payment-gateway'),
+            'Invoice runner completed successfully! Processed %d orders total. PayPlus orders found: %d. Invoices created: %d. Invoices already existed: %d. Non-PayPlus orders skipped: %d.',
             $results['total_orders_checked'],
             $results['payplus_orders_found'],
             $results['invoices_created'],
@@ -370,7 +386,7 @@ class WC_PayPlus
         );
 
         if (!empty($results['errors'])) {
-            $message .= ' ' . sprintf(__('Errors encountered: %d', 'payplus-payment-gateway'), count($results['errors']));
+            $message .= ' ' . sprintf('Errors encountered: %d', count($results['errors']));
         }
 
         wp_die(wp_json_encode([
@@ -402,7 +418,7 @@ class WC_PayPlus
 
         $args = array(
             'status' => ['processing'],
-            'date_created' => '>=' . date('Y-m-d 00:00:00'), // Only orders created today
+            'date_created' => '>=' . gmdate('Y-m-d 00:00:00'), // Only orders created today
             'return' => 'ids', // Just return IDs to save memory
             'limit'  => -1, // Retrieve all orders
         );
@@ -510,7 +526,7 @@ class WC_PayPlus
     public static function payplus_invoice_runner_admin_page()
     {
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to access this page.'));
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'payplus-payment-gateway'));
         }
 
     ?>
@@ -1017,7 +1033,13 @@ class WC_PayPlus
             public function init()
             {
                 $isPayPlusEnabled = isset($this->payplus_payment_gateway_settings->enabled) && $this->payplus_payment_gateway_settings->enabled === 'yes';
-                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+
+                // Load text domain for translations
+                // While WordPress.org plugins have automatic translation loading,
+                // we need to explicitly load for admin pages, AJAX calls, and cron jobs
+                if (!function_exists('get_plugin_data') || is_admin() || wp_doing_ajax() || wp_doing_cron()) {
+                    load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+                }
                 if (class_exists("WooCommerce")) {
                     $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
@@ -1247,7 +1269,7 @@ class WC_PayPlus
                 ob_start();
                     ?>
         <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>" style="<?php echo $iframeAutoHeight; ?>"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>" style="<?php echo esc_attr($iframeAutoHeight); ?>"></div>
         <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
                 $html = ob_get_clean();
