@@ -1037,9 +1037,7 @@ class WC_PayPlus
                 // Load text domain for translations
                 // While WordPress.org plugins have automatic translation loading,
                 // we need to explicitly load for admin pages, AJAX calls, and cron jobs
-                if (!function_exists('get_plugin_data') || is_admin() || wp_doing_ajax() || wp_doing_cron()) {
-                    load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
-                }
+                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
                 if (class_exists("WooCommerce")) {
                     $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
