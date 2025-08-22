@@ -926,7 +926,8 @@ jQuery(function ($) {
                                     );
                                     if (
                                         hostedPayload.more_info &&
-                                        !isNaN(hostedPayload.more_info)
+                                        !isNaN(hostedPayload.more_info) &&
+                                        typeof hostedPayload.more_info === 'number'
                                     ) {
                                         overlay();
                                         jQuery(
