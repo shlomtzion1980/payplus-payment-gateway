@@ -236,6 +236,7 @@ jQuery(() => {
                 height: 500px;
                 border: none;
                 left: 5px !important;
+                top: 25% !important;
                 ${pageLang === "he-IL" || document.dir === "rtl" ? "right: unset !important;" : ""}
             }
         `;
