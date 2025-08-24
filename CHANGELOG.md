@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.8.9] - 24-08-2025 - (Dream)
+
+- Fix     - Corrected erroneous transactions in PayPlus Embedded that were recorded with an incorrect order number.
+
 ## [7.8.8] - 17-08-2025 - (a-ha)
 
 - Fix     - Resolved Plugin Check warnings and errors.
