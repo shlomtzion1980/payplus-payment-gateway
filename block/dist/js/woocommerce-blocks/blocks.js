@@ -264,14 +264,26 @@ if (isCheckout || hasOrder) {
                         };
                         const dotInterval = setInterval(animateDots, 400);
 
-                        // Phase 1: Generating payment page (0.5-1.5 seconds)
-                        loadingText.textContent = "Generating payment page";
-                        const phase1Duration = Math.random() * 1000 + 500; // 0.5-1.5 seconds
+                        // Check if it's hosted fields payment method
+                        if (activePaymentMethod === "payplus-payment-gateway-hostedfields") {
+                            // For hosted fields: show "Processing your payment now..."
+                            loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.processing_payment) 
+                                ? window.payplus_i18n.processing_payment 
+                                : "Processing your payment now";
+                        } else {
+                            // For other PayPlus methods: Phase 1: Generating payment page (1-1.5 seconds)
+                            loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.generating_page) 
+                                ? window.payplus_i18n.generating_page 
+                                : "Generating payment page";
+                            const phase1Duration = Math.random() * 1000 + 4000; // 4-5 seconds
 
-                        setTimeout(() => {
-                            // Phase 2: Loading payment page (until store.isComplete() is true)
-                            loadingText.textContent = "Loading payment page";
-                        }, phase1Duration);
+                            setTimeout(() => {
+                                // Phase 2: Loading payment page (until store.isComplete() is true)
+                                loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.loading_page) 
+                                    ? window.payplus_i18n.loading_page 
+                                    : "Loading payment page";
+                            }, phase1Duration);
+                        }
 
                         // Only remove when store actually completes or error occurs
                         const checkForCompletion = setInterval(() => {
@@ -400,10 +412,15 @@ if (isCheckout || hasOrder) {
                             undefined
                                 ? getPaymentResult.paymentDetails.errorMessage +
                                   "<br>" +
-                                  "Click this to close."
+                                  ((window.payplus_i18n && window.payplus_i18n.click_to_close) 
+                                      ? window.payplus_i18n.click_to_close 
+                                      : "Click this to close.")
                                 : getPaymentResult.message +
                                   "<br>" +
-                                  "Click this to close.";
+                                  ((window.payplus_i18n && window.payplus_i18n.click_to_close) 
+                                      ? window.payplus_i18n.click_to_close 
+                                      : "Click this to close.");
+
                         pp_iframe.addEventListener("click", (e) => {
                             e.preventDefault();
                             pp_iframe.style.display = "none";
@@ -499,7 +516,9 @@ if (isCheckout || hasOrder) {
                                     // Disconnect the observer to stop observing further changes
                                 } else {
                                     alert(
-                                        "Error: the payment page failed to load."
+                                        (window.payplus_i18n && window.payplus_i18n.payment_page_failed) 
+                                            ? window.payplus_i18n.payment_page_failed 
+                                            : "Error: the payment page failed to load."
                                     );
                                     location.reload();
                                 }
