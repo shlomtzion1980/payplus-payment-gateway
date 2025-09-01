@@ -179,12 +179,7 @@ if (isCheckout || hasOrder) {
     document.addEventListener("DOMContentLoaded", function () {
         // Function to start observing for the target element
         let loopImages = true;
-        let autoPPCCrun = customerId > 0 ? true : false;
         let WcSettings = window.wc.wcSettings;
-
-        if (WcSettings.allSettings?.customerPaymentMethods?.cc !== undefined) {
-            autoPPCCrun = false;
-        }
 
         var loader = document.createElement("div");
         loader.class = "blocks-payplus_loader";
@@ -202,7 +197,120 @@ if (isCheckout || hasOrder) {
         loaderInner.appendChild(loaderBackground);
         loaderContent.appendChild(loaderInner);
         loader.appendChild(loaderContent);
-        console.log("isAutoPPCC: ", payPlusGateWay.isAutoPPCC);
+
+        // Add early loading indicator for Place Order button
+        function addEarlyLoadingIndicator() {
+            const placeOrderButton = document.querySelector(
+                ".wc-block-checkout__actions_row button"
+            );
+
+            if (placeOrderButton && !placeOrderButton.hasAttribute('data-payplus-listener')) {
+                placeOrderButton.setAttribute('data-payplus-listener', 'true');
+                placeOrderButton.addEventListener("click", function () {
+                    const activePaymentMethod = payment.getActivePaymentMethod();
+
+                    // Check if it's a PayPlus payment method
+                    if (activePaymentMethod && activePaymentMethod.includes("payplus-payment-gateway")) {
+                        // Show loading immediately
+                        const overlay = document.createElement("div");
+                        overlay.id = "early-payplus-overlay";
+                        overlay.style.cssText = `
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0, 0, 0, 0.5);
+                            z-index: 999999;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        `;
+
+                        const loadingContainer = document.createElement("div");
+                        loadingContainer.style.cssText = `
+                            background: white;
+                            padding: 30px 50px;
+                            border-radius: 12px;
+                            text-align: center;
+                            color: #333;
+                            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                            min-width: 300px;
+                        `;
+
+                        const loadingText = document.createElement("div");
+                        loadingText.style.cssText = `
+                            font-size: 18px;
+                            font-weight: 500;
+                            margin-bottom: 15px;
+                        `;
+
+                        const loadingDots = document.createElement("div");
+                        loadingDots.style.cssText = `
+                            font-size: 24px;
+                            color: #007cba;
+                        `;
+
+                        loadingContainer.appendChild(loadingText);
+                        loadingContainer.appendChild(loadingDots);
+                        overlay.appendChild(loadingContainer);
+                        document.body.appendChild(overlay);
+
+                        // Animate dots
+                        let dotCount = 0;
+                        const animateDots = () => {
+                            dotCount = (dotCount % 3) + 1;
+                            loadingDots.textContent = '.'.repeat(dotCount);
+                        };
+                        const dotInterval = setInterval(animateDots, 400);
+
+                        // Phase 1: Generating payment page (0.5-1.5 seconds)
+                        loadingText.textContent = "Generating payment page";
+                        const phase1Duration = Math.random() * 1000 + 500; // 0.5-1.5 seconds
+
+                        setTimeout(() => {
+                            // Phase 2: Loading payment page (until store.isComplete() is true)
+                            loadingText.textContent = "Loading payment page";
+                        }, phase1Duration);
+
+                        // Only remove when store actually completes or error occurs
+                        const checkForCompletion = setInterval(() => {
+                            // Check if checkout is complete or has error
+                            if (store.isComplete() || store.hasError()) {
+                                clearInterval(dotInterval);
+                                clearInterval(checkForCompletion);
+                                const earlyOverlay = document.getElementById("early-payplus-overlay");
+                                if (earlyOverlay) {
+                                    earlyOverlay.remove();
+                                }
+                            }
+                        }, 100);
+
+                        // Safety cleanup after 15 seconds (extended time)
+                        setTimeout(() => {
+                            clearInterval(dotInterval);
+                            clearInterval(checkForCompletion);
+                            const earlyOverlay = document.getElementById("early-payplus-overlay");
+                            if (earlyOverlay) {
+                                earlyOverlay.remove();
+                            }
+                        }, 15000);
+                    }
+                });
+            }
+        }
+
+        // Try to add the early loading indicator immediately and periodically
+        addEarlyLoadingIndicator();
+        const intervalId = setInterval(() => {
+            addEarlyLoadingIndicator();
+        }, 1000);
+
+        // Clear interval after 10 seconds to avoid memory leaks
+        setTimeout(() => {
+            clearInterval(intervalId);
+        }, 10000);
+
         function startObserving(event) {
             console.log("observer started");
 
@@ -499,19 +607,7 @@ if (isCheckout || hasOrder) {
                 pp_iframe.style.display = "none";
                 var currentUrl = window.location.href;
                 var params = new URLSearchParams(currentUrl);
-                let isAddressEdit =
-                    currentUrl.search("address_edit=yes") !== -1;
-                if (!isAddressEdit && payPlusGateWay.isAutoPPCC) {
-                    if (currentUrl.indexOf("?") === -1) {
-                        // No query string, add the parameter
-                        window.location.href = currentUrl + "?address_edit=yes";
-                    } else {
-                        // Query string exists, append the parameter with an '&'
-                        window.location.href = currentUrl + "&address_edit=yes";
-                    }
-                } else {
-                    location.reload();
-                }
+                location.reload();
             });
             pp_iframe.appendChild(iframe);
             if (payPlusGateWay.importApplePayScript) {
@@ -604,57 +700,6 @@ if (isCheckout || hasOrder) {
         /* finished multipass image replace */
     }
 
-    function autoPPCC(overlay, loader, payPlusCC = null) {
-        setTimeout(function () {
-            if (payPlusCC === null) {
-                payPlusCC = document.querySelector(
-                    "#radio-control-wc-payment-method-options-payplus-payment-gateway"
-                );
-            }
-            if (payPlusCC) {
-                // Automatically click the 'Place Order' button
-                var params = new URLSearchParams(window.location.search);
-                let isAddressEdit = params.get("address_edit") === "yes";
-
-                const actionsRowDiv = document.querySelector(
-                    ".wc-block-checkout__actions_row"
-                );
-
-                // Find the button inside this div
-                const placeOrderButton = actionsRowDiv
-                    ? actionsRowDiv.querySelector("button")
-                    : null;
-
-                if (
-                    !isAddressEdit &&
-                    placeOrderButton &&
-                    payPlusGateWay.isAutoPPCC
-                ) {
-                    payPlusCC.click();
-                    payPlusCC.scrollIntoView({
-                        behavior: "smooth",
-                        block: "start",
-                    });
-                    document.body.appendChild(overlay);
-                    overlay.appendChild(loader);
-                    placeOrderButton.click();
-                } else {
-                    placeOrderButton?.addEventListener("click", function () {
-                        const activePaymentMethod =
-                            payment.getActivePaymentMethod();
-                        if (
-                            activePaymentMethod.search(
-                                "payplus-payment-gateway"
-                            ) === 0
-                        ) {
-                            document.body.appendChild(overlay);
-                            overlay.appendChild(loader);
-                        }
-                    });
-                }
-            }
-        }, 1000);
-    }
 
     const putOverlay = (remove = false) => {
         if (remove) {
