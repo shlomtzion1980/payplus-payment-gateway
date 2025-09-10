@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.0] - 10-09-2025 - (Guatemala)
+
+- Tweak   - Enhanced loading indicators for iframe pages in new blocks checkout.
+- Tweak   - Eliminated outdated functions and streamlined legacy code for improved new blocks checkout functionality.
+- Fix     - Corrected 3D Secure iframe positioning on mobile devices for PayPlus Embedded.
+
 ## [7.8.9] - 24-08-2025 - (Dream)
 
 - Fix     - Corrected erroneous transactions in PayPlus Embedded that were recorded with an incorrect order number.
