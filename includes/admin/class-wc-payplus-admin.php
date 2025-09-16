@@ -378,12 +378,50 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
-        $order = wc_get_order($order_id);
 
-        // Add validation to ensure order exists
+        // Try to get the order with retry logic for database timing issues
+        $order = null;
+        $retry_count = 0;
+        $max_retries = 3;
+
+        while ($retry_count < $max_retries && !$order) {
+            $order = wc_get_order($order_id);
+            if (!$order) {
+                $retry_count++;
+                if ($retry_count < $max_retries) {
+                    // Wait briefly before retry
+                    usleep(500000); // 0.5 seconds
+                    $this->payplus_add_log_all('payplus-ipn', 'Order not found on attempt ' . $retry_count . ', retrying for order ID: ' . $order_id, 'warning');
+                }
+            }
+        }
+
+        // Add validation to ensure order exists after retries
         if (!$order) {
-            $this->payplus_add_log_all('payplus-ipn', 'Invalid order ID: ' . $order_id, 'error');
-            wp_send_json_error('Invalid order ID: ' . $order_id);
+            $this->payplus_add_log_all('payplus-ipn', 'Invalid order ID after ' . $max_retries . ' attempts: ' . $order_id, 'error');
+
+            // For customer-facing requests, redirect to a safe page instead of showing error
+            if (!is_admin() || wp_doing_ajax()) {
+                // Check if this is a frontend/customer request
+                if (!current_user_can('edit_shop_orders')) {
+                    // Redirect customer to checkout or my-account page
+                    $redirect_url = wc_get_checkout_url();
+                    if (is_user_logged_in()) {
+                        $redirect_url = wc_get_account_endpoint_url('orders');
+                    }
+
+                    wp_send_json_success([
+                        'redirect' => $redirect_url,
+                        'message' => __('Redirecting you to complete your order...', 'payplus-payment-gateway')
+                    ]);
+                } else {
+                    // For admin AJAX requests, show user-friendly error
+                    wp_send_json_error(__('Order processing error. Please contact support if this persists.', 'payplus-payment-gateway'));
+                }
+            } else {
+                // For admin backend requests, show technical error
+                wp_send_json_error('Invalid order ID: ' . $order_id);
+            }
             wp_die();
         }
 
