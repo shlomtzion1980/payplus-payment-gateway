@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.1] - 16-09-2025 - (Redford)
+
+- Tweak   - Display identification number in PayPlus Order Metabox when available.
+- Tweak   - Enhanced order handling during IPN processing: improved reliability when processing newly created orders by allowing time for server and database updates to complete.
+
 ## [7.9.0] - 10-09-2025 - (Guatemala)
 
 - Tweak   - Enhanced loading indicators for iframe pages in new blocks checkout.

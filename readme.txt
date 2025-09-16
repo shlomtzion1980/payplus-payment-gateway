@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.9.0
+Stable tag: 7.9.1
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 7.9.1 - 16-09-2025 =
+
+- Tweak   - Display identification number in PayPlus Order Metabox when available.
+- Tweak   - Enhanced order handling during IPN processing: improved reliability when processing newly created orders by allowing time for server and database updates to complete.
 
 == 7.9.0 - 10-09-2025 =
 
