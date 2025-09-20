@@ -259,7 +259,7 @@ class WC_PayPlus
             WC_PayPlus_Meta_Data::update_meta($order, $metaData);
             $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
             $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
+            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true, true, false, false, false, false, false, 'hostedPayment');
             WC()->session->set('hostedTimeStamp', false);
             WC()->session->set('hostedPayload', false);
             WC()->session->set('page_request_uid', false);
@@ -629,7 +629,8 @@ class WC_PayPlus
                             $getInvoice = false,
                             $moreInfo = false,
                             $returnStatusOnly = false,
-                            $isCron = true
+                            $isCron = true,
+                            $from = 'cron'
                         );
                     }
                 } else {
@@ -684,7 +685,7 @@ class WC_PayPlus
         if (empty($payPlusResponse) || $order->get_status() === "pending") {
             $_wpnonce = wp_create_nonce('_wp_payplusIpn');
             $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
+            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false, true, false, false, false, false, false, 'checkRunIpnResponse');
         }
     }
 
