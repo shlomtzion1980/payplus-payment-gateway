@@ -546,6 +546,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'isLoggedIn' => is_user_logged_in(),
             'isAutoPPCC' => $this->isAutoPPCC,
             'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION : false,
+            'show_hide_submit_button' => $this->name === 'payplus-payment-gateway-hostedfields' ? $this->settings['show_hide_submit_button'] ?? 'no' : 'no',
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',

@@ -268,7 +268,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->id === 'payplus-payment-gateway-hostedfields') {
             $this->form_fields['show_hide_submit_button'] = [
                 'title' => __('Show the PayPlus Embedded "Place Order" button', 'payplus-payment-gateway'),
-                'description' => __('Displays the PayPlus Embedded "Place Order" button inside the form. *Only for Woocommerce classic checkout page.', 'payplus-payment-gateway'),
+                'description' => __('Displays the PayPlus Embedded "Place Order" button inside the payment form.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no'
             ];

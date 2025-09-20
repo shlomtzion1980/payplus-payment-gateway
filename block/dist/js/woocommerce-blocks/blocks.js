@@ -360,6 +360,47 @@ if (isCheckout || hasOrder) {
                         document.getElementsByClassName("pp_iframe_h")[0];
                     if (ppIframeElement) {
                         ppIframeElement.style.display = "flex";
+                        
+                        // Add Place Order button to hosted fields if not already added
+                        if (!ppIframeElement.querySelector('.payplus-hosted-place-order')) {
+                            const originalPlaceOrderButton = document.querySelector('.wc-block-checkout__actions_row button');
+                            const ppLogo = ppIframeElement.querySelector('#ppLogo');
+                            
+                            // Check if the show_hide_submit_button setting is enabled
+                            const hostedFieldsSettings = window.wc.wcSettings.getPaymentMethodData('payplus-payment-gateway-hostedfields');
+                            const showSubmitButton = hostedFieldsSettings && hostedFieldsSettings.show_hide_submit_button === 'yes';
+                            
+                            if (originalPlaceOrderButton && ppLogo && showSubmitButton) {
+                                const hostedPlaceOrderButton = document.createElement('button');
+                                hostedPlaceOrderButton.className = 'btn btn-primary payplus-hosted-place-order wp-element-button wc-block-components-button wp-element-button contained';
+                                hostedPlaceOrderButton.type = 'button';
+                                hostedPlaceOrderButton.textContent = originalPlaceOrderButton.textContent;
+                                hostedPlaceOrderButton.style.cssText = `
+                                    margin-top: 15px;
+                                    margin-bottom: 15px;
+                                    margin-right: auto;
+                                    margin-left: auto;
+                                    width: 90%;
+                                    background-color: rgb(0, 0, 0);
+                                    color: white;
+                                    border: none;
+                                    border-radius: 10px;
+                                    padding: 12px 24px;
+                                    font-size: 16px;
+                                    font-weight: 600;
+                                    cursor: pointer;
+                                `;
+                                
+                                // Clone the click behavior from the original button
+                                hostedPlaceOrderButton.addEventListener('click', function(e) {
+                                    e.preventDefault();
+                                    originalPlaceOrderButton.click();
+                                });
+                                
+                                // Insert the button right before the ppLogo
+                                ppLogo.parentNode.insertBefore(hostedPlaceOrderButton, ppLogo);
+                            }
+                        }
                     }
                 }
                 if (hideMainPayPlusGateway) {
