@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.2] - 28-09-2025 - (Madsen)
+
+- Added   - "Place Order" button for "PayPlus Embedded" now supports "New Blocks Checkout" in addition to classic checkout.
+
 ## [7.9.1] - 16-09-2025 - (Redford)
 
 - Tweak   - Display identification number in PayPlus Order Metabox when available.
