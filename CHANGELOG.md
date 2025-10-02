@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.3] - 02-10-2025 - (MetaClean)
+
+- Added   - New setting to automatically delete payplus_page_request_uid HPOS meta data when orders are cancelled.
+
 ## [7.9.2] - 21-09-2025 - (Gaslite)
 
 - Added   - Implemented "Place Order" button integration within PayPlus Embedded for the new block-based checkout experience, maintaining consistency with the classic checkout flow.

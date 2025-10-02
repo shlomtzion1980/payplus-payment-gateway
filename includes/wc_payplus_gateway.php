@@ -112,6 +112,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $isPosOverrideGateways;
     public $posOverrideGateways;
     public $pw_gift_card_auto_cancel_unpaid_order;
+    public $delete_page_request_uid_on_cancel;
 
     /**
      *
@@ -170,6 +171,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->useLegacyPayload = $this->get_option('use_legacy_payload') == 'yes' ? true : false;
         $this->updateStatusesIpn = $this->get_option('update_statuses_in_ipn') === 'yes' ? true : false;
         $this->pw_gift_card_auto_cancel_unpaid_order = $this->get_option('pw_gift_card_auto_cancel_unpaid_order') == 'yes' ? true : false;
+        $this->delete_page_request_uid_on_cancel = $this->get_option('delete_page_request_uid_on_cancel') == 'yes' ? true : false;
 
         if (wc_get_price_decimals() < ROUNDING_DECIMALS) {
             $this->rounding_decimals = wc_get_price_decimals();
@@ -297,6 +299,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (class_exists('WC_Subscriptions_Order') && $this->disable_woocommerce_scheduler !== 'yes') {
             add_action('woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduled_subscription_payment'), 10, 2);
         }
+
+        // Hook to handle order status changes for deleting page request UID on cancel
+        add_action('woocommerce_order_status_changed', array($this, 'handle_order_status_change'), 10, 4);
 
         $this->invoice_api = new PayplusInvoice();
         $payplus_invoice_option = get_option('payplus_invoice_option');
@@ -4063,5 +4068,51 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $dateNow = new DateTime();
         $dateNow = $dateNow->format('Y-m-d H:i:s');
         return $dateNow;
+    }
+
+    /**
+     * Handle order status changes to delete payplus_page_request_uid when order is cancelled
+     *
+     * @param int $order_id Order ID
+     * @param string $old_status Old order status
+     * @param string $new_status New order status
+     * @param WC_Order $order Order object
+     */
+    public function handle_order_status_change($order_id, $old_status, $new_status, $order)
+    {
+        // Check if the new status is cancelled and the setting is enabled
+        if ($new_status === 'cancelled' && $this->delete_page_request_uid_on_cancel) {
+            
+            // Only proceed if this order was processed by PayPlus gateway
+            $payment_method = $order->get_payment_method();
+            if (strpos($payment_method, 'payplus') !== false) {
+                
+                // Check if payplus_page_request_uid exists before deleting
+                $page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+                
+                if (!empty($page_request_uid)) {
+                    // Delete the meta data
+                    $order->delete_meta_data('payplus_page_request_uid');
+                    $order->save();
+                    
+                    // Add order note for tracking
+                    $order->add_order_note(
+                        __('PayPlus page request UID meta data deleted due to order cancellation.', 'payplus-payment-gateway')
+                    );
+                    
+                    // Log the action if logging is enabled
+                    if ($this->logging) {
+                        $this->payplus_add_log_all(
+                            'payplus_meta_deletion',
+                            sprintf(
+                                'Deleted payplus_page_request_uid (%s) for cancelled order %d',
+                                $page_request_uid,
+                                $order_id
+                            )
+                        );
+                    }
+                }
+            }
+        }
     }
 }

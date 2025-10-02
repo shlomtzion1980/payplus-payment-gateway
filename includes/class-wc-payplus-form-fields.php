@@ -1046,6 +1046,14 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'type'    => 'checkbox',
                 'default' => 'yes',
             ],
+            'delete_page_request_uid_on_cancel' => [
+                'title' => __('Delete Page Request UID on Order Cancel', 'payplus-payment-gateway'),
+                'label' => __('Delete payplus_page_request_uid meta when order is cancelled', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('When enabled, the payplus_page_request_uid HPOS meta data will be automatically deleted when an order is cancelled.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'enable_dev_mode' => [
                 'title'   => __('Enable partners dev mode', 'payplus-payment-gateway'),
                 'desc_tip' => true,
