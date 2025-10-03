@@ -86,8 +86,6 @@ hf.SetMainFields({
     .AddField("custom_invoice_name", "#invoice-name", "#invoice-name-wrapper")
     .AddField("notes", "[name=notes]", ".notes-wrapper")
     .SetRecaptcha("#recaptcha")
-    .SetGooglePay("#googlePayButton")
-    .SetApplePay("#applePayButton")
     .SetHostedFieldsStyles(
         "::placeholder {color: #A2ADB5;} .hf-inp-name-cc {font-size:1rem !important;text-align: " +
         direction +
@@ -490,7 +488,7 @@ hf.Upon("pp_noAttemptedRemaining", (e) => {
 });
 
 hf.Upon("pp_responseFromServer", (e) => {
-    console.log("response from server", e.detail);
+    // console.log("response from server", e.detail);
     let r = "";
     try {
         r = JSON.stringify(e.detail, null, 2);
@@ -578,164 +576,23 @@ hf.Upon("pp_responseFromServer", (e) => {
                                 (final_response.message ||
                                     final_response.data.message)
                             );
-                            // location.reload();
+                            location.reload();
                         }
                     },
                     error: function (xhr, status, error) {
                         alert("Error completing order: " + error);
-                        // location.reload();
+                        location.reload();
                     },
                 });
             },
             error: function (xhr, status, error) {
-                console.log(xhr, status, error);
                 alert("Error making hosted payment: " + error);
-                // location.reload();
+                location.reload();
             },
         });
     }
 });
-// Track which button was clicked
-let lastClickedButton = null;
-let hasTriggeredPlaceOrder = false; // Flag to prevent duplicate orders
-
-// Add click listeners to track button clicks
-jQuery(document).ready(function($) {
-    // Function to simulate Place Order process
-    function simulatePlaceOrderProcess() {
-        if (hasTriggeredPlaceOrder) {
-            console.log('🚫 Place order already triggered, skipping duplicate');
-            return;
-        }
-        
-        console.log('🔄 Simulating Place Order process for Google Pay...');
-        hasTriggeredPlaceOrder = true;
-        
-        // Find the checkout form and trigger submit - same as the submit button does
-        const checkoutForm = $('form[name="checkout"]');
-        if (checkoutForm.length) {
-            console.log('📝 Triggering checkout form submit...');
-            checkoutForm.trigger('submit');
-        } else {
-            console.log('❌ Checkout form not found');
-            hasTriggeredPlaceOrder = false; // Reset flag if form not found
-        }
-    }
-    
-    // Track Google Pay button interactions (multiple methods for reliability)
-    $(document).on('mousedown touchstart', '#googlePayButton', function(e) {
-        console.log('🟡 Google Pay button interaction detected');
-        lastClickedButton = 'googlePay';
-        
-        // Simulate the Place Order process that normally needs to be done first
-        simulatePlaceOrderProcess();
-    });
-    
-    // Fallback: detect when user interacts with the iframe
-    $(document).on('mouseenter', '#googlePayButton', function() {
-        if (!lastClickedButton && !hasTriggeredPlaceOrder) {
-            console.log('🟡 Google Pay button hover - preparing for interaction');
-            lastClickedButton = 'googlePay';
-        }
-    });
-    
-    // Track Apple Pay button clicks  
-    $(document).on('click', '#applePayButton', function() {
-        console.log('🍎 Apple Pay button clicked');
-        lastClickedButton = 'applePay';
-    });
-    
-    // Track Place Order button clicks (regular submit)
-    $(document).on('click', '#submit-payment', function() {
-        console.log('📋 Place Order button clicked');
-        lastClickedButton = 'placeOrder';
-        // Do NOT set lastClickedButton or hasTriggeredPlaceOrder here
-        // Let WooCommerce handle the normal flow
-    });
-
-    $(document).on('click', '#place_order', function() {
-        console.log('📋 Place Order button clicked (classic)')
-        lastClickedButton = 'placeOrder';
-        // Do NOT set lastClickedButton or hasTriggeredPlaceOrder here
-        // Let WooCommerce handle the normal flow
-    });   
-    // Reset flags when payment method changes
-    $(document).on('change', 'input[name="payment_method"]', function() {
-        console.log('💳 Payment method changed, resetting flags');
-        lastClickedButton = null;
-        hasTriggeredPlaceOrder = false;
-    });
-    
-    // Reset flags on page unload to handle page refreshes
-    $(window).on('beforeunload', function() {
-        hasTriggeredPlaceOrder = false;
-    });
-});
-
 hf.Upon("pp_submitProcess", (e) => {
-    console.log('submitting!', e);
-    
-    // Detect which button triggered the submission
-    let shouldSimulatePlaceOrder = false;
-    switch(lastClickedButton) {
-        case 'googlePay':
-            console.log('🟡 Submission triggered by Google Pay button');
-            shouldSimulatePlaceOrder = true;
-            break;
-        case 'applePay':
-            console.log('🍎 Submission triggered by Apple Pay button');
-            shouldSimulatePlaceOrder = true;
-            break;
-        case 'placeOrder':
-            console.log('📋 Submission triggered by Place Order button');
-            shouldSimulatePlaceOrder = false; // Explicitly do NOT simulate for regular Place Order
-            break;
-        default:
-            console.log('❓ Submission triggered by unknown source');
-            shouldSimulatePlaceOrder = true;
-    }
-    if (shouldSimulatePlaceOrder && !hasTriggeredPlaceOrder) {
-        // Only hide error message for Google Pay, Apple Pay, or unknown sources
-        switch(lastClickedButton) {
-            case 'placeOrder':
-                // Do nothing, let normal flow happen
-                break;
-            case 'googlePay':
-            case 'applePay':
-            default:
-                if (lastClickedButton !== 'placeOrder') {
-                    console.log('🟡 Handling non-Place Order submission, simulating Place Order process...CHANGING CLASS & HIDING LOADER!');
-                    const $errorMsg = jQuery('.payment-error-message');
-                    const $loader = jQuery('.blocks-payplus_loader_hosted');
-                    $loader.length ? $loader.fadeIn() : null;
-                    overlay(true);
-                    if ($errorMsg.length) {
-                        console.log("GELLELLELELLELELE!")
-                        $errorMsg.hide();
-                        $errorMsg.removeClass('payment-error-message').addClass('payment-error-message-hidden');
-                        // if ($loader.length) {
-                        //     $loader.fadeIn();
-                        // }
-                        setTimeout(function() {
-                        //     console.log('🟡 Restoring error message visibility and showing loader after delay...');
-                            jQuery('.payment-error-message-hidden').removeClass('payment-error-message-hidden').addClass('payment-error-message');
-                        //     if ($loader.length) {
-                        //         $loader.fadeOut();
-                        //     }
-                        }, 5000);
-                    }
-                }
-        }
-        // Simulate the Place Order process for Google Pay, Apple Pay, or unknown sources, only once
-        const checkoutForm = jQuery('form[name="checkout"]');
-        if (checkoutForm.length) {
-            console.log('📝 [pp_submitProcess] Triggering checkout form submit for non-Place Order source...');
-            checkoutForm.trigger('submit');
-            hasTriggeredPlaceOrder = true;
-        } else {
-            console.log('❌ [pp_submitProcess] Checkout form not found');
-        }
-    }
     // jQuery(".blocks-payplus_loader_hosted").fadeIn();
     // overlay();
 });
