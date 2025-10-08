@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [7.9.3] - 02-10-2025 - (MetaClean)
 
-- Added   - New setting to automatically delete payplus_page_request_uid HPOS meta data when orders are cancelled.
+- Added   - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
 
 ## [7.9.2] - 21-09-2025 - (Gaslite)
 
