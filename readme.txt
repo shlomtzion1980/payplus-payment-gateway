@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 7.9.3 - 02-10-2025 =
+== 7.9.3 - 08-10-2025 =
 
 - Added   - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
 

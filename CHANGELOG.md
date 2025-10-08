@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.9.3] - 02-10-2025 - (MetaClean)
+## [7.9.3] - 08-10-2025 - (MetaClean)
 
 - Added   - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
 
