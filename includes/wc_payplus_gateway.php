@@ -651,7 +651,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
 
-                        $ipnResponse = !$reportOnly ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice, $moreInfo = false, $returnStatusOnly = false, $from = 'payPlusOrdersCheck') : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice, $moreInfo = false, $returnStatusOnly = false, $from = 'payPlusOrdersCheck');
+                        $ipnResponse = !$reportOnly ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice) : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice);
                         if ($reportOnly) {
                             echo "Report only mode.\n";
                         }
@@ -1728,8 +1728,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $allowReturn = false,
                     $getInvoice = false,
                     $moreInfo = false,
-                    $returnStatusOnly = true,
-                    $from = 'enableDoubleCheckIfPruidExists'
+                    $returnStatusOnly = true
                 );
                 if ($status === "processing" || $status === "on-hold") {
                     $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
@@ -1845,7 +1844,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->payplus_add_log_all('payplus_after_process_payment_event', 'Order #' . $order_id . ' Running IPN!');
                 $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                 $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = false, $getInvoice = false, $moreInfo = false, $returnStatusOnly = false, $from = 'payplus_after_process_payment_event');
+                $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce);
             } else {
                 $this->payplus_add_log_all('payplus_after_process_payment_event', 'No need to run for order #' . $order_id . ' already contains payplus_response and status is ' . $order->get_status());
             }
@@ -2862,7 +2861,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     );
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false, false, false, false, false, false, $from = 'legacy_callback_response');
+                    $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, false, false, false);
                 }
             }
 

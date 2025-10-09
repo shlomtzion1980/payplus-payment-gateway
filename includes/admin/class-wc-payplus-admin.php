@@ -363,8 +363,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $getInvoice = false,
         $moreInfo = false,
         $returnStatusOnly = false,
-        $isCron = false,
-        $from = 'ajax',
+        $isCron = false
     ) {
         $this->isInitiated();
 
@@ -389,18 +388,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $order = wc_get_order($order_id);
             if (!$order) {
                 $retry_count++;
-                $this->payplus_add_log_all('payplus-ipn', 'Order not found on attempt ' . $retry_count . ', retrying for order ID: ' . $order_id . ' (from: ' . $from . ')', 'warning');
-
                 if ($retry_count < $max_retries) {
                     // Wait briefly before retry
                     usleep(500000); // 0.5 seconds
+                    $this->payplus_add_log_all('payplus-ipn', 'Order not found on attempt ' . $retry_count . ', retrying for order ID: ' . $order_id, 'warning');
                 }
             }
         }
 
         // Add validation to ensure order exists after retries
         if (!$order) {
-            $this->payplus_add_log_all('payplus-ipn', 'Invalid order ID after ' . $max_retries . ' attempts: ' . $order_id . ' (from: ' . $from . ')', 'error');
+            $this->payplus_add_log_all('payplus-ipn', 'Invalid order ID after ' . $max_retries . ' attempts: ' . $order_id, 'error');
 
             // For customer-facing requests, redirect to a safe page instead of showing error
             if (!is_admin() || wp_doing_ajax()) {
@@ -437,7 +435,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $getInvoice = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? true : $getInvoice;
         $moreInfo = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? $order_id : $moreInfo;
         $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid');
-        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN (from: ' . $from . '):', 'default');
+        $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN:', 'default');
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
         !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) && isset(json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid']) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
