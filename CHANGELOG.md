@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.4] - 09-10-2025 - (Fixer)
+
+- Fix     - Eliminated problematic logging functionality that was causing errors for certain website users.
+
 ## [7.9.3] - 08-10-2025 - (MetaClean)
 
 - Added   - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
