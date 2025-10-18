@@ -160,11 +160,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 WC()->session->set('randomHash', $order_id = bin2hex(random_bytes(16)));
                 $payload = json_decode(WC()->session->get('hostedPayload'), true);
                 $payload['more_info'] = $order_id;
-                WC()->session->set('order_awaiting_payment', $order_id);
+                // WC()->session->set('order_awaiting_payment', $order_id);
             }
         }
 
-        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
+        // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -324,9 +324,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order_id = $order_id === "000" ? $this->updateOrderId($randomHash) : $order_id;
         $data->more_info = $order_id;
 
-        if ($order_id !== "000" && isset($order) && $order) {
-            WC()->session->set('order_awaiting_payment', $order_id);
-        }
+        // if ($order_id !== "000" && isset($order) && $order) {
+        //     WC()->session->set('order_awaiting_payment', $order_id);
+        // }
 
         $totalAmount = 0;
         foreach ($data->items as $item) {
@@ -342,19 +342,23 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
         is_int($data->more_info) && $data->more_info === $order_id ? WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]) : null;
 
-        $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-Class Payload: \n$payload");
+        // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-Class Payload: \n$payload");
 
         WC()->session->set('hostedPayload', $payload);
 
         $order = wc_get_order($order_id);
         $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-        if ($order) {
-            $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #:$order_id") : null;
-            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-after update Payload: \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
-        } else {
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
+        if (!$order) {
+            // $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #:$order_id") : null;
+            // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-after update Payload: \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
+            // $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
+            $hostedResponse = WC()->session->get('hostedResponse');
+            if(empty($hostedResponse)){
+                $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "Create for new Order: ($order_id) - \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
+                $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
+            }
+            
         }
 
 

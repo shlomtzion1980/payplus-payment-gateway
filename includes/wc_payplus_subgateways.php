@@ -623,7 +623,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 $transactionType = $payPlusResponse['type'];
                 $transactionUid = $payPlusResponse['transaction_uid'];
                 $isDone = $order->get_status() === "processing" ? " - Done. \n" : " - Not done. \n";
-                $this->payplus_add_log_all('hosted-fields-data', 'Order status: ' . $order->get_status() . $isDone . "\n");
+                $this->payplus_add_log_all('hosted-fields-data', "Order ($order_id) status: " . $order->get_status() . $isDone . "\n");
                 if (str_replace("wc-", "", $this->successful_order_status) !== str_replace("wc-", "", $order->get_status())) {
                     if ($status_code === "000") {
                         if ($transactionType == "Charge") {

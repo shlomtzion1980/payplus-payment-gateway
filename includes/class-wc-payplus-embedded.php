@@ -98,7 +98,7 @@ class WC_PayPlus_Embedded
             $order = wc_get_order($order_id);
         }
 
-        $this->get_payplus_gateway()->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');
+        $this->get_payplus_gateway()->payplus_add_log_all("hosted-fields-data", 'PayPlus Embedded Class update for order #: (' . $order_id . ')');
         
         $discountPrice = 0;
         $products = array();
