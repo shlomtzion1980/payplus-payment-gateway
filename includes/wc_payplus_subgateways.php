@@ -596,8 +596,9 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     public function getHostedPayload()
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
-        $hostedPayload = WC()->session->get('hostedPayload');
-        $hostedResponse = WC()->session->get('hostedResponse');
+        $order_id = WC()->session->get('order_awaiting_payment');
+        $hostedPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_payload');
+        $hostedResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_update_page_response');
         wp_send_json_success(array(
             'hostedPayload' => $hostedPayload,
             'hostedResponse' => $hostedResponse
