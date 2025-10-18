@@ -262,9 +262,6 @@ class WC_PayPlus_Embedded
             $totalAmount += $item->price * $item->quantity;
         }
 
-        $hostedResponse = WC()->session->get('hostedPayload');
-        $hostedResponseArray = !empty($hostedResponse) ? json_decode($hostedResponse, true) : '{}';
-
         $data->amount = number_format($totalAmount, 2, '.', '');
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
 
@@ -272,8 +269,5 @@ class WC_PayPlus_Embedded
         $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, true);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
-  
-
-    //     return $hostedResponse;
     }
 }
