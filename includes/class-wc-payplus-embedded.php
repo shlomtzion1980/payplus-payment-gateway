@@ -263,7 +263,6 @@ class WC_PayPlus_Embedded
         }
 
         $data->amount = number_format($totalAmount, 2, '.', '');
-        $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
 
         $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
         $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, true);
