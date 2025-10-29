@@ -27,30 +27,18 @@ class WC_PayPlus_Embedded
     public $isPlaceOrder;
     public $showSubmitButton;
     public $pwGiftCardData;
-    
+
     /**
      * Constructor
      */
     public function __construct()
     {
-        // echo '<pre>';
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-        // print_r($payplus_payment_gateway_settings);die;
 
-        // $this->isHideLoaderLogo = boolval(isset($this->payPlusGateway->hostedFieldsOptions['hide_loader_logo']) && $this->payPlusGateway->hostedFieldsOptions['hide_loader_logo'] === 'yes');
-        // $this->vat4All = isset($this->payPlusGateway->settings['paying_vat_all_order']) ? boolval($this->payPlusGateway->settings['paying_vat_all_order'] === "yes") : false;
         $this->testMode = boolval($payplus_payment_gateway_settings['api_test_mode'] === 'yes');
-        // $this->url = $this->testMode ? PAYPLUS_PAYMENT_URL_DEV . 'Transactions/updateMoreInfos' : PAYPLUS_PAYMENT_URL_PRODUCTION . 'Transactions/updateMoreInfos';
         $this->apiKey = $this->testMode ? $payplus_payment_gateway_settings['dev_api_key'] : $payplus_payment_gateway_settings['api_key'];
         $this->secretKey = $this->testMode ? $payplus_payment_gateway_settings['dev_secret_key'] : $payplus_payment_gateway_settings['secret_key'];
         $this->paymentPageUid = $this->testMode ? $payplus_payment_gateway_settings['dev_payment_page_id'] : $payplus_payment_gateway_settings['payment_page_id'];
-        // $this->order_id = $order_id;
-        // $this->order = $order;
-        // $this->isPlaceOrder = $isPlaceOrder;
-        // $this->showSubmitButton = isset($this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button']) && $this->payPlusGateway->hostedFieldsOptions['show_hide_submit_button'] === 'yes';
-        // if ($pwGiftCardData) {
-        //     $this->pwGiftCardData = $pwGiftCardData;
-        // }
         // // Hook into the checkout order processed event
         define('API_KEY', $this->apiKey);
         define('SECRET_KEY', $this->secretKey);
@@ -60,8 +48,9 @@ class WC_PayPlus_Embedded
         define('FAILURE_URL', site_url() . "/error-payment-payplus/");
         define('CANCEL_URL', site_url() . "/cancel-payment-payplus/");
         add_action('woocommerce_checkout_order_processed', [$this, 'payplus_embedded_order_processed'], 25, 3);
+        add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
     }
-    
+
     /**
      * Get the PayPlus gateway instance (lazy loading)
      */
@@ -73,6 +62,12 @@ class WC_PayPlus_Embedded
         return $this->payPlusGateway;
     }
 
+    public function modify_gift_card_session_data($session_data, $gift_card_number)
+    {
+        // Modify session data if necessary
+        $this->pwGiftCardData = $session_data;
+        return $session_data;
+    }
     /**
      * PayPlus Embedded order processed function
      * This function gets the order object and stops execution with wp_die()
@@ -88,18 +83,18 @@ class WC_PayPlus_Embedded
         if (strpos($order->get_payment_method(), 'payplus-payment-gateway-hostedfields') !== 0) {
             return; // Only process for PayPlus payments
         }
-        WC()->session->set('order_awaiting_payment',$order_id);
+        WC()->session->set('order_awaiting_payment', $order_id);
         $this->hostedFieldsData($order_id);
     }
 
     public function hostedFieldsData($order_id)
-    {        
+    {
         if ($order_id !== "000" && is_int($order_id)) {
             $order = wc_get_order($order_id);
         }
 
         $this->get_payplus_gateway()->payplus_add_log_all("hosted-fields-data", 'PayPlus Embedded Class update for order #: (' . $order_id . ')');
-        
+
         $discountPrice = 0;
         $products = array();
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
@@ -109,7 +104,7 @@ class WC_PayPlus_Embedded
 
         $wc_tax_enabled = wc_tax_enabled();
         $isTaxIncluded = wc_prices_include_tax();
-        
+
         if (isset($order) && $order) {
             $products = [];
             if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards'])) {
@@ -204,7 +199,6 @@ class WC_PayPlus_Embedded
         $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = FAILURE_URL;
         $data->refURL_cancel = CANCEL_URL;
-        
         $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($this->get_payplus_gateway()->settings['transaction_type']);
