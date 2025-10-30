@@ -534,10 +534,7 @@ hf.Upon("pp_responseFromServer", (e) => {
     }
 
     if (e.detail.data?.status_code === "000") {
-        let orderId =
-            typeof isCheckout !== "undefined" && isCheckout
-                ? wp.data.select("wc/store/checkout").getOrderId()
-                : e.detail.data.more_info;
+        let orderId = e.detail.data.more_info;
         let token = e.detail.data.token_uid;
         let pageRequestdUid = e.detail.data.page_request_uid;
         jQuery.ajax({
