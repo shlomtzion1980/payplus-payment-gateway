@@ -81,9 +81,11 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->checkHostedTime() ? $hostedResponse = $this->hostedFieldsData($this->order_id) : $hostedResponse = $this->emptyResponse();
         $hostedResponse = !empty($hostedResponse) ? $hostedResponse : $hostedResponse = $this->emptyResponse();
         $hostedResponseArray = json_decode($hostedResponse, true);
-        $hostedResponseArray['results']['status'] === "error" ? $this->updateOrderId() : null;
+        if(isset($hostedResponseArray['results']['status'])){
+            $hostedResponseArray['results']['status'] === "error" ? $this->updateOrderId() : null;
+        }
 
-        if (isset($hostedResponse) && $hostedResponse && json_decode($hostedResponse, true)['results']['status'] === "success") {
+        if (isset($hostedResponse) && $hostedResponse && isset(json_decode($hostedResponse, true)['results']['status']) && json_decode($hostedResponse, true)['results']['status'] === "success") {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
@@ -364,7 +366,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
-        if ($hostedResponseArray['results']['status'] === "error") {
+        if (isset($hostedResponseArray['results']['status']) && $hostedResponseArray['results']['status'] === "error") {
             WC()->session->set('page_request_uid', false);
             $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
         }

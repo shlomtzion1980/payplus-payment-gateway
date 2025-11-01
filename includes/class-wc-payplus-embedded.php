@@ -7,7 +7,7 @@ defined('ABSPATH') || exit; // Exit if accessed directly
  * Handles embedded payment processing and order data collection
  * for PayPlus payment gateways during the checkout process.
  */
-class WC_PayPlus_Embedded
+class WC_PayPlus_Embedded extends WC_PayPlus_HostedFields
 {
     private $order_id;
     private $order;
@@ -15,11 +15,6 @@ class WC_PayPlus_Embedded
     protected static $instance = null;
     public $options;
     public $testMode;
-    public $url;
-    public $apiKey;
-    public $secretKey;
-    public $paymentPageUid;
-    public $apiUrl;
     public $vat4All;
     public $payPlusGateway;
     public $isHideLoaderLogo;
@@ -33,20 +28,9 @@ class WC_PayPlus_Embedded
      */
     public function __construct()
     {
-        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-
+        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');   
         $this->testMode = boolval($payplus_payment_gateway_settings['api_test_mode'] === 'yes');
-        $this->apiKey = $this->testMode ? $payplus_payment_gateway_settings['dev_api_key'] : $payplus_payment_gateway_settings['api_key'];
-        $this->secretKey = $this->testMode ? $payplus_payment_gateway_settings['dev_secret_key'] : $payplus_payment_gateway_settings['secret_key'];
         $this->paymentPageUid = $this->testMode ? $payplus_payment_gateway_settings['dev_payment_page_id'] : $payplus_payment_gateway_settings['payment_page_id'];
-        // // Hook into the checkout order processed event
-        define('API_KEY', $this->apiKey);
-        define('SECRET_KEY', $this->secretKey);
-        define('PAYMENT_PAGE_UID', $this->paymentPageUid);
-        define('ORIGIN_DOMAIN', site_url());
-        define('SUCCESS_URL', site_url() . '?wc-api=payplus_gateway&hostedFields=true');
-        define('FAILURE_URL', site_url() . "/error-payment-payplus/");
-        define('CANCEL_URL', site_url() . "/cancel-payment-payplus/");
         add_action('woocommerce_checkout_order_processed', [$this, 'payplus_embedded_order_processed'], 25, 3);
         add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
     }
@@ -193,12 +177,12 @@ class WC_PayPlus_Embedded
 
         // Building sample request to create a payment page
         $data = new stdClass();
-        $data->payment_page_uid = PAYMENT_PAGE_UID;
-        $data->refURL_success = SUCCESS_URL;
+        $data->payment_page_uid = $this->paymentPageUid;
+        $data->refURL_success = site_url() . '?wc-api=payplus_gateway&hostedFields=true';
         $_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
         $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
-        $data->refURL_failure = FAILURE_URL;
-        $data->refURL_cancel = CANCEL_URL;
+        $data->refURL_failure = site_url() . "/error-payment-payplus/";
+        $data->refURL_cancel = site_url() . "/cancel-payment-payplus/";
         $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($this->get_payplus_gateway()->settings['transaction_type']);
@@ -206,7 +190,7 @@ class WC_PayPlus_Embedded
          * Origin domain is the domain of the page that is requesting the payment page.
          * This is necessary for the hosted fields to be able to communicate with the client website.
          */
-        $data->refURL_origin = ORIGIN_DOMAIN;
+        $data->refURL_origin = site_url();
         /**
          * Also notice that we set hosted_fields to true.
          */
