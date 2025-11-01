@@ -362,6 +362,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->settings['sub_hide_other_charge_methods'] != 2 && $this->settings['sub_hide_other_charge_methods'] !== null) {
             $this->settings['hide_other_charge_methods'] = $this->settings['sub_hide_other_charge_methods'];
         }
+        
+        // Load POS EMV specific settings
+        if ($this->id === 'payplus-payment-gateway-pos-emv') {
+            $this->settings['show_in_regular_checkout'] = isset($subOptionsettings['show_in_regular_checkout']) ? $subOptionsettings['show_in_regular_checkout'] : 'no';
+            $this->settings['show_in_blocks_checkout'] = isset($subOptionsettings['show_in_blocks_checkout']) ? $subOptionsettings['show_in_blocks_checkout'] : 'no';
+        }
     }
 
     /**
@@ -510,6 +516,23 @@ class WC_PayPlus_Gateway_POS_EMV extends WC_PayPlus_Subgateway
         if (isset($this->form_fields['enabled'])) {
             $this->form_fields['enabled']['default'] = 'yes';
         }
+        
+        // Add checkboxes for checkout visibility
+        $this->form_fields['show_in_regular_checkout'] = [
+            'title' => __('Show in Regular Checkout', 'payplus-payment-gateway'),
+            'type' => 'checkbox',
+            'label' => __('Show in Regular Checkout', 'payplus-payment-gateway'),
+            'description' => __('Enable this option to show POS EMV in regular WooCommerce checkout.', 'payplus-payment-gateway'),
+            'default' => 'no'
+        ];
+        
+        $this->form_fields['show_in_blocks_checkout'] = [
+            'title' => __('Show in Blocks Checkout', 'payplus-payment-gateway'),
+            'type' => 'checkbox',
+            'label' => __('Show in Blocks Checkout', 'payplus-payment-gateway'),
+            'description' => __('Enable this option to show POS EMV in WooCommerce Blocks checkout.', 'payplus-payment-gateway'),
+            'default' => 'no'
+        ];
     }
 
     /**
@@ -693,9 +716,14 @@ function payplus_filter_checkout_gateways($available_gateways)
 {
     // Check if it's the checkout page and not another WC endpoint
     if (function_exists('is_checkout') && is_checkout() && !is_wc_endpoint_url()) {
-        // 1. Hide POS EMV gateway unconditionally on checkout
+        // 1. Hide POS EMV gateway if "Show in Regular Checkout" is not enabled
         if (isset($available_gateways['payplus-payment-gateway-pos-emv'])) {
-            unset($available_gateways['payplus-payment-gateway-pos-emv']);
+            $pos_emv_settings = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
+            $show_in_regular_checkout = isset($pos_emv_settings['show_in_regular_checkout']) && $pos_emv_settings['show_in_regular_checkout'] === 'yes';
+            
+            if (!$show_in_regular_checkout) {
+                unset($available_gateways['payplus-payment-gateway-pos-emv']);
+            }
         }
 
         // 2. Hide Main PayPlus gateway if its setting 'hide_main_pp_checkout' is 'yes'

@@ -78,8 +78,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
-        // Filter out the specific gateway
-        $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-pos-emv']));
+        // Filter out POS EMV gateway if "Show in Blocks Checkout" is not enabled
+        $pos_emv_settings = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
+        $show_in_blocks_checkout = isset($pos_emv_settings['show_in_blocks_checkout']) && $pos_emv_settings['show_in_blocks_checkout'] === 'yes';
+        if (!$show_in_blocks_checkout) {
+            $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-pos-emv']));
+        }
     }
 
     /**
