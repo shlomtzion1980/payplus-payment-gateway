@@ -351,18 +351,10 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order = wc_get_order($order_id);
         $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-        // if (!$order) {
-            // $this->isPlaceOrder ? $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "Updating Order #:$order_id") : null;
-            // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-after update Payload: \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
-            // $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder);
-            // $hostedResponse = WC()->session->get('hostedPayload');
-            if(!$this->isPlaceOrder){
-                $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "Create for new Order: ($order_id) - \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
-                $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
-            }
-            
-        // }
-
+        if(!$this->isPlaceOrder){
+            $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "Create for new Order: ($order_id) - \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
+        }
 
         $hostedResponseArray = json_decode($hostedResponse, true);
 
