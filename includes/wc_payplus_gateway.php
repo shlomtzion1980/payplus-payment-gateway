@@ -4079,6 +4079,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function handle_order_status_change($order_id, $old_status, $new_status, $order)
     {
+        // Only proceed if the status was changed manually by an admin
+        // Exclude automatic changes, AJAX requests, and REST API calls
+        if (!is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+            return;
+        }
+        
         // Check if the new status is cancelled and the setting is enabled
         if ($new_status === 'cancelled' && $this->delete_page_request_uid_on_cancel) {
             

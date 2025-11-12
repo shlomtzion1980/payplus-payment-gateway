@@ -90,7 +90,10 @@ let applePayConfig;
 function ApplePayPayLoaded() {
     if (window.ApplePaySession) {
         const appleButton = document.getElementById("applePayButton");
-        appleButton.style.display = "block";
+        
+        if (appleButton) {
+            appleButton.style.display = "block";
+        }
         const style = document.createElement("style");
         document.head.appendChild(style);
         style.sheet.insertRule(`
@@ -699,8 +702,10 @@ window.addEventListener("message", async function (event) {
             }
         } else {
             // Hide the phone number input field and make it not required
-            phoneNumberField.style.display = "none";
-            phoneNumberField.required = false;
+            if (phoneNumberField) {
+                phoneNumberField.style.display = "none";
+                phoneNumberField.required = false;
+            }
         }
 
         if (paymentData.oneClickCheckoutGooglePay === "ProcessPayment") {
