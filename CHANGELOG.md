@@ -2,68 +2,75 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.5] - 16-11-2025 - (Keaton)
+
+- Tweak - Deletion of payplus_page_uid and order cancellation now only occur via manual admin action.
+- Added - Checkbox to enable EMV positioning on Classic Checkout.
+- Added - Checkbox to enable POS EMV positioning on Blocks Checkout.
+- Fix - Resolved an issue in PayPlus Embedded where the customer's name could appear incorrectly.
+
 ## [7.9.4] - 09-10-2025 - (Fixer)
 
-- Fix     - Eliminated problematic logging functionality that was causing errors for certain website users.
+- Fix - Eliminated problematic logging functionality that was causing errors for certain website users.
 
 ## [7.9.3] - 08-10-2025 - (MetaClean)
 
-- Added   - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
+- Added - New setting to automatically remove payplus_page_request_uid HPOS meta data from cancelled orders - prevents cron from processing these orders.
 
 ## [7.9.2] - 21-09-2025 - (Gaslite)
 
-- Added   - Implemented "Place Order" button integration within PayPlus Embedded for the new block-based checkout experience, maintaining consistency with the classic checkout flow.
+- Added - Implemented "Place Order" button integration within PayPlus Embedded for the new block-based checkout experience, maintaining consistency with the classic checkout flow.
 
 ## [7.9.1] - 16-09-2025 - (Redford)
 
-- Tweak   - Display identification number in PayPlus Order Metabox when available.
-- Tweak   - Enhanced order handling during IPN processing: improved reliability when processing newly created orders by allowing time for server and database updates to complete.
+- Tweak - Display identification number in PayPlus Order Metabox when available.
+- Tweak - Enhanced order handling during IPN processing: improved reliability when processing newly created orders by allowing time for server and database updates to complete.
 
 ## [7.9.0] - 10-09-2025 - (Guatemala)
 
-- Tweak   - Enhanced loading indicators for iframe pages in new blocks checkout.
-- Tweak   - Eliminated outdated functions and streamlined legacy code for improved new blocks checkout functionality.
-- Fix     - Corrected 3D Secure iframe positioning on mobile devices for PayPlus Embedded.
+- Tweak - Enhanced loading indicators for iframe pages in new blocks checkout.
+- Tweak - Eliminated outdated functions and streamlined legacy code for improved new blocks checkout functionality.
+- Fix - Corrected 3D Secure iframe positioning on mobile devices for PayPlus Embedded.
 
 ## [7.8.9] - 24-08-2025 - (Dream)
 
-- Fix     - Corrected erroneous transactions in PayPlus Embedded that were recorded with an incorrect order number.
+- Fix - Corrected erroneous transactions in PayPlus Embedded that were recorded with an incorrect order number.
 
 ## [7.8.8] - 17-08-2025 - (a-ha)
 
-- Fix     - Resolved Plugin Check warnings and errors.
-- Fix     - Resolved Payplus Embedded css issue.
+- Fix - Resolved Plugin Check warnings and errors.
+- Fix - Resolved Payplus Embedded css issue.
 
 ## [7.8.7] - 17-08-2025 - (Ozzy)
 
-- Added   - Introduced PayPlus Invoice+ Runner manager - enables batch processing of today's orders to generate invoices for orders missing them.
-- Added   - Included PayPlus Invoice+ Runner cron functionality in Invoice+ settings - once activated it will automatically execute every 30 minutes to generate invoices, functioning similarly to the manual manager.
+- Added - Introduced PayPlus Invoice+ Runner manager - enables batch processing of today's orders to generate invoices for orders missing them.
+- Added - Included PayPlus Invoice+ Runner cron functionality in Invoice+ settings - once activated it will automatically execute every 30 minutes to generate invoices, functioning similarly to the manual manager.
 
 ## [7.8.6] - 06-08-2025 - (Lennon)
 
-- Tweak   - Enhanced the 3D Secure iframe content and positioning in PayPlus Embedded for mobile devices, ensuring correct display in both RTL and LTR languages.
+- Tweak - Enhanced the 3D Secure iframe content and positioning in PayPlus Embedded for mobile devices, ensuring correct display in both RTL and LTR languages.
 
 ## [7.8.5] - 30-07-2025 - (Commerce)
 
-- Tweak   - Improved 3D Secure background and sizing for PayPlus Embedded on mobile devices to ensure proper display.
-- Fix     - The "Do not create invoices+" option now correctly prevents invoice creation for both charges and refunds, not just charges.
-- Fix     - Resolved an issue where the Invoice+ cash on delivery refund feature generated multiple duplicate documents instead of a single one when the "POS Override" option was enabled.
+- Tweak - Improved 3D Secure background and sizing for PayPlus Embedded on mobile devices to ensure proper display.
+- Fix - The "Do not create invoices+" option now correctly prevents invoice creation for both charges and refunds, not just charges.
+- Fix - Resolved an issue where the Invoice+ cash on delivery refund feature generated multiple duplicate documents instead of a single one when the "POS Override" option was enabled.
 
 ## [7.8.4] - 27-07-2025 - (Druze)
 
 - Feature - Previously, PW Gift Cards were redeemed as soon as an order payment was initiated, causing the gift card balance to be deducted even if the payment was not completed or failed. Now, with a new checkbox option, the plugin will refresh and restore the gift card balance for unpaid or failed orders when the same gift card is used again.
 - Feature - The same gift card balance restoration logic now also applies to PayPlus Embedded.
-- Added   - Display Approval ID in the PayPlus Metabox on the order page.
-- Fix     - Resolved a display overflow issue in the PayPlus Metabox on the order page for Tokens: Long tokens now break correctly instead of overflowing.
+- Added - Display Approval ID in the PayPlus Metabox on the order page.
+- Fix - Resolved a display overflow issue in the PayPlus Metabox on the order page for Tokens: Long tokens now break correctly instead of overflowing.
 
 ## [7.8.3] - 17-07-2025 - (Aleppo)
 
-- Fix   - Corrected price rounding errors in Express checkout that occurred on certain system configurations.
+- Fix - Corrected price rounding errors in Express checkout that occurred on certain system configurations.
 - Tweak - Replaced Voucher ID with Approval Number in the PayPlus metabox within order details (Voucher ID was previously showing the same value as voucher number).
 
 ## [7.8.2] - 16-07-2025 - (Sylvester)
 
-- Fix   - Resolved an issue where, on classic checkout, standard payment pages would always open via redirect on subsequent accesses, disregarding the configured page settings.
+- Fix - Resolved an issue where, on classic checkout, standard payment pages would always open via redirect on subsequent accesses, disregarding the configured page settings.
 
 ## [7.8.1] - 06-07-2025 - (Rocky)
 

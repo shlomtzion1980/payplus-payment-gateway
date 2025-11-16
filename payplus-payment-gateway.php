@@ -4,7 +4,7 @@
  * Plugin Name: PayPlus Payment Gateway
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
- * Version: 7.9.4
+ * Version: 7.9.5
  * Tested up to: 6.8
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
@@ -19,7 +19,7 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '7.9.4');
+define('PAYPLUS_VERSION', '7.9.5');
 define('PAYPLUS_VERSION_DB', 'payplus_7_9_4');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
@@ -532,13 +532,15 @@ class WC_PayPlus
     ?>
         <div class="wrap">
             <h1><?php echo esc_html__('PayPlus Invoice Runner Management', 'payplus-payment-gateway'); ?></h1>
-            <p><?php echo esc_html__('Use the button below to manually run the PayPlus invoice runner to check and create missing invoices for processing orders.', 'payplus-payment-gateway'); ?></p>
+            <p><?php echo esc_html__('Use the button below to manually run the PayPlus invoice runner to check and create missing invoices for processing orders.', 'payplus-payment-gateway'); ?>
+            </p>
 
             <div id="payplus-runner-result" style="margin: 20px 0;"></div>
 
             <?php wp_nonce_field('payplus_invoice_runner_form', 'payplus_invoice_runner_form_nonce'); ?>
 
-            <button type="button" id="run-payplus-invoice-runner" class="button button-primary" data-nonce="<?php echo esc_attr(wp_create_nonce('payplus_invoice_runner_nonce')); ?>">
+            <button type="button" id="run-payplus-invoice-runner" class="button button-primary"
+                data-nonce="<?php echo esc_attr(wp_create_nonce('payplus_invoice_runner_nonce')); ?>">
                 <?php echo esc_html__('Run Invoice Runner Now', 'payplus-payment-gateway'); ?>
             </button>
 
@@ -1057,7 +1059,7 @@ class WC_PayPlus
                         // Initialize the embedded order processing class
                         new WC_PayPlus_Embedded();
                     }
-                    
+
                     add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
                     if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                         add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
@@ -1272,7 +1274,8 @@ class WC_PayPlus
                 ob_start();
                     ?>
         <div class="payplus-option-description-area"></div>
-        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>" style="<?php echo esc_attr($iframeAutoHeight); ?>"></div>
+        <div class="pp_iframe" data-height="<?php echo esc_attr($height); ?>"
+            style="<?php echo esc_attr($iframeAutoHeight); ?>"></div>
         <div class="pp_iframe_h" data-height="<?php echo esc_attr($height); ?>"></div>
 <?php
                 $html = ob_get_clean();
