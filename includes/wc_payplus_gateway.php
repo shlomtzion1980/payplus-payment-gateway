@@ -3719,7 +3719,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
             $this->payplus_add_log_all($handle, 'IPN Error: There was a problem adding this card', 'error');
         }
-        wp_redirect(wc_get_endpoint_url('payment-methods', '', wc_get_page_permalink('myaccount')));
+        wp_safe_redirect(wc_get_endpoint_url('payment-methods', '', wc_get_page_permalink('myaccount')));
         exit;
     }
 

@@ -77,6 +77,7 @@ class WC_PayPlus
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
+        add_action('plugins_loaded', [$this, 'load_textdomain'], 10);
         add_action('plugins_loaded', [$this, 'init']);
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
@@ -706,7 +707,7 @@ class WC_PayPlus
                     WC()->cart->empty_cart();
                 }
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
-                wp_redirect($redirect_to);
+                wp_safe_redirect($redirect_to);
                 exit;
             } else {
                 // no order id
@@ -797,7 +798,8 @@ class WC_PayPlus
                     }
                 }
                 WC()->session->__unset('save_payment_method');
-                wp_redirect($linkRedirect);
+                wp_safe_redirect($linkRedirect);
+                exit;
             } else {
                 $countProcess = intval($result->count_process);
                 $rowId = intval($result->rowId);
@@ -818,7 +820,8 @@ class WC_PayPlus
                 $order = wc_get_order($order_id);
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
-                wp_redirect($linkRedirect);
+                wp_safe_redirect($linkRedirect);
+                exit;
             }
         } elseif (
             isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' ||
@@ -829,7 +832,8 @@ class WC_PayPlus
             if ($order) {
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
-                wp_redirect($linkRedirect);
+                wp_safe_redirect($linkRedirect);
+                exit;
             }
         }
     }
@@ -1030,16 +1034,26 @@ class WC_PayPlus
             }
 
             /**
+             * Load plugin text domain for translations
+             * Hooked to plugins_loaded with priority 10 (WordPress recommended approach)
+             * 
+             * @return void
+             */
+            public function load_textdomain()
+            {
+                // Load text domain for translations
+                // While WordPress.org plugins have automatic translation loading,
+                // we need to explicitly load for admin pages, AJAX calls, and cron jobs
+                // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Required for translations to work in admin pages, AJAX calls, and cron jobs
+                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+            }
+
+            /**
              * @return void
              */
             public function init()
             {
                 $isPayPlusEnabled = isset($this->payplus_payment_gateway_settings->enabled) && $this->payplus_payment_gateway_settings->enabled === 'yes';
-
-                // Load text domain for translations
-                // While WordPress.org plugins have automatic translation loading,
-                // we need to explicitly load for admin pages, AJAX calls, and cron jobs
-                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
                 if (class_exists("WooCommerce")) {
                     $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';

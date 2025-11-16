@@ -61,7 +61,7 @@ class WC_PayPlus_Form_Fields
      */
     public static function getGateway()
     {
-        wp_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway'));
+        wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway'));
         exit;
     }
 
