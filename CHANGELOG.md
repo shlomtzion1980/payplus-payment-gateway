@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ## [7.9.5] - 16-11-2025 - (Keaton)
 
-- Tweak - Deletion of payplus_page_uid and order cancellation now only occur via manual admin action.
-- Added - Checkbox to enable EMV positioning on Classic Checkout.
-- Added - Checkbox to enable POS EMV positioning on Blocks Checkout.
-- Fix - Resolved an issue in PayPlus Embedded where the customer's name could appear incorrectly.
+- Tweak   - Deletion of payplus_page_uid and order cancellation now only occur via manual admin action.
+- Added   - Checkbox to enable EMV positioning on Classic Checkout.
+- Added   - Checkbox to enable POS EMV positioning on Blocks Checkout.
+- Fix     - Resolved an issue in PayPlus Embedded where the customer's name could appear incorrectly.
+- Tweak   - Code improvements and updates to comply with Plugin Check (PCP) requirements.
 
 ## [7.9.4] - 09-10-2025 - (Fixer)
 

@@ -92,6 +92,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Added   - Checkbox to enable EMV positioning on Classic Checkout.
 - Added   - Checkbox to enable POS EMV positioning on Blocks Checkout.
 - Fix     - Resolved an issue in PayPlus Embedded where the customer's name could appear incorrectly.
+- Tweak   - Code improvements and updates to comply with Plugin Check (PCP) requirements.
 
 == 7.9.4 - 09-10-2025 =
 
