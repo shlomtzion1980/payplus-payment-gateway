@@ -327,10 +327,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $devices = explode(',', $deviceUid);
 
                 foreach ($devices as $device) {
-                    list($storeId, $deviceId) = explode(':', $device);
-                    if ($cStoreId == $storeId) {
-                        $currentDevice = $deviceId;
-                        break;
+                    $deviceParts = explode(':', $device);
+                    if (count($deviceParts) >= 2) {
+                        list($storeId, $deviceId) = $deviceParts;
+                        if ($cStoreId == $storeId) {
+                            $currentDevice = $deviceId;
+                            break;
+                        }
                     }
                 }
             }
