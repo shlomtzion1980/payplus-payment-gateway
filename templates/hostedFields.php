@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template variables
 $ccImage = site_url() . "/wp-content/plugins/payplus-payment-gateway/assets/images/cCards.png";
 $ccImageAltText = 'Pay with Debit or Credit Card';
 

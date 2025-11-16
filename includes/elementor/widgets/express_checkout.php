@@ -1,5 +1,6 @@
 <?php
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Elementor widget class naming convention
 class Elementor_Express_Checkout extends \Elementor\Widget_Base
 {
     /**

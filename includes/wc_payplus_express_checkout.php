@@ -464,7 +464,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $variationId = !empty($formData['variation_id']) ? $formData['variation_id'] : 0;
                 $quantity = !empty($formData['quantity']) ? $formData['quantity'] : 1;
                 if ($variationId) {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter
                     $product_id = (int) apply_filters('woocommerce_add_to_cart_product_id', $productId);
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter
                     $vid = (int) apply_filters('woocommerce_add_to_cart_product_id', $variationId);
                     $product = new WC_Product_Variable($product_id);
                     $productData = $product->get_available_variation($vid);

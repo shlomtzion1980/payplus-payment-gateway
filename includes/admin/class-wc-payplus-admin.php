@@ -151,16 +151,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             __('PayPlus Hash Check', 'payplus-payment-gateway'),
             'manage_options',
             'payplus-hash-check',
-            [$this, 'display_hash_check_notice'],
+            [$this, 'payplus_display_hash_check_notice'],
             'dashicons-admin-tools',
             6
         );
     }
 
-    public function display_hash_check_notice()
+    public function payplus_display_hash_check_notice()
     {
         $plugin_dir = PAYPLUS_PLUGIN_DIR;
-        $integrity_check_result = verify_plugin_integrity($plugin_dir);
+        $integrity_check_result = payplus_verify_plugin_integrity($plugin_dir);
         if ($integrity_check_result !== 'All files are intact.') {
             set_transient('payplus_plugin_integrity_check_failed', $integrity_check_result);
             echo '<div class="notice notice-error is-dismissible"><p>' . esc_html($integrity_check_result) . '</p></div>';
@@ -858,7 +858,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $payments = !empty($_POST['payments']) ? WC_PayPlus_Statics::sanitize_recursive(wp_unslash($_POST['payments'])) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	
 
             if (!empty($payments)) {
-                function set_payment_payplus($value)
+                function payplus_set_payment_payplus($value)
                 {
                     if ($value['method_payment'] == "payment-app") {
                         $value['method_payment'] = sanitize_text_field($value['payment_app']);
@@ -866,7 +866,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     }
                     return $value;
                 }
-                $payments = array_map('set_payment_payplus', $payments);
+                $payments = array_map('payplus_set_payment_payplus', $payments);
                 $this->payplus_add_payments($order_id, $payments);
             }
 
@@ -1405,14 +1405,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
-        function is_json($string)
+        function payplus_is_json($string)
         {
             json_decode($string);
             return (json_last_error() === JSON_ERROR_NONE);
         }
 
         if (!is_array($payments)) {
-            if (is_json($payments)) {
+            if (payplus_is_json($payments)) {
                 $array = [];
                 $array[] = json_decode($payments);
                 $payments = $array;
@@ -1452,14 +1452,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         if (empty($payments) || !count($payments)) {
 
             $installed_payment_methods = WC()->payment_gateways()->payment_gateways();
-            function get_payment_payplus($key, $value)
+            function payplus_get_payment_payplus($key, $value)
             {
                 if (strpos($key, "payplus") !== false) {
                     return $value->default_charge_method;
                 }
             }
 
-            $installed_payment_methods = array_map('get_payment_payplus', array_keys($installed_payment_methods), array_values($installed_payment_methods));
+            $installed_payment_methods = array_map('payplus_get_payment_payplus', array_keys($installed_payment_methods), array_values($installed_payment_methods));
             $installed_payment_methods = array_filter($installed_payment_methods, function ($value) {
                 return $value != '' && $value != null && $value != 'hostedFields' && $value != 'posEmv';
             });

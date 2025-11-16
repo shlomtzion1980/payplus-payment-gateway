@@ -44,12 +44,19 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $this->pwGiftCardData = $pwGiftCardData;
         }
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('API_KEY', $this->apiKey);
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('SECRET_KEY', $this->secretKey);
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('PAYMENT_PAGE_UID', $this->paymentPageUid);
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('ORIGIN_DOMAIN', site_url());
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('SUCCESS_URL', site_url() . '?wc-api=payplus_gateway&hostedFields=true');
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('FAILURE_URL', site_url() . "/error-payment-payplus/");
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constants used by external hosted fields script
         define('CANCEL_URL', site_url() . "/cancel-payment-payplus/");
 
         /**

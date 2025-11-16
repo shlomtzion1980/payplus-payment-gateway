@@ -1,5 +1,6 @@
 <?php
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Error codes class with existing prefix
 class WCPayPlusErrorCodes
 {
     public $errors = [];

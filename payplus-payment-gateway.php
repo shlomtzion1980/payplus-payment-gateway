@@ -1075,6 +1075,7 @@ class WC_PayPlus
                     }
 
                     add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                     if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                         add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
                     }
@@ -1209,6 +1210,7 @@ class WC_PayPlus
                 $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && !$isSubscriptionOrder ? $this->isHostedInitiated() : null;
                 $this->is_block_based_checkout() && boolval($this->hostedFieldsOptions['enabled'] === "yes") && $isSubscriptionOrder && get_current_user_id() !== 0 ? $this->isHostedInitiated() : null;
 
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                 $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
                 $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
                     (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
@@ -1783,7 +1785,7 @@ class WC_PayPlus
         register_activation_hook(__FILE__, 'payplus_create_table_order');
         register_activation_hook(__FILE__, 'payplus_create_table_change_status_order');
         register_activation_hook(__FILE__, 'payplus_create_table_process');
-        register_activation_hook(__FILE__, 'checkSetPayPlusOptions');
+        register_activation_hook(__FILE__, 'payplus_check_set_payplus_options');
         register_activation_hook(__FILE__, 'payplusGenerateErrorPage');
-        register_activation_hook(__FILE__, 'display_hash_check_notice');
+        register_activation_hook(__FILE__, 'payplus_display_hash_check_notice');
         register_deactivation_hook(__FILE__, 'payplus_cron_deactivate');

@@ -1273,7 +1273,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         echo "<h3 id='payplus-title-section'>" . esc_html($title) . "</h3>
                     <p>" . wp_kses_post($desc) . "</p>";
 
-        function hide($currentSection)
+        function payplus_hide($currentSection)
         {
             $hide = $currentSection === 'payplus-payment-gateway' ? 'hideIt' : null;
             return $hide;
@@ -1584,7 +1584,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         ));
 
         echo "<div id='settingsContainer'><div class='tab-section-payplus' id='tab-payplus-gateway' >
-                        <table class='form-table " . esc_attr(hide($currentSection)) . " fullWidth'>" . wp_kses($settings, $allowed_tags) . "</table>
+                        <table class='form-table " . esc_attr(payplus_hide($currentSection)) . " fullWidth'>" . wp_kses($settings, $allowed_tags) . "</table>
                     </div><div class='right-tab-section-payplus fullHeight hideIt'></div></div>
                     <div class='payplus-credit' style='left:20px;position: absolute; bottom: 0;'>" . wp_kses(
             $credit,
@@ -1632,7 +1632,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $html .= '</div>';
 
-        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter
     }
 
     public function get_payment_ips()
@@ -1750,6 +1751,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (!$this->checkValidateCard($token)) {
                 $this->payplus_add_log_all($handle, 'Token Expired: ' . $token, 'error');
                 wc_add_notice(__('Error: user or other, please contact PayPlus support', 'payplus-payment-gateway'), 'error');
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Plugin hook with existing prefix
                 do_action('wc_gateway_payplus_process_payment_error', __('Error: user or other, please contact PayPlus support', 'payplus-payment-gateway'), $order);
                 $order->update_status('failed');
 
@@ -1767,6 +1769,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 // Translators: %s will be replaced with the error message received from the payment gateway.
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), 'error');
                 // Translators: %s will be replaced with the error message received from the payment gateway.
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Plugin hook with existing prefix
                 do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), $order);
                 $order->update_status('failed');
                 $this->store_payment_ip();
