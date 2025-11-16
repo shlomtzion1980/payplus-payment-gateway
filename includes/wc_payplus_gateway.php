@@ -1632,8 +1632,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $html .= '</div>';
 
-        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound,WordPress.Security.EscapeOutput.OutputNotEscaped -- WooCommerce core filter; HTML is escaped in $html variable
+        echo apply_filters('woocommerce_payment_gateway_save_new_payment_method_option_html', $html, $this);
     }
 
     public function get_payment_ips()
@@ -1769,8 +1769,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 // Translators: %s will be replaced with the error message received from the payment gateway.
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), 'error');
                 // Translators: %s will be replaced with the error message received from the payment gateway.
-                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Plugin hook with existing prefix
-                do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), $order);
+                do_action('wc_gateway_payplus_process_payment_error', sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), $order); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Plugin hook with existing prefix
                 $order->update_status('failed');
                 $this->store_payment_ip();
                 return [
