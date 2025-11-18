@@ -92,6 +92,7 @@ class WC_PayPlus
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('payplus_twice_hourly_cron_job', [$this, 'getPayplusCron']);
         add_action('payplus_invoice_runner_cron_job', [$this, 'getPayplusInvoiceRunnerCron']);
+        add_action('woocommerce_init', [$this, 'pwgc_remove_processing_redemption'], 11);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -190,6 +191,30 @@ class WC_PayPlus
         // Modify session data if necessary
         $this->pwGiftCardData = $session_data;
         return $session_data;
+    }
+
+    /**
+     * Remove early PW Gift Cards redemption hooks so gift cards are only debited
+     * when order status is "processing" or "completed" instead of immediately at checkout.
+     * 
+     * This prevents gift cards from being debited before payment is confirmed,
+     * ensuring they are only used when the order is actually processing or completed.
+     */
+    public function pwgc_remove_processing_redemption()
+    {
+        global $pw_gift_cards_redeeming;
+
+        // Check if PW Gift Cards redeeming class exists
+        if (!isset($pw_gift_cards_redeeming) || !is_object($pw_gift_cards_redeeming)) {
+            return;
+        }
+
+        // Remove early redemption hooks that debit gift cards immediately at checkout
+        remove_action('woocommerce_pre_payment_complete', array($pw_gift_cards_redeeming, 'woocommerce_pre_payment_complete'));
+        remove_action('woocommerce_checkout_update_order_meta', array($pw_gift_cards_redeeming, 'woocommerce_checkout_update_order_meta'), 10, 2);
+        
+        // Note: We keep woocommerce_order_status_processing and woocommerce_order_status_completed
+        // hooks so gift cards are debited when order status changes to processing or completed
     }
 
     public function wc_payplus_check_version()
