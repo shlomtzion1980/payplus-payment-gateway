@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [7.9.5] - 16-11-2025 - (Keaton)
+## [7.9.5] - 23-11-2025 - (Keaton)
 
 - Tweak   - Deletion of payplus_page_uid and order cancellation now only occur via manual admin action.
 - Added   - Checkbox to enable EMV positioning on Classic Checkout.
