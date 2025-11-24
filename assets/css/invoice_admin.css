@@ -1,154 +1,157 @@
-.width-100, select.width-100 {
-  width: 100%;
-  max-width: 350px;
+.width-100,
+select.width-100 {
+    width: 100%;
+    max-width: 350px;
 }
 
 .invoicePlusButtonContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
 .invoicePlusButtonShow {
-  background-image: url('../images/showDocs+.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  border: none;
-  background-color: transparent;
-  height: 60px;
-  width: 120px;
-  transition: transform 0.5s;
-  cursor: pointer;
-  margin: 0 auto;
+    background-image: url("../images/showDocsPlus.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+    background-color: transparent;
+    height: 60px;
+    width: 120px;
+    transition: transform 0.5s;
+    cursor: pointer;
+    margin: 0 auto;
 }
 
 .invoicePlusButtonShow.flip {
-  transform: rotateX(180deg);
+    transform: rotateX(180deg);
 }
 
 .invoicePlusButton {
-  display: inline-block;
-  padding: 5px;
-  font-size: 10px;
-  font-weight: bold;
-  color: #999;
-  /* background-color: #007BFF; */
-  text-align: center;
-  text-decoration: none;
-  border-radius: 5px;
-  transition: background-color 0.3s, transform 0.3s;
-  cursor: pointer;
-  margin: 5px 0 5px 0;
+    display: inline-block;
+    padding: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #999;
+    /* background-color: #007BFF; */
+    text-align: center;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s, transform 0.3s;
+    cursor: pointer;
+    margin: 5px 0 5px 0;
 }
 .invoicePlusButton:hover {
-  /* background-color: #0056b3; */
-  transform: scale(1.05);
+    /* background-color: #0056b3; */
+    transform: scale(1.05);
 }
 
 a:focus {
-  outline: none;
-  box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2); /* Example box-shadow */
-
+    outline: none;
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.2); /* Example box-shadow */
 }
 
-
 .invoicePlusButton:active {
-  /* background-color: #004080; */
-  transform: scale(1);
-  border: none;
+    /* background-color: #004080; */
+    transform: scale(1);
+    border: none;
 }
 
 .invoicePlusButtonHidden {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 1s ease, opacity 1s ease;
-  display: flex;
-  flex-direction: column;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 1s ease, opacity 1s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .invoicePlusButtonVisible {
-  max-height: 500px; /* Adjust based on content size */
-  opacity: 1;
-  transition: max-height 1s ease, opacity 1s ease;
-  display: flex;
-  flex-direction: column;
+    max-height: 500px; /* Adjust based on content size */
+    opacity: 1;
+    transition: max-height 1s ease, opacity 1s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .link-invoice {
-  text-align: center;
-  border-radius: 7px;
-  border: solid 0.2px;
-  color: #34aa54;
-  display: block;
-  font-size: 12px;
-  padding: 5px;
-  max-width: 60%;
-  margin: 10px auto;
-  font-weight: bold;
+    text-align: center;
+    border-radius: 7px;
+    border: solid 0.2px;
+    color: #34aa54;
+    display: block;
+    font-size: 12px;
+    padding: 5px;
+    max-width: 60%;
+    margin: 10px auto;
+    font-weight: bold;
 }
 
 .link-invoice:hover {
-  color: rgb(255, 255, 255);
-  background-color:#34aa54;
+    color: rgb(255, 255, 255);
+    background-color: #34aa54;
 }
 
-p.link-invoice-error{
-  text-align: center;
-  color:red;
-
+p.link-invoice-error {
+    text-align: center;
+    color: red;
 }
 
 .note_content .link-invoice {
-  line-height: 2em;
-  text-decoration: none;
-  font-weight: bold;
+    line-height: 2em;
+    text-decoration: none;
+    font-weight: bold;
 }
 
-.system-note .link-invoice, .system-note .link-invoice:hover {
-  font-size: 13px;
-  margin: 10px 0px;
+.system-note .link-invoice,
+.system-note .link-invoice:hover {
+    font-size: 13px;
+    margin: 10px 0px;
+}
+
+.column-order_invoice {
+    text-align: center !important;
 }
 
 .column-order_invoice span {
-  text-align: center;
-  display: block;
+    text-align: center;
+    display: block;
 }
 
 #order-payment-payplus-refund {
-  background: #2271b1;
-  color: #fff;
+    background: #2271b1;
+    color: #fff;
 }
 
 .payplus_loader_refund {
-  left: 20%;
-  right: 0%;
+    left: 20%;
+    right: 0%;
 }
 
-html[lang=he-IL] .payplus_loader_refund {
-  right: 16%;
-  left: 0px;
+html[lang="he-IL"] .payplus_loader_refund {
+    right: 16%;
+    left: 0px;
 }
 
 .payplus_loader_refund {
-  border: 16px solid #2271b1;
-  border-top: 16px solid #2271b1;
-  width: 15px;
-  height: 15px;
-  animation: spin 2s linear infinite;
-  position: absolute;
-  bottom: 10px;
-  display: none;
-  border-radius: 25%;
+    border: 16px solid #2271b1;
+    border-top: 16px solid #2271b1;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+    position: absolute;
+    bottom: 10px;
+    display: none;
+    border-radius: 25%;
 }
 
 #woocommerce_payplus-payment-gateway_description {
-  width: auto;
+    width: auto;
 }
 
 #payplus_invoice_enable_logging_mode {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 /*# sourceMappingURL=invoice_admin.css.map */
