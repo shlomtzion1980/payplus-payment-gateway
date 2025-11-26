@@ -849,6 +849,9 @@ class WC_PayPlus
                 if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
                     $paymentPayPlusDashboard = $REQUEST['paymentPayPlusDashboard'];
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
+                        $order->set_payment_method('payplus-payment-gateway');
+                        $order->set_payment_method_title('Pay with Debit or Credit Card');
+                        $order->save();
                         $linkRedirect = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
                     }
                 }
