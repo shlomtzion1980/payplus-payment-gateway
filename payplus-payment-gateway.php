@@ -844,6 +844,15 @@ class WC_PayPlus
                 }
                 $order = wc_get_order($order_id);
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+
+                // Check if payment was initiated from admin dashboard
+                if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
+                    $paymentPayPlusDashboard = $REQUEST['paymentPayPlusDashboard'];
+                    if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
+                        $linkRedirect = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
+                    }
+                }
+
                 WC()->session->__unset('save_payment_method');
                 wp_safe_redirect($linkRedirect);
                 exit;
