@@ -1734,7 +1734,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $moreInfo = false,
                     $returnStatusOnly = true
                 );
-                if ($status === "processing" || $status === "on-hold") {
+                if ($status === "processing" || $status === "on-hold" || $status === "approved") {
                     $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
                     $result = [
                         'result' => 'success',

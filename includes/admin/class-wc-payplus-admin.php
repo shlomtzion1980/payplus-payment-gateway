@@ -612,7 +612,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
             }
             if ($allowReturn && isset($status) || $returnStatusOnly && isset($status)) {
-                return $status;
+                if(isset($status)){
+                    return $status;
+                }
+                return $responseBody['data']['status'];
             }
         }
     }
