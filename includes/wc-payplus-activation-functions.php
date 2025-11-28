@@ -295,6 +295,18 @@ function payplus_check_set_payplus_options()
             $savePayPlus = true;
         }
     }
+    // One-time migration: Enable enable_double_check_if_pruid_exists if unchecked (version 7.9.5)
+    $migration_flag = 'payplus_migration_enable_double_check_796';
+    if (!get_option($migration_flag)) {
+        $current_value = isset($payPlusOptions['enable_double_check_if_pruid_exists']) ? $payPlusOptions['enable_double_check_if_pruid_exists'] : 'no';
+        if ($current_value !== 'yes') {
+            $payPlusOptions['enable_double_check_if_pruid_exists'] = 'yes';
+            $savePayPlus = true;
+        }
+        // Mark migration as complete - this ensures it never runs again, even if code is left in place
+        update_option($migration_flag, true);
+    }
+
     ($savePayPlus ?? false) ? update_option('woocommerce_payplus-payment-gateway_settings', $payPlusOptions) : null;
 
     if (!array_key_exists('post-content', $payPlusErrorOptions)) {
