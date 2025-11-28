@@ -715,6 +715,9 @@ function payplus_filter_checkout_gateways($available_gateways)
 {
     // Check if it's the checkout page and not another WC endpoint
     if (function_exists('is_checkout') && is_checkout() && !is_wc_endpoint_url()) {
+        // Check if we're on classic checkout (not blocks)
+        $is_blocks_checkout = function_exists('has_block') && has_block('woocommerce/checkout');
+        
         // 1. Hide POS EMV gateway if "Show in Regular Checkout" is not enabled
         if (isset($available_gateways['payplus-payment-gateway-pos-emv'])) {
             $pos_emv_settings = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
@@ -730,6 +733,18 @@ function payplus_filter_checkout_gateways($available_gateways)
             $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
             if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
                 unset($available_gateways['payplus-payment-gateway']);
+            }
+        }
+
+        // 3. Hide hostedfields gateway on classic checkout if pp_iframe/pp_iframe_h elements won't be rendered
+        // These elements are only rendered when display_mode is samePageIframe, popupIframe, or iframe
+        if (!$is_blocks_checkout && isset($available_gateways['payplus-payment-gateway-hostedfields'])) {
+            $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+            $display_mode = isset($main_settings['display_mode']) ? $main_settings['display_mode'] : 'redirect';
+            
+            // Only show hostedfields if display_mode would render pp_iframe/pp_iframe_h elements
+            if (!in_array($display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                unset($available_gateways['payplus-payment-gateway-hostedfields']);
             }
         }
     }
