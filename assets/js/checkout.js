@@ -17,28 +17,6 @@ jQuery(function ($) {
     $.blockUI.defaults.overlayCSS.cursor = "default";
     let hasSavedCCs = Object.keys(payplus_script_checkout.hasSavedTokens);
 
-    // Hide hostedfields gateway if pp_iframe or pp_iframe_h elements don't exist (classic checkout only)
-    // Check if we're on classic checkout (not blocks) by checking for blocks checkout elements
-    const isBlocksCheckout = document.querySelector('.wc-block-checkout') !== null;
-    if (!isBlocksCheckout) {
-        const ppIframe = document.querySelector('.pp_iframe');
-        const ppIframeH = document.querySelector('.pp_iframe_h');
-        
-        // If neither element exists, hide the hostedfields gateway
-        if (!ppIframe && !ppIframeH) {
-            const $hostedFieldsGateway = $('.payment_method_payplus-payment-gateway-hostedfields');
-            if ($hostedFieldsGateway.length) {
-                // Check if hostedfields is currently selected before hiding
-                const isHostedFieldsSelected = $('input#' + payPlusHosted).is(':checked');
-                $hostedFieldsGateway.hide();
-                // If it was selected, select the main gateway instead
-                if (isHostedFieldsSelected) {
-                    $('input#' + payPlusMain).prop('checked', true).trigger('change');
-                }
-            }
-        }
-    }
-
     //function to hide other payment methods when subscription order
     function subscriptionOrderHide() {
         // Select all elements with the wc_payment_method class inside .wc_payment_methods.payment_methods.methods
