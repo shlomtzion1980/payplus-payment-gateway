@@ -848,6 +848,17 @@ function payplus_filter_checkout_gateways($available_gateways)
                 unset($available_gateways['payplus-payment-gateway']);
             }
         }
+
+        // 3. Hide Hosted Fields gateway if pp_iframe or pp_iframe_h elements are not expected to be rendered
+        if (isset($available_gateways['payplus-payment-gateway-hostedfields'])) {
+            $main_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+            $display_mode = $main_gateway_settings['display_mode'] ?? 'redirect'; // Default to 'redirect'
+
+            // If display mode is not iframe-based, hide hosted fields
+            if (!in_array($display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                unset($available_gateways['payplus-payment-gateway-hostedfields']);
+            }
+        }
     }
     return $available_gateways;
 }
