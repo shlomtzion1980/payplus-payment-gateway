@@ -1209,6 +1209,7 @@ class WC_PayPlus
                             $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION;
                         }
                     }
+                    $this->payplus_gateway = $this->get_main_payplus_gateway();
                     wp_localize_script(
                         'wc-checkout',
                         'payplus_script_checkout',
@@ -1230,6 +1231,7 @@ class WC_PayPlus
                             "hostedFieldsIsMain" => isset($this->hostedFieldsOptions['hosted_fields_is_main']) ? boolval($this->hostedFieldsOptions['hosted_fields_is_main'] === "yes") : false,
                             "saveCreditCard" => __("Save credit card in my account", "payplus-payment-gateway"),
                             "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
+                            "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
                         ]
                     );
