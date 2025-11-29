@@ -931,37 +931,15 @@ jQuery(function ($) {
                                     ) {
                                         console.log(hostedPayload.more_info);
                                         
-                                        // Clear the cart before submitting payment
-                                        jQuery.ajax({
-                                            type: "post",
-                                            dataType: "json",
-                                            url: payplus_script_checkout.ajax_url,
-                                            data: {
-                                                action: "payplus-clear-cart",
-                                                _ajax_nonce: payplus_script_checkout.frontNonce,
-                                            },
-                                            success: function() {
-                                                overlay();
-                                                jQuery(
-                                                    ".blocks-payplus_loader_hosted"
-                                                ).fadeIn();
-                                                wc_checkout_form.$checkout_form
-                                                    .removeClass("processing")
-                                                    .unblock();
-                                                hf.SubmitPayment();
-                                            },
-                                            error: function() {
-                                                // Even if cart clear fails, proceed with payment
-                                                overlay();
-                                                jQuery(
-                                                    ".blocks-payplus_loader_hosted"
-                                                ).fadeIn();
-                                                wc_checkout_form.$checkout_form
-                                                    .removeClass("processing")
-                                                    .unblock();
-                                                hf.SubmitPayment();
-                                            }
-                                        });
+                                        // Proceed with payment submission
+                                        overlay();
+                                        jQuery(
+                                            ".blocks-payplus_loader_hosted"
+                                        ).fadeIn();
+                                        wc_checkout_form.$checkout_form
+                                            .removeClass("processing")
+                                            .unblock();
+                                        hf.SubmitPayment();
                                     } else {
                                         window.onbeforeunload = null; // If `onbeforeunload` is set directly
                                         window.removeEventListener(
