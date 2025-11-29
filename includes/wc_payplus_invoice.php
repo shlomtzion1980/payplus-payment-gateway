@@ -989,7 +989,8 @@ class PayplusInvoice
 
             $sql .= implode(' OR ', $clauses) . ")";
 
-            $resultApps = $wpdb->get_results($sql, OBJECT); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- SQL is built with prepared statements for each clause
+            $resultApps = $wpdb->get_results($sql, OBJECT);
             $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
         return $resultApps;

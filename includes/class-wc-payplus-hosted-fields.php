@@ -171,6 +171,41 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 $payload['more_info'] = $order_id;
                 // WC()->session->set('order_awaiting_payment', $order_id);
             }
+            
+            // Double check IPN if enabled and page request UID exists (for regular checkout pages)
+            if ($order && isset($this->payPlusGateway->enableDoubleCheckIfPruidExists) && $this->payPlusGateway->enableDoubleCheckIfPruidExists) {
+                $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+                
+                if (!empty($payplus_page_request_uid)) {
+                    $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $status = $PayPlusAdminPayments->payplusIpn(
+                        $order_id,
+                        $_wpnonce,
+                        $saveToken = false,
+                        $isHostedPayment = true,
+                        $allowUpdateStatuses = true,
+                        $allowReturn = false,
+                        $getInvoice = false,
+                        $moreInfo = false,
+                        $returnStatusOnly = true
+                    );
+                    $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                    
+                    if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                        $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Status approved - Payment already processed, redirecting');
+                        // Payment already processed, redirect to order received page
+                        $redirect_url = $order->get_checkout_order_received_url();
+                        wp_safe_redirect($redirect_url);
+                        exit;
+                    } else {
+                        $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with hosted fields payment page');
+                    }
+                } else {
+                    $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
+                }
+            }
         }
 
         // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", 'HostedFields-hostedFieldsData(1): (' . $order_id . ')');

@@ -585,6 +585,8 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
+        add_action('wp_ajax_payplus-clear-cart', [$this, 'clear_cart_via_ajax']);
+        add_action('wp_ajax_nopriv_payplus-clear-cart', [$this, 'clear_cart_via_ajax']);
     }
 
     /**
@@ -620,12 +622,99 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $order_id = WC()->session->get('order_awaiting_payment');
-        $hostedPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_payload');
-        $hostedResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_update_page_response');
+        
+        // Get the main gateway settings (lightweight, no API calls)
+        $mainGatewaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $hostedFieldsOptions = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
+        
+        if (is_numeric($order_id)) {
+            $order = wc_get_order($order_id);
+            if ($order) {
+                $hostedPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_payload');
+                $hostedResponse = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_embedded_update_page_response');
+            }
+        }
+        
+        // Fallback: if still empty, get from session order meta
+        if (empty($hostedResponse)) {
+            $hostedPayload = WC()->session->get('hostedPayload');
+            $hostedResponse = WC()->session->get('hostedResponse');
+        }
+        
         wp_send_json_success(array(
             'hostedPayload' => $hostedPayload,
             'hostedResponse' => $hostedResponse
         ));
+    }
+
+    public function clear_cart_via_ajax()
+    {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        
+        if (WC()->cart) {
+            WC()->cart->empty_cart();
+            wp_send_json_success(array('message' => 'Cart cleared successfully'));
+        } else {
+            wp_send_json_error(array('message' => 'Cart not available'));
+        }
+    }
+
+    public function double_check_ipn_via_ajax()
+    {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        
+        if (!$order_id) {
+            wp_send_json_error(array('message' => 'Invalid order ID'));
+            return;
+        }
+        
+        $payplus_instance = WC_PayPlus::get_instance();
+        $mainGateway = $payplus_instance->get_main_payplus_gateway();
+        
+        if (!$mainGateway || !isset($mainGateway->enableDoubleCheckIfPruidExists) || !$mainGateway->enableDoubleCheckIfPruidExists) {
+            wp_send_json_error(array('message' => 'Double check IPN not enabled'));
+            return;
+        }
+        
+        $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+        
+        if (empty($payplus_page_request_uid)) {
+            wp_send_json_error(array('message' => 'No page request UID found'));
+            return;
+        }
+        
+        $mainGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN AJAX for Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
+        
+        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+        $status = $PayPlusAdminPayments->payplusIpn(
+            $order_id,
+            $_wpnonce,
+            $saveToken = false,
+            $isHostedPayment = true,
+            $allowUpdateStatuses = true,
+            $allowReturn = false,
+            $getInvoice = false,
+            $moreInfo = false,
+            $returnStatusOnly = true
+        );
+        
+        $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields AJAX Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+        
+        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+            $order = wc_get_order($order_id);
+            $redirect_url = $order ? $order->get_checkout_order_received_url() : '';
+            wp_send_json_success(array(
+                'status' => $status,
+                'redirect_url' => $redirect_url
+            ));
+        } else {
+            wp_send_json_success(array(
+                'status' => $status ? $status : 'pending',
+                'redirect_url' => ''
+            ));
+        }
     }
 
     public function complete_order_via_ajax()
@@ -693,6 +782,46 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         }
+        
+        // Double check IPN if enabled and page request UID exists
+        $payplus_instance = WC_PayPlus::get_instance();
+        $mainGateway = $payplus_instance->get_main_payplus_gateway();
+        if ($mainGateway && isset($mainGateway->enableDoubleCheckIfPruidExists) && $mainGateway->enableDoubleCheckIfPruidExists) {
+            $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+            
+            if (!empty($payplus_page_request_uid)) {
+                $mainGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
+                $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                $status = $PayPlusAdminPayments->payplusIpn(
+                    $order_id,
+                    $_wpnonce,
+                    $saveToken = false,
+                    $isHostedPayment = true,
+                    $allowUpdateStatuses = true,
+                    $allowReturn = false,
+                    $getInvoice = false,
+                    $moreInfo = false,
+                    $returnStatusOnly = true
+                );
+                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                
+                if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Status approved - Payment already processed');
+                    // Payment already processed, return success with redirect to order received
+                    $redirect_to = $order->get_checkout_order_received_url();
+                    return array(
+                        'result'   => 'success',
+                        'redirect' => $redirect_to,
+                    );
+                } else {
+                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with hosted fields payment');
+                }
+            } else {
+                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
+            }
+        }
+        
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             WC()->session->set('order_awaiting_payment', $order_id);
         }

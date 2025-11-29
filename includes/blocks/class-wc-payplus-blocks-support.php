@@ -51,6 +51,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function __construct($payment_request_configuration = null)
     {
         add_action('woocommerce_rest_checkout_process_payment_with_context', [$this, 'add_payment_request_order_meta'], 8, 2);
+        // Check PRUID when blocks checkout page loads
+        add_action('template_redirect', [$this, 'payplus_check_pruid_on_blocks_checkout_load'], 5);
     }
 
     /**
@@ -289,6 +291,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
 
         $hostedResponseArray = json_decode($hostedResponse, true);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $hostedResponseArray['data']['page_request_uid']]);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
 
         if ($hostedResponseArray['results']['status'] === "error") {
             WC()->session->__unset('page_request_uid');
@@ -338,6 +343,45 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $hostedStarted = WC()->session->get('hostedStarted') ? WC()->session->get('hostedStarted') : WC()->session->set('hostedStarted', 0);
         if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
+            // Double check IPN if enabled and page request UID exists
+            $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+            if ($WC_PayPlus_Gateway && isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) {
+                $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($this->orderId, 'payplus_page_request_uid', true);
+                
+                if (!empty($payplus_page_request_uid)) {
+                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid);
+                    $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+                    $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                    $status = $PayPlusAdminPayments->payplusIpn(
+                        $this->orderId,
+                        $_wpnonce,
+                        $saveToken = false,
+                        $isHostedPayment = true,
+                        $allowUpdateStatuses = true,
+                        $allowReturn = false,
+                        $getInvoice = false,
+                        $moreInfo = false,
+                        $returnStatusOnly = true
+                    );
+                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                    
+                    if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Status approved - Payment already processed');
+                        // Payment already processed, set result to success
+                        $result->set_status('success');
+                        $payment_details = $result->payment_details;
+                        $payment_details['order_id'] = $this->orderId;
+                        $payment_details['redirect_url'] = $order->get_checkout_order_received_url();
+                        $result->set_payment_details($payment_details);
+                        return;
+                    } else {
+                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with hosted fields payment');
+                    }
+                } else {
+                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | No Page Request UID found - Skipping double check');
+                }
+            }
+            
             ++$hostedStarted;
             if ($hostedStarted <= 1) {
                 WC()->session->set('hostedStarted', $hostedStarted);
@@ -423,6 +467,11 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             if ($responseArray['results']['status'] === 'error' || !isset($responseArray['results']) && isset($responseArray['message'])) {
                 $payment_details['errorMessage'] = isset($responseArray['results']['description']) ? wp_strip_all_tags($responseArray['results']['description']) : $responseArray['message'];
             } else {
+                // Set page_order_awaiting_payment when payment page is opened (for non-hosted fields)
+                if ($context->payment_method !== 'payplus-payment-gateway-hostedfields' && WC()->session) {
+                    WC()->session->set('page_order_awaiting_payment', $this->orderId);
+                }
+                
                 $orderMeta = [
                     'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],
                     'payplus_payment_page_link' => $responseArray['data']['payment_page_link']
@@ -536,6 +585,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         }
 
+        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         return [
             'title' => $this->get_setting('title'),
             'description' => $this->get_setting('description'),
@@ -551,6 +601,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'isAutoPPCC' => $this->isAutoPPCC,
             'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION : false,
             'show_hide_submit_button' => $this->name === 'payplus-payment-gateway-hostedfields' ? $this->settings['show_hide_submit_button'] ?? 'no' : 'no',
+            'enableDoubleCheckIfPruidExists' => isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists ? true : false,
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',
@@ -561,6 +612,97 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'customIcons' => $this->customIcons,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
         ];
+    }
+
+    /**
+     * Check PRUID when blocks checkout page loads (for non-hosted fields payment methods)
+     * This runs when the checkout page is opened, not during payment processing
+     */
+    public function payplus_check_pruid_on_blocks_checkout_load()
+    {
+        // // Only run on checkout page
+        if (is_wc_endpoint_url('order-received')) {
+            return;
+        }
+        // Check if it's blocks checkout
+        $page_id = get_the_ID();
+        if ($page_id) {
+            $post = get_post($page_id);
+            if (!$post || !has_block('woocommerce/checkout', $post->post_content)) {
+                return;
+            }
+        } else {
+            return;
+        }
+        // Check if there's a page_order_awaiting_payment in session
+        if (!WC()->session) {
+            return;
+        }
+
+        $order_id = WC()->session->get('page_order_awaiting_payment');
+        if (!$order_id || !is_numeric($order_id)) {
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        // Only check for PayPlus payment methods (not hosted fields - they use order_awaiting_payment)
+        $payment_method = $order->get_payment_method();
+        if (strpos($payment_method, 'payplus-payment-gateway') !== 0 || $payment_method === 'payplus-payment-gateway-hostedfields') {
+            return;
+        }
+
+        $main_gateway = $this->get_main_payplus_gateway();
+        if (!$main_gateway || !isset($main_gateway->enableDoubleCheckIfPruidExists) || !$main_gateway->enableDoubleCheckIfPruidExists) {
+            return;
+        }
+
+        $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+        
+        if (empty($payplus_page_request_uid)) {
+            return;
+        }
+
+        $main_gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started on Blocks Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid);
+        
+        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+        $status = $PayPlusAdminPayments->payplusIpn(
+            $order_id,
+            $_wpnonce,
+            $saveToken = false,
+            $isHostedPayment = false,
+            $allowUpdateStatuses = true,
+            $allowReturn = false,
+            $getInvoice = false,
+            $moreInfo = false,
+            $returnStatusOnly = true
+        );
+        
+        $main_gateway->payplus_add_log_all('payplus_double_check', 'Blocks Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+        
+        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Blocks Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status approved - Payment already processed, redirecting');
+            
+            // Clear cart and unset page_order_awaiting_payment, then redirect to order received page
+            if (WC()->cart) {
+                WC()->cart->empty_cart();
+            }
+            
+            // Unset page_order_awaiting_payment since payment is complete
+            if (WC()->session) {
+                WC()->session->__unset('page_order_awaiting_payment');
+            }
+            
+            $redirect_url = $order->get_checkout_order_received_url();
+            wp_safe_redirect($redirect_url);
+            exit;
+        } else {
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Blocks Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with checkout');
+        }
     }
 }
 /**

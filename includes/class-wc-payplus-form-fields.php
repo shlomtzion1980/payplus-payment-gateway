@@ -802,8 +802,8 @@ class WC_PayPlus_Form_Fields
             'enable_double_check_if_pruid_exists' => [
                 'title' => __('Double check ipn', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'default' => 'no',
-                'label' => __('Double check ipn (Default: Unchecked)', 'payplus-payment-gateway'),
+                'default' => 'yes',
+                'label' => __('Double check ipn (Default: Checked)', 'payplus-payment-gateway'),
                 'description' => __('Before opening a payment page and if a PayPlus payment request uid already exists for this order, perform an ipn check.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
@@ -812,7 +812,7 @@ class WC_PayPlus_Form_Fields
                 'type' => 'checkbox',
                 'default' => 'no',
                 'label' => __('Update statuses in ipn response (Default: Unchecked)', 'payplus-payment-gateway'),
-                'description' => __('In ipn response check status (This will run with or without the callback status update)', 'payplus-payment-gateway'),
+                'description' => __('In ipn response check status (This will prevent the callback status update)', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'use_legacy_payload' => [

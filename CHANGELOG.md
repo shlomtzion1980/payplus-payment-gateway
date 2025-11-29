@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.6] - 30-11-2025 - (WittiX)
+
+- Tweak    - PRUID: Enabled double IPN check for orders with existing payplus_page_request_uid. Now works for all payment gateways and checks for successful payments before allowing duplicate payment attempts, even if the order status wasn't previously updated.
+- Fix      - Hosted Fields (PayPlus Embedded): Fixed issue with orders created using temporary data where order_id was stored as a string instead of a numeric order number. Prevents duplicate order payments.
+- Fix      - Admin Dashboard Payments: Fixed redirect issue where payments initiated from the admin dashboard were redirecting to the customer-facing order received page. Now correctly redirects back to the admin order edit page.
+
+
 ## [7.9.5] - 23-11-2025 - (Keaton)
 
 - Tweak   - Deletion of payplus_page_uid and order cancellation now only occur via manual admin action.

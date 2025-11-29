@@ -1721,6 +1721,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
 
             if (!empty($payplus_page_request_uid)) {
+                $this->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
                 $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                 $_wpnonce = wp_create_nonce('_wp_payplusIpn');
                 $status = $PayPlusAdminPayments->payplusIpn(
@@ -1734,14 +1735,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     $moreInfo = false,
                     $returnStatusOnly = true
                 );
-                if ($status === "processing" || $status === "on-hold") {
+                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                    $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Status approved - Redirecting to order received page');
                     $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
                     $result = [
                         'result' => 'success',
                         'redirect' => $redirect_to
                     ];
                     return $result;
+                } else {
+                    $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with payment page creation');
                 }
+            } else {
+                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
             }
         }
 
@@ -1950,7 +1957,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($where) {
             $sql .= " WHERE" . $where;
         }
-        $posts = $wpdb->get_results($sql); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+        // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared,PluginCheck.Security.DirectDB.UnescapedDBParameter -- SQL is built with prepared statements
+        $posts = $wpdb->get_results($sql);
 
         return $posts;
     }
