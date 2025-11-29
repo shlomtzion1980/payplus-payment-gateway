@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 7.9.6 - 30-11-2025
+== 7.9.6 - 30-11-2025 =
 
 - Tweak    - PRUID: Enabled double IPN check for orders with existing payplus_page_request_uid. Now works for all payment gateways and checks for successful payments before allowing duplicate payment attempts, even if the order status wasn't previously updated.
 - Fix      - Hosted Fields (PayPlus Embedded): Fixed issue with orders created using temporary data where order_id was stored as a string instead of a numeric order number. Prevents duplicate order payments.
