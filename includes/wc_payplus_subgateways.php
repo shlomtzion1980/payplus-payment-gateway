@@ -585,8 +585,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
-        add_action('wp_ajax_payplus-clear-cart', [$this, 'clear_cart_via_ajax']);
-        add_action('wp_ajax_nopriv_payplus-clear-cart', [$this, 'clear_cart_via_ajax']);
     }
 
     /**
@@ -647,17 +645,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         ));
     }
 
-    public function clear_cart_via_ajax()
-    {
-        check_ajax_referer('frontNonce', '_ajax_nonce');
-        
-        if (WC()->cart) {
-            WC()->cart->empty_cart();
-            wp_send_json_success(array('message' => 'Cart cleared successfully'));
-        } else {
-            wp_send_json_error(array('message' => 'Cart not available'));
-        }
-    }
 
     public function double_check_ipn_via_ajax()
     {
@@ -859,6 +846,17 @@ function payplus_filter_checkout_gateways($available_gateways)
             $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
             if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
                 unset($available_gateways['payplus-payment-gateway']);
+            }
+        }
+
+        // 3. Hide Hosted Fields gateway if pp_iframe or pp_iframe_h elements are not expected to be rendered
+        if (isset($available_gateways['payplus-payment-gateway-hostedfields'])) {
+            $main_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+            $display_mode = $main_gateway_settings['display_mode'] ?? 'redirect'; // Default to 'redirect'
+
+            // If display mode is not iframe-based, hide hosted fields
+            if (!in_array($display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
+                unset($available_gateways['payplus-payment-gateway-hostedfields']);
             }
         }
     }
