@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 7.9.5
+Stable tag: 7.9.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 7.9.6 - 30-11-2025
+
+- Tweak    - PRUID: Enabled double IPN check for orders with existing payplus_page_request_uid. Now works for all payment gateways and checks for successful payments before allowing duplicate payment attempts, even if the order status wasn't previously updated.
+- Fix      - Hosted Fields (PayPlus Embedded): Fixed issue with orders created using temporary data where order_id was stored as a string instead of a numeric order number. Prevents duplicate order payments.
+- Fix      - Admin Dashboard Payments: Fixed redirect issue where payments initiated from the admin dashboard were redirecting to the customer-facing order received page. Now correctly redirects back to the admin order edit page.
 
 == 7.9.5 - 23-11-2025 =
 
