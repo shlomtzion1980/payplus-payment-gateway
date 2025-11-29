@@ -812,7 +812,7 @@ class WC_PayPlus_Form_Fields
                 'type' => 'checkbox',
                 'default' => 'no',
                 'label' => __('Update statuses in ipn response (Default: Unchecked)', 'payplus-payment-gateway'),
-                'description' => __('In ipn response check status (This will run with or without the callback status update)', 'payplus-payment-gateway'),
+                'description' => __('In ipn response check status (This will prevent the callback status update)', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'use_legacy_payload' => [
