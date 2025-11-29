@@ -63,9 +63,9 @@ class WC_PayPlus_Embedded extends WC_PayPlus_HostedFields
      */
     public function payplus_embedded_order_processed($order_id, $posted_data, $order)
     {
-        // Check if this is a PayPlus payment method (any method starting with 'payplus-payment-gateway')
+        // Check if this is the hosted fields payment method (only process for 'payplus-payment-gateway-hostedfields')
         if (strpos($order->get_payment_method(), 'payplus-payment-gateway-hostedfields') !== 0) {
-            return; // Only process for PayPlus payments
+            return; // Only process for hosted fields payment method
         }
         WC()->session->set('order_awaiting_payment', $order_id);
         $this->hostedFieldsData($order_id);

@@ -52,7 +52,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     {
         add_action('woocommerce_rest_checkout_process_payment_with_context', [$this, 'add_payment_request_order_meta'], 8, 2);
         // Check PRUID when blocks checkout page loads
-        add_action('wp', [$this, 'payplus_check_pruid_on_blocks_checkout_load'], 5);
+        add_action('template_redirect', [$this, 'payplus_check_pruid_on_blocks_checkout_load'], 5);
     }
 
     /**

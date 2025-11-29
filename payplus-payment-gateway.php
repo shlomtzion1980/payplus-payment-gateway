@@ -92,7 +92,10 @@ class WC_PayPlus
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
         add_action('payplus_twice_hourly_cron_job', [$this, 'getPayplusCron']);
         add_action('payplus_invoice_runner_cron_job', [$this, 'getPayplusInvoiceRunnerCron']);
+        add_action('template_redirect', [$this, 'payplus_check_pruid_on_checkout_load'], 5);
         add_action('woocommerce_init', [$this, 'pwgc_remove_processing_redemption'], 11);
+        add_action('woocommerce_checkout_order_processed', [$this, 'payplus_checkout_order_processed'], 25, 3);
+
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -120,6 +123,122 @@ class WC_PayPlus
             $this->payPlusInvoiceRunnerCronActivate();
         } else {
             $this->payPlusInvoiceRunnerCronDeactivate();
+        }
+    }
+
+        /**
+     * PayPlus Embedded order processed function
+     * This function gets the order object and stops execution with wp_die()
+     * Displays comprehensive order information for debugging and testing
+     *
+     * @param int $order_id Order ID
+     * @param array $posted_data Posted checkout data
+     * @param WC_Order $order Order object
+     */
+    public function payplus_checkout_order_processed($order_id, $posted_data, $order)
+    {
+        // Check if this is a PayPlus payment method (any method starting with 'payplus-payment-gateway') but not hosted fields
+        $payment_method = $order->get_payment_method();
+        if (strpos($payment_method, 'payplus-payment-gateway') !== 0 || $payment_method === 'payplus-payment-gateway-hostedfields') {
+            return; // Only process for PayPlus payments (excluding hosted fields)
+        }
+        WC()->session->set('page_order_awaiting_payment', $order_id);
+    }
+
+    /**
+     * Check PRUID when checkout page loads (for non-hosted fields payment methods)
+     * This runs when the checkout page is opened, not during payment processing
+     */
+    public function payplus_check_pruid_on_checkout_load()
+    {
+        // Only run on checkout page (but not blocks checkout - that's handled separately)
+        if (!is_checkout() || is_wc_endpoint_url('order-received')) {
+            return;
+        }
+
+        // Skip if it's blocks checkout (handled in blocks support class)
+        $page_id = get_the_ID();
+        if ($page_id) {
+            $post = get_post($page_id);
+            if ($post && has_block('woocommerce/checkout', $post->post_content)) {
+                return;
+            }
+        }
+
+        // Check if there's a page_order_awaiting_payment in session
+        if (!WC()->session) {
+            return;
+        }
+
+        $order_id = WC()->session->get('page_order_awaiting_payment');
+        if (!$order_id || !is_numeric($order_id)) {
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        // Only check for PayPlus payment methods (not hosted fields - they use order_awaiting_payment)
+        $payment_method = $order->get_payment_method();
+        if (strpos($payment_method, 'payplus-payment-gateway') !== 0 || $payment_method === 'payplus-payment-gateway-hostedfields') {
+            return;
+        }
+
+        // Get the main gateway instance
+        $gateways = WC()->payment_gateways->get_available_payment_gateways();
+        if (!isset($gateways['payplus-payment-gateway'])) {
+            return;
+        }
+
+        $main_gateway = $gateways['payplus-payment-gateway'];
+        if (!isset($main_gateway->enableDoubleCheckIfPruidExists) || !$main_gateway->enableDoubleCheckIfPruidExists) {
+            return;
+        }
+
+        $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+        
+        if (empty($payplus_page_request_uid)) {
+            return;
+        }
+
+        $main_gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started on Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid);
+        
+        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+        $status = $PayPlusAdminPayments->payplusIpn(
+            $order_id,
+            $_wpnonce,
+            $saveToken = false,
+            $isHostedPayment = false,
+            $allowUpdateStatuses = true,
+            $allowReturn = false,
+            $getInvoice = false,
+            $moreInfo = false,
+            $returnStatusOnly = true
+        );
+        
+        $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+        
+        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status approved - Payment already processed, redirecting');
+            
+            // Clear cart and unset page_order_awaiting_payment, then redirect to order received page
+            if (WC()->cart) {
+                WC()->cart->empty_cart();
+            }
+            
+            // Unset page_order_awaiting_payment since payment is complete
+            if (WC()->session) {
+                WC()->session->__unset('page_order_awaiting_payment');
+            }
+            
+            $redirect_url = $order->get_checkout_order_received_url();
+            wp_safe_redirect($redirect_url);
+            exit;
+        } else {
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with checkout');
         }
     }
 
