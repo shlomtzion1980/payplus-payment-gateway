@@ -3758,7 +3758,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                 $result = $this->receipt_page($order->get_id(), $token, true, 'WP_SUB_' . $order->get_id(), $amount_to_charge, false, $move_token);
 
-                if ($result->data->status == "approved" && $result->data->status_code == "000" && $result->data->transaction_uid) {
+                if ($result && isset($result->data) && isset($result->data->status) && $result->data->status == "approved" && isset($result->data->status_code) && $result->data->status_code == "000" && isset($result->data->transaction_uid) && $result->data->transaction_uid) {
                     $this->payplus_add_log_all($handle, wp_json_encode($result), 'completed');
                     $external_recurring_id = WC_PayPlus_Meta_Data::get_meta($order->get_id(), '_subscription_renewal', true);
                     $post = $this->payplus_get_posts_id($external_recurring_id);
@@ -3774,8 +3774,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $insertMeta['payplus_number_of_payments'] = $payplusNumberOfPayments;
                     }
                     // Translators: %s will be replaced with the transaction number received from the payment gateway.
-                    $order->add_order_note(sprintf(__('PayPlus Subscription Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $result->data->number));
-                    $insertMeta['payplus_type'] = $result->data->type;
+                    $transaction_number = isset($result->data->number) ? $result->data->number : '';
+                    $order->add_order_note(sprintf(__('PayPlus Subscription Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $transaction_number));
+                    $insertMeta['payplus_type'] = isset($result->data->type) ? $result->data->type : '';
                     $insertMeta['payplus_response'] = wp_json_encode($result->data);
                     $insertMeta['payplus_method'] = "credit-card";
                     $insertMeta['payplus_transaction_uid'] = $result->data->transaction_uid;
