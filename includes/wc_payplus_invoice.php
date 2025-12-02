@@ -423,6 +423,13 @@ class PayplusInvoice
                 if (!empty($found_in_other) || !empty($found_in_or_other)) {
                     $method_payment = 'paypal';
                 }
+                
+                // Validate donation receipt cannot have 'other' payment method
+                if ($payplus_invoice_type_document_refund === 'inv_don_receipt' && $method_payment === 'other') {
+                    $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                    throw new Exception(__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                }
+                
                 $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
                 $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
                 $resultApps[] = $objectInvoicePaymentNoPayplus;
@@ -1093,6 +1100,17 @@ class PayplusInvoice
                     $dual = 1;
                     $resultApps = $this->payplus_get_payments($order_id);
 
+                    // Validate donation receipt cannot have 'other' payment method
+                    if ($payplus_document_type === 'inv_don_receipt') {
+                        foreach ($resultApps as $payment) {
+                            if (isset($payment->method_payment) && $payment->method_payment === 'other') {
+                                $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
+                                return;
+                            }
+                        }
+                    }
+
                     if ($payplus_document_type === "inv_refund_receipt") {
                         $dual = -1;
                         $payplus_document_type = "inv_receipt";
@@ -1231,6 +1249,14 @@ class PayplusInvoice
                             if (!empty($found_in_other) || !empty($found_in_or_other)) {
                                 $method_payment = 'paypal';
                             }
+                            
+                            // Validate donation receipt cannot have 'other' payment method
+                            if ($payplus_document_type === 'inv_don_receipt' && $method_payment === 'other') {
+                                $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
+                                return;
+                            }
+                            
                             if (
                                 isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create']) ||
                                 isset($this->payplus_invoice_option['do-not-create']) && in_array($order->get_payment_method(), $this->payplus_invoice_option['do-not-create'])

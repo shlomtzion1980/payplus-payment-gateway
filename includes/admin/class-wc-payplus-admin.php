@@ -860,6 +860,40 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $type_document = isset($_POST['typeDocument']) ? sanitize_text_field(wp_unslash($_POST['typeDocument'])) : false;
             $payments = !empty($_POST['payments']) ? WC_PayPlus_Statics::sanitize_recursive(wp_unslash($_POST['payments'])) : []; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized	
 
+            // Validate donation receipt cannot have 'other' payment method
+            if ($type_document === 'inv_don_receipt') {
+                // Check payments from POST data
+                if (!empty($payments)) {
+                    function payplus_set_payment_payplus($value)
+                    {
+                        if ($value['method_payment'] == "payment-app") {
+                            $value['method_payment'] = sanitize_text_field($value['payment_app']);
+                            unset($value['payment_app']);
+                        }
+                        return $value;
+                    }
+                    $payments = array_map('payplus_set_payment_payplus', $payments);
+                    
+                    // Check if any payment has 'other' method
+                    foreach ($payments as $payment) {
+                        if (isset($payment['method_payment']) && $payment['method_payment'] === 'other') {
+                            wp_send_json_error(__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                            wp_die();
+                        }
+                    }
+                } else {
+                    // If no payments in POST, check existing payments from order
+                    $order = wc_get_order($order_id);
+                    $existing_payments = $this->payPlusInvoice->payplus_get_payments($order_id);
+                    foreach ($existing_payments as $payment) {
+                        if (isset($payment->method_payment) && $payment->method_payment === 'other') {
+                            wp_send_json_error(__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                            wp_die();
+                        }
+                    }
+                }
+            }
+
             if (!empty($payments)) {
                 function payplus_set_payment_payplus($value)
                 {
