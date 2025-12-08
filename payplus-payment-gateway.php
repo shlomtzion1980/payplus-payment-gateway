@@ -154,6 +154,12 @@ class WC_PayPlus
         // Only run on checkout page (but not blocks checkout - that's handled separately)
         if (!is_checkout() || is_wc_endpoint_url('order-received')) {
             return;
+        } else {
+            if(is_wc_endpoint_url('order-received')) {
+                if (WC()->session) {
+                    WC()->session->__unset('page_order_awaiting_payment');
+                }
+            }
         }
 
         // Skip if it's blocks checkout (handled in blocks support class)
