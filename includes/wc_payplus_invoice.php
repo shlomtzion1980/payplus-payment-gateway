@@ -1120,6 +1120,10 @@ class PayplusInvoice
                     $date = $date->format('m-d-Y H:i');
                     $order = wc_get_order($order_id);
                     $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
+                    $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                    $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
+                    
+                    isset($payPlusResponse['identification_number']) ? $payload['customer']['vat_number'] = $payPlusResponse['identification_number'] : null;
                     $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
                     if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
                         $payload['customer']['paying_vat'] = true;
@@ -1289,9 +1293,6 @@ class PayplusInvoice
                     $payplusApprovalNumPaypl = $order->get_transaction_id();
                     $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
                     $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
-
-                    $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                    $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
 
                     if (isset($payload['payments'][0]['payment_app']) && $payload['payments'][0]['payment_app'] === "-1") {
                         if (is_array($payPlusResponse)) {
