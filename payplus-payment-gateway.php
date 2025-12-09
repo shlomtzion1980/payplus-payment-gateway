@@ -95,6 +95,7 @@ class WC_PayPlus
         add_action('template_redirect', [$this, 'payplus_check_pruid_on_checkout_load'], 5);
         add_action('woocommerce_init', [$this, 'pwgc_remove_processing_redemption'], 11);
         add_action('woocommerce_checkout_order_processed', [$this, 'payplus_checkout_order_processed'], 25, 3);
+        add_action('woocommerce_thankyou', [$this, 'payplus_clear_session_on_order_received'], 10, 1);
 
 
         //FILTER
@@ -245,6 +246,39 @@ class WC_PayPlus
             exit;
         } else {
             $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with checkout');
+        }
+    }
+
+    /**
+     * Clear session and cart when customer successfully completes order and reaches thank you page
+     * 
+     * @param int $order_id The order ID
+     */
+    public function payplus_clear_session_on_order_received($order_id)
+    {
+        if (!$order_id) {
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+
+        // Only clear for PayPlus payment methods (not hosted fields - they use order_awaiting_payment)
+        $payment_method = $order->get_payment_method();
+        if (strpos($payment_method, 'payplus-payment-gateway') !== 0 || $payment_method === 'payplus-payment-gateway-hostedfields') {
+            return;
+        }
+
+        // Clear cart
+        if (WC()->cart) {
+            WC()->cart->empty_cart();
+        }
+
+        // Unset page_order_awaiting_payment since payment is complete
+        if (WC()->session) {
+            WC()->session->__unset('page_order_awaiting_payment');
         }
     }
 
