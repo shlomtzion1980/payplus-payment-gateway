@@ -1123,7 +1123,11 @@ class PayplusInvoice
                     $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
                     $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
                     
-                    isset($payPlusResponse['identification_number']) ? $payload['customer']['vat_number'] = $payPlusResponse['identification_number'] : null;
+                    // Only set vat_number from identification_number if setting is enabled
+                    $display_customer_id = isset($this->payplus_invoice_option['display_customer_id_in_invoice']) && ($this->payplus_invoice_option['display_customer_id_in_invoice'] === 'yes' || $this->payplus_invoice_option['display_customer_id_in_invoice'] === 'on');
+                    if ($display_customer_id && isset($payPlusResponse['identification_number']) && !empty($payPlusResponse['identification_number'])) {
+                        $payload['customer']['vat_number'] = $payPlusResponse['identification_number'];
+                    }
                     $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
                     if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
                         $payload['customer']['paying_vat'] = true;

@@ -522,6 +522,15 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-documents'
                 ];
                 $settings[$section][] = [
+                    'title' => __('Display customer ID in invoice if exists', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('If checked, the customer identification number (VAT number) from the payment response will be displayed in the invoice when available.', 'payplus-payment-gateway'),
+                    'default' => 'no',
+                    'desc_tip' => true,
+                    'id' => 'payplus_invoice_option[display_customer_id_in_invoice]',
+                    'class' => 'payplus-documents'
+                ];
+                $settings[$section][] = [
                     'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [
