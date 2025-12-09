@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.7] - 08-12-2025 - (Pluribus)
+
+- Fix      - Fixed issue where pp_iframe was loading multiple times on some setups by removing unnecessary function.
+
 ## [7.9.6] - 30-11-2025 - (WittiX)
 
 - Tweak    - PRUID: Enabled double IPN check for orders with existing payplus_page_request_uid. Now works for all payment gateways and checks for successful payments before allowing duplicate payment attempts, even if the order status wasn't previously updated.
