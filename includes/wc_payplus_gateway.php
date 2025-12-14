@@ -1715,8 +1715,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $order->save_meta_data();
 
-        // Use WooCommerce method to get checkout payment URL (order-pay)
-        $redirect_to = $order->get_checkout_payment_url();
+        $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
         if ($this->enableDoubleCheckIfPruidExists) {
             $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
@@ -1739,8 +1738,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
                 if ($status === "processing" || $status === "on-hold" || $status === "approved") {
                     $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Status approved - Redirecting to order received page');
-                    // Use WooCommerce method to get order received URL instead of string replacement
-                    $redirect_to = $order->get_checkout_order_received_url();
+                    $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
                     $result = [
                         'result' => 'success',
                         'redirect' => $redirect_to
@@ -1793,8 +1791,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->payplus_add_log_all($handle, wp_json_encode($response), 'completed');
 
             if ($response->data->status == "approved" && $response->data->status_code == "000" && $response->data->transaction_uid) {
-                // Use WooCommerce method to get order received URL instead of string replacement
-                $redirect_to = $order->get_checkout_order_received_url();
+                $redirect_to = str_replace('order-pay', 'order-received', $redirect_to);
                 $transactionUid = $response->data->transaction_uid;
 
                 $this->updateMetaData($order_id, (array) $response->data);
