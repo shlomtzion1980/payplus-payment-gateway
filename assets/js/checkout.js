@@ -1294,6 +1294,108 @@ jQuery(function ($) {
     wc_checkout_login_form.init();
     wc_terms_toggle.init();
 
+    // Function to show error with countdown animation
+    function showIDError(message) {
+        const errorMessageDiv = document.querySelector(".payment-error-message");
+        const loaderCountdown = document.querySelector(".loader-countdown");
+        const circle = document.querySelector(".progress-ring__circle");
+        const errorMessage = document.querySelector(".error-message");
+        const errorCode = document.querySelector(".error-code");
+        
+        let countdown = 5;
+        loaderCountdown.textContent = countdown;
+        
+        // Set error message
+        errorMessage.innerText = message;
+        errorCode.innerText = "";
+        
+        // Show error message
+        errorMessageDiv.style.display = "flex";
+        errorMessageDiv.style.opacity = "1";
+        errorMessageDiv.style.transition = "opacity 1s";
+        
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        
+        // Set circle circumference
+        circle.style.strokeDasharray = `${circumference}`;
+        circle.style.strokeDashoffset = "0";
+        
+        const updateLoader = () => {
+            // Update countdown number
+            loaderCountdown.textContent = countdown;
+            
+            // Calculate stroke-dashoffset for the "drain" effect
+            const offset = circumference - (countdown / 5) * circumference + 15;
+            circle.style.strokeDashoffset = offset;
+            
+            // If countdown is complete, hide the error message
+            if (countdown === 1) {
+                clearInterval(timer);
+                // Fade out
+                errorMessageDiv.style.opacity = "0";
+                setTimeout(() => {
+                    errorMessageDiv.style.display = "none";
+                }, 1000);
+            } else {
+                countdown--;
+            }
+        };
+        
+        // Start the countdown
+        const timer = setInterval(updateLoader, 1000);
+        
+        // Scroll to error
+        jQuery('html, body').animate({
+            scrollTop: jQuery('.payment-error-message').offset().top - 100
+        }, 500);
+    }
+
+    // Israeli ID validation before checkout submission for hosted fields
+    $('form.checkout').on('checkout_place_order_payplus-payment-gateway-hostedfields', function() {
+        const idField = jQuery("#id-number");
+        
+        // Check if ID field exists and is visible
+        if (idField.length && idField.is(':visible')) {
+            const id = idField.val().trim();
+            
+            // Only validate if there's a value
+            if (id.length > 0) {
+                // Israeli ID must be exactly 9 digits
+                if (!/^\d{9}$/.test(id)) {
+                    showIDError('Invalid Israeli ID number: Must be exactly 9 digits.');
+                    
+                    idField.addClass('invalid');
+                    jQuery("#id-number-wrapper").addClass('invalid');
+                    
+                    return false; // Prevent submission
+                }
+                
+                // Validate checksum
+                let sum = 0;
+                for (let i = 0; i < 9; i++) {
+                    let digit = Number(id[i]);
+                    let step = digit * ((i % 2) + 1);
+                    if (step > 9) {
+                        step = Math.floor(step / 10) + (step % 10);
+                    }
+                    sum += step;
+                }
+                
+                if (sum % 10 !== 0) {
+                    showIDError('Invalid Israeli ID number: Checksum validation failed.');
+                    
+                    idField.addClass('invalid');
+                    jQuery("#id-number-wrapper").addClass('invalid');
+                    
+                    return false; // Prevent submission
+                }
+            }
+        }
+        
+        return true; // Allow submission
+    });
+
     // Make pp_iframe_h clickable to select payment method
     $(document.body).on('click touchstart', '.pp_iframe_h', function(e) {
         // Find the parent li element that contains the payment method input
