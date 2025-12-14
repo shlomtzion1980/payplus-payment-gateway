@@ -1715,8 +1715,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $order->save_meta_data();
 
-        // Use WooCommerce method to get checkout payment URL (order-pay)
-        $redirect_to = $order->get_checkout_payment_url();
+        // Build redirect URL using original format (query args) for compatibility with redirect/iframe modes
+        $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
         if ($this->enableDoubleCheckIfPruidExists) {
             $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
