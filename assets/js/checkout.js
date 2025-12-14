@@ -1294,6 +1294,22 @@ jQuery(function ($) {
     wc_checkout_login_form.init();
     wc_terms_toggle.init();
 
+    // Make pp_iframe_h clickable to select payment method
+    $(document.body).on('click touchstart', '.pp_iframe_h', function(e) {
+        // Find the parent li element that contains the payment method input
+        var $parentLi = $(this).closest('li.wc_payment_method');
+        
+        if ($parentLi.length) {
+            // Find the payment method radio input within the parent li
+            var $paymentInput = $parentLi.find('input[name="payment_method"]');
+            
+            if ($paymentInput.length && !$paymentInput.is(':checked')) {
+                // Trigger click on the radio input to select this payment method
+                $paymentInput.prop('checked', true).trigger('click');
+            }
+        }
+    });
+
     $(
         $(window).on("popstate", () => {
             closePayplusIframe(false);
