@@ -851,14 +851,14 @@ class WC_PayPlus_Product_Syncer
      */
     private static function transform_to_commerce_format($product, $company_id)
     {
-        $product_id = $product->get_id();
-        $product_type = $product->get_type();
-        $currency = get_woocommerce_currency();
+        $product_id = intval($product->get_id());
+        $product_type = strval($product->get_type());
+        $currency = strval(get_woocommerce_currency());
         
-        // Determine VAT type
-        $vat_type = 1; // VAT_INCLUDED as default
+        // Determine VAT type (strictly as integer)
+        $vat_type = intval(1); // VAT_INCLUDED as default
         if ($product->get_tax_status() === 'none') {
-            $vat_type = 0; // VAT_EXEMPT
+            $vat_type = intval(0); // VAT_EXEMPT
         }
 
         // Get categories
@@ -876,30 +876,35 @@ class WC_PayPlus_Product_Syncer
             $variants[] = self::transform_simple_product_variant($product, $currency, true);
         }
 
+        $description = $product->get_description();
+        if (!$description || $description === '') {
+            $description = $product->get_short_description();
+        }
+
         $commerce_product = array(
-            'company_id' => $company_id,
-            'name' => $product->get_name(),
-            'description' => $product->get_description() ?: $product->get_short_description(),
-            'valid' => $product->get_status() === 'publish',
+            'company_id' => intval($company_id),
+            'name' => strval($product->get_name()),
+            'description' => strval($description ?: ''),
+            'valid' => boolval($product->get_status() === 'publish'),
             'vat_type' => $vat_type,
-            'default' => false,
-            'system_product' => false,
+            'default' => boolval(false),
+            'system_product' => boolval(false),
             'guide_document_url' => null,
             'currency_code' => $currency,
-            'has_variants' => count($variants) > 1,
-            'selling_unit_type' => 'UNITS',
-            'manage_inventory' => $product->get_manage_stock(),
-            'is_serial' => false,
+            'has_variants' => boolval(count($variants) > 1),
+            'selling_unit_type' => strval('UNITS'),
+            'manage_inventory' => boolval($product->get_manage_stock()),
+            'is_serial' => boolval(false),
             'variants' => $variants,
             'categories' => $categories,
             'tags' => $tags,
             'media' => self::transform_product_media($product),
             'external_id' => array(
-                'platform_id' => 3, // WooCommerce platform ID (assuming 1=Shopify, 2=Other, 3=WooCommerce)
+                'platform_id' => intval(3), // WooCommerce platform ID
                 'external_id' => $product_id,
-                'external_id_source_field' => 'id'
+                'external_id_source_field' => strval('id')
             ),
-            'source_type' => 'woocommerce',
+            'source_type' => strval('woocommerce'),
         );
 
         return $commerce_product;
@@ -915,14 +920,16 @@ class WC_PayPlus_Product_Syncer
      */
     private static function transform_simple_product_variant($product, $currency, $is_main = true)
     {
-        $price = floatval($product->get_price()) ?: 0;
-        $regular_price = floatval($product->get_regular_price()) ?: $price;
-        $sale_price = floatval($product->get_sale_price()) ?: 0;
+        // Properly round prices like TypeScript (Math.round(price * 100) / 100)
+        $price = round(floatval($product->get_price() ?: 0) * 100) / 100;
+        $regular_price = round(floatval($product->get_regular_price() ?: $price) * 100) / 100;
+        $sale_price = round(floatval($product->get_sale_price() ?: 0) * 100) / 100;
 
         // Determine inventory status
         $stock_quantity = $product->get_stock_quantity();
         $inventory_status = 'AVAILABLE';
         if ($stock_quantity !== null) {
+            $stock_quantity = intval($stock_quantity);
             if ($stock_quantity > 10) {
                 $inventory_status = 'AVAILABLE';
             } elseif ($stock_quantity > 0) {
@@ -934,39 +941,45 @@ class WC_PayPlus_Product_Syncer
             $inventory_status = 'DEAD';
         }
 
+        $backorders = $product->get_backorders();
+        $continue_selling = boolval($backorders === 'yes' || $backorders === 'notify');
+        
+        $sku = $product->get_sku();
+        $sku_value = $sku && $sku !== '' ? strval($sku) : null;
+
         $variant = array(
-            'id' => 0,
-            'uuid' => '',
-            'sku' => $product->get_sku() ?: null,
-            'name' => $product->get_name(),
-            'is_main' => $is_main,
-            'system_default' => false,
-            'inventory_status' => $inventory_status,
-            'continue_selling_out_of_stock' => $product->get_backorders() === 'yes' || $product->get_backorders() === 'notify',
-            'item_type' => 'P',
+            'id' => intval(0),
+            'uuid' => strval(''),
+            'sku' => $sku_value,
+            'name' => strval($product->get_name()),
+            'is_main' => boolval($is_main),
+            'system_default' => boolval(false),
+            'inventory_status' => strval($inventory_status),
+            'continue_selling_out_of_stock' => $continue_selling,
+            'item_type' => strval('P'),
             'pricing' => array(
                 array(
-                    'uuid' => '',
-                    'currency_code' => $currency,
-                    'value' => $price,
-                    'price' => $price,
-                    'start_at' => gmdate('Y-m-d\TH:i:s\Z'),
+                    'uuid' => strval(''),
+                    'currency_code' => strval($currency),
+                    'value' => floatval($price),
+                    'price' => floatval($price),
+                    'start_at' => strval(gmdate('Y-m-d\TH:i:s\Z')),
                     'finish_at' => null,
                 )
             ),
             'external_ids' => array(
                 array(
-                    'platform_id' => 3,
-                    'external_id' => $product->get_id(),
-                    'external_id_source_field' => 'id'
+                    'platform_id' => intval(3),
+                    'external_id' => intval($product->get_id()),
+                    'external_id_source_field' => strval('id')
                 )
             ),
             'media' => self::transform_variant_media($product),
             'properties' => array(), // Simple products don't have variant properties
-            'created_at' => $product->get_date_created() ? $product->get_date_created()->date('c') : gmdate('c'),
-            'updated_at' => $product->get_date_modified() ? $product->get_date_modified()->date('c') : gmdate('c'),
+            'created_at' => $product->get_date_created() ? strval($product->get_date_created()->date('c')) : strval(gmdate('c')),
+            'updated_at' => $product->get_date_modified() ? strval($product->get_date_modified()->date('c')) : strval(gmdate('c')),
             'deleted_at' => null,
-            'is_deleted' => false,
+            'is_deleted' => boolval(false),
         );
 
         // Add sale price if exists
@@ -975,12 +988,12 @@ class WC_PayPlus_Product_Syncer
             $date_on_sale_to = $product->get_date_on_sale_to();
             
             $variant['pricing'][] = array(
-                'uuid' => '',
-                'currency_code' => $currency,
-                'value' => $sale_price,
-                'price' => $sale_price,
-                'start_at' => $date_on_sale_from ? $date_on_sale_from->date('c') : gmdate('Y-m-d\TH:i:s\Z'),
-                'finish_at' => $date_on_sale_to ? $date_on_sale_to->date('c') : null,
+                'uuid' => strval(''),
+                'currency_code' => strval($currency),
+                'value' => floatval($sale_price),
+                'price' => floatval($sale_price),
+                'start_at' => $date_on_sale_from ? strval($date_on_sale_from->date('c')) : strval(gmdate('Y-m-d\TH:i:s\Z')),
+                'finish_at' => $date_on_sale_to ? strval($date_on_sale_to->date('c')) : null,
             );
         }
 
@@ -1007,14 +1020,16 @@ class WC_PayPlus_Product_Syncer
                 continue;
             }
 
-            $price = floatval($variation->get_price()) ?: 0;
-            $regular_price = floatval($variation->get_regular_price()) ?: $price;
-            $sale_price = floatval($variation->get_sale_price()) ?: 0;
+            // Properly round prices
+            $price = round(floatval($variation->get_price() ?: 0) * 100) / 100;
+            $regular_price = round(floatval($variation->get_regular_price() ?: $price) * 100) / 100;
+            $sale_price = round(floatval($variation->get_sale_price() ?: 0) * 100) / 100;
 
             // Determine inventory status
             $stock_quantity = $variation->get_stock_quantity();
             $inventory_status = 'AVAILABLE';
             if ($stock_quantity !== null) {
+                $stock_quantity = intval($stock_quantity);
                 if ($stock_quantity > 10) {
                     $inventory_status = 'AVAILABLE';
                 } elseif ($stock_quantity > 0) {
@@ -1036,45 +1051,51 @@ class WC_PayPlus_Product_Syncer
                 $property_name = ucwords(str_replace('-', ' ', $property_name));
                 
                 $properties[] = array(
-                    'property_type_uid' => 0, // Will be created/matched on commerce side
-                    'value' => $attr_value,
-                    'property_type_name' => $property_name,
+                    'property_type_uid' => intval(0), // Will be created/matched on commerce side
+                    'value' => strval($attr_value),
+                    'property_type_name' => strval($property_name),
                 );
             }
 
+            $backorders = $variation->get_backorders();
+            $continue_selling = boolval($backorders === 'yes' || $backorders === 'notify');
+            
+            $sku = $variation->get_sku();
+            $sku_value = $sku && $sku !== '' ? strval($sku) : null;
+
             $variant_data = array(
-                'id' => 0,
-                'uuid' => '',
-                'sku' => $variation->get_sku() ?: null,
-                'name' => $variation->get_name(),
-                'is_main' => $is_first,
-                'system_default' => false,
-                'inventory_status' => $inventory_status,
-                'continue_selling_out_of_stock' => $variation->get_backorders() === 'yes' || $variation->get_backorders() === 'notify',
-                'item_type' => 'P',
+                'id' => intval(0),
+                'uuid' => strval(''),
+                'sku' => $sku_value,
+                'name' => strval($variation->get_name()),
+                'is_main' => boolval($is_first),
+                'system_default' => boolval(false),
+                'inventory_status' => strval($inventory_status),
+                'continue_selling_out_of_stock' => $continue_selling,
+                'item_type' => strval('P'),
                 'pricing' => array(
                     array(
-                        'uuid' => '',
-                        'currency_code' => $currency,
-                        'value' => $price,
-                        'price' => $price,
-                        'start_at' => gmdate('Y-m-d\TH:i:s\Z'),
+                        'uuid' => strval(''),
+                        'currency_code' => strval($currency),
+                        'value' => floatval($price),
+                        'price' => floatval($price),
+                        'start_at' => strval(gmdate('Y-m-d\TH:i:s\Z')),
                         'finish_at' => null,
                     )
                 ),
                 'external_ids' => array(
                     array(
-                        'platform_id' => 3,
-                        'external_id' => $variation_id,
-                        'external_id_source_field' => 'id'
+                        'platform_id' => intval(3),
+                        'external_id' => intval($variation_id),
+                        'external_id_source_field' => strval('id')
                     )
                 ),
                 'media' => self::transform_variant_media($variation),
                 'properties' => $properties,
-                'created_at' => $variation->get_date_created() ? $variation->get_date_created()->date('c') : gmdate('c'),
-                'updated_at' => $variation->get_date_modified() ? $variation->get_date_modified()->date('c') : gmdate('c'),
+                'created_at' => $variation->get_date_created() ? strval($variation->get_date_created()->date('c')) : strval(gmdate('c')),
+                'updated_at' => $variation->get_date_modified() ? strval($variation->get_date_modified()->date('c')) : strval(gmdate('c')),
                 'deleted_at' => null,
-                'is_deleted' => false,
+                'is_deleted' => boolval(false),
             );
 
             // Add sale price if exists
@@ -1083,12 +1104,12 @@ class WC_PayPlus_Product_Syncer
                 $date_on_sale_to = $variation->get_date_on_sale_to();
                 
                 $variant_data['pricing'][] = array(
-                    'uuid' => '',
-                    'currency_code' => $currency,
-                    'value' => $sale_price,
-                    'price' => $sale_price,
-                    'start_at' => $date_on_sale_from ? $date_on_sale_from->date('c') : gmdate('Y-m-d\TH:i:s\Z'),
-                    'finish_at' => $date_on_sale_to ? $date_on_sale_to->date('c') : null,
+                    'uuid' => strval(''),
+                    'currency_code' => strval($currency),
+                    'value' => floatval($sale_price),
+                    'price' => floatval($sale_price),
+                    'start_at' => $date_on_sale_from ? strval($date_on_sale_from->date('c')) : strval(gmdate('Y-m-d\TH:i:s\Z')),
+                    'finish_at' => $date_on_sale_to ? strval($date_on_sale_to->date('c')) : null,
                 );
             }
 
@@ -1113,9 +1134,9 @@ class WC_PayPlus_Product_Syncer
         if (!is_wp_error($terms)) {
             foreach ($terms as $term) {
                 $categories[] = array(
-                    'id' => $term->term_id,
-                    'uuid' => $term->slug,
-                    'name' => $term->name,
+                    'id' => intval($term->term_id),
+                    'uuid' => strval($term->slug),
+                    'name' => strval($term->name),
                 );
             }
         }
@@ -1136,7 +1157,7 @@ class WC_PayPlus_Product_Syncer
 
         if (!is_wp_error($terms)) {
             foreach ($terms as $term) {
-                $tags[] = $term->name;
+                $tags[] = strval($term->name);
             }
         }
 
@@ -1157,7 +1178,7 @@ class WC_PayPlus_Product_Syncer
         if ($product->get_image_id()) {
             $image_url = wp_get_attachment_url($product->get_image_id());
             if ($image_url) {
-                $media[] = $image_url;
+                $media[] = strval($image_url);
             }
         }
         
@@ -1166,7 +1187,7 @@ class WC_PayPlus_Product_Syncer
         foreach ($gallery_ids as $image_id) {
             $image_url = wp_get_attachment_url($image_id);
             if ($image_url) {
-                $media[] = $image_url;
+                $media[] = strval($image_url);
             }
         }
         
@@ -1186,7 +1207,7 @@ class WC_PayPlus_Product_Syncer
         if ($product->get_image_id()) {
             $image_url = wp_get_attachment_url($product->get_image_id());
             if ($image_url) {
-                $media[] = $image_url;
+                $media[] = strval($image_url);
             }
         }
         
