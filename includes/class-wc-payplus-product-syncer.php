@@ -794,7 +794,7 @@ class WC_PayPlus_Product_Syncer
                 ) : null,
                 
                 // Attributes
-                'attributes' => $variation->get_variation_attributes(),
+                'attributes' => ($variation instanceof WC_Product_Variation) ? $variation->get_variation_attributes() : array(),
                 
                 // Virtual & Downloadable
                 'virtual' => $variation->is_virtual(),
@@ -834,9 +834,14 @@ class WC_PayPlus_Product_Syncer
         // Get PayPlus settings for company info
         $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         $company_id = isset($payplus_settings['api_key']) ? crc32($payplus_settings['api_key']) : 1; // Generate pseudo company_id from API key
+        $company_uuid = isset($payplus_settings['api_key']) ? md5($payplus_settings['api_key']) : ''; // Generate pseudo company_uuid from API key
+        $company = array(
+            'id' => $company_id,
+            'uuid' => $company_uuid,
+        );
         
         foreach ($products as $product) {
-            $products_data[] = self::transform_to_commerce_format($product, $company_id);
+            $products_data[] = self::transform_to_commerce_format($product, $company);
         }
         
         return $products_data;
@@ -846,65 +851,91 @@ class WC_PayPlus_Product_Syncer
      * Transform WooCommerce product to PayPlus Commerce format
      *
      * @param WC_Product $product
-     * @param int $company_id
+     * @param array $company Company info with 'id' and 'uuid'
      * @return array
      */
-    private static function transform_to_commerce_format($product, $company_id)
+    private static function transform_to_commerce_format($product, $company)
     {
         $product_id = intval($product->get_id());
         $product_type = strval($product->get_type());
         $currency = strval(get_woocommerce_currency());
         
-        // Determine VAT type (strictly as integer)
-        $vat_type = intval(1); // VAT_INCLUDED as default
-        if ($product->get_tax_status() === 'none') {
-            $vat_type = intval(0); // VAT_EXEMPT
+        // Get product media
+        $media = self::compose_product_media_for_bus($product);
+        
+        // Get product options (for variants)
+        $product_options = self::get_product_options($product);
+        
+        // Get product variants
+        $product_variants = array();
+        if ($product_type === 'variable') {
+            $variation_ids = $product->get_children();
+            foreach ($variation_ids as $variation_id) {
+                $variation = wc_get_product($variation_id);
+                if ($variation) {
+                    $product_variants[] = $variation;
+                }
+            }
+        } else {
+            $product_variants[] = $product;
         }
-
-        // Get categories
-        $categories = self::transform_categories($product_id);
+        
+        // Get categories (collections) with media
+        $categories = self::transform_categories_to_handle($product_id);
         
         // Get tags
-        $tags = self::transform_tags($product_id);
+        $tags = self::get_tags_from_product($product);
         
-        // Transform variants
-        $variants = array();
-        if ($product_type === 'variable') {
-            $variants = self::transform_variable_product_variants($product, $currency);
-        } else {
-            // Simple product - create a single variant
-            $variants[] = self::transform_simple_product_variant($product, $currency, true);
-        }
-
+        // Transform variants using composeProductVariantForBus
+        $variants = self::compose_product_variant_for_bus($product_variants, $product_options, $product);
+        
+        // Get VAT type from variants
+        $vat_type = self::get_product_vat_type($product_variants);
+        
+        // Get description (bodyHtml/body_html equivalent)
         $description = $product->get_description();
         if (!$description || $description === '') {
             $description = $product->get_short_description();
         }
+        // Convert HTML entities and clean up
+        $description = $description ?: '';
+        
+        // Determine manage_inventory from first variant
+        // Matches: product.variants && product.variants.length > 0 && product.variants[0].inventoryManagement ? true : false
+        $manage_inventory = false;
+        if (!empty($product_variants) && $product_variants[0] instanceof WC_Product) {
+            $first_variant = $product_variants[0];
+            $manage_stock = $first_variant->get_manage_stock();
+            $manage_inventory = ($manage_stock === true || $manage_stock === 'yes') ? true : false;
+        }
 
         $commerce_product = array(
-            'company_id' => intval($company_id),
+            'company_id' => intval($company['id']),
+            'company_uuid' => strval($company['uuid']),
             'name' => strval($product->get_name()),
-            'description' => strval($description ?: ''),
-            'valid' => boolval($product->get_status() === 'publish'),
+            'description' => strval($description),
+            'valid' => strtolower($product->get_status()) === 'publish',
             'vat_type' => $vat_type,
-            'default' => boolval(false),
-            'system_product' => boolval(false),
+            'default' => false,
+            'system_product' => false,
             'guide_document_url' => null,
-            'currency_code' => $currency,
-            'has_variants' => boolval(count($variants) > 1),
-            'selling_unit_type' => strval('UNITS'),
-            'manage_inventory' => boolval($product->get_manage_stock()),
-            'is_serial' => boolval(false),
+            'currency_code' => !empty($variants) && isset($variants[0]['pricing'][0]['currency_code']) 
+                ? strval($variants[0]['pricing'][0]['currency_code']) 
+                : strval($currency),
+            'has_variants' => count($variants) > 1,
+            'selling_unit_type' => 'UNITS',
+            'manage_inventory' => $manage_inventory,
+            'is_serial' => false,
             'variants' => $variants,
-            'categories' => $categories,
-            'tags' => $tags,
-            'media' => self::transform_product_media($product),
+            'categories_to_handle' => $categories,
+            'tags_to_handle' => $tags,
+            'media_to_handle' => $media,
             'external_id' => array(
                 'platform_id' => intval(3), // WooCommerce platform ID
-                'external_id' => $product_id,
-                'external_id_source_field' => strval('id')
+                'external_id' => strval($product_id),
+                'external_id_source_field' => 'id'
             ),
-            'source_type' => strval('woocommerce'),
+            'source_type' => 'woocommerce',
         );
 
         return $commerce_product;
@@ -1043,7 +1074,7 @@ class WC_PayPlus_Product_Syncer
 
             // Get variation attributes as properties
             $properties = array();
-            $attributes = $variation->get_variation_attributes();
+            $attributes = ($variation instanceof WC_Product_Variation) ? $variation->get_variation_attributes() : array();
             foreach ($attributes as $attr_name => $attr_value) {
                 // Remove 'attribute_' prefix if present
                 $property_name = str_replace('attribute_', '', $attr_name);
@@ -1121,7 +1152,7 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
-     * Transform product categories for commerce
+     * Transform product categories for commerce (legacy method)
      *
      * @param int $product_id
      * @return array
@@ -1145,7 +1176,49 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
-     * Transform product tags for commerce
+     * Transform product categories to categories_to_handle format with media
+     *
+     * @param int $product_id
+     * @return array
+     */
+    private static function transform_categories_to_handle($product_id)
+    {
+        $categories = array();
+        $terms = wp_get_post_terms($product_id, 'product_cat');
+
+        if (!is_wp_error($terms)) {
+            foreach ($terms as $term) {
+                // Get category image/thumbnail
+                $image_id = get_term_meta($term->term_id, 'thumbnail_id', true);
+                $category_images = array();
+                
+                if ($image_id) {
+                    $image_url = wp_get_attachment_url($image_id);
+                    if ($image_url) {
+                        // Format as object similar to Shopify's structure
+                        $category_images[] = array(
+                            'id' => intval($image_id),
+                            'url' => strval($image_url),
+                            'altText' => get_post_meta($image_id, '_wp_attachment_image_alt', true) ?: '',
+                            'width' => 0, // WooCommerce doesn't store this in term meta
+                            'height' => 0, // WooCommerce doesn't store this in term meta
+                        );
+                    }
+                }
+                
+                $categories[] = array(
+                    'id' => intval($term->term_id),
+                    'name' => strval($term->name),
+                    'media_to_handle' => self::compose_category_media_for_bus($category_images),
+                );
+            }
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Transform product tags for commerce (legacy method)
      *
      * @param int $product_id
      * @return array
@@ -1165,7 +1238,29 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
-     * Transform product media for commerce (returns URLs for media service to download)
+     * Get tags from product (for tags_to_handle)
+     * Handles both string and array formats
+     *
+     * @param WC_Product $product
+     * @return array
+     */
+    private static function get_tags_from_product($product)
+    {
+        $tags = array();
+        $product_id = $product->get_id();
+        $terms = wp_get_post_terms($product_id, 'product_tag');
+
+        if (!is_wp_error($terms)) {
+            foreach ($terms as $term) {
+                $tags[] = strval($term->name);
+            }
+        }
+
+        return $tags;
+    }
+
+    /**
+     * Transform product media for commerce (returns URLs for media service to download) - legacy method
      *
      * @param WC_Product $product
      * @return array
@@ -1195,6 +1290,104 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
+     * Compose product media for bus (media_to_handle format)
+     * Returns array of media objects with {url, mimetype, name}
+     *
+     * @param WC_Product $product
+     * @return array
+     */
+    private static function compose_product_media_for_bus($product)
+    {
+        $media = array();
+        
+        // Main image
+        if ($product->get_image_id()) {
+            $image_id = $product->get_image_id();
+            $image_url = wp_get_attachment_url($image_id);
+            if ($image_url) {
+                $jpg_url = strtok($image_url, '?'); // Remove query params
+                $extension = strtolower(pathinfo($jpg_url, PATHINFO_EXTENSION));
+                $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+                
+                if (in_array($extension, $allowed_extensions)) {
+                    $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
+                    
+                    $media[] = array(
+                        'url' => strval($jpg_url),
+                        'mimetype' => $mimetype,
+                        'name' => $name,
+                    );
+                }
+            }
+        }
+        
+        // Gallery images
+        $gallery_ids = $product->get_gallery_image_ids();
+        foreach ($gallery_ids as $image_id) {
+            $image_url = wp_get_attachment_url($image_id);
+            if ($image_url) {
+                $jpg_url = strtok($image_url, '?'); // Remove query params
+                $extension = strtolower(pathinfo($jpg_url, PATHINFO_EXTENSION));
+                $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+                
+                if (in_array($extension, $allowed_extensions)) {
+                    $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
+                    
+                    $media[] = array(
+                        'url' => strval($jpg_url),
+                        'mimetype' => $mimetype,
+                        'name' => $name,
+                    );
+                }
+            }
+        }
+        
+        return $media;
+    }
+
+    /**
+     * Compose category media for bus (media_to_handle format for categories)
+     * Returns array of media objects with {url, mimetype, name}
+     * Accepts array of objects with {id, url, altText, width, height} or URL strings
+     *
+     * @param array $images Array of image objects or URL strings
+     * @return array
+     */
+    private static function compose_category_media_for_bus($images)
+    {
+        $media = array();
+        
+        if (is_array($images)) {
+            foreach ($images as $image_data) {
+                // Handle both URL strings and objects with url property
+                $image_url = is_string($image_data) ? $image_data : (isset($image_data['url']) ? $image_data['url'] : null);
+                $image_id = is_array($image_data) && isset($image_data['id']) ? $image_data['id'] : null;
+                
+                if ($image_url) {
+                    $jpg_url = strtok($image_url, '?'); // Remove query params
+                    $extension = strtolower(pathinfo($jpg_url, PATHINFO_EXTENSION));
+                    $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+                    
+                    if (in_array($extension, $allowed_extensions)) {
+                        $name = basename($jpg_url) ?: ($image_id ? "image_{$image_id}.{$extension}" : "image_" . uniqid() . ".{$extension}");
+                        $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
+                        
+                        $media[] = array(
+                            'url' => strval($jpg_url),
+                            'mimetype' => $mimetype,
+                            'name' => $name,
+                        );
+                    }
+                }
+            }
+        }
+        
+        return $media;
+    }
+
+    /**
      * Transform variant media for commerce
      *
      * @param WC_Product $product
@@ -1208,6 +1401,242 @@ class WC_PayPlus_Product_Syncer
             $image_url = wp_get_attachment_url($product->get_image_id());
             if ($image_url) {
                 $media[] = strval($image_url);
+            }
+        }
+        
+        return $media;
+    }
+
+    /**
+     * Get product VAT type from variants
+     * Returns 1 for VAT_INCLUDED, 0 for VAT_EXEMPT
+     *
+     * @param array $variants Array of WC_Product objects
+     * @return int
+     */
+    private static function get_product_vat_type($variants)
+    {
+        if (empty($variants)) {
+            return 1; // Default to VAT_INCLUDED
+        }
+        
+        // Check first variant's tax status
+        $first_variant = $variants[0];
+        if ($first_variant instanceof WC_Product) {
+            if ($first_variant->get_tax_status() === 'none') {
+                return 0; // VAT_EXEMPT
+            }
+        }
+        
+        return 1; // VAT_INCLUDED
+    }
+
+    /**
+     * Get product options (for variant composition)
+     *
+     * @param WC_Product $product
+     * @return array
+     */
+    private static function get_product_options($product)
+    {
+        $options = array();
+        $attributes = $product->get_attributes();
+        
+        foreach ($attributes as $attribute) {
+            if (is_object($attribute)) {
+                $option = array(
+                    'name' => $attribute->get_name(),
+                    'position' => $attribute->get_position(),
+                    'values' => array(),
+                );
+                
+                if ($attribute->is_taxonomy()) {
+                    $terms = $attribute->get_terms();
+                    foreach ($terms as $term) {
+                        $option['values'][] = $term->name;
+                    }
+                } else {
+                    $option['values'] = $attribute->get_options();
+                }
+                
+                $options[] = $option;
+            }
+        }
+        
+        return $options;
+    }
+
+    /**
+     * Compose product variant for bus (new schema format)
+     *
+     * @param array $product_variants Array of WC_Product objects
+     * @param array $product_options Array of product options
+     * @param WC_Product $product Parent product
+     * @return array
+     */
+    private static function compose_product_variant_for_bus($product_variants, $product_options, $product)
+    {
+        $variants = array();
+        $currency = strval(get_woocommerce_currency());
+        $is_first = true;
+        
+        foreach ($product_variants as $variant) {
+            if (!($variant instanceof WC_Product)) {
+                continue;
+            }
+            
+            // Properly round prices
+            $price = round(floatval($variant->get_price() ?: 0) * 100) / 100;
+            $regular_price = round(floatval($variant->get_regular_price() ?: $price) * 100) / 100;
+            $sale_price = round(floatval($variant->get_sale_price() ?: 0) * 100) / 100;
+            
+            // Determine inventory status
+            $stock_quantity = $variant->get_stock_quantity();
+            $inventory_status = 'AVAILABLE';
+            if ($stock_quantity !== null) {
+                $stock_quantity = intval($stock_quantity);
+                if ($stock_quantity > 10) {
+                    $inventory_status = 'AVAILABLE';
+                } elseif ($stock_quantity > 0) {
+                    $inventory_status = 'SLOW';
+                } else {
+                    $inventory_status = 'DEAD';
+                }
+            } elseif (!$variant->is_in_stock()) {
+                $inventory_status = 'DEAD';
+            }
+            
+            // Get variant properties from attributes (properties_to_handle format)
+            $properties = array();
+            $options_array = array(); // For variant options
+            
+            if ($variant instanceof WC_Product_Variation) {
+                $attributes = $variant->get_variation_attributes();
+                foreach ($attributes as $attr_name => $attr_value) {
+                    // Remove 'attribute_' prefix if present
+                    $property_name = str_replace('attribute_', '', $attr_name);
+                    $property_name = str_replace('pa_', '', $property_name); // Remove taxonomy prefix
+                    $property_name = ucwords(str_replace('-', ' ', $property_name));
+                    
+                    $properties[] = array(
+                        'property_type_name' => strval($property_name),
+                        'value' => strval($attr_value),
+                    );
+                    
+                    // Add to options array
+                    $options_array[] = strval($attr_value);
+                }
+            }
+            
+            $backorders = $variant->get_backorders();
+            $continue_selling = ($backorders === 'yes' || $backorders === 'notify');
+            
+            $sku = $variant->get_sku();
+            $sku_value = ($sku && $sku !== '') ? strval($sku) : null;
+            
+            // Get barcode (WooCommerce doesn't have native barcode, but check meta)
+            $barcode = $variant->get_meta('_barcode') ?: null;
+            $barcode_value = ($barcode && $barcode !== '') ? strval($barcode) : null;
+            
+            // Build pricing array
+            $pricing = array(
+                array(
+                    'uuid' => '',
+                    'currency_code' => $currency,
+                    'value' => floatval($price),
+                    'price' => floatval($price),
+                    'start_at' => gmdate('Y-m-d\TH:i:s\Z'),
+                    'finish_at' => null,
+                )
+            );
+            
+            // Add sale price if exists
+            if ($sale_price > 0 && $sale_price < $regular_price) {
+                $date_on_sale_from = $variant->get_date_on_sale_from();
+                $date_on_sale_to = $variant->get_date_on_sale_to();
+                
+                $pricing[] = array(
+                    'uuid' => '',
+                    'currency_code' => $currency,
+                    'value' => floatval($sale_price),
+                    'price' => floatval($sale_price),
+                    'start_at' => $date_on_sale_from ? $date_on_sale_from->date('c') : gmdate('Y-m-d\TH:i:s\Z'),
+                    'finish_at' => $date_on_sale_to ? $date_on_sale_to->date('c') : null,
+                );
+            }
+            
+            // Get variant media
+            $variant_media = self::compose_variant_media_for_bus($variant);
+            
+            // Determine if this is the default variant (first variant with default name)
+            $is_default_variant = ($is_first && strtolower($variant->get_name()) === strtolower($product->get_name()));
+            
+            $variant_data = array(
+                'id' => 0,
+                'uuid' => '',
+                'sku' => $sku_value,
+                'barcode' => $barcode_value,
+                'name' => $is_default_variant ? strval($product->get_name()) : strval($variant->get_name()),
+                'is_main' => $is_first,
+                'system_default' => $is_default_variant,
+                'price' => floatval($price),
+                'value' => floatval($price),
+                'inventory_status' => $inventory_status,
+                'continue_selling_out_of_stock' => $continue_selling,
+                'item_type' => 'P',
+                'pricing' => $pricing,
+                'external_ids' => array(
+                    array(
+                        'platform_id' => 3,
+                        'external_id' => strval($variant->get_id()),
+                        'external_id_source_field' => 'id'
+                    )
+                ),
+                'media_to_handle' => $variant_media,
+                'properties_to_handle' => $properties,
+                'options' => $options_array,
+                'created_at' => $variant->get_date_created() ? $variant->get_date_created()->date('c') : gmdate('c'),
+                'updated_at' => $variant->get_date_modified() ? $variant->get_date_modified()->date('c') : gmdate('c'),
+                'deleted_at' => null,
+                'is_deleted' => false,
+            );
+            
+            $variants[] = $variant_data;
+            $is_first = false;
+        }
+        
+        return $variants;
+    }
+
+    /**
+     * Compose variant media for bus (media_to_handle format for variants)
+     * Returns array of media objects with {url, mimetype, name}
+     *
+     * @param WC_Product $variant
+     * @return array
+     */
+    private static function compose_variant_media_for_bus($variant)
+    {
+        $media = array();
+        
+        if ($variant->get_image_id()) {
+            $image_id = $variant->get_image_id();
+            $image_url = wp_get_attachment_url($image_id);
+            if ($image_url) {
+                $jpg_url = strtok($image_url, '?'); // Remove query params
+                $extension = strtolower(pathinfo($jpg_url, PATHINFO_EXTENSION));
+                $allowed_extensions = array('jpg', 'jpeg', 'png', 'gif', 'webp');
+                
+                if (in_array($extension, $allowed_extensions)) {
+                    $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
+                    
+                    $media[] = array(
+                        'url' => strval($jpg_url),
+                        'mimetype' => $mimetype,
+                        'name' => $name,
+                    );
+                }
             }
         }
         
