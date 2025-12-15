@@ -651,125 +651,17 @@ jQuery(document).ready(function () {
             jQuery(this).addClass("validated");
         }
     });
-    
-    // Israeli ID validation function
-    // Israeli identity number (מספר זהות) is composed of 9 digits:
-    // - 1 digit prefix
-    // - 7 digits
-    // - 1 check digit (calculated using Luhn-like algorithm)
-    function validateIsraeliID(id) {
-        // Remove any spaces and ensure it's a string
-        id = String(id).trim();
-        
-        // Check if the ID contains exactly 9 digits
-        if (!/^\d{9}$/.test(id)) {
-            return false;
-        }
-        
-        // Pad with zeros if less than 9 digits (for IDs starting with 0)
-        id = id.padStart(9, '0');
-        
-        // Calculate checksum using Israeli ID algorithm
-        // Each digit is multiplied by 1 or 2 alternately
-        let sum = 0;
-        for (let i = 0; i < 9; i++) {
-            let digit = Number(id[i]);
-            // Multiply by 1 or 2 based on position
-            let step = digit * ((i % 2) + 1);
-            
-            // If the result is two digits, add them together
-            // e.g., 12 becomes 1+2=3, 16 becomes 1+6=7
-            if (step > 9) {
-                step = Math.floor(step / 10) + (step % 10);
-            }
-            
-            sum += step;
-        }
-        
-        // Valid if sum is divisible by 10
-        return sum % 10 === 0;
-    }
-
-    // Validate Israeli ID on blur and input (with visual feedback)
-    jQuery("#id-number").on("blur input", function () {
+    jQuery("#id-number").on("blur", function () {
         // Get the input value and trim any extra spaces
         let id = jQuery(this).val().trim();
 
-        // Only validate if user has entered something
-        if (id.length === 0) {
-            jQuery(this).removeClass("validated invalid");
-            jQuery("#id-number-wrapper").removeClass("invalid");
-            return;
-        }
-
-        // Validate using Israeli ID checksum algorithm
-        if (!validateIsraeliID(id)) {
+        // Check if the ID contains exactly 9 digits
+        if (!/^\d{9}$/.test(id)) {
             // If validation fails, show an error message or add an error class
             jQuery(this).removeClass("validated");
-            jQuery(this).addClass("invalid");
-            jQuery("#id-number-wrapper").addClass("invalid");
         } else {
-            // If validation passes, add validated class (shows green checkmark)
-            jQuery(this).removeClass("invalid");
+            // If validation passes, remove any error indication
             jQuery(this).addClass("validated");
-            jQuery("#id-number-wrapper").removeClass("invalid");
         }
     });
-});
-
-// Validate Israeli ID before payment submission
-hf.Upon("pp_beforeSubmitPayment", (e) => {
-    const idField = jQuery("#id-number");
-    
-    // Check if ID field exists and is visible
-    if (idField.length && idField.is(':visible')) {
-        const id = idField.val().trim();
-        
-        // Only validate if there's a value
-        if (id.length > 0) {
-            // Israeli ID must be exactly 9 digits
-            if (!/^\d{9}$/.test(id)) {
-                showError(
-                    pageLang !== "he-IL" 
-                        ? "Invalid Israeli ID number: Must be exactly 9 digits." 
-                        : "מספר תעודת זהות לא תקין: חייב להיות בדיוק 9 ספרות.",
-                    pageLang !== "he-IL" ? "ID Number" : "מספר תעודת זהות"
-                );
-                
-                idField.addClass('invalid');
-                jQuery("#id-number-wrapper").addClass('invalid');
-                
-                e.preventDefault();
-                return false;
-            }
-            
-            // Validate checksum using Israeli ID validation function
-            let sum = 0;
-            for (let i = 0; i < 9; i++) {
-                let digit = Number(id[i]);
-                let step = digit * ((i % 2) + 1);
-                if (step > 9) {
-                    step = Math.floor(step / 10) + (step % 10);
-                }
-                sum += step;
-            }
-            
-            if (sum % 10 !== 0) {
-                showError(
-                    pageLang !== "he-IL" 
-                        ? "Invalid Israeli ID number: Checksum validation failed." 
-                        : "מספר תעודת זהות לא תקין: אימות הסכום הבדיקה נכשל.",
-                    pageLang !== "he-IL" ? "ID Number" : "מספר תעודת זהות"
-                );
-                
-                idField.addClass('invalid');
-                jQuery("#id-number-wrapper").addClass('invalid');
-                
-                e.preventDefault();
-                return false;
-            }
-        }
-    }
-    
-    return true;
 });
