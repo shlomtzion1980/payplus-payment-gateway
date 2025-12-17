@@ -1263,11 +1263,6 @@ class WC_PayPlus
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
-                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-product-syncer.php';
-                    
-                    // Initialize product syncer
-                    new WC_PayPlus_Product_Syncer();
-                    
                     if (boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-embedded.php';
                         // Initialize the embedded order processing class
