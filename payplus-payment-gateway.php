@@ -1268,7 +1268,7 @@ class WC_PayPlus
                     // Initialize product syncer
                     new WC_PayPlus_Product_Syncer();
                     
-                    if (boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
+                    if (is_array($this->hostedFieldsOptions) && boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-embedded.php';
                         // Initialize the embedded order processing class
                         new WC_PayPlus_Embedded();
