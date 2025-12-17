@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.8] - 17-12-2025 - (PN)
+
+- Added    - Customer ID now displays on Invoice+ documents (supports collection from both payment page and embedded forms).
+- Tweak    - Enhanced PRUID handling for order completion.
+
 ## [7.9.7] - 08-12-2025 - (Pluribus)
 
 - Fix      - Fixed issue where pp_iframe was loading multiple times on some setups by removing unnecessary function.
