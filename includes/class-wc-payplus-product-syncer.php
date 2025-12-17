@@ -1311,8 +1311,7 @@ class WC_PayPlus_Product_Syncer
                 
                 if (in_array($extension, $allowed_extensions)) {
                     $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
-                    // Use image/jpg for jpg files to match Shopify format
-                    $mimetype = ($extension === 'jpg' || $extension === 'jpeg') ? 'image/jpg' : "image/{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
                     
                     $media[] = array(
                         'url' => strval($jpg_url),
@@ -1334,8 +1333,7 @@ class WC_PayPlus_Product_Syncer
                 
                 if (in_array($extension, $allowed_extensions)) {
                     $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
-                    // Use image/jpg for jpg files to match Shopify format
-                    $mimetype = ($extension === 'jpg' || $extension === 'jpeg') ? 'image/jpg' : "image/{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
                     
                     $media[] = array(
                         'url' => strval($jpg_url),
@@ -1374,8 +1372,7 @@ class WC_PayPlus_Product_Syncer
                     
                     if (in_array($extension, $allowed_extensions)) {
                         $name = basename($jpg_url) ?: ($image_id ? "image_{$image_id}.{$extension}" : "image_" . uniqid() . ".{$extension}");
-                        // Use image/jpg for jpg files to match Shopify format
-                        $mimetype = ($extension === 'jpg' || $extension === 'jpeg') ? 'image/jpg' : "image/{$extension}";
+                        $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
                         
                         $media[] = array(
                             'url' => strval($jpg_url),
@@ -1537,19 +1534,18 @@ class WC_PayPlus_Product_Syncer
             $sku = $variant->get_sku();
             $sku_value = ($sku && $sku !== '') ? strval($sku) : null;
             
-            // Get barcode from _global_unique_id field
-            $barcode = $variant->get_meta('_global_unique_id') ?: null;
+            // Get barcode (WooCommerce doesn't have native barcode, but check meta)
+            $barcode = $variant->get_meta('_barcode') ?: null;
             $barcode_value = ($barcode && $barcode !== '') ? strval($barcode) : null;
             
-            // Build pricing array with milliseconds in timestamps
-            $now_millis = self::format_date_with_millis(null); // Current time with milliseconds
+            // Build pricing array
             $pricing = array(
                 array(
                     'uuid' => '',
                     'currency_code' => $currency,
                     'value' => floatval($price),
                     'price' => floatval($price),
-                    'start_at' => $now_millis,
+                    'start_at' => gmdate('Y-m-d\TH:i:s\Z'),
                     'finish_at' => null,
                 )
             );
@@ -1559,17 +1555,13 @@ class WC_PayPlus_Product_Syncer
                 $date_on_sale_from = $variant->get_date_on_sale_from();
                 $date_on_sale_to = $variant->get_date_on_sale_to();
                 
-                // Format dates with milliseconds
-                $sale_from = $date_on_sale_from ? self::format_date_with_millis($date_on_sale_from) : $now_millis;
-                $sale_to = $date_on_sale_to ? self::format_date_with_millis($date_on_sale_to) : null;
-                
                 $pricing[] = array(
                     'uuid' => '',
                     'currency_code' => $currency,
                     'value' => floatval($sale_price),
                     'price' => floatval($sale_price),
-                    'start_at' => $sale_from,
-                    'finish_at' => $sale_to,
+                    'start_at' => $date_on_sale_from ? $date_on_sale_from->date('c') : gmdate('Y-m-d\TH:i:s\Z'),
+                    'finish_at' => $date_on_sale_to ? $date_on_sale_to->date('c') : null,
                 );
             }
             
@@ -1596,15 +1588,15 @@ class WC_PayPlus_Product_Syncer
                 'external_ids' => array(
                     array(
                         'platform_id' => 3,
-                        'external_id' => intval($variant->get_id()), // Use intval to match numeric format
+                        'external_id' => strval($variant->get_id()),
                         'external_id_source_field' => 'id'
                     )
                 ),
                 'media_to_handle' => $variant_media,
                 'properties_to_handle' => $properties,
                 'options' => $options_array,
-                'created_at' => self::format_date_with_millis($variant->get_date_created()),
-                'updated_at' => self::format_date_with_millis($variant->get_date_modified()),
+                'created_at' => $variant->get_date_created() ? $variant->get_date_created()->date('c') : gmdate('c'),
+                'updated_at' => $variant->get_date_modified() ? $variant->get_date_modified()->date('c') : gmdate('c'),
                 'deleted_at' => null,
                 'is_deleted' => false,
             );
@@ -1614,26 +1606,6 @@ class WC_PayPlus_Product_Syncer
         }
         
         return $variants;
-    }
-
-    /**
-     * Format date with milliseconds to match Shopify format (e.g., "2025-10-26T21:11:31.000Z")
-     *
-     * @param WC_DateTime|null $date
-     * @return string
-     */
-    private static function format_date_with_millis($date)
-    {
-        if ($date && $date instanceof WC_DateTime) {
-            // WC_DateTime doesn't have millisecond precision, so use 000
-            // Format: YYYY-MM-DDTHH:mm:ss.000Z
-            return $date->date('Y-m-d\TH:i:s') . '.000Z';
-        }
-        // Default to current time with milliseconds from microtime
-        $microtime = microtime(true);
-        $seconds = floor($microtime);
-        $millis = str_pad(intval(($microtime - $seconds) * 1000), 3, '0', STR_PAD_LEFT);
-        return gmdate('Y-m-d\TH:i:s', $seconds) . '.' . $millis . 'Z';
     }
 
     /**
@@ -1657,8 +1629,7 @@ class WC_PayPlus_Product_Syncer
                 
                 if (in_array($extension, $allowed_extensions)) {
                     $name = basename($jpg_url) ?: "image_{$image_id}.{$extension}";
-                    // Use image/jpg for jpg files to match Shopify format
-                    $mimetype = ($extension === 'jpg' || $extension === 'jpeg') ? 'image/jpg' : "image/{$extension}";
+                    $mimetype = ($extension === 'jpg') ? 'image/jpeg' : "image/{$extension}";
                     
                     $media[] = array(
                         'url' => strval($jpg_url),
