@@ -427,7 +427,7 @@ class PayplusInvoice
                 // Validate donation receipt cannot have 'other' payment method
                 if ($payplus_invoice_type_document_refund === 'inv_don_receipt' && $method_payment === 'other') {
                     $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
-                    throw new Exception(__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                    throw new Exception(esc_html__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
                 }
                 
                 $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
