@@ -3252,16 +3252,63 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $userID = $order->get_user_id();
             }
             $insertMeta = array();
+            $maxRetries = 3; // Retry up to 3 times for network errors
+            $retryDelay = 1; // Start with 1 second delay
+            
             for ($i = 0; $i < $countLoop; $i++) {
-                $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
-
-                if (is_wp_error($response)) {
-                    $error = $response->get_error_message();
-                    $this->payplus_add_log_all($handle, wp_json_encode($error), 'error');
-                    $html = '<div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px">
-                    PayPlus Error <br>  ' . $error . '        </div>';
-                    $order->add_order_note($html);
-                } else {
+                $networkErrorRetry = 0;
+                $response = null;
+                
+                // Retry loop for network errors
+                while ($networkErrorRetry <= $maxRetries) {
+                    $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
+                    
+                    if (is_wp_error($response)) {
+                        $networkErrorRetry++;
+                        $error = $response->get_error_message();
+                        
+                        if ($networkErrorRetry <= $maxRetries) {
+                            // Log retry attempt
+                            $this->payplus_add_log_all(
+                                $handle, 
+                                "Network error (attempt $networkErrorRetry/$maxRetries): " . wp_json_encode($error) . " - Retrying in {$retryDelay}s...", 
+                                'warning'
+                            );
+                            
+                            // Wait before retry (exponential backoff)
+                            sleep($retryDelay);
+                            $retryDelay *= 2; // Double the delay for next retry
+                        } else {
+                            // Max retries reached - log final error
+                            $this->payplus_add_log_all($handle, "Network error after $maxRetries retries: " . wp_json_encode($error), 'error');
+                            
+                            // Add order note with retry information
+                            $html = '<div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px; color: #d63638;">
+                            PayPlus IPN Network Error (Failed after ' . $maxRetries . ' retries)<br>' . esc_html($error) . '<br>
+                            <em>Order marked for manual review. This order may need to be checked manually in PayPlus dashboard.</em></div>';
+                            $order->add_order_note($html);
+                            
+                            // Mark order for manual review
+                            WC_PayPlus_Meta_Data::update_meta($order, [
+                                'payplus_ipn_network_error' => current_time('mysql'),
+                                'payplus_needs_manual_review' => '1',
+                                'payplus_last_error' => $error
+                            ]);
+                            
+                            // Update order status to on-hold for manual review
+                            $order->update_status('on-hold', __('PayPlus IPN network error - requires manual verification', 'payplus-payment-gateway'));
+                        }
+                    } else {
+                        // Success - break out of retry loop
+                        if ($networkErrorRetry > 0) {
+                            $this->payplus_add_log_all($handle, "IPN request succeeded after $networkErrorRetry retry attempts", 'info');
+                        }
+                        break;
+                    }
+                }
+                
+                // Only proceed if we have a valid response
+                if (!is_wp_error($response)) {
                     $this->payplus_add_log_all('payplus_callback_secured', $order_id . ' requestPayPlusIpn->Response: ' . wp_remote_retrieve_body($response) . "\n");
                     $res = json_decode(wp_remote_retrieve_body($response));
                     $orderPayplus = $this->getOrderPayplus($order_id);
@@ -3445,7 +3492,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             break;
                         }
                     }
-                }
+                } // End of: Only proceed if we have a valid response
                 sleep(1);
             }
             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
