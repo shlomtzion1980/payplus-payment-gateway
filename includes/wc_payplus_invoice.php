@@ -1421,9 +1421,13 @@ class PayplusInvoice
                              <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
                             }
                         } else {
-                            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $res->error));
-                            $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
-                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
+                            // Only log and add notes if we actually have a response with error data
+                            if (!empty($response)) {
+                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $response));
+                                $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
+                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
+                            }
+                            // If response is empty/null, do nothing - might be OK or will retry later
                         }
                     }
                 }
