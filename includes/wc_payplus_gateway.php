@@ -2713,7 +2713,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     wp_die(esc_html($wp_error));
                 }
             } else {
-                wc_add_notice(__('Error: The payment page failed to load - please check your page uid and domain settings.', 'payplus-payment-gateway'), 'error');
+                // Log the full response for debugging
+                $this->payplus_add_log_all($handle, 'ERROR: Payment page failed to load - $res->data not found');
+                $this->payplus_add_log_all($handle, 'Full response object: ' . wp_json_encode($res, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                $this->payplus_add_log_all($handle, 'Response body: ' . wp_remote_retrieve_body($response));
+                $this->payplus_add_log_all($handle, 'Response code: ' . wp_remote_retrieve_response_code($response));
+                error_log('PayPlus Payment Gateway: Payment page failed to load for order ' . $order_id);
+                error_log('PayPlus Response: ' . wp_json_encode($res, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+                
+                // Build detailed error message for display
+                $error_message = __('Error: The payment page failed to load - please check your page uid and domain settings.', 'payplus-payment-gateway');
+                $error_message .= '<br/><br/><strong>Response Details:</strong><br/>';
+                $error_message .= 'Response Code: ' . wp_remote_retrieve_response_code($response) . '<br/>';
+                
+                if (isset($res->results)) {
+                    $error_message .= 'Status: ' . (isset($res->results->status) ? $res->results->status : 'N/A') . '<br/>';
+                    $error_message .= 'Message: ' . (isset($res->results->description) ? $res->results->description : 'N/A') . '<br/>';
+                }
+                
+                $error_message .= '<br/><strong>Full Response:</strong><br/>';
+                $error_message .= '<pre>' . esc_html(wp_json_encode($res, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) . '</pre>';
+                
+                wc_add_notice($error_message, 'error');
 
                 return;
             }
