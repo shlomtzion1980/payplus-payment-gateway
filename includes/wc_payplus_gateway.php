@@ -3297,6 +3297,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             
                             // Update order status to on-hold for manual review
                             $order->update_status('on-hold', __('PayPlus IPN network error - requires manual verification', 'payplus-payment-gateway'));
+                            
+                            // IMPORTANT: Set flagPayplus to false to prevent it being marked as "failed"
+                            // Network error doesn't mean payment failed - it means we couldn't verify
+                            $flagPayplus = false;
+                            $flagProcess = false;
                         }
                     } else {
                         // Success - break out of retry loop
