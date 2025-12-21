@@ -515,6 +515,31 @@ function payplus_Add_log_payplus($last_error)
 
 add_filter('woocommerce_price_trim_zeros', '__return_true');
 add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
+add_filter('woocommerce_billing_fields', 'payplus_add_custom_checkout_fields', 10, 1);
+
+function payplus_add_custom_checkout_fields($fields)
+{
+    $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+    $enable_customer_invoice_name = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+    
+    if ($enable_customer_invoice_name) {
+        // Get current language
+        $current_locale = get_locale();
+        $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
+        
+        // Add customer invoice name field after the company field
+        $fields['billing_customer_invoice_name'] = array(
+            'label' => $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway'),
+            'placeholder' => $is_hebrew ? __('שם לחשבונית (אופציונלי)', 'payplus-payment-gateway') : __('Name for invoice (optional)', 'payplus-payment-gateway'),
+            'required' => false,
+            'class' => array('form-row-wide'),
+            'clear' => true,
+            'priority' => 35,
+        );
+    }
+    
+    return $fields;
+}
 
 function payplus_order_admin_custom_fields($fields)
 {
@@ -533,6 +558,18 @@ function payplus_order_admin_custom_fields($fields)
                     'position ' => 1,
                     'style' => '',
                 );
+                // Add customer invoice name field
+                $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($theorder->get_id(), '_billing_customer_invoice_name', true);
+                if (!empty($customer_invoice_name)) {
+                    $sorted_fields['customer_invoice_name'] = array(
+                        'label' => __('Name on Invoice', 'payplus-payment-gateway'),
+                        'value' => $customer_invoice_name,
+                        'show' => true,
+                        'wrapper_class' => 'form-field-wide',
+                        'position ' => 2,
+                        'style' => '',
+                    );
+                }
             } else {
                 $sorted_fields[$key] = $values;
             }
@@ -548,6 +585,38 @@ function payplus_add_vat_number_nonce_field()
     wp_nonce_field('vat_number_nonce_action', 'vat_number_nonce');
 }
 
+add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invoice_name', 10, 1);
+function payplus_save_customer_invoice_name($order_id)
+{
+    // Save from regular checkout field
+    if (isset($_POST['billing_customer_invoice_name']) && !empty($_POST['billing_customer_invoice_name'])) {
+        $customer_invoice_name = sanitize_text_field(wp_unslash($_POST['billing_customer_invoice_name']));
+        update_post_meta($order_id, '_billing_customer_invoice_name', $customer_invoice_name);
+    }
+    
+    // Save from blocks checkout field (happens automatically, just copy it)
+    $order = wc_get_order($order_id);
+    if ($order) {
+        $blocks_field_value = $order->get_meta('_wc_other/payplus/customer-invoice-name', true);
+        if (!empty($blocks_field_value)) {
+            update_post_meta($order_id, '_billing_customer_invoice_name', sanitize_text_field($blocks_field_value));
+        }
+    }
+}
+
+// Hook to save blocks checkout field value to our unified meta key
+add_action('woocommerce_set_additional_field_value', 'payplus_sync_blocks_invoice_name_field', 10, 4);
+function payplus_sync_blocks_invoice_name_field($key, $value, $group, $wc_object)
+{
+    // Check if this is our customer invoice name field
+    if ($key === 'payplus/customer-invoice-name' && !empty($value)) {
+        // If it's an order object, save to our unified meta key
+        if (is_a($wc_object, 'WC_Order')) {
+            // Use the PayPlus meta data handler to ensure compatibility with both HPOS and classic
+            WC_PayPlus_Meta_Data::update_meta($wc_object, ['_billing_customer_invoice_name' => sanitize_text_field($value)]);
+        }
+    }
+}
 
 add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
 function payplus_checkout_field_update_order_meta($order_id)

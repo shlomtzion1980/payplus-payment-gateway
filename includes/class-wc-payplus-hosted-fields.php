@@ -338,6 +338,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->customer->postal_code = $customer['postal_code'];
             $data->customer->country_iso = $customer['country_iso'];
             $data->customer->customer_external_number = $order->get_customer_id();
+            
+            // Add customer_name_invoice if it exists
+            $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+            if (!empty($customer_invoice_name)) {
+                $data->customer->customer_name_invoice = $customer_invoice_name;
+            }
+            
             $payingVat = isset($this->payPlusGateway->settings['paying_vat']) && in_array($this->payPlusGateway->settings['paying_vat'], [0, 1, 2]) ? $this->payPlusGateway->settings['paying_vat'] : false;
             if ($payingVat) {
                 $payingVat = $payingVat === "0" ? true : false;

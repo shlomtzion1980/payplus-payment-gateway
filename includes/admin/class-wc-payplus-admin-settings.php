@@ -593,6 +593,15 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-languages-class',
                 ];
                 $settings[$section][] = [
+                    'title' => __('Customer Invoice Name Field', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Name on invoice: When enabled, adds a checkout field that allows customers to specify a different name for the invoice.', 'payplus-payment-gateway'),
+                    'desc_tip' => false,
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[enable_customer_invoice_name]',
+                    'class' => 'payplus-invoice',
+                ];
+                $settings[$section][] = [
                     'title' => __('Show Invoice Runner Management Button', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'desc' => __('Display the Invoice Runner Management button in admin menus. This allows manual processing of invoices for orders.', 'payplus-payment-gateway'),

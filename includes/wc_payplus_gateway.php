@@ -2073,6 +2073,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!empty($customerName)) {
             $customer['customer_name'] = $customerName;
         }
+        
+        // Add customer_name_invoice if it exists
+        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+        if (!empty($customer_invoice_name)) {
+            $customer['customer_name_invoice'] = $customer_invoice_name;
+        }
+        
         if ($cell_phone) {
             $customer['phone'] = $cell_phone;
         }

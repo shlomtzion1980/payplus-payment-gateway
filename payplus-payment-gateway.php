@@ -1275,6 +1275,7 @@ class WC_PayPlus
                     }
 
                     add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+                    add_action('woocommerce_blocks_loaded', [$this, 'register_customer_invoice_name_blocks_field']);
                     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                     if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                         add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
@@ -1976,6 +1977,44 @@ class WC_PayPlus
                             $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
                         }
                     );
+                }
+            }
+
+            /**
+             * Register customer invoice name field for WooCommerce Blocks checkout
+             */
+            public function register_customer_invoice_name_blocks_field()
+            {
+                $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+                $enable_customer_invoice_name = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+                
+                if (!$enable_customer_invoice_name) {
+                    return;
+                }
+
+                // Get current language
+                $current_locale = get_locale();
+                $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
+                
+                // Register the field for WooCommerce Blocks
+                if (function_exists('woocommerce_register_additional_checkout_field')) {
+                    try {
+                        woocommerce_register_additional_checkout_field([
+                            'id' => 'payplus/customer-invoice-name',
+                            'label' => $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway'),
+                            'location' => 'contact',
+                            'type' => 'text',
+                            'required' => false,
+                            'attributes' => [
+                                'placeholder' => $is_hebrew ? __('שם לחשבונית (אופציונלי)', 'payplus-payment-gateway') : __('Name for invoice (optional)', 'payplus-payment-gateway'),
+                            ],
+                        ]);
+                    } catch (Exception $e) {
+                        // Log error if field registration fails
+                        if (WP_DEBUG_LOG) {
+                            error_log('PayPlus: Failed to register customer invoice name field for blocks: ' . $e->getMessage());
+                        }
+                    }
                 }
             }
         }

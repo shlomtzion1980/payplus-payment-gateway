@@ -235,6 +235,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $data->customer->postal_code = $customer['postal_code'];
             $data->customer->country_iso = $customer['country_iso'];
             $data->customer->customer_external_number = $order->get_customer_id();
+            
+            // Add customer_name_invoice if it exists
+            $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+            if (!empty($customer_invoice_name)) {
+                $data->customer->customer_name_invoice = $customer_invoice_name;
+            }
+            
             $payingVat = isset($options['paying_vat']) && in_array($options['paying_vat'], [0, 1, 2]) ? $options['paying_vat'] : false;
             if ($payingVat) {
                 $payingVat = $payingVat === "0" ? true : false;

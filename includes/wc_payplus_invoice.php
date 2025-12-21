@@ -268,6 +268,13 @@ class PayplusInvoice
                 $customerName .= " (" . $company . ")";
             }
         }
+        
+        // Check if customer invoice name exists and use it
+        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+        if (!empty($customer_invoice_name)) {
+            $customerName = $customer_invoice_name;
+        }
+        
         if (empty($customerName)) {
             $customer['name'] = __("General Customer - לקוח כללי", 'payplus-payment-gateway');
         } else {
