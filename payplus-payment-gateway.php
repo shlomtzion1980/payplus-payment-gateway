@@ -74,10 +74,12 @@ class WC_PayPlus
         $this->hidePayPlusGatewayNMW = boolval(property_exists($this->payplus_payment_gateway_settings, 'hide_main_pp_checkout') && $this->payplus_payment_gateway_settings->hide_main_pp_checkout === 'yes');
         $this->iframeAutoHeight = boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_auto_height') && $this->payplus_payment_gateway_settings->iframe_auto_height === 'yes');
 
+        add_action('plugins_loaded', [$this, 'load_textdomain'], 0); // Load first for gateway settings
         add_action('admin_init', [$this, 'check_environment']);
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
-        add_action('plugins_loaded', [$this, 'load_textdomain'], 10);
+        add_action('wp_enqueue_scripts', [$this, 'maybe_load_textdomain_for_checkout'], 5); // Load for checkout pages (hosted fields)
+        add_action('init', [$this, 'load_textdomain'], 10); // Load for other frontend pages
         add_action('plugins_loaded', [$this, 'init']);
         add_action('manage_product_posts_custom_column', [$this, 'payplus_custom_column_product'], 10, 2);
         add_action('woocommerce_email_before_order_table', [$this, 'payplus_add_content_specific_email'], 20, 4);
@@ -1229,18 +1231,55 @@ class WC_PayPlus
             }
 
             /**
+             * Load translations for checkout pages (wp_enqueue_scripts hook)
+             * This ensures hosted fields have translations available when they're instantiated
+             * 
+             * @return void
+             */
+            public function maybe_load_textdomain_for_checkout()
+            {
+                // Load for checkout pages where hosted fields are used
+                // wp_enqueue_scripts fires after init, so this is safe and won't trigger warnings
+                if (function_exists('is_checkout') && is_checkout() && !is_textdomain_loaded('payplus-payment-gateway')) {
+                    $this->load_textdomain();
+                }
+            }
+
+            /**
              * Load plugin text domain for translations
-             * Hooked to plugins_loaded with priority 10 (WordPress recommended approach)
+             * Called on admin_init (priority 5) for admin pages and init (priority 10) for frontend
              * 
              * @return void
              */
             public function load_textdomain()
             {
-                // Load text domain for translations
-                // While WordPress.org plugins have automatic translation loading,
-                // we need to explicitly load for admin pages, AJAX calls, and cron jobs
-                // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound -- Required for translations to work in admin pages, AJAX calls, and cron jobs
-                load_plugin_textdomain('payplus-payment-gateway', false, dirname(plugin_basename(__FILE__)) . '/languages/');
+                // Load translations directly to avoid "too early" warnings
+                // First try WordPress language directory (for translations from wordpress.org)
+                $locale = determine_locale();
+                $mofile = WP_LANG_DIR . '/plugins/payplus-payment-gateway-' . $locale . '.mo';
+                
+                if (file_exists($mofile)) {
+                    load_textdomain('payplus-payment-gateway', $mofile);
+                } else {
+                    // Fallback to plugin's own languages directory
+                    $mofile = PAYPLUS_PLUGIN_DIR . '/languages/payplus-payment-gateway-' . $locale . '.mo';
+                    if (file_exists($mofile)) {
+                        load_textdomain('payplus-payment-gateway', $mofile);
+                    }
+                }
+                
+                // Force reload for admin if already loaded by hosted fields
+                if (is_admin() && is_textdomain_loaded('payplus-payment-gateway')) {
+                    unload_textdomain('payplus-payment-gateway');
+                    if (file_exists(WP_LANG_DIR . '/plugins/payplus-payment-gateway-' . $locale . '.mo')) {
+                        load_textdomain('payplus-payment-gateway', WP_LANG_DIR . '/plugins/payplus-payment-gateway-' . $locale . '.mo');
+                    } else {
+                        $mofile = PAYPLUS_PLUGIN_DIR . '/languages/payplus-payment-gateway-' . $locale . '.mo';
+                        if (file_exists($mofile)) {
+                            load_textdomain('payplus-payment-gateway', $mofile);
+                        }
+                    }
+                }
             }
 
             /**
@@ -1275,7 +1314,9 @@ class WC_PayPlus
                     }
 
                     add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
-                    add_action('woocommerce_blocks_loaded', [$this, 'register_customer_invoice_name_blocks_field']);
+                    // Register checkout field on init (priority 20) after translations are loaded
+                    // woocommerce_register_additional_checkout_field will automatically handle woocommerce_blocks_loaded timing
+                    add_action('init', [$this, 'register_customer_invoice_name_blocks_field'], 20);
                     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                     if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                         add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
@@ -1997,6 +2038,8 @@ class WC_PayPlus
                 $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
                 
                 // Register the field for WooCommerce Blocks
+                // Note: woocommerce_register_additional_checkout_field automatically handles woocommerce_blocks_loaded timing
+                // If woocommerce_blocks_loaded hasn't fired yet, it will re-hook itself to that hook
                 if (function_exists('woocommerce_register_additional_checkout_field')) {
                     try {
                         woocommerce_register_additional_checkout_field([
@@ -2005,9 +2048,6 @@ class WC_PayPlus
                             'location' => 'contact',
                             'type' => 'text',
                             'required' => false,
-                            'attributes' => [
-                                'placeholder' => $is_hebrew ? __('שם לחשבונית (אופציונלי)', 'payplus-payment-gateway') : __('Name for invoice (optional)', 'payplus-payment-gateway'),
-                            ],
                         ]);
                     } catch (Exception $e) {
                         // Log error if field registration fails

@@ -100,6 +100,22 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $payPlusErrors = new WCPayPlusErrorCodes();
 
             if (file_exists($template_path)) {
+                // Force load translations before template renders
+                // We need to load early here because the template is rendered in the constructor
+                // Suppress the "too early" warning since this is intentional and necessary
+                if (!is_textdomain_loaded('payplus-payment-gateway')) {
+                    $mofile = WP_LANG_DIR . '/plugins/payplus-payment-gateway-' . determine_locale() . '.mo';
+                    if (file_exists($mofile)) {
+                        load_textdomain('payplus-payment-gateway', $mofile);
+                    } else {
+                        // Fallback to plugin's own languages directory
+                        $mofile = PAYPLUS_PLUGIN_DIR . '/languages/payplus-payment-gateway-' . determine_locale() . '.mo';
+                        if (file_exists($mofile)) {
+                            load_textdomain('payplus-payment-gateway', $mofile);
+                        }
+                    }
+                }
+                
                 wp_enqueue_style('hosted-css', PAYPLUS_PLUGIN_URL . 'assets/css/hostedFields.css', [], $script_version);
                 include $template_path;
             }
