@@ -383,6 +383,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                     background-repeat: no-repeat;
                     background-position: <?php echo esc_attr($direction) . " 15px center";
                                             ?>;
+                    background-color: white !important;
 
                     &.validated {
                         background-image: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg')); ?>');
