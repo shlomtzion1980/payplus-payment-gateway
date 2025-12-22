@@ -589,9 +589,14 @@ add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invo
 function payplus_save_customer_invoice_name($order_id)
 {
     // Save from regular checkout field
-    if (isset($_POST['billing_customer_invoice_name']) && !empty($_POST['billing_customer_invoice_name'])) {
+    if (isset($_POST['billing_customer_invoice_name'])) {
         $customer_invoice_name = sanitize_text_field(wp_unslash($_POST['billing_customer_invoice_name']));
-        update_post_meta($order_id, '_billing_customer_invoice_name', $customer_invoice_name);
+        if (!empty($customer_invoice_name)) {
+            update_post_meta($order_id, '_billing_customer_invoice_name', $customer_invoice_name);
+        } else {
+            // If field is empty, delete the meta to ensure fallback to regular name
+            delete_post_meta($order_id, '_billing_customer_invoice_name');
+        }
     }
     
     // Save from blocks checkout field (happens automatically, just copy it)
@@ -600,6 +605,9 @@ function payplus_save_customer_invoice_name($order_id)
         $blocks_field_value = $order->get_meta('_wc_other/payplus/customer-invoice-name', true);
         if (!empty($blocks_field_value)) {
             update_post_meta($order_id, '_billing_customer_invoice_name', sanitize_text_field($blocks_field_value));
+        } else {
+            // If field is empty, delete the meta to ensure fallback to regular name
+            delete_post_meta($order_id, '_billing_customer_invoice_name');
         }
     }
 }
@@ -609,11 +617,16 @@ add_action('woocommerce_set_additional_field_value', 'payplus_sync_blocks_invoic
 function payplus_sync_blocks_invoice_name_field($key, $value, $group, $wc_object)
 {
     // Check if this is our customer invoice name field
-    if ($key === 'payplus/customer-invoice-name' && !empty($value)) {
+    if ($key === 'payplus/customer-invoice-name') {
         // If it's an order object, save to our unified meta key
         if (is_a($wc_object, 'WC_Order')) {
-            // Use the PayPlus meta data handler to ensure compatibility with both HPOS and classic
-            WC_PayPlus_Meta_Data::update_meta($wc_object, ['_billing_customer_invoice_name' => sanitize_text_field($value)]);
+            if (!empty($value)) {
+                // Use the PayPlus meta data handler to ensure compatibility with both HPOS and classic
+                WC_PayPlus_Meta_Data::update_meta($wc_object, ['_billing_customer_invoice_name' => sanitize_text_field($value)]);
+            } else {
+                // If field is empty, delete the meta to ensure fallback to regular name
+                WC_PayPlus_Meta_Data::delete_meta($wc_object, '_billing_customer_invoice_name');
+            }
         }
     }
 }
