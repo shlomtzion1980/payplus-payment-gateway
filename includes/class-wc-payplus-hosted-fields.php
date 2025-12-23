@@ -189,10 +189,19 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             }
             
             // Double check IPN if enabled and page request UID exists (for regular checkout pages)
-            if ($order && isset($this->payPlusGateway->enableDoubleCheckIfPruidExists) && $this->payPlusGateway->enableDoubleCheckIfPruidExists) {
+            // Use session flag to prevent multiple checks for the same order in the same session
+            $session_key = 'payplus_ipn_checked_' . $order_id;
+            $already_checked = WC()->session && WC()->session->get($session_key);
+            
+            if ($order && !$already_checked && isset($this->payPlusGateway->enableDoubleCheckIfPruidExists) && $this->payPlusGateway->enableDoubleCheckIfPruidExists) {
                 $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
                 
                 if (!empty($payplus_page_request_uid)) {
+                    // Mark as checked in session to prevent duplicate calls
+                    if (WC()->session) {
+                        WC()->session->set($session_key, true);
+                    }
+                    
                     $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
@@ -221,6 +230,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 } else {
                     $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
                 }
+            } elseif ($already_checked) {
+                $this->payPlusGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Regular Checkout Order ID: ' . $order_id . ' | Already checked in this session - Skipping duplicate check');
             }
         }
 

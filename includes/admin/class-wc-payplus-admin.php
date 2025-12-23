@@ -563,7 +563,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if (isset($responseBody['data']['token_uid'])) $responseArray['payplus_token_uid'] = esc_html($responseBody['data']['token_uid']);
                     if (isset($responseBody['data']['voucher_num'])) $responseArray['payplus_voucher_num'] = esc_html($responseBody['data']['voucher_num']);
                 }
-                $responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000" ? WC_PayPlus_Meta_Data::update_meta($order, $responseArray) : $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
+                // Update meta on success, add order note on failure (but skip notes for status-only checks)
+                if ($responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000") {
+                    WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
+                } elseif (!$returnStatusOnly) {
+                    $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
+                }
 
                 $transactionUid = $responseBody['data']['transaction_uid'];
 
@@ -597,12 +602,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
             } else {
                 $result = $responseBody['data']['status'] ?? $responseBody['results']['description'] ?? '';
-                // if ($result !== "missing-transaction_uid-or-payment_request_uid") {
-                //     $note = $result . ' - If token payment - token doesn`t fit billing or no payment.';
-                //     $note = !$isCron ? $note : 'Cron job: ' . $result;
-                //     $note = "Cron job: " ? "$note - No transaction data." : $note;
-                //     $order->add_order_note('PayPlus IPN: ' . $note);
-                // }
+                // Don't add order notes when just checking status (PRUID double-check)
+                if ($result !== "missing-transaction_uid-or-payment_request_uid" && !$returnStatusOnly) {
+                    $note = $result . ' - If token payment - token doesn`t fit billing or no payment.';
+                    $note = !$isCron ? $note : 'Cron job: ' . $result;
+                    $note = "Cron job: " ? "$note - No transaction data." : $note;
+                    $order->add_order_note('PayPlus IPN: ' . $note);
+                }
             }
             if ($allowReturn) {
                 if (!isset($responseBody['data']['status'])) {

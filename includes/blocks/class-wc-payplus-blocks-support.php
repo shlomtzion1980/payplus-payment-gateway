@@ -349,11 +349,20 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $hostedStarted = WC()->session->get('hostedStarted') ? WC()->session->get('hostedStarted') : WC()->session->set('hostedStarted', 0);
         if ($context->payment_method === "payplus-payment-gateway-hostedfields") {
             // Double check IPN if enabled and page request UID exists
+            // Use session flag to prevent multiple checks for the same order in the same session
+            $session_key = 'payplus_ipn_checked_' . $this->orderId;
+            $already_checked = WC()->session && WC()->session->get($session_key);
+            
             $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-            if ($WC_PayPlus_Gateway && isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) {
+            if ($WC_PayPlus_Gateway && !$already_checked && isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) {
                 $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($this->orderId, 'payplus_page_request_uid', true);
                 
                 if (!empty($payplus_page_request_uid)) {
+                    // Mark as checked in session to prevent duplicate calls
+                    if (WC()->session) {
+                        WC()->session->set($session_key, true);
+                    }
+                    
                     $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid);
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
@@ -385,6 +394,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 } else {
                     $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | No Page Request UID found - Skipping double check');
                 }
+            } elseif ($already_checked && $WC_PayPlus_Gateway) {
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Already checked in this session - Skipping duplicate check');
             }
             
             ++$hostedStarted;
