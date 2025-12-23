@@ -2052,6 +2052,7 @@ class WC_PayPlus
                     } catch (Exception $e) {
                         // Log error if field registration fails
                         if (WP_DEBUG_LOG) {
+                            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Only logs when WP_DEBUG_LOG is enabled
                             error_log('PayPlus: Failed to register customer invoice name field for blocks: ' . $e->getMessage());
                         }
                     }

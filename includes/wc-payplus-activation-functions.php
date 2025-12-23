@@ -589,7 +589,9 @@ add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invo
 function payplus_save_customer_invoice_name($order_id)
 {
     // Save from regular checkout field
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies nonce before this hook
     if (isset($_POST['billing_customer_invoice_name'])) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies nonce before this hook
         $customer_invoice_name = sanitize_text_field(wp_unslash($_POST['billing_customer_invoice_name']));
         if (!empty($customer_invoice_name)) {
             update_post_meta($order_id, '_billing_customer_invoice_name', $customer_invoice_name);
