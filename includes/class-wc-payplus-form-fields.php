@@ -832,7 +832,7 @@ class WC_PayPlus_Form_Fields
                 'title' => __('Successful Order Status', 'payplus-payment-gateway'),
                 'type' => 'select',
                 'options' => $listOrderStatus,
-                'default' => 'default-woo',
+                'default' => 'wc-processing',
             ],
             'fire_completed' => [
                 'title' => __('Payment Completed', 'payplus-payment-gateway'),
