@@ -3875,8 +3875,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $insertMeta['payplus_brand_name'] = $payplusBrandName;
                         $insertMeta['payplus_number_of_payments'] = $payplusNumberOfPayments;
                     }
-                    // Translators: %s will be replaced with the transaction number received from the payment gateway.
                     $transaction_number = isset($result->data->number) ? $result->data->number : '';
+                    // Translators: %s will be replaced with the transaction number received from the payment gateway.
                     $order->add_order_note(sprintf(__('PayPlus Subscription Payment Successful<br/>Transaction Number: %s', 'payplus-payment-gateway'), $transaction_number));
                     $insertMeta['payplus_type'] = isset($result->data->type) ? $result->data->type : '';
                     $insertMeta['payplus_response'] = wp_json_encode($result->data);
