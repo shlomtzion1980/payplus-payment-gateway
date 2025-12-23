@@ -64,6 +64,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $balance_name;
     public $successful_order_status;
     public $failure_order_status;
+    public $prevent_failed_on_ipn_error;
     public $callback_addr;
     public $allowSendCallBack;
     public $logging;
@@ -213,6 +214,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->saveOrderNote = isset($this->settings['payplus_data_save_order_note']) ? boolval($this->settings['payplus_data_save_order_note'] === 'yes') : null;
         $this->successful_order_status = $this->get_option('successful_order_status');
         $this->failure_order_status = $this->get_option('failure_order_status');
+        $this->prevent_failed_on_ipn_error = $this->get_option('prevent_failed_on_ipn_error') === 'yes';
         $this->callback_addr = $this->get_option('callback_addr');
         $this->allowSendCallBack = isset($this->callback_addr) && (strpos($this->callback_addr, 'https://') === 0 || strpos($this->callback_addr, 'http://') === 0) ? true : false;
 
@@ -3331,8 +3333,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                         $this->payplus_add_log_all($handle, 'Error IPN Error: ' . wp_json_encode($res), 'error');
                         $this->store_payment_ip();
-                        if ($this->failure_order_status !== 'default-woo') {
-                            $order->update_status($this->failure_order_status);
+                        // Only change to failed status if the setting allows it
+                        if (!$this->prevent_failed_on_ipn_error) {
+                            if ($this->failure_order_status !== 'default-woo') {
+                                $order->update_status($this->failure_order_status);
+                            }
+                        } else {
+                            // If prevented, log that we're not changing status
+                            $this->payplus_add_log_all($handle, 'IPN Error detected but status change to failed prevented by setting', 'info');
                         }
                         // Translators: %s will be replaced with the transaction UID received from the payment gateway.
                         $order->add_order_note(sprintf(__('PayPlus IPN Failed<br/>Transaction UID: %s', 'payplus-payment-gateway'), $transaction_uid));
@@ -3503,8 +3511,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
         }
         if ($flagPayplus) {
-            if ($this->failure_order_status !== 'default-woo') {
-                $order->update_status($this->failure_order_status);
+            // Only change to failed status if the setting allows it
+            if (!$this->prevent_failed_on_ipn_error) {
+                if ($this->failure_order_status !== 'default-woo') {
+                    $order->update_status($this->failure_order_status);
+                }
+            } else {
+                // If prevented, log that we're not changing status
+                $this->payplus_add_log_all($handle, 'Payment validation failed but status change to failed prevented by setting', 'info');
             }
             $order->add_order_note(__('PayPlus payment failed', 'payplus-payment-gateway'));
             $insertMeta = array('order_validated_error' => '1');

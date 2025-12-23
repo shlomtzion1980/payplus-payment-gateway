@@ -958,6 +958,14 @@ class WC_PayPlus_Form_Fields
                 'title' => __('PayPlus Advanced Features', 'payplus-payment-gateway'),
                 'type' => 'title',
             ],
+            'prevent_failed_on_ipn_error' => [
+                'title' => __('Refactor: Do not change status to failed on requestPayPlusIpn failure', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Enable this to prevent orders from being automatically marked as "Failed" when IPN verification fails due to network or technical errors.', 'payplus-payment-gateway'),
+                'description' => __('When enabled, orders will be placed "On-Hold" for manual review instead of being marked as failed. This prevents legitimate payments from being incorrectly marked as failed due to temporary network issues.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'yes',
+            ],
             'pw_gift_card_auto_cancel_unpaid_order' => [
                 'title' => __('Auto Cancel (PWGiftCards) Unpaid Orders', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
