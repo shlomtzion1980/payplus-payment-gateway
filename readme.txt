@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 7.9.8
+Stable tag: 7.9.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,19 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 7.9.9 - 23-12-2025 =
+
+- Fix      - Resolved harmless installation warnings that appeared in debug logs for first-time users
+- Tweak    - Enhanced frontend error logging and display for payment page loading issues
+- Added    - Custom invoice name field to WooCommerce checkout, allowing customers to specify a different name for Invoice+ documents - Activated via Invoice+ settings.
+- Tweak    - Enhanced network error handling during IPN verification with automatic retry logic and better fallback behavior
+- Tweak    - Orders now marked as "on-hold" instead of "failed" when network errors occur during payment verification (configurable in Advanced Features)
+- Fix      - Resolved issue where "PayPlus Error Invoice" note was incorrectly added to cash-only payment orders when no actual error occurred
+- Fix      - Standardized background color for "Name" and "ID number" fields in PayPlus Embedded to white across all themes
+- Added    - New Advanced Features setting: "Refactor: Do not change status to failed on requestPayPlusIpn failure" - prevents orders from being marked as "failed" during IPN verification failures (enabled by default)
+- Tweak    - Improved WordPress Plugin Check (PCP) compliance by updating translator comments and nonce verifications
+- Fix      - Pruid was firing wrong notes to PayPlus Embedded orders , now fixed
 
 == 7.9.8 - 17-12-2025 =
 

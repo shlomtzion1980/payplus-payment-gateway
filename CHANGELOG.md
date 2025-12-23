@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [7.9.9] - 23-12-2025 - (MaKore)
+
+- Fix      - Resolved harmless installation warnings that appeared in debug logs for first-time users
+- Tweak    - Enhanced frontend error logging and display for payment page loading issues
+- Added    - Custom invoice name field to WooCommerce checkout, allowing customers to specify a different name for Invoice+ documents - Activated via Invoice+ settings.
+- Tweak    - Enhanced network error handling during IPN verification with automatic retry logic and better fallback behavior
+- Tweak    - Orders now marked as "on-hold" instead of "failed" when network errors occur during payment verification (configurable in Advanced Features)
+- Fix      - Resolved issue where "PayPlus Error Invoice" note was incorrectly added to cash-only payment orders when no actual error occurred
+- Fix      - Standardized background color for "Name" and "ID number" fields in PayPlus Embedded to white across all themes
+- Added    - New Advanced Features setting: "Refactor: Do not change status to failed on requestPayPlusIpn failure" - prevents orders from being marked as "failed" during IPN verification failures (enabled by default)
+- Tweak    - Improved WordPress Plugin Check (PCP) compliance by updating translator comments and nonce verifications
+- Fix      - Pruid was firing wrong notes to PayPlus Embedded orders , now fixed
+
 ## [7.9.8] - 17-12-2025 - (PN)
 
 - Added    - Customer ID now displays on Invoice+ documents (supports collection from both payment page and embedded forms).
