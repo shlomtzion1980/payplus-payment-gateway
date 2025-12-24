@@ -1310,9 +1310,10 @@ class WC_PayPlus
                     }
 
                     add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
-                    // Register checkout field on init (priority 20) after translations are loaded
+                    // Register checkout fields on init (priority 20) after translations are loaded
                     // woocommerce_register_additional_checkout_field will automatically handle woocommerce_blocks_loaded timing
                     add_action('init', [$this, 'register_customer_invoice_name_blocks_field'], 20);
+                    add_action('init', [$this, 'register_customer_other_id_blocks_field'], 20);
                     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                     if (in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')))) {
                         add_action('elementor/widgets/register', [$this, 'payplus_register_widgets']);
@@ -2050,6 +2051,44 @@ class WC_PayPlus
                         if (WP_DEBUG_LOG) {
                             // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Only logs when WP_DEBUG_LOG is enabled
                             error_log('PayPlus: Failed to register customer invoice name field for blocks: ' . $e->getMessage());
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Register customer other ID field for WooCommerce Blocks checkout
+             */
+            public function register_customer_other_id_blocks_field()
+            {
+                $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+                $enable_customer_other_id = isset($payplus_settings['enable_customer_other_id']) && $payplus_settings['enable_customer_other_id'] === 'yes';
+                
+                if (!$enable_customer_other_id) {
+                    return;
+                }
+
+                // Get current language
+                $current_locale = get_locale();
+                $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
+                
+                // Register the field for WooCommerce Blocks
+                // Note: woocommerce_register_additional_checkout_field automatically handles woocommerce_blocks_loaded timing
+                // If woocommerce_blocks_loaded hasn't fired yet, it will re-hook itself to that hook
+                if (function_exists('woocommerce_register_additional_checkout_field')) {
+                    try {
+                        woocommerce_register_additional_checkout_field([
+                            'id' => 'payplus/customer-other-id',
+                            'label' => $is_hebrew ? __('מספר זהות אחר לחשבונית', 'payplus-payment-gateway') : __('Other ID for invoice', 'payplus-payment-gateway'),
+                            'location' => 'contact',
+                            'type' => 'text',
+                            'required' => false,
+                        ]);
+                    } catch (Exception $e) {
+                        // Log error if field registration fails
+                        if (WP_DEBUG_LOG) {
+                            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Only logs when WP_DEBUG_LOG is enabled
+                            error_log('PayPlus: Failed to register customer other ID field for blocks: ' . $e->getMessage());
                         }
                     }
                 }

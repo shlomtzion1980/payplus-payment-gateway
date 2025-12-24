@@ -2077,7 +2077,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         // Add customer_name_invoice if it exists
-        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
         if (!empty($customer_invoice_name)) {
             $customer['customer_name_invoice'] = $customer_invoice_name;
         }
@@ -2098,9 +2098,20 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($customer_country_iso) {
             $customer['country_iso'] = $customer_country_iso;
         }
-        if ($this->vat_number_field && $order->get_meta($this->vat_number_field)) {
+        
+        // VAT Number Priority Logic for Payment Page:
+        // 1. Customer "Other ID" field - HIGHEST PRIORITY (if customer filled this, always use it)
+        // 2. Custom vat_number_field setting (if configured in gateway settings)
+        // 3. Default _billing_vat_number - FALLBACK
+        $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
+        if (!empty($customer_other_id)) {
+            // Customer specified an alternative ID - use it (overrides all other settings)
+            $customer['vat_number'] = $customer_other_id;
+        } elseif ($this->vat_number_field && $order->get_meta($this->vat_number_field)) {
+            // Use custom vat_number field if configured
             $customer['vat_number'] = $order->get_meta($this->vat_number_field);
         }
+        
         if (intval($order->get_customer_id())) {
             $customer['customer_external_number'] = $order->get_customer_id();
         }

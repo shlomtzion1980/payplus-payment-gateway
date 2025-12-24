@@ -367,7 +367,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $data->customer->customer_external_number = $order->get_customer_id();
             
             // Add customer_name_invoice if it exists
-            $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+            $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
             if (!empty($customer_invoice_name)) {
                 $data->customer->customer_name_invoice = $customer_invoice_name;
             }

@@ -602,6 +602,15 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-invoice',
                 ];
                 $settings[$section][] = [
+                    'title' => __('Customer Other ID Field', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('Other ID for invoice: When enabled, adds a checkout field that allows customers to specify an alternative ID/VAT number for the invoice. If filled, this will be used instead of the regular ID field.', 'payplus-payment-gateway'),
+                    'desc_tip' => false,
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[enable_customer_other_id]',
+                    'class' => 'payplus-invoice',
+                ];
+                $settings[$section][] = [
                     'title' => __('Show Invoice Runner Management Button', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'desc' => __('Display the Invoice Runner Management button in admin menus. This allows manual processing of invoices for orders.', 'payplus-payment-gateway'),

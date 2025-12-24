@@ -253,7 +253,14 @@ class PayplusInvoice
         $postal_code = str_replace(["'", '"', "\\"], '', $order->get_billing_postcode());
         $customer_country_iso = $order->get_billing_country();
         $customerName = "";
-        $vat_number = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_vat_number', true);
+        
+        // VAT Number Priority Logic:
+        // 1. Customer "Other ID" field (_billing_customer_other_id) - HIGHEST PRIORITY (overrides everything)
+        // 2. Payment response identification_number (if display_customer_id_in_invoice setting is enabled)
+        // 3. Regular VAT number field (_billing_vat_number) - FALLBACK
+        $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
+        $vat_number = !empty($customer_other_id) ? $customer_other_id : WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_vat_number');
+        
         $company = $order->get_billing_company();
 
         if ($WC_PayPlus_Gateway->exist_company && !empty($company)) {
@@ -270,7 +277,7 @@ class PayplusInvoice
         }
         
         // Check if customer invoice name exists and use it
-        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name', true);
+        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
         if (!empty($customer_invoice_name)) {
             $customerName = $customer_invoice_name;
         }
@@ -1130,9 +1137,18 @@ class PayplusInvoice
                     $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
                     $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
                     
-                    // Only set vat_number from identification_number if setting is enabled
+                    // VAT Number Override Logic:
+                    // If customer filled "Other ID" field, it has HIGHEST priority and should NEVER be overridden
+                    // Only apply display_customer_id_in_invoice setting if Other ID is empty
+                    $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
+                    $has_other_id = !empty($customer_other_id);
+                    
+                    // Apply identification_number ONLY if:
+                    // 1. Customer did NOT specify an Other ID (customer's choice takes priority)
+                    // 2. AND display_customer_id_in_invoice setting is enabled
+                    // 3. AND identification_number exists in payment response
                     $display_customer_id = isset($this->payplus_invoice_option['display_customer_id_in_invoice']) && ($this->payplus_invoice_option['display_customer_id_in_invoice'] === 'yes' || $this->payplus_invoice_option['display_customer_id_in_invoice'] === 'on');
-                    if ($display_customer_id && isset($payPlusResponse['identification_number']) && !empty($payPlusResponse['identification_number'])) {
+                    if (!$has_other_id && $display_customer_id && isset($payPlusResponse['identification_number']) && !empty($payPlusResponse['identification_number'])) {
                         $payload['customer']['vat_number'] = $payPlusResponse['identification_number'];
                     }
                     $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
