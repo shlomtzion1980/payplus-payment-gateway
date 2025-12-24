@@ -588,29 +588,31 @@ function payplus_add_vat_number_nonce_field()
 add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invoice_name', 10, 1);
 function payplus_save_customer_invoice_name($order_id)
 {
+    $order = wc_get_order($order_id);
+    if (!$order) {
+        return;
+    }
+    
     // Save from regular checkout field
     // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies nonce before this hook
     if (isset($_POST['billing_customer_invoice_name'])) {
         // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WooCommerce verifies nonce before this hook
         $customer_invoice_name = sanitize_text_field(wp_unslash($_POST['billing_customer_invoice_name']));
         if (!empty($customer_invoice_name)) {
-            update_post_meta($order_id, '_billing_customer_invoice_name', $customer_invoice_name);
+            WC_PayPlus_Meta_Data::update_meta($order, ['_billing_customer_invoice_name' => $customer_invoice_name]);
         } else {
             // If field is empty, delete the meta to ensure fallback to regular name
-            delete_post_meta($order_id, '_billing_customer_invoice_name');
+            WC_PayPlus_Meta_Data::delete_meta($order, '_billing_customer_invoice_name');
         }
     }
     
     // Save from blocks checkout field (happens automatically, just copy it)
-    $order = wc_get_order($order_id);
-    if ($order) {
-        $blocks_field_value = $order->get_meta('_wc_other/payplus/customer-invoice-name', true);
-        if (!empty($blocks_field_value)) {
-            update_post_meta($order_id, '_billing_customer_invoice_name', sanitize_text_field($blocks_field_value));
-        } else {
-            // If field is empty, delete the meta to ensure fallback to regular name
-            delete_post_meta($order_id, '_billing_customer_invoice_name');
-        }
+    $blocks_field_value = $order->get_meta('_wc_other/payplus/customer-invoice-name', true);
+    if (!empty($blocks_field_value)) {
+        WC_PayPlus_Meta_Data::update_meta($order, ['_billing_customer_invoice_name' => sanitize_text_field($blocks_field_value)]);
+    } else {
+        // If field is empty, delete the meta to ensure fallback to regular name
+        WC_PayPlus_Meta_Data::delete_meta($order, '_billing_customer_invoice_name');
     }
 }
 

@@ -42,6 +42,40 @@ class WC_PayPlus_Meta_Data
     }
 
     /**
+     * Delete Order metadata or Post metadata
+     * Handles both HPOS and classic WooCommerce modes
+     * 
+     * @param WC_Order|int $order The order object or order ID
+     * @param string|array $keys Single meta key or array of meta keys to delete
+     * @return void
+     */
+    public static function delete_meta($order, $keys)
+    {
+        if (!$order) {
+            return;
+        }
+
+        // Convert single key to array for unified processing
+        $keys = is_array($keys) ? $keys : [$keys];
+
+        $isHPOS = WC_PayPlus_Meta_Data::isHPOS();
+        
+        if ($isHPOS) {
+            // HPOS: Use object methods
+            foreach ($keys as $key) {
+                $order->delete_meta_data($key);
+            }
+            $order->save();
+        } else {
+            // Classic: Use post meta functions
+            $id = $order->get_id();
+            foreach ($keys as $key) {
+                delete_post_meta($id, $key);
+            }
+        }
+    }
+
+    /**
      * Get Order metadata or Post metadata
      * @return String|Array
      */
