@@ -359,8 +359,11 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
             $payload['method'] = isset($_POST['method']) ? sanitize_text_field(wp_unslash($_POST['method'])) : null;
             $payload['domain'] = site_url();
             $method = $payload['method'];
+            
+            // Check if this is a V2 request
+            $isV2 = (strpos($method, '-v2') !== false);
 
-            if ($method == 'apple-pay') {
+            if ($method == 'apple-pay' || $method == 'apple-pay-v2') {
                 $result = $this->payplus_add_file_ApplePay();
                 if (!$result) {
                     $res = array('results' => array(
@@ -373,6 +376,11 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     echo wp_json_encode(array("response_initialized" => $res, "status" => false));
                     wp_die();
                 }
+            }
+            
+            // For V2, strip the -v2 suffix before sending to API
+            if ($isV2) {
+                $payload['method'] = str_replace('-v2', '', $payload['method']);
             }
 
             $payload = wp_json_encode($payload);
@@ -388,14 +396,32 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_express_checkout_initialized', wp_json_encode($res), 'completed');
                 if ($res->results->status === "success") {
                     if (property_exists($res->data, 'apple_pay_identifier')) {
-                        update_option('payplus_apple_pay_identifier', $res->data->apple_pay_identifier);
+                        if ($isV2) {
+                            // Store V2 identifier
+                            $payplus_payment_gateway_settings['apple_pay_identifier_v2'] = $res->data->apple_pay_identifier;
+                        } else {
+                            // Store V1 identifier
+                            update_option('payplus_apple_pay_identifier', $res->data->apple_pay_identifier);
+                        }
                         $resObj = array('apple_pay_identifier' => $res->data->apple_pay_identifier);
                     }
+                    
+                    if (property_exists($res->data, 'google_pay_page_uid') && $isV2) {
+                        $payplus_payment_gateway_settings['google_pay_page_uid_v2'] = $res->data->google_pay_page_uid;
+                    }
 
-                    if ($method == "google-pay") {
-                        $payplus_payment_gateway_settings['enable_google_pay'] = "yes";
+                    if ($method == "google-pay" || $method == "google-pay-v2") {
+                        if ($isV2) {
+                            $payplus_payment_gateway_settings['express_google_pay_enabled'] = "yes";
+                        } else {
+                            $payplus_payment_gateway_settings['enable_google_pay'] = "yes";
+                        }
                     } else {
-                        $payplus_payment_gateway_settings['enable_apple_pay'] = "yes";
+                        if ($isV2) {
+                            $payplus_payment_gateway_settings['express_apple_pay_enabled'] = "yes";
+                        } else {
+                            $payplus_payment_gateway_settings['enable_apple_pay'] = "yes";
+                        }
                     }
                     update_option('woocommerce_payplus-payment-gateway_settings', $payplus_payment_gateway_settings);
                     $result = $resObj ?? $res;

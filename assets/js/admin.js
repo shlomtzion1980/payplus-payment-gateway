@@ -14,6 +14,12 @@ jQuery(function ($) {
     const googlePayPageUid = $(".google_pay_page_uid");
     const shippingWooJs = $(".shipping_woo_js");
     const enableExpressOnProductPage = $(".enable_product");
+    
+    // Express Checkout V2 selectors
+    const enableGooglePayV2 = $(".enable_google_pay_v2");
+    const enableApplePayV2 = $(".enable_apple_pay_v2");
+    const tokenApplePayV2 = $(".apple_pay_identifier_v2");
+    const googlePayPageUidV2 = $(".google_pay_page_uid_v2");
 
     const checkAmountAuthorization = $(
         "#woocommerce_payplus-payment-gateway_settings\\[check_amount_authorization\\]"
@@ -393,6 +399,104 @@ jQuery(function ($) {
             tokenApplePay.parents("tr").fadeOut();
         }
     });
+    
+    // Express Checkout V2 - Google Pay handler
+    enableGooglePayV2.change(function (event) {
+        event.preventDefault();
+        const slef = $(this);
+        const checked = slef.prop("checked");
+        const elementFieldset = enableGooglePayV2.parents("fieldset");
+        $(".error-express-checkout-v2").html("");
+        if (checked) {
+            elementFieldset.find(".loading-express").fadeIn();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: payplus_script_admin.ajax_url,
+                data: {
+                    action: "payplus-express-checkout-initialized",
+                    method: "google-pay-v2",
+                    _ajax_nonce: payplus_script_payment.frontNonce,
+                },
+                success: function (response) {
+                    elementFieldset.find(".loading-express").fadeOut();
+                    if (!response.status) {
+                        elementFieldset
+                            .find(".error-express-checkout-v2")
+                            .html(
+                                "<b>PayPlus Error: </b>" +
+                                (response.response_initialized.results
+                                    ? response.response_initialized.results.description
+                                    : "Unknown error occurred")
+                            );
+                        slef.prop("checked", false);
+                    } else {
+                        googlePayPageUidV2.parents("tr").fadeIn();
+                        googlePayPageUidV2.val(
+                            payplus_script_admin.mainPageUid
+                        );
+                    }
+                },
+            });
+        } else {
+            // When unchecking, clear the field and hide it
+            googlePayPageUidV2.val("");
+            googlePayPageUidV2.parents("tr").fadeOut();
+        }
+    });
+    
+    // Express Checkout V2 - Apple Pay handler
+    enableApplePayV2.change(function () {
+        const checked = $(this).prop("checked");
+        const elementFieldset = enableApplePayV2.parents("fieldset");
+        const slef = $(this);
+        $(".error-express-checkout-v2").html("");
+        if (checked) {
+            elementFieldset.find(".loading-express").fadeIn();
+            $.ajax({
+                type: "post",
+                dataType: "json",
+                url: payplus_script_admin.ajax_url,
+                data: {
+                    action: "payplus-express-checkout-initialized",
+                    method: "apple-pay-v2",
+                    _ajax_nonce: payplus_script_payment.frontNonce,
+                },
+                success: function (response) {
+                    elementFieldset.find(".loading-express").fadeOut();
+                    if (!response.status) {
+                        let description = response.response_initialized.results
+                            .description.description
+                            ? response.response_initialized.results.description
+                                .description
+                            : response.response_initialized.results.description;
+                        elementFieldset
+                            .find(".error-express-checkout-v2")
+                            .html("<b>PayPlus Error: </b>" + description);
+                        slef.prop("checked", false);
+                    } else {
+                        tokenApplePayV2.parents("tr").fadeIn();
+                        tokenApplePayV2.val(
+                            response.response_initialized.apple_pay_identifier
+                        );
+                    }
+                },
+            });
+        } else {
+            // When unchecking, clear the field and hide it
+            tokenApplePayV2.val("");
+            tokenApplePayV2.parents("tr").fadeOut();
+        }
+    });
+    
+    // Hide V2 identifier fields initially if checkboxes are unchecked
+    if (enableApplePayV2 && enableApplePayV2.prop("checked") === false) {
+        tokenApplePayV2.parents("tr").fadeOut();
+    }
+
+    if (enableGooglePayV2 && enableGooglePayV2.prop("checked") === false) {
+        googlePayPageUidV2.parents("tr").fadeOut();
+    }
 
     $("#woocommerce_payplus-payment-gateway_transaction_type").change(
         function () {

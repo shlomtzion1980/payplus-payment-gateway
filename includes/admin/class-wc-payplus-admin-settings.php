@@ -760,34 +760,44 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus-express-checkout-v2-main'
                 );
                 
-                $settings[$section][] = [
-                    'name' => __('Enable Apple Pay (V2)', 'payplus-payment-gateway'),
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_apple_pay_enabled]',
-                    'type' => 'checkbox',
-                    'desc' => __('Enable modern Apple Pay express checkout with latest API', 'payplus-payment-gateway'),
-                ];
-                
-                $settings[$section][] = [
-                    'name' => __('Apple Merchant Identifier', 'payplus-payment-gateway'),
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[apple_merchant_identifier]',
-                    'type' => 'text',
-                    'desc' => __('Your Apple Pay merchant identifier (e.g., merchant.com.yourstore)', 'payplus-payment-gateway'),
-                    'placeholder' => 'merchant.com.example'
-                ];
-                
+                // Google Pay V2 Settings
                 $settings[$section][] = [
                     'name' => __('Enable Google Pay (V2)', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[express_google_pay_enabled]',
                     'type' => 'checkbox',
-                    'desc' => __('Enable modern Google Pay express checkout with latest API', 'payplus-payment-gateway'),
+                    'class' => 'enable_google_pay_v2 enable_checkout',
+                    'desc' => '<div style="color:red" class="error-express-checkout-v2"></div>
+                                <div class="loading-express">
+                                <div class="spinner-icon"></div>
+                                </div>',
                 ];
                 
                 $settings[$section][] = [
-                    'name' => __('Google Merchant ID', 'payplus-payment-gateway'),
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[google_merchant_id]',
+                    'name' => __('Google Pay Page UID (V2)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[google_pay_page_uid_v2]',
                     'type' => 'text',
-                    'desc' => __('Your Google Pay merchant ID (optional, leave empty for test environment)', 'payplus-payment-gateway'),
-                    'placeholder' => '12345678901234567890'
+                    'class' => 'google_pay_page_uid_v2',
+                    'custom_attributes' => array('readonly' => 'readonly'),
+                ];
+                
+                // Apple Pay V2 Settings
+                $settings[$section][] = [
+                    'name' => __('Enable Apple Pay (V2)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_apple_pay_enabled]',
+                    'type' => 'checkbox',
+                    'class' => 'enable_apple_pay_v2 enable_checkout',
+                    'desc' => '<div style="color:red" class="error-express-checkout-v2"></div>
+                                <div class="loading-express">
+                                <div class="spinner-icon"></div>
+                                </div>',
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Apple Pay Identifier (V2)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[apple_pay_identifier_v2]',
+                    'type' => 'text',
+                    'class' => 'apple_pay_identifier_v2',
+                    'custom_attributes' => array('readonly' => 'readonly'),
                 ];
                 
                 $settings[$section][] = [
