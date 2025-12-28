@@ -566,8 +566,6 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 // Update meta on success, add order note on failure (but skip notes for status-only checks)
                 if ($responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000") {
                     WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
-                } elseif (!$returnStatusOnly) {
-                    $order->add_order_note('PayPlus IPN: ' . sanitize_text_field(wp_unslash($responseBody['data']['status'])));
                 }
 
                 $transactionUid = $responseBody['data']['transaction_uid'];
