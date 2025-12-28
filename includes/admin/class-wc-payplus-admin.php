@@ -601,7 +601,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             } else {
                 $result = $responseBody['data']['status'] ?? $responseBody['results']['description'] ?? '';
                 // Don't add order notes when just checking status (PRUID double-check)
-                if ($result !== "missing-transaction_uid-or-payment_request_uid" && !$returnStatusOnly) {
+                if ($result !== "missing-transaction_uid-or-payment_request_uid" && !$returnStatusOnly && $isCron) {
                     $note = $result . ' - If token payment - token doesn`t fit billing or no payment.';
                     $note = !$isCron ? $note : 'Cron job: ' . $result;
                     $note = "Cron job: " ? "$note - No transaction data." : $note;
