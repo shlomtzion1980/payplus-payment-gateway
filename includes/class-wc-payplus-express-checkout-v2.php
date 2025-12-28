@@ -157,7 +157,7 @@ class WC_PayPlus_Express_Checkout_V2 {
      *
      * @return bool
      */
-    private function is_available() {
+    public function is_available() {
         if (!class_exists('WooCommerce')) {
             $this->log('Express Checkout V2 - Not Available', ['reason' => 'WooCommerce not active']);
             return false;
@@ -274,7 +274,7 @@ class WC_PayPlus_Express_Checkout_V2 {
             PAYPLUS_VERSION
         );
 
-        // Enqueue main script
+        // Enqueue main script (required for both classic and blocks)
         wp_enqueue_script(
             'payplus-express-checkout',
             PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2.js',
@@ -282,18 +282,6 @@ class WC_PayPlus_Express_Checkout_V2 {
             PAYPLUS_VERSION,
             true
         );
-        
-        // Enqueue blocks script if we have blocks checkout
-        if ($has_checkout_block || $has_cart_block) {
-            wp_enqueue_script(
-                'payplus-express-checkout-blocks',
-                PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2-blocks.js',
-                ['wc-blocks-registry', 'wp-element', 'wp-i18n'],
-                PAYPLUS_VERSION,
-                true
-            );
-            $this->log('Express Checkout V2 - Enqueued Blocks Script');
-        }
 
         // Apple Pay JS (required for Apple Pay)
         if ($this->apple_pay_enabled) {
@@ -317,30 +305,23 @@ class WC_PayPlus_Express_Checkout_V2 {
             );
         }
 
-        // Localize script with data
-        wp_localize_script('payplus-express-checkout', 'payplus_express_params', [
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('payplus_express_checkout'),
-            'apple_pay_enabled' => $this->apple_pay_enabled,
-            'google_pay_enabled' => $this->google_pay_enabled,
-            'apple_merchant_id' => $this->apple_merchant_id,
-            'google_merchant_id' => $this->google_merchant_id,
-            'google_gateway' => 'payplus',
-            'google_gateway_merchant_id' => $this->api_key,
-            'test_mode' => $this->test_mode,
-            'environment' => $this->test_mode ? 'TEST' : 'PRODUCTION',
-            'country_code' => substr(get_option('woocommerce_default_country'), 0, 2),
-            'currency_code' => get_woocommerce_currency(),
-            'store_name' => get_bloginfo('name'),
-            'button_type' => $this->settings->express_button_type ?? 'buy',
-            'button_color' => $this->settings->express_button_color ?? 'black',
-            'button_height' => $this->settings->express_button_height ?? '48',
-            'i18n' => [
-                'error_generic' => __('An error occurred. Please try again.', 'payplus-payment-gateway'),
-                'error_shipping' => __('Unable to calculate shipping. Please use regular checkout.', 'payplus-payment-gateway'),
-                'error_payment' => __('Payment failed. Please try again.', 'payplus-payment-gateway'),
+        // Localize script with data (for both classic and blocks)
+        wp_localize_script('payplus-express-checkout', 'payplus_express_params', $this->get_javascript_params());
+        
+        // Expose the params globally for blocks script
+        wp_localize_script('payplus-express-checkout', 'wc_payplus_express_checkout_v2_blocks_params', array_merge(
+            $this->get_javascript_params(),
+            [
+                'shouldShowExpressCheckoutButton' => in_array('checkout', $this->display_locations, true),
+                'isBlocksCheckout' => $has_checkout_block,
             ]
-        ]);
+        ));
+        
+        // Expose PayPlusExpressCheckout class globally for blocks to use
+        wp_add_inline_script('payplus-express-checkout', '
+            // Make PayPlusExpressCheckout available globally
+            window.PayPlusExpressCheckout = window.PayPlusExpressCheckout || {};
+        ', 'after');
     }
 
     /**
@@ -884,6 +865,55 @@ class WC_PayPlus_Express_Checkout_V2 {
                 exit;
             }
         }
+    }
+    
+    /**
+     * Check if Apple Pay V2 is enabled
+     *
+     * @return bool
+     */
+    public function is_apple_pay_v2_enabled() {
+        return $this->apple_pay_enabled;
+    }
+
+    /**
+     * Check if Google Pay V2 is enabled
+     *
+     * @return bool
+     */
+    public function is_google_pay_v2_enabled() {
+        return $this->google_pay_enabled;
+    }
+
+    /**
+     * Get JavaScript params for localization
+     *
+     * @return array
+     */
+    public function get_javascript_params() {
+        return [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('payplus_express_checkout'),
+            'apple_pay_enabled' => $this->apple_pay_enabled,
+            'google_pay_enabled' => $this->google_pay_enabled,
+            'apple_merchant_id' => $this->apple_merchant_id,
+            'google_merchant_id' => $this->google_merchant_id,
+            'google_gateway' => 'payplus',
+            'google_gateway_merchant_id' => $this->api_key,
+            'test_mode' => $this->test_mode,
+            'environment' => $this->test_mode ? 'TEST' : 'PRODUCTION',
+            'country_code' => substr(get_option('woocommerce_default_country'), 0, 2),
+            'currency_code' => get_woocommerce_currency(),
+            'store_name' => get_bloginfo('name'),
+            'button_type' => $this->settings->express_button_type ?? 'buy',
+            'button_color' => $this->settings->express_button_color ?? 'black',
+            'button_height' => $this->settings->express_button_height ?? '48',
+            'i18n' => [
+                'error_generic' => __('An error occurred. Please try again.', 'payplus-payment-gateway'),
+                'error_shipping' => __('Unable to calculate shipping. Please use regular checkout.', 'payplus-payment-gateway'),
+                'error_payment' => __('Payment failed. Please try again.', 'payplus-payment-gateway'),
+            ]
+        ];
     }
     
     /**

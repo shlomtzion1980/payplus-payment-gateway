@@ -1,149 +1,123 @@
 /**
  * PayPlus Express Checkout V2 - Blocks Integration
- * Registers with WooCommerce Blocks to show express checkout buttons
+ * Renders Apple Pay and Google Pay buttons in WooCommerce Blocks checkout
+ * 
+ * This script DOES NOT use registerExpressPaymentMethod because ECE buttons
+ * are not payment methods themselves - they are part of the checkout experience.
  * 
  * @package PayPlus
  * @version 2.0.0
  */
 
-(function() {
-    'use strict';
-    
-    const { registerExpressPaymentMethod } = window.wc.wcBlocksRegistry;
-    const { createElement } = window.wp.element;
-    const { __ } = window.wp.i18n;
-    
-    if (typeof registerExpressPaymentMethod === 'undefined') {
-        console.warn('PayPlus Express V2 Blocks: WooCommerce Blocks not available');
-        return;
-    }
-    
-    // Get settings from PHP
-    const settings = window.payplus_express_params || {};
-    
-    console.log('PayPlus Express V2 Blocks: Initializing...', settings);
-    
-    /**
-     * PayPlus Express Checkout Payment Method for Blocks
-     */
-    const PayPlusExpressCheckoutMethod = {
-        name: 'payplus-express-checkout',
-        
-        content: createElement('div', {
-            className: 'payplus-express-checkout-container',
-            'data-context': 'checkout',
-            style: { padding: '20px', background: '#f9f9f9', borderRadius: '8px', textAlign: 'center' }
-        }, [
-            createElement('div', {
-                key: 'separator',
-                className: 'payplus-express-separator',
-                style: { 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    marginBottom: '15px',
-                    color: '#666'
-                }
-            }, [
-                createElement('span', { 
-                    key: 'line1',
-                    style: { flex: 1, borderBottom: '1px solid #ddd' } 
-                }, ''),
-                createElement('span', { 
-                    key: 'text',
-                    style: { padding: '0 15px' } 
-                }, __('Or pay with', 'payplus-payment-gateway')),
-                createElement('span', { 
-                    key: 'line2',
-                    style: { flex: 1, borderBottom: '1px solid #ddd' } 
-                }, '')
-            ]),
-            createElement('div', {
-                key: 'buttons',
-                className: 'payplus-express-buttons',
-                style: { 
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    alignItems: 'center',
-                    maxWidth: '400px',
-                    margin: '0 auto'
-                }
-            }, [
-                settings.google_pay_enabled && createElement('div', {
-                    key: 'google-pay',
-                    id: 'payplus-google-pay-button',
-                    className: 'payplus-express-button payplus-google-pay-button',
-                    style: { width: '100%', minHeight: '48px', background: '#fff', borderRadius: '4px' }
-                }),
-                settings.apple_pay_enabled && createElement('div', {
-                    key: 'apple-pay',
-                    id: 'payplus-apple-pay-button',
-                    className: 'payplus-express-button payplus-apple-pay-button',
-                    style: { 
-                        width: '100%', 
-                        minHeight: '48px',
-                        WebkitAppearance: '-apple-pay-button',
-                        applePayButtonType: settings.button_type || 'buy',
-                        applePayButtonStyle: settings.button_color || 'black'
-                    }
-                })
-            ].filter(Boolean))
-        ]),
-        
-        edit: createElement('div', {
-            style: { padding: '20px', textAlign: 'center', border: '2px dashed #ccc', borderRadius: '4px' }
-        }, [
-            createElement('strong', { key: 'title' }, 'PayPlus Express Checkout'),
-            createElement('br', { key: 'br' }),
-            createElement('span', { key: 'desc', style: { color: '#666' } }, 
-                __('Apple Pay / Google Pay buttons will appear here', 'payplus-payment-gateway'))
-        ]),
-        
-        canMakePayment: () => {
-            // Always return true if either payment method is enabled
-            // The actual availability will be checked by the button initialization
-            const available = settings.apple_pay_enabled || settings.google_pay_enabled;
-            console.log('PayPlus Express V2 Blocks: canMakePayment =', available);
-            return available;
-        },
-        
-        paymentMethodId: 'payplus-payment-gateway',
-        
-        supports: {
-            features: ['products']
-        }
-    };
-    
-    // Register the express payment method
-    registerExpressPaymentMethod(PayPlusExpressCheckoutMethod);
-    
-    console.log('PayPlus Express V2 Blocks: Successfully registered!');
-    
-    // Wait for DOM and initialize payment buttons
-    setTimeout(() => {
-        console.log('PayPlus Express V2 Blocks: Attempting to initialize buttons...');
-        if (typeof window.PayPlusExpressCheckout === 'function') {
-            try {
-                new window.PayPlusExpressCheckout();
-                console.log('PayPlus Express V2 Blocks: Buttons initialized!');
-            } catch (error) {
-                console.error('PayPlus Express V2 Blocks: Init error', error);
-            }
-        } else {
-            console.warn('PayPlus Express V2 Blocks: PayPlusExpressCheckout class not found yet, will try again...');
-            // Try again after a longer delay
-            setTimeout(() => {
-                if (typeof window.PayPlusExpressCheckout === 'function') {
-                    try {
-                        new window.PayPlusExpressCheckout();
-                        console.log('PayPlus Express V2 Blocks: Buttons initialized (delayed)!');
-                    } catch (error) {
-                        console.error('PayPlus Express V2 Blocks: Delayed init error', error);
-                    }
-                }
-            }, 1000);
-        }
-    }, 500);
-    
-})();
-
+(function($) {
+	'use strict';
+	
+	console.log('PayPlus Express V2 Blocks: Script loaded');
+	
+	// Get configuration from localized data
+	const config = window.payplus_express_params || {};
+	console.log('PayPlus Express V2 Blocks: Config:', config);
+	
+	/**
+	 * Wait for the blocks checkout to be ready, then inject our buttons
+	 */
+	function initExpressCheckoutForBlocks() {
+		console.log('PayPlus Express V2 Blocks: Initializing for blocks');
+		
+		// Look for the checkout form container
+		const checkoutForm = document.querySelector('.wc-block-checkout__form');
+		
+		if (!checkoutForm) {
+			console.log('PayPlus Express V2 Blocks: Checkout form not found, retrying...');
+			setTimeout(initExpressCheckoutForBlocks, 500);
+			return;
+		}
+		
+		console.log('PayPlus Express V2 Blocks: Checkout form found');
+		
+		// Check if we should show express checkout
+		if (!config.apple_pay_enabled && !config.google_pay_enabled) {
+			console.log('PayPlus Express V2 Blocks: No express payment methods enabled');
+			return;
+		}
+		
+		// Check if buttons already exist (to avoid duplicates)
+		if (document.getElementById('payplus-apple-pay-button') || document.getElementById('payplus-google-pay-button')) {
+			console.log('PayPlus Express V2 Blocks: Buttons already exist');
+			return;
+		}
+		
+		// Create the container for express checkout buttons with actual button elements
+		const wrapper = document.createElement('div');
+		wrapper.id = 'payplus-express-checkout-v2-wrapper';
+		wrapper.style.marginBottom = '20px';
+		
+		// Build the button HTML
+		let buttonsHtml = '<div class="payplus-express-buttons">';
+		
+		if (config.apple_pay_enabled) {
+			buttonsHtml += '<div id="payplus-apple-pay-button" class="payplus-express-button payplus-apple-pay-button"></div>';
+		}
+		
+		if (config.google_pay_enabled) {
+			buttonsHtml += '<div id="payplus-google-pay-button" class="payplus-express-button payplus-google-pay-button"></div>';
+		}
+		
+		buttonsHtml += '</div>';
+		
+		wrapper.innerHTML = `
+			<div class="payplus-express-checkout-container" data-context="checkout">
+				<div class="payplus-express-separator">
+					<span>Or pay with</span>
+				</div>
+				${buttonsHtml}
+				<div class="payplus-express-loading" style="display: none;">
+					<span class="spinner"></span>
+					<span class="text">Processing...</span>
+				</div>
+			</div>
+		`;
+		
+		// Insert the wrapper at the beginning of the checkout form
+		checkoutForm.insertBefore(wrapper, checkoutForm.firstChild);
+		
+		console.log('PayPlus Express V2 Blocks: Container injected into DOM');
+		
+		// Initialize the PayPlusExpressCheckout class
+		if (window.PayPlusExpressCheckout) {
+			console.log('PayPlus Express V2 Blocks: Initializing PayPlusExpressCheckout');
+			window.payplusExpressCheckout = new window.PayPlusExpressCheckout();
+		} else {
+			console.error('PayPlus Express V2 Blocks: PayPlusExpressCheckout class not found');
+		}
+	}
+	
+	// Wait for DOM to be ready, then initialize
+	$(document).ready(function() {
+		console.log('PayPlus Express V2 Blocks: DOM ready');
+		
+		// Start initialization after a short delay to ensure blocks are rendered
+		setTimeout(initExpressCheckoutForBlocks, 1000);
+		
+		// Also observe for dynamic changes in case blocks re-render
+		const observer = new MutationObserver(function(mutations) {
+			// Check if the checkout form is present but our buttons are not
+			const checkoutForm = document.querySelector('.wc-block-checkout__form');
+			const ourButtons = document.querySelector('#payplus-apple-pay-button, #payplus-google-pay-button');
+			
+			if (checkoutForm && !ourButtons) {
+				console.log('PayPlus Express V2 Blocks: Blocks re-rendered, re-initializing');
+				initExpressCheckoutForBlocks();
+			}
+		});
+		
+		// Observe the entire document for changes
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true
+		});
+		
+		console.log('PayPlus Express V2 Blocks: Observer started');
+	});
+	
+})(jQuery);

@@ -2004,6 +2004,7 @@ class WC_PayPlus
                 if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
 
                     require_once 'includes/blocks/class-wc-payplus-blocks-support.php';
+                    
                     add_action(
                         'woocommerce_blocks_payment_method_type_registration',
                         function (Automattic\WooCommerce\Blocks\Payments\PaymentMethodRegistry $payment_method_registry) {
@@ -2021,6 +2022,74 @@ class WC_PayPlus
                             $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
                         }
                     );
+                    
+                    // Express Checkout V2 is NOT a payment method - it's injected via JavaScript
+                    // Enqueue scripts when blocks are detected
+                    add_action('wp_enqueue_scripts', function() {
+                        // Only load on checkout page
+                        if (!is_checkout() && !is_cart()) {
+                            return;
+                        }
+                        
+                        // Check if blocks checkout is being used
+                        if (!has_block('woocommerce/checkout') && !has_block('woocommerce/cart')) {
+                            return;
+                        }
+                        
+                        $express_checkout_v2 = WC_PayPlus_Express_Checkout_V2::get_instance();
+                        if (!$express_checkout_v2->is_available()) {
+                            return;
+                        }
+                        
+                        error_log('PayPlus Express V2: Enqueuing blocks scripts');
+                        
+                        // Enqueue Apple Pay SDK if enabled
+                        if ($express_checkout_v2->is_apple_pay_v2_enabled()) {
+                            wp_enqueue_script(
+                                'apple-pay-sdk',
+                                'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
+                                [],
+                                null,
+                                true
+                            );
+                        }
+                        
+                        // Enqueue Google Pay SDK if enabled
+                        if ($express_checkout_v2->is_google_pay_v2_enabled()) {
+                            wp_enqueue_script(
+                                'google-pay-sdk',
+                                'https://pay.google.com/gp/p/js/pay.js',
+                                [],
+                                null,
+                                true
+                            );
+                        }
+                        
+                        // Enqueue main express checkout script
+                        wp_enqueue_script(
+                            'payplus-express-checkout-v2',
+                            PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2.js',
+                            ['jquery'],
+                            PAYPLUS_VERSION,
+                            true
+                        );
+                        
+                        // Enqueue blocks-specific script
+                        wp_enqueue_script(
+                            'payplus-express-checkout-v2-blocks',
+                            PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2-blocks.js',
+                            ['jquery', 'payplus-express-checkout-v2'],
+                            PAYPLUS_VERSION,
+                            true
+                        );
+                        
+                        // Localize the script with configuration data
+                        wp_localize_script(
+                            'payplus-express-checkout-v2',
+                            'payplus_express_params',
+                            $express_checkout_v2->get_javascript_params()
+                        );
+                    }, 100); // Priority 100 to run after the main Express Checkout V2 enqueue
                 }
             }
 
