@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.0] - 28-12-2025 - (ZeKore)
+
+- Added    - Custom Invoice ID field to woocommerce checkot, aloowing customers to specify a different ID for Invoice+ documents - Activated via Invoice+ setting.
+
 ## [7.9.9] - 23-12-2025 - (MaKore)
 
 - Fix      - Resolved harmless installation warnings that appeared in debug logs for first-time users

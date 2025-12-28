@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 7.9.9
+Stable tag: 8.0.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.0.0 - 28-12-2025 =
+
+- Added    - Custom Invoice ID field to woocommerce checkot, aloowing customers to specify a different ID for Invoice+ documents - Activated via Invoice+ setting.
 
 == 7.9.9 - 23-12-2025 =
 
