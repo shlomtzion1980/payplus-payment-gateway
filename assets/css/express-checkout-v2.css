@@ -1,0 +1,308 @@
+/**
+ * PayPlus Express Checkout V2 Styles
+ * 
+ * @package PayPlus
+ * @version 2.0.0
+ */
+
+/* Express Checkout Container */
+.payplus-express-checkout-container {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.payplus-express-checkout-container[data-context="product"] {
+    margin-top: 15px;
+}
+
+.payplus-express-checkout-container[data-context="cart"] {
+    margin-bottom: 20px;
+}
+
+.payplus-express-checkout-container[data-context="checkout"] {
+    margin-bottom: 30px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+}
+
+/* Separator */
+.payplus-express-separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 14px;
+}
+
+.payplus-express-separator::before,
+.payplus-express-separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.payplus-express-separator span {
+    padding: 0 15px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Buttons Container */
+.payplus-express-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* Express Button */
+.payplus-express-button {
+    width: 100%;
+    max-width: 400px;
+    min-height: 48px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.payplus-express-button:hover {
+    opacity: 0.9;
+}
+
+.payplus-express-button:active {
+    opacity: 0.8;
+}
+
+/* Apple Pay Button */
+#payplus-apple-pay-button {
+    -webkit-appearance: -apple-pay-button;
+    -apple-pay-button-type: buy;
+    -apple-pay-button-style: black;
+}
+
+#payplus-apple-pay-button.white {
+    -apple-pay-button-style: white;
+}
+
+#payplus-apple-pay-button.white-outline {
+    -apple-pay-button-style: white-outline;
+}
+
+/* Google Pay Button */
+#payplus-google-pay-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#payplus-google-pay-button > div {
+    width: 100% !important;
+    min-height: 48px !important;
+}
+
+/* Loading State */
+.payplus-express-loading {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}
+
+.payplus-express-loading .spinner {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top-color: #000;
+    animation: payplus-spin 0.8s linear infinite;
+}
+
+.payplus-express-loading .text {
+    display: block;
+    margin-top: 10px;
+    color: #666;
+    font-size: 14px;
+}
+
+@keyframes payplus-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .payplus-express-checkout-container {
+        padding: 15px;
+        margin: 15px 0;
+    }
+
+    .payplus-express-buttons {
+        gap: 10px;
+    }
+
+    .payplus-express-button {
+        max-width: 100%;
+    }
+
+    .payplus-express-separator span {
+        font-size: 12px;
+        padding: 0 10px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .payplus-express-checkout-container {
+        padding: 12px;
+        margin: 12px 0;
+    }
+
+    .payplus-express-separator {
+        font-size: 12px;
+        margin-bottom: 12px;
+    }
+
+    .payplus-express-button {
+        min-height: 44px;
+    }
+}
+
+/* RTL Support */
+.rtl .payplus-express-separator span {
+    padding: 0 15px;
+}
+
+/* Hide when not available */
+.payplus-express-button[style*="display: none"] {
+    display: none !important;
+}
+
+/* Disabled State */
+.payplus-express-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Success State */
+.payplus-express-success {
+    display: none;
+    padding: 15px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    color: #155724;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.payplus-express-success.show {
+    display: block;
+}
+
+/* Error State */
+.payplus-express-error {
+    display: none;
+    padding: 15px;
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    color: #721c24;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.payplus-express-error.show {
+    display: block;
+}
+
+/* Compatibility with different themes */
+.woocommerce .payplus-express-checkout-container {
+    clear: both;
+}
+
+.woocommerce-page .payplus-express-checkout-container {
+    clear: both;
+}
+
+/* Cart Page Specific */
+.woocommerce-cart .payplus-express-checkout-container {
+    margin: 20px 0;
+    order: -1; /* Display before proceed to checkout */
+}
+
+/* Checkout Page Specific */
+.woocommerce-checkout .payplus-express-checkout-container {
+    margin-bottom: 30px;
+}
+
+/* Product Page Specific */
+.single-product .payplus-express-checkout-container {
+    margin-top: 20px;
+}
+
+/* Block Checkout Styles */
+.wp-block-woocommerce-checkout .payplus-express-checkout-container {
+    margin-bottom: 24px;
+}
+
+/* Ensure buttons work with different themes */
+.payplus-express-button * {
+    box-sizing: border-box;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .payplus-express-checkout-container {
+        border: 2px solid currentColor;
+    }
+    
+    .payplus-express-separator::before,
+    .payplus-express-separator::after {
+        border-bottom-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .payplus-express-button,
+    .payplus-express-loading .spinner {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .payplus-express-checkout-container {
+        background: #1a1a1a;
+        border-color: #333;
+    }
+    
+    .payplus-express-separator {
+        color: #ccc;
+    }
+    
+    .payplus-express-separator::before,
+    .payplus-express-separator::after {
+        border-bottom-color: #444;
+    }
+    
+    .payplus-express-loading .text {
+        color: #ccc;
+    }
+    
+    .payplus-express-loading .spinner {
+        border-color: rgba(255, 255, 255, 0.1);
+        border-top-color: #fff;
+    }
+}
+

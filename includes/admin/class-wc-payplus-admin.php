@@ -72,6 +72,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $sections[] = 'payplus-error-setting';
         $sections[] = 'payplus-invoice';
         $sections[] = 'payplus-express-checkout';
+        $sections[] = 'payplus-express-checkout-v2';
 
         if (
             $isPageOrder

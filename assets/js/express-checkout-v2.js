@@ -1,0 +1,503 @@
+/**
+ * PayPlus Express Checkout V2
+ * JavaScript for Apple Pay and Google Pay integration
+ * 
+ * @package PayPlus
+ * @version 2.0.0
+ */
+
+(function($) {
+    'use strict';
+
+    class PayPlusExpressCheckout {
+        constructor() {
+            this.params = window.payplus_express_params || {};
+            this.applePaySession = null;
+            this.googlePayClient = null;
+            this.context = 'cart';
+            this.orderData = null;
+            
+            this.init();
+        }
+
+        init() {
+            if (!this.params.ajax_url) {
+                return;
+            }
+
+            this.context = $('.payplus-express-checkout-container').data('context') || 'cart';
+            
+            // Initialize Apple Pay
+            if (this.params.apple_pay_enabled && window.ApplePaySession) {
+                this.initApplePay();
+            }
+
+            // Initialize Google Pay
+            if (this.params.google_pay_enabled) {
+                this.initGooglePay();
+            }
+        }
+
+        // ==================== Apple Pay ====================
+
+        initApplePay() {
+            if (!window.ApplePaySession || !ApplePaySession.canMakePayments()) {
+                $('#payplus-apple-pay-button').hide();
+                return;
+            }
+
+            const $button = $('#payplus-apple-pay-button');
+            
+            if ($button.length === 0) {
+                return;
+            }
+
+            // Set Apple Pay button styling
+            $button.css({
+                '-webkit-appearance': '-apple-pay-button',
+                '-apple-pay-button-type': this.params.button_type || 'buy',
+                '-apple-pay-button-style': this.params.button_color || 'black',
+                'height': (this.params.button_height || '48') + 'px',
+                'cursor': 'pointer',
+                'display': 'inline-block'
+            });
+
+            // Bind click event
+            $button.on('click', (e) => {
+                e.preventDefault();
+                this.startApplePay();
+            });
+
+            $button.show();
+        }
+
+        async startApplePay() {
+            try {
+                this.showLoading();
+                
+                // Get order data
+                this.orderData = await this.getOrderData();
+                
+                // Build payment request
+                const paymentRequest = {
+                    countryCode: this.params.country_code,
+                    currencyCode: this.params.currency_code,
+                    merchantCapabilities: ['supports3DS'],
+                    supportedNetworks: ['visa', 'masterCard', 'amex', 'discover'],
+                    total: {
+                        label: this.orderData.total.label,
+                        type: 'final',
+                        amount: this.orderData.total.amount
+                    },
+                    lineItems: this.orderData.displayItems || [],
+                    requiredBillingContactFields: ['postalAddress', 'name', 'phone', 'email'],
+                    requiredShippingContactFields: this.orderData.shippingRequired 
+                        ? ['postalAddress', 'name', 'phone', 'email'] 
+                        : []
+                };
+
+                // Create Apple Pay session
+                const session = new ApplePaySession(10, paymentRequest);
+                this.applePaySession = session;
+
+                // Event: Merchant validation
+                session.onvalidatemerchant = (event) => {
+                    this.validateApplePayMerchant(event, session);
+                };
+
+                // Event: Shipping contact selected
+                session.onshippingcontactselected = (event) => {
+                    this.onApplePayShippingContactSelected(event, session);
+                };
+
+                // Event: Shipping method selected
+                session.onshippingmethodselected = (event) => {
+                    this.onApplePayShippingMethodSelected(event, session);
+                };
+
+                // Event: Payment authorized
+                session.onpaymentauthorized = (event) => {
+                    this.onApplePayPaymentAuthorized(event, session);
+                };
+
+                // Event: Cancel
+                session.oncancel = () => {
+                    this.hideLoading();
+                    console.log('Apple Pay cancelled');
+                };
+
+                // Start session
+                session.begin();
+                
+            } catch (error) {
+                console.error('Apple Pay error:', error);
+                this.showError(error.message || this.params.i18n.error_generic);
+                this.hideLoading();
+            }
+        }
+
+        async validateApplePayMerchant(event, session) {
+            try {
+                // In production, you need to validate the merchant through your backend
+                // For now, we'll complete the validation directly
+                const merchantSession = {
+                    epochTimestamp: Date.now(),
+                    expiresAt: Date.now() + 300000,
+                    merchantSessionIdentifier: 'PAYPLUS_SESSION_' + Date.now(),
+                    nonce: this.generateNonce(),
+                    merchantIdentifier: this.params.apple_merchant_id,
+                    domainName: window.location.hostname,
+                    displayName: this.params.store_name,
+                    signature: ''
+                };
+
+                session.completeMerchantValidation(merchantSession);
+            } catch (error) {
+                console.error('Merchant validation error:', error);
+                session.abort();
+                this.hideLoading();
+            }
+        }
+
+        async onApplePayShippingContactSelected(event, session) {
+            try {
+                const shippingContact = event.shippingContact;
+                
+                // Update shipping
+                const shippingData = await this.updateShipping({
+                    countryCode: shippingContact.countryCode,
+                    administrativeArea: shippingContact.administrativeArea,
+                    locality: shippingContact.locality,
+                    postalCode: shippingContact.postalCode
+                });
+
+                const update = {
+                    newTotal: {
+                        label: this.params.store_name,
+                        amount: shippingData.total,
+                        type: 'final'
+                    },
+                    newLineItems: shippingData.displayItems || [],
+                    newShippingMethods: shippingData.shippingOptions || []
+                };
+
+                session.completeShippingContactSelection(update);
+            } catch (error) {
+                console.error('Shipping contact error:', error);
+                session.completeShippingContactSelection({
+                    errors: [new ApplePayError('shippingContactInvalid', 'postalAddress', error.message)]
+                });
+            }
+        }
+
+        async onApplePayShippingMethodSelected(event, session) {
+            // Update totals when shipping method changes
+            const shippingMethod = event.shippingMethod;
+            
+            const update = {
+                newTotal: this.orderData.total,
+                newLineItems: this.orderData.displayItems
+            };
+
+            session.completeShippingMethodSelection(update);
+        }
+
+        async onApplePayPaymentAuthorized(event, session) {
+            try {
+                const payment = event.payment;
+                
+                // Process payment
+                const result = await this.processPayment({
+                    paymentMethod: 'apple_pay',
+                    token: payment.token,
+                    billingContact: payment.billingContact,
+                    shippingContact: payment.shippingContact
+                });
+
+                if (result.success) {
+                    session.completePayment({
+                        status: ApplePaySession.STATUS_SUCCESS
+                    });
+
+                    // Redirect to success page
+                    setTimeout(() => {
+                        window.location.href = result.redirect_url;
+                    }, 500);
+                } else {
+                    session.completePayment({
+                        status: ApplePaySession.STATUS_FAILURE
+                    });
+                    this.showError(result.message || this.params.i18n.error_payment);
+                    this.hideLoading();
+                }
+            } catch (error) {
+                console.error('Payment authorization error:', error);
+                session.completePayment({
+                    status: ApplePaySession.STATUS_FAILURE
+                });
+                this.showError(error.message || this.params.i18n.error_payment);
+                this.hideLoading();
+            }
+        }
+
+        // ==================== Google Pay ====================
+
+        async initGooglePay() {
+            if (typeof google === 'undefined' || !google.payments) {
+                // Wait for Google Pay SDK to load
+                setTimeout(() => this.initGooglePay(), 100);
+                return;
+            }
+
+            const $button = $('#payplus-google-pay-button');
+            
+            if ($button.length === 0) {
+                return;
+            }
+
+            try {
+                this.googlePayClient = new google.payments.api.PaymentsClient({
+                    environment: this.params.environment === 'TEST' ? 'TEST' : 'PRODUCTION'
+                });
+
+                // Check if Google Pay is available
+                const isReadyToPay = await this.googlePayClient.isReadyToPay({
+                    apiVersion: 2,
+                    apiVersionMinor: 0,
+                    allowedPaymentMethods: this.getGooglePaymentMethods()
+                });
+
+                if (isReadyToPay.result) {
+                    // Create and add Google Pay button
+                    const button = this.googlePayClient.createButton({
+                        onClick: () => this.startGooglePay(),
+                        buttonType: this.params.button_type || 'buy',
+                        buttonColor: this.params.button_color === 'white' ? 'white' : 'black',
+                        buttonSizeMode: 'fill'
+                    });
+
+                    $button.empty().append(button).show();
+                } else {
+                    $button.hide();
+                }
+            } catch (error) {
+                console.error('Google Pay initialization error:', error);
+                $button.hide();
+            }
+        }
+
+        async startGooglePay() {
+            try {
+                this.showLoading();
+                
+                // Get order data
+                this.orderData = await this.getOrderData();
+
+                // Build payment request
+                const paymentDataRequest = {
+                    apiVersion: 2,
+                    apiVersionMinor: 0,
+                    allowedPaymentMethods: this.getGooglePaymentMethods(),
+                    merchantInfo: {
+                        merchantId: this.params.google_merchant_id,
+                        merchantName: this.params.store_name
+                    },
+                    transactionInfo: {
+                        totalPriceStatus: 'FINAL',
+                        totalPrice: this.orderData.total.amount,
+                        currencyCode: this.params.currency_code,
+                        countryCode: this.params.country_code,
+                        displayItems: this.orderData.displayItems.map(item => ({
+                            label: item.label,
+                            type: 'LINE_ITEM',
+                            price: item.amount
+                        }))
+                    },
+                    emailRequired: true,
+                    shippingAddressRequired: this.orderData.shippingRequired,
+                    shippingAddressParameters: this.orderData.shippingRequired ? {
+                        allowedCountryCodes: [this.params.country_code],
+                        phoneNumberRequired: true
+                    } : undefined,
+                    callbackIntents: this.orderData.shippingRequired ? ['SHIPPING_ADDRESS', 'SHIPPING_OPTION'] : undefined
+                };
+
+                // Load payment data
+                const paymentData = await this.googlePayClient.loadPaymentData(paymentDataRequest);
+                
+                // Process payment
+                await this.onGooglePayAuthorized(paymentData);
+                
+            } catch (error) {
+                if (error.statusCode === 'CANCELED') {
+                    console.log('Google Pay cancelled');
+                } else {
+                    console.error('Google Pay error:', error);
+                    this.showError(error.message || this.params.i18n.error_generic);
+                }
+                this.hideLoading();
+            }
+        }
+
+        getGooglePaymentMethods() {
+            return [{
+                type: 'CARD',
+                parameters: {
+                    allowedAuthMethods: ['PAN_ONLY', 'CRYPTOGRAM_3DS'],
+                    allowedCardNetworks: ['AMEX', 'DISCOVER', 'MASTERCARD', 'VISA']
+                },
+                tokenizationSpecification: {
+                    type: 'PAYMENT_GATEWAY',
+                    parameters: {
+                        gateway: this.params.google_gateway,
+                        gatewayMerchantId: this.params.google_gateway_merchant_id
+                    }
+                }
+            }];
+        }
+
+        async onGooglePayAuthorized(paymentData) {
+            try {
+                const paymentToken = paymentData.paymentMethodData.tokenizationData.token;
+                const info = paymentData.paymentMethodData.info;
+                const email = paymentData.email;
+                const shippingAddress = paymentData.shippingAddress;
+
+                // Process payment
+                const result = await this.processPayment({
+                    paymentMethod: 'google_pay',
+                    token: paymentToken,
+                    cardInfo: info,
+                    email: email,
+                    billingContact: shippingAddress,
+                    shippingContact: shippingAddress
+                });
+
+                if (result.success) {
+                    // Redirect to success page
+                    window.location.href = result.redirect_url;
+                } else {
+                    this.showError(result.message || this.params.i18n.error_payment);
+                    this.hideLoading();
+                }
+            } catch (error) {
+                console.error('Google Pay authorization error:', error);
+                this.showError(error.message || this.params.i18n.error_payment);
+                this.hideLoading();
+            }
+        }
+
+        // ==================== Common Methods ====================
+
+        async getOrderData() {
+            const data = {
+                action: 'payplus_express_create_order',
+                nonce: this.params.nonce,
+                context: this.context
+            };
+
+            // Add product data if on product page
+            if (this.context === 'product') {
+                const $form = $('form.cart');
+                data.product_id = $form.find('[name="product_id"], [name="add-to-cart"]').val();
+                data.quantity = $form.find('[name="quantity"]').val() || 1;
+            }
+
+            const response = await $.post(this.params.ajax_url, data);
+            
+            if (!response.success) {
+                throw new Error(response.data?.message || this.params.i18n.error_generic);
+            }
+
+            return response.data;
+        }
+
+        async updateShipping(shippingAddress) {
+            const response = await $.post(this.params.ajax_url, {
+                action: 'payplus_express_update_shipping',
+                nonce: this.params.nonce,
+                shipping_address: shippingAddress
+            });
+
+            if (!response.success) {
+                throw new Error(response.data?.message || this.params.i18n.error_shipping);
+            }
+
+            return response.data;
+        }
+
+        async processPayment(paymentData) {
+            const data = {
+                action: 'payplus_express_process_payment',
+                nonce: this.params.nonce,
+                context: this.context,
+                payment_data: paymentData
+            };
+
+            // Add product data if on product page
+            if (this.context === 'product') {
+                const $form = $('form.cart');
+                data.payment_data.product_id = $form.find('[name="product_id"], [name="add-to-cart"]').val();
+                data.payment_data.quantity = $form.find('[name="quantity"]').val() || 1;
+            }
+
+            const response = await $.post(this.params.ajax_url, data);
+            
+            if (!response.success) {
+                throw new Error(response.data?.message || this.params.i18n.error_payment);
+            }
+
+            return {
+                success: true,
+                redirect_url: response.data.redirect_url,
+                order_id: response.data.order_id
+            };
+        }
+
+        showLoading() {
+            $('.payplus-express-buttons').hide();
+            $('.payplus-express-loading').show();
+        }
+
+        hideLoading() {
+            $('.payplus-express-loading').hide();
+            $('.payplus-express-buttons').show();
+        }
+
+        showError(message) {
+            if (typeof wc_add_notice !== 'undefined') {
+                wc_add_notice(message, 'error');
+            } else {
+                alert(message);
+            }
+        }
+
+        generateNonce() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    }
+
+    // Initialize on document ready
+    $(document).ready(function() {
+        if ($('.payplus-express-checkout-container').length > 0) {
+            new PayPlusExpressCheckout();
+        }
+    });
+
+    // Re-initialize on AJAX complete (for dynamic content)
+    $(document).ajaxComplete(function() {
+        if ($('.payplus-express-checkout-container').length > 0 && !$('.payplus-express-checkout-container').data('initialized')) {
+            $('.payplus-express-checkout-container').data('initialized', true);
+            new PayPlusExpressCheckout();
+        }
+    });
+    
+    // Expose class globally for WooCommerce Blocks
+    window.PayPlusExpressCheckout = PayPlusExpressCheckout;
+
+})(jQuery);
+

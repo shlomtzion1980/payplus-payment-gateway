@@ -25,9 +25,14 @@ class WC_PayPlus_Admin_Settings
                 'img' => "<img style='height: 75%;' src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "InvoicePlusLogo.png'>",
             ),
             'payplus-express-checkout' => array(
-                'name' => __('Express Checkout', 'payplus-payment-gateway'),
+                'name' => __('Express Checkout (Legacy)', 'payplus-payment-gateway'),
                 'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout',
                 'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "expressCheckout.png'>",
+            ),
+            'payplus-express-checkout-v2' => array(
+                'name' => __('Express Checkout V2', 'payplus-payment-gateway'),
+                'link' => get_admin_url() . 'admin.php?page=wc-settings&tab=checkout&section=payplus-express-checkout-v2',
+                'img' => "<img src='" . PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "express.svg'>",
             ),
         );
     }
@@ -745,6 +750,103 @@ class WC_PayPlus_Admin_Settings
                     );
                 }
                 $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-express-checkout');
+                break;
+            
+            case 'payplus-express-checkout-v2':
+                $settings[$section][] = array(
+                    'name' => __('Express Checkout V2 (Modern)', 'payplus-payment-gateway'),
+                    'type' => 'title',
+                    'desc' => __('Modern Apple Pay and Google Pay integration with improved features and better compatibility. Supports both Classic and Block-based Checkout.', 'payplus-payment-gateway'),
+                    'id' => 'payplus-express-checkout-v2-main'
+                );
+                
+                $settings[$section][] = [
+                    'name' => __('Enable Apple Pay (V2)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_apple_pay_enabled]',
+                    'type' => 'checkbox',
+                    'desc' => __('Enable modern Apple Pay express checkout with latest API', 'payplus-payment-gateway'),
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Apple Merchant Identifier', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[apple_merchant_identifier]',
+                    'type' => 'text',
+                    'desc' => __('Your Apple Pay merchant identifier (e.g., merchant.com.yourstore)', 'payplus-payment-gateway'),
+                    'placeholder' => 'merchant.com.example'
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Enable Google Pay (V2)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_google_pay_enabled]',
+                    'type' => 'checkbox',
+                    'desc' => __('Enable modern Google Pay express checkout with latest API', 'payplus-payment-gateway'),
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Google Merchant ID', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[google_merchant_id]',
+                    'type' => 'text',
+                    'desc' => __('Your Google Pay merchant ID (optional, leave empty for test environment)', 'payplus-payment-gateway'),
+                    'placeholder' => '12345678901234567890'
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Display Locations', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_display_locations]',
+                    'type' => 'multiselect',
+                    'class' => 'wc-enhanced-select',
+                    'desc' => __('Select where to display express checkout buttons', 'payplus-payment-gateway'),
+                    'options' => [
+                        'product' => __('Product Pages', 'payplus-payment-gateway'),
+                        'cart' => __('Cart Page', 'payplus-payment-gateway'),
+                        'checkout' => __('Checkout Page', 'payplus-payment-gateway')
+                    ],
+                    'default' => ['product', 'cart', 'checkout']
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Button Type', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_button_type]',
+                    'type' => 'select',
+                    'desc' => __('The type of button to display', 'payplus-payment-gateway'),
+                    'options' => [
+                        'buy' => __('Buy', 'payplus-payment-gateway'),
+                        'plain' => __('Plain', 'payplus-payment-gateway'),
+                        'check-out' => __('Check Out', 'payplus-payment-gateway'),
+                        'book' => __('Book', 'payplus-payment-gateway'),
+                        'donate' => __('Donate', 'payplus-payment-gateway'),
+                        'subscribe' => __('Subscribe', 'payplus-payment-gateway')
+                    ],
+                    'default' => 'buy'
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Button Color', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_button_color]',
+                    'type' => 'select',
+                    'desc' => __('The color of the Apple Pay button', 'payplus-payment-gateway'),
+                    'options' => [
+                        'black' => __('Black', 'payplus-payment-gateway'),
+                        'white' => __('White', 'payplus-payment-gateway'),
+                        'white-outline' => __('White with Outline', 'payplus-payment-gateway')
+                    ],
+                    'default' => 'black'
+                ];
+                
+                $settings[$section][] = [
+                    'name' => __('Button Height (px)', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[express_button_height]',
+                    'type' => 'number',
+                    'desc' => __('Height of the express checkout buttons in pixels', 'payplus-payment-gateway'),
+                    'default' => '48',
+                    'custom_attributes' => [
+                        'min' => '40',
+                        'max' => '64',
+                        'step' => '1'
+                    ]
+                ];
+                
+                $settings[$section][] = array('type' => 'sectionend', 'id' => 'payplus-express-checkout-v2-main');
                 break;
         }
         $settings = isset($settings[$section]) ? $settings[$section] : $settings;

@@ -1298,6 +1298,8 @@ class WC_PayPlus
                     if ($isPayPlusEnabled) {
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
                     }
+                    // Load new Express Checkout V2 (Apple Pay & Google Pay)
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-express-checkout-v2.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
