@@ -897,6 +897,9 @@ class WC_PayPlus_Express_Checkout_V2 {
         // Get main PayPlus gateway instance to access iframe URLs
         $gateway = $this->get_main_payplus_gateway();
         
+        // Get shipping data (similar to original Express Checkout)
+        $shipping_data = $this->get_shipping_data();
+        
         return [
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('frontNonce'), // Use same nonce name as original
@@ -913,12 +916,56 @@ class WC_PayPlus_Express_Checkout_V2 {
             'button_type' => $this->settings->express_button_type ?? 'buy',
             'button_color' => $this->settings->express_button_color ?? 'black',
             'button_height' => $this->settings->express_button_height ?? '48',
+            'shipping_data' => $shipping_data, // Add shipping data
             'i18n' => [
                 'error_generic' => __('An error occurred. Please try again.', 'payplus-payment-gateway'),
                 'error_shipping' => __('Unable to calculate shipping. Please use regular checkout.', 'payplus-payment-gateway'),
                 'error_payment' => __('Payment failed. Please try again.', 'payplus-payment-gateway'),
             ]
         ];
+    }
+    
+    /**
+     * Get shipping data from WooCommerce shipping zones
+     *
+     * @return array
+     */
+    private function get_shipping_data() {
+        $shipping_data = ['all' => []];
+        
+        // Get all shipping zones
+        $shipping_zones = WC_Shipping_Zones::get_zones();
+        
+        foreach ($shipping_zones as $zone_data) {
+            $zone = new WC_Shipping_Zone($zone_data['zone_id']);
+            $shipping_methods = $zone->get_shipping_methods(true); // Only enabled methods
+            
+            foreach ($shipping_methods as $method) {
+                if ($method->enabled === 'yes') {
+                    $shipping_data['all'][] = [
+                        'id' => $method->instance_id,
+                        'title' => $method->title,
+                        'cost' => isset($method->cost) ? $method->cost : 0,
+                    ];
+                }
+            }
+        }
+        
+        // Get "Rest of World" zone (zone 0)
+        $zone_0 = new WC_Shipping_Zone(0);
+        $methods_0 = $zone_0->get_shipping_methods(true);
+        
+        foreach ($methods_0 as $method) {
+            if ($method->enabled === 'yes') {
+                $shipping_data['all'][] = [
+                    'id' => $method->instance_id,
+                    'title' => $method->title,
+                    'cost' => isset($method->cost) ? $method->cost : 0,
+                ];
+            }
+        }
+        
+        return $shipping_data;
     }
     
     /**

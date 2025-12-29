@@ -441,6 +441,21 @@
             }
         }
 
+        loadShippingFromDOM() {
+            // Use shipping data from params (passed from PHP)
+            if (this.params.shipping_data) {
+                return this.params.shipping_data;
+            }
+            
+            // Fallback: try to load from global variable
+            if (typeof payplus_shipping !== 'undefined') {
+                return payplus_shipping;
+            }
+            
+            // Return default structure with empty array
+            return { all: [] };
+        }
+
         async sendPayingVatToIframe(paymentData) {
             console.log('PayPlus Express V2: Updating paying VAT status');
             const contact = {
@@ -448,10 +463,10 @@
             };
             await this.updatePayingVat(contact);
             
-            // Send updated status to iframe
+            // Send updated status to iframe (must respond to avoid timeout!)
             const iframe = $('#payplus-google-pay-button iframe')[0];
             if (iframe && iframe.contentWindow) {
-                iframe.contentWindow.postMessage({ paying_vat: this.globalPayingVat }, '*');
+                iframe.contentWindow.postMessage({ paying_vat_check: this.globalPayingVat }, '*');
             }
         }
 
@@ -557,14 +572,17 @@
                 // The response IS the data (no .data wrapper)
                 const data = response;
             
-            // Store values for later use - use original field names
-            this.globalPriceProductsWithoutTax = parseFloat(data.priceProductsWithoutTax || data.total_without_tax || 0);
-            this.globalPriceProductsWithTax = parseFloat(data.priceProductsWithTax || data.total || 0);
-            this.globalTaxForProducts = parseFloat(data.taxProducts || data.tax || 0);
-            this.globalDiscount = parseFloat(data.discount || data.discountPrice || 0);
-            this.appleTotalPrice = parseFloat(data.totalPrice || data.total || 0);
-            this.ArrayCheckoutItemsApplePay = data.items || data.products || [];
-            this.currentShippingArrayPayPlus = { all: data.shippingMethods || data.shipping || [] };
+            // Store values for later use - map from AJAX response field names
+            this.globalPriceProductsWithoutTax = parseFloat(data.total_without_tax || 0);
+            this.globalPriceProductsWithTax = parseFloat(data.total || 0);
+            this.globalTaxForProducts = parseFloat(data.taxGlobal || 0);
+            this.globalDiscount = parseFloat(data.discountPrice || 0);
+            this.appleTotalPrice = parseFloat(data.total || 0);
+            this.ArrayCheckoutItemsApplePay = data.products || [];
+            this.currencyCode = this.params.currency_code; // Use from params
+            
+            // Load shipping methods from DOM or use empty array
+            this.currentShippingArrayPayPlus = this.loadShippingFromDOM();
             
             console.log('PayPlus Express V2: Cart data received', data);
             return data;
