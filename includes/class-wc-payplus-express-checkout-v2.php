@@ -414,9 +414,11 @@ class WC_PayPlus_Express_Checkout_V2 {
 
     /**
      * AJAX: Create order data for express checkout
+     * Note: This endpoint is not used by the V2 implementation anymore.
+     * The V2 uses the original 'payplus-get-total-cart' endpoint instead.
      */
     public function ajax_create_order() {
-        check_ajax_referer('payplus_express_checkout', 'nonce');
+        check_ajax_referer('frontNonce', '_ajax_nonce');
 
         try {
             $context = isset($_POST['context']) ? sanitize_text_field($_POST['context']) : 'cart';
@@ -540,9 +542,10 @@ class WC_PayPlus_Express_Checkout_V2 {
 
     /**
      * AJAX: Update shipping method
+     * Note: This endpoint is not used by the V2 implementation anymore.
      */
     public function ajax_update_shipping() {
-        check_ajax_referer('payplus_express_checkout', 'nonce');
+        check_ajax_referer('frontNonce', '_ajax_nonce');
 
         try {
             $shipping_address = isset($_POST['shipping_address']) ? $_POST['shipping_address'] : [];
@@ -606,9 +609,11 @@ class WC_PayPlus_Express_Checkout_V2 {
 
     /**
      * AJAX: Process payment
+     * Note: This endpoint is not used by the V2 implementation anymore.
+     * The V2 uses the original 'process-payment-oneclick' endpoint instead.
      */
     public function ajax_process_payment() {
-        check_ajax_referer('payplus_express_checkout', 'nonce');
+        check_ajax_referer('frontNonce', '_ajax_nonce');
 
         try {
             $payment_data = isset($_POST['payment_data']) ? $_POST['payment_data'] : [];
@@ -886,20 +891,22 @@ class WC_PayPlus_Express_Checkout_V2 {
     }
 
     /**
-     * Get JavaScript params for localization
+     * Get JavaScript params for localization (matches original implementation)
      *
      * @return array
      */
     public function get_javascript_params() {
+        // Get main PayPlus gateway instance to access iframe URLs
+        $gateway = $this->get_main_payplus_gateway();
+        
         return [
             'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('payplus_express_checkout'),
+            'nonce' => wp_create_nonce('frontNonce'), // Use same nonce name as original
             'apple_pay_enabled' => $this->apple_pay_enabled,
             'google_pay_enabled' => $this->google_pay_enabled,
+            'google_pay_iframe_url' => $gateway ? $gateway->payplus_iframe_google_pay_oneclick : '',
             'apple_merchant_id' => $this->apple_merchant_id,
             'google_merchant_id' => $this->google_merchant_id,
-            'google_gateway' => 'payplus',
-            'google_gateway_merchant_id' => $this->api_key,
             'test_mode' => $this->test_mode,
             'environment' => $this->test_mode ? 'TEST' : 'PRODUCTION',
             'country_code' => substr(get_option('woocommerce_default_country'), 0, 2),
@@ -914,6 +921,16 @@ class WC_PayPlus_Express_Checkout_V2 {
                 'error_payment' => __('Payment failed. Please try again.', 'payplus-payment-gateway'),
             ]
         ];
+    }
+    
+    /**
+     * Get main PayPlus gateway instance
+     *
+     * @return WC_PayPlus_Gateway|null
+     */
+    private function get_main_payplus_gateway() {
+        $gateways = WC()->payment_gateways()->payment_gateways();
+        return isset($gateways['payplus-payment-gateway']) ? $gateways['payplus-payment-gateway'] : null;
     }
     
     /**
