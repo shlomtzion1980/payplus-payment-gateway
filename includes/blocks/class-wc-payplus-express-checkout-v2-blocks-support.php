@@ -78,6 +78,15 @@ final class WC_PayPlus_Express_Checkout_V2_Blocks_Support extends AbstractPaymen
 	public function get_payment_method_script_handles() {
 		error_log('PayPlus Express V2 Blocks: get_payment_method_script_handles called');
 		
+		// Enqueue CSS for Express Checkout V2
+		wp_enqueue_style(
+			'payplus-express-checkout-v2',
+			PAYPLUS_PLUGIN_URL . 'assets/css/express-checkout-v2.css',
+			[],
+			PAYPLUS_VERSION
+		);
+		error_log('PayPlus Express V2 Blocks: CSS enqueued');
+		
 		// Enqueue Apple Pay SDK if enabled
 		if ($this->express_checkout_configuration->is_apple_pay_v2_enabled()) {
 			wp_register_script(
@@ -105,7 +114,8 @@ final class WC_PayPlus_Express_Checkout_V2_Blocks_Support extends AbstractPaymen
 		$this->register_blocks_script_handles();
 		
 		error_log('PayPlus Express V2 Blocks: Returning script handles');
-		return ['payplus-express-checkout-v2-blocks'];
+		// Return both the main script and the blocks script
+		return ['payplus-express-checkout-v2-main', 'payplus-express-checkout-v2-blocks'];
 	}
 	
 	/**
@@ -113,7 +123,28 @@ final class WC_PayPlus_Express_Checkout_V2_Blocks_Support extends AbstractPaymen
 	 */
 	private function register_blocks_script_handles() {
 		$version = PAYPLUS_VERSION;
-		$dependencies = ['wp-element', 'wp-i18n', 'wc-blocks-registry'];
+		
+		// IMPORTANT: Register the main V2 script first (contains PayPlusExpressCheckout class)
+		wp_register_script(
+			'payplus-express-checkout-v2-main',
+			PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2.js',
+			['jquery'],
+			$version,
+			true
+		);
+		
+		// Localize the main script with params (using the same variable name as classic)
+		$config_data = $this->express_checkout_configuration->get_javascript_params();
+		wp_localize_script(
+			'payplus-express-checkout-v2-main',
+			'payplus_express_params',
+			$config_data
+		);
+		
+		error_log('PayPlus Express V2 Blocks: Main script localized with: ' . wp_json_encode($config_data));
+		
+		// Now register the blocks-specific script that depends on the main script
+		$dependencies = ['jquery', 'wp-element', 'wp-i18n', 'wc-blocks-registry', 'payplus-express-checkout-v2-main'];
 		
 		// Add SDK dependencies if enabled
 		if ($this->express_checkout_configuration->is_apple_pay_v2_enabled()) {
@@ -124,7 +155,7 @@ final class WC_PayPlus_Express_Checkout_V2_Blocks_Support extends AbstractPaymen
 		}
 		
 		$script_url = PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2-blocks.js';
-		error_log('PayPlus Express V2 Blocks: Registering script at: ' . $script_url);
+		error_log('PayPlus Express V2 Blocks: Registering blocks script at: ' . $script_url);
 		error_log('PayPlus Express V2 Blocks: Dependencies: ' . wp_json_encode($dependencies));
 		
 		wp_register_script(
@@ -134,17 +165,6 @@ final class WC_PayPlus_Express_Checkout_V2_Blocks_Support extends AbstractPaymen
 			$version,
 			true
 		);
-		
-		// Localize the script with configuration data
-		// This is crucial - the JS looks for this variable
-		$config_data = $this->get_payment_method_data();
-		wp_localize_script(
-			'payplus-express-checkout-v2-blocks',
-			'wc_payplus_express_checkout_v2_blocks_params',
-			$config_data
-		);
-		
-		error_log('PayPlus Express V2 Blocks: Localized script with data: ' . wp_json_encode($config_data));
 		
 		wp_set_script_translations(
 			'payplus-express-checkout-v2-blocks',

@@ -231,13 +231,11 @@ class WC_PayPlus_Express_Checkout_V2 {
             $this->log('Express Checkout V2 - Added hook: woocommerce_proceed_to_checkout');
         }
 
-        // Checkout page - Classic ONLY for now (blocks needs different approach)
+        // Checkout page - BOTH Classic AND Blocks
         if (in_array('checkout', $this->display_locations, true)) {
             add_action('woocommerce_before_checkout_form', [$this, 'display_express_buttons'], 5);
-            $this->log('Express Checkout V2 - Added hook: woocommerce_before_checkout_form (classic only)');
-            
-            // TODO: Blocks checkout needs proper React integration, not HTML injection
-            // For now, we'll focus on classic checkout working perfectly
+            $this->log('Express Checkout V2 - Added hook: woocommerce_before_checkout_form (classic)');
+            // Blocks checkout is handled by the JavaScript + blocks support class
         }
     }
 

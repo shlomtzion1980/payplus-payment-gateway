@@ -736,6 +736,15 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function payplus_extra_button_on_product_page($visible = null)
     {
+        // If Express Checkout V2 is enabled, don't display original buttons
+        $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $v2_enabled = (isset($payplus_settings['express_apple_pay_enabled']) && $payplus_settings['express_apple_pay_enabled'] === 'yes') ||
+                      (isset($payplus_settings['express_google_pay_enabled']) && $payplus_settings['express_google_pay_enabled'] === 'yes');
+        
+        if ($v2_enabled) {
+            return; // V2 will handle display
+        }
+        
         ob_start();
         global $product;
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();

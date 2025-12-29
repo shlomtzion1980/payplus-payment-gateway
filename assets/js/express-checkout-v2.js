@@ -402,21 +402,33 @@
             try {
                 const cartData = await this.getCartData();
                 
+                // Format products in the simplified Google Pay line items format (like original front.js)
+                const formattedProducts = (this.ArrayCheckoutItemsApplePay || []).map(item => ({
+                    type: 'LINE_ITEM',
+                    label: item.title || 'Product',
+                    status: 'FINAL',
+                    price: ((item.priceProductWithoutTax || 0) * (item.quantity || 1)).toString()
+                }));
+
+                // Use instance variables which were set by getCartData()
                 const finalCartData = {
                     startProcess: true,
-                    host: window.location.hostname,
-                    totalPriceWithoutTax: cartData.priceProductsWithoutTax.toFixed(2),
-                    taxProductsAmount: cartData.taxProducts.toFixed(2),
-                    currencyCode: cartData.currencyCode,
-                    shipping: {
-                        all: cartData.shippingMethods
-                    },
-                    products: cartData.items,
-                    discount: cartData.discount.toFixed(2),
-                    totalPriceWithTax: cartData.priceProductsWithTax.toFixed(2),
-                    paying_vat: this.globalPayingVat
+                    host: window.location.host, // Use .host not .hostname (includes port)
+                    totalPriceWithoutTax: this.globalPriceProductsWithoutTax,
+                    taxProductsAmount: this.globalTaxForProducts,
+                    currencyCode: this.currencyCode,
+                    shipping: this.currentShippingArrayPayPlus,
+                    products: formattedProducts, // Use simplified format
+                    discount: this.globalDiscount
                 };
 
+                console.log('PayPlus Express V2: === FINAL CART DATA ===');
+                console.log('PayPlus Express V2: Total without tax:', finalCartData.totalPriceWithoutTax.toFixed(2));
+                console.log('PayPlus Express V2: Tax:', finalCartData.taxProductsAmount.toFixed(2));
+                console.log('PayPlus Express V2: Discount:', finalCartData.discount.toFixed(2));
+                console.log('PayPlus Express V2: Currency:', finalCartData.currencyCode);
+                console.log('PayPlus Express V2: Products:', finalCartData.products);
+                console.log('PayPlus Express V2: Shipping:', finalCartData.shipping);
                 console.log('PayPlus Express V2: Posting cart data to iframe', finalCartData);
                 
                 // Send data to iframe
@@ -520,34 +532,48 @@
 
         async getCartData() {
             console.log('PayPlus Express V2: Getting cart data');
+            console.log('PayPlus Express V2: AJAX URL:', this.params.ajax_url);
+            console.log('PayPlus Express V2: Nonce:', this.params.nonce);
             
-            const response = await $.ajax({
-                type: 'post',
-                dataType: 'json',
-                url: this.params.ajax_url,
-                data: {
-                    action: 'payplus-get-total-cart',
-                    _ajax_nonce: this.params.nonce
+            try {
+                const response = await $.ajax({
+                    type: 'post',
+                    dataType: 'json',
+                    url: this.params.ajax_url,
+                    data: {
+                        action: 'payplus-get-total-cart',
+                        _ajax_nonce: this.params.nonce
+                    }
+                });
+                
+                console.log('PayPlus Express V2: AJAX response:', response);
+                
+                // The original AJAX handler returns {error: false, ...data} not {status: true, data: {...}}
+                if (!response || response.error !== false) {
+                    console.error('PayPlus Express V2: Invalid response or error:', response);
+                    throw new Error('Failed to get cart data - ' + (response.error || 'invalid response'));
                 }
-            });
+                
+                // The response IS the data (no .data wrapper)
+                const data = response;
             
-            if (!response || !response.status) {
-                throw new Error('Failed to get cart data');
-            }
-            
-            const data = response.data;
-            
-            // Store values for later use
-            this.globalPriceProductsWithoutTax = parseFloat(data.priceProductsWithoutTax);
-            this.globalPriceProductsWithTax = parseFloat(data.priceProductsWithTax);
-            this.globalTaxForProducts = parseFloat(data.taxProducts);
-            this.globalDiscount = parseFloat(data.discount);
-            this.appleTotalPrice = parseFloat(data.totalPrice);
-            this.ArrayCheckoutItemsApplePay = data.items;
-            this.currentShippingArrayPayPlus = { all: data.shippingMethods };
+            // Store values for later use - use original field names
+            this.globalPriceProductsWithoutTax = parseFloat(data.priceProductsWithoutTax || data.total_without_tax || 0);
+            this.globalPriceProductsWithTax = parseFloat(data.priceProductsWithTax || data.total || 0);
+            this.globalTaxForProducts = parseFloat(data.taxProducts || data.tax || 0);
+            this.globalDiscount = parseFloat(data.discount || data.discountPrice || 0);
+            this.appleTotalPrice = parseFloat(data.totalPrice || data.total || 0);
+            this.ArrayCheckoutItemsApplePay = data.items || data.products || [];
+            this.currentShippingArrayPayPlus = { all: data.shippingMethods || data.shipping || [] };
             
             console.log('PayPlus Express V2: Cart data received', data);
             return data;
+            
+            } catch (error) {
+                console.error('PayPlus Express V2: AJAX error:', error);
+                console.error('PayPlus Express V2: Error details:', error.responseText || error.statusText || error.message);
+                throw new Error('Failed to get cart data: ' + (error.statusText || error.message));
+            }
         }
 
         updateApplePayConfig(

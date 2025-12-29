@@ -1295,11 +1295,16 @@ class WC_PayPlus
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_subgateways.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_invoice.php';
+                    
+                    // Load new Express Checkout V2 (Apple Pay & Google Pay)
+                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-express-checkout-v2.php';
+                    
+                    // IMPORTANT: Always load the original Express Checkout class for its AJAX handlers
+                    // V2 uses the original AJAX endpoints (payplus-get-total-cart, process-payment-oneclick, etc.)
+                    // The original class will check if V2 is enabled and skip displaying if it is
                     if ($isPayPlusEnabled) {
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_express_checkout.php';
                     }
-                    // Load new Express Checkout V2 (Apple Pay & Google Pay)
-                    require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-express-checkout-v2.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-payment-tokens.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
@@ -1459,8 +1464,15 @@ class WC_PayPlus
 
                 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                 $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
-                $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
-                    (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
+                // Check if Express Checkout V2 is enabled
+                $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                $v2_enabled = (isset($payplus_settings['express_apple_pay_enabled']) && $payplus_settings['express_apple_pay_enabled'] === 'yes') ||
+                              (isset($payplus_settings['express_google_pay_enabled']) && $payplus_settings['express_google_pay_enabled'] === 'yes');
+                
+                // Original Express Checkout - only if V2 is NOT enabled
+                $isEnableOneClick = !$v2_enabled && ((isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
+                    (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes"));
+                
                 if (is_checkout() || is_product() || is_cart() || $isElementor) {
                     if (
                         $this->payplus_payment_gateway_settings->enable_design_checkout === "yes" || $isEnableOneClick
@@ -1470,6 +1482,7 @@ class WC_PayPlus
                         add_filter('body_class', [$this, 'payplus_body_classes']);
                         wp_enqueue_style('payplus-css', PAYPLUS_PLUGIN_URL . 'assets/css/style.min.css', [], $css_script_version);
 
+                        // Load original front.js ONLY if V2 is NOT enabled
                         if ($isEnableOneClick) {
                             $payment_url_google_pay_iframe = $this->payplus_gateway->payplus_iframe_google_pay_oneclick;
                             wp_register_script('payplus-front-js', PAYPLUS_PLUGIN_URL . 'assets/js/front.min.js', [], $script_version, true);
@@ -2004,6 +2017,7 @@ class WC_PayPlus
                 if (class_exists('Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType')) {
 
                     require_once 'includes/blocks/class-wc-payplus-blocks-support.php';
+                    require_once 'includes/blocks/class-wc-payplus-express-checkout-v2-blocks-support.php';
                     
                     add_action(
                         'woocommerce_blocks_payment_method_type_registration',
@@ -2020,76 +2034,15 @@ class WC_PayPlus
                             $payment_method_registry->register(new WC_PayPlus_Gateway_POS_EMV_Block());
                             $payment_method_registry->register(new WC_Gateway_Payplus_WireTransfer_Block());
                             $payment_method_registry->register(new WC_Gateway_Payplus_Paypal_Block());
+                            
+                            // Register Express Checkout V2 for Blocks
+                            // Note: V2 shows as payment method in blocks to inject buttons at top of checkout
+                            $payment_method_registry->register(new WC_PayPlus_Express_Checkout_V2_Blocks_Support());
                         }
                     );
                     
-                    // Express Checkout V2 is NOT a payment method - it's injected via JavaScript
-                    // Enqueue scripts when blocks are detected
-                    add_action('wp_enqueue_scripts', function() {
-                        // Only load on checkout page
-                        if (!is_checkout() && !is_cart()) {
-                            return;
-                        }
-                        
-                        // Check if blocks checkout is being used
-                        if (!has_block('woocommerce/checkout') && !has_block('woocommerce/cart')) {
-                            return;
-                        }
-                        
-                        $express_checkout_v2 = WC_PayPlus_Express_Checkout_V2::get_instance();
-                        if (!$express_checkout_v2->is_available()) {
-                            return;
-                        }
-                        
-                        error_log('PayPlus Express V2: Enqueuing blocks scripts');
-                        
-                        // Enqueue Apple Pay SDK if enabled
-                        if ($express_checkout_v2->is_apple_pay_v2_enabled()) {
-                            wp_enqueue_script(
-                                'apple-pay-sdk',
-                                'https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js',
-                                [],
-                                null,
-                                true
-                            );
-                        }
-                        
-                        // Enqueue Google Pay SDK if enabled
-                        if ($express_checkout_v2->is_google_pay_v2_enabled()) {
-                            wp_enqueue_script(
-                                'google-pay-sdk',
-                                'https://pay.google.com/gp/p/js/pay.js',
-                                [],
-                                null,
-                                true
-                            );
-                        }
-                        
-                        // Enqueue main express checkout script
-                        wp_enqueue_script(
-                            'payplus-express-checkout-v2',
-                            PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2.js',
-                            ['jquery'],
-                            PAYPLUS_VERSION,
-                            true
-                        );
-                        
-                        // Enqueue blocks-specific script
-                        wp_enqueue_script(
-                            'payplus-express-checkout-v2-blocks',
-                            PAYPLUS_PLUGIN_URL . 'assets/js/express-checkout-v2-blocks.js',
-                            ['jquery', 'payplus-express-checkout-v2'],
-                            PAYPLUS_VERSION,
-                            true
-                        );
-                        
-                        // Localize the script with configuration data
-                        wp_localize_script(
-                            'payplus-express-checkout-v2',
-                            'payplus_express_params',
-                            $express_checkout_v2->get_javascript_params()
-                        );
-                    }, 100); // Priority 100 to run after the main Express Checkout V2 enqueue
+                    // Note: Express Checkout V2 blocks integration is now handled by
+                    // WC_PayPlus_Express_Checkout_V2_Blocks_Support class registered above
                 }
             }
 

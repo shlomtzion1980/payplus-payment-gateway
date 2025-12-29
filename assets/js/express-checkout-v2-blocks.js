@@ -14,9 +14,14 @@
 	
 	console.log('PayPlus Express V2 Blocks: Script loaded');
 	
-	// Get configuration from localized data
-	const config = window.payplus_express_params || {};
+	// Get configuration from localized data (use both possible names)
+	const config = window.payplus_express_params || window.wc_payplus_express_checkout_v2_blocks_params || {};
 	console.log('PayPlus Express V2 Blocks: Config:', config);
+	
+	// If config is empty, wait for it to be available
+	if (!config.ajax_url) {
+		console.log('PayPlus Express V2 Blocks: Config not ready, will retry');
+	}
 	
 	/**
 	 * Wait for the blocks checkout to be ready, then inject our buttons
