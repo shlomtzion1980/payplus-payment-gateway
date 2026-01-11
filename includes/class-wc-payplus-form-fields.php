@@ -20,6 +20,7 @@ class WC_PayPlus_Form_Fields
         $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
         $payplus_invoice_option = get_option('payplus_invoice_option');
         $showInvoiceRunnerButton = boolval(isset($payplus_invoice_option['show_invoice_runner_button']) && ($payplus_invoice_option['show_invoice_runner_button'] === 'yes' || $payplus_invoice_option['show_invoice_runner_button'] === 'on'));
+        $showPartnersFeatures = boolval(isset($payplus_payment_gateway_settings['enable_partners_features']) && $payplus_payment_gateway_settings['enable_partners_features'] === 'yes');
 
         $admin_bar->add_menu(array(
             'id' => 'PayPlus-toolbar',
@@ -55,6 +56,20 @@ class WC_PayPlus_Form_Fields
                 ),
             ));
         }
+
+        if ($showPartnersFeatures) {
+            $admin_bar->add_menu(array(
+                'id' => 'payPlus-toolbar-product-syncer',
+                'parent' => 'PayPlus-toolbar',
+                'title' => __('Product Syncer', 'payplus-payment-gateway'),
+                'href' => get_admin_url() . "admin.php?page=payplus-product-syncer",
+                'meta' => array(
+                    'title' => __('Product Syncer', 'payplus-payment-gateway'),
+                    'target' => '_blank',
+                    'class' => 'my_menu_item_class',
+                ),
+            ));
+        }
     }
 
     /**
@@ -80,6 +95,7 @@ class WC_PayPlus_Form_Fields
         $showOrdersButton = boolval($isPayPlus && isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
         $showSubGatewaysOnSide = boolval(isset($payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu']) && $payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu'] === 'yes');
         $showInvoiceRunnerButton = boolval(isset($payplus_invoice_option['show_invoice_runner_button']) && ($payplus_invoice_option['show_invoice_runner_button'] === 'yes' || $payplus_invoice_option['show_invoice_runner_button'] === 'on'));
+        $showPartnersFeatures = boolval(isset($payplus_payment_gateway_settings['enable_partners_features']) && $payplus_payment_gateway_settings['enable_partners_features'] === 'yes');
 
         add_menu_page(
             __('PayPlus Gateway', 'payplus-payment-gateway'),
@@ -159,6 +175,16 @@ class WC_PayPlus_Form_Fields
                 'administrator', //Capability
                 'runPayPlusOrdersChecker', //Page slug
                 [__CLASS__, 'runPayPlusOrdersChecker']
+            );
+        }
+        if ($showPartnersFeatures) {
+            add_submenu_page(
+                'payplus-payment-gateway', //Page Title
+                __('Product Syncer', 'payplus-payment-gateway'),
+                __('Product Syncer', 'payplus-payment-gateway'),
+                'administrator', //Capability
+                'payplus-product-syncer', //Page slug
+                ['WC_PayPlus_Product_Syncer', 'render_product_syncer_page']
             );
         }
     }
@@ -1067,6 +1093,13 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'title'   => __('Enable partners dev mode', 'payplus-payment-gateway'),
                 'desc_tip' => true,
                 'description' => __('Enable dev mode for PayPlus partners.', 'payplus-payment-gateway'),
+                'type'    => 'checkbox',
+                'default' => 'no',
+            ],
+            'enable_partners_features' => [
+                'title'   => __('Enable Partners Features', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'description' => __('Enable additional features for PayPlus partners, including product syncing.', 'payplus-payment-gateway'),
                 'type'    => 'checkbox',
                 'default' => 'no',
             ],
