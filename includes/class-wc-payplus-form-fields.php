@@ -989,6 +989,14 @@ class WC_PayPlus_Form_Fields
 Orders that were successful and cancelled manually will not be tested or updated via cron.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'payplus_cron_skip_subscriptions' => [
+                'title' => __('Skip subscription renewal orders in cron', 'payplus-payment-gateway'),
+                'label' => __('Skip WooCommerce subscription renewal orders when cron runs.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'description' => __('When enabled, the PayPlus cron service and invoice runner will skip subscription renewal orders. Renewal orders inherit payment information from their parent subscription, so they typically do not need to be reprocessed. The cron will still run on the initial parent subscription order.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'payplus_orders_check_button' => [
                 'title' => __('Display PayPlus "Orders Validator Button"', 'payplus-payment-gateway'),
                 'label' => __('Show PayPlus "Orders Validator Button" on the side menu.', 'payplus-payment-gateway'),

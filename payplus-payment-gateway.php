@@ -618,6 +618,40 @@ class WC_PayPlus
 
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
+            
+            // Skip subscription renewal orders if setting is enabled
+            $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
+            $skip_subscriptions = isset($payplus_settings['payplus_cron_skip_subscriptions']) && 
+                                  $payplus_settings['payplus_cron_skip_subscriptions'] === 'yes';
+            
+            if ($skip_subscriptions) {
+                // Skip subscription renewal orders - they inherit meta from parent subscription
+                if (function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order)) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: Skipping - this is a subscription renewal order (setting enabled).\n");
+                    $results['skipped_non_payplus']++;
+                    $results['processed_orders'][] = [
+                        'order_id' => $order_id,
+                        'payment_method' => $order->get_payment_method(),
+                        'status' => 'skipped',
+                        'reason' => 'Subscription renewal order (setting enabled)'
+                    ];
+                    continue;
+                }
+                
+                // Alternative check for renewal orders if the above function doesn't catch it
+                $is_renewal = WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal');
+                if ($is_renewal) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: Skipping - this is a subscription renewal order (meta check, setting enabled).\n");
+                    $results['skipped_non_payplus']++;
+                    $results['processed_orders'][] = [
+                        'order_id' => $order_id,
+                        'payment_method' => $order->get_payment_method(),
+                        'status' => 'skipped',
+                        'reason' => 'Subscription renewal order (meta check, setting enabled)'
+                    ];
+                    continue;
+                }
+            }
 
             // Check if order uses PayPlus payment method
             $payment_method = $order->get_payment_method();
@@ -778,6 +812,26 @@ class WC_PayPlus
         $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started:' . "\n" . 'Checking orders with statuses of: "pending" and "cancelled" created last half an hour ago and today.' . "\nOrders:" . wp_json_encode($orders), 'default');
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
+            
+            // Skip subscription renewal orders if setting is enabled
+            $skip_subscriptions = isset($this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions) && 
+                                  $this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions === 'yes';
+            
+            if ($skip_subscriptions) {
+                // Skip subscription renewal orders - they inherit meta from parent subscription
+                if (function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order)) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Skipping - this is a subscription renewal order (setting enabled).\n");
+                    continue;
+                }
+                
+                // Alternative check for renewal orders if the above function doesn't catch it
+                $is_renewal = WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal');
+                if ($is_renewal) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Skipping - this is a subscription renewal order (meta check, setting enabled).\n");
+                    continue;
+                }
+            }
+            
             $hour = $order->get_date_created()->date('H');
             $min = $order->get_date_created()->date('i');
             $calc = $current_minute - $min;
