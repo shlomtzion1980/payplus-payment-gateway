@@ -2771,7 +2771,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         ') . '
                         }';
         if ($this->api_test_mode) {
-            $apiURL = 'https://restapidev.payplus.co.il/api/v1.0/';
+            $apiURL = 'https://restapibeta.payplus.co.il/api/v1.0/';
         } else {
             $apiURL = 'https://restapi.payplus.co.il/api/v1.0/';
         }

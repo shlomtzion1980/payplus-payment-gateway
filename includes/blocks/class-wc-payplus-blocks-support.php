@@ -105,7 +105,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
         $this->vat4All = isset($options['paying_vat_all_order']) ? boolval($options['paying_vat_all_order'] === "yes") : false;
         $testMode = boolval($options['api_test_mode'] === 'yes');
-        $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
+        $apiUrl = $testMode ? 'https://restapibeta.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
         $apiKey = $testMode ? $options['dev_api_key'] : $options['api_key'];
         $secretKey = $testMode ? $options['dev_secret_key'] : $options['secret_key'];
         $paymentPageUid = $testMode ? $options['dev_payment_page_id'] : $options['payment_page_id'];

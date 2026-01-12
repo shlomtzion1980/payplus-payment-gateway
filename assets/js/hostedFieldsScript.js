@@ -295,7 +295,7 @@ jQuery(() => {
                         hosted_fields_uuid: resp.data.hosted_fields_uuid,
                         page_request_uid: resp.data.page_request_uid,
                         origin: testMode
-                            ? "https://restapidev.payplus.co.il"
+                            ? "https://restapibeta.payplus.co.il"
                             : "https://restapi.payplus.co.il",
                     });
                 } catch (error) {

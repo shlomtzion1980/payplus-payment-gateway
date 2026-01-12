@@ -671,7 +671,7 @@ class WC_PayPlus_Statics
         {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
             $testMode = boolval($options['api_test_mode'] === 'yes');
-            $apiUrl = $testMode ? 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
+            $apiUrl = $testMode ? 'https://restapibeta.payplus.co.il/api/v1.0/PaymentPages/generateLink' : 'https://restapi.payplus.co.il/api/v1.0/PaymentPages/generateLink';
 
             $pageRequestUid = WC()->session->get('page_request_uid');
             $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');

@@ -62,7 +62,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         /**
          * PAYPLUS_API_URL_DEV is the URL of the API in the development environment.
          */
-        define('PAYPLUS_API_URL_DEV', 'https://restapidev.payplus.co.il/api/v1.0/PaymentPages/generateLink');
+        define('PAYPLUS_API_URL_DEV', 'https://restapibeta.payplus.co.il/api/v1.0/PaymentPages/generateLink');
 
         /**
          * PAYPLUS_API_URL_PROD is the URL of the API in the production environment.

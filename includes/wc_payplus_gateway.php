@@ -4,7 +4,7 @@ define("COUNT_PAY_PLUS", 3);
 define('CLUB_CARD', array('multipass', 'valuecard', 'tav-zahav', 'finitione'));
 define('CREDIT_CARD', 'credit-card');
 define('PAYPLUS_PAYMENT_URL_PRODUCTION', 'https://restapi.payplus.co.il/api/v1.0/');
-define('PAYPLUS_PAYMENT_URL_DEV', 'https://restapidev.payplus.co.il/api/v1.0/');
+define('PAYPLUS_PAYMENT_URL_DEV', 'https://restapibeta.payplus.co.il/api/v1.0/');
 define('PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_PRODUCTION', 'https://payments.payplus.co.il/occ/google-pay');
 define('PAYPLUS_GOOGLE_PAY_IFRAME_ONECLICK_DEV', 'https://paymentsdev.payplus.co.il/occ/google-pay');
 define('ROUNDING_DECIMALS', 2);
