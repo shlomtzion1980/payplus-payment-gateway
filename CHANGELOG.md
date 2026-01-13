@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.1] - 14-01-2026 - (Sanji)
+
+- Tweak    - Order notes for IPN and cron processes are now separated for better clarity.
+- Tweak    - Improved PRUID validation to prevent duplicate processing after successful payment completion.
+- Added    - New setting to skip WooCommerce subscription renewal orders in cron service and invoice runner.
+
 ## [8.0.0] - 28-12-2025 - (ZeKore)
 
 - Added    - Custom Invoice ID field to woocommerce checkot, aloowing customers to specify a different ID for Invoice+ documents - Activated via Invoice+ setting.

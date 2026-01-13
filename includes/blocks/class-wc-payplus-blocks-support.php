@@ -1,4 +1,5 @@
 <?php
+if (! defined('ABSPATH')) exit; // Exit if accessed directly
 
 use Automattic\WooCommerce\Blocks\Payments\Integrations\AbstractPaymentMethodType;
 use Automattic\WooCommerce\Blocks\Payments\PaymentResult;
@@ -235,13 +236,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $data->customer->postal_code = $customer['postal_code'];
             $data->customer->country_iso = $customer['country_iso'];
             $data->customer->customer_external_number = $order->get_customer_id();
-            
+
             // Add customer_name_invoice if it exists
             $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
             if (!empty($customer_invoice_name)) {
                 $data->customer->customer_name_invoice = $customer_invoice_name;
             }
-            
+
             $payingVat = isset($options['paying_vat']) && in_array($options['paying_vat'], [0, 1, 2]) ? $options['paying_vat'] : false;
             if ($payingVat) {
                 $payingVat = $payingVat === "0" ? true : false;
@@ -352,17 +353,17 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             // Use session flag to prevent multiple checks for the same order in the same session
             $session_key = 'payplus_ipn_checked_' . $this->orderId;
             $already_checked = WC()->session && WC()->session->get($session_key);
-            
+
             $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
             if ($WC_PayPlus_Gateway && !$already_checked && isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) {
                 $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($this->orderId, 'payplus_page_request_uid', true);
-                
+
                 if (!empty($payplus_page_request_uid)) {
                     // Mark as checked in session to prevent duplicate calls
                     if (WC()->session) {
                         WC()->session->set($session_key, true);
                     }
-                    
+
                     $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid);
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
@@ -378,7 +379,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                         $returnStatusOnly = true
                     );
                     $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
-                    
+
                     if ($status === "processing" || $status === "on-hold" || $status === "approved") {
                         $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Status approved - Payment already processed');
                         // Payment already processed, set result to success
@@ -397,7 +398,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             } elseif ($already_checked && $WC_PayPlus_Gateway) {
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Already checked in this session - Skipping duplicate check');
             }
-            
+
             ++$hostedStarted;
             if ($hostedStarted <= 1) {
                 WC()->session->set('hostedStarted', $hostedStarted);
@@ -470,7 +471,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             // THIS IS THE BOTTLENECK - External API call
             $payload = $main_gateway->generatePaymentLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments, 'isSubscriptionOrder' => $this->isSubscriptionOrder]);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
-            
+
             // ANOTHER BOTTLENECK - Remote HTTP request
             $response = WC_PayPlus_Statics::payPlusRemote($main_gateway->payment_url, $payload);
 
@@ -487,7 +488,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 if ($context->payment_method !== 'payplus-payment-gateway-hostedfields' && WC()->session) {
                     WC()->session->set('page_order_awaiting_payment', $this->orderId);
                 }
-                
+
                 $orderMeta = [
                     'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],
                     'payplus_payment_page_link' => $responseArray['data']['payment_page_link']

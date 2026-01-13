@@ -1,4 +1,6 @@
 <?php
+if (! defined('ABSPATH')) exit; // Exit if accessed directly
+
 class WC_PayPlus_Express_Checkout extends WC_PayPlus
 {
     private $payPlusGateWaySettings;
