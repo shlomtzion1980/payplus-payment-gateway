@@ -129,7 +129,7 @@ class WC_PayPlus
         }
     }
 
-        /**
+    /**
      * PayPlus Embedded order processed function
      * This function gets the order object and stops execution with wp_die()
      * Displays comprehensive order information for debugging and testing
@@ -155,14 +155,16 @@ class WC_PayPlus
     public function payplus_check_pruid_on_checkout_load()
     {
         // Only run on checkout page (but not blocks checkout - that's handled separately)
-        if (!is_checkout() || is_wc_endpoint_url('order-received')) {
-            return;
-        } else {
-            if(is_wc_endpoint_url('order-received')) {
-                if (WC()->session) {
-                    WC()->session->__unset('page_order_awaiting_payment');
-                }
+        // Clean up session on order-received page FIRST (before any early return)
+        if (is_wc_endpoint_url('order-received')) {
+            if (WC()->session) {
+                WC()->session->__unset('page_order_awaiting_payment');
             }
+            return;
+        }
+        // Only run on checkout page (but not blocks checkout - that's handled separately)
+        if (!is_checkout()) {
+            return;
         }
 
         // Skip if it's blocks checkout (handled in blocks support class)
@@ -207,13 +209,13 @@ class WC_PayPlus
         }
 
         $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
-        
+
         if (empty($payplus_page_request_uid)) {
             return;
         }
 
         $main_gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started on Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid);
-        
+
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
         $status = $PayPlusAdminPayments->payplusIpn(
@@ -227,22 +229,22 @@ class WC_PayPlus
             $moreInfo = false,
             $returnStatusOnly = true
         );
-        
+
         $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
-        
+
         if ($status === "processing" || $status === "on-hold" || $status === "approved") {
             $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status approved - Payment already processed, redirecting');
-            
+
             // Clear cart and unset page_order_awaiting_payment, then redirect to order received page
             if (WC()->cart) {
                 WC()->cart->empty_cart();
             }
-            
+
             // Unset page_order_awaiting_payment since payment is complete
             if (WC()->session) {
                 WC()->session->__unset('page_order_awaiting_payment');
             }
-            
+
             $redirect_url = $order->get_checkout_order_received_url();
             wp_safe_redirect($redirect_url);
             exit;
@@ -373,7 +375,7 @@ class WC_PayPlus
         // Remove early redemption hooks that debit gift cards immediately at checkout
         remove_action('woocommerce_pre_payment_complete', array($pw_gift_cards_redeeming, 'woocommerce_pre_payment_complete'));
         remove_action('woocommerce_checkout_update_order_meta', array($pw_gift_cards_redeeming, 'woocommerce_checkout_update_order_meta'), 10, 2);
-        
+
         // Note: We keep woocommerce_order_status_processing and woocommerce_order_status_completed
         // hooks so gift cards are debited when order status changes to processing or completed
     }
@@ -618,12 +620,12 @@ class WC_PayPlus
 
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
-            
+
             // Skip subscription renewal orders if setting is enabled
             $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-            $skip_subscriptions = isset($payplus_settings['payplus_cron_skip_subscriptions']) && 
-                                  $payplus_settings['payplus_cron_skip_subscriptions'] === 'yes';
-            
+            $skip_subscriptions = isset($payplus_settings['payplus_cron_skip_subscriptions']) &&
+                $payplus_settings['payplus_cron_skip_subscriptions'] === 'yes';
+
             if ($skip_subscriptions) {
                 // Skip subscription renewal orders - they inherit meta from parent subscription
                 if (function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order)) {
@@ -637,7 +639,7 @@ class WC_PayPlus
                     ];
                     continue;
                 }
-                
+
                 // Alternative check for renewal orders if the above function doesn't catch it
                 $is_renewal = WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal');
                 if ($is_renewal) {
@@ -812,18 +814,18 @@ class WC_PayPlus
         $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', 'getPayplusCron process started:' . "\n" . 'Checking orders with statuses of: "pending" and "cancelled" created last half an hour ago and today.' . "\nOrders:" . wp_json_encode($orders), 'default');
         foreach ($orders as $order_id) {
             $order = wc_get_order($order_id);
-            
+
             // Skip subscription renewal orders if setting is enabled
-            $skip_subscriptions = isset($this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions) && 
-                                  $this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions === 'yes';
-            
+            $skip_subscriptions = isset($this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions) &&
+                $this->payplus_payment_gateway_settings->payplus_cron_skip_subscriptions === 'yes';
+
             if ($skip_subscriptions) {
                 // Skip subscription renewal orders - they inherit meta from parent subscription
                 if (function_exists('wcs_order_contains_renewal') && wcs_order_contains_renewal($order)) {
                     $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Skipping - this is a subscription renewal order (setting enabled).\n");
                     continue;
                 }
-                
+
                 // Alternative check for renewal orders if the above function doesn't catch it
                 $is_renewal = WC_PayPlus_Meta_Data::get_meta($order_id, '_subscription_renewal');
                 if ($is_renewal) {
@@ -831,7 +833,7 @@ class WC_PayPlus
                     continue;
                 }
             }
-            
+
             $hour = $order->get_date_created()->date('H');
             $min = $order->get_date_created()->date('i');
             $calc = $current_minute - $min;
@@ -945,6 +947,9 @@ class WC_PayPlus
                 $this->updateStatusesIpn ? $this->checkRunIpnResponse($order_id, $order, 1) : null;
                 if (WC()->cart) {
                     WC()->cart->empty_cart();
+                }
+                if (WC()->session) {
+                    WC()->session->__unset('page_order_awaiting_payment');
                 }
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 wp_safe_redirect($redirect_to);
@@ -1311,7 +1316,7 @@ class WC_PayPlus
                 // First try WordPress language directory (for translations from wordpress.org)
                 $locale = determine_locale();
                 $mofile = WP_LANG_DIR . '/plugins/payplus-payment-gateway-' . $locale . '.mo';
-                
+
                 if (file_exists($mofile)) {
                     load_textdomain('payplus-payment-gateway', $mofile);
                 } else {
@@ -1321,7 +1326,7 @@ class WC_PayPlus
                         load_textdomain('payplus-payment-gateway', $mofile);
                     }
                 }
-                
+
                 // Force reload for admin if already loaded by hosted fields
                 if (is_admin() && is_textdomain_loaded('payplus-payment-gateway')) {
                     unload_textdomain('payplus-payment-gateway');
@@ -1356,7 +1361,7 @@ class WC_PayPlus
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-order-data.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-hosted-fields.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin.php';
-                    
+
                     if (is_array($this->hostedFieldsOptions) && boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
                         require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-embedded.php';
                         // Initialize the embedded order processing class
@@ -2079,7 +2084,7 @@ class WC_PayPlus
             {
                 $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
                 $enable_customer_invoice_name = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
-                
+
                 if (!$enable_customer_invoice_name) {
                     return;
                 }
@@ -2087,7 +2092,7 @@ class WC_PayPlus
                 // Get current language
                 $current_locale = get_locale();
                 $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
-                
+
                 // Register the field for WooCommerce Blocks
                 // Note: woocommerce_register_additional_checkout_field automatically handles woocommerce_blocks_loaded timing
                 // If woocommerce_blocks_loaded hasn't fired yet, it will re-hook itself to that hook
@@ -2117,7 +2122,7 @@ class WC_PayPlus
             {
                 $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
                 $enable_customer_other_id = isset($payplus_settings['enable_customer_other_id']) && $payplus_settings['enable_customer_other_id'] === 'yes';
-                
+
                 if (!$enable_customer_other_id) {
                     return;
                 }
@@ -2125,7 +2130,7 @@ class WC_PayPlus
                 // Get current language
                 $current_locale = get_locale();
                 $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
-                
+
                 // Register the field for WooCommerce Blocks
                 // Note: woocommerce_register_additional_checkout_field automatically handles woocommerce_blocks_loaded timing
                 // If woocommerce_blocks_loaded hasn't fired yet, it will re-hook itself to that hook
