@@ -611,6 +611,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
             'hideMainPayPlusGateway' => $this->hideMainPayPlusGateway,
+            'hostedFieldsIsMain' => isset($this->hostedFieldsSettings['hosted_fields_is_main']) ? boolval($this->hostedFieldsSettings['hosted_fields_is_main'] === 'yes') : false,
             'multiPassIcons' => WC_PayPlus_Statics::getMultiPassIcons(),
             'isSubscriptionOrder' => $isSubscriptionOrder,
             'isLoggedIn' => is_user_logged_in(),
