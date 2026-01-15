@@ -119,7 +119,7 @@ jQuery(function ($) {
                     ? $hostedDiv.append($checkbox)
                     : null;
 
-                if (hasSavedCCs.length === 0) {
+                if (hasSavedCCs.length === 0 && hostedIsMain) {
                     setTimeout(function () {
                         $("input#" + inputPayPlus).prop("checked", true);
                         $("div.container.hostedFields").show();

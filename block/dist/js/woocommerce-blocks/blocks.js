@@ -82,6 +82,20 @@ if (isCheckout || hasOrder) {
     const hasSavedTokens =
         Object.keys(payPlusGateWay.hasSavedTokens).length > 0;
     const hideMainPayPlusGateway = payPlusGateWay.hideMainPayPlusGateway;
+    const hostedFieldsIsMain = payPlusGateWay.hostedFieldsIsMain;
+
+    // Auto-select hosted fields if hostedFieldsIsMain is true
+    if (hostedFieldsIsMain) {
+        const { dispatch } = window.wp.data;
+        const PAYMENT_STORE_KEY = window.wc.wcBlocksData.PAYMENT_STORE_KEY;
+        const OUR_GATEWAY = 'payplus-payment-gateway-hostedfields';
+
+        try {
+            dispatch(PAYMENT_STORE_KEY).__internalSetActivePaymentMethod(OUR_GATEWAY);
+        } catch (error) {
+            // Silently ignore errors
+        }
+    }
 
     (() => {
         ("use strict");
@@ -351,6 +365,7 @@ if (isCheckout || hasOrder) {
 
             const observer = new MutationObserver((mutationsList, observer) => {
                 const activePaymentMethod = payment.getActivePaymentMethod();
+                
                 if (
                     activePaymentMethod.search(
                         "payplus-payment-gateway-hostedfields"
@@ -401,6 +416,13 @@ if (isCheckout || hasOrder) {
                                 ppLogo.parentNode.insertBefore(hostedPlaceOrderButton, ppLogo);
                             }
                         }
+                    }
+                } else {
+                    // Hide hosted fields iframe when a different payment method is selected
+                    const ppIframeElement =
+                        document.getElementsByClassName("pp_iframe_h")[0];
+                    if (ppIframeElement) {
+                        ppIframeElement.style.display = "none";
                     }
                 }
                 if (hideMainPayPlusGateway) {
