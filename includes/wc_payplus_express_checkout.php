@@ -773,11 +773,14 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     $shippingPrice = wp_json_encode($allShippingArray);
                 }
             }
-            foreach (json_decode($shippingPrice, true) as $country => $entries) {
-                $array[$country] = array_values(array_unique($entries, SORT_REGULAR));
+            $decodedShippingPrice = json_decode($shippingPrice, true);
+            if (is_array($decodedShippingPrice)) {
+                foreach ($decodedShippingPrice as $country => $entries) {
+                    $array[$country] = array_values(array_unique($entries, SORT_REGULAR));
+                }
             }
 
-            $shippingPrice = wp_json_encode($array);
+            $shippingPrice = isset($array) ? wp_json_encode($array) : '[]';
 
             $productId = ($product) ? $product->get_id() : "";
             $productName = ($product) ? $product->get_title() : "";
