@@ -672,6 +672,18 @@ window.addEventListener("message", async function (event) {
     const url = payment_url_google_pay_iframe;
     const domain = new URL(url).origin;
     if (senderOrigin === domain) {
+        // Check if we're on WooCommerce Blocks (checkout or cart) - if so, skip processing
+        // Blocks pages are handled by express-payment.js instead
+        const isBlocksPage = document.querySelector('.wp-block-woocommerce-checkout') !== null || 
+                            document.querySelector('.wc-block-checkout') !== null ||
+                            document.querySelector('.wp-block-woocommerce-cart') !== null ||
+                            document.querySelector('.wc-block-cart') !== null ||
+                            document.body.classList.contains('woocommerce-checkout-block') ||
+                            document.body.classList.contains('woocommerce-cart-block');
+        if (isBlocksPage) {
+            return; // Let express-payment.js handle blocks pages
+        }
+        
         let productID =
             googleButton && googleButton.getAttribute("data-product-id");
         let quantity;

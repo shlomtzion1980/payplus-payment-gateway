@@ -455,6 +455,16 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $discountPrice = 0;
         $products = array();
+        
+        // Ensure cart is loaded and initialized
+        if (!WC()->cart || is_null(WC()->cart)) {
+            WC()->frontend_includes();
+            WC()->session = new WC_Session_Handler();
+            WC()->session->init();
+            WC()->cart = new WC_Cart();
+            WC()->customer = new WC_Customer(get_current_user_id(), true);
+        }
+        
         $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
         WC()->customer->set_shipping_country($merchantCountryCode);
         WC()->cart->calculate_totals();

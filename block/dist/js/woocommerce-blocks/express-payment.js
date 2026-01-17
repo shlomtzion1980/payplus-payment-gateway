@@ -78,6 +78,15 @@
                     },
                     success: function(response) {
                         if (response && response.error === false) {
+                            // Check if cart has products
+                            if (!response.products || response.products.length === 0 || !response.total_without_tax || response.total_without_tax == 0) {
+                                const errorDiv = document.getElementById('error-api-payplus');
+                                if (errorDiv) {
+                                    errorDiv.innerHTML = '<p>Error: Empty shopping cart</p>';
+                                }
+                                return;
+                            }
+                            
                             // Format products for Google Pay (same as front.js)
                             const formattedProducts = (response.products || []).map(item => ({
                                 type: 'LINE_ITEM',
