@@ -579,12 +579,70 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         parent::__construct();
         $this->id = 'payplus-payment-gateway-hostedfields';
         $this->method_title = __('PayPlus - Embedded', 'payplus-payment-gateway');
+        
+        // Enable payment fields for this gateway
+        $this->has_fields = true;
+        
         add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
+        
+        // Support tokenization for saved cards
+        $this->supports = array_merge($this->supports, ['tokenization']);
+    }
+
+    /**
+     * Override payment_fields to show saved payment methods when hosted_fields_is_main is enabled
+     */
+    public function payment_fields()
+    {
+        // Get hosted fields settings
+        $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
+        $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+        
+        // Get main gateway settings
+        $mainGatewaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $create_pp_token = isset($mainGatewaySettings['create_pp_token']) && $mainGatewaySettings['create_pp_token'] === 'yes';
+        
+        // If hosted fields is main and tokenization is enabled, show saved payment methods
+        if ($hosted_fields_is_main && $create_pp_token && is_checkout() && !is_admin()) {
+            // Get saved tokens from the main gateway (tokens are stored under 'payplus-payment-gateway' ID)
+            $tokens = WC_Payment_Tokens::get_customer_tokens(get_current_user_id(), 'payplus-payment-gateway');
+            
+            if (!empty($tokens)) {
+                $this->tokenization_script();
+                
+                // Display the saved payment methods manually since they belong to the main gateway
+                echo '<ul class="woocommerce-SavedPaymentMethods wc-saved-payment-methods" data-count="' . esc_attr(count($tokens)) . '">';
+                
+                foreach ($tokens as $token) {
+                    $checked = '';
+                    // Check the first token by default
+                    if (reset($tokens)->get_id() === $token->get_id()) {
+                        $checked = 'checked="checked"';
+                    }
+                    
+                    echo '<li class="woocommerce-SavedPaymentMethods-token">';
+                    echo '<input id="wc-payplus-payment-gateway-payment-token-' . esc_attr($token->get_id()) . '" type="radio" name="wc-payplus-payment-gateway-payment-token" value="' . esc_attr($token->get_id()) . '" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" ' . $checked . ' />';
+                    echo '<label for="wc-payplus-payment-gateway-payment-token-' . esc_attr($token->get_id()) . '">' . esc_html($token->get_display_name()) . '</label>';
+                    echo '</li>';
+                }
+                
+                // Add "Use a new payment method" option
+                echo '<li class="woocommerce-SavedPaymentMethods-new">';
+                echo '<input id="wc-payplus-payment-gateway-payment-token-new" type="radio" name="wc-payplus-payment-gateway-payment-token" value="new" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" />';
+                echo '<label for="wc-payplus-payment-gateway-payment-token-new">' . esc_html__('Use a new payment method', 'woocommerce') . '</label>';
+                echo '</li>';
+                
+                echo '</ul>';
+            }
+        }
+        
+        // Call parent to show description
+        parent::payment_fields();
     }
 
     /**
@@ -841,11 +899,44 @@ function payplus_filter_checkout_gateways($available_gateways)
             }
         }
 
-        // 2. Hide Main PayPlus gateway if its setting 'hide_main_pp_checkout' is 'yes'
+        // 2. Handle Main PayPlus gateway visibility based on hosted fields settings
         if (isset($available_gateways['payplus-payment-gateway'])) {
-            $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
-            if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
-                unset($available_gateways['payplus-payment-gateway']);
+            $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
+            $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+            
+            if ($hosted_fields_is_main) {
+                // Check if user has saved tokens
+                $has_tokens = false;
+                if (is_user_logged_in()) {
+                    $tokens = WC_Payment_Tokens::get_customer_tokens(get_current_user_id(), 'payplus-payment-gateway');
+                    $has_tokens = !empty($tokens);
+                }
+                
+                if ($has_tokens) {
+                    // Keep the gateway available but mark it for CSS hiding
+                    // Don't unset it - we need it for token payments
+                    add_filter('woocommerce_gateway_title', function($title, $gateway_id) {
+                        if ($gateway_id === 'payplus-payment-gateway') {
+                            // Add a CSS class to hide this gateway visually
+                            add_filter('woocommerce_available_payment_gateways', function($gateways) {
+                                if (isset($gateways['payplus-payment-gateway'])) {
+                                    // This will be picked up by JavaScript to hide it
+                                }
+                                return $gateways;
+                            });
+                        }
+                        return $title;
+                    }, 10, 2);
+                } else {
+                    // No saved tokens, completely remove the main gateway
+                    unset($available_gateways['payplus-payment-gateway']);
+                }
+            } else {
+                // Hosted fields is NOT main, check hide_main_pp_checkout setting
+                $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
+                    unset($available_gateways['payplus-payment-gateway']);
+                }
             }
         }
     }
