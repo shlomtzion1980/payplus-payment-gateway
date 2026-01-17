@@ -722,6 +722,12 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
      */
     public function payplus_extra_button_on_product_page($visible = null)
     {
+        // Prevent duplicate rendering - use static variable to track if already rendered on this page
+        static $already_rendered = false;
+        if ($already_rendered) {
+            return;
+        }
+        
         ob_start();
         global $product;
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
@@ -861,6 +867,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
         }
 
         $output = str_replace(array("\r", "\n"), '', trim(ob_get_clean()));
+
+        // Mark as rendered to prevent duplicates
+        $already_rendered = true;
 
         if (is_bool($visible) && $visible) {
             return $output;
