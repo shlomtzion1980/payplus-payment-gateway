@@ -1423,6 +1423,27 @@ jQuery(function ($) {
             $('input#wc-payplus-payment-gateway-payment-token-new').prop('checked', true).trigger('change');
         }
     });
+    
+    // Detect interaction with hosted fields iframes (for nested iframes that don't bubble click events)
+    if (payplus_script_checkout.hostedFieldsIsMain) {
+        var iframeInteractionChecker = setInterval(function() {
+            // Check if any iframe within pp_iframe_h has focus
+            var $activeElement = $(document.activeElement);
+            if ($activeElement.is('iframe') && $activeElement.closest('.pp_iframe_h').length) {
+                // An iframe within hosted fields has focus, user is interacting with it
+                var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
+                if ($hostedFieldsInput.is(':checked')) {
+                    var $tokenChecked = $('input[name="wc-payplus-payment-gateway-payment-token"]:checked');
+                    // If a token is selected (not "new"), switch to new payment method
+                    if ($tokenChecked.length && $tokenChecked.val() !== 'new') {
+                        $tokenChecked.prop('checked', false);
+                        $('input#wc-payplus-payment-gateway-payment-token-new').prop('checked', true).trigger('change');
+                        console.log('PayPlus: Detected iframe interaction, switched to new payment method');
+                    }
+                }
+            }
+        }, 300); // Check every 300ms
+    }
 
     // Make pp_iframe_h clickable to select payment method
     $(document.body).on('click touchstart', '.pp_iframe_h', function(e) {
