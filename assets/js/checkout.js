@@ -119,7 +119,7 @@ jQuery(function ($) {
                     ? $hostedDiv.append($checkbox)
                     : null;
 
-                if (hasSavedCCs.length === 0 && hostedIsMain) {
+                if (hostedIsMain) {
                     setTimeout(function () {
                         $("input#" + inputPayPlus).prop("checked", true);
                         $("div.container.hostedFields").show();
@@ -1293,6 +1293,136 @@ jQuery(function ($) {
     wc_checkout_coupons.init();
     wc_checkout_login_form.init();
     wc_terms_toggle.init();
+
+    // Hide main gateway visually when hosted fields is main (but keep it in DOM for token payments)
+    if (payplus_script_checkout.hostedFieldsIsMain) {
+        var hideMainGateway = function() {
+            // Target the li element specifically
+            $('li.payment_method_payplus-payment-gateway').attr('style', 'display: none !important;');
+            console.log('PayPlus: Hiding main gateway li element');
+        };
+        
+        // Hide immediately
+        hideMainGateway();
+        
+        // Also hide on updated_checkout event (when WooCommerce refreshes payment methods)
+        $(document.body).on('updated_checkout', function() {
+            hideMainGateway();
+        });
+        
+        // Ensure hosted fields is selected and its payment box is visible
+        setTimeout(function() {
+            var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
+            if ($hostedFieldsInput.length && !$hostedFieldsInput.is(':checked')) {
+                $hostedFieldsInput.prop('checked', true).trigger('change');
+            }
+            // Force show the payment box
+            $('.payment_box.payment_method_payplus-payment-gateway-hostedfields').show().css('display', 'block');
+        }, 100);
+    }
+
+    // Debug: Log selected payment method on change
+    $(document.body).on('change', 'input[name="payment_method"]', function() {
+        var selectedMethod = $('input[name="payment_method"]:checked').val();
+        console.log('Payment method changed to:', selectedMethod);
+        
+        // When hosted fields is selected, ensure its payment box is visible
+        if (selectedMethod === 'payplus-payment-gateway-hostedfields') {
+            $('.payment_box.payment_method_payplus-payment-gateway-hostedfields').show();
+        }
+    });
+
+    // Debug: Log payment info when place order is clicked
+    $(document.body).on('click', '#place_order', function(e) {
+        var selectedToken = $('input[name="wc-payplus-payment-gateway-payment-token"]:checked').val();
+        var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
+        var $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
+        
+        // If a saved token is selected (not "new") and hosted fields is checked, switch to main gateway
+        if ($hostedFieldsInput.is(':checked') && selectedToken && selectedToken !== 'new') {
+            console.log('INTERCEPTING: Forcing main gateway for token payment');
+            
+            // Check if main gateway exists
+            if ($mainGatewayInput.length === 0) {
+                console.error('Main gateway not found! Cannot process token payment.');
+                alert('Error: Payment method not available for saved cards. Please contact support.');
+                e.preventDefault();
+                return false;
+            }
+            
+            // Force main gateway selection
+            $mainGatewayInput.prop('checked', true);
+            $hostedFieldsInput.prop('checked', false);
+        }
+        
+        // Log after our changes
+        var selectedMethod = $('input[name="payment_method"]:checked').val();
+        var usingToken = $('body').attr('data-payplus-using-token');
+        console.log('=== PLACE ORDER CLICKED ===');
+        console.log('Selected payment method:', selectedMethod);
+        console.log('Selected token:', selectedToken);
+        console.log('Using token flag:', usingToken);
+        console.log('===========================');
+    });
+
+    // Handle saved payment method selection for hosted fields
+    // When a saved token is selected, temporarily show main gateway method for processing
+    $(document.body).on('change', 'input[name="wc-payplus-payment-gateway-payment-token"]', function() {
+        var selectedValue = $(this).val();
+        var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
+        var $mainGatewayLi = $('.payment_method_payplus-payment-gateway');
+        var $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
+        
+        console.log('Token selection changed to:', selectedValue);
+        console.log('Hosted fields checked:', $hostedFieldsInput.is(':checked'));
+        
+        if ($hostedFieldsInput.is(':checked')) {
+            if (selectedValue !== 'new') {
+                // A saved token is selected - we need to use main gateway for token processing
+                // Make main gateway visible but keep it hidden from user
+                if ($mainGatewayLi.length === 0) {
+                    // Main gateway was removed, we need to temporarily add it back
+                    var mainGatewayHtml = '<li class="wc_payment_method payment_method_payplus-payment-gateway" style="display:none !important;">' +
+                        '<input id="payment_method_payplus-payment-gateway" type="radio" class="input-radio" name="payment_method" value="payplus-payment-gateway" />' +
+                        '<label for="payment_method_payplus-payment-gateway">PayPlus</label>' +
+                        '<div class="payment_box payment_method_payplus-payment-gateway"></div>' +
+                        '</li>';
+                    $('.payment_method_payplus-payment-gateway-hostedfields').before(mainGatewayHtml);
+                    $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
+                    console.log('Main gateway added dynamically');
+                } else {
+                    // Main gateway exists, just ensure it's hidden
+                    $mainGatewayLi.css('display', 'none');
+                    console.log('Main gateway already exists, hiding it');
+                }
+                
+                // Select the main gateway input (this will be used for processing)
+                $mainGatewayInput.prop('checked', true);
+                // Do NOT set hosted fields back to checked - let main gateway stay selected for processing
+                
+                // Mark that we're using a saved token
+                $('body').attr('data-payplus-using-token', 'yes');
+                console.log('Switched to main gateway for token processing');
+            } else {
+                // "Use a new payment method" selected - use hosted fields
+                $hostedFieldsInput.prop('checked', true);
+                $('body').attr('data-payplus-using-token', 'no');
+                console.log('Using hosted fields for new payment method');
+            }
+        }
+    });
+
+    // When user clicks on pp_iframe_h, unselect saved tokens and select "Use a new payment method"
+    $(document.body).on('click touchstart', '.pp_iframe_h, .pp_iframe_h *', function(e) {
+        // Check if hosted fields is the selected payment method
+        var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
+        if ($hostedFieldsInput.is(':checked')) {
+            // Unselect any saved payment token
+            $('input[name="wc-payplus-payment-gateway-payment-token"]:checked').prop('checked', false);
+            // Select "Use a new payment method"
+            $('input#wc-payplus-payment-gateway-payment-token-new').prop('checked', true).trigger('change');
+        }
+    });
 
     // Make pp_iframe_h clickable to select payment method
     $(document.body).on('click touchstart', '.pp_iframe_h', function(e) {

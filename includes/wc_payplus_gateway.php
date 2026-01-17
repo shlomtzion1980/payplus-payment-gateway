@@ -1608,8 +1608,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public function payment_fields()
     {
         if ($this->supports('tokenization') && is_checkout()) {
+            // Check if hosted fields is the main payment method
+            $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
+            $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+            
             $this->tokenization_script();
-            if ($this->create_pp_token) {
+            // Only show saved payment methods here if hosted fields is NOT the main method
+            // When hosted_fields_is_main is enabled, saved payment methods are shown in the hosted fields section
+            if ($this->create_pp_token && !$hosted_fields_is_main) {
                 $this->saved_payment_methods();
             }
             $this->save_payment_method_checkbox();
