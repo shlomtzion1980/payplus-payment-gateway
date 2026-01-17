@@ -599,6 +599,11 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
      */
     private function should_show_payment_fields()
     {
+        // Don't show payment fields in admin area
+        if (is_admin() && !wp_doing_ajax()) {
+            return false;
+        }
+        
         // Get hosted fields settings
         $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
         $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';

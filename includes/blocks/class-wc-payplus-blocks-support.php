@@ -622,8 +622,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $isExpressCheckoutEnabled = ($WC_PayPlus_Gateway->enable_google_pay || $WC_PayPlus_Gateway->enable_apple_pay) && !$isSubscriptionOrder;
         
         // Get shipping data for express checkout (needed for Google Pay iframe)
-        $express_checkout = new WC_PayPlus_Express_Checkout();
-        $shippingPrice = $express_checkout->get_all_shipping_costs();
+        // Only get shipping costs if we're not in the admin editor (to avoid cart initialization issues)
+        $shippingPrice = [];
+        if (!is_admin() || wp_doing_ajax()) {
+            $express_checkout = new WC_PayPlus_Express_Checkout();
+            $shippingPrice = $express_checkout->get_all_shipping_costs();
+        }
         $shippingWoo = ($WC_PayPlus_Gateway->shipping_woo) ? "true" : "false";
         $globalShipping = round($WC_PayPlus_Gateway->global_shipping, ROUNDING_DECIMALS);
         $globalShippingTax = $WC_PayPlus_Gateway->global_shipping_tax;
