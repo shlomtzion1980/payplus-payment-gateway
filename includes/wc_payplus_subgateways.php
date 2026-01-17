@@ -580,8 +580,8 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $this->id = 'payplus-payment-gateway-hostedfields';
         $this->method_title = __('PayPlus - Embedded', 'payplus-payment-gateway');
         
-        // Enable payment fields for this gateway
-        $this->has_fields = true;
+        // Enable payment fields only when hosted_fields_is_main and there are saved tokens
+        $this->has_fields = $this->should_show_payment_fields();
         
         add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
         add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
@@ -592,6 +592,28 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         
         // Support tokenization for saved cards
         $this->supports = array_merge($this->supports, ['tokenization']);
+    }
+    
+    /**
+     * Check if we should show payment fields (only when hosted_fields_is_main and there are saved tokens)
+     */
+    private function should_show_payment_fields()
+    {
+        // Get hosted fields settings
+        $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
+        $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+        
+        // Get main gateway settings
+        $mainGatewaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $create_pp_token = isset($mainGatewaySettings['create_pp_token']) && $mainGatewaySettings['create_pp_token'] === 'yes';
+        
+        // Only show fields if hosted_fields_is_main, tokenization is enabled, and there are saved tokens
+        if ($hosted_fields_is_main && $create_pp_token && is_user_logged_in()) {
+            $tokens = WC_Payment_Tokens::get_customer_tokens(get_current_user_id(), 'payplus-payment-gateway');
+            return !empty($tokens);
+        }
+        
+        return false;
     }
 
     /**
@@ -616,6 +638,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 $this->tokenization_script();
                 
                 // Display the saved payment methods manually since they belong to the main gateway
+                echo '<h4 class="payplus-saved-tokens-heading" style="margin-bottom: 10px;">' . esc_html__('Saved Card Tokens', 'payplus-payment-gateway') . '</h4>';
                 echo '<ul class="woocommerce-SavedPaymentMethods wc-saved-payment-methods" data-count="' . esc_attr(count($tokens)) . '">';
                 
                 foreach ($tokens as $token) {
@@ -638,11 +661,15 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 echo '</li>';
                 
                 echo '</ul>';
+                
+                // Call parent to show description only when we have tokens
+                parent::payment_fields();
+                return;
             }
         }
         
-        // Call parent to show description
-        parent::payment_fields();
+        // If we reach here, either hosted fields is not main OR there are no saved tokens
+        // Don't show anything (empty payment_fields means payment box will be hidden)
     }
 
     /**
