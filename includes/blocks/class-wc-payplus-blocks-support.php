@@ -51,6 +51,27 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     protected static $express_data_cache = null;
 
+    /**
+     * Static cache for shared PayPlus gateway instance (shared across all gateway blocks)
+     *
+     * @var WC_PayPlus_Gateway|null
+     */
+    protected static $shared_payplus_gateway = null;
+
+    /**
+     * Static cache for shared settings to prevent multiple DB queries
+     *
+     * @var array
+     */
+    protected static $shared_settings_cache = [
+        'payplus_settings' => null,
+        'hosted_fields_settings' => null,
+        'apple_pay_settings' => null,
+        'custom_icons' => null,
+        'all_gateways' => null,
+        'pos_emv_settings' => null,
+    ];
+
 
     /**
      * Constructor
@@ -67,18 +88,44 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public function initialize()
     {
         $this->settings = get_option("woocommerce_{$this->name}_settings", []);
-        $this->payPlusSettings = get_option("woocommerce_payplus-payment-gateway_settings");
-        $this->hostedFieldsSettings = get_option("woocommerce_payplus-payment-gateway-hostedfields_settings");
+
+        // Use cached shared settings to avoid multiple DB queries across gateway instances
+        if (self::$shared_settings_cache['payplus_settings'] === null) {
+            self::$shared_settings_cache['payplus_settings'] = get_option("woocommerce_payplus-payment-gateway_settings");
+        }
+        $this->payPlusSettings = self::$shared_settings_cache['payplus_settings'];
+
+        if (self::$shared_settings_cache['hosted_fields_settings'] === null) {
+            self::$shared_settings_cache['hosted_fields_settings'] = get_option("woocommerce_payplus-payment-gateway-hostedfields_settings");
+        }
+        $this->hostedFieldsSettings = self::$shared_settings_cache['hosted_fields_settings'];
+
         $this->hideMainPayPlusGateway = isset($this->hostedFieldsSettings['hide_payplus_gateway']) && $this->hostedFieldsSettings['hide_payplus_gateway'] === 'yes' ? true : false;
         $this->displayMode = $this->settings['display_mode'] ?? null;
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
         $this->hideOtherPayments = boolval(isset($this->settings['hide_other_charge_methods']) && $this->settings['hide_other_charge_methods']) ?? null;
-        $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+
+        if (self::$shared_settings_cache['apple_pay_settings'] === null) {
+            self::$shared_settings_cache['apple_pay_settings'] = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
+        }
+        $this->applePaySettings = self::$shared_settings_cache['apple_pay_settings'];
+
         $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
         $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
-        $this->customIcons = array_values(WC_PayPlus_Statics::getCardsLogos());
+
+        // Cache card logos
+        if (self::$shared_settings_cache['custom_icons'] === null) {
+            self::$shared_settings_cache['custom_icons'] = array_values(WC_PayPlus_Statics::getCardsLogos());
+        }
+        $this->customIcons = self::$shared_settings_cache['custom_icons'];
+
         $this->secretKey = $this->settings['secret_key'] ?? null;
-        $gateways = WC()->payment_gateways->payment_gateways();
+
+        // Cache all gateways
+        if (self::$shared_settings_cache['all_gateways'] === null) {
+            self::$shared_settings_cache['all_gateways'] = WC()->payment_gateways->payment_gateways();
+        }
+        $gateways = self::$shared_settings_cache['all_gateways'];
 
         $this->settings['gateways'] = [];
         foreach (array_keys($gateways) as $payPlusGateWay) {
@@ -86,8 +133,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         }
         $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
         $this->gateway = $gateways[$this->name];
-        // Filter out POS EMV gateway if "Show in Blocks Checkout" is not enabled
-        $pos_emv_settings = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
+
+        // Cache POS EMV settings
+        if (self::$shared_settings_cache['pos_emv_settings'] === null) {
+            self::$shared_settings_cache['pos_emv_settings'] = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
+        }
+        $pos_emv_settings = self::$shared_settings_cache['pos_emv_settings'];
+
         $show_in_blocks_checkout = isset($pos_emv_settings['show_in_blocks_checkout']) && $pos_emv_settings['show_in_blocks_checkout'] === 'yes';
         if (!$show_in_blocks_checkout) {
             $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-pos-emv']));
@@ -96,15 +148,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
     /**
      * Returns the main PayPlus payment gateway class instance.
+     * Uses a shared static instance across all gateway blocks for better performance.
      *
-     * @return new WC_PayPlus_Gateway
+     * @return WC_PayPlus_Gateway
      */
     public function get_main_payplus_gateway()
     {
+        // First check instance variable for backward compatibility
         if (!is_null($this->payplus_gateway)) {
             return $this->payplus_gateway;
         }
-        $this->payplus_gateway = new WC_PayPlus_Gateway();
+
+        // Use shared static instance to avoid creating multiple gateway instances
+        if (self::$shared_payplus_gateway === null) {
+            self::$shared_payplus_gateway = new WC_PayPlus_Gateway();
+        }
+
+        $this->payplus_gateway = self::$shared_payplus_gateway;
         return $this->payplus_gateway;
     }
 
