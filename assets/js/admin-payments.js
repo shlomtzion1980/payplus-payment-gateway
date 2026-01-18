@@ -622,6 +622,52 @@ if (
     section == "payplus-error-setting" ||
     section == "payplus-payment-gateway"
 ) {
+    // Express Checkout Status Indicator
+    if (section === "payplus-express-checkout") {
+        function updateExpressCheckoutStatus() {
+            const googlePayEnabled = jQuery('#woocommerce_payplus-payment-gateway_settings\\[enable_google_pay\\]').is(':checked');
+            const googlePayUid = jQuery('#woocommerce_payplus-payment-gateway_settings\\[google_pay_page_uid\\]').val();
+            const applePayEnabled = jQuery('#woocommerce_payplus-payment-gateway_settings\\[enable_apple_pay\\]').is(':checked');
+            const applePayUid = jQuery('#woocommerce_payplus-payment-gateway_settings\\[apple_pay_identifier\\]').val();
+            
+            const isEnabled = (googlePayEnabled && googlePayUid && googlePayUid.trim() !== '') || 
+                            (applePayEnabled && applePayUid && applePayUid.trim() !== '');
+            
+            let statusTitle = jQuery('#payplus-express-status-title');
+            
+            // Create status element if it doesn't exist
+            if (statusTitle.length === 0) {
+                const statusHtml = '<div id="payplus-express-status-container" style="margin: 20px 0;"><h3 id="payplus-express-status-title" style="margin: 0; padding: 15px; border-radius: 4px; font-weight: 600; text-align: center;"></h3></div>';
+                jQuery('#settingsContainer .tab-section-payplus').prepend(statusHtml);
+                statusTitle = jQuery('#payplus-express-status-title');
+            }
+            
+            if (isEnabled) {
+                statusTitle.text('Express Checkout Enabled');
+                statusTitle.css({
+                    'background-color': '#d4edda',
+                    'color': '#155724',
+                    'border': '1px solid #c3e6cb'
+                });
+            } else {
+                statusTitle.text('Express Checkout Disabled');
+                statusTitle.css({
+                    'background-color': '#f8d7da',
+                    'color': '#721c24',
+                    'border': '1px solid #f5c6cb'
+                });
+            }
+        }
+        
+        // Wait for settingsContainer to be created, then add status
+        setTimeout(function() {
+            updateExpressCheckoutStatus();
+            
+            // Update when checkboxes or UIDs change
+            jQuery('#woocommerce_payplus-payment-gateway_settings\\[enable_google_pay\\], #woocommerce_payplus-payment-gateway_settings\\[enable_apple_pay\\]').on('change', updateExpressCheckoutStatus);
+            jQuery('#woocommerce_payplus-payment-gateway_settings\\[google_pay_page_uid\\], #woocommerce_payplus-payment-gateway_settings\\[apple_pay_identifier\\]').on('input change', updateExpressCheckoutStatus);
+        }, 100);
+    }
     jQuery(window).on("scroll", function () {
         var offset = $specificDiv.offset();
         var scrollTop = jQuery(window).scrollTop();

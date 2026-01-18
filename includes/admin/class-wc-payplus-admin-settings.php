@@ -638,6 +638,7 @@ class WC_PayPlus_Admin_Settings
                     'desc' => '',
                     'id' => 'payplus-express-checkout'
                 );
+                
                 $settings[$section][] = [
                     'name' => __('Google Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_google_pay]',
@@ -809,9 +810,10 @@ class WC_PayPlus_Admin_Settings
                 $taxRate = round(floatval($tax_rate['rate']), 2); // Adjust rounding as needed
                 $taxRateName = sanitize_text_field($tax_rate['label']);
 
-                $options[$taxRate] = sprintf('%s ( %d )', $taxRateName, $taxRate);
+                $options[$taxRate] = sprintf('%s ( %s )', $taxRateName, $taxRate);
             }
         }
         return $options;
     }
+    
 }
