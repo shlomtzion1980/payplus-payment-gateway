@@ -592,7 +592,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         // Register express payment script
         $express_script_path = '/block/dist/js/woocommerce-blocks/express-payment.min.js';
         $express_script_url = PAYPLUS_PLUGIN_URL . $express_script_path;
-        
+
         wp_register_script(
             'wc-payplus-express-payments-block',
             $express_script_url,
@@ -650,9 +650,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
                 // Use the one-click checkout iframe URL (same as classic checkout)
                 $iframeGooglePay = $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick;
-                
+
                 $isExpressCheckoutEnabled = ($WC_PayPlus_Gateway->enable_google_pay || $WC_PayPlus_Gateway->enable_apple_pay) && !$isSubscriptionOrder;
-                
+
                 // Get shipping data for express checkout (needed for Google Pay iframe)
                 // Only get shipping costs if we're not in the admin editor (to avoid cart initialization issues)
                 $shippingPrice = [];
@@ -664,7 +664,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $globalShipping = round($WC_PayPlus_Gateway->global_shipping, ROUNDING_DECIMALS);
                 $globalShippingTax = $WC_PayPlus_Gateway->global_shipping_tax;
                 $globalShippingTaxRate = $WC_PayPlus_Gateway->global_shipping_tax_rate;
-                
+
                 // Calculate global shipping with tax if needed
                 $globalShippingPriceTax = $globalShipping;
                 if ($shippingWoo === "false" && $globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
@@ -672,7 +672,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     $globalShippingPriceTax = $globalShipping * (1 + $rate);
                     $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
                 }
-                
+
                 $requirePhone = $WC_PayPlus_Gateway->get_option('require_phone') === 'yes' ? true : false;
 
                 // Update express_data with actual values
