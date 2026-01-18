@@ -100,6 +100,23 @@
                                 return acc + ((obj.priceProductWithTax || 0) - (obj.priceProductWithoutTax || 0)) * (obj.quantity || 1);
                             }, 0);
                             
+                            // Determine which shipping to use based on shippingWoo setting
+                            let shippingData;
+                            if (shippingWoo === "false") {
+                                // Use global shipping (overrides WooCommerce shipping)
+                                shippingData = {
+                                    all: [{
+                                        id: 0,
+                                        title: "Shipping Delivery",
+                                        cost_without_tax: (globalShippingWithoutTax || globalShipping || 0).toString(),
+                                        cost_with_tax: (globalShippingPriceTax || globalShipping || 0).toString()
+                                    }]
+                                };
+                            } else {
+                                // Use WooCommerce shipping
+                                shippingData = shippingPrice ? JSON.parse(shippingPrice) : { all: [] };
+                            }
+                            
                             // Prepare cart data for iframe (same format as classic checkout)
                             const cartData = {
                                 startProcess: startProcess, // Only true when iframe requests it
@@ -107,7 +124,7 @@
                                 totalPriceWithoutTax: parseFloat(response.total_without_tax || 0),
                                 taxProductsAmount: parseFloat(response.taxGlobal || resultTaxGlobal || 0),
                                 currencyCode: currencyCode || 'ILS',
-                                shipping: shippingPrice ? JSON.parse(shippingPrice) : { all: [] },
+                                shipping: shippingData,
                                 products: formattedProducts,
                                 discount: parseFloat(response.discountPrice || 0)
                             };
