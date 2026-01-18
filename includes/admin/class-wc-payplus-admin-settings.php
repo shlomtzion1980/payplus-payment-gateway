@@ -467,12 +467,12 @@ class WC_PayPlus_Admin_Settings
                     'type' => 'checkbox',
                     'default' => 'yes',
                     'desc_tip' => true,
-                    'desc' => __('Uncheck this if you manage your VAT with woocommerce tax and different tax rules.', 'payplus-payment-gateway'), 
+                    'desc' => __('(default - on) When this is turned on all items will include VAT unless one of the next rules (below) applies. / Uncheck this if you want VAT to be set for items according to WooCommerce tax settings.', 'payplus-payment-gateway'), 
                     'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat_all_order]',
                     'class' => 'payplus-vat',
                 ];
                 $settings[$section][] = [
-                    'title' => __('VAT change in Eilat', 'payplus-payment-gateway'),
+                    'title' => __('No VAT for Eilat', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'label' => '',
                     'default' => 'no',
@@ -532,26 +532,26 @@ class WC_PayPlus_Admin_Settings
                     'id' => 'payplus_invoice_option[display_customer_id_in_invoice]',
                     'class' => 'payplus-documents'
                 ];
+                // $settings[$section][] = [
+                //     'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
+                //     'type' => 'select',
+                //     'options' => [
+                //         '0' => __('Default', 'payplus-payment-gateway'),
+                //         '1' => __('PayPlus', 'payplus-payment-gateway'),
+                //         '2' => __('WooCommerce', 'payplus-payment-gateway'),
+                //     ],
+                //     'desc' => __('If you don`t know what to do here leave it on default :)', 'payplus-payment-gateway'),
+                //     'default' => '0',
+                //     'id' => 'woocommerce_payplus-payment-gateway_settings[initial_invoice]',
+                //     'class' => 'payplus-vat'
+                // ];
                 $settings[$section][] = [
-                    'title' => __('Calculate VAT According to:', 'payplus-payment-gateway'),
-                    'type' => 'select',
-                    'options' => [
-                        '0' => __('Default', 'payplus-payment-gateway'),
-                        '1' => __('PayPlus', 'payplus-payment-gateway'),
-                        '2' => __('WooCommerce', 'payplus-payment-gateway'),
-                    ],
-                    'desc' => __('If you don`t know what to do here leave it on default :)', 'payplus-payment-gateway'),
-                    'default' => '0',
-                    'id' => 'woocommerce_payplus-payment-gateway_settings[initial_invoice]',
-                    'class' => 'payplus-vat'
-                ];
-                $settings[$section][] = [
-                    'title' => __('Invoice For Foreign Customers', 'payplus-payment-gateway'),
+                    'title' => __('International VAT Settings', 'payplus-payment-gateway'),
                     'type' => 'select',
                     'options' => [
                         '0' => __('Paying VAT', 'payplus-payment-gateway'),
-                        '1' => __('Exempt VAT', 'payplus-payment-gateway'),
-                        '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than - enter in the input below two letter ISO country codes divided by commas', 'payplus-payment-gateway'),
+                        '1' => __('Exempt VAT - All except IL', 'payplus-payment-gateway'),
+                        '2' => __('Exempt VAT - All except IL and specified countries - comma separated - example: IT,US,DE', 'payplus-payment-gateway'),
                     ],
                     'default' => '0',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat]',
