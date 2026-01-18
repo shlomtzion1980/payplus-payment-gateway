@@ -319,7 +319,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     {
         $data = $context->payment_data;
         $is_payplus_payment_method = $this->name === $context->payment_method;
-        $main_gateway              = new WC_PayPlus_Gateway;
+        // Use cached gateway instance for better performance
+        $main_gateway              = $this->get_main_payplus_gateway();
         $this->orderId = $context->order->get_id();
         $order = $context->order;
 
