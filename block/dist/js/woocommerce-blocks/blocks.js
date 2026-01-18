@@ -596,8 +596,8 @@ if (isCheckout || hasOrder) {
             const config = { childList: true, subtree: true };
             observer.observe(targetNode, config);
         }
-        // Wait for a few seconds before starting to observe
-        setTimeout(startObserving(), 1000); // Adjust the time (in milliseconds) as needed
+        // Start observing immediately for faster response
+        startObserving();
     });
 
     function startIframe(paymentPageLink, overlay, loader) {
