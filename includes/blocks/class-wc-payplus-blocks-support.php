@@ -44,6 +44,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     protected $payplus_gateway = null;
 
+    /**
+     * Static cache for express checkout data to prevent recalculating on every gateway
+     *
+     * @var array|null
+     */
+    protected static $express_data_cache = null;
+
 
     /**
      * Constructor
@@ -614,34 +621,82 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         }
 
-        // Get express checkout data
-        $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
-        // Use the one-click checkout iframe URL (same as classic checkout)
-        $iframeGooglePay = $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick;
-        
-        $isExpressCheckoutEnabled = ($WC_PayPlus_Gateway->enable_google_pay || $WC_PayPlus_Gateway->enable_apple_pay) && !$isSubscriptionOrder;
-        
-        // Get shipping data for express checkout (needed for Google Pay iframe)
-        // Only get shipping costs if we're not in the admin editor (to avoid cart initialization issues)
-        $shippingPrice = [];
-        if (!is_admin() || wp_doing_ajax()) {
-            $express_checkout = new WC_PayPlus_Express_Checkout();
-            $shippingPrice = $express_checkout->get_all_shipping_costs();
+        // Check if we already have cached express data for this request
+        if (self::$express_data_cache !== null) {
+            $express_data = self::$express_data_cache;
+        } else {
+            // Initialize express checkout data with minimal defaults
+            $express_data = [
+                'isExpressCheckoutEnabled' => false,
+                'isGoogleEnabled' => false,
+                'isAppleEnabled' => false,
+                'googlePayIframeUrl' => '',
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'frontNonce' => wp_create_nonce('frontNonce'),
+                'shippingPrice' => [],
+                'currencyCode' => get_woocommerce_currency(),
+                'shippingWoo' => 'false',
+                'globalShipping' => 0,
+                'globalShippingPriceTax' => 0,
+                'globalShippingWithoutTax' => 0,
+                'requirePhone' => false,
+                'phonePlaceholder' => __('Phone number here:', 'payplus-payment-gateway'),
+            ];
+
+            // Only load expensive express checkout data on checkout/cart pages
+            // This prevents slowdown on all other pages of the site
+            if (is_checkout() || is_cart() || (defined('REST_REQUEST') && REST_REQUEST)) {
+                // Get express checkout data
+                $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
+                // Use the one-click checkout iframe URL (same as classic checkout)
+                $iframeGooglePay = $WC_PayPlus_Gateway->payplus_iframe_google_pay_oneclick;
+                
+                $isExpressCheckoutEnabled = ($WC_PayPlus_Gateway->enable_google_pay || $WC_PayPlus_Gateway->enable_apple_pay) && !$isSubscriptionOrder;
+                
+                // Get shipping data for express checkout (needed for Google Pay iframe)
+                // Only get shipping costs if we're not in the admin editor (to avoid cart initialization issues)
+                $shippingPrice = [];
+                if (!is_admin() || wp_doing_ajax()) {
+                    $express_checkout = new WC_PayPlus_Express_Checkout();
+                    $shippingPrice = $express_checkout->get_all_shipping_costs();
+                }
+                $shippingWoo = ($WC_PayPlus_Gateway->shipping_woo) ? "true" : "false";
+                $globalShipping = round($WC_PayPlus_Gateway->global_shipping, ROUNDING_DECIMALS);
+                $globalShippingTax = $WC_PayPlus_Gateway->global_shipping_tax;
+                $globalShippingTaxRate = $WC_PayPlus_Gateway->global_shipping_tax_rate;
+                
+                // Calculate global shipping with tax if needed
+                $globalShippingPriceTax = $globalShipping;
+                if ($shippingWoo === "false" && $globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
+                    $rate = (floatval($globalShippingTaxRate)) ? round(floatval($globalShippingTaxRate) / 100, ROUNDING_DECIMALS) : 0;
+                    $globalShippingPriceTax = $globalShipping * (1 + $rate);
+                    $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
+                }
+                
+                $requirePhone = $WC_PayPlus_Gateway->get_option('require_phone') === 'yes' ? true : false;
+
+                // Update express_data with actual values
+                $express_data = [
+                    'isExpressCheckoutEnabled' => $isExpressCheckoutEnabled,
+                    'isGoogleEnabled' => boolval($WC_PayPlus_Gateway->enable_google_pay),
+                    'isAppleEnabled' => boolval($WC_PayPlus_Gateway->enable_apple_pay),
+                    'googlePayIframeUrl' => $iframeGooglePay,
+                    'ajaxUrl' => admin_url('admin-ajax.php'),
+                    'frontNonce' => wp_create_nonce('frontNonce'),
+                    'shippingPrice' => $shippingPrice ? $shippingPrice : '',
+                    'currencyCode' => get_woocommerce_currency(),
+                    'shippingWoo' => $shippingWoo,
+                    'globalShipping' => $globalShipping,
+                    'globalShippingPriceTax' => $globalShippingPriceTax,
+                    'globalShippingWithoutTax' => $globalShipping,
+                    'requirePhone' => $requirePhone,
+                    'phonePlaceholder' => __('Phone number here:', 'payplus-payment-gateway'),
+                ];
+            }
+
+            // Cache the result for subsequent calls in the same request
+            self::$express_data_cache = $express_data;
         }
-        $shippingWoo = ($WC_PayPlus_Gateway->shipping_woo) ? "true" : "false";
-        $globalShipping = round($WC_PayPlus_Gateway->global_shipping, ROUNDING_DECIMALS);
-        $globalShippingTax = $WC_PayPlus_Gateway->global_shipping_tax;
-        $globalShippingTaxRate = $WC_PayPlus_Gateway->global_shipping_tax_rate;
-        
-        // Calculate global shipping with tax if needed
-        $globalShippingPriceTax = $globalShipping;
-        if ($shippingWoo === "false" && $globalShippingTax == "taxable" && get_option('woocommerce_calc_taxes') == 'yes') {
-            $rate = (floatval($globalShippingTaxRate)) ? round(floatval($globalShippingTaxRate) / 100, ROUNDING_DECIMALS) : 0;
-            $globalShippingPriceTax = $globalShipping * (1 + $rate);
-            $globalShippingPriceTax = ($rate) ? round($globalShippingPriceTax, ROUNDING_DECIMALS) : $globalShipping;
-        }
-        
-        $requirePhone = $WC_PayPlus_Gateway->get_option('require_phone') === 'yes' ? true : false;
 
         return [
             'title' => $this->get_setting('title'),
@@ -669,22 +724,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'gateways' => $this->settings['gateways'],
             'customIcons' => $this->customIcons,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : '',
-            'express_data' => [
-                'isExpressCheckoutEnabled' => $isExpressCheckoutEnabled,
-                'isGoogleEnabled' => boolval($WC_PayPlus_Gateway->enable_google_pay),
-                'isAppleEnabled' => boolval($WC_PayPlus_Gateway->enable_apple_pay),
-                'googlePayIframeUrl' => $iframeGooglePay,
-                'ajaxUrl' => admin_url('admin-ajax.php'),
-                'frontNonce' => wp_create_nonce('frontNonce'),
-                'shippingPrice' => $shippingPrice ? $shippingPrice : '',
-                'currencyCode' => get_woocommerce_currency(),
-                'shippingWoo' => $shippingWoo,
-                'globalShipping' => $globalShipping,
-                'globalShippingPriceTax' => $globalShippingPriceTax,
-                'globalShippingWithoutTax' => $globalShipping,
-                'requirePhone' => $requirePhone,
-                'phonePlaceholder' => __('Phone number here:', 'payplus-payment-gateway'),
-            ]
+            'express_data' => $express_data
         ];
     }
 }
