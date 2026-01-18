@@ -858,9 +858,26 @@ class PayplusInvoice
                 'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
 
             ];
-            if ($tax_rate_shipping || !$wc_tax_enabled) {
+            
+            // Set initial VAT type based on paying_vat_all_order setting (same logic as products)
+            if (isset($WC_PayPlus_Gateway->settings['paying_vat_all_order']) && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes")) {
+                $itemDetails['vat_type_code'] = 'vat-type-included';
+            } else {
+                $itemDetails['vat_type_code'] = 'vat-type-exempt';
+            }
+            
+            // Check actual shipping tax status if WooCommerce tax is enabled (same logic as products)
+            if ($wc_tax_enabled) {
+                // If shipping has tax > 0, it's taxable, otherwise it's exempt
+                $is_shipping_taxable = ($order->get_shipping_total() > 0 && $order->get_shipping_tax() > 0);
+                $itemDetails['vat_type_code'] = $is_shipping_taxable ? 'vat-type-included' : 'vat-type-exempt';
+            }
+            
+            // Override if allways_pay_vat is enabled (same logic as products)
+            if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
                 $itemDetails['vat_type_code'] = 'vat-type-included';
             }
+            
             $productsItems[] = $itemDetails;
             $totalCartAmount += $productPrice;
         }
