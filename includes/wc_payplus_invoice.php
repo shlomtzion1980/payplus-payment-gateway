@@ -617,12 +617,7 @@ class PayplusInvoice
         $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'customer_country_iso:' . $customer_country_iso);
         $WC_PayPlus_Gateway->payplus_add_log_all($handle . "_log", 'paying_vat_iso_code:' . $WC_PayPlus_Gateway->paying_vat_iso_code);
         if ($WC_PayPlus_Gateway->paying_vat == "2") {
-            // Treat paying_vat_iso_code as comma-delimited list of country codes
-            $iso_codes = array_map('trim', explode(',', strtolower($WC_PayPlus_Gateway->paying_vat_iso_code)));
-            $customer_country_lower = strtolower(trim($customer_country_iso));
-            
-            // Return true if customer country is NOT in the list
-            if (!in_array($customer_country_lower, $iso_codes)) {
+            if (trim(strtolower($customer_country_iso)) != trim(strtolower($WC_PayPlus_Gateway->paying_vat_iso_code))) {
                 return true;
             }
         }
@@ -954,25 +949,17 @@ class PayplusInvoice
     public function payplus_set_vat_all_product($order_id, $productsItems)
     {
         $handle = 'payplus_process_invoice';
-        $order = wc_get_order($order_id);
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payingVatAllOrder = $WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes";
-        $exemptOtherCountries = boolval($WC_PayPlus_Gateway->paying_vat === "1");
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
-        if ($WC_PayPlus_Gateway->paying_vat == "2") {
-            $checkVatPayment = $this->payplus_check_vat_payment($order_id);
-        }
-        $vatIsoCode = $WC_PayPlus_Gateway->paying_vat_iso_code;
         if ($WC_PayPlus_Gateway->settings['new_vat_order'] === "yes") {
-
+            $order = wc_get_order($order_id);
             $OtherVatCountry = boolval($order->get_billing_country() !== "IL");
         } else {
-            $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat === "1";
+            $OtherVatCountry = $this->payplus_check_vat_payment($order_id) || $WC_PayPlus_Gateway->paying_vat == "1";
         }
+
         foreach ($productsItems as $key => $productsItem) {
-            if($order->get_billing_country() === "IL") {
-                continue;
-            }
             if ($payingVatAllOrder) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-included';
             }
@@ -981,12 +968,6 @@ class PayplusInvoice
             }
             if ($OtherVatCountry) {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-exempt';
-            }
-            if($exemptOtherCountries && $order->get_billing_country() !== "IL") {
-                $productsItems[$key]['vat_type_code'] = 'vat-type-exempt';
-            }
-            if(isset($checkVatPayment) && !$checkVatPayment) {
-                $productsItems[$key]['vat_type_code'] = 'vat-type-included';
             }
             if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
                 $productsItems[$key]['vat_type_code'] = 'vat-type-included';

@@ -470,14 +470,14 @@ jQuery(function ($) {
                 toggle_foreign_invoice();
             }
         );
-        // $(document).on(
-        //     "change",
-        //     "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]",
-        //     function () {
-        //         toggle_invoice_options();
-        //         toggle_foreign_invoice();
-        //     }
-        // );
+        $(document).on(
+            "change",
+            "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]",
+            function () {
+                toggle_invoice_options();
+                toggle_foreign_invoice();
+            }
+        );
 
         function toggle_iframe_height() {
             var display_mode = $(
@@ -528,62 +528,62 @@ jQuery(function ($) {
                 )
                     .closest("tr")
                     .show();
-                // $(
-                //     "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
-                // )
-                //     .closest("tr")
-                //     .show();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+                )
+                    .closest("tr")
+                    .show();
             } else {
                 $(
                     "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
                 )
                     .closest("tr")
                     .hide();
-                // $(
-                //     "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
-                // )
-                //     .closest("tr")
-                //     .hide();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+                )
+                    .closest("tr")
+                    .hide();
             }
         }
 
         function toggle_invoice_options() {
-            // var initial_invoice = $(
-            //     "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
-            // ).val();
-            // if (initial_invoice == "1") {
-            //     $(
-            //         "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]"
-            //     )
-            //         .closest("tr")
-            //         .show();
-            //     $(
-            //         "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
-            //     )
-            //         .closest("tr")
-            //         .show();
-            //     $(
-            //         "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
-            //     )
-            //         .closest("tr")
-            //         .show();
-            // } else {
-            //     $(
-            //         "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]"
-            //     )
-            //         .closest("tr")
-            //         .hide();
-            //     $(
-            //         "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
-            //     )
-            //         .closest("tr")
-            //         .hide();
-            //     $(
-            //         "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
-            //     )
-            //         .closest("tr")
-            //         .hide();
-            // }
+            var initial_invoice = $(
+                "select#woocommerce_payplus-payment-gateway_settings\\[initial_invoice\\]"
+            ).val();
+            if (initial_invoice == "1") {
+                $(
+                    "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]"
+                )
+                    .closest("tr")
+                    .show();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+                )
+                    .closest("tr")
+                    .show();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+                )
+                    .closest("tr")
+                    .show();
+            } else {
+                $(
+                    "select#woocommerce_payplus-payment-gateway_settings\\[paying_vat\\]"
+                )
+                    .closest("tr")
+                    .hide();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[paying_vat_iso_code\\]"
+                )
+                    .closest("tr")
+                    .hide();
+                $(
+                    "input#woocommerce_payplus-payment-gateway_settings\\[foreign_invoices_lang\\]"
+                )
+                    .closest("tr")
+                    .hide();
+            }
         }
     }
     //==================invoice not automatic  ======================
