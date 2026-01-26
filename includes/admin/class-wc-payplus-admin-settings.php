@@ -463,11 +463,9 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-display'
                 );
                 $settings[$section][] = [
-                    'title' => __('All prices include VAT', 'payplus-payment-gateway'),
+                    'title' => __('Every order is subject to VAT', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'default' => 'yes',
-                    'desc_tip' => true,
-                    'desc' => __('Uncheck this if you manage your VAT with woocommerce tax and different tax rules.', 'payplus-payment-gateway'), 
                     'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat_all_order]',
                     'class' => 'payplus-vat',
                 ];
@@ -551,7 +549,7 @@ class WC_PayPlus_Admin_Settings
                     'options' => [
                         '0' => __('Paying VAT', 'payplus-payment-gateway'),
                         '1' => __('Exempt VAT', 'payplus-payment-gateway'),
-                        '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than - enter in the input below two letter ISO country codes divided by commas', 'payplus-payment-gateway'),
+                        '2' => __('Exempt VAT If Customer Billing ISO Country Is Different Than...', 'payplus-payment-gateway'),
                     ],
                     'default' => '0',
                     'id' => 'woocommerce_payplus-payment-gateway_settings[paying_vat]',
