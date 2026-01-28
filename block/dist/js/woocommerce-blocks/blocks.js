@@ -654,7 +654,7 @@ if (isCheckout || hasOrder) {
                     break;
                 case "popupIframe":
                     pp_iframe.style.width =
-                        window.innerWidth <= 768 ? "98%" : "55%";
+                        window.innerWidth <= 768 ? "98%" : (gateWaySettings.iFrameWidth || "40%");
                     pp_iframe.style.height = gateWaySettings.iFrameHeight;
                     pp_iframe.style.position = "fixed";
                     pp_iframe.style.top = "50%";

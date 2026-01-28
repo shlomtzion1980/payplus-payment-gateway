@@ -131,6 +131,25 @@ jQuery(function ($) {
         toggleIframeHeightRow();
     });
 
+    // Hide or show iframe width field based on display mode
+    function toggleIframeWidthField() {
+        var displayMode = $('select[name="woocommerce_payplus-payment-gateway_display_mode"]').val();
+        var iframeWidthRow = $('.iframe-width-field').closest('tr');
+        if (displayMode === 'popupIframe') {
+            iframeWidthRow.show();
+        } else {
+            iframeWidthRow.hide();
+        }
+    }
+
+    // Run on page load
+    $(document).ready(function () {
+        toggleIframeWidthField();
+    });
+
+    // Run on change
+    $('select[name="woocommerce_payplus-payment-gateway_display_mode"]').on('change', toggleIframeWidthField);
+
     if (!changeVatInEliat.prop("checked")) {
         keywordsEilat.closest("tr").fadeOut();
     }
