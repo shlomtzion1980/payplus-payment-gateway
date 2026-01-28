@@ -72,7 +72,10 @@ if (isCheckout || hasOrder) {
             className: "payplus-icons",
             style: {
                 display: "flex",
-                width: "95%",
+                flexWrap: "wrap",
+                width: "100%",
+                maxWidth: "100%",
+                gap: "5px",
             },
         },
         customIcons
