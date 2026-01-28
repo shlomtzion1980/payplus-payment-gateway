@@ -757,6 +757,14 @@ class WC_PayPlus_Form_Fields
                 'type' => 'number',
                 'default' => 600,
             ],
+            'iframe_width' => [
+                'title' => __('iFrame Width (Popup Only) - (Default 40%)', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => '40%',
+                'description' => __('Width of the payment iframe (e.g., 40%, 1050px, 50vw). Only applies to popup iframe mode on desktop devices.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'class' => 'iframe-width-field',
+            ],
             'iframe_auto_height' => [
                 'title' => __('Auto-adjust iframe height for screen size and zoom (overrides the Iframe Height setting above) - Only for classic checkout!', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

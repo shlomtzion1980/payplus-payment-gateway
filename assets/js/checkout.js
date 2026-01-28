@@ -1566,7 +1566,7 @@ jQuery(function ($) {
                     hooks: {
                         onshow: function () {
                             this.elements.dialog.style.maxWidth = "100%";
-                            this.elements.dialog.style.width = "1050px";
+                            this.elements.dialog.style.width = payplus_script_checkout.iframeWidth || "40%";
                             this.elements.dialog.style.height =
                                 windowWidth > 568 ? "82%" : "100%";
                             this.elements.content.style.top = "25px";

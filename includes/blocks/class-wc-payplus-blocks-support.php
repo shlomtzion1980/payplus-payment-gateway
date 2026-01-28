@@ -26,6 +26,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
     public $displayMode;
     private $secretKey;
     public $iFrameHeight;
+    public $iFrameWidth;
     public $hideOtherPayments;
     public $payPlusSettings;
     public $customIcons;
@@ -65,6 +66,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->hideMainPayPlusGateway = isset($this->hostedFieldsSettings['hide_payplus_gateway']) && $this->hostedFieldsSettings['hide_payplus_gateway'] === 'yes' ? true : false;
         $this->displayMode = $this->settings['display_mode'] ?? null;
         $this->iFrameHeight = $this->settings['iframe_height'] ?? null;
+        $this->iFrameWidth = $this->settings['iframe_width'] ?? '40%';
         $this->hideOtherPayments = boolval(isset($this->settings['hide_other_charge_methods']) && $this->settings['hide_other_charge_methods']) ?? null;
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
         $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
@@ -623,6 +625,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',
+                'iFrameWidth' => $this->iFrameWidth,
                 'secretKey' => $this->secretKey,
                 'hideOtherPayments' => $this->hideOtherPayments,
             ],
