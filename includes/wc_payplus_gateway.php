@@ -1611,7 +1611,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             // Check if hosted fields is the main payment method
             $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
             $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
-            
             $this->tokenization_script();
             // Only show saved payment methods here if hosted fields is NOT the main method
             // When hosted_fields_is_main is enabled, saved payment methods are shown in the hosted fields section
@@ -2104,7 +2103,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($customer_country_iso) {
             $customer['country_iso'] = $customer_country_iso;
         }
-        
+
         // VAT Number Priority Logic for Payment Page:
         // 1. Customer "Other ID" field - HIGHEST PRIORITY (if customer filled this, always use it)
         // 2. Custom vat_number_field setting (if configured in gateway settings)
@@ -2117,7 +2116,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             // Use custom vat_number field if configured
             $customer['vat_number'] = $order->get_meta($this->vat_number_field);
         }
-        
+
         if (intval($order->get_customer_id())) {
             $customer['customer_external_number'] = $order->get_customer_id();
         }
@@ -2800,8 +2799,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->iframe_height = ($this->iframe_height ?: 600);
         }
         if ($this->display_mode == 'iframe') {
+            $this->iframe_height !== "600" ? $iframeHeight = $this->iframe_height . 'px' : $iframeHeight = '75vh';
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
-            echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($this->iframe_height) . "px; border: 0;'></iframe>";
+            // Use viewport units on desktop, but revert to old settings on mobile
+            if (wp_is_mobile()) {
+                echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
+            } else {
+                echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 70vw; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
+            }
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }

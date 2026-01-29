@@ -1497,7 +1497,7 @@ jQuery(function ($) {
         iframe.name = "payplus-iframe";
         iframe.src = src;
         if(iframeAutoHeight) {
-            iframe.height = "90%";
+            iframe.height = "100%";
             iframe.maxHeight = "100vh";
         } else {
             iframe.height = height;
