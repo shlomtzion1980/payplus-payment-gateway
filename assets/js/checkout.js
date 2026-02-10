@@ -1299,25 +1299,33 @@ jQuery(function ($) {
         var hideMainGateway = function() {
             // Target the li element specifically
             $('li.payment_method_payplus-payment-gateway').attr('style', 'display: none !important;');
-            console.log('PayPlus: Hiding main gateway li element');
         };
-        
-        // Hide immediately
-        hideMainGateway();
-        
-        // Also hide on updated_checkout event (when WooCommerce refreshes payment methods)
-        $(document.body).on('updated_checkout', function() {
-            hideMainGateway();
-        });
-        
-        // Ensure hosted fields is selected and its payment box is visible
-        setTimeout(function() {
+
+        // When hosted fields is the selected method, ensure its payment box is visible (on load and after fragment refresh).
+        function ensureHostedFieldsBoxVisible() {
             var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
-            if ($hostedFieldsInput.length && !$hostedFieldsInput.is(':checked')) {
+            if (!$hostedFieldsInput.length) {
+                return;
+            }
+            if (!$hostedFieldsInput.is(':checked')) {
                 $hostedFieldsInput.prop('checked', true).trigger('change');
             }
-            // Force show the payment box
             $('.payment_box.payment_method_payplus-payment-gateway-hostedfields').show().css('display', 'block');
+        }
+
+        // Hide immediately
+        hideMainGateway();
+
+        // On every checkout update: hide main gateway and, if hosted fields is selected, keep its box open
+        $(document.body).on('updated_checkout', function() {
+            hideMainGateway();
+            ensureHostedFieldsBoxVisible();
+        });
+
+        // On initial load: ensure hosted fields is selected and its payment box is visible (including when saved tokens exist)
+        setTimeout(function() {
+            hideMainGateway();
+            ensureHostedFieldsBoxVisible();
         }, 100);
     }
 
