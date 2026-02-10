@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.2] - 10-02-2026 - (Zenitsu)
+
+- Tweak    - Improved iframe sizes and heights in auto modes.
+- Tweak    - Improved PayPlus Embedded-as-main behavior in classic checkout.
+- Fix      - CC icons in Blocks checkout now fit responsive displays.
+- Added    - Plugin setting to set iframe width as a percentage.
+
 ## [8.0.1] - 14-01-2026 - (Sanji)
 
 - Tweak    - Order notes for IPN and cron processes are now separated for better clarity.
