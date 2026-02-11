@@ -98,7 +98,7 @@ class WC_PayPlus
         add_action('woocommerce_init', [$this, 'pwgc_remove_processing_redemption'], 11);
         add_action('woocommerce_checkout_order_processed', [$this, 'payplus_checkout_order_processed'], 25, 3);
         add_action('woocommerce_thankyou', [$this, 'payplus_clear_session_on_order_received'], 10, 1);
-
+        add_action('wp_footer', [$this, 'payplus_thankyou_iframe_redirect_script'], 5);
 
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -284,6 +284,19 @@ class WC_PayPlus
         if (WC()->session) {
             WC()->session->__unset('page_order_awaiting_payment');
         }
+    }
+
+    /**
+     * When thank-you page is loaded inside the PayPlus payment iframe (e.g. Firefox blocks
+     * iframe from navigating top), tell the parent to redirect so the top window goes to thank-you.
+     */
+    public function payplus_thankyou_iframe_redirect_script()
+    {
+        if (!function_exists('is_wc_endpoint_url') || !is_wc_endpoint_url('order-received')) {
+            return;
+        }
+        // Only output when we're on order-received; parent will redirect when it receives this message.
+        echo "<script>(function(){if(window.self!==window.top){window.top.postMessage({type:'payplus_redirect',url:window.location.href},'*');}})();</script>\n";
     }
 
     /**

@@ -100,6 +100,22 @@ if (isCheckout || hasOrder) {
         }
     }
 
+    // Firefox blocks cross-origin iframe from navigating top window. When PayPlus iframe sends
+    // postMessage with redirect URL (or thank-you page loads in iframe), parent performs the redirect.
+    window.addEventListener("message", function (e) {
+        if (!e.data || e.data.type !== "payplus_redirect" || !e.data.url) {
+            return;
+        }
+        try {
+            var u = new URL(e.data.url, window.location.origin);
+            if (u.origin === window.location.origin) {
+                window.location.href = e.data.url;
+            }
+        } catch (err) {
+            // ignore invalid URL
+        }
+    });
+
     (() => {
         ("use strict");
         const e = window.React,
