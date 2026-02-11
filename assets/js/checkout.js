@@ -118,7 +118,6 @@ jQuery(function ($) {
 
             if (firstTime) {
                 firstTime = false;
-                console.log($hostedDiv.parent().attr("class"));
                 // Add save token checkbox to hosted fields container //
                 var $checkbox = $(
                     '<p class="hf-save form-row">' +
@@ -992,8 +991,6 @@ jQuery(function ($) {
                                         !isNaN(hostedPayload.more_info) &&
                                         typeof hostedPayload.more_info === 'number'
                                     ) {
-                                        console.log(hostedPayload.more_info);
-                                        
                                         // Proceed with payment submission
                                         overlay();
                                         jQuery(
@@ -1246,11 +1243,7 @@ jQuery(function ($) {
                             .val("");
                     }
                 },
-                error: function (jqXHR) {
-                    if (wc_checkout_params.debug_mode) {
-                        /* jshint devel: true */
-                        console.log(jqXHR.responseText);
-                    }
+                error: function () {
                 },
                 dataType: "html",
             });
@@ -1345,48 +1338,29 @@ jQuery(function ($) {
         }, 100);
     }
 
-    // Debug: Log selected payment method on change
     $(document.body).on('change', 'input[name="payment_method"]', function() {
         var selectedMethod = $('input[name="payment_method"]:checked').val();
-        console.log('Payment method changed to:', selectedMethod);
-        
         // When hosted fields is selected, ensure its payment box is visible
         if (selectedMethod === 'payplus-payment-gateway-hostedfields') {
             $('.payment_box.payment_method_payplus-payment-gateway-hostedfields').show();
         }
     });
 
-    // Debug: Log payment info when place order is clicked
     $(document.body).on('click', '#place_order', function(e) {
         var selectedToken = $('input[name="wc-payplus-payment-gateway-payment-token"]:checked').val();
         var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
         var $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
-        
+
         // If a saved token is selected (not "new") and hosted fields is checked, switch to main gateway
         if ($hostedFieldsInput.is(':checked') && selectedToken && selectedToken !== 'new') {
-            console.log('INTERCEPTING: Forcing main gateway for token payment');
-            
-            // Check if main gateway exists
             if ($mainGatewayInput.length === 0) {
-                console.error('Main gateway not found! Cannot process token payment.');
                 alert('Error: Payment method not available for saved cards. Please contact support.');
                 e.preventDefault();
                 return false;
             }
-            
-            // Force main gateway selection
             $mainGatewayInput.prop('checked', true);
             $hostedFieldsInput.prop('checked', false);
         }
-        
-        // Log after our changes
-        var selectedMethod = $('input[name="payment_method"]:checked').val();
-        var usingToken = $('body').attr('data-payplus-using-token');
-        console.log('=== PLACE ORDER CLICKED ===');
-        console.log('Selected payment method:', selectedMethod);
-        console.log('Selected token:', selectedToken);
-        console.log('Using token flag:', usingToken);
-        console.log('===========================');
     });
 
     // Handle saved payment method selection for hosted fields
@@ -1396,10 +1370,7 @@ jQuery(function ($) {
         var $hostedFieldsInput = $('input#payment_method_payplus-payment-gateway-hostedfields');
         var $mainGatewayLi = $('.payment_method_payplus-payment-gateway');
         var $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
-        
-        console.log('Token selection changed to:', selectedValue);
-        console.log('Hosted fields checked:', $hostedFieldsInput.is(':checked'));
-        
+
         if ($hostedFieldsInput.is(':checked')) {
             if (selectedValue !== 'new') {
                 // A saved token is selected - we need to use main gateway for token processing
@@ -1413,25 +1384,14 @@ jQuery(function ($) {
                         '</li>';
                     $('.payment_method_payplus-payment-gateway-hostedfields').before(mainGatewayHtml);
                     $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
-                    console.log('Main gateway added dynamically');
                 } else {
-                    // Main gateway exists, just ensure it's hidden
                     $mainGatewayLi.css('display', 'none');
-                    console.log('Main gateway already exists, hiding it');
                 }
-                
-                // Select the main gateway input (this will be used for processing)
                 $mainGatewayInput.prop('checked', true);
-                // Do NOT set hosted fields back to checked - let main gateway stay selected for processing
-                
-                // Mark that we're using a saved token
                 $('body').attr('data-payplus-using-token', 'yes');
-                console.log('Switched to main gateway for token processing');
             } else {
-                // "Use a new payment method" selected - use hosted fields
                 $hostedFieldsInput.prop('checked', true);
                 $('body').attr('data-payplus-using-token', 'no');
-                console.log('Using hosted fields for new payment method');
             }
         }
     });
@@ -1462,7 +1422,6 @@ jQuery(function ($) {
                     if ($tokenChecked.length && $tokenChecked.val() !== 'new') {
                         $tokenChecked.prop('checked', false);
                         $('input#wc-payplus-payment-gateway-payment-token-new').prop('checked', true).trigger('change');
-                        console.log('PayPlus: Detected iframe interaction, switched to new payment method');
                     }
                 }
             }
@@ -1661,7 +1620,6 @@ jQuery(function ($) {
             element &&
             Object.keys(payplus_script_checkout.multiPassIcons).length > 0
         ) {
-            console.log("isMultiPass");
             const multiPassIcons = payplus_script_checkout.multiPassIcons;
 
             // Function to find an image by its src attribute
@@ -1689,8 +1647,6 @@ jQuery(function ($) {
                         image.src = newSrc;
                         image.style.opacity = 1;
                     }, 500);
-                } else {
-                    console.log("Image or new source not found.");
                 }
             }
 
