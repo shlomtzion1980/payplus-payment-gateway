@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.3] - 11-02-2026 - (FireBlocked)
+
+- Fix      - Firefox: redirect to thank-you page from payment iframe (parent performs redirect when iframe cannot).
+
 ## [8.0.2] - 10-02-2026 - (Zenitsu)
 
 - Tweak    - Improved iframe sizes and heights in auto modes.

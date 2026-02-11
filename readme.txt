@@ -1,10 +1,10 @@
-﻿=== PayPlus Payment Gateway ===
+=== PayPlus Payment Gateway ===
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.0.2
+Stable tag: 8.0.3
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.0.3 - 11-02-2026  =
+
+- Fix      - Firefox: redirect to thank-you page from payment iframe (parent performs redirect when iframe cannot).
 
 == 8.0.2 - 10-02-2026  =
 
