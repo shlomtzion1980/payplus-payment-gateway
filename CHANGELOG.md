@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.4] - 12-02-2026 - (HostedIsMain)
+
+- Fix      - PayPlus Embedded (Hosted Fields) settings no longer affect classic checkout when the feature is disabled; the main PayPlus gateway is no longer hidden in that case.
+- Tweak    - Updated applePay script to new version.
+
 ## [8.0.3] - 11-02-2026 - (FireBlocked)
 
 - Fix      - Firefox: redirect to thank-you page from payment iframe (parent performs redirect when iframe cannot).
