@@ -486,6 +486,16 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-vat'
                 ];
                 $settings[$section][] = [
+                    'title' => __('Treat local pickup as Eilat (VAT exempt)', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'label' => __('Include "Local pickup" shipping in Eilat VAT logic', 'payplus-payment-gateway'),
+                    'desc' => __('When enabled, orders with shipping method "Local pickup" are treated as Eilat for VAT. When disabled, only shipping city in Eilat keywords applies.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[is_local_pickup]',
+                    'class' => 'payplus-vat',
+                ];
+                $settings[$section][] = [
                     'title' => __('Hide products from Invoice+ docs', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'label' => __('Use "General Product" invoice+ documents', 'payplus-payment-gateway'),

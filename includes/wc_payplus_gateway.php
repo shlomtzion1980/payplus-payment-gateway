@@ -42,6 +42,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $paying_vat_all_order;
     public $change_vat_in_eilat;
     public $keywords_eilat;
+    public $is_local_pickup;
     public $paying_vat_iso_code;
     public $foreign_invoices_lang;
     public $exist_company;
@@ -190,6 +191,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $this->change_vat_in_eilat = ($this->get_option('change_vat_in_eilat') == "yes") ? true : false;
         $this->keywords_eilat = explode(",", $this->get_option('keywords_eilat'));
+        $this->is_local_pickup = ($this->get_option('is_local_pickup') == "yes");
 
         $this->paying_vat_iso_code = $this->get_option('paying_vat_iso_code');
         $this->foreign_invoices_lang = $this->get_option('foreign_invoices_lang');
@@ -2424,7 +2426,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $cityShipping = trim($order->get_shipping_city());
         $isEilat = (is_array($this->keywords_eilat) && in_array($cityShipping, $this->keywords_eilat)) ? true : false;
 
-        if ((isset($shippingMethod['method_id']) && $shippingMethod['method_id'] === 'local_pickup') || $isEilat) {
+        $isLocalPickup = isset($shippingMethod['method_id']) && $shippingMethod['method_id'] === 'local_pickup';
+        if ($isEilat) {
+            return true;
+        }
+        if ($this->is_local_pickup && $isLocalPickup) {
             return true;
         }
         return false;
