@@ -651,7 +651,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                     }
                     
                     echo '<li class="woocommerce-SavedPaymentMethods-token">';
-                    echo '<input id="wc-payplus-payment-gateway-payment-token-' . esc_attr($token->get_id()) . '" type="radio" name="wc-payplus-payment-gateway-payment-token" value="' . esc_attr($token->get_id()) . '" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" ' . $checked . ' />';
+                    echo '<input id="wc-payplus-payment-gateway-payment-token-' . esc_attr($token->get_id()) . '" type="radio" name="wc-payplus-payment-gateway-payment-token" value="' . esc_attr($token->get_id()) . '" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" ' . esc_attr($checked) . ' />';
                     echo '<label for="wc-payplus-payment-gateway-payment-token-' . esc_attr($token->get_id()) . '">' . esc_html($token->get_display_name()) . '</label>';
                     echo '</li>';
                 }
@@ -659,7 +659,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 // Add "Use a new payment method" option
                 echo '<li class="woocommerce-SavedPaymentMethods-new">';
                 echo '<input id="wc-payplus-payment-gateway-payment-token-new" type="radio" name="wc-payplus-payment-gateway-payment-token" value="new" style="width:auto;" class="woocommerce-SavedPaymentMethods-tokenInput" />';
-                echo '<label for="wc-payplus-payment-gateway-payment-token-new">' . esc_html__('Use a new payment method', 'woocommerce') . '</label>';
+                echo '<label for="wc-payplus-payment-gateway-payment-token-new">' . esc_html__('Use a new payment method', 'payplus-payment-gateway') . '</label>';
                 echo '</li>';
                 
                 echo '</ul>';
