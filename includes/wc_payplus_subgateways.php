@@ -599,9 +599,10 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
      */
     private function should_show_payment_fields()
     {
-        // Get hosted fields settings
+        // Get hosted fields settings; if Hosted Fields is not enabled, hosted_fields_is_main is false
         $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
-        $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+        $hostedfields_enabled = isset($hostedFieldsSettings['enabled']) && $hostedFieldsSettings['enabled'] === 'yes';
+        $hosted_fields_is_main = $hostedfields_enabled && isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
         
         // Get main gateway settings
         $mainGatewaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
@@ -621,9 +622,10 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
      */
     public function payment_fields()
     {
-        // Get hosted fields settings
+        // Get hosted fields settings; if Hosted Fields is not enabled, hosted_fields_is_main is false
         $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
-        $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+        $hostedfields_enabled = isset($hostedFieldsSettings['enabled']) && $hostedFieldsSettings['enabled'] === 'yes';
+        $hosted_fields_is_main = $hostedfields_enabled && isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
         
         // Get main gateway settings
         $mainGatewaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
@@ -929,7 +931,8 @@ function payplus_filter_checkout_gateways($available_gateways)
         // 2. Handle Main PayPlus gateway visibility based on hosted fields settings
         if (isset($available_gateways['payplus-payment-gateway'])) {
             $hostedFieldsSettings = get_option('woocommerce_payplus-payment-gateway-hostedfields_settings', []);
-            $hosted_fields_is_main = isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
+            $hostedfields_enabled = isset($hostedFieldsSettings['enabled']) && $hostedFieldsSettings['enabled'] === 'yes';
+            $hosted_fields_is_main = $hostedfields_enabled && isset($hostedFieldsSettings['hosted_fields_is_main']) && $hostedFieldsSettings['hosted_fields_is_main'] === 'yes';
             
             if ($hosted_fields_is_main) {
                 // Check if user has saved tokens
@@ -959,10 +962,12 @@ function payplus_filter_checkout_gateways($available_gateways)
                     unset($available_gateways['payplus-payment-gateway']);
                 }
             } else {
-                // Hosted fields is NOT main, check hide_main_pp_checkout setting
-                $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
-                if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
-                    unset($available_gateways['payplus-payment-gateway']);
+                // Hosted fields is NOT main; only check hide_main_pp_checkout when Hosted Fields is enabled
+                if ($hostedfields_enabled) {
+                    $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                    if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
+                        unset($available_gateways['payplus-payment-gateway']);
+                    }
                 }
             }
         }
