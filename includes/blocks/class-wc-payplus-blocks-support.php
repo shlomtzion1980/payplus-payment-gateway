@@ -619,7 +619,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'isSubscriptionOrder' => $isSubscriptionOrder,
             'isLoggedIn' => is_user_logged_in(),
             'isAutoPPCC' => $this->isAutoPPCC,
-            'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/script.js' . '?ver=' . PAYPLUS_VERSION : false,
+            'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/scriptV2.js' . '?ver=' . PAYPLUS_VERSION : false,
             'show_hide_submit_button' => $this->name === 'payplus-payment-gateway-hostedfields' ? $this->settings['show_hide_submit_button'] ?? 'no' : 'no',
             'enableDoubleCheckIfPruidExists' => isset($this->payPlusSettings['enable_double_check_if_pruid_exists']) && $this->payPlusSettings['enable_double_check_if_pruid_exists'] === 'yes' ? true : false,
             "{$this->name}-settings" => [

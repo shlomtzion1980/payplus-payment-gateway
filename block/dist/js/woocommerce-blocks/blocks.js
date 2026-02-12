@@ -628,7 +628,8 @@ if (isCheckout || hasOrder) {
                 activePaymentMethod + "-settings"
             ];
         var iframe = document.createElement("iframe");
-        // Set the attributes for the iframe
+        iframe.id = "pp_iframe";
+        iframe.name = "payplus-iframe";
         iframe.width = "95%";
         iframe.height = "100%";
         iframe.style.border = "0";
