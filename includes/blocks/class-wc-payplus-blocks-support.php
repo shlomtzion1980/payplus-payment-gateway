@@ -310,54 +310,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         return $hostedResponse;
     }
-
-    /**
-     * Ensure PW Gift Cards data is captured and saved to the order for Blocks checkout
-     * (same as classic: save payplus_pw_gift_cards and optionally run cancel-pending logic).
-     *
-     * @param \WC_Order $order Order object.
-     * @param \WC_PayPlus_Gateway $main_gateway Main PayPlus gateway instance.
-     * @param object $result Result object to set error on cancel failure (PaymentResult).
-     * @return bool True if we should continue; false if cancel failed and caller should return.
-     */
-    protected function blocks_save_pw_gift_cards_to_order($order, $main_gateway, &$result)
-    {
-        try {
-            if (!WC()->session) {
-                return true;
-            }
-            if (!class_exists('WC_PayPlus') || !class_exists('WC_PayPlus_Meta_Data')) {
-                return true;
-            }
-            // Trigger cart totals so PW Gift Cards plugin may run and fire pwgc_redeeming_session_data (populates main instance).
-            if (WC()->cart) {
-                WC()->cart->calculate_totals();
-            }
-            $payplus_instance = WC_PayPlus::get_instance();
-            $pwGiftCardData   = isset($payplus_instance->pwGiftCardData) ? $payplus_instance->pwGiftCardData : null;
-            if (empty($pwGiftCardData) || !is_array($pwGiftCardData) || empty($pwGiftCardData['gift_cards']) || !is_array($pwGiftCardData['gift_cards'])) {
-                return true;
-            }
-            if (isset($main_gateway->pw_gift_card_auto_cancel_unpaid_order) && $main_gateway->pw_gift_card_auto_cancel_unpaid_order) {
-                $current_order_id = $order && is_callable(array($order, 'get_id')) ? $order->get_id() : null;
-                $cancelledResponse = $main_gateway->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($pwGiftCardData), $current_order_id);
-                if ($cancelledResponse === false) {
-                    $payment_details = $result->payment_details;
-                    $payment_details = is_array($payment_details) ? $payment_details : array();
-                    $payment_details['errorMessage'] = __('Gift Card refreshed - Please try again.', 'payplus-payment-gateway');
-                    $result->set_payment_details($payment_details);
-                    $result->set_status('failure');
-                    return false;
-                }
-            }
-            WC_PayPlus_Meta_Data::update_meta($order, array('payplus_pw_gift_cards' => wp_json_encode($pwGiftCardData)));
-            $main_gateway->pwGiftCardData = $pwGiftCardData;
-            return true;
-        } catch (\Throwable $e) {
-            return true;
-        }
-    }
-
     /**
      * Add payment request data to the order meta as hooked on the
      * woocommerce_rest_checkout_process_payment_with_context action.
@@ -373,11 +325,6 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $main_gateway              = $this->get_main_payplus_gateway();
         $this->orderId = $context->order->get_id();
         $order = $context->order;
-
-        // PW Gift Cards: capture and save to order (same as classic checkout) so payload/items use correct amount.
-        if (!$this->blocks_save_pw_gift_cards_to_order($order, $main_gateway, $result)) {
-            return;
-        }
 
         $this->isSubscriptionOrder = false;
         if (is_checkout()) {

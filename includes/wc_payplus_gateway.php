@@ -365,14 +365,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
     }
 
-    /**
-     * Cancel pending/failed orders that used the same gift card so balance can be refreshed.
-     *
-     * @param string|null $giftCardData JSON-encoded PW gift card data.
-     * @param int|null $exclude_order_id Order ID to never cancel (e.g. current order being paid).
-     * @return void|false Returns false only when at least one order was cancelled (so user should try again).
-     */
-    public function cancel_pending_giftcard_orders_for_current_user($giftCardData = null, $exclude_order_id = null)
+    public function cancel_pending_giftcard_orders_for_current_user($giftCardData = null)
     {
 
         $user_id = get_current_user_id();
@@ -392,9 +385,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $orders = wc_get_orders($args);
 
         foreach ($orders as $order_id) {
-            if ($exclude_order_id !== null && (int) $order_id === (int) $exclude_order_id) {
-                continue;
-            }
             $order = wc_get_order($order_id);
 
             // Check for gift cards in meta
@@ -1710,7 +1700,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if (isset($this->pwGiftCardData) && $this->pwGiftCardData && is_array($this->pwGiftCardData['gift_cards']) && count($this->pwGiftCardData['gift_cards']) > 0) {
             if ($this->pw_gift_card_auto_cancel_unpaid_order) {
-                $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData), $order_id);
+                $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
                 if ($cancelledResponse === false) {
                     wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
                     return [
@@ -2375,22 +2365,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
         }
 
-        $pwGiftCardsToApply = null;
         if (isset($this->pwGiftCardData) && isset($this->pwGiftCardData['gift_cards']) && is_array($this->pwGiftCardData['gift_cards'])) {
-            $pwGiftCardsToApply = $this->pwGiftCardData['gift_cards'];
-        } else {
-            $raw = $order->get_meta('payplus_pw_gift_cards');
-            if (!empty($raw)) {
-                $data = is_string($raw) ? json_decode($raw, true) : $raw;
-                if (!empty($data['gift_cards']) && is_array($data['gift_cards'])) {
-                    $pwGiftCardsToApply = $data['gift_cards'];
-                }
-            }
-        }
-        if ($pwGiftCardsToApply !== null) {
-            foreach ($pwGiftCardsToApply as $giftCardId => $giftCard) {
+            foreach ($this->pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
                 $priceGift = 0;
-                $productPrice = -1 * (float) $giftCard;
+                $productPrice = -1 * ($giftCard);
                 $allProductSku .= (empty($allProductSku)) ? " ( " . $giftCardId . ")" : ' , ' . $giftCardId;
                 $priceGift += round($productPrice, $this->rounding_decimals);
 
