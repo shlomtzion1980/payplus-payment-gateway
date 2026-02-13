@@ -124,7 +124,7 @@ class PayplusInvoice
     /**
      * Returns the main PayPlus payment gateway class instance.
      *
-     * @return new WC_PayPlus_Gateway
+     * @return \WC_PayPlus_Gateway
      */
     public function get_main_payplus_gateway()
     {
@@ -932,6 +932,7 @@ class PayplusInvoice
     public function payplus_set_vat_all_product($order_id, $productsItems)
     {
         $handle = 'payplus_process_invoice';
+        /** @var \WC_PayPlus_Gateway $WC_PayPlus_Gateway */
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $payingVatAllOrder = $WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes";
         $changevatInEilat = $WC_PayPlus_Gateway->change_vat_in_eilat && $WC_PayPlus_Gateway->payplus_check_is_vat_eilat($order_id);
