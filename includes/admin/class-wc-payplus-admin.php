@@ -2653,6 +2653,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "mainPageUid" => $this->api_test_mode === "yes" ? $this->allSettings['dev_payment_page_id'] : $this->allSettings['payment_page_id'],
                 "isApplePayEnabled" => $this->isApplePayEnabled,
                 "tokenPaymentConfirmMessage" => __('Are you sure you want to charge this order with token of CC that ends with: ', 'payplus-payment-gateway'),
+                "duid_i18n" => array(
+                    "duplicate"  => __('Duplicate UID — each device UID must be unique', 'payplus-payment-gateway'),
+                    "emptyHint"  => __('No admin users assigned. Select an admin user above and click "+ Add User" to map a device UID.', 'payplus-payment-gateway'),
+                    "remove"     => __('Remove', 'payplus-payment-gateway'),
+                    "deviceUid"  => __('Device UID:', 'payplus-payment-gateway'),
+                    "enterUid"   => __('Enter device UID...', 'payplus-payment-gateway'),
+                ),
             )
         );
         wp_enqueue_script('payplus-admin-payment');

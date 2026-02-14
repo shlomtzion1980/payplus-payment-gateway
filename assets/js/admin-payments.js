@@ -1029,4 +1029,200 @@ function payplusMenusDisplay() {
             jQuery("h2").css("color", "#34aa54");
         }
     }
+
+    // ── Device UID Map (EMV POS) ──────────────────────────────────────────
+    (function ($) {
+        var i18n =
+            typeof payplus_script_admin !== "undefined" &&
+            payplus_script_admin.duid_i18n
+                ? payplus_script_admin.duid_i18n
+                : {};
+
+        function rebuildValue($container) {
+            
+            // Extract field name from container class
+            var classes = $container.attr('class').split(' ');
+            var fieldName = '';
+            for (var i = 0; i < classes.length; i++) {
+                if (classes[i].indexOf('payplus-duid-field-') === 0) {
+                    fieldName = classes[i].replace('payplus-duid-field-', '');
+                    break;
+                }
+            }
+            
+            if (!fieldName) {
+                console.error('PayPlus Device UID Map: Could not find field name from container classes');
+                return;
+            }
+            
+            var fieldId = 'woocommerce_payplus-payment-gateway_' + fieldName;
+            
+            var $allRows = $container.find(".payplus-duid-row");
+            
+            var parts = [];
+            $allRows.each(function (index) {
+                // Extract userId from class name (payplus-duid-userid-123)
+                var classes = $(this).attr('class').split(' ');
+                var userId = '';
+                for (var i = 0; i < classes.length; i++) {
+                    if (classes[i].indexOf('payplus-duid-userid-') === 0) {
+                        userId = classes[i].replace('payplus-duid-userid-', '');
+                        break;
+                    }
+                }
+                var uid = $(this).find(".payplus-duid-input").val().trim();
+                if (userId && uid) {
+                    parts.push(userId + ":" + uid);
+                }
+            });
+            var newValue = parts.join(",");
+            $("#" + fieldId).val(newValue);
+            checkDuplicates($container);
+        }
+
+        function checkDuplicates($container) {
+            var seen = {};
+            var dupes = {};
+            $container.find(".payplus-duid-input").each(function () {
+                var val = $(this).val().trim();
+                if (val) {
+                    if (seen[val]) {
+                        dupes[val] = true;
+                    }
+                    seen[val] = true;
+                }
+            });
+            $container.find(".payplus-duid-input").each(function () {
+                var val = $(this).val().trim();
+                if (val && dupes[val]) {
+                    $(this).addClass("payplus-duid-duplicate");
+                    $(this).attr("title", i18n.duplicate || "Duplicate UID");
+                } else {
+                    $(this).removeClass("payplus-duid-duplicate");
+                    $(this).removeAttr("title");
+                }
+            });
+        }
+
+        function toggleEmptyHint($container) {
+            var $rows = $container.find(".payplus-duid-row");
+            var $hint = $container.find(".payplus-duid-empty-hint");
+            if ($rows.length === 0) {
+                if ($hint.length === 0) {
+                    $container
+                        .find(".payplus-duid-rows")
+                        .after(
+                            '<p class="payplus-duid-empty-hint description">' +
+                                (i18n.emptyHint || "") +
+                                "</p>"
+                        );
+                } else {
+                    $hint.show();
+                }
+            } else {
+                $hint.hide();
+            }
+        }
+
+        function escHtml(str) {
+            return $("<span>").text(str).html();
+        }
+
+        // Add User button.
+        $(document).on("click", ".payplus-duid-add-btn", function (e) {
+            e.preventDefault();
+            var $container = $(this).closest(".payplus-device-uid-map");
+            var $select = $container.find(".payplus-duid-user-select");
+            var $option = $select.find("option:selected");
+            var userId = $select.val();
+
+            if (!userId) {
+                return;
+            }
+
+            // Parse user info from option text: "Name (login, ID: 123)"
+            var optionText = $option.text();
+            var userName = '';
+            var userLogin = '';
+            var userDisplay = optionText;
+            
+            // Extract name and login from text
+            var match = optionText.match(/^(.+?)\s+\((.+?),\s+ID:\s+\d+\)$/);
+            if (match) {
+                userName = match[1];
+                userLogin = match[2];
+            }
+
+            var row =
+                '<div class="payplus-duid-row payplus-duid-userid-' +
+                userId +
+                '" data-user-name="' +
+                escHtml(userName) +
+                '" data-user-login="' +
+                escHtml(userLogin) +
+                '">' +
+                '<div class="payplus-duid-row-header">' +
+                '<span class="payplus-duid-user-label"><span class="dashicons dashicons-admin-users"></span> ' +
+                escHtml(userDisplay) +
+                "</span>" +
+                '<span class="button-link payplus-duid-remove-btn" role="button" tabindex="0" title="' +
+                escHtml(i18n.remove || "Remove") +
+                '"><span class="dashicons dashicons-no-alt"></span></span>' +
+                "</div>" +
+                '<div class="payplus-duid-row-body">' +
+                "<label>" +
+                escHtml(i18n.deviceUid || "Device UID:") +
+                "</label>" +
+                '<input type="text" class="payplus-duid-input regular-text" value="" placeholder="' +
+                escHtml(i18n.enterUid || "") +
+                '" />' +
+                "</div>" +
+                "</div>";
+
+            $container.find(".payplus-duid-rows").append(row);
+            $option.remove();
+            $select.val("");
+            toggleEmptyHint($container);
+            rebuildValue($container);
+        });
+
+        // Remove row button.
+        $(document).on("click", ".payplus-duid-remove-btn", function (e) {
+            e.preventDefault();
+            var $row = $(this).closest(".payplus-duid-row");
+            var $container = $row.closest(".payplus-device-uid-map");
+            var $select = $container.find(".payplus-duid-user-select");
+            
+            // Extract userId from class name
+            var classes = $row.attr('class').split(' ');
+            var userId = '';
+            for (var i = 0; i < classes.length; i++) {
+                if (classes[i].indexOf('payplus-duid-userid-') === 0) {
+                    userId = classes[i].replace('payplus-duid-userid-', '');
+                    break;
+                }
+            }
+            var userName = $row.data("user-name");
+            var userLogin = $row.data("user-login");
+
+            // Re-add to dropdown if user name is available (not a deleted user).
+            if (userName && userLogin) {
+                var optionText =
+                    userName + " (" + userLogin + ", ID: " + userId + ")";
+                $select.append(
+                    $("<option>", { value: userId, text: optionText })
+                );
+            }
+
+            $row.remove();
+            toggleEmptyHint($container);
+            rebuildValue($container);
+        });
+
+        // UID input change — rebuild value.
+        $(document).on("input", ".payplus-duid-input", function () {
+            var $container = $(this).closest(".payplus-device-uid-map");
+            rebuildValue($container);
+        });
+    })(jQuery);
 }

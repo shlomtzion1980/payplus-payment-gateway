@@ -630,7 +630,7 @@ class WC_PayPlus_Form_Fields
             ],
             'device_uid' => [
                 'title' => __('POS Device UID (If applicable)', 'payplus-payment-gateway'),
-                'type' => 'textarea',
+                'type' => 'device_uid_map',
                 'description' => __('Your POS Device UID can be found in your PayPlus account', 'payplus-payment-gateway'),
                 'default' => '',
                 'desc_tip' => true,
@@ -658,7 +658,7 @@ class WC_PayPlus_Form_Fields
             ],
             'dev_device_uid' => [
                 'title' => __('Development POS Device UID (If applicable)', 'payplus-payment-gateway'),
-                'type' => 'textarea',
+                'type' => 'device_uid_map',
                 'description' => __('Your Dev POS Device UID can be found in your PayPlus account', 'payplus-payment-gateway'),
                 'default' => '',
                 'desc_tip' => true,

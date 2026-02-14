@@ -993,6 +993,263 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     }
 
     /**
+     * Generate HTML for the custom device_uid_map field type.
+     *
+     * WooCommerce auto-discovers generate_{type}_html methods for custom field types.
+     * Renders a dynamic admin-user-to-device-UID mapping UI instead of a plain textarea.
+     *
+     * @param string $key  Field key.
+     * @param array  $data Field data.
+     * @return string
+     */
+    public function generate_device_uid_map_html($key, $data)
+    {
+        $field_key = $this->get_field_key($key);
+        $defaults = array(
+            'title'       => '',
+            'desc_tip'    => false,
+            'description' => '',
+            'default'     => '',
+        );
+        $data = wp_parse_args($data, $defaults);
+
+        $current_value = $this->get_option($key);
+        $mappings = array();
+        $legacy_uids = array();
+
+        // Parse existing value into mappings.
+        if (!empty($current_value)) {
+            $entries = explode(',', $current_value);
+            foreach ($entries as $entry) {
+                $entry = trim($entry);
+                if (empty($entry)) {
+                    continue;
+                }
+                if (strpos($entry, ':') !== false) {
+                    $parts = explode(':', $entry, 2);
+                    $mappings[intval($parts[0])] = sanitize_text_field($parts[1]);
+                } else {
+                    $legacy_uids[] = sanitize_text_field($entry);
+                }
+            }
+        }
+
+        // Get admin and shop_manager users.
+        $admin_users = get_users(array(
+            'role__in' => array('administrator', 'shop_manager'),
+            'orderby'  => 'display_name',
+            'order'    => 'ASC',
+        ));
+
+        // Build user lookup.
+        $all_users = array();
+        foreach ($admin_users as $user) {
+            $all_users[$user->ID] = array(
+                'id'   => $user->ID,
+                'name' => $user->display_name,
+                'login' => $user->user_login,
+            );
+        }
+
+        ob_start();
+        ?>
+        <tr valign="top">
+            <th scope="row" class="titledesc">
+                <label for="<?php echo esc_attr($field_key); ?>">
+                    <?php echo wp_kses_post($data['title']); ?>
+                    <?php echo $this->get_tooltip_html($data); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+                </label>
+            </th>
+            <td class="forminp">
+                <input type="hidden"
+                       id="<?php echo esc_attr($field_key); ?>"
+                       name="<?php echo esc_attr($field_key); ?>"
+                       value="<?php echo esc_attr($current_value); ?>" />
+
+                <div class="payplus-device-uid-map payplus-duid-field-<?php echo esc_attr($key); ?>">
+                    <div class="payplus-duid-controls">
+                        <select class="payplus-duid-user-select">
+                            <option value=""><?php esc_html_e('-- Select admin user --', 'payplus-payment-gateway'); ?></option>
+                            <?php foreach ($all_users as $uid => $udata) : ?>
+                                <?php if (!isset($mappings[$uid])) : ?>
+                                    <option value="<?php echo esc_attr($uid); ?>">
+                                        <?php echo esc_html($udata['name'] . ' (' . $udata['login'] . ', ID: ' . $uid . ')'); ?>
+                                    </option>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </select>
+                        <span class="button payplus-duid-add-btn" role="button" tabindex="0"><?php esc_html_e('+ Add User', 'payplus-payment-gateway'); ?></span>
+                    </div>
+
+                    <?php if (!empty($legacy_uids)) : ?>
+                        <?php foreach ($legacy_uids as $luid) : ?>
+                            <div class="payplus-duid-legacy-notice">
+                                <span class="dashicons dashicons-warning"></span>
+                                <?php
+                                /* translators: %s is the unassigned device UID value */
+                                printf(esc_html__('Unassigned device UID: %s — please assign it to an admin user above, then paste the UID in their field.', 'payplus-payment-gateway'), '<code>' . esc_html($luid) . '</code>');
+                                ?>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+
+                    <div class="payplus-duid-rows">
+                        <?php foreach ($mappings as $user_id => $device_uid) : ?>
+                            <?php
+                            $user_display = isset($all_users[$user_id])
+                                ? $all_users[$user_id]['name'] . ' (' . $all_users[$user_id]['login'] . ', ID: ' . $user_id . ')'
+                                : sprintf(
+                                    /* translators: %d is the user ID that was not found */
+                                    __('User not found (ID: %d)', 'payplus-payment-gateway'),
+                                    $user_id
+                                );
+                            $user_name = isset($all_users[$user_id]) ? $all_users[$user_id]['name'] : '';
+                            $user_login = isset($all_users[$user_id]) ? $all_users[$user_id]['login'] : '';
+                            $not_found = !isset($all_users[$user_id]);
+                            ?>
+                            <div class="payplus-duid-row payplus-duid-userid-<?php echo esc_attr($user_id); ?><?php echo $not_found ? ' payplus-duid-row-warning' : ''; ?>"
+                                 data-user-name="<?php echo esc_attr($user_name); ?>"
+                                 data-user-login="<?php echo esc_attr($user_login); ?>">
+                                <div class="payplus-duid-row-header">
+                                    <span class="payplus-duid-user-label">
+                                        <?php if ($not_found) : ?>
+                                            <span class="dashicons dashicons-warning"></span>
+                                        <?php else : ?>
+                                            <span class="dashicons dashicons-admin-users"></span>
+                                        <?php endif; ?>
+                                        <?php echo esc_html($user_display); ?>
+                                    </span>
+                                    <span class="button-link payplus-duid-remove-btn" role="button" tabindex="0" title="<?php esc_attr_e('Remove', 'payplus-payment-gateway'); ?>">
+                                        <span class="dashicons dashicons-no-alt"></span>
+                                    </span>
+                                </div>
+                                <div class="payplus-duid-row-body">
+                                    <label><?php esc_html_e('Device UID:', 'payplus-payment-gateway'); ?></label>
+                                    <input type="text" class="payplus-duid-input regular-text" value="<?php echo esc_attr($device_uid); ?>" placeholder="<?php esc_attr_e('Enter device UID...', 'payplus-payment-gateway'); ?>" />
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php if (empty($mappings)) : ?>
+                        <p class="payplus-duid-empty-hint description"><?php esc_html_e('No admin users assigned. Select an admin user above and click "+ Add User" to map a device UID.', 'payplus-payment-gateway'); ?></p>
+                    <?php endif; ?>
+                </div>
+
+                <?php if ($data['desc_tip'] && !empty($data['description'])) : ?>
+                    <p class="description"><?php echo wp_kses_post($data['description']); ?></p>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php
+        // Register inline CSS and JS — only once for both device_uid and dev_device_uid fields.
+        static $device_uid_map_assets_rendered = false;
+        if (!$device_uid_map_assets_rendered) {
+            $device_uid_map_assets_rendered = true;
+
+            // CSS via wp_add_inline_style attached to the already-enqueued admin stylesheet.
+            $css = '
+                .payplus-device-uid-map { max-width: 600px; }
+                .payplus-duid-controls { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+                .payplus-duid-controls select { min-width: 280px; }
+                .payplus-duid-rows { display: flex; flex-direction: column; gap: 8px; }
+                .payplus-duid-row {
+                    border: 1px solid #c3c4c7;
+                    border-radius: 4px;
+                    padding: 10px 12px;
+                    background: #f9f9f9;
+                }
+                .payplus-duid-row-warning { border-color: #dba617; background: #fff8e5; }
+                .payplus-duid-row-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 6px;
+                }
+                .payplus-duid-user-label {
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+                .payplus-duid-remove-btn { color: #b32d2e; cursor: pointer; text-decoration: none; }
+                .payplus-duid-remove-btn:hover { color: #a00; }
+                .payplus-duid-remove-btn .dashicons { font-size: 20px; width: 20px; height: 20px; }
+                .payplus-duid-row-body { display: flex; align-items: center; gap: 8px; }
+                .payplus-duid-row-body label { font-weight: 500; white-space: nowrap; }
+                .payplus-duid-row-body input { flex: 1; }
+                .payplus-duid-input.payplus-duid-duplicate { border-color: #d63638; box-shadow: 0 0 0 1px #d63638; }
+                .payplus-duid-legacy-notice {
+                    background: #fff8e5;
+                    border: 1px solid #dba617;
+                    border-radius: 4px;
+                    padding: 8px 12px;
+                    margin-bottom: 12px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .payplus-duid-legacy-notice .dashicons { color: #dba617; }
+                .payplus-duid-empty-hint { font-style: italic; color: #646970; margin-top: 4px; }
+            ';
+            wp_add_inline_style('payplus', $css);
+            // JS is in admin-payments.js — i18n strings passed via payplus_script_admin.duid_i18n.
+        }
+        
+        $html = ob_get_clean();
+        
+        return $html;
+    }
+
+    /**
+     * Validate the device_uid_map field.
+     *
+     * Sanitizes the value and strips duplicate UIDs (keeps the first occurrence).
+     *
+     * @param string $key   Field key.
+     * @param string $value Posted value.
+     * @return string Cleaned user_id:uid,... string.
+     */
+    public function validate_device_uid_map_field($key, $value)
+    {
+        $value = is_null($value) ? '' : $value;
+        $value = wp_unslash($value);
+        $entries = explode(',', $value);
+        $clean = array();
+        $seen_uids = array();
+
+        foreach ($entries as $entry) {
+            $entry = trim($entry);
+            if (empty($entry)) {
+                continue;
+            }
+            if (strpos($entry, ':') !== false) {
+                $parts = explode(':', $entry, 2);
+                $user_id = intval($parts[0]);
+                $device_uid = sanitize_text_field(trim($parts[1]));
+
+                if ($user_id <= 0 || empty($device_uid)) {
+                    continue;
+                }
+                // Skip duplicate UIDs — keep the first occurrence.
+                if (in_array($device_uid, $seen_uids, true)) {
+                    continue;
+                }
+                $seen_uids[] = $device_uid;
+                $clean[] = $user_id . ':' . $device_uid;
+            } else {
+                // Legacy raw UID — pass through.
+                $raw = sanitize_text_field($entry);
+                if (!empty($raw) && !in_array($raw, $seen_uids, true)) {
+                    $seen_uids[] = $raw;
+                    $clean[] = $raw;
+                }
+            }
+        }
+
+        return implode(',', $clean);
+    }
+
+    /**
      * @param int $order_id
      * @param float|null $amount
      * @param string $reason
