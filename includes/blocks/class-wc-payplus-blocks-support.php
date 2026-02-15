@@ -503,6 +503,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 WC_PayPlus_Meta_Data::update_meta($order, $orderMeta);
 
                 $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
+                // Provide order received URL for client-side polling (Firefox-safe redirect fallback)
+                $payment_details['order_received_url'] = $order->get_checkout_order_received_url();
             }
             $result->set_payment_details($payment_details);
             !isset($payment_details['errorMessage']) ? $result->set_status('pending') : $result->set_status('failure');
@@ -553,6 +555,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'frontNonce' => wp_create_nonce('frontNonce'),
                 "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
+                "iframeRedirectLegacy" => boolval(isset($this->payPlusSettings['iframe_redirect_legacy']) && $this->payPlusSettings['iframe_redirect_legacy'] === 'yes'),
             ]
         );
 

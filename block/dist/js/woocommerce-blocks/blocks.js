@@ -100,8 +100,15 @@ if (isCheckout || hasOrder) {
         }
     }
 
-    // Firefox blocks cross-origin iframe from navigating top window. When PayPlus iframe sends
-    // postMessage with redirect URL (or thank-you page loads in iframe), parent performs the redirect.
+    // ── Firefox-safe iframe redirect: 3-layer approach ──────────────────────
+    // Layer 1 (sandbox): iframe has allow-top-navigation-by-user-activation
+    // Layer 2 (postMessage): iframe sends redirect URL to parent via postMessage
+    // Layer 3 (polling): parent polls server for order status and redirects itself
+    // ──────────────────────────────────────────────────────────────────────────
+
+    var _payplusPollDone = false;
+
+    // Layer 2: postMessage listener (fast-path)
     window.addEventListener("message", function (e) {
         if (!e.data || e.data.type !== "payplus_redirect" || !e.data.url) {
             return;
@@ -109,12 +116,70 @@ if (isCheckout || hasOrder) {
         try {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
+                _payplusPollDone = true;
                 window.location.href = e.data.url;
             }
         } catch (err) {
             // ignore invalid URL
         }
     });
+
+    // Layer 3: polling fallback
+    function startBlocksOrderStatusPoll(orderId, orderReceivedUrl) {
+        if (!orderId || !orderReceivedUrl) return;
+        if (!(window.payplus_script && window.payplus_script.ajax_url && window.payplus_script.frontNonce)) return;
+        // Don't poll in legacy mode
+        if (window.payplus_script.iframeRedirectLegacy) return;
+
+        var orderKey = '';
+        try {
+            var u = new URL(orderReceivedUrl, window.location.origin);
+            orderKey = u.searchParams.get('key') || '';
+        } catch (err) {
+            return;
+        }
+        if (!orderKey) return;
+
+        var pollCount = 0;
+        var maxPolls = 200;
+
+        function poll() {
+            if (_payplusPollDone) return;
+            pollCount++;
+            if (pollCount > maxPolls) return;
+
+            jQuery.ajax({
+                url: window.payplus_script.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'payplus_check_order_redirect',
+                    _ajax_nonce: window.payplus_script.frontNonce,
+                    order_id: orderId,
+                    order_key: orderKey,
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (_payplusPollDone) return;
+                    if (res && res.success && res.data && res.data.status) {
+                        var s = res.data.status;
+                        if (s === 'processing' || s === 'completed' || s === 'wc-processing' || s === 'wc-completed') {
+                            _payplusPollDone = true;
+                            window.location.href = res.data.redirect_url || orderReceivedUrl;
+                        }
+                    }
+                },
+            });
+        }
+
+        poll();
+        var pollTimer = setInterval(function () {
+            if (_payplusPollDone) {
+                clearInterval(pollTimer);
+                return;
+            }
+            poll();
+        }, 1500);
+    }
 
     (() => {
         ("use strict");
@@ -595,7 +660,9 @@ if (isCheckout || hasOrder) {
                                         overlay,
                                         loader
                                     );
-                                    // Disconnect the observer to stop observing further changes
+                                    // Start polling for order completion (Layer 3 fallback)
+                                    var _pd = payment.getPaymentResult().paymentDetails;
+                                    startBlocksOrderStatusPoll(_pd.order_id, _pd.order_received_url);
                                 } else {
                                     alert(
                                         (window.payplus_i18n && window.payplus_i18n.payment_page_failed) 
@@ -636,6 +703,12 @@ if (isCheckout || hasOrder) {
         iframe.style.display = "block";
         iframe.style.margin = "auto";
 
+        // In new (default) mode: sandbox the iframe so Firefox allows top navigation
+        // only after a user gesture, avoiding the "prevented redirect" prompt.
+        // In legacy mode: skip sandbox so the old direct wp_safe_redirect works.
+        if (!(window.payplus_script && window.payplus_script.iframeRedirectLegacy)) {
+            iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
+        }
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");
         let pp_iframe = document
