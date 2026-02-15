@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 8.0.5  - 15-02-2026 =
 
 - Fix      - Local pickup orders are now treated as VAT exempt in Invoice+ only when the corresponding setting is enabled; previously they were always treated as VAT exempt.
+- Feature  - Added "Charge VAT for Eilat customers with local pickup" setting: when enabled, local pickup orders from Eilat customers will have VAT applied (overriding Eilat exemption). Only applies when "Treat local pickup as Eilat (VAT exempt)" is disabled.
 - Tweak    - Improved plugin update checks.
 - Feature  - Enhanced EMV POS Device UID management with an improved admin interface for assigning unique device UIDs to individual admin users, enabling multiple EMV POS devices per store.
 
