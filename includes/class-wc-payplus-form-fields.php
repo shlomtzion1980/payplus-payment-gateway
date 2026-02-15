@@ -1098,6 +1098,14 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'default' => 'yes',
                 'custom_attributes' => array('disabled' => 'disabled'),
             ],
+            'iframe_redirect_legacy' => [
+                'title' => __('Iframe redirect — legacy mode', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Use direct redirect from iframe (may require Firefox permission)', 'payplus-payment-gateway'),
+                'default' => 'no',
+                'desc_tip' => true,
+                'description' => __('When checked, the payment iframe redirects the browser directly (the old method). Firefox users may see a "prevented redirect" prompt they need to allow. When unchecked (default), the checkout page detects payment completion via server polling and redirects automatically — no browser prompt needed.', 'payplus-payment-gateway'),
+            ],
             'pos_override' => [
                 'title' => __('POS Override', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

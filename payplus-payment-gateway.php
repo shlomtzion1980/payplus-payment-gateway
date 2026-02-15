@@ -89,6 +89,10 @@ class WC_PayPlus
         add_action('wp_ajax_nopriv_make-hosted-payment', [$this, 'hostedPayment']);
         add_action('wp_ajax_run_payplus_invoice_runner', [$this, 'ajax_run_payplus_invoice_runner']);
 
+        // AJAX endpoint for client-side polling of order status (Firefox iframe redirect fallback)
+        add_action('wp_ajax_payplus_check_order_redirect', [$this, 'ajax_payplus_check_order_redirect']);
+        add_action('wp_ajax_nopriv_payplus_check_order_redirect', [$this, 'ajax_payplus_check_order_redirect']);
+
         //end custom hook
 
         add_action('woocommerce_before_checkout_form', [$this, 'msg_checkout_code']);
@@ -965,8 +969,7 @@ class WC_PayPlus
                     WC()->session->__unset('page_order_awaiting_payment');
                 }
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
-                wp_safe_redirect($redirect_to);
-                exit;
+                $this->payplus_redirect_graceful($redirect_to);
             } else {
                 // no order id
                 wp_die('Invalid request');
@@ -1056,8 +1059,7 @@ class WC_PayPlus
                     }
                 }
                 WC()->session->__unset('save_payment_method');
-                wp_safe_redirect($linkRedirect);
-                exit;
+                $this->payplus_redirect_graceful($linkRedirect);
             } else {
                 $countProcess = intval($result->count_process);
                 $rowId = intval($result->rowId);
@@ -1089,8 +1091,7 @@ class WC_PayPlus
                 }
 
                 WC()->session->__unset('save_payment_method');
-                wp_safe_redirect($linkRedirect);
-                exit;
+                $this->payplus_redirect_graceful($linkRedirect);
             }
         } elseif (
             isset($_GET['success_order_id']) && isset($_GET['charge_method']) && $_GET['charge_method'] === 'bit' ||
@@ -1101,10 +1102,92 @@ class WC_PayPlus
             if ($order) {
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
-                wp_safe_redirect($linkRedirect);
-                exit;
+                $this->payplus_redirect_graceful($linkRedirect);
             }
         }
+    }
+
+    /**
+     * AJAX handler: returns order status + redirect URL for client-side polling.
+     *
+     * The checkout page polls this endpoint after opening the payment iframe.
+     * When the order moves to processing/completed (via IPN callback), the
+     * client-side JS detects it and redirects the top window — completely
+     * bypassing any iframe-to-parent navigation that Firefox might block.
+     */
+    public function ajax_payplus_check_order_redirect()
+    {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+
+        $order_id  = isset($_REQUEST['order_id']) ? absint($_REQUEST['order_id']) : 0;
+        $order_key = isset($_REQUEST['order_key']) ? sanitize_text_field(wp_unslash($_REQUEST['order_key'])) : '';
+
+        if (!$order_id || !$order_key) {
+            wp_send_json_error(['status' => 'invalid']);
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order || $order->get_order_key() !== $order_key) {
+            wp_send_json_error(['status' => 'invalid']);
+        }
+
+        $status       = $order->get_status();
+        $redirect_url = $order->get_checkout_order_received_url();
+
+        wp_send_json_success([
+            'status'       => $status,
+            'redirect_url' => $redirect_url,
+        ]);
+    }
+
+    /**
+     * Graceful redirect that works inside iframes (Firefox-safe).
+     *
+     * DEFAULT (new method — iframe_redirect_legacy = no):
+     *   When running inside an iframe, outputs a tiny HTML page that sends
+     *   postMessage to the parent with the redirect URL. The parent checkout
+     *   page picks it up and redirects, or the polling fallback catches it.
+     *   No Firefox "prevented redirect" prompt.
+     *
+     * LEGACY (iframe_redirect_legacy = yes):
+     *   Uses wp_safe_redirect directly — the old behaviour. Firefox may show
+     *   a "prevented redirect" prompt that the user must allow.
+     *
+     * When running in the top window (direct visit), both modes do a normal redirect.
+     *
+     * @param string $url The URL to redirect to.
+     */
+    private function payplus_redirect_graceful($url)
+    {
+        // Check if legacy (old) redirect mode is enabled in plugin settings
+        $use_legacy = property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy')
+            && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes';
+
+        if ($use_legacy) {
+            // Old method: direct wp_safe_redirect (Firefox may prompt to allow)
+            wp_safe_redirect($url);
+            exit;
+        }
+
+        // New method: postMessage to parent + polling fallback
+        $url = esc_url($url);
+        nocache_headers();
+        header('Content-Type: text/html; charset=utf-8');
+        echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>';
+        echo '<script>(function(){';
+        echo 'var u=' . wp_json_encode($url) . ';';
+        // If we are inside an iframe, send postMessage to parent and show message.
+        // The parent will handle the actual redirect.
+        echo 'if(window.self!==window.top){';
+        echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},window.location.origin);}catch(e){}';
+        echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
+        echo '}else{';
+        // Top window — just redirect normally.
+        echo 'window.location.href=u;';
+        echo '}';
+        echo '})();</script>';
+        echo '</body></html>';
+        exit;
     }
 
     /**
@@ -1509,6 +1592,7 @@ class WC_PayPlus
                             "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
                             "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
+                            "iframeRedirectLegacy" => boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy') && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes'),
                         ]
                     );
                     if (!is_cart() && !is_product() && !is_shop()) {

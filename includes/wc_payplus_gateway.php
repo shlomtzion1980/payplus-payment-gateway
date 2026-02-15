@@ -2113,6 +2113,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         ];
         if (in_array($this->display_mode, ['samePageIframe', 'popupIframe']) && !$is_token || $this->id === "payplus-payment-gateway-hostedfields") {
             $result['payplus_iframe'] = $this->receipt_page($order_id, null, false, '', 0, true);
+            // Provide order details so the checkout page can poll for completion status.
+            // This powers the Firefox-safe polling fallback for iframe redirects.
+            $order = wc_get_order($order_id);
+            if ($order) {
+                $result['order_id']           = $order_id;
+                $result['order_received_url'] = $order->get_checkout_order_received_url();
+            }
         }
         return $result;
     }
