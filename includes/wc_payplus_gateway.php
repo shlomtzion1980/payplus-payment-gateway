@@ -328,11 +328,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $cStoreId = get_current_user_id();
         if (strlen($deviceUid) > 0 && isset($cStoreId)) {
-            $currentDevice = $this->device_uid;
-            if (strpos($deviceUid, ',') !== false) {
-                $devices = explode(',', $deviceUid);
-
+            $currentDevice = $deviceUid;  // Default to original value
+            
+            // Check if the value contains user_id:uid format (single or multiple)
+            if (strpos($deviceUid, ':') !== false) {
+                $devices = strpos($deviceUid, ',') !== false ? explode(',', $deviceUid) : array($deviceUid);
+                
                 foreach ($devices as $device) {
+                    $device = trim($device);
                     $deviceParts = explode(':', $device);
                     if (count($deviceParts) >= 2) {
                         list($storeId, $deviceId) = $deviceParts;
@@ -343,6 +346,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     }
                 }
             }
+            
             $this->device_uid = $currentDevice;
         }
         return $this->device_uid;
