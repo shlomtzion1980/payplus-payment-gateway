@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.5]  - 15-02-2026 - (Vaturi)
+
+- Fix      - Local pickup orders are now treated as VAT exempt in Invoice+ only when the corresponding setting is enabled; previously they were always treated as VAT exempt.
+- Tweak    - Improved plugin update checks.
+- Feature  - Enhanced EMV POS Device UID management with an improved admin interface for assigning unique device UIDs to individual admin users, enabling multiple EMV POS devices per store.
+
 ## [8.0.4] - 12-02-2026 - (HostedIsMain)
 
 - Fix      - PayPlus Embedded (Hosted Fields) settings no longer affect classic checkout when the feature is disabled; the main PayPlus gateway is no longer hidden in that case.

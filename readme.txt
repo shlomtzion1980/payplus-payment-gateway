@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.0.4
+Stable tag: 8.0.5
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.0.5  - 15-02-2026 =
+
+- Fix      - Local pickup orders are now treated as VAT exempt in Invoice+ only when the corresponding setting is enabled; previously they were always treated as VAT exempt.
+- Tweak    - Improved plugin update checks.
+- Feature  - Enhanced EMV POS Device UID management with an improved admin interface for assigning unique device UIDs to individual admin users, enabling multiple EMV POS devices per store.
 
 == 8.0.4  - 12-02-2026 =
 
