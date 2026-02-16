@@ -2979,7 +2979,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($payplus_payment_page_link) {
             if ($this->checkPayemntPageTime($order_id, $check_payplus_generate_products_link)) {
-                $this->get_payment_page($payplus_payment_page_link);
+                $this->get_payment_page($payplus_payment_page_link, $order_id);
                 return;
             }
         }
@@ -3054,7 +3054,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (isset($res->data->payment_page_link) && $this->validateUrl($res->data->payment_page_link)) {
                 $this->payplus_add_log_all($handle, wp_json_encode($res), "\n Response: completed");
                 $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
-                $this->get_payment_page($res->data->payment_page_link);
+                $this->get_payment_page($res->data->payment_page_link, $order_id);
             } else {
                 $this->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                 echo esc_html__('Something went wrong with the payment page', 'payplus-payment-gateway') . '<hr /><b>Error:</b> ' . esc_html(is_array($response) ? $response['body'] : $response->body);
@@ -3068,7 +3068,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      * @param $res
      * @return void
      */
-    public function get_payment_page($res)
+    public function get_payment_page($res, $order_id = 0)
     {
         // Prevent duplicate iframe creation - check if already exists
         static $iframe_created = false;
@@ -3084,12 +3084,51 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if ($this->display_mode == 'iframe') {
             $this->iframe_height !== "600" ? $iframeHeight = $this->iframe_height . 'px' : $iframeHeight = '75vh';
             echo "<form name='pp_iframe' target='payplus-iframe' method='GET' action='" . esc_url($res) . "'></form>";
+
+            // Determine sandbox attribute based on legacy mode setting
+            $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+            $use_legacy = isset($settings['iframe_redirect_legacy']) && $settings['iframe_redirect_legacy'] === 'yes';
+            $sandbox = $use_legacy
+                ? 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation'
+                : 'allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation';
+
             // Use viewport units on desktop, but revert to old settings on mobile
             if (wp_is_mobile()) {
-                echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 100%; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
+                echo "<iframe allowpaymentrequest id='pp_iframe' name='payplus-iframe' sandbox='" . esc_attr($sandbox) . "' style='width: 100%; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
             } else {
-                echo "<iframe  allowpaymentrequest id='pp_iframe' name='payplus-iframe' style='width: 70vw; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
+                echo "<iframe allowpaymentrequest id='pp_iframe' name='payplus-iframe' sandbox='" . esc_attr($sandbox) . "' style='width: 70vw; height: " . esc_attr($iframeHeight) . "; border: 0;'></iframe>";
             }
+
+            // Add postMessage listener + polling for Firefox-safe redirect
+            $order = $order_id ? wc_get_order($order_id) : null;
+            $order_received_url = $order ? $order->get_checkout_order_received_url() : '';
+            echo '<script type="text/javascript">';
+            echo '(function(){';
+            echo 'var _payplusPollDone=false;';
+            // Layer 2: postMessage listener (fast-path from iframe)
+            echo 'window.addEventListener("message",function(e){';
+            echo 'if(!e.data||e.data.type!=="payplus_redirect"||!e.data.url)return;';
+            echo 'try{var u=new URL(e.data.url,window.location.origin);';
+            echo 'if(u.origin===window.location.origin){_payplusPollDone=true;window.location.href=e.data.url;}}catch(err){}';
+            echo '});';
+            // Layer 3: polling fallback
+            if ($order_id && $order_received_url) {
+                $order_key = $order ? $order->get_order_key() : '';
+                echo 'var orderId=' . wp_json_encode($order_id) . ',orderKey=' . wp_json_encode($order_key) . ',orderReceivedUrl=' . wp_json_encode($order_received_url) . ';';
+                echo 'var ajaxUrl=' . wp_json_encode(admin_url('admin-ajax.php')) . ',nonce=' . wp_json_encode(wp_create_nonce('frontNonce')) . ';';
+                echo 'var pollCount=0;';
+                echo 'function poll(){if(_payplusPollDone||++pollCount>200)return;';
+                echo 'var x=new XMLHttpRequest();x.open("POST",ajaxUrl,true);';
+                echo 'x.setRequestHeader("Content-Type","application/x-www-form-urlencoded");';
+                echo 'x.onreadystatechange=function(){if(x.readyState===4&&x.status===200){try{var r=JSON.parse(x.responseText);';
+                echo 'if(r&&r.success&&r.data&&r.data.status){var s=r.data.status;';
+                echo 'if(s==="processing"||s==="completed"||s==="wc-processing"||s==="wc-completed"){';
+                echo '_payplusPollDone=true;window.location.href=r.data.redirect_url||orderReceivedUrl;}}}catch(e){}}};';
+                echo 'x.send("action=payplus_check_order_redirect&_ajax_nonce="+encodeURIComponent(nonce)+"&order_id="+encodeURIComponent(orderId)+"&order_key="+encodeURIComponent(orderKey));}';
+                echo 'poll();setInterval(function(){if(!_payplusPollDone)poll();},1500);';
+            }
+            echo '})();';
+            echo '</script>';
         } else {
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }

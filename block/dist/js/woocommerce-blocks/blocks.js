@@ -630,7 +630,7 @@ if (isCheckout || hasOrder) {
                                 activePaymentMethod
                             )[activePaymentMethod + "-settings"];
                         const isIframe =
-                            ["samePageIframe", "popupIframe"].indexOf(
+                            ["samePageIframe", "popupIframe", "iframe"].indexOf(
                                 gateWaySettings.displayMode
                             ) !== -1;
                         console.log("isIframe?", isIframe);
@@ -706,13 +706,11 @@ if (isCheckout || hasOrder) {
         // Legacy OFF: allow-top-navigation-by-user-activation (user click required).
         // Read from getPaymentMethodData (reliable) with wp_localize_script fallback.
         var _legacyMode = !!(payPlusGateWay.iframeRedirectLegacy || (window.payplus_script && window.payplus_script.iframeRedirectLegacy));
-        console.log('[PayPlus Blocks] iframeRedirectLegacy =', payPlusGateWay.iframeRedirectLegacy, '→ legacyMode =', _legacyMode);
         if (_legacyMode) {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
         } else {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
         }
-        console.log('[PayPlus Blocks] sandbox =', iframe.getAttribute("sandbox"));
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");
         let pp_iframe = document
@@ -721,7 +719,7 @@ if (isCheckout || hasOrder) {
             )
             .nextElementSibling.querySelector(".pp_iframe");
         if (
-            ["samePageIframe", "popupIframe"].indexOf(
+            ["samePageIframe", "popupIframe", "iframe"].indexOf(
                 gateWaySettings.displayMode
             ) !== -1
         ) {
@@ -749,6 +747,7 @@ if (isCheckout || hasOrder) {
                     pp_iframe.style.height = gateWaySettings.iFrameHeight;
                     overlay.style.display = "none";
                     break;
+                case "iframe":
                 case "popupIframe":
                     pp_iframe.style.width =
                         window.innerWidth <= 768 ? "98%" : (gateWaySettings.iFrameWidth || "40%");
