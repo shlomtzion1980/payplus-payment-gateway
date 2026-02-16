@@ -128,8 +128,6 @@ if (isCheckout || hasOrder) {
     function startBlocksOrderStatusPoll(orderId, orderReceivedUrl) {
         if (!orderId || !orderReceivedUrl) return;
         if (!(window.payplus_script && window.payplus_script.ajax_url && window.payplus_script.frontNonce)) return;
-        // Don't poll in legacy mode
-        if (window.payplus_script.iframeRedirectLegacy) return;
 
         var orderKey = '';
         try {
@@ -703,12 +701,18 @@ if (isCheckout || hasOrder) {
         iframe.style.display = "block";
         iframe.style.margin = "auto";
 
-        // In new (default) mode: sandbox the iframe so Firefox allows top navigation
-        // only after a user gesture, avoiding the "prevented redirect" prompt.
-        // In legacy mode: skip sandbox so the old direct wp_safe_redirect works.
-        if (!(window.payplus_script && window.payplus_script.iframeRedirectLegacy)) {
+        // Sandbox the iframe to control top-window navigation.
+        // Legacy ON:  allow-top-navigation (unconditional) so the delayed fallback can fire.
+        // Legacy OFF: allow-top-navigation-by-user-activation (user click required).
+        // Read from getPaymentMethodData (reliable) with wp_localize_script fallback.
+        var _legacyMode = !!(payPlusGateWay.iframeRedirectLegacy || (window.payplus_script && window.payplus_script.iframeRedirectLegacy));
+        console.log('[PayPlus Blocks] iframeRedirectLegacy =', payPlusGateWay.iframeRedirectLegacy, '→ legacyMode =', _legacyMode);
+        if (_legacyMode) {
+            iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
+        } else {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
         }
+        console.log('[PayPlus Blocks] sandbox =', iframe.getAttribute("sandbox"));
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");
         let pp_iframe = document

@@ -535,7 +535,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $script_asset = array(
             'dependencies' => array(),
-            'version' => '1.0.0'
+            'version' => '1.0.1'
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
         $style_url = PAYPLUS_PLUGIN_URL . $style_path;
@@ -634,7 +634,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             ],
             'gateways' => $this->settings['gateways'],
             'customIcons' => $this->customIcons,
-            'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
+            'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : '',
+            'iframeRedirectLegacy' => isset($this->payPlusSettings['iframe_redirect_legacy']) && $this->payPlusSettings['iframe_redirect_legacy'] === 'yes',
         ];
     }
 }

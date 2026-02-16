@@ -1143,44 +1143,37 @@ class WC_PayPlus
     /**
      * Graceful redirect that works inside iframes (Firefox-safe).
      *
-     * DEFAULT (new method — iframe_redirect_legacy = no):
-     *   When running inside an iframe, outputs a tiny HTML page that sends
-     *   postMessage to the parent with the redirect URL. The parent checkout
-     *   page picks it up and redirects, or the polling fallback catches it.
-     *   No Firefox "prevented redirect" prompt.
+     * Always tries the new method first (postMessage to parent + polling).
      *
-     * LEGACY (iframe_redirect_legacy = yes):
-     *   Uses wp_safe_redirect directly — the old behaviour. Firefox may show
-     *   a "prevented redirect" prompt that the user must allow.
+     * When legacy mode is ON and we're inside an iframe, a delayed fallback
+     * kicks in after 8 seconds: if the parent hasn't redirected yet (no callback
+     * arrived), the iframe itself navigates window.top — Firefox will show its
+     * "allow redirect" prompt, but only as a last resort.
      *
-     * When running in the top window (direct visit), both modes do a normal redirect.
+     * When running in the top window (direct visit), does a normal redirect.
      *
      * @param string $url The URL to redirect to.
      */
     private function payplus_redirect_graceful($url)
     {
-        // Check if legacy (old) redirect mode is enabled in plugin settings
         $use_legacy = property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy')
             && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes';
 
-        if ($use_legacy) {
-            // Old method: direct wp_safe_redirect (Firefox may prompt to allow)
-            wp_safe_redirect($url);
-            exit;
-        }
-
-        // New method: postMessage to parent + polling fallback
         $url = esc_url($url);
         nocache_headers();
         header('Content-Type: text/html; charset=utf-8');
         echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>';
         echo '<script>(function(){';
         echo 'var u=' . wp_json_encode($url) . ';';
-        // If we are inside an iframe, send postMessage to parent and show message.
-        // The parent will handle the actual redirect.
         echo 'if(window.self!==window.top){';
+        // Always try postMessage first (parent picks it up and redirects).
         echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},window.location.origin);}catch(e){}';
         echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
+        if ($use_legacy) {
+            // Legacy fallback: if postMessage + polling didn't redirect within 8s,
+            // force a direct top-window redirect (Firefox will prompt to allow).
+            echo 'setTimeout(function(){try{window.top.location.href=u;}catch(e){window.location.href=u;}},8000);';
+        }
         echo '}else{';
         // Top window — just redirect normally.
         echo 'window.location.href=u;';

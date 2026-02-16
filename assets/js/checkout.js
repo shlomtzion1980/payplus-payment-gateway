@@ -1110,11 +1110,11 @@ jQuery(function ($) {
                                         700
                                     );
                                 }
-                                // Start polling for order completion (Layer 3 fallback)
-                                // Only in new mode — legacy mode relies on direct redirect from iframe.
-                                if (!payplus_script_checkout.iframeRedirectLegacy) {
-                                    startOrderStatusPoll(result);
-                                }
+                                // Start polling for order completion (Layer 3 fallback).
+                                // Always poll — even in legacy mode, we try the new method first.
+                                // Legacy's iframe-side delayed redirect only kicks in after 8s
+                                // if polling + postMessage haven't redirected by then.
+                                startOrderStatusPoll(result);
                                 return true;
                             }
                             try {
@@ -1567,10 +1567,14 @@ jQuery(function ($) {
         iframe.width = width;
         iframe.setAttribute("style", `border:0px`);
         iframe.setAttribute("allowpaymentrequest", "allowpaymentrequest");
-        // In new (default) mode: sandbox the iframe so Firefox allows top navigation
-        // only after a user gesture, avoiding the "prevented redirect" prompt.
-        // In legacy mode: skip sandbox so the old direct wp_safe_redirect works as before.
-        if (!payplus_script_checkout.iframeRedirectLegacy) {
+        // Sandbox the iframe to control top-window navigation.
+        // Legacy ON:  allow-top-navigation (unconditional) so the 8s delayed fallback
+        //             redirect from the iframe can fire even after user activation expires.
+        // Legacy OFF: allow-top-navigation-by-user-activation (only after user click)
+        //             which prevents Firefox's "prevented redirect" prompt entirely.
+        if (payplus_script_checkout.iframeRedirectLegacy) {
+            iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
+        } else {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
         }
         return iframe;
