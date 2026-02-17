@@ -117,12 +117,49 @@ if (isCheckout || hasOrder) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
-                window.location.href = e.data.url;
+                var enhanced = !!(payPlusGateWay.iframeEnhancedCompletion || (window.payplus_script && window.payplus_script.iframeEnhancedCompletion));
+                if (enhanced) {
+                    showPayPlusBlocksLoader();
+                    setTimeout(function() { window.location.href = e.data.url; }, 800);
+                } else {
+                    window.location.href = e.data.url;
+                }
             }
         } catch (err) {
             // ignore invalid URL
         }
     });
+
+    // TV screen closing effect for blocks. Styles from style.css. Remove class + reflow so
+    // animation runs again when same page is reused (bfcache / second payment on remote).
+    function showPayPlusBlocksLoader() {
+        var iframeEl = document.getElementById('pp_iframe');
+        var dialog = iframeEl ? iframeEl.closest('.pp_iframe') : null;
+        if (!dialog) {
+            var all = document.querySelectorAll('.pp_iframe');
+            for (var i = 0; i < all.length; i++) {
+                if (all[i].offsetParent !== null || all[i].style.display !== 'none') {
+                    dialog = all[i];
+                    break;
+                }
+            }
+        }
+        if (!dialog) dialog = document.querySelector('.pp_iframe');
+        if (!dialog) return;
+
+        dialog.classList.remove('tv-closing');
+        dialog.style.removeProperty('display');
+        void dialog.offsetHeight;
+        dialog.classList.add('tv-closing');
+
+        setTimeout(function() {
+            if (dialog) {
+                dialog.style.display = 'none';
+                var overlay = document.getElementById('overlay');
+                if (overlay) overlay.style.display = 'none';
+            }
+        }, 800);
+    }
 
     // Layer 3: polling fallback
     function startBlocksOrderStatusPoll(orderId, orderReceivedUrl) {
@@ -139,7 +176,7 @@ if (isCheckout || hasOrder) {
         if (!orderKey) return;
 
         var pollCount = 0;
-        var maxPolls = 200;
+        var maxPolls = 600; // 600 polls at 150ms = 90 seconds max
 
         function poll() {
             if (_payplusPollDone) return;
@@ -162,7 +199,13 @@ if (isCheckout || hasOrder) {
                         var s = res.data.status;
                         if (s === 'processing' || s === 'completed' || s === 'wc-processing' || s === 'wc-completed') {
                             _payplusPollDone = true;
-                            window.location.href = res.data.redirect_url || orderReceivedUrl;
+                            var enhanced = !!(payPlusGateWay.iframeEnhancedCompletion || (window.payplus_script && window.payplus_script.iframeEnhancedCompletion));
+                            if (enhanced) {
+                                showPayPlusBlocksLoader();
+                                setTimeout(function() { window.location.href = res.data.redirect_url || orderReceivedUrl; }, 800);
+                            } else {
+                                window.location.href = res.data.redirect_url || orderReceivedUrl;
+                            }
                         }
                     }
                 },
@@ -176,7 +219,7 @@ if (isCheckout || hasOrder) {
                 return;
             }
             poll();
-        }, 1500);
+        }, 150); // Poll every 150ms instead of 1500ms for instant detection
     }
 
     (() => {
@@ -711,6 +754,25 @@ if (isCheckout || hasOrder) {
         } else {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
         }
+        
+        // Monitor iframe navigation to detect IPN redirect and show loader when enhanced completion is on
+        var _enhancedCompletion = !!(payPlusGateWay.iframeEnhancedCompletion || (window.payplus_script && window.payplus_script.iframeEnhancedCompletion));
+        iframe.addEventListener('load', function() {
+            try {
+                var iframeUrl = this.contentWindow.location.href;
+                if (iframeUrl.indexOf('wc-api=payplus_gateway') !== -1 || 
+                    iframeUrl.indexOf('/wc-api/payplus_gateway') !== -1) {
+                    if (_enhancedCompletion) {
+                        showPayPlusBlocksLoader();
+                    }
+                }
+            } catch(e) {
+                // Cross-origin - iframe has navigated away from our domain
+                // This likely means it went to PayPlus and is now coming back to IPN
+                // We can't read the URL due to same-origin policy, but we can detect the navigation
+            }
+        });
+        
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");
         let pp_iframe = document

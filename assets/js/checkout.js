@@ -78,12 +78,38 @@ jQuery(function ($) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true; // cancel any active polling
-                window.location.href = e.data.url;
+                if (payplus_script_checkout.iframeEnhancedCompletion) {
+                    showPayPlusLoader();
+                    setTimeout(function() { window.location.href = e.data.url; }, 800);
+                } else {
+                    window.location.href = e.data.url;
+                }
             }
         } catch (err) {
             // ignore invalid URL
         }
     });
+
+    // TV screen closing effect — styles from checkout-tv.css. Remove class + reflow so animation
+    // runs again when same page is reused (bfcache / second payment on remote).
+    function showPayPlusLoader() {
+        var dialog = document.querySelector('.ajs-dialog');
+        if (!dialog) dialog = document.getElementById('pp_iframe');
+        if (!dialog) return;
+
+        dialog.classList.remove('tv-closing');
+        dialog.style.removeProperty('display');
+        void dialog.offsetHeight;
+        dialog.classList.add('tv-closing');
+
+        setTimeout(function() {
+            if (dialog) {
+                dialog.style.display = 'none';
+                var overlay = document.querySelector('.ajs-overlay');
+                if (overlay) overlay.style.display = 'none';
+            }
+        }, 800);
+    }
 
     // Layer 3: polling fallback
     function startOrderStatusPoll(result) {
@@ -100,7 +126,7 @@ jQuery(function ($) {
         if (!orderKey) return;
 
         var pollCount = 0;
-        var maxPolls = 200; // ~5 min at 1.5s interval
+        var maxPolls = 600; // 600 polls at 150ms = 90 seconds max
 
         function poll() {
             if (_payplusPollDone) return;
@@ -123,14 +149,19 @@ jQuery(function ($) {
                         var s = res.data.status;
                         if (s === 'processing' || s === 'completed' || s === 'wc-processing' || s === 'wc-completed') {
                             _payplusPollDone = true;
-                            window.location.href = res.data.redirect_url || redirectUrl;
+                            if (payplus_script_checkout.iframeEnhancedCompletion) {
+                                showPayPlusLoader();
+                                setTimeout(function() { window.location.href = res.data.redirect_url || redirectUrl; }, 800);
+                            } else {
+                                window.location.href = res.data.redirect_url || redirectUrl;
+                            }
                         }
                     }
                 },
             });
         }
 
-        // First poll immediately, then every 1.5s
+        // First poll immediately, then every 150ms for fast detection
         poll();
         var pollTimer = setInterval(function() {
             if (_payplusPollDone) {
@@ -138,7 +169,7 @@ jQuery(function ($) {
                 return;
             }
             poll();
-        }, 1500);
+        }, 150); // Poll every 150ms instead of 1500ms for instant detection
     }
 
     //function to hide other payment methods when subscription order
@@ -1577,6 +1608,25 @@ jQuery(function ($) {
         } else {
             iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
         }
+        
+        // Monitor iframe navigation to detect IPN redirect and show loader immediately
+        iframe.addEventListener('load', function() {
+            try {
+                // Check if iframe is navigating to the IPN endpoint (wc-api=payplus_gateway)
+                var iframeUrl = this.contentWindow.location.href;
+                if (iframeUrl.indexOf('wc-api=payplus_gateway') !== -1 || 
+                    iframeUrl.indexOf('/wc-api/payplus_gateway') !== -1) {
+                    if (payplus_script_checkout.iframeEnhancedCompletion) {
+                        showPayPlusLoader();
+                    }
+                }
+            } catch(e) {
+                // Cross-origin - iframe has navigated away from our domain
+                // This likely means it went to PayPlus and is now coming back to IPN
+                // We can't read the URL due to same-origin policy, but we can detect the navigation
+            }
+        });
+        
         return iframe;
     }
     function openPayplusIframe(src) {

@@ -1134,6 +1134,17 @@ class WC_PayPlus
         $status       = $order->get_status();
         $redirect_url = $order->get_checkout_order_received_url();
 
+        // When order is paid, clear cart and session now so thank-you page shows empty cart
+        // even when redirect is client-side (postMessage/polling) instead of server redirect.
+        if (in_array($status, array('processing', 'completed', 'wc-processing', 'wc-completed'), true)) {
+            if (WC()->cart) {
+                WC()->cart->empty_cart();
+            }
+            if (WC()->session) {
+                WC()->session->__unset('page_order_awaiting_payment');
+            }
+        }
+
         wp_send_json_success([
             'status'       => $status,
             'redirect_url' => $redirect_url,
@@ -1160,15 +1171,26 @@ class WC_PayPlus
             && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes';
 
         $url = esc_url($url);
+
+        // When redirecting to order-received (thank-you), clear cart/session now so the
+        // client-side redirect (postMessage) flow still results in an empty cart.
+        if (strpos($url, 'order-received') !== false) {
+            if (WC()->cart) {
+                WC()->cart->empty_cart();
+            }
+            if (WC()->session) {
+                WC()->session->__unset('page_order_awaiting_payment');
+            }
+        }
+
         nocache_headers();
         header('Content-Type: text/html; charset=utf-8');
         echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>';
         echo '<script>(function(){';
         echo 'var u=' . wp_json_encode($url) . ';';
         echo 'if(window.self!==window.top){';
-        // Always try postMessage first (parent picks it up and redirects).
+        // Send postMessage to parent (parent will show TV effect and redirect)
         echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},window.location.origin);}catch(e){}';
-        echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
         if ($use_legacy) {
             // Legacy fallback: if postMessage + polling didn't redirect within 8s,
             // force a direct top-window redirect (Firefox will prompt to allow).
@@ -1555,6 +1577,10 @@ class WC_PayPlus
                     }
 
                     wp_scripts()->registered['wc-checkout']->src = PAYPLUS_PLUGIN_URL . 'assets/js/checkout.min.js?ver=3' . PAYPLUS_VERSION;
+                    $checkout_tv_css = plugin_dir_path(__FILE__) . 'assets/css/checkout-tv.css';
+                    if (file_exists($checkout_tv_css)) {
+                        wp_enqueue_style('payplus-checkout-tv', PAYPLUS_PLUGIN_URL . 'assets/css/checkout-tv.css', [], filemtime($checkout_tv_css));
+                    }
                     if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                         if (in_array($this->payplus_payment_gateway_settings->display_mode, ['samePageIframe', 'popupIframe', 'iframe'])) {
                             $importAapplepayScript = PAYPLUS_PLUGIN_URL . 'assets/js/scriptV2.js' . '?ver=' . PAYPLUS_VERSION;
@@ -1586,6 +1612,7 @@ class WC_PayPlus
                             "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
                             "iframeRedirectLegacy" => boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy') && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes'),
+                            "iframeEnhancedCompletion" => boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_enhanced_completion') && $this->payplus_payment_gateway_settings->iframe_enhanced_completion === 'yes'),
                         ]
                     );
                     if (!is_cart() && !is_product() && !is_shop()) {

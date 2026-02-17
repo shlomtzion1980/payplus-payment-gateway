@@ -1,0 +1,29 @@
+/**
+ * TV closing effect for PayPlus classic checkout.
+ * Loaded from stylesheet so it works reliably on remote (no CSP/bfcache issues with injected styles).
+ */
+@keyframes payplus-tv-close-classic {
+    0% {
+        transform: scale(1, 1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1, 0.05);
+        opacity: 0.8;
+    }
+    75% {
+        transform: scale(0.05, 0.05);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0, 0);
+        opacity: 0;
+    }
+}
+
+.ajs-dialog.tv-closing,
+#pp_iframe.tv-closing {
+    animation: payplus-tv-close-classic 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards !important;
+    filter: brightness(1.5) contrast(1.2);
+    transform-origin: center center !important;
+}

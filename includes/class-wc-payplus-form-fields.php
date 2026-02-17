@@ -772,6 +772,14 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'no',
             ],
+            'iframe_enhanced_completion' => [
+                'title' => __('Enhanced completion experience (TV closing effect)', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Enable TV closing effect and short delay before redirect after payment', 'payplus-payment-gateway'),
+                'description' => __('When checked: after payment the iframe shows a TV-style closing animation before redirecting to the thank-you page. When unchecked: redirect happens immediately with no animation (previous behaviour).', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',

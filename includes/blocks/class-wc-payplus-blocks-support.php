@@ -535,7 +535,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $script_asset = array(
             'dependencies' => array(),
-            'version' => '1.0.1'
+            'version' => '1.0.2'
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
         $style_url = PAYPLUS_PLUGIN_URL . $style_path;
@@ -556,6 +556,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'frontNonce' => wp_create_nonce('frontNonce'),
                 "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
                 "iframeRedirectLegacy" => boolval(isset($this->payPlusSettings['iframe_redirect_legacy']) && $this->payPlusSettings['iframe_redirect_legacy'] === 'yes'),
+                "iframeEnhancedCompletion" => boolval(isset($this->payPlusSettings['iframe_enhanced_completion']) && $this->payPlusSettings['iframe_enhanced_completion'] === 'yes'),
             ]
         );
 
@@ -636,6 +637,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'customIcons' => $this->customIcons,
             'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : '',
             'iframeRedirectLegacy' => isset($this->payPlusSettings['iframe_redirect_legacy']) && $this->payPlusSettings['iframe_redirect_legacy'] === 'yes',
+            'iframeEnhancedCompletion' => isset($this->payPlusSettings['iframe_enhanced_completion']) && $this->payPlusSettings['iframe_enhanced_completion'] === 'yes',
         ];
     }
 }
