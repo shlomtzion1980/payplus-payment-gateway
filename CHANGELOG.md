@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.0.8]  - 18-02-2026 - (BBBliss)
+## [8.0.9]  - 18-02-2026 - (BBBliss)
 
 - Fix       - Fixed default setting for Firefox-compatible redirect mode - polling fallback is now enabled by default as intended.
 
