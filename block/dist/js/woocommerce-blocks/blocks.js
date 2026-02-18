@@ -704,6 +704,11 @@ if (isCheckout || hasOrder) {
         iframe.style.border = "0";
         iframe.style.display = "block";
         iframe.style.margin = "auto";
+        // allow-top-navigation lets PayPlus's own redirectAfterTransaction navigate the top
+        // window to the callback URL after payment. Using unconditional (not -by-user-activation)
+        // avoids Chrome "Unsafe attempt" errors and Firefox "prevented redirect" prompts.
+        // payplus_redirect_graceful immediately JS-redirects to the clean thank-you URL.
+        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
 
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");

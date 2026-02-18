@@ -51,25 +51,36 @@ jQuery(function ($) {
         checkAndHideHostedFieldsIfMissing();
     });
 
-    // ── Firefox-safe iframe redirect: 3-layer approach ──────────────────────
+    // ── Iframe payment redirect: 2-layer approach ───────────────────────────
     //
-    // Layer 1 (sandbox): The iframe has sandbox="allow-top-navigation-by-user-activation"
-    //   so if the user clicked inside the iframe, Firefox allows top navigation natively.
+    // The iframe has sandbox="...allow-top-navigation" so PayPlus's own
+    // redirectAfterTransaction can navigate the top window to the callback URL.
+    // Using unconditional allow-top-navigation (not -by-user-activation) avoids
+    // Chrome "Unsafe attempt" errors and Firefox "prevented redirect" prompts.
     //
-    // Layer 2 (postMessage fast-path): When ipn_response finishes inside the iframe,
-    //   it sends a postMessage with the redirect URL. The parent picks it up here
-    //   and redirects immediately — no polling delay.
+    // Layer 1 (top-window navigation — primary):
+    //   PayPlus JS does window.top.location = callbackUrl after payment.
+    //   The callback URL loads in the top window; payplus_redirect_graceful
+    //   outputs a JS page that immediately does window.location.href = thankYouUrl.
+    //   The IPN/callback URL is visible in the address bar for ~50ms (JS execution
+    //   time) — imperceptible to users.
     //
-    // Layer 3 (polling fallback): If both above fail (e.g. cross-origin, no user gesture),
-    //   the parent polls the server every 1.5s for order status and redirects when
-    //   the order moves to processing/completed.
+    // Layer 2 (polling fallback — safety net):
+    //   PayPlus also sends a server-to-server IPN independent of the browser.
+    //   The parent polls /wp-admin/admin-ajax.php every 1.5s; as soon as the
+    //   order reaches processing/completed it redirects to the thank-you URL.
+    //   → Works if the browser redirect is blocked or the user closes the popup
+    //     before completion (in production with real IPN).
     //
-    // Together these three layers guarantee a redirect in every browser.
+    // postMessage listener (below) is an additional fast-path for cases where
+    // PayPlus navigates the iframe itself (not the top window) to the callback.
     // ──────────────────────────────────────────────────────────────────────────
 
     var _payplusPollDone = false; // shared flag so postMessage can cancel polling
 
-    // Layer 2: postMessage listener (fast-path)
+    // Layer 1: postMessage listener (fast-path)
+    // The IPN page (loaded inside the iframe) sends this message after processing.
+    // We validate the URL is same-origin before redirecting.
     window.addEventListener('message', function(e) {
         if (!e.data || e.data.type !== 'payplus_redirect' || !e.data.url) {
             return;
@@ -77,7 +88,7 @@ jQuery(function ($) {
         try {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
-                _payplusPollDone = true; // cancel any active polling
+                _payplusPollDone = true;
                 window.location.href = e.data.url;
             }
         } catch (err) {
@@ -85,7 +96,7 @@ jQuery(function ($) {
         }
     });
 
-    // Layer 3: polling fallback
+    // Layer 2: polling fallback
     function startOrderStatusPoll(result) {
         if (!result || !result.order_id || !result.order_received_url) return;
 
@@ -1110,12 +1121,20 @@ jQuery(function ($) {
                                         700
                                     );
                                 }
-                                // Start polling for order completion (Layer 3 fallback)
-                                // Only in new mode — legacy mode relies on direct redirect from iframe.
-                                if (!payplus_script_checkout.iframeRedirectLegacy) {
-                                    startOrderStatusPoll(result);
-                                }
+                                // Start polling fallback (Layer 2).
+                                startOrderStatusPoll(result);
                                 return true;
+                            }
+                            // Plain 'iframe' mode: the payment page is already on the page.
+                            // The top window navigates away (result.redirect → order-pay page),
+                            // but we can still start polling in case the user stays on this page.
+                            if (
+                                result.viewMode === "iframe" &&
+                                "success" === result.result &&
+                                result.order_id &&
+                                result.order_received_url
+                            ) {
+                                startOrderStatusPoll(result);
                             }
                             try {
                                 if (
@@ -1567,12 +1586,14 @@ jQuery(function ($) {
         iframe.width = width;
         iframe.setAttribute("style", `border:0px`);
         iframe.setAttribute("allowpaymentrequest", "allowpaymentrequest");
-        // In new (default) mode: sandbox the iframe so Firefox allows top navigation
-        // only after a user gesture, avoiding the "prevented redirect" prompt.
-        // In legacy mode: skip sandbox so the old direct wp_safe_redirect works as before.
-        if (!payplus_script_checkout.iframeRedirectLegacy) {
-            iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation");
-        }
+        // allow-top-navigation lets PayPlus's own redirectAfterTransaction navigate the top
+        // window to the callback URL after payment — required for the redirect to work at all.
+        // Using the unconditional flag (not -by-user-activation) avoids:
+        //   • Chrome "Unsafe attempt to initiate navigation" errors (gesture expiry)
+        //   • Firefox "prevented redirect" permission bar
+        // The callback URL (IPN URL) is immediately redirected to the clean thank-you URL
+        // by payplus_redirect_graceful, so users never see it in the address bar.
+        iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
         return iframe;
     }
     function openPayplusIframe(src) {

@@ -1141,50 +1141,54 @@ class WC_PayPlus
     }
 
     /**
-     * Graceful redirect that works inside iframes (Firefox-safe).
+     * Redirect to thank-you page in a way that works for both iframe and top-window contexts.
      *
-     * DEFAULT (new method — iframe_redirect_legacy = no):
-     *   When running inside an iframe, outputs a tiny HTML page that sends
-     *   postMessage to the parent with the redirect URL. The parent checkout
-     *   page picks it up and redirects, or the polling fallback catches it.
-     *   No Firefox "prevented redirect" prompt.
+     * IFRAME context (Sec-Fetch-Dest: iframe/frame/embed):
+     *   Outputs a minimal HTML page that sends postMessage({type:'payplus_redirect', url})
+     *   to the parent window. The parent checkout JS picks it up and redirects the top
+     *   window to the thank-you URL. The IPN/callback URL is never visible in the address bar.
      *
-     * LEGACY (iframe_redirect_legacy = yes):
-     *   Uses wp_safe_redirect directly — the old behaviour. Firefox may show
-     *   a "prevented redirect" prompt that the user must allow.
+     * TOP-WINDOW context (direct visit, Sec-Fetch-Dest: document/navigate/empty):
+     *   Issues an immediate 302 to the thank-you URL so the IPN/callback URL is never
+     *   the final URL in the browser address bar.
      *
-     * When running in the top window (direct visit), both modes do a normal redirect.
-     *
-     * @param string $url The URL to redirect to.
+     * @param string $url The thank-you URL to redirect to.
      */
     private function payplus_redirect_graceful($url)
     {
-        // Check if legacy (old) redirect mode is enabled in plugin settings
-        $use_legacy = property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy')
-            && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes';
+        $url = esc_url($url);
 
-        if ($use_legacy) {
-            // Old method: direct wp_safe_redirect (Firefox may prompt to allow)
-            wp_safe_redirect($url);
-            exit;
+        // Use Sec-Fetch-Dest to detect browser context (supported Chrome 80+, Firefox 90+, Safari 17+).
+        $fetch_dest = isset($_SERVER['HTTP_SEC_FETCH_DEST'])
+            ? strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_SEC_FETCH_DEST'])))
+            : '';
+
+        // Server-to-server IPN calls (PayPlus pings our callback directly) have no Sec-Fetch-Dest
+        // and no Accept: text/html — detect them and return early without any output.
+        $accept = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '';
+        $is_browser = (strpos($accept, 'text/html') !== false) || in_array($fetch_dest, ['iframe', 'frame', 'embed', 'document', 'navigate', ''], true);
+        if (!$is_browser) {
+            return; // server-side IPN call, no HTML output needed
         }
 
-        // New method: postMessage to parent + polling fallback
-        $url = esc_url($url);
+        // Always output JS-driven HTML. The script detects context itself:
+        //   • In an iframe → sends postMessage to parent; parent redirects the top window.
+        //   • In the top window → navigates directly.
+        // This avoids relying on Sec-Fetch-Dest reliability and avoids wp_safe_redirect()
+        // loading the thank-you page inside a small iframe (which the user would never see).
         nocache_headers();
         header('Content-Type: text/html; charset=utf-8');
         echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>';
         echo '<script>(function(){';
         echo 'var u=' . wp_json_encode($url) . ';';
-        // If we are inside an iframe, send postMessage to parent and show message.
-        // The parent will handle the actual redirect.
         echo 'if(window.self!==window.top){';
-        echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},window.location.origin);}catch(e){}';
-        echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
+        // Inside iframe: postMessage parent to redirect the top window.
+        echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},"*");}catch(e){}';
         echo '}else{';
-        // Top window — just redirect normally.
+        // Top window: redirect directly (direct visit to IPN URL, older browser without Sec-Fetch-Dest).
         echo 'window.location.href=u;';
         echo '}';
+        echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
         echo '})();</script>';
         echo '</body></html>';
         exit;
@@ -1592,7 +1596,6 @@ class WC_PayPlus
                             "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
                             "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
-                            "iframeRedirectLegacy" => boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_redirect_legacy') && $this->payplus_payment_gateway_settings->iframe_redirect_legacy === 'yes'),
                         ]
                     );
                     if (!is_cart() && !is_product() && !is_shop()) {
