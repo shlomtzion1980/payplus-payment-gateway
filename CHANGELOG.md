@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.0.8]  - 18-02-2026 - (BBBliss)
+
+- Fix       - Fixed default setting for Firefox-compatible redirect mode - polling fallback is now enabled by default as intended.
+
 ## [8.0.7]  - 18-02-2026 - (Bliss+)
 
 - Tweak     - Added automatic polling fallback for iframe payment redirects in both blocks and classic checkouts. This ensures reliable redirects for Firefox users and other scenarios where the iframe cannot communicate via postMessage. The system polls the server for order completion status and redirects to the thank-you page automatically.
