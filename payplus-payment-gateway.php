@@ -1178,19 +1178,49 @@ class WC_PayPlus
         // loading the thank-you page inside a small iframe (which the user would never see).
         nocache_headers();
         header('Content-Type: text/html; charset=utf-8');
-        echo '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>';
-        echo '<script>(function(){';
-        echo 'var u=' . wp_json_encode($url) . ';';
-        echo 'if(window.self!==window.top){';
-        // Inside iframe: postMessage parent to redirect the top window.
-        echo 'try{window.parent.postMessage({type:"payplus_redirect",url:u},"*");}catch(e){}';
-        echo '}else{';
-        // Top window: redirect directly (direct visit to IPN URL, older browser without Sec-Fetch-Dest).
-        echo 'window.location.href=u;';
-        echo '}';
-        echo 'document.body.innerText="' . esc_js(__('Payment received — redirecting…', 'payplus-payment-gateway')) . '";';
-        echo '})();</script>';
-        echo '</body></html>';
+        $msg      = esc_html(__('Payment received — redirecting…', 'payplus-payment-gateway'));
+        $json_url = wp_json_encode($url);
+        $dir      = is_rtl() ? 'rtl' : 'ltr';
+        $lang     = esc_attr(get_bloginfo('language'));
+        echo '<!DOCTYPE html>
+<html lang="' . $lang . '" dir="' . $dir . '">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;width:100%}
+body{
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:24px;
+  background:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,sans-serif;
+  text-align:center;padding:20px;
+}
+.pp-msg{font-size:clamp(15px,4vw,20px);font-weight:500;color:#333;letter-spacing:.01em}
+.pp-spinner{
+  width:44px;height:44px;
+  border:4px solid #e0e0e0;
+  border-top-color:#2563eb;
+  border-radius:50%;
+  animation:pp-spin .8s linear infinite;
+}
+@keyframes pp-spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<p class="pp-msg">' . $msg . '</p>
+<div class="pp-spinner"></div>
+<script>(function(){
+  var u=' . $json_url . ';
+  if(window.self!==window.top){
+    try{window.parent.postMessage({type:"payplus_redirect",url:u},"*");}catch(e){}
+  }else{
+    window.location.href=u;
+  }
+})();</script>
+</body>
+</html>';
         exit;
     }
 
