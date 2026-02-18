@@ -1110,7 +1110,7 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'title' => __('POS Override', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'label' => __('Use PayPlus EMV POS for selected gateway(s)', 'payplus-payment-gateway'),
-                'default' => 'no',
+                'default' => 'yes',
                 'desc_tip' => true,
                 'description' => __('If you have a PayPlus POS device and want to use it for payments with unsupported POS Gateways, check this box (happens after status change).', 'payplus-payment-gateway'),
             ],
