@@ -100,6 +100,9 @@ if (isCheckout || hasOrder) {
         }
     }
 
+    // Prevent double redirects when both postMessage and polling fire
+    var _payplusPollDone = false;
+
     // Firefox blocks cross-origin iframe from navigating top window. When PayPlus iframe sends
     // postMessage with redirect URL (or thank-you page loads in iframe), parent performs the redirect.
     window.addEventListener("message", function (e) {
@@ -109,12 +112,70 @@ if (isCheckout || hasOrder) {
         try {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
+                _payplusPollDone = true;
                 window.location.href = e.data.url;
             }
         } catch (err) {
             // ignore invalid URL
         }
     });
+
+    // Polling fallback: when iframe can't postMessage (sandbox/cross-origin), poll server for order status
+    function startOrderStatusPoll(result) {
+        if (!result || !result.order_id || !result.order_received_url) return;
+
+        var redirectUrl = result.order_received_url;
+        var orderKey = '';
+        try {
+            var u = new URL(redirectUrl, window.location.origin);
+            orderKey = u.searchParams.get('key') || '';
+        } catch (err) {
+            return;
+        }
+        if (!orderKey) return;
+
+        var attempts = 0;
+        var maxAttempts = 600; // 90 seconds (600 * 150ms)
+
+        function poll() {
+            if (_payplusPollDone || attempts++ > maxAttempts) {
+                return;
+            }
+
+            jQuery.ajax({
+                url: payPlusGateWay.ajax_url || window.payplus_script?.ajax_url,
+                type: 'POST',
+                data: {
+                    action: 'payplus_check_order_redirect',
+                    _ajax_nonce: payPlusGateWay.frontNonce || window.payplus_script?.frontNonce,
+                    order_id: result.order_id,
+                    order_key: orderKey
+                },
+                dataType: 'json',
+                success: function (response) {
+                    if (_payplusPollDone) return;
+
+                    if (response && response.success && response.data && response.data.status) {
+                        var status = response.data.status;
+                        if (status === 'processing' || status === 'completed' ||
+                            status === 'wc-processing' || status === 'wc-completed') {
+                            _payplusPollDone = true;
+                            window.location.href = response.data.redirect_url || redirectUrl;
+                        }
+                    }
+                }
+            });
+        }
+
+        poll();
+        var pollTimer = setInterval(function () {
+            if (_payplusPollDone) {
+                clearInterval(pollTimer);
+                return;
+            }
+            poll();
+        }, 150);
+    }
 
     (() => {
         ("use strict");
@@ -595,6 +656,14 @@ if (isCheckout || hasOrder) {
                                         overlay,
                                         loader
                                     );
+                                    // Start polling for order status (fallback for redirect)
+                                    var paymentDetails = payment.getPaymentResult().paymentDetails;
+                                    if (paymentDetails.order_id && paymentDetails.order_received_url) {
+                                        startOrderStatusPoll({
+                                            order_id: paymentDetails.order_id,
+                                            order_received_url: paymentDetails.order_received_url
+                                        });
+                                    }
                                     // Disconnect the observer to stop observing further changes
                                 } else {
                                     alert(
