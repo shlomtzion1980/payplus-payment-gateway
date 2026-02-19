@@ -41,15 +41,14 @@ jQuery(function ($) {
         }
     }
 
-    // Run check immediately and also after a short delay to catch dynamically loaded content
+    // Run check only at initial page load to detect mis-configured hosted fields
+    // (i.e. the gateway appears in the list but the payment UI was never rendered).
+    // Do NOT run this on updated_checkout: after a fragment refresh the hosted fields
+    // SDK hasn't re-initialised yet, so .pp_iframe_h is temporarily absent and the
+    // function would incorrectly hide the hosted-fields gateway list item.
     checkAndHideHostedFieldsIfMissing();
     setTimeout(checkAndHideHostedFieldsIfMissing, 100);
     setTimeout(checkAndHideHostedFieldsIfMissing, 500);
-    
-    // Also check when checkout is updated
-    jQuery(document.body).on('updated_checkout', function() {
-        checkAndHideHostedFieldsIfMissing();
-    });
 
     // ── Iframe payment redirect: 2-layer approach ───────────────────────────
     //
@@ -221,7 +220,11 @@ jQuery(function ($) {
 
                 if (hostedIsMain) {
                     setTimeout(function () {
-                        $("input#" + inputPayPlus).prop("checked", true);
+                        // Use .trigger('click') instead of .prop('checked') to fire WC's
+                        // payment_method_selected handler, which sets selectedPaymentMethod.
+                        // This ensures init_payment_methods can restore hosted-fields after
+                        // a fragment refresh (otherwise it falls back to the first method).
+                        $("input#" + inputPayPlus).trigger('click');
                         $("div.container.hostedFields").show();
                     }, 1000);
                 } else {
@@ -1401,6 +1404,21 @@ jQuery(function ($) {
     wc_checkout_login_form.init();
     wc_terms_toggle.init();
 
+    // After every checkout update, ensure selectedPaymentMethod is synced with the
+    // actually-checked payment method radio. This handles cases where:
+    // - Token-switching logic programmatically checked the main gateway
+    // - Fragment refresh rendered a different method as checked than what the user selected
+    // - User interacted with hosted fields iframe (clicks don't bubble to our handlers)
+    $(document.body).on('updated_checkout', function() {
+        var $checked = $('input[name="payment_method"]:checked');
+        if ($checked.length) {
+            var checkedId = $checked.attr('id');
+            if (checkedId && wc_checkout_form.selectedPaymentMethod !== checkedId) {
+                wc_checkout_form.selectedPaymentMethod = checkedId;
+            }
+        }
+    });
+
     // Hide main gateway visually when hosted fields is main (but keep it in DOM for token payments)
     if (payplus_script_checkout.hostedFieldsIsMain) {
         var hideMainGateway = function() {
@@ -1471,10 +1489,15 @@ jQuery(function ($) {
 
         if ($hostedFieldsInput.is(':checked')) {
             if (selectedValue !== 'new') {
-                // A saved token is selected - we need to use main gateway for token processing
-                // Make main gateway visible but keep it hidden from user
+                // A saved token is selected — route through the main gateway for processing.
+                // We only need the radio to be checked for form serialisation; we must NOT
+                // apply display:none to the main gateway <li> here because this handler also
+                // fires during WC's paymentDetails restore after every checkout fragment
+                // refresh, which would incorrectly hide the gateway on every shipping change.
+                // The hostedIsMain case is handled separately by hideMainGateway().
                 if ($mainGatewayLi.length === 0) {
-                    // Main gateway was removed, we need to temporarily add it back
+                    // Main gateway was removed from the fragment (hidePPGateway with no tokens);
+                    // inject a hidden placeholder so WC can serialise the correct payment_method.
                     var mainGatewayHtml = '<li class="wc_payment_method payment_method_payplus-payment-gateway" style="display:none !important;">' +
                         '<input id="payment_method_payplus-payment-gateway" type="radio" class="input-radio" name="payment_method" value="payplus-payment-gateway" />' +
                         '<label for="payment_method_payplus-payment-gateway">PayPlus</label>' +
@@ -1482,8 +1505,6 @@ jQuery(function ($) {
                         '</li>';
                     $('.payment_method_payplus-payment-gateway-hostedfields').before(mainGatewayHtml);
                     $mainGatewayInput = $('input#payment_method_payplus-payment-gateway');
-                } else {
-                    $mainGatewayLi.css('display', 'none');
                 }
                 $mainGatewayInput.prop('checked', true);
                 $('body').attr('data-payplus-using-token', 'yes');
