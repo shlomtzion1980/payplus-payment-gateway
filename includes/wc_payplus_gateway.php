@@ -3251,8 +3251,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     )
                 );
 
-                if ($order->get_status() === "pending") {
-                    $this->payplus_add_log_all('payplus_callback_secured', "$order_id - Order status is pending - we are in legacy callback response - updating order status");
+                if ($order->get_status() === "pending" || $order->get_status() === "failed") {
+                    $this->payplus_add_log_all('payplus_callback_secured', "$order_id - Order status is {$order->get_status()} - we are in legacy callback response - updating order status");
                     $dataInsert = array(
                         'order_id' => $order_id,
                         'status' => sanitize_text_field($order->get_status()),
