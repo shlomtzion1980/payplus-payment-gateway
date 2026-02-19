@@ -340,7 +340,13 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = FAILURE_URL;
         $data->refURL_cancel = CANCEL_URL;
-        $data->create_token = true;
+        // Check if user wants to save payment method (from order meta or session for guest checkouts)
+        $createToken = false;
+        if (is_int($order_id) && isset($order) && $order && $order->get_user_id() && $this->payPlusGateway->create_pp_token === 'yes') {
+            $savePaymentMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'save_payment_method');
+            $createToken = !empty($savePaymentMethod) && $savePaymentMethod == true;
+        }
+        $data->create_token = $createToken;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($this->payPlusGateway->settings['transaction_type']);
         /**
