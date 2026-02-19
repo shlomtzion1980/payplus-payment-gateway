@@ -1158,24 +1158,30 @@ class WC_PayPlus
     {
         $url = esc_url($url);
 
-        // Use Sec-Fetch-Dest to detect browser context (supported Chrome 80+, Firefox 90+, Safari 17+).
+        // Detect request context via Sec-Fetch-Dest (Chrome 80+, Firefox 90+, Safari 17+).
         $fetch_dest = isset($_SERVER['HTTP_SEC_FETCH_DEST'])
             ? strtolower(sanitize_text_field(wp_unslash($_SERVER['HTTP_SEC_FETCH_DEST'])))
             : '';
 
-        // Server-to-server IPN calls (PayPlus pings our callback directly) have no Sec-Fetch-Dest
-        // and no Accept: text/html — detect them and return early without any output.
-        $accept = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '';
-        $is_browser = (strpos($accept, 'text/html') !== false) || in_array($fetch_dest, ['iframe', 'frame', 'embed', 'document', 'navigate', ''], true);
+        // Server-to-server IPN: no browser, no Accept: text/html — skip silently.
+        $accept     = isset($_SERVER['HTTP_ACCEPT']) ? $_SERVER['HTTP_ACCEPT'] : '';
+        $is_browser = (strpos($accept, 'text/html') !== false)
+            || in_array($fetch_dest, ['iframe', 'frame', 'embed', 'document', 'navigate', ''], true);
         if (!$is_browser) {
-            return; // server-side IPN call, no HTML output needed
+            return;
         }
 
-        // Always output JS-driven HTML. The script detects context itself:
-        //   • In an iframe → sends postMessage to parent; parent redirects the top window.
-        //   • In the top window → navigates directly.
-        // This avoids relying on Sec-Fetch-Dest reliability and avoids wp_safe_redirect()
-        // loading the thank-you page inside a small iframe (which the user would never see).
+        // TOP-WINDOW request (redirect mode, or iframe mode after allow-top-navigation fires):
+        // Issue an instant 302 — no HTML rendered, no spinner flash, clean URL immediately.
+        $is_iframe = in_array($fetch_dest, ['iframe', 'frame', 'embed'], true);
+        if (!$is_iframe) {
+            wp_safe_redirect($url);
+            exit;
+        }
+
+        // IFRAME request (edge case: PayPlus navigated the iframe itself to the callback URL).
+        // Send postMessage to the parent so it can redirect the top window cleanly.
+        // The spinner is shown as a brief visual while the parent processes the message.
         nocache_headers();
         header('Content-Type: text/html; charset=utf-8');
         $msg      = esc_html(__('Payment received — redirecting…', 'payplus-payment-gateway'));
@@ -1213,11 +1219,8 @@ body{
 <div class="pp-spinner"></div>
 <script>(function(){
   var u=' . $json_url . ';
-  if(window.self!==window.top){
-    try{window.parent.postMessage({type:"payplus_redirect",url:u},"*");}catch(e){}
-  }else{
-    window.location.href=u;
-  }
+  try{window.parent.postMessage({type:"payplus_redirect",url:u},"*");}catch(e){}
+  if(window.self===window.top){window.location.href=u;}
 })();</script>
 </body>
 </html>';
