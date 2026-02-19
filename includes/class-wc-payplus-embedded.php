@@ -183,14 +183,7 @@ class WC_PayPlus_Embedded extends WC_PayPlus_HostedFields
         $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
         $data->refURL_failure = site_url() . "/error-payment-payplus/";
         $data->refURL_cancel = site_url() . "/cancel-payment-payplus/";
-        // Check if user wants to save payment method (from order meta)
-        $order = wc_get_order($order_id);
-        $createToken = false;
-        if ($order && $order->get_user_id() && $this->get_payplus_gateway()->create_pp_token === 'yes') {
-            $savePaymentMethod = WC_PayPlus_Meta_Data::get_meta($order_id, 'save_payment_method');
-            $createToken = !empty($savePaymentMethod) && $savePaymentMethod == true;
-        }
-        $data->create_token = $createToken;
+        $data->create_token = true;
         $data->currency_code = get_woocommerce_currency();
         $data->charge_method = intval($this->get_payplus_gateway()->settings['transaction_type']);
         /**
