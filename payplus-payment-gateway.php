@@ -284,9 +284,12 @@ class WC_PayPlus
             WC()->cart->empty_cart();
         }
 
-        // Unset page_order_awaiting_payment since payment is complete
+        // Unset both our custom session key and WC's own order_awaiting_payment.
+        // WC's get_cart_from_session() restores cart items from a pending order when
+        // order_awaiting_payment is still set — clearing it stops that re-hydration.
         if (WC()->session) {
             WC()->session->__unset('page_order_awaiting_payment');
+            WC()->session->__unset('order_awaiting_payment');
         }
     }
 
@@ -1059,6 +1062,11 @@ class WC_PayPlus
                     }
                 }
                 WC()->session->__unset('save_payment_method');
+                WC()->session->__unset('order_awaiting_payment');
+                WC()->session->__unset('page_order_awaiting_payment');
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
                 $this->payplus_redirect_graceful($linkRedirect);
             } else {
                 $countProcess = intval($result->count_process);
@@ -1091,6 +1099,11 @@ class WC_PayPlus
                 }
 
                 WC()->session->__unset('save_payment_method');
+                WC()->session->__unset('order_awaiting_payment');
+                WC()->session->__unset('page_order_awaiting_payment');
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
                 $this->payplus_redirect_graceful($linkRedirect);
             }
         } elseif (
@@ -1102,6 +1115,11 @@ class WC_PayPlus
             if ($order) {
                 $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
                 WC()->session->__unset('save_payment_method');
+                WC()->session->__unset('order_awaiting_payment');
+                WC()->session->__unset('page_order_awaiting_payment');
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
                 $this->payplus_redirect_graceful($linkRedirect);
             }
         }
