@@ -379,10 +379,10 @@ jQuery(function ($) {
                 .prop("id");
 
             if ($payment_methods.length > 1) {
-                // Hide open descriptions.
+                // Hide open descriptions (instant, no animation for testing)
                 $('div.payment_box:not(".' + checkedPaymentMethod + '")')
                     .filter(":visible")
-                    .slideUp(0);
+                    .hide();
             }
 
             // Trigger click event for selected method
@@ -404,10 +404,10 @@ jQuery(function ($) {
                     is_checked = $(this).is(":checked");
 
                 if (is_checked && !target_payment_box.is(":visible")) {
-                    $("div.payment_box").filter(":visible").slideUp(230);
-
+                    // Use fadeOut/fadeIn for smooth transitions (CSS handles opacity)
+                    $("div.payment_box").filter(":visible").fadeOut(200);
                     if (is_checked) {
-                        target_payment_box.slideDown(230);
+                        target_payment_box.fadeIn(200);
                     }
                 }
             }

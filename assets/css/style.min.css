@@ -331,6 +331,12 @@ body #applePayButton {
 .express-checkout p {
     margin: 0px;
 }
+
+/* Smooth fade transitions for payment boxes */
+.payment_box {
+    transition: opacity 0.2s ease-in-out;
+}
+
 @media screen and (min-width: 568px) {
     body .alertify .ajs-dialog {
         height: 82% !important;
@@ -349,4 +355,4 @@ body #applePayButton {
     }
 }
 
-/*# sourceMappingURL=style.min.css.map */
+/*# sourceMappingURL=style.css.map */
