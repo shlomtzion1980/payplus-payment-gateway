@@ -104,7 +104,7 @@ if (isCheckout || hasOrder) {
     var _payplusPollDone = false;
     var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
 
-    // Helper: trigger TV power-down effect before redirect (popup mode only - BLOCKS CHECKOUT)
+    // Helper: trigger TV power-down effect before redirect (BLOCKS CHECKOUT)
     function redirectWithTvEffect(url) {
         // Prevent multiple calls
         if (_payplusTvEffectInProgress) {
@@ -113,31 +113,37 @@ if (isCheckout || hasOrder) {
         
         // Only apply TV effect if:
         // 1. Feature is enabled (popupTvEffect setting)
-        // 2. Display mode is popupIframe
-        // 3. .pp_iframe container exists (blocks checkout popup)
+        // 2. .pp_iframe container exists
+        // 3. The iframe is actually in popup mode (position: fixed, not relative)
         if (
             payPlusGateWay && 
             payPlusGateWay.popupTvEffect &&
-            payPlusGateWay.viewMode === 'popupIframe' &&
             jQuery('.pp_iframe').length > 0
         ) {
-            _payplusTvEffectInProgress = true;
-            _payplusPollDone = true; // Stop polling from redirecting
-            
-            // Add TV closing class to the .pp_iframe container div
             var $popup = jQuery('.pp_iframe');
-            $popup.addClass('tv-closing-blocks');
             
-            // Force a reflow to ensure CSS is applied
-            $popup[0].offsetHeight;
+            // Check if the iframe is actually displayed as a popup (fixed positioning)
+            // samePageIframe uses position: relative, popupIframe uses position: fixed
+            var isActuallyPopup = $popup.css('position') === 'fixed';
             
-            // Wait for animation to complete (1000ms) then redirect
-            setTimeout(function() {
-                window.location.href = url;
-            }, 1050);
-            
-            // IMPORTANT: Return without redirecting immediately
-            return;
+            if (isActuallyPopup) {
+                _payplusTvEffectInProgress = true;
+                _payplusPollDone = true; // Stop polling from redirecting
+                
+                // Add TV closing class to the .pp_iframe container div (popup only)
+                $popup.addClass('tv-closing-blocks');
+                
+                // Force a reflow to ensure CSS is applied
+                $popup[0].offsetHeight;
+                
+                // Wait for animation to complete (1000ms) then redirect
+                setTimeout(function() {
+                    window.location.href = url;
+                }, 1050);
+                
+                // IMPORTANT: Return without redirecting immediately
+                return;
+            }
         }
         
         // No TV effect, redirect immediately
