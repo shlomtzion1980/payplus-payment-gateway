@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.0]  - 22-02-2026 - (Bill)
+
+- Fix       - Improved redirect handling across all browsers with a unified solution, eliminating the need for browser-specific settings and checkboxes.
+- Tweak     - Added translated "Payment received - redirecting..." screen that appears briefly when using fallback redirect method.
+- Fix       - Resolved issue where changing delivery method in classic checkout would incorrectly switch the selected payment method in the payment list.
+- Tweak     - Callback handler now processes orders in "failed" status (in addition to "pending") since callbacks occur after order creation and payment.
+- Added     - Optional TV power-down effect for popup iframe mode. When enabled via plugin settings, displays a classic CRT television shutdown animation before redirecting to thank you page.
+- Fix       - Order payment method now reflects the actual payment method used (e.g., credit card, Google Pay, Bit) rather than the initially selected gateway, ensuring accuracy in WooCommerce order details and invoices.
+
 ## [8.0.9]  - 18-02-2026 - (BBBliss)
 
 - Fix       - Fixed default setting for Firefox-compatible redirect mode - polling fallback is now enabled by default as intended.

@@ -534,7 +534,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $script_asset = array(
             'dependencies' => array(),
-            'version' => '1.0.0'
+            'version' => PAYPLUS_VERSION . '.' . filemtime(PAYPLUS_PLUGIN_DIR . $script_path)
         );
         $script_url = PAYPLUS_PLUGIN_URL . $script_path;
         $style_url = PAYPLUS_PLUGIN_URL . $style_path;
