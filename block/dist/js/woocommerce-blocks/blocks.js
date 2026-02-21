@@ -102,6 +102,47 @@ if (isCheckout || hasOrder) {
 
     // Prevent double redirects when both postMessage and polling fire
     var _payplusPollDone = false;
+    var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
+
+    // Helper: trigger TV power-down effect before redirect (popup mode only - BLOCKS CHECKOUT)
+    function redirectWithTvEffect(url) {
+        // Prevent multiple calls
+        if (_payplusTvEffectInProgress) {
+            return;
+        }
+        
+        // Only apply TV effect if:
+        // 1. Feature is enabled (popupTvEffect setting)
+        // 2. Display mode is popupIframe
+        // 3. .pp_iframe container exists (blocks checkout popup)
+        if (
+            payPlusGateWay && 
+            payPlusGateWay.popupTvEffect &&
+            payPlusGateWay.viewMode === 'popupIframe' &&
+            jQuery('.pp_iframe').length > 0
+        ) {
+            _payplusTvEffectInProgress = true;
+            _payplusPollDone = true; // Stop polling from redirecting
+            
+            // Add TV closing class to the .pp_iframe container div
+            var $popup = jQuery('.pp_iframe');
+            $popup.addClass('tv-closing-blocks');
+            
+            // Force a reflow to ensure CSS is applied
+            $popup[0].offsetHeight;
+            
+            // Wait for animation to complete (1000ms) then redirect
+            setTimeout(function() {
+                window.location.href = url;
+            }, 1050);
+            
+            // IMPORTANT: Return without redirecting immediately
+            return;
+        }
+        
+        // No TV effect, redirect immediately
+        window.location.href = url;
+    }
 
     // Firefox blocks cross-origin iframe from navigating top window. When PayPlus iframe sends
     // postMessage with redirect URL (or thank-you page loads in iframe), parent performs the redirect.
@@ -113,7 +154,7 @@ if (isCheckout || hasOrder) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
-                window.location.href = e.data.url;
+                redirectWithTvEffect(e.data.url);
             }
         } catch (err) {
             // ignore invalid URL
@@ -160,7 +201,7 @@ if (isCheckout || hasOrder) {
                         if (status === 'processing' || status === 'completed' ||
                             status === 'wc-processing' || status === 'wc-completed') {
                             _payplusPollDone = true;
-                            window.location.href = response.data.redirect_url || redirectUrl;
+                            redirectWithTvEffect(response.data.redirect_url || redirectUrl);
                         }
                     }
                 }

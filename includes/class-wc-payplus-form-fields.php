@@ -772,6 +772,13 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'no',
             ],
+            'popup_tv_effect' => [
+                'title' => __('TV Power Down Effect (Popup Only)', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'description' => __('Show a TV power-down animation when closing the popup iframe after successful payment. Only applies to popup iframe mode.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',

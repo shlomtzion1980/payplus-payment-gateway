@@ -44,6 +44,7 @@ class WC_PayPlus
     public $hidePayPlusGatewayNMW;
     public $pwGiftCardData;
     public $iframeAutoHeight;
+    public $popupTvEffect;
 
     /**
      * The main PayPlus gateway instance. Use get_main_payplus_gateway() to access it.
@@ -73,6 +74,7 @@ class WC_PayPlus
         $this->secret_key = $is_test_mode ? ($this->payplus_payment_gateway_settings->dev_secret_key ?? null) : ($this->payplus_payment_gateway_settings->secret_key ?? null);
         $this->hidePayPlusGatewayNMW = boolval(property_exists($this->payplus_payment_gateway_settings, 'hide_main_pp_checkout') && $this->payplus_payment_gateway_settings->hide_main_pp_checkout === 'yes');
         $this->iframeAutoHeight = boolval(property_exists($this->payplus_payment_gateway_settings, 'iframe_auto_height') && $this->payplus_payment_gateway_settings->iframe_auto_height === 'yes');
+        $this->popupTvEffect = boolval(property_exists($this->payplus_payment_gateway_settings, 'popup_tv_effect') && $this->payplus_payment_gateway_settings->popup_tv_effect === 'yes');
 
         add_action('plugins_loaded', [$this, 'load_textdomain'], 0); // Load first for gateway settings
         add_action('admin_init', [$this, 'check_environment']);
@@ -1636,6 +1638,8 @@ body{
                             'frontNonce' => wp_create_nonce('frontNonce'),
                             "isSubscriptionOrder" => $isSubscriptionOrder,
                             "iframeAutoHeight" => $this->iframeAutoHeight,
+                            "popupTvEffect" => $this->popupTvEffect,
+                            "viewMode" => $this->payplus_payment_gateway_settings->display_mode ?? 'redirect',
                             "iframeWidth" => $this->payplus_payment_gateway_settings->iframe_width ?? '40%',
                             "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
                             "isHostedFields" => isset($this->hostedFieldsOptions['enabled']) ? boolval($this->hostedFieldsOptions['enabled'] === "yes") : false,

@@ -623,6 +623,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'importApplePayScript' => $this->importApplePayScript  && !wp_script_is('applePayScript', 'enqueued')  ? PAYPLUS_PLUGIN_URL . 'assets/js/scriptV2.js' . '?ver=' . PAYPLUS_VERSION : false,
             'show_hide_submit_button' => $this->name === 'payplus-payment-gateway-hostedfields' ? $this->settings['show_hide_submit_button'] ?? 'no' : 'no',
             'enableDoubleCheckIfPruidExists' => isset($this->payPlusSettings['enable_double_check_if_pruid_exists']) && $this->payPlusSettings['enable_double_check_if_pruid_exists'] === 'yes' ? true : false,
+            'popupTvEffect' => isset($this->payPlusSettings['popup_tv_effect']) && $this->payPlusSettings['popup_tv_effect'] === 'yes' ? true : false,
+            'viewMode' => $this->displayMode !== 'default' ? $this->displayMode : ($this->payPlusSettings['display_mode'] ?? 'redirect'),
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',
