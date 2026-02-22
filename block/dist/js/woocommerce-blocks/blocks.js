@@ -114,36 +114,40 @@ if (isCheckout || hasOrder) {
         // Only apply TV effect if:
         // 1. Feature is enabled (popupTvEffect setting)
         // 2. .pp_iframe container exists
-        // 3. The iframe is actually in popup mode (position: fixed, not relative)
+        // 3. viewMode is popupIframe (trust the setting, not the CSS)
         if (
             payPlusGateWay && 
             payPlusGateWay.popupTvEffect &&
+            payPlusGateWay.viewMode === 'popupIframe' &&
             jQuery('.pp_iframe').length > 0
         ) {
+            _payplusTvEffectInProgress = true;
+            _payplusPollDone = true; // Stop polling from redirecting
+            
             var $popup = jQuery('.pp_iframe');
             
-            // Check if the iframe is actually displayed as a popup (fixed positioning)
-            // samePageIframe uses position: relative, popupIframe uses position: fixed
-            var isActuallyPopup = $popup.css('position') === 'fixed';
+            // FORCE the correct popup positioning (in case something overrode it)
+            $popup.css({
+                'position': 'fixed',
+                'top': '50%',
+                'left': '50%',
+                'transform': 'translate(-50%, -50%)',
+                'z-index': '100000'
+            });
             
-            if (isActuallyPopup) {
-                _payplusTvEffectInProgress = true;
-                _payplusPollDone = true; // Stop polling from redirecting
-                
-                // Add TV closing class to the .pp_iframe container div (popup only)
-                $popup.addClass('tv-closing-blocks');
-                
-                // Force a reflow to ensure CSS is applied
-                $popup[0].offsetHeight;
-                
-                // Wait for animation to complete (1000ms) then redirect
-                setTimeout(function() {
-                    window.location.href = url;
-                }, 1050);
-                
-                // IMPORTANT: Return without redirecting immediately
-                return;
-            }
+            // Add TV closing class to the .pp_iframe container div
+            $popup.addClass('tv-closing-blocks');
+            
+            // Force a reflow to ensure CSS is applied
+            $popup[0].offsetHeight;
+            
+            // Wait for animation to complete (1000ms) then redirect
+            setTimeout(function() {
+                window.location.href = url;
+            }, 1050);
+            
+            // IMPORTANT: Return without redirecting immediately
+            return;
         }
         
         // No TV effect, redirect immediately
