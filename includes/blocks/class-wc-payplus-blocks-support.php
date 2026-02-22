@@ -471,42 +471,33 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $result->set_payment_details('');
             }
 
-            // THIS IS THE BOTTLENECK - External API call
+            // Build the payment payload locally — this is fast (no HTTP call).
             $payload = $main_gateway->generatePaymentLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments, 'isSubscriptionOrder' => $this->isSubscriptionOrder]);
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
 
-            // ANOTHER BOTTLENECK - Remote HTTP request
-            $response = WC_PayPlus_Statics::payPlusRemote($main_gateway->payment_url, $payload);
-
-            $payment_details = $result->payment_details;
-            $payment_details['order_id'] = $this->orderId;
-            $payment_details['secret_key'] = $this->secretKey;
-
-            $responseArray = json_decode(wp_remote_retrieve_body($response), true);
-
-            if ($responseArray['results']['status'] === 'error' || !isset($responseArray['results']) && isset($responseArray['message'])) {
-                $payment_details['errorMessage'] = isset($responseArray['results']['description']) ? wp_strip_all_tags($responseArray['results']['description']) : $responseArray['message'];
-            } else {
-                // Set page_order_awaiting_payment when payment page is opened (for non-hosted fields)
-                if ($context->payment_method !== 'payplus-payment-gateway-hostedfields' && WC()->session) {
-                    WC()->session->set('page_order_awaiting_payment', $this->orderId);
-                }
-
-                $orderMeta = [
-                    'payplus_page_request_uid' => $responseArray['data']['page_request_uid'],
-                    'payplus_payment_page_link' => $responseArray['data']['payment_page_link']
-                ];
-
-                isset($data['wc-payplus-payment-gateway-new-payment-method']) ? $orderMeta['save_payment_method'] = $data['wc-payplus-payment-gateway-new-payment-method'] : null;
-
-
-                WC_PayPlus_Meta_Data::update_meta($order, $orderMeta);
-
-                $payment_details['paymentPageLink'] = $responseArray['data']['payment_page_link'];
-                $payment_details['order_received_url'] = $order->get_checkout_order_received_url();
+            // Save the payload and everything the async AJAX handler will need later.
+            // The slow payPlusRemote() HTTP call is intentionally deferred to that handler.
+            WC_PayPlus_Meta_Data::update_meta($order, [
+                'payplus_payload'      => $payload,
+                'payplus_payment_url'  => $main_gateway->payment_url,
+                'payplus_async_method' => $context->payment_method,
+            ]);
+            if (isset($data['wc-payplus-payment-gateway-new-payment-method'])) {
+                WC_PayPlus_Meta_Data::update_meta($order, [
+                    'save_payment_method' => $data['wc-payplus-payment-gateway-new-payment-method'],
+                ]);
             }
+
+            // Return immediately so the Store API responds in < 1 s instead of 7-10 s.
+            // The JS will call payplus_get_iframe_link via AJAX to get the actual link.
+            $payment_details = $result->payment_details;
+            $payment_details['order_id']            = $this->orderId;
+            $payment_details['order_key']           = $order->get_order_key();
+            $payment_details['secret_key']          = $this->secretKey;
+            $payment_details['order_received_url']  = $order->get_checkout_order_received_url();
+            $payment_details['payplus_iframe_async'] = true;
+
             $result->set_payment_details($payment_details);
-            !isset($payment_details['errorMessage']) ? $result->set_status('pending') : $result->set_status('failure');
+            $result->set_status('pending');
         }
     }
 

@@ -343,131 +343,6 @@ if (isCheckout || hasOrder) {
         loaderContent.appendChild(loaderInner);
         loader.appendChild(loaderContent);
 
-        // Add early loading indicator for Place Order button
-        function addEarlyLoadingIndicator() {
-            const placeOrderButton = document.querySelector(
-                ".wc-block-checkout__actions_row button"
-            );
-
-            if (placeOrderButton && !placeOrderButton.hasAttribute('data-payplus-listener')) {
-                placeOrderButton.setAttribute('data-payplus-listener', 'true');
-                placeOrderButton.addEventListener("click", function () {
-                    const activePaymentMethod = payment.getActivePaymentMethod();
-
-                    // Check if it's a PayPlus payment method
-                    if (activePaymentMethod && activePaymentMethod.includes("payplus-payment-gateway")) {
-                        // Show loading immediately
-                        const overlay = document.createElement("div");
-                        overlay.id = "early-payplus-overlay";
-                        overlay.style.cssText = `
-                            position: fixed;
-                            top: 0;
-                            left: 0;
-                            width: 100%;
-                            height: 100%;
-                            background-color: rgba(0, 0, 0, 0.5);
-                            z-index: 999999;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        `;
-
-                        const loadingContainer = document.createElement("div");
-                        loadingContainer.style.cssText = `
-                            background: white;
-                            padding: 30px 50px;
-                            border-radius: 12px;
-                            text-align: center;
-                            color: #333;
-                            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-                            min-width: 300px;
-                        `;
-
-                        const loadingText = document.createElement("div");
-                        loadingText.style.cssText = `
-                            font-size: 18px;
-                            font-weight: 500;
-                            margin-bottom: 15px;
-                        `;
-
-                        const loadingDots = document.createElement("div");
-                        loadingDots.style.cssText = `
-                            font-size: 24px;
-                            color: #007cba;
-                        `;
-
-                        loadingContainer.appendChild(loadingText);
-                        loadingContainer.appendChild(loadingDots);
-                        overlay.appendChild(loadingContainer);
-                        document.body.appendChild(overlay);
-
-                        // Animate dots
-                        let dotCount = 0;
-                        const animateDots = () => {
-                            dotCount = (dotCount % 3) + 1;
-                            loadingDots.textContent = '.'.repeat(dotCount);
-                        };
-                        const dotInterval = setInterval(animateDots, 400);
-
-                        // Check if it's hosted fields payment method
-                        if (activePaymentMethod === "payplus-payment-gateway-hostedfields") {
-                            // For hosted fields: show "Processing your payment now..."
-                            loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.processing_payment) 
-                                ? window.payplus_i18n.processing_payment 
-                                : "Processing your payment now";
-                        } else {
-                            // For other PayPlus methods: Phase 1: Generating payment page (1-1.5 seconds)
-                            loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.generating_page) 
-                                ? window.payplus_i18n.generating_page 
-                                : "Generating payment page";
-                            const phase1Duration = Math.random() * 1000 + 4000; // 4-5 seconds
-
-                            setTimeout(() => {
-                                // Phase 2: Loading payment page (until store.isComplete() is true)
-                                loadingText.textContent = (window.payplus_i18n && window.payplus_i18n.loading_page) 
-                                    ? window.payplus_i18n.loading_page 
-                                    : "Loading payment page";
-                            }, phase1Duration);
-                        }
-
-                        // Only remove when store actually completes or error occurs
-                        const checkForCompletion = setInterval(() => {
-                            // Check if checkout is complete or has error
-                            if (store.isComplete() || store.hasError()) {
-                                clearInterval(dotInterval);
-                                clearInterval(checkForCompletion);
-                                const earlyOverlay = document.getElementById("early-payplus-overlay");
-                                if (earlyOverlay) {
-                                    earlyOverlay.remove();
-                                }
-                            }
-                        }, 100);
-
-                        // Safety cleanup after 15 seconds (extended time)
-                        setTimeout(() => {
-                            clearInterval(dotInterval);
-                            clearInterval(checkForCompletion);
-                            const earlyOverlay = document.getElementById("early-payplus-overlay");
-                            if (earlyOverlay) {
-                                earlyOverlay.remove();
-                            }
-                        }, 15000);
-                    }
-                });
-            }
-        }
-
-        // Try to add the early loading indicator immediately and periodically
-        addEarlyLoadingIndicator();
-        const intervalId = setInterval(() => {
-            addEarlyLoadingIndicator();
-        }, 1000);
-
-        // Clear interval after 10 seconds to avoid memory leaks
-        setTimeout(() => {
-            clearInterval(intervalId);
-        }, 10000);
-
         function startObserving(event) {
             console.log("observer started");
 
@@ -692,34 +567,64 @@ if (isCheckout || hasOrder) {
                             console.log("isComplete: " + store.isComplete());
                             // Call the function to handle the target element
                             if (isIframe) {
-                                if (
-                                    payment.getPaymentResult().paymentDetails
-                                        .paymentPageLink?.length > 0
-                                ) {
-                                    console.log(
-                                        "paymentPageLink",
-                                        payment.getPaymentResult()
-                                            .paymentDetails.paymentPageLink
-                                    );
-                                    startIframe(
-                                        payment.getPaymentResult()
-                                            .paymentDetails.paymentPageLink,
-                                        overlay,
-                                        loader
-                                    );
-                                    // Start polling for order status (fallback for redirect)
-                                    var paymentDetails = payment.getPaymentResult().paymentDetails;
+                                var paymentDetails = payment.getPaymentResult().paymentDetails;
+
+                                if (paymentDetails.payplus_iframe_async) {
+                                    // Async mode: Store API returned instantly (no PayPlus HTTP call yet).
+                                    // Show the iframe container immediately, then fetch the link via AJAX.
+                                    startOrderStatusPoll({
+                                        order_id: paymentDetails.order_id,
+                                        order_received_url: paymentDetails.order_received_url
+                                    });
+                                    // Show overlay/container right away with a blank src.
+                                    startIframe('about:blank', overlay, loader);
+                                    // Now fetch the actual PayPlus payment page link.
+                                    jQuery.ajax({
+                                        type: 'POST',
+                                        url: payplus_script.ajax_url,
+                                        data: {
+                                            action: 'payplus_get_iframe_link',
+                                            _ajax_nonce: payplus_script.frontNonce,
+                                            order_id: paymentDetails.order_id,
+                                            order_key: paymentDetails.order_key,
+                                        },
+                                        success: function(resp) {
+                                            if (resp.success && resp.data && resp.data.payment_page_link) {
+                                                var iframe = document.getElementById('pp_iframe');
+                                                if (iframe) {
+                                                    iframe.src = resp.data.payment_page_link;
+                                                }
+                                            } else {
+                                                var errMsg = (resp.data && resp.data.message)
+                                                    ? resp.data.message
+                                                    : ((window.payplus_i18n && window.payplus_i18n.payment_page_failed)
+                                                        ? window.payplus_i18n.payment_page_failed
+                                                        : 'Error: the payment page failed to load.');
+                                                alert(errMsg);
+                                                location.reload();
+                                            }
+                                        },
+                                        error: function() {
+                                            alert((window.payplus_i18n && window.payplus_i18n.payment_page_failed)
+                                                ? window.payplus_i18n.payment_page_failed
+                                                : 'Error: the payment page failed to load.');
+                                            location.reload();
+                                        }
+                                    });
+                                } else if (paymentDetails.paymentPageLink && paymentDetails.paymentPageLink.length > 0) {
+                                    // Legacy sync path — link already in paymentDetails.
+                                    console.log("paymentPageLink", paymentDetails.paymentPageLink);
+                                    startIframe(paymentDetails.paymentPageLink, overlay, loader);
                                     if (paymentDetails.order_id && paymentDetails.order_received_url) {
                                         startOrderStatusPoll({
                                             order_id: paymentDetails.order_id,
                                             order_received_url: paymentDetails.order_received_url
                                         });
                                     }
-                                    // Disconnect the observer to stop observing further changes
                                 } else {
                                     alert(
-                                        (window.payplus_i18n && window.payplus_i18n.payment_page_failed) 
-                                            ? window.payplus_i18n.payment_page_failed 
+                                        (window.payplus_i18n && window.payplus_i18n.payment_page_failed)
+                                            ? window.payplus_i18n.payment_page_failed
                                             : "Error: the payment page failed to load."
                                     );
                                     location.reload();
