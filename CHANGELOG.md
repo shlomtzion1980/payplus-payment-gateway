@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.1]  - 23-02-2026 - (Speed)
+
+- Fix       - TV power-down effect in Blocks Checkout is now driven by the plugin setting rather than CSS positioning, ensuring it triggers reliably regardless of theme styles.
+- Tweak     - Blocks Checkout popup and same-page iframe modes now open instantly — the PayPlus payment page link is fetched asynchronously after checkout submission instead of blocking the Store API response.
+
 ## [8.1.0]  - 22-02-2026 - (Bill)
 
 - Fix       - Improved redirect handling across all browsers with a unified solution, eliminating the need for browser-specific settings and checkboxes.
