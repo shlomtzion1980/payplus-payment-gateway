@@ -108,6 +108,7 @@ class WC_PayPlus
         add_action('woocommerce_init', [$this, 'pwgc_remove_processing_redemption'], 11);
         add_action('woocommerce_checkout_order_processed', [$this, 'payplus_checkout_order_processed'], 25, 3);
         add_action('woocommerce_thankyou', [$this, 'payplus_clear_session_on_order_received'], 10, 1);
+        add_action('woocommerce_thankyou', [$this, 'payplus_clear_pw_gift_cards_session'], 10, 1);
         add_action('wp_footer', [$this, 'payplus_thankyou_iframe_redirect_script'], 5);
 
         //FILTER
@@ -300,6 +301,30 @@ class WC_PayPlus
     }
 
     /**
+     * Internal helper: removes all PW Gift Cards data from the active WC session.
+     * Called from ipn_response() and woocommerce_thankyou so we always clear in
+     * whatever context has a valid session cookie.
+     */
+    public function payplus_clear_pw_gift_cards_session_data()
+    {
+        if (!WC()->session) {
+            return;
+        }
+        $session_key = defined('PWGC_SESSION_KEY') ? PWGC_SESSION_KEY : 'pw-gift-card-data';
+        WC()->session->__unset($session_key);
+    }
+
+    /**
+     * Clear PW Gift Cards session data when the order-received (thank-you) page loads.
+     * Acts as a secondary cleanup layer in addition to ipn_response() and the
+     * pwgc_redeeming_session_data filter which auto-prunes depleted cards.
+     */
+    public function payplus_clear_pw_gift_cards_session($order_id)
+    {
+        $this->payplus_clear_pw_gift_cards_session_data();
+    }
+
+    /**
      * When thank-you page is loaded inside the PayPlus payment iframe (e.g. Firefox blocks
      * iframe from navigating top), tell the parent to redirect so the top window goes to thank-you.
      */
@@ -375,10 +400,26 @@ class WC_PayPlus
         }
     }
 
-    public function modify_gift_card_session_data($session_data, $gift_card_number)
+    public function modify_gift_card_session_data($session_data, $cart)
     {
-        // Modify session data if necessary
+        // Capture session data for internal PayPlus use (gift card discount propagation).
         $this->pwGiftCardData = $session_data;
+
+        // Auto-remove gift cards that have been fully debited (DB balance = 0) so they do
+        // not reappear in subsequent orders after payment. We only remove a card when its
+        // calculated session amount is also 0 — if another card already covered the total,
+        // a valid card may legitimately show 0 amount and should not be pruned.
+        if (!empty($session_data['gift_cards']) && is_array($session_data['gift_cards']) && class_exists('PW_Gift_Card')) {
+            foreach ($session_data['gift_cards'] as $card_number => $amount) {
+                if ($amount == 0) {
+                    $gift_card_obj = new PW_Gift_Card($card_number);
+                    if ($gift_card_obj->get_id() && floatval($gift_card_obj->get_balance()) <= 0) {
+                        unset($session_data['gift_cards'][$card_number]);
+                    }
+                }
+            }
+        }
+
         return $session_data;
     }
 
@@ -414,7 +455,16 @@ class WC_PayPlus
                 if (!is_a($pw_gift_cards_redeeming, 'PW_Gift_Cards_Redeeming')) {
                     return;
                 }
-                // Add gift card item to the order and recalculate totals so the
+
+                // Remove any existing gift card line items before adding fresh ones.
+                // When the same pending order is resubmitted (e.g. the customer closes
+                // and reopens the payment page), this hook fires again on the same order.
+                // Without this removal each submission would stack another set of items.
+                foreach ($order->get_items('pw_gift_card') as $item_id => $item) {
+                    $order->remove_item($item_id);
+                }
+
+                // Add gift card items to the order and recalculate totals so the
                 // WooCommerce order total reflects the gift card discount.
                 $pw_gift_cards_redeeming->woocommerce_checkout_create_order($order);
                 if ($order->get_items('pw_gift_card')) {
@@ -1000,6 +1050,7 @@ class WC_PayPlus
                 if (WC()->session) {
                     WC()->session->__unset('page_order_awaiting_payment');
                 }
+                $this->payplus_clear_pw_gift_cards_session_data();
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
                 $this->payplus_redirect_graceful($redirect_to);
             } else {
@@ -1093,6 +1144,7 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 WC()->session->__unset('order_awaiting_payment');
                 WC()->session->__unset('page_order_awaiting_payment');
+                $this->payplus_clear_pw_gift_cards_session_data();
                 if (WC()->cart) {
                     WC()->cart->empty_cart();
                 }
@@ -1130,6 +1182,7 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 WC()->session->__unset('order_awaiting_payment');
                 WC()->session->__unset('page_order_awaiting_payment');
+                $this->payplus_clear_pw_gift_cards_session_data();
                 if (WC()->cart) {
                     WC()->cart->empty_cart();
                 }
@@ -1146,6 +1199,7 @@ class WC_PayPlus
                 WC()->session->__unset('save_payment_method');
                 WC()->session->__unset('order_awaiting_payment');
                 WC()->session->__unset('page_order_awaiting_payment');
+                $this->payplus_clear_pw_gift_cards_session_data();
                 if (WC()->cart) {
                     WC()->cart->empty_cart();
                 }
