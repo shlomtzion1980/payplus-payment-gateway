@@ -2998,6 +2998,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
 
+        // In redirect / iframe-next-page mode, receipt_page() runs in a new HTTP request
+        // where the pwgc_redeeming_session_data filter never fires, so $this->pwGiftCardData
+        // is null. Restore it from the order meta that was saved during process_payment().
+        if (empty($this->pwGiftCardData)) {
+            $saved_gift_cards = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+            if (!empty($saved_gift_cards)) {
+                $this->pwGiftCardData = json_decode($saved_gift_cards, true);
+            }
+        }
+
         $options = $isSubscriptionOrder ? ['isSubscriptionOrder' => true] : [];
         $payload = $this->generatePaymentLink($order_id, false, $token, $subscription, $custom_more_info, $move_token, $options);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload' => $payload]);
