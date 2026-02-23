@@ -391,19 +391,25 @@ class WC_PayPlus
      */
     public function pwgc_remove_processing_redemption()
     {
-        global $pw_gift_cards_redeeming;
+        global $pw_gift_cards_redeeming, $pw_gift_cards_blocks;
 
-        // Check if PW Gift Cards redeeming class exists
-        if (!isset($pw_gift_cards_redeeming) || !is_object($pw_gift_cards_redeeming)) {
-            return;
+        // Classic checkout: remove hooks that debit gift cards immediately during checkout submission.
+        if (isset($pw_gift_cards_redeeming) && is_object($pw_gift_cards_redeeming)) {
+            remove_action('woocommerce_pre_payment_complete', array($pw_gift_cards_redeeming, 'woocommerce_pre_payment_complete'));
+            remove_action('woocommerce_checkout_update_order_meta', array($pw_gift_cards_redeeming, 'woocommerce_checkout_update_order_meta'), 10, 2);
         }
 
-        // Remove early redemption hooks that debit gift cards immediately at checkout
-        remove_action('woocommerce_pre_payment_complete', array($pw_gift_cards_redeeming, 'woocommerce_pre_payment_complete'));
-        remove_action('woocommerce_checkout_update_order_meta', array($pw_gift_cards_redeeming, 'woocommerce_checkout_update_order_meta'), 10, 2);
+        // Blocks checkout: PW Gift Cards uses a dedicated Blocks class that hooks into
+        // woocommerce_store_api_checkout_order_processed and calls debit_gift_cards()
+        // immediately — before PayPlus opens the payment page. Remove it so gift cards
+        // are only debited when the order reaches "processing" or "completed" status,
+        // exactly as with classic checkout.
+        if (isset($pw_gift_cards_blocks) && is_object($pw_gift_cards_blocks)) {
+            remove_action('woocommerce_store_api_checkout_order_processed', array($pw_gift_cards_blocks, 'woocommerce_store_api_checkout_order_processed'));
+        }
 
-        // Note: We keep woocommerce_order_status_processing and woocommerce_order_status_completed
-        // hooks so gift cards are debited when order status changes to processing or completed
+        // Note: woocommerce_order_status_processing and woocommerce_order_status_completed
+        // hooks remain intact so gift cards are still debited once payment is confirmed.
     }
 
     public function wc_payplus_check_version()
