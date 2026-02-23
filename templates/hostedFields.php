@@ -129,25 +129,18 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
             z-index: 999999;
 
             .blocks-loader-text {
+                /* When no-image: curved SVG text sits centered inside the black circle. */
                 &.no-image {
-                    background-image: none;
+                    background-image: none !important;
+                    background-color: transparent !important;
+                    overflow: visible;
+                    opacity: 1 !important;
+                    top: 50% !important;
+                    left: 50% !important;
+                    width: 90% !important;
+                    height: 90% !important;
+                    transform: translate(-50%, -50%) !important;
                 }
-
-                &.no-image::before {
-                    content: "<?php echo esc_attr(__('Processing...', 'payplus-payment-gateway')); ?>";
-                    position: relative;
-                    bottom: 25px;
-                    font-size: 7px;
-                    color: white;
-                }
-
-                &.no-image.blocks::before {
-                    bottom: 20px;
-                }
-
-                /* &.no-image.blocks-he::before {
-                bottom: 0px;
-            } */
             }
         }
 

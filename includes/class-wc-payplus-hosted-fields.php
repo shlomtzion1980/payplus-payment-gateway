@@ -127,6 +127,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
                 [
                     "hostedResponse" => $hostedResponse,
                     "isHideLoaderLogo" => $this->isHideLoaderLogo,
+                    "processingText" => __('Processing Payment', 'payplus-payment-gateway'),
+                    "isRtl" => is_rtl(),
                     "isLoggedIn" => boolval(get_current_user_id() > 0),
                     "isSavingCerditCards" => boolval(isset($this->payPlusGateway->settings['create_pp_token']) && $this->payPlusGateway->settings['create_pp_token'] === 'yes'),
                     'ajax_url' => admin_url('admin-ajax.php'),

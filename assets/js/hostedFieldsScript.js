@@ -280,10 +280,40 @@ jQuery(() => {
         jQuery("#submit-payment").css("display", "none");
     }
     if (payplus_script_hosted.isHideLoaderLogo) {
-        jQuery(".blocks-loader-text").addClass("no-image");
-        if (isCheckout) {
-            jQuery(".blocks-loader-text").addClass("blocks");
-        }
+        var processingText = payplus_script_hosted.processingText || 'Processing Payment';
+        var isRtl = !!payplus_script_hosted.isRtl;
+        var fontFamily = isRtl
+            ? "'AlmoniMLv5AAA', Arial, sans-serif"
+            : "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif";
+        var svgNS = 'http://www.w3.org/2000/svg';
+        var svg = document.createElementNS(svgNS, 'svg');
+        svg.setAttribute('xmlns', svgNS);
+        svg.setAttribute('viewBox', '0 0 120 28');
+        svg.setAttribute('width', '120');
+        svg.setAttribute('height', '26');
+        svg.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);' +
+                            'display:block;overflow:visible;pointer-events:none;';
+
+        var text = document.createElementNS(svgNS, 'text');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '50%');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-family', fontFamily);
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', '600');
+        text.setAttribute('fill', '#ffffff');
+        text.setAttribute('stroke', '#333333');
+        text.setAttribute('stroke-width', '2.5');
+        text.setAttribute('paint-order', 'stroke fill');
+        if (isRtl) { text.setAttribute('direction', 'rtl'); }
+        text.textContent = processingText;
+        svg.appendChild(text);
+
+        jQuery('.blocks-loader-text')
+            .addClass('no-image')
+            .css({ overflow: 'visible', background: 'transparent' })
+            .append(svg);
     }
 
     // Define the async function to handle the response

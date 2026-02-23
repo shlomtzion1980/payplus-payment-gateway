@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2026-02-23 17:30+0200\n"
-"PO-Revision-Date: 2026-02-23 17:33+0200\n"
+"POT-Creation-Date: 2026-02-24 00:12+0200\n"
+"PO-Revision-Date: 2026-02-24 00:14+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -23,7 +23,7 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin-settings.php:18
 #: includes/admin/class-wc-payplus-admin-settings.php:23
-#: payplus-payment-gateway.php:1507
+#: payplus-payment-gateway.php:1584
 msgid "Settings"
 msgstr "הגדרות"
 
@@ -146,7 +146,7 @@ msgid "Enable Test/Sandbox Mode"
 msgstr "הפעל מצב בדיקות/סביבת פיתוח"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:109
-#: includes/class-wc-payplus-form-fields.php:667 payplus-payment-gateway.php:1874
+#: includes/class-wc-payplus-form-fields.php:667 payplus-payment-gateway.php:1951
 msgid "Transactions Type"
 msgstr "סוג עסקה"
 
@@ -163,14 +163,14 @@ msgstr "ברירת מחדל גלובלית"
 #: includes/admin/class-wc-payplus-admin-settings.php:113
 #: includes/class-wc-payplus-form-fields.php:671
 #: includes/class-wc-payplus-statics.php:78
-#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:1399
-#: payplus-payment-gateway.php:1869 payplus-payment-gateway.php:2138
+#: includes/class-wc-payplus-statics.php:195 payplus-payment-gateway.php:1476
+#: payplus-payment-gateway.php:1946 payplus-payment-gateway.php:2215
 msgid "Charge"
 msgstr "חיוב"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:114
-#: includes/class-wc-payplus-form-fields.php:672 payplus-payment-gateway.php:1400
-#: payplus-payment-gateway.php:1870 payplus-payment-gateway.php:2139
+#: includes/class-wc-payplus-form-fields.php:672 payplus-payment-gateway.php:1477
+#: payplus-payment-gateway.php:1947 payplus-payment-gateway.php:2216
 msgid "Authorization"
 msgstr "תפיסת מסגרת"
 
@@ -608,7 +608,7 @@ msgstr "בחירת שיטות תשלום עליהן הפקת מסמכים לא �
 #: includes/admin/class-wc-payplus-admin.php:1538
 #: includes/class-wc-payplus-form-fields.php:141
 #: includes/class-wc-payplus-form-fields.php:142
-#: includes/wc_payplus_gateway.php:1500 includes/wc_payplus_gateway.php:4056
+#: includes/wc_payplus_gateway.php:1500 includes/wc_payplus_gateway.php:4072
 #: includes/wc_payplus_subgateways.php:48
 msgid "PayPal"
 msgstr "פייפאל"
@@ -769,7 +769,7 @@ msgstr "ברירת מחדל woocommerce"
 
 #: includes/admin/class-wc-payplus-admin-settings.php:558
 #: includes/wc_payplus_gateway.php:130 includes/wc_payplus_gateway.php:1392
-#: includes/wc_payplus_gateway.php:4053
+#: includes/wc_payplus_gateway.php:4069
 msgid "PayPlus"
 msgstr "פיי פלוס"
 
@@ -912,7 +912,7 @@ msgstr ""
 #: includes/admin/class-wc-payplus-admin-settings.php:681
 #: includes/class-wc-payplus-form-fields.php:120
 #: includes/class-wc-payplus-form-fields.php:121
-#: includes/wc_payplus_gateway.php:1491 includes/wc_payplus_gateway.php:4059
+#: includes/wc_payplus_gateway.php:1491 includes/wc_payplus_gateway.php:4075
 #: includes/wc_payplus_subgateways.php:45
 msgid "Google Pay"
 msgstr "גוגל פיי"
@@ -930,7 +930,7 @@ msgstr "דרישת מספר טלפון בתשלום גוגל פיי"
 #: includes/class-wc-payplus-form-fields.php:127
 #: includes/class-wc-payplus-form-fields.php:128
 #: includes/class-wc-payplus-form-fields.php:722
-#: includes/wc_payplus_gateway.php:1494 includes/wc_payplus_gateway.php:4060
+#: includes/wc_payplus_gateway.php:1494 includes/wc_payplus_gateway.php:4076
 #: includes/wc_payplus_subgateways.php:46
 msgid "Apple Pay"
 msgstr "אפל פיי"
@@ -1087,8 +1087,8 @@ msgstr ""
 
 #: includes/admin/class-wc-payplus-admin.php:1170
 #: includes/class-wc-payplus-embedded.php:101
-#: includes/class-wc-payplus-hosted-fields.php:258
-#: includes/wc_payplus_gateway.php:2651
+#: includes/class-wc-payplus-hosted-fields.php:260
+#: includes/wc_payplus_gateway.php:2657
 #, fuzzy
 #| msgid "Credit Card"
 msgid "PW Gift Card"
@@ -1181,7 +1181,7 @@ msgstr "רגיל"
 
 #: includes/admin/class-wc-payplus-admin.php:1607
 #: includes/admin/class-wc-payplus-admin.php:1635
-#: includes/class-wc-payplus-statics.php:410 templates/hostedFields.php:684
+#: includes/class-wc-payplus-statics.php:410 templates/hostedFields.php:677
 msgid "Payments"
 msgstr "תשלומים"
 
@@ -1489,7 +1489,7 @@ msgstr "ביצוע תשלום"
 
 #. Plugin Name of the plugin/theme
 #: includes/admin/class-wc-payplus-admin.php:2842
-#: payplus-payment-gateway.php:1489
+#: payplus-payment-gateway.php:1566
 msgid "PayPlus Payment Gateway"
 msgstr "פיי פלוס פתרונות תשלום"
 
@@ -1505,31 +1505,31 @@ msgstr "חברת כרטיסי האשראי דחתה את העסקה, אנא בד
 msgid "PayPlus Payment Successful"
 msgstr "התשלום באמצעות פיי פלוס בוצע בהצלחה"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:466
-#: includes/blocks/class-wc-payplus-blocks-support.php:468
-#: includes/wc_payplus_gateway.php:1957 payplus-payment-gateway.php:2219
+#: includes/blocks/class-wc-payplus-blocks-support.php:489
+#: includes/blocks/class-wc-payplus-blocks-support.php:491
+#: includes/wc_payplus_gateway.php:1957 payplus-payment-gateway.php:2296
 #, fuzzy
 #| msgid "Something went wrong with the payment page"
 msgid "Something went wrong with the payment page - This Ip is blocked"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:572
+#: includes/blocks/class-wc-payplus-blocks-support.php:607
 msgid "Processing your payment now"
 msgstr "עיבוד תשלום מתבצע"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:573
+#: includes/blocks/class-wc-payplus-blocks-support.php:608
 msgid "Generating payment page"
 msgstr "יצירת דף תשלום מתבצעת"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:574
+#: includes/blocks/class-wc-payplus-blocks-support.php:609
 msgid "Loading payment page"
 msgstr "דף התשלום נטען"
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:575
+#: includes/blocks/class-wc-payplus-blocks-support.php:610
 msgid "Click this to close."
 msgstr "הקלק/י כאן לסגירה."
 
-#: includes/blocks/class-wc-payplus-blocks-support.php:576
+#: includes/blocks/class-wc-payplus-blocks-support.php:611
 msgid "Error: the payment page failed to load."
 msgstr "שגיאה: דף התשלום נכשל בטעינה."
 
@@ -1621,7 +1621,7 @@ msgid "Tav zahav"
 msgstr "תו הזהב"
 
 #: includes/class-wc-payplus-form-fields.php:149
-#: includes/wc_payplus_gateway.php:1503 includes/wc_payplus_gateway.php:4057
+#: includes/wc_payplus_gateway.php:1503 includes/wc_payplus_gateway.php:4073
 #: includes/wc_payplus_subgateways.php:49
 msgid "Tav Zahav"
 msgstr "תו הזהב"
@@ -1649,7 +1649,7 @@ msgstr "כותרת"
 msgid "This controls the title which the user sees during checkout"
 msgstr "באפשרות זה ניתן לבחור מה הלקוח יראה בעמוד תשלום"
 
-#: includes/class-wc-payplus-form-fields.php:594 templates/hostedFields.php:714
+#: includes/class-wc-payplus-form-fields.php:594 templates/hostedFields.php:707
 msgid "Pay with Debit or Credit Card"
 msgstr "שלם באמצעות כרטיס אשראי"
 
@@ -2379,8 +2379,12 @@ msgstr ""
 "שערי עקיפת POS – הפרד באמצעות פסיקים – שערי התשלום שיועקפו באמצעות מסוף ה־POS "
 "של PayPlus בתקן EMV."
 
-#: includes/class-wc-payplus-hosted-fields.php:133
-#: includes/wc_payplus_gateway.php:1906 payplus-payment-gateway.php:1719
+#: includes/class-wc-payplus-hosted-fields.php:130
+msgid "Processing Payment"
+msgstr "עיבוד תשלום מתבצע"
+
+#: includes/class-wc-payplus-hosted-fields.php:135
+#: includes/wc_payplus_gateway.php:1906 payplus-payment-gateway.php:1796
 msgid "Save credit card in my account"
 msgstr "שמור את כרטיס האשראי בחשבון שלי"
 
@@ -2477,13 +2481,13 @@ msgstr ""
 
 #: includes/wc-payplus-activation-functions.php:538
 #: includes/wc-payplus-activation-functions.php:541
-#: payplus-payment-gateway.php:2326
+#: payplus-payment-gateway.php:2403
 msgid "שם על החשבונית"
 msgstr ""
 
 #: includes/wc-payplus-activation-functions.php:538
 #: includes/wc-payplus-activation-functions.php:541
-#: payplus-payment-gateway.php:2326
+#: payplus-payment-gateway.php:2403
 #, fuzzy
 #| msgid "Refund Invoice"
 msgid "Name on invoice"
@@ -2510,12 +2514,12 @@ msgid "Name for invoice (optional)"
 msgstr "כרטיסי אשראי לתצוגה:"
 
 #: includes/wc-payplus-activation-functions.php:557
-#: payplus-payment-gateway.php:2373
+#: payplus-payment-gateway.php:2450
 msgid "מספר זהות אחר לחשבונית"
 msgstr ""
 
 #: includes/wc-payplus-activation-functions.php:557
-#: payplus-payment-gateway.php:2373
+#: payplus-payment-gateway.php:2450
 #, fuzzy
 #| msgid "Refund Invoice"
 msgid "Other ID for invoice"
@@ -2712,123 +2716,125 @@ msgstr ""
 msgid "Wire Transfer"
 msgstr "העברה בנקאית"
 
-#: includes/wc_payplus_gateway.php:1971 payplus-payment-gateway.php:461
-msgid "Gift Card refreshed - Please <a href=\"#\">try again</a>."
+#: includes/wc_payplus_gateway.php:1971
+#, fuzzy
+#| msgid "Gift Card refreshed - Please <a href=\"#\">try again</a>."
+msgid "Gift Card refreshed - Please try the payment process again now."
 msgstr "כרטיס המתנה עבר רענון בהצלחה - <a href=\"#\">אנא נסה/י שוב!</a>."
 
-#: includes/wc_payplus_gateway.php:2038 includes/wc_payplus_gateway.php:2040
+#: includes/wc_payplus_gateway.php:2044 includes/wc_payplus_gateway.php:2046
 msgid "Error: user or other, please contact PayPlus support"
 msgstr "שגיאה בעת יצירת הטוקן"
 
-#: includes/wc_payplus_gateway.php:2055 includes/wc_payplus_gateway.php:2057
+#: includes/wc_payplus_gateway.php:2061 includes/wc_payplus_gateway.php:2063
 #, fuzzy, php-format
 #| msgid "Error: credit card declined: %s"
 msgid "Error: Credit card declined. %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:2090
+#: includes/wc_payplus_gateway.php:2096
 #, php-format
 msgid "PayPlus Token Payment Successful<br/>Transaction Number: %s"
 msgstr "חיוב באמצעות טוקן בוצע בהצלחה בפיי פלוס<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:2097
+#: includes/wc_payplus_gateway.php:2103
 #, php-format
 msgid "PayPlus Token Payment Failed<br/>Transaction Number: %s"
 msgstr "תשלום באמצעות טוקן נכשלה<br />מספר עסקה: %s"
 
-#: includes/wc_payplus_gateway.php:2102
+#: includes/wc_payplus_gateway.php:2108
 #, php-format
 msgid "Error: credit card declined: %s"
 msgstr "שגיאה: העסקה נדחתה מהסיבה: %s"
 
-#: includes/wc_payplus_gateway.php:2529 includes/wc_payplus_invoice.php:891
+#: includes/wc_payplus_gateway.php:2535 includes/wc_payplus_invoice.php:891
 msgid "Round"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:2569 includes/wc_payplus_gateway.php:2601
-#: includes/wc_payplus_gateway.php:2612 includes/wc_payplus_invoice.php:691
+#: includes/wc_payplus_gateway.php:2575 includes/wc_payplus_gateway.php:2607
+#: includes/wc_payplus_gateway.php:2618 includes/wc_payplus_invoice.php:691
 #: includes/wc_payplus_invoice.php:853
 msgid "Shipping"
 msgstr "משלוח"
 
-#: includes/wc_payplus_gateway.php:2635 includes/wc_payplus_gateway.php:2636
-#: includes/wc_payplus_gateway.php:2675 includes/wc_payplus_gateway.php:2676
+#: includes/wc_payplus_gateway.php:2641 includes/wc_payplus_gateway.php:2642
+#: includes/wc_payplus_gateway.php:2681 includes/wc_payplus_gateway.php:2682
 #: includes/wc_payplus_invoice.php:879 includes/wc_payplus_invoice.php:880
 msgid "Discount coupons"
 msgstr "הנחת קופונים"
 
-#: includes/wc_payplus_gateway.php:3020
+#: includes/wc_payplus_gateway.php:3036
 #, php-format
 msgid "An error occurred: %s"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:3033
+#: includes/wc_payplus_gateway.php:3049
 msgid ""
 "Error: The payment page failed to load - please check your page uid and domain "
 "settings."
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:3062 includes/wc_payplus_gateway.php:4175
-#: includes/wc_payplus_gateway.php:4183
+#: includes/wc_payplus_gateway.php:3078 includes/wc_payplus_gateway.php:4191
+#: includes/wc_payplus_gateway.php:4199
 msgid "Something went wrong with the payment page"
 msgstr "התגלתה שגיאה בדף התשלום"
 
-#: includes/wc_payplus_gateway.php:3606
+#: includes/wc_payplus_gateway.php:3622
 msgid "PayPlus IPN network error - requires manual verification"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:3651
+#: includes/wc_payplus_gateway.php:3667
 #, php-format
 msgid "PayPlus IPN Failed<br/>Transaction UID: %s"
 msgstr "אימות IPN מול פיי פלוס על העסקה נכשל<br />מספר UID: %s"
 
-#: includes/wc_payplus_gateway.php:3828
+#: includes/wc_payplus_gateway.php:3844
 msgid "PayPlus payment failed"
 msgstr "תשלום באמצעות פיי פלוס נכשל"
 
-#: includes/wc_payplus_gateway.php:4023
+#: includes/wc_payplus_gateway.php:4039
 #, php-format
 msgid ""
 "Payment method updated from %1$s to %2$s based on actual payment method used "
 "(%3$s)"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:4054
+#: includes/wc_payplus_gateway.php:4070
 #, fuzzy
 #| msgid "bit"
 msgid "Bit"
 msgstr "ביט"
 
-#: includes/wc_payplus_gateway.php:4055
+#: includes/wc_payplus_gateway.php:4071
 #, fuzzy
 #| msgid "PayPlus MultiPass"
 msgid "MultiPass"
 msgstr "פיי פלוס - מולטיפאס  "
 
-#: includes/wc_payplus_gateway.php:4058
+#: includes/wc_payplus_gateway.php:4074
 msgid "ValueCard"
 msgstr ""
 
-#: includes/wc_payplus_gateway.php:4211
+#: includes/wc_payplus_gateway.php:4227
 msgid "Your new payment method has been added"
 msgstr "אמצעי התשלום החדש שלך נוסף בהצלחה לחשבון שלך"
 
-#: includes/wc_payplus_gateway.php:4221
+#: includes/wc_payplus_gateway.php:4237
 msgid "There was a problem adding this card"
 msgstr "נמצאה שגיאה בעת הוספת אמצעי התשלום לחשבונך"
 
-#: includes/wc_payplus_gateway.php:4267
+#: includes/wc_payplus_gateway.php:4283
 #, php-format
 msgid "PayPlus Subscription Payment Successful<br/>Transaction Number: %s"
 msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:4298 includes/wc_payplus_gateway.php:4304
+#: includes/wc_payplus_gateway.php:4314 includes/wc_payplus_gateway.php:4320
 #, fuzzy, php-format
 #| msgid "PayPlus Subscription Payment Failure<br/>Transaction Number: %s"
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
 msgstr "חידוש המנוי בפיי פלוס נכשל<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:4608
+#: includes/wc_payplus_gateway.php:4624
 msgid "PayPlus page request UID meta data deleted due to order cancellation."
 msgstr ""
 
@@ -3073,7 +3079,7 @@ msgstr "הסתרת לוגו פייפלוס באנימציית טעינה"
 
 #: includes/wc_payplus_subgateways.php:220
 msgid "Hide PayPlus from loader and display: \"Processing...\""
-msgstr "הסתרה של לוגו פייפלוס בטעינת התשלום ותצוגה של : \"התהליך...\""
+msgstr "הסתרה של לוגו פייפלוס בטעינת התשלום ותצוגה של : “עיבוד תשלום מתבצע״"
 
 #: includes/wc_payplus_subgateways.php:225
 #: includes/wc_payplus_subgateways.php:226
@@ -3146,119 +3152,119 @@ msgstr "חיוב מוצלח"
 msgid "Invalid order ID"
 msgstr "תעודת זהות בעל הכרטיס"
 
-#: payplus-payment-gateway.php:349
+#: payplus-payment-gateway.php:374
 msgid "Security token missing. Please refresh the page and try again."
 msgstr ""
 
-#: payplus-payment-gateway.php:350
+#: payplus-payment-gateway.php:375
 #, fuzzy
 #| msgid "Details"
 msgid "Detailed Results"
 msgstr "פרטים"
 
-#: payplus-payment-gateway.php:351
+#: payplus-payment-gateway.php:376
 msgid "Metric"
 msgstr ""
 
-#: payplus-payment-gateway.php:352
+#: payplus-payment-gateway.php:377
 msgid "Value"
 msgstr ""
 
-#: payplus-payment-gateway.php:353
+#: payplus-payment-gateway.php:378
 msgid "Started At"
 msgstr ""
 
-#: payplus-payment-gateway.php:354
+#: payplus-payment-gateway.php:379
 #, fuzzy
 #| msgid "Payment Completed"
 msgid "Completed At"
 msgstr "חיוב מוצלח"
 
-#: payplus-payment-gateway.php:355
+#: payplus-payment-gateway.php:380
 msgid "Total Orders Checked"
 msgstr ""
 
-#: payplus-payment-gateway.php:356
+#: payplus-payment-gateway.php:381
 #, fuzzy
 #| msgid "PayPlus - Embedded"
 msgid "PayPlus Orders Found"
 msgstr "פייפלוס - טופס מובנה"
 
-#: payplus-payment-gateway.php:357
+#: payplus-payment-gateway.php:382
 #, fuzzy
 #| msgid "Invoice Creation Mode:"
 msgid "Invoices Created"
 msgstr "מצב הפקת חשבונית:"
 
-#: payplus-payment-gateway.php:358
+#: payplus-payment-gateway.php:383
 msgid "Invoices Already Exist"
 msgstr ""
 
-#: payplus-payment-gateway.php:359
+#: payplus-payment-gateway.php:384
 msgid "Non-PayPlus Orders Skipped"
 msgstr ""
 
-#: payplus-payment-gateway.php:360
+#: payplus-payment-gateway.php:385
 #, fuzzy
 #| msgid "Error Page"
 msgid "Errors"
 msgstr "דף תקלה בתשלום"
 
-#: payplus-payment-gateway.php:361
+#: payplus-payment-gateway.php:386
 msgid "Errors Encountered:"
 msgstr ""
 
-#: payplus-payment-gateway.php:362
+#: payplus-payment-gateway.php:387
 msgid "Order Processing Details:"
 msgstr ""
 
-#: payplus-payment-gateway.php:363
+#: payplus-payment-gateway.php:388
 #, fuzzy
 #| msgid "Card holder ID"
 msgid "Order ID"
 msgstr "תעודת זהות בעל הכרטיס"
 
-#: payplus-payment-gateway.php:364
+#: payplus-payment-gateway.php:389
 #, fuzzy
 #| msgid "Payment Completed"
 msgid "Payment Method"
 msgstr "חיוב מוצלח"
 
-#: payplus-payment-gateway.php:365
+#: payplus-payment-gateway.php:390
 #, fuzzy
 #| msgid "Status:"
 msgid "Status"
 msgstr "סטטוס:"
 
-#: payplus-payment-gateway.php:366
+#: payplus-payment-gateway.php:391
 msgid "Reason"
 msgstr ""
 
-#: payplus-payment-gateway.php:367
+#: payplus-payment-gateway.php:392
 msgid "... and more orders. Check logs for complete details."
 msgstr ""
 
-#: payplus-payment-gateway.php:368
+#: payplus-payment-gateway.php:393
 msgid "Error parsing server response. Please check the server logs."
 msgstr ""
 
-#: payplus-payment-gateway.php:369
+#: payplus-payment-gateway.php:394
 msgid "An error occurred while running the runner."
 msgstr ""
 
-#: payplus-payment-gateway.php:370
+#: payplus-payment-gateway.php:395
 msgid "Request timed out. The runner may still be running in the background."
 msgstr ""
 
-#: payplus-payment-gateway.php:371
+#: payplus-payment-gateway.php:396
 msgid "Security verification failed. Please refresh the page and try again."
 msgstr ""
 
-#: payplus-payment-gateway.php:372
+#: payplus-payment-gateway.php:397
 msgid "Invalid request method."
 msgstr ""
 
-#: payplus-payment-gateway.php:430
+#: payplus-payment-gateway.php:503
 msgid ""
 "<strong style=\"font-size: 1.2em;\">Dear Customers,</strong><br><br>\n"
 "\n"
@@ -3285,19 +3291,23 @@ msgstr ""
 "        תודה,<br>\n"
 "        <strong>צוות PayPlus</strong></span>"
 
-#: payplus-payment-gateway.php:502
+#: payplus-payment-gateway.php:534
+msgid "Gift Card refreshed - Please <a href=\"#\">try again</a>."
+msgstr "כרטיס המתנה עבר רענון בהצלחה - <a href=\"#\">אנא נסה/י שוב!</a>."
+
+#: payplus-payment-gateway.php:575
 msgid "Every 30 Minutes"
 msgstr ""
 
-#: payplus-payment-gateway.php:778
+#: payplus-payment-gateway.php:851
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: payplus-payment-gateway.php:783
+#: payplus-payment-gateway.php:856
 msgid "PayPlus Invoice Runner Management"
 msgstr "ניהול מריץ חשבוניות של PayPlus"
 
-#: payplus-payment-gateway.php:784
+#: payplus-payment-gateway.php:857
 msgid ""
 "Use the button below to manually run the PayPlus invoice runner to check and "
 "create missing invoices for processing orders."
@@ -3305,15 +3315,15 @@ msgstr ""
 "השתמש/י בכפתור שלהלן כדי להריץ ידנית את מריץ החשבוניות של PayPlus לבדיקת יצירה "
 "של חשבוניות חסרות עבור הזמנות בעיבוד."
 
-#: payplus-payment-gateway.php:793
+#: payplus-payment-gateway.php:866
 msgid "Run Invoice Runner Now"
 msgstr "הפעל/י את מריץ החשבוניות כעת"
 
-#: payplus-payment-gateway.php:798
+#: payplus-payment-gateway.php:871
 msgid "Running invoice runner..."
 msgstr ""
 
-#: payplus-payment-gateway.php:939
+#: payplus-payment-gateway.php:1012
 #, fuzzy
 #| msgid ""
 #| "Sandbox mode is active and real transaction cannot be processed. Please "
@@ -3326,7 +3336,7 @@ msgstr ""
 "שים לב: מצב Sandbox פעיל ועסקאות אמיתיות לא יסלקו. אנא וודא להוריד סימון בתוסף "
 "לאחר סיום הבדיקות"
 
-#: payplus-payment-gateway.php:945
+#: payplus-payment-gateway.php:1018
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -3338,15 +3348,15 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:1276
+#: payplus-payment-gateway.php:1353
 msgid "Payment received — redirecting…"
 msgstr "התשלום הצליח - מיד תועבר/י…"
 
-#: payplus-payment-gateway.php:1373
+#: payplus-payment-gateway.php:1450
 msgid "Four last digits"
 msgstr "ארבע ספרות אחרונות"
 
-#: payplus-payment-gateway.php:1433
+#: payplus-payment-gateway.php:1510
 msgid ""
 "This plugin requires <a href=\"https://wordpress.org/plugins/woocommerce/\" "
 "target=\"_blank\">WooCommerce</a> to be activated."
@@ -3355,14 +3365,14 @@ msgstr ""
 "target=\"_blank\">WooCommerce</a> ונדרש שיהיה פעיל."
 
 #. translators: %1$s: Current PHP version, %2$s: Required PHP version
-#: payplus-payment-gateway.php:1446
+#: payplus-payment-gateway.php:1523
 #, php-format
 msgid ""
 "Your server is running PHP version %1$s but some features require at least "
 "%2$s."
 msgstr ""
 
-#: payplus-payment-gateway.php:1454
+#: payplus-payment-gateway.php:1531
 #, fuzzy
 #| msgid ""
 #| "Please change the \"Number of decimal digits\" to 2 in your WooCommerce "
@@ -3373,75 +3383,71 @@ msgid ""
 msgstr ""
 "אנא שנה את  \"מספר הספרות העשרוניות\"  ל-2 בהגדרות הווקומרס>כללי>הגדרות מטבע"
 
-#: payplus-payment-gateway.php:1507
+#: payplus-payment-gateway.php:1584
 msgid "View PayPlus Settings"
 msgstr "הגדרות פיי פלוס"
 
-#: payplus-payment-gateway.php:1762
+#: payplus-payment-gateway.php:1839
 msgid "Phone number is required."
 msgstr "נדרש מספר טלפון."
 
-#: payplus-payment-gateway.php:1763
+#: payplus-payment-gateway.php:1840
 msgid "Click again to continue!"
 msgstr "הקלק/י שוב להתקדם!"
 
-#: payplus-payment-gateway.php:1898 payplus-payment-gateway.php:1917
+#: payplus-payment-gateway.php:1975 payplus-payment-gateway.php:1994
 msgid "Transaction Type "
 msgstr "סוג עסקה "
 
-#: payplus-payment-gateway.php:1936
+#: payplus-payment-gateway.php:2013
 #, fuzzy
 #| msgid "Transactions Type"
 msgid "Transaction Type"
 msgstr "סוג עסקה"
 
-#: payplus-payment-gateway.php:1959 payplus-payment-gateway.php:1976
+#: payplus-payment-gateway.php:2036 payplus-payment-gateway.php:2053
 msgid "Balance Name"
 msgstr ""
 
-#: payplus-payment-gateway.php:2184 payplus-payment-gateway.php:2192
+#: payplus-payment-gateway.php:2261 payplus-payment-gateway.php:2269
 msgid "Cheatin&#8217; huh?"
 msgstr ""
 
-#: payplus-payment-gateway.php:2207
+#: payplus-payment-gateway.php:2284
 msgid ""
 "Unable to create a payment page due to a site settings issue. Please contact "
 "the website owner"
 msgstr "לא ניתן ליצור דף תשלום עקב בעיה בהגדרות האתר. אנא פנה לבעל האתר"
 
-#: templates/hostedFields.php:137
-msgid "Processing..."
-msgstr "בתהליך..."
-
-#: templates/hostedFields.php:615
+#: templates/hostedFields.php:608
 msgid "Credit card"
 msgstr "כרטיס אשראי"
 
-#: templates/hostedFields.php:626
+#: templates/hostedFields.php:619
 msgid "Name"
 msgstr "שם בעל הכרטיס"
 
-#: templates/hostedFields.php:630
+#: templates/hostedFields.php:623
 msgid "ID number"
 msgstr "ת.ז בעל הכרטיס"
 
-#: templates/hostedFields.php:634
+#: templates/hostedFields.php:627
 msgid "Invoice Name"
 msgstr "הנפק חשבונית / קבלה על שם"
 
-#: templates/hostedFields.php:639
+#: templates/hostedFields.php:632
 msgid "Phone"
 msgstr "טלפון"
 
-#: templates/hostedFields.php:663
+#: templates/hostedFields.php:656
 msgid "Card number"
 msgstr "מידע על הכרטיס"
 
-#: templates/hostedFields.php:691
+#: templates/hostedFields.php:684
 msgid "Place Order"
 msgstr "לתשלום"
 
-#: templates/hostedFields.php:711
+#: templates/hostedFields.php:704
 msgid "Powered by "
 msgstr ""
 
@@ -3466,6 +3472,9 @@ msgstr "פיי פלוס"
 #. Author URI of the plugin/theme
 msgid "https://www.payplus.co.il/"
 msgstr ""
+
+#~ msgid "Processing..."
+#~ msgstr "בתהליך..."
 
 #, fuzzy
 #~| msgid "Production Mode"
