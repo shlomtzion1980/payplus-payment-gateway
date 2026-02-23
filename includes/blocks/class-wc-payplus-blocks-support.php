@@ -135,6 +135,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $isTaxIncluded = wc_prices_include_tax();
 
         if (isset($order) && $order) {
+            // Restore PW Gift Cards data onto the gateway instance so that
+            // payplus_get_products_by_order_id() includes gift card negative line items.
+            // The filter fires during cart total calculation (before this runs), so the
+            // WC_PayPlus singleton already holds the full session gift card data.
+            if (empty($WC_PayPlus_Gateway->pwGiftCardData)) {
+                $payplus_instance = WC_PayPlus::get_instance();
+                if (!empty($payplus_instance->pwGiftCardData)) {
+                    $WC_PayPlus_Gateway->pwGiftCardData = $payplus_instance->pwGiftCardData;
+                } else {
+                    // Fallback: read from order meta (saved by woocommerce_store_api_checkout_order_processed).
+                    $saved = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+                    if (!empty($saved)) {
+                        $WC_PayPlus_Gateway->pwGiftCardData = json_decode($saved, true);
+                    }
+                }
+            }
+
             $objectProducts = $WC_PayPlus_Gateway->payplus_get_products_by_order_id($order_id);
             foreach ($objectProducts->productsItems as $item) {
                 $product = json_decode($item, true);
