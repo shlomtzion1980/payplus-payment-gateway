@@ -110,7 +110,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $enableDevMode;
     public $enableDoubleCheckIfPruidExists;
     public $updateStatusesIpn;
-    protected $pwGiftCardData; // Store gift card data
+    public $pwGiftCardData; // Store gift card data
     public $useLegacyPayload;
     public $isPosOverrideGateways;
     public $posOverrideGateways;

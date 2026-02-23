@@ -471,6 +471,18 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $result->set_payment_details('');
             }
 
+            // Restore PW Gift Cards data onto the gateway instance before building the payload.
+            // In Blocks checkout, the gateway's pwGiftCardData is never populated via process_payment(),
+            // so we pull it from the WC_PayPlus singleton (which gets it via the pwgc_redeeming_session_data
+            // filter during cart total calculation) — mirroring exactly what classic process_payment() does.
+            $payplus_instance = WC_PayPlus::get_instance();
+            if (!empty($payplus_instance->pwGiftCardData)) {
+                $main_gateway->pwGiftCardData = $payplus_instance->pwGiftCardData;
+                // Also persist it to order meta so the receipt_page() fallback and
+                // any future requests (e.g. ajax_get_iframe_link) can access it.
+                WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($main_gateway->pwGiftCardData)]);
+            }
+
             // Build the payment payload locally — this is fast (no HTTP call).
             $payload = $main_gateway->generatePaymentLink($this->orderId, is_admin(), null, $subscription = false, $custom_more_info = '', $move_token = false, ['chargeDefault' => $chargeDefault, 'hideOtherPayments' => $hideOtherPayments, 'isSubscriptionOrder' => $this->isSubscriptionOrder]);
 
