@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.2]  - 24-02-2026 - (Nami)
+
+- Feature   - Full PW Gift Cards integration for Blocks Checkout across all PayPlus payment methods, including correct discount handling, order totals, and debit timing.
+- Fix       - PW Gift Cards discount now applied correctly in Iframe (next page) and Redirect modes in Blocks Checkout, consistent with Popup and Same-Page Iframe behavior.
+- Feature   - Added option to mark the Customer Invoice Name field as required in both Classic and Blocks Checkout.
+- Feature   - Added option to set a custom label and placeholder for the Customer Invoice Name field in both Classic and Blocks Checkout.
+
+
 ## [8.1.1]  - 23-02-2026 - (Speed)
 
 - Fix       - TV power-down effect in Blocks Checkout is now driven by the plugin setting rather than CSS positioning, ensuring it triggers reliably regardless of theme styles.
