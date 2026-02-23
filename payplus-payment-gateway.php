@@ -399,13 +399,30 @@ class WC_PayPlus
             remove_action('woocommerce_checkout_update_order_meta', array($pw_gift_cards_redeeming, 'woocommerce_checkout_update_order_meta'), 10, 2);
         }
 
-        // Blocks checkout: PW Gift Cards uses a dedicated Blocks class that hooks into
-        // woocommerce_store_api_checkout_order_processed and calls debit_gift_cards()
-        // immediately — before PayPlus opens the payment page. Remove it so gift cards
-        // are only debited when the order reaches "processing" or "completed" status,
-        // exactly as with classic checkout.
+        // Blocks checkout: PW Gift Cards hooks woocommerce_store_api_checkout_order_processed
+        // and immediately calls debit_gift_cards() before PayPlus opens the payment page.
+        // We replace it with our own handler that:
+        //   - Still adds the gift card line item to the WC order and recalculates totals
+        //     (so the order-pay page shows the correct discounted amount), but
+        //   - Does NOT call debit_gift_cards() — the balance is debited only when the order
+        //     reaches "processing" or "completed" status, exactly as with classic checkout.
         if (isset($pw_gift_cards_blocks) && is_object($pw_gift_cards_blocks)) {
             remove_action('woocommerce_store_api_checkout_order_processed', array($pw_gift_cards_blocks, 'woocommerce_store_api_checkout_order_processed'));
+
+            add_action('woocommerce_store_api_checkout_order_processed', function ($order) {
+                global $pw_gift_cards_redeeming;
+                if (!is_a($pw_gift_cards_redeeming, 'PW_Gift_Cards_Redeeming')) {
+                    return;
+                }
+                // Add gift card item to the order and recalculate totals so the
+                // WooCommerce order total reflects the gift card discount.
+                $pw_gift_cards_redeeming->woocommerce_checkout_create_order($order);
+                if ($order->get_items('pw_gift_card')) {
+                    $order->calculate_totals();
+                    $order->save();
+                }
+                // debit_gift_cards() intentionally omitted — debited on order status change.
+            });
         }
 
         // Note: woocommerce_order_status_processing and woocommerce_order_status_completed
