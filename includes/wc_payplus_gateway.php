@@ -1968,7 +1968,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if ($this->pw_gift_card_auto_cancel_unpaid_order) {
                 $cancelledResponse = $this->cancel_pending_giftcard_orders_for_current_user(wp_json_encode($this->pwGiftCardData));
                 if ($cancelledResponse === false) {
-                    wc_add_notice(__('Gift Card refreshed - Please <a href="#">try again</a>.', 'payplus-payment-gateway'), 'error');
+                    $gc_refresh_msg = __('Gift Card refreshed - Please try the payment process again now.', 'payplus-payment-gateway');
+                    // Classic checkout: show as a notice.
+                    wc_add_notice($gc_refresh_msg, 'error');
+                    // Blocks checkout: surface the message via the action that
+                    // add_payment_request_order_meta() listens for and forwards
+                    // to the JS as payment_details['errorMessage'].
+                    do_action('wc_gateway_payplus_process_payment_error', $gc_refresh_msg);
                     return [
                         'result' => 'fail',
                         'redirect' => '',
