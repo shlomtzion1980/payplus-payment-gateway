@@ -520,22 +520,34 @@ add_filter('woocommerce_billing_fields', 'payplus_add_custom_checkout_fields', 1
 function payplus_add_custom_checkout_fields($fields)
 {
     $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-    $enable_customer_invoice_name = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+    $enable_customer_invoice_name   = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+    $customer_invoice_name_required = $enable_customer_invoice_name && isset($payplus_settings['customer_invoice_name_required']) && $payplus_settings['customer_invoice_name_required'] === 'yes';
+    $customer_invoice_name_label    = $enable_customer_invoice_name && !empty($payplus_settings['customer_invoice_name_label']) ? trim($payplus_settings['customer_invoice_name_label']) : '';
     $enable_customer_other_id = isset($payplus_settings['enable_customer_other_id']) && $payplus_settings['enable_customer_other_id'] === 'yes';
-    
+
     // Get current language
     $current_locale = get_locale();
     $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
-    
+
     if ($enable_customer_invoice_name) {
-        // Add customer invoice name field after the company field
+        if ($customer_invoice_name_label !== '') {
+            // Admin-defined label overrides language-based defaults.
+            $label       = $customer_invoice_name_label;
+            $placeholder = $customer_invoice_name_label;
+        } elseif ($customer_invoice_name_required) {
+            $label       = $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway');
+            $placeholder = $is_hebrew ? __('שם לחשבונית', 'payplus-payment-gateway') : __('Name for invoice', 'payplus-payment-gateway');
+        } else {
+            $label       = $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway');
+            $placeholder = $is_hebrew ? __('שם לחשבונית (אופציונלי)', 'payplus-payment-gateway') : __('Name for invoice (optional)', 'payplus-payment-gateway');
+        }
         $fields['billing_customer_invoice_name'] = array(
-            'label' => $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway'),
-            'placeholder' => $is_hebrew ? __('שם לחשבונית (אופציונלי)', 'payplus-payment-gateway') : __('Name for invoice (optional)', 'payplus-payment-gateway'),
-            'required' => false,
-            'class' => array('form-row-wide'),
-            'clear' => true,
-            'priority' => 35,
+            'label'       => $label,
+            'placeholder' => $placeholder,
+            'required'    => $customer_invoice_name_required,
+            'class'       => array('form-row-wide'),
+            'clear'       => true,
+            'priority'    => 35,
         );
     }
     

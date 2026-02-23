@@ -19,8 +19,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-    define('PAYPLUS_VERSION', '8.1.1');
-    define('PAYPLUS_VERSION_DB', 'payplus_8_1_1');
+define('PAYPLUS_VERSION', '8.1.1');
+define('PAYPLUS_VERSION_DB', 'payplus_8_1_1');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
 {
@@ -2308,7 +2308,9 @@ body{
             public function register_customer_invoice_name_blocks_field()
             {
                 $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-                $enable_customer_invoice_name = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+                $enable_customer_invoice_name   = isset($payplus_settings['enable_customer_invoice_name']) && $payplus_settings['enable_customer_invoice_name'] === 'yes';
+                $customer_invoice_name_required = $enable_customer_invoice_name && isset($payplus_settings['customer_invoice_name_required']) && $payplus_settings['customer_invoice_name_required'] === 'yes';
+                $customer_invoice_name_label    = $enable_customer_invoice_name && !empty($payplus_settings['customer_invoice_name_label']) ? trim($payplus_settings['customer_invoice_name_label']) : '';
 
                 if (!$enable_customer_invoice_name) {
                     return;
@@ -2318,17 +2320,22 @@ body{
                 $current_locale = get_locale();
                 $is_hebrew = (strpos($current_locale, 'he') === 0 || strpos($current_locale, 'iw') === 0);
 
+                // Determine label: admin-defined text takes priority over language defaults.
+                $field_label = $customer_invoice_name_label !== ''
+                    ? $customer_invoice_name_label
+                    : ($is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway'));
+
                 // Register the field for WooCommerce Blocks
                 // Note: woocommerce_register_additional_checkout_field automatically handles woocommerce_blocks_loaded timing
                 // If woocommerce_blocks_loaded hasn't fired yet, it will re-hook itself to that hook
                 if (function_exists('woocommerce_register_additional_checkout_field')) {
                     try {
                         woocommerce_register_additional_checkout_field([
-                            'id' => 'payplus/customer-invoice-name',
-                            'label' => $is_hebrew ? __('שם על החשבונית', 'payplus-payment-gateway') : __('Name on invoice', 'payplus-payment-gateway'),
+                            'id'       => 'payplus/customer-invoice-name',
+                            'label'    => $field_label,
                             'location' => 'contact',
-                            'type' => 'text',
-                            'required' => false,
+                            'type'     => 'text',
+                            'required' => $customer_invoice_name_required,
                         ]);
                     } catch (Exception $e) {
                         // Log error if field registration fails

@@ -622,6 +622,25 @@ class WC_PayPlus_Admin_Settings
                     'class' => 'payplus-invoice',
                 ];
                 $settings[$section][] = [
+                    'title' => __('Require Invoice Name Field', 'payplus-payment-gateway'),
+                    'type' => 'checkbox',
+                    'desc' => __('When enabled, the invoice name field becomes mandatory and customers must fill it in before placing an order. Only applies when the Customer Invoice Name Field is enabled.', 'payplus-payment-gateway'),
+                    'desc_tip' => false,
+                    'default' => 'no',
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[customer_invoice_name_required]',
+                    'class' => 'payplus-invoice',
+                ];
+                $settings[$section][] = [
+                    'title' => __('Invoice Name Field Label', 'payplus-payment-gateway'),
+                    'type' => 'text',
+                    'desc' => __('Custom label and placeholder for the invoice name field. If left empty, the default text is used based on the site language. Only applies when the Customer Invoice Name Field is enabled.', 'payplus-payment-gateway'),
+                    'desc_tip' => true,
+                    'default' => '',
+                    'placeholder' => __('e.g. Name on invoice', 'payplus-payment-gateway'),
+                    'id' => 'woocommerce_payplus-payment-gateway_settings[customer_invoice_name_label]',
+                    'class' => 'payplus-invoice',
+                ];
+                $settings[$section][] = [
                     'title' => __('Customer Other ID Field', 'payplus-payment-gateway'),
                     'type' => 'checkbox',
                     'desc' => __('Other ID for invoice: When enabled, adds a checkout field that allows customers to specify an alternative ID/VAT number for the invoice. If filled, this will be used instead of the regular ID field.', 'payplus-payment-gateway'),
