@@ -151,6 +151,12 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                     }
                 }
             }
+            // Persist to order meta so the invoice generator can find it at IPN time
+            // (a separate HTTP request where the session filter never fires).
+            // This mirrors exactly what classic checkout's process_payment() does.
+            if (!empty($WC_PayPlus_Gateway->pwGiftCardData)) {
+                WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($WC_PayPlus_Gateway->pwGiftCardData)]);
+            }
 
             $objectProducts = $WC_PayPlus_Gateway->payplus_get_products_by_order_id($order_id);
             foreach ($objectProducts->productsItems as $item) {
