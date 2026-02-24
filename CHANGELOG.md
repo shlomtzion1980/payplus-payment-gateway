@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Fix       - PW Gift Cards discount now applied correctly in Iframe (next page) and Redirect modes in Blocks Checkout, consistent with Popup and Same-Page Iframe behavior.
 - Feature   - Added option to mark the Customer Invoice Name field as required in both Classic and Blocks Checkout.
 - Feature   - Added option to set a custom label and placeholder for the Customer Invoice Name field in both Classic and Blocks Checkout.
+- Tweak     - PayPlus Embedded loader: when "Hide PayPlus logo when showing loader" is enabled, "Processing Payment..." (or its Hebrew translation) is now always centered in the loader and displayed clearly.
 
 
 ## [8.1.1]  - 23-02-2026 - (Speed)
