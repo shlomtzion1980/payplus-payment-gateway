@@ -146,7 +146,18 @@ function hideElement(element) {
     }, 1000); // Match the transition duration (1s = 1000ms)
 }
 
+function resetPlaceOrderButton() {
+    // Reset the place order button state
+    jQuery("#submit-payment").prop("disabled", false);
+    jQuery("#submit-payment .button-loader").css("display", "none");
+    jQuery(".payplus-hosted-place-order").prop("disabled", false).css("opacity", "1");
+    jQuery(".payplus-hosted-place-order .button-loader").css("display", "none");
+}
+
 function showError(message, code) {
+    // Hide loader on the hosted fields place order buttons
+    resetPlaceOrderButton();
+    
     const errorMessageDiv = document.querySelector(".payment-error-message");
     const loaderCountdown = document.querySelector(".loader-countdown");
     const circle = document.querySelector(".progress-ring__circle");
@@ -216,6 +227,11 @@ function showError(message, code) {
 
     // Start the countdown
     const timer = setInterval(updateLoader, 1000);
+    
+    // After error countdown completes, ensure button is reset
+    setTimeout(() => {
+        resetPlaceOrderButton();
+    }, 6000); // After the 5-second countdown + 1 second buffer
 }
 
 jQuery(() => {
@@ -471,6 +487,7 @@ jQuery(() => {
 
 hf.Upon("pp_pageExpired", (e) => {
     console.log(e);
+    resetPlaceOrderButton();
     // jQuery("#submit-payment").prop("disabled", true);
     jQuery("#status").val("Page Expired");
     jQuery.ajax({
@@ -514,6 +531,7 @@ hf.Upon("pp_pageExpired", (e) => {
 });
 
 hf.Upon("pp_noAttemptedRemaining", (e) => {
+    resetPlaceOrderButton();
     alert("No more attempts remaining");
 });
 
@@ -598,6 +616,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                             window.location.href =
                                 final_response.data.redirect_url;
                         } else {
+                            resetPlaceOrderButton();
                             alert(
                                 "Order completion failed(Please try again): " +
                                 (final_response.message ||
@@ -607,12 +626,14 @@ hf.Upon("pp_responseFromServer", (e) => {
                         }
                     },
                     error: function (xhr, status, error) {
+                        resetPlaceOrderButton();
                         alert("Error completing order: " + error);
                         location.reload();
                     },
                 });
             },
             error: function (xhr, status, error) {
+                resetPlaceOrderButton();
                 alert("Error making hosted payment: " + error);
                 location.reload();
             },
@@ -620,8 +641,13 @@ hf.Upon("pp_responseFromServer", (e) => {
     }
 });
 hf.Upon("pp_submitProcess", (e) => {
-    // jQuery(".blocks-payplus_loader_hosted").fadeIn();
-    // overlay();
+    // Show loader on the hosted fields place order button (classic checkout)
+    jQuery("#submit-payment").prop("disabled", true);
+    jQuery("#submit-payment .button-loader").css("display", "inline-block");
+    
+    // Show loader on the hosted fields place order button (blocks checkout)
+    jQuery(".payplus-hosted-place-order").prop("disabled", true).css("opacity", "0.7");
+    jQuery(".payplus-hosted-place-order .button-loader").css("display", "inline-block");
 });
 
 let $overlay; // Declare outside to store the overlay reference
@@ -667,6 +693,27 @@ const overlay = (remove = false) => {
 };
 
 jQuery(document).ready(function () {
+    // Watch for error message display and reset button immediately
+    const errorMessageDiv = document.querySelector('.payment-error-message');
+    if (errorMessageDiv) {
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                    // Check if error message is now visible
+                    if (errorMessageDiv.style.display !== 'none' && 
+                        errorMessageDiv.style.display !== '') {
+                        resetPlaceOrderButton();
+                    }
+                }
+            });
+        });
+        
+        observer.observe(errorMessageDiv, {
+            attributes: true,
+            attributeFilter: ['style']
+        });
+    }
+    
     let $cardHolderNameInput = jQuery("#card-holder-name");
     $cardHolderNameInput.on("blur", function () {
         // Get the input value and trim any extra spaces

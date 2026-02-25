@@ -395,7 +395,20 @@ if (isCheckout || hasOrder) {
                                 const hostedPlaceOrderButton = document.createElement('button');
                                 hostedPlaceOrderButton.className = 'btn btn-primary payplus-hosted-place-order wp-element-button wc-block-components-button wp-element-button contained';
                                 hostedPlaceOrderButton.type = 'button';
-                                hostedPlaceOrderButton.textContent = originalPlaceOrderButton.textContent;
+                                
+                                // Create button content wrapper
+                                const buttonText = document.createElement('span');
+                                buttonText.className = 'button-text';
+                                buttonText.textContent = originalPlaceOrderButton.textContent;
+                                
+                                const buttonLoader = document.createElement('span');
+                                buttonLoader.className = 'button-loader';
+                                buttonLoader.style.cssText = 'display: none; margin-left: 8px;';
+                                buttonLoader.innerHTML = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation: spin 1s linear infinite; vertical-align: middle;"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="30 10" /></svg>';
+                                
+                                hostedPlaceOrderButton.appendChild(buttonText);
+                                hostedPlaceOrderButton.appendChild(buttonLoader);
+                                
                                 hostedPlaceOrderButton.style.cssText = `
                                     margin-top: 15px;
                                     margin-bottom: 15px;
@@ -415,6 +428,13 @@ if (isCheckout || hasOrder) {
                                 // Clone the click behavior from the original button
                                 hostedPlaceOrderButton.addEventListener('click', function(e) {
                                     e.preventDefault();
+                                    // Show loader immediately on click
+                                    hostedPlaceOrderButton.disabled = true;
+                                    hostedPlaceOrderButton.style.opacity = '0.7';
+                                    const loader = hostedPlaceOrderButton.querySelector('.button-loader');
+                                    if (loader) {
+                                        loader.style.display = 'inline-block';
+                                    }
                                     originalPlaceOrderButton.click();
                                 });
                                 

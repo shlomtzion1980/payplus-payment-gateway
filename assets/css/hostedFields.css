@@ -12775,3 +12775,24 @@ textarea {
 }
 
 /*# sourceMappingURL=bootstrap.css.map */
+
+/* PayPlus Hosted Fields Button Loader Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+#submit-payment .button-loader svg,
+.payplus-hosted-place-order .button-loader svg {
+    animation: spin 1s linear infinite;
+}
+
+#submit-payment:disabled,
+.payplus-hosted-place-order:disabled {
+    cursor: not-allowed;
+}
+

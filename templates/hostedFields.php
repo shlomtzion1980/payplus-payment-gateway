@@ -681,9 +681,15 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                             <?php endfor; ?>
                         </select>
                     </div>
-                    <input type="button" value="<?php echo esc_attr__('Place Order', 'payplus-payment-gateway'); ?>"
-                        id="submit-payment" class="btn btn-primary"
-                        onclick="jQuery('form[name=\'checkout\']').trigger('submit');" />
+                    <button type="button" id="submit-payment" class="btn btn-primary"
+                        onclick="(function(btn) { jQuery(btn).prop('disabled', true); jQuery(btn).find('.button-loader').css('display', 'inline-block'); jQuery('form[name=\'checkout\']').trigger('submit'); })(this);">
+                        <span class="button-text"><?php echo esc_html__('Place Order', 'payplus-payment-gateway'); ?></span>
+                        <span class="button-loader" style="display: none; margin-left: 8px;">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation: spin 1s linear infinite; vertical-align: middle;">
+                                <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="30 10" />
+                            </svg>
+                        </span>
+                    </button>
                     <br />
                     <div class="payment-error-message">
                         <div class="loader-container">
