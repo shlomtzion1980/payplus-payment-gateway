@@ -3025,6 +3025,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $this->payplus_add_log_all($handle, wp_json_encode($response));
         } else {
             $res = json_decode(wp_remote_retrieve_body($response));
+            
             if (isset($res->data)) {
                 try {
                     if (property_exists($res->data, 'page_request_uid')) {
@@ -3088,12 +3089,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function get_payment_page($res)
     {
-        // Prevent duplicate iframe creation - check if already exists
-        static $iframe_created = false;
-        if ($iframe_created) {
-            return;
-        }
-
         if (!$this->display_mode || $this->display_mode == 'default') {
             $mainPluginOptions = get_option('woocommerce_payplus-payment-gateway_settings');
             $this->display_mode = ($mainPluginOptions['display_mode'] ?: 'redirect');
@@ -3112,8 +3107,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             echo "<form id='pp_iframe' name='pp_iframe' method='GET' action='" . esc_url($res) . "'></form>";
         }
         echo '<script type="text/javascript">(function() { var iframe = document.getElementById("pp_iframe"); if (iframe) { iframe.style.display = "block"; if (document.pp_iframe) { document.pp_iframe.submit(); } } })();</script>';
-
-        $iframe_created = true;
     }
 
 
