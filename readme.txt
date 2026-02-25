@@ -91,6 +91,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Fix       - Resolved "Redirect" and "Next page iframe" display issues on the order-pay page for specific customer environments caused by an unnecessary static flag preventing proper rendering.
 - Feature   - Added inline loader to PayPlus Embedded "Place Order" button, providing immediate visual feedback during payment processing for improved user experience. 
 - Tweak     - Addressed WordPress Plugin Check (PCP) compliance requirements.
+- Fix       - Improved Invoice+ error message handling on the orders page to properly display API error details.
 
 == 8.1.2  - 24-02-2026 =
 
