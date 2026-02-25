@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.2
+Stable tag: 8.1.3
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.1.3  - 25-02-2026 =
+
+- Fix       - Resolved "Redirect" and "Next page iframe" display issues on the order-pay page for specific customer environments caused by an unnecessary static flag preventing proper rendering.
+- Feature   - Added inline loader to PayPlus Embedded "Place Order" button, providing immediate visual feedback during payment processing for improved user experience. 
 
 == 8.1.2  - 24-02-2026 =
 

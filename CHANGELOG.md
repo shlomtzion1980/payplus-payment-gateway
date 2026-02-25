@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.3]  - 25-02-2026 - (SJ)
+
+- Fix       - Resolved "Redirect" and "Next page iframe" display issues on the order-pay page for specific customer environments caused by an unnecessary static flag preventing proper rendering.
+- Feature   - Added inline loader to PayPlus Embedded "Place Order" button, providing immediate visual feedback during payment processing for improved user experience. 
+
 ## [8.1.2]  - 24-02-2026 - (Nami)
 
 - Feature   - Full PW Gift Cards integration for Blocks Checkout across all PayPlus payment methods, including correct discount handling, order totals, and debit timing.
