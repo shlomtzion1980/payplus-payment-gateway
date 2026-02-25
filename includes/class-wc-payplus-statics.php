@@ -147,7 +147,7 @@ class WC_PayPlus_Statics
                 }
             } elseif ($errorInvoice) { ?>
         <p class='link-invoice-error'>
-            <?php echo esc_html($errorInvoice); ?>
+            <?php echo is_array($errorInvoice) ? esc_html(json_decode($errorInvoice['body'], true)['error']) : esc_html($errorInvoice); ?>
         </p><?php
             }
         }
