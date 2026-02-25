@@ -1974,7 +1974,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     // Blocks checkout: surface the message via the action that
                     // add_payment_request_order_meta() listens for and forwards
                     // to the JS as payment_details['errorMessage'].
-                    do_action('wc_gateway_payplus_process_payment_error', $gc_refresh_msg);
+                    do_action('wc_gateway_payplus_process_payment_error', $gc_refresh_msg); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Plugin hook with existing prefix
                     return [
                         'result' => 'fail',
                         'redirect' => '',
@@ -4029,6 +4029,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $new_title = $this->get_payment_method_title($expected_payment_method);
                 $order->add_order_note(
                     sprintf(
+                        // Translators: %1$s is the old payment method title, %2$s is the new payment method title, %3$s is the actual payment method identifier.
                         __('Payment method updated from %1$s to %2$s based on actual payment method used (%3$s)', 'payplus-payment-gateway'),
                         $old_title,
                         $new_title,
