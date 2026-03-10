@@ -542,7 +542,7 @@ class WC_PayPlus
         $order = wc_get_order($order_id);
         if ($order) {
             $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
-            $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+            $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
             $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
             WC_PayPlus_Meta_Data::update_meta($order, $metaData);
             $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
@@ -1129,7 +1129,7 @@ class WC_PayPlus
                     $order = wc_get_order($order_id);
                 }
 
-                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+                $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
 
                 if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
                     $order_id = $REQUEST['more_info'];
@@ -1138,7 +1138,7 @@ class WC_PayPlus
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
                         $order->set_payment_method('payplus-payment-gateway');
                         $order->set_payment_method_title('Pay with Debit or Credit Card');
-                        $linkRedirect = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
+                        $linkRedirect = esc_url_raw(get_admin_url() . "post.php?post=" . $order_id . "&action=edit");
                     }
                 }
                 WC()->session->__unset('save_payment_method');
@@ -1167,7 +1167,7 @@ class WC_PayPlus
                     payplus_Add_log_payplus($wpdb->last_error);
                 }
                 $order = wc_get_order($order_id);
-                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+                $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
 
                 // Check if payment was initiated from admin dashboard
                 if (isset($REQUEST['paymentPayPlusDashboard']) && !empty($REQUEST['paymentPayPlusDashboard'])) {
@@ -1175,7 +1175,7 @@ class WC_PayPlus
                     if ($paymentPayPlusDashboard === $this->payplus_gateway->payplus_generate_key_dashboard) {
                         $order->set_payment_method('payplus-payment-gateway');
                         $order->set_payment_method_title('Pay with Debit or Credit Card');
-                        $linkRedirect = esc_url(get_admin_url()) . "post.php?post=" . $order_id . "&action=edit";
+                        $linkRedirect = esc_url_raw(get_admin_url() . "post.php?post=" . $order_id . "&action=edit");
                     }
                 }
 
@@ -1195,7 +1195,7 @@ class WC_PayPlus
             $order_id = isset($_GET['success_order_id']) ? intval($_GET['success_order_id']) : 0;
             $order = wc_get_order($order_id);
             if ($order) {
-                $linkRedirect = html_entity_decode(esc_url($this->payplus_gateway->get_return_url($order)));
+                $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
                 WC()->session->__unset('save_payment_method');
                 WC()->session->__unset('order_awaiting_payment');
                 WC()->session->__unset('page_order_awaiting_payment');
@@ -1322,7 +1322,7 @@ class WC_PayPlus
      */
     private function payplus_redirect_graceful($url)
     {
-        $url = esc_url($url);
+        $url = esc_url_raw($url);
 
         // Detect request context via Sec-Fetch-Dest (Chrome 80+, Firefox 90+, Safari 17+).
         $fetch_dest = isset($_SERVER['HTTP_SEC_FETCH_DEST'])
