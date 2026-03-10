@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.3
+Stable tag: 8.1.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.1.4  - 10-03-2026 =
+
+- Fix       - Fixed an issue where redirect URLs after payment could be malformed (& converted to &amp;), potentially causing broken thank-you page loads or missing order details.
 
 == 8.1.3  - 25-02-2026 =
 

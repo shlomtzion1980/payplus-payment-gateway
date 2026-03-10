@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.4]  - 10-03-2026 - (Dereshishishi)
+
+- Fix       - Fixed an issue where redirect URLs after payment could be malformed (& converted to &amp;), potentially causing broken thank-you page loads or missing order details.
+
 ## [8.1.3]  - 25-02-2026 - (SJ)
 
 - Fix       - Resolved "Redirect" and "Next page iframe" display issues on the order-pay page for specific customer environments caused by an unnecessary static flag preventing proper rendering.
