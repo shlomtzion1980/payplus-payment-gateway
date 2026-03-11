@@ -2684,6 +2684,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'create_invoice_refund_nonce' => wp_create_nonce('create_invoice_refund_nonce'),
                 'create_invoice_nonce' => wp_create_nonce('create_invoice_nonce'),
                 "frontNonce" => wp_create_nonce('frontNonce'),
+                'vat_choice_included' => __('VAT Included', 'payplus-payment-gateway'),
+                'vat_choice_exempt'   => __('VAT Exempt', 'payplus-payment-gateway'),
+                'vat_choice_cancel'   => __('Cancel', 'payplus-payment-gateway'),
+                'vat_refund_partial_msg' => __('This is a partial refund. Should the refund document be created with VAT included or VAT exempt?', 'payplus-payment-gateway'),
                 "displayOnProductPage" => __('Display on product page', 'payplus-payment-gateway'),
                 "enableExpressOnProductPageMessage" => __('For Express in product page you ALSO need to select: Either Shipping by Woocommerce or Global the one you choose will be used in the product page.', 'payplus-payment-gateway'),
             )

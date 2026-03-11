@@ -4,6 +4,92 @@ let table_payment = null;
 const allSum = document.getElementById("all-sum");
 
 jQuery(function ($) {
+    // Inject payplus_refund_vat_type into WooCommerce refund AJAX requests
+    $.ajaxPrefilter(function (options, originalOptions) {
+        if (originalOptions.data && typeof originalOptions.data === 'object'
+            && originalOptions.data.action === 'woocommerce_refund_line_items'
+            && window.payplusRefundVatType) {
+            options.data += '&payplus_refund_vat_type=' + encodeURIComponent(window.payplusRefundVatType);
+            window.payplusRefundVatType = null;
+        }
+    });
+
+    // Capture-phase listener intercepts before WooCommerce's jQuery delegation
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('button.do-api-refund');
+        if (!btn) return;
+
+        var refundAmount = parseFloat($('#refund_amount').val()) || 0;
+        if (refundAmount <= 0) return;
+
+        var orderTotal = parseFloat($('#_order_total').val() || $('input.order_total').val() || 0);
+        if (!orderTotal) {
+            var totalText = $('.wc-order-totals .total .woocommerce-Price-amount').first().text();
+            orderTotal = parseFloat(totalText.replace(/[^\d.]/g, '')) || 0;
+        }
+
+        if (refundAmount >= orderTotal) return;
+
+        if (btn.dataset.payplusVatChosen === 'true') {
+            btn.dataset.payplusVatChosen = '';
+            return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+
+        var overlay = $('<div>').css({
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.5)', zIndex: 100000,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+        });
+        var box = $('<div>').css({
+            background: '#fff', padding: '24px', borderRadius: '4px',
+            maxWidth: '460px', width: '90%', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+        });
+
+        var vatIncludedLabel = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.vat_choice_included) || 'VAT Included';
+        var vatExemptLabel = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.vat_choice_exempt) || 'VAT Exempt';
+        var cancelLabel = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.vat_choice_cancel) || 'Cancel';
+        var messageText = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.vat_refund_partial_msg)
+            || 'This is a partial refund. Should the refund document be created with VAT included or VAT exempt?';
+
+        box.html(
+            '<p style="margin:0 0 16px; line-height:1.5; font-size:13px;">' + messageText + '</p>' +
+            '<div style="display:flex; gap:10px; justify-content:flex-end; margin-top:20px;">' +
+            '<button type="button" class="button button-primary pp-vat-included">' + vatIncludedLabel + '</button>' +
+            '<button type="button" class="button pp-vat-exempt">' + vatExemptLabel + '</button>' +
+            '<button type="button" class="button pp-vat-cancel">' + cancelLabel + '</button>' +
+            '</div>'
+        );
+        overlay.append(box);
+        $('body').append(overlay);
+
+        var close = function () { overlay.remove(); };
+        overlay.on('click', function (ev) {
+            if (ev.target === overlay[0]) close();
+        });
+
+        function proceedWithVat(vatType) {
+            close();
+            window.payplusRefundVatType = vatType;
+            btn.dataset.payplusVatChosen = 'true';
+            btn.click();
+        }
+
+        box.find('.pp-vat-included').on('click', function () {
+            proceedWithVat('vat-type-included');
+        });
+        box.find('.pp-vat-exempt').on('click', function () {
+            proceedWithVat('vat-type-exempt');
+        });
+        box.find('.pp-vat-cancel').on('click', function () {
+            close();
+            $('.wc-order-refund-items .cancel-action').trigger('click');
+        });
+    }, true);
+
     const globalShipping = $(".global_shipping");
     const shippingwoo = $(".shipping_woo");
     const globalShippingTax = $(".global_shipping_tax");

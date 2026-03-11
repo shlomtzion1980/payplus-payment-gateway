@@ -314,9 +314,10 @@ class PayplusInvoice
      * @param $payments
      * @param $sum
      * @param $unique_identifier
+     * @param $vat_type_code_override
      * @return array
      */
-    public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier)
+    public function generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $resultApps, $sum, $unique_identifier, $vat_type_code_override = null)
     {
         $payPlusPayloadInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload_invoice');
         $payloadInvoiceData = !empty($payPlusPayloadInvoice)
@@ -398,11 +399,15 @@ class PayplusInvoice
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);
             $sum = $payplus_invoice_type_document_refund === "inv_refund_receipt" ? -abs($sum) : $sum;
             $payload['totalAmount'] = $sum;
-            $payload['items'][] = array(
+            $refundItem = array(
                 'name' => __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id,
                 'price' => $sum,
-                "quantity" => 1,
+                'quantity' => 1,
             );
+            if ($vat_type_code_override && in_array($vat_type_code_override, ['vat-type-included', 'vat-type-exempt'], true)) {
+                $refundItem['vat_type_code'] = $vat_type_code_override;
+            }
+            $payload['items'][] = $refundItem;
         }
 
         $payload['send_document_email'] = $payloadInvoiceData ? $payloadInvoiceData['send_document_email'] : $this->payplus_invoice_send_document_email;
@@ -513,9 +518,10 @@ class PayplusInvoice
      * @param $payments
      * @param $sum
      * @param $unique_identifier
+     * @param $vat_type_code_override
      * @return void
      */
-    public function payPlusCreateRefundInvoicePlus($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null)
+    public function payPlusCreateRefundInvoicePlus($order_id, $payplus_invoice_type_document_refund, $payments, $sum, $unique_identifier = null, $vat_type_code_override = null)
     {
         $order = wc_get_order($order_id);
         $typePaymentMethod = $order->get_payment_method();
@@ -525,20 +531,20 @@ class PayplusInvoice
         }
         if ($payplus_invoice_type_document_refund === "inv_refund_receipt") {
             $payplus_document_type = "inv_refund_receipt";
-            $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null);
+            $payload = $this->generatePayloadInvoice($order_id, $payplus_document_type, $payments, $sum, null, $vat_type_code_override);
             $payplus_document_type = "inv_receipt";
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload__inv_refund_receipt-inv_receipt' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else if ($payplus_invoice_type_document_refund == "inv_refund_receipt_invoice") {
-            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null);
+            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund', $payments, $sum, null, $vat_type_code_override);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt_invoice-inv_refund' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, 'inv_refund', $payload, REFUND_INVOICE);
             $payplus_document_type = "inv_receipt";
-            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null);
+            $payload = $this->generatePayloadInvoice($order_id, 'inv_refund_receipt', $payments, $sum, null, $vat_type_code_override);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_inv_refund_receipt-inv_receipt' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_document_type, $payload, REFUND_RECEIPT);
         } else {
-            $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null);
+            $payload = $this->generatePayloadInvoice($order_id, $payplus_invoice_type_document_refund, $payments, $sum, null, $vat_type_code_override);
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_' . $payplus_invoice_type_document_refund => wp_json_encode($payload, JSON_UNESCAPED_UNICODE)]);
             $this->createRefundInvoice($order_id, $payplus_invoice_type_document_refund, $payload, REFUND_INVOICE);
         }
