@@ -253,7 +253,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $payPlusInvoice = new PayplusInvoice;
             $customer = $payPlusInvoice->payplus_get_client_by_order_id($order_id);
             $data->customer = new stdClass();
-            $data->customer->customer_name = $customer['name'];
+            // Use real billing name for customer_name (matching main gateway behavior)
+            // so tokens are saved with the correct billing identity.
+            // $customer['name'] may contain the invoice name override which breaks token reuse.
+            $billingName = '';
+            if ($WC_PayPlus_Gateway->exist_company && !empty($order->get_billing_company())) {
+                $billingName = $order->get_billing_company();
+            } else {
+                if (!empty($order->get_billing_first_name()) || !empty($order->get_billing_last_name())) {
+                    $billingName = trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name());
+                }
+                if (!$billingName) {
+                    $billingName = $order->get_billing_company();
+                } elseif ($order->get_billing_company()) {
+                    $billingName .= ' (' . $order->get_billing_company() . ')';
+                }
+            }
+            $data->customer->customer_name = !empty($billingName) ? $billingName : $customer['name'];
             $data->customer->email = $customer['email'];
             $data->customer->phone = $customer['phone'];
             $data->customer->address = $customer['street_name'];
