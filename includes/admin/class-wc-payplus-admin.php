@@ -2688,6 +2688,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'vat_choice_exempt'   => __('VAT Exempt', 'payplus-payment-gateway'),
                 'vat_choice_cancel'   => __('Cancel', 'payplus-payment-gateway'),
                 'vat_refund_partial_msg' => __('This is a partial refund. Should the refund document be created with VAT included or VAT exempt?', 'payplus-payment-gateway'),
+                'vat_refund_partial_hint' => __('Since this is a partial refund, we can\'t automatically determine the VAT status of the refunded amount. Please choose based on whether the item being refunded is subject to VAT or not.', 'payplus-payment-gateway'),
                 "displayOnProductPage" => __('Display on product page', 'payplus-payment-gateway'),
                 "enableExpressOnProductPageMessage" => __('For Express in product page you ALSO need to select: Either Shipping by Woocommerce or Global the one you choose will be used in the product page.', 'payplus-payment-gateway'),
             )

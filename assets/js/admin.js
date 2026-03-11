@@ -61,7 +61,11 @@ jQuery(function ($) {
             '<button type="button" class="button button-primary pp-vat-included">' + vatIncludedLabel + '</button>' +
             '<button type="button" class="button pp-vat-exempt">' + vatExemptLabel + '</button>' +
             '<button type="button" class="button pp-vat-cancel">' + cancelLabel + '</button>' +
-            '</div>'
+            '</div>' +
+            '<p style="margin:16px 0 0; font-size:11px; color:#666; line-height:1.4;">' +
+            ((typeof payplus_script_payment !== 'undefined' && payplus_script_payment.vat_refund_partial_hint)
+                || 'Since this is a partial refund, we can\'t automatically determine the VAT status of the refunded amount. Please choose based on whether the item being refunded is subject to VAT or not.') +
+            '</p>'
         );
         overlay.append(box);
         $('body').append(overlay);
