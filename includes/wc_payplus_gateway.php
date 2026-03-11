@@ -2060,7 +2060,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $response = $this->receipt_page($order_id, $token);
 
             if (property_exists($response, 'results') && $response->results->status === "error" && $response->results->code === 1) {
-                // Customize the error message here
+                $this->payplus_add_log_all('payload_token_log', '[TOKEN PAYMENT FAILED] Order #' . $order_id . ' | Response: ' . wp_json_encode($response, JSON_UNESCAPED_UNICODE));
                 $error_message = 'This credit card token was saved with different billing information. It cannot be used for this order. Please enter the credit card information manually.';
                 // Translators: %s will be replaced with the error message received from the payment gateway.
                 wc_add_notice(sprintf(__('Error: Credit card declined. %s', 'payplus-payment-gateway'), $error_message), 'error');
