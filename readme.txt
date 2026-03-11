@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.4
+Stable tag: 8.1.5
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.1.5  - 12-03-2026 =
+
+- Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
+- Fix       - Resolved an issue where saved payment tokens could override the PayPlus Embedded selection, causing the checkout to revert to a previously saved card instead of using newly entered card details.
+- Fix       - Fixed token saving failure when the optional "Name for Invoice" or "Alternative ID/VAT" fields were filled during PayPlus Embedded checkout.
 
 == 8.1.4  - 10-03-2026 =
 

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.5]  - 12-03-2026 - (Stella)
+
+- Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
+- Fix       - Resolved an issue where saved payment tokens could override the PayPlus Embedded selection, causing the checkout to revert to a previously saved card instead of using newly entered card details.
+- Fix       - Fixed token saving failure when the optional "Name for Invoice" or "Alternative ID/VAT" fields were filled during PayPlus Embedded checkout.
+
 ## [8.1.4]  - 10-03-2026 - (Dereshishishi)
 
 - Fix       - Fixed an issue where redirect URLs after payment could be malformed (& converted to &amp;), potentially causing broken thank-you page loads or missing order details.
