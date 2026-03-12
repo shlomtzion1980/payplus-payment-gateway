@@ -116,6 +116,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         add_action('wp_ajax_payplus_ipn', [$this, 'payplusIpn']);
         add_action('wp_ajax_invoice_plus_search', [$this, 'payplusIpn']);
         add_action('wp_ajax_invoice_plus_create', [$this, 'payplusIpn']);
+        add_action('wp_ajax_payplus_check_order_status', [$this, 'ajax_check_order_status']);
         add_action('wp_ajax_display-meta-data', [$this, 'displayMetaData']);
         add_action('wp_ajax_make-token-payment', [$this, 'makeTokenPayment']);
 
@@ -349,6 +350,17 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             $this->initiated = true;
             parent::__construct();
         }
+    }
+
+    public function ajax_check_order_status()
+    {
+        check_ajax_referer('payplus_payplus_ipn', '_ajax_nonce');
+        $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            wp_send_json_error(['status' => '']);
+        }
+        wp_send_json_success(['status' => $order->get_status()]);
     }
 
     /**

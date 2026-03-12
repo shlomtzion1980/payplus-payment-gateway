@@ -273,6 +273,47 @@ jQuery(document).ready(function ($) {
         });
     }
 
+    function payplusTryAllPruids(history, orderId, index, box, overlay, initialStatus) {
+        if (index >= history.length) {
+            box.find("tbody tr").css("background", "");
+            box.find(".pp-try-all-status").remove();
+            box.append('<p class="pp-try-all-status" style="margin:12px 0 0;color:#d63638;font-weight:bold;">No approved PRUID found. None returned a successful status.</p>');
+            box.find(".pp-try-all-btn").prop("disabled", false).text("Try All");
+            return;
+        }
+
+        var entry = history[index];
+        var rows = box.find("tbody tr");
+        rows.css("background", "");
+        rows.eq(index).css("background", "#fff8e1");
+        box.find(".pp-try-all-status").remove();
+        box.append('<p class="pp-try-all-status" style="margin:12px 0 0;color:#666;">Checking #' + (index + 1) + ' of ' + history.length + '...</p>');
+
+        $.post(ajaxurl, {
+            action: "payplus_ipn",
+            payment_request_uid: entry.uid,
+            order_id: orderId,
+            _ajax_nonce: payplus_script_admin.payplusCustomAction,
+        }).always(function () {
+            $.post(ajaxurl, {
+                action: "payplus_check_order_status",
+                order_id: orderId,
+                _ajax_nonce: payplus_script_admin.payplusCustomAction,
+            }, function (statusResponse) {
+                var newStatus = statusResponse && statusResponse.data && statusResponse.data.status;
+                if (newStatus && newStatus !== initialStatus && newStatus !== "pending" && newStatus !== "failed" && newStatus !== "cancelled") {
+                    rows.eq(index).css("background", "#e8f5e9");
+                    box.find(".pp-try-all-status").remove();
+                    box.append('<p class="pp-try-all-status" style="margin:12px 0 0;color:#46b450;font-weight:bold;">PRUID #' + (index + 1) + ' matched! Order status: ' + newStatus + '. Reloading...</p>');
+                    setTimeout(function () { location.reload(); }, 1500);
+                } else {
+                    rows.eq(index).css("background", "#ffebee");
+                    payplusTryAllPruids(history, orderId, index + 1, box, overlay, initialStatus);
+                }
+            });
+        });
+    }
+
     function payplusShowPruidSelectionModal(history, orderId) {
         $(".pp-pruid-overlay").remove();
 
@@ -323,8 +364,16 @@ jQuery(document).ready(function ($) {
         box.append(table);
 
         var footer = $('<div style="margin-top:16px;display:flex;gap:8px;justify-content:flex-end;"></div>');
+        var tryAllBtn = $('<button class="button button-primary pp-try-all-btn" style="padding:4px 16px;">Try All</button>');
+        tryAllBtn.on("click", function () {
+            tryAllBtn.prop("disabled", true).text("Checking...");
+            var currentStatus = $("#order_status").val() || "";
+            currentStatus = currentStatus.replace("wc-", "");
+            payplusTryAllPruids(history, orderId, 0, box, overlay, currentStatus);
+        });
         var cancelBtn = $('<button class="button" style="padding:4px 16px;">Cancel</button>');
         cancelBtn.on("click", function () { overlay.remove(); });
+        footer.append(tryAllBtn);
         footer.append(cancelBtn);
         box.append(footer);
 
