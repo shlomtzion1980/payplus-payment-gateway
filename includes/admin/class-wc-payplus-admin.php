@@ -203,6 +203,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'payplus_transaction_uid' => $response->data->transaction_uid,
             ];
             WC_PayPlus_Meta_Data::update_meta($order, $updateData);
+            WC_PayPlus_Meta_Data::append_pruid_history($order, $response->data->page_request_uid, 'admin_invoice');
         }
         $this->payplusIpn();
     }
@@ -307,7 +308,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         $payplusResponse = json_decode($payplusResponse, true);
                         $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
                         if (!empty($pageRequestUid) || !empty($transactionUid)) {
-                            echo '<p><button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" >Get PayPlus Data</button></p>';
+                            $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
+                            echo '<p><button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" data-pruid-history="' . esc_attr(wp_json_encode($pruid_history)) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" >Get PayPlus Data</button></p>';
                             echo wp_kses_post($payPlusLoader);
                         }
                     }
@@ -363,7 +365,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $getInvoice = false,
         $moreInfo = false,
         $returnStatusOnly = false,
-        $isCron = false
+        $isCron = false,
+        $payment_request_uid_override = null
     ) {
         $this->isInitiated();
 
@@ -437,8 +440,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid');
         $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN:', 'default');
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
-        $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
-        !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) && isset(json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid']) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
+        if ($payment_request_uid_override) {
+            $payment_request_uid = $payment_request_uid_override;
+        } else {
+            $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
+            !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) && isset(json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid']) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
+        }
 
         $url = !$getInvoice && !$moreInfo ? $this->ipn_url : $this->invoice_search . "?more_info=" . $moreInfo . "&transaction_uuid=$transactionUid&take=5";
 
@@ -1233,6 +1240,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                         $this->payplus_add_log_all($handle, 'WS Redirecting to Page: ' . $res->data->payment_page_link . "\n" . $this->payplus_get_space());
                         WC_PayPlus_Meta_Data::update_meta($order, array('payplus_page_request_uid' => $res->data->page_request_uid));
+                        WC_PayPlus_Meta_Data::append_pruid_history($order, $res->data->page_request_uid, 'admin_payment_link');
                         WC_PayPlus_Meta_Data::update_meta($order, array('payplus_payment_page_link' => $res->data->payment_page_link));
                         $response = array("status" => true, "payment_response" => $res->data->payment_page_link);
                     } else {
@@ -2135,7 +2143,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $payplusResponse = json_decode($payplusResponse, true);
                     $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
                     if (!empty($pageRequestUid) || !empty($transactionUid)) {
-                        echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
+                        $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
+                        echo '<button type="button" data-value="' . esc_attr($order_id) . '" value="' . esc_attr($pageRequestUid) . '" data-pruid-history="' . esc_attr(wp_json_encode($pruid_history)) . '" title="' . esc_attr(__('This button triggers an IPN process based on the payment page request UID, retrieving relevant data and updating the order accordingly. If the charge or approval is successful, the order status will automatically update to the default status. Please be aware of this behavior.', 'payplus-payment-gateway')) . '" class="button" id="custom-button-get-pp" style="position: absolute;' . esc_attr($rtl) . ': 5px; top: 0; margin: 10px 0 0 0; color: white; background-color: #35aa53; border-radius: 15px;">Get PayPlus Data</button>';
                         echo wp_kses_post($payPlusLoader);
                     }
                 }

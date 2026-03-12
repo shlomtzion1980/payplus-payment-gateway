@@ -219,48 +219,42 @@ class WC_PayPlus
             return;
         }
 
-        $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+        $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
 
-        if (empty($payplus_page_request_uid)) {
+        if (empty($pruid_history)) {
             return;
         }
 
-        $main_gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started on Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid);
-
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-        $status = $PayPlusAdminPayments->payplusIpn(
-            $order_id,
-            $_wpnonce,
-            $saveToken = false,
-            $isHostedPayment = false,
-            $allowUpdateStatuses = true,
-            $allowReturn = false,
-            $getInvoice = false,
-            $moreInfo = false,
-            $returnStatusOnly = true
-        );
 
-        $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+        foreach (array_reverse($pruid_history) as $entry) {
+            $uid = $entry['uid'];
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN on Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | PRUID: ' . $uid . ' | Source: ' . ($entry['source'] ?? ''));
 
-        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
-            $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status approved - Payment already processed, redirecting');
+            $status = $PayPlusAdminPayments->payplusIpn(
+                $order_id,
+                $_wpnonce,
+                false, false, true, false, false, false, true, false,
+                $uid
+            );
 
-            // Clear cart and unset page_order_awaiting_payment, then redirect to order received page
-            if (WC()->cart) {
-                WC()->cart->empty_cart();
+            $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+
+            if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Status approved - Redirecting');
+
+                if (WC()->cart) {
+                    WC()->cart->empty_cart();
+                }
+                if (WC()->session) {
+                    WC()->session->__unset('page_order_awaiting_payment');
+                }
+
+                $redirect_url = $order->get_checkout_order_received_url();
+                wp_safe_redirect($redirect_url);
+                exit;
             }
-
-            // Unset page_order_awaiting_payment since payment is complete
-            if (WC()->session) {
-                WC()->session->__unset('page_order_awaiting_payment');
-            }
-
-            $redirect_url = $order->get_checkout_order_received_url();
-            wp_safe_redirect($redirect_url);
-            exit;
-        } else {
-            $main_gateway->payplus_add_log_all('payplus_double_check', 'Checkout Page Load - Order ID: ' . $order_id . ' | Payment Method: ' . $payment_method . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with checkout');
         }
     }
 
@@ -545,6 +539,9 @@ class WC_PayPlus
             $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
             $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
             WC_PayPlus_Meta_Data::update_meta($order, $metaData);
+            if (!empty($metaData['payplus_page_request_uid'])) {
+                WC_PayPlus_Meta_Data::append_pruid_history($order, $metaData['payplus_page_request_uid'], 'hosted_callback');
+            }
             $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
             $_wpnonce = wp_create_nonce('_wp_payplusIpn');
             $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
@@ -1291,6 +1288,7 @@ class WC_PayPlus
             'payplus_page_request_uid'  => $responseArray['data']['page_request_uid'],
             'payplus_payment_page_link' => $link,
         ]);
+        WC_PayPlus_Meta_Data::append_pruid_history($order, $responseArray['data']['page_request_uid'], 'async_payment');
 
         // Set session so cart restoration works correctly.
         $async_method = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_async_method');

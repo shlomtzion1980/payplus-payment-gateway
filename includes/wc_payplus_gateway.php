@@ -2003,38 +2003,32 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $redirect_to = add_query_arg('order-pay', $order_id, add_query_arg('key', $order->get_order_key(), get_permalink(wc_get_page_id('checkout'))));
 
         if ($this->enableDoubleCheckIfPruidExists) {
-            $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+            $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
 
-            if (!empty($payplus_page_request_uid)) {
-                $this->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
+            if (!empty($pruid_history)) {
                 $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                 $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                $status = $PayPlusAdminPayments->payplusIpn(
-                    $order_id,
-                    $_wpnonce,
-                    $saveToken = false,
-                    $isHostedPayment = false,
-                    $allowUpdateStatuses = true,
-                    $allowReturn = false,
-                    $getInvoice = false,
-                    $moreInfo = false,
-                    $returnStatusOnly = true
-                );
-                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
-                if ($status === "processing" || $status === "on-hold" || $status === "approved") {
-                    $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Status approved - Redirecting to order received page');
-                    // Use WooCommerce method to get order received URL instead of string replacement
-                    $redirect_to = $order->get_checkout_order_received_url();
-                    $result = [
-                        'result' => 'success',
-                        'redirect' => $redirect_to
-                    ];
-                    return $result;
-                } else {
-                    $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with payment page creation');
+
+                foreach (array_reverse($pruid_history) as $entry) {
+                    $uid = $entry['uid'];
+                    $this->payplus_add_log_all('payplus_double_check', 'Double check IPN for Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Source: ' . ($entry['source'] ?? ''));
+                    $status = $PayPlusAdminPayments->payplusIpn(
+                        $order_id, $_wpnonce,
+                        false, false, true, false, false, false, true, false,
+                        $uid
+                    );
+                    $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                    if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                        $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Status approved - Redirecting');
+                        return [
+                            'result' => 'success',
+                            'redirect' => $order->get_checkout_order_received_url()
+                        ];
+                    }
                 }
+                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | No approved PRUID found - Continuing with payment page creation');
             } else {
-                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
+                $this->payplus_add_log_all('payplus_double_check', 'Order ID: ' . $order_id . ' | No PRUID history found - Skipping double check');
             }
         }
 
@@ -3036,6 +3030,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if (property_exists($res->data, 'page_request_uid')) {
                         $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
                         WC_PayPlus_Meta_Data::update_meta($order, $pageRequestUid);
+                        WC_PayPlus_Meta_Data::append_pruid_history($order, $res->data->page_request_uid, 'main_gateway');
                     }
                 } catch (Exception $e) {
                     // Translators: %s is the error message retrieved from the exception.

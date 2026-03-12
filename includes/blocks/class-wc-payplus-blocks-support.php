@@ -346,6 +346,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         $hostedResponseArray = json_decode($hostedResponse, true);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $hostedResponseArray['data']['page_request_uid']]);
+        WC_PayPlus_Meta_Data::append_pruid_history($order, $hostedResponseArray['data']['page_request_uid'], 'blocks_hosted');
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
 
@@ -405,47 +406,42 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
             $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
             if ($WC_PayPlus_Gateway && !$already_checked && isset($WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) && $WC_PayPlus_Gateway->enableDoubleCheckIfPruidExists) {
-                $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($this->orderId, 'payplus_page_request_uid', true);
+                $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($this->orderId);
 
-                if (!empty($payplus_page_request_uid)) {
-                    // Mark as checked in session to prevent duplicate calls
+                if (!empty($pruid_history)) {
                     if (WC()->session) {
                         WC()->session->set($session_key, true);
                     }
 
-                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid);
                     $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                     $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                    $status = $PayPlusAdminPayments->payplusIpn(
-                        $this->orderId,
-                        $_wpnonce,
-                        $saveToken = false,
-                        $isHostedPayment = true,
-                        $allowUpdateStatuses = true,
-                        $allowReturn = false,
-                        $getInvoice = false,
-                        $moreInfo = false,
-                        $returnStatusOnly = true
-                    );
-                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
 
-                    if ($status === "processing" || $status === "on-hold" || $status === "approved") {
-                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Status approved - Payment already processed');
-                        // Payment already processed, set result to success
-                        $result->set_status('success');
-                        $payment_details = $result->payment_details;
-                        $payment_details['order_id'] = $this->orderId;
-                        $payment_details['redirect_url'] = $order->get_checkout_order_received_url();
-                        $result->set_payment_details($payment_details);
-                        return;
-                    } else {
-                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with hosted fields payment');
+                    foreach (array_reverse($pruid_history) as $entry) {
+                        $uid = $entry['uid'];
+                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | PRUID: ' . $uid . ' | Source: ' . ($entry['source'] ?? ''));
+                        $status = $PayPlusAdminPayments->payplusIpn(
+                            $this->orderId, $_wpnonce,
+                            false, true, true, false, false, false, true, false,
+                            $uid
+                        );
+                        $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | PRUID: ' . $uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+
+                        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                            $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | PRUID: ' . $uid . ' | Status approved');
+                            $result->set_status('success');
+                            $payment_details = $result->payment_details;
+                            $payment_details['order_id'] = $this->orderId;
+                            $payment_details['redirect_url'] = $order->get_checkout_order_received_url();
+                            $result->set_payment_details($payment_details);
+                            return;
+                        }
                     }
+                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | No approved PRUID found - Continuing');
                 } else {
-                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | No Page Request UID found - Skipping double check');
+                    $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | No PRUID history found - Skipping');
                 }
             } elseif ($already_checked && $WC_PayPlus_Gateway) {
-                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Already checked in this session - Skipping duplicate check');
+                $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Already checked - Skipping');
             }
 
             ++$hostedStarted;

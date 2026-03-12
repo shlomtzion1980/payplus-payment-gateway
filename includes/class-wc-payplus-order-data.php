@@ -141,6 +141,69 @@ class WC_PayPlus_Meta_Data
         }
     }
 
+    /**
+     * Append a PRUID entry to the payplus_page_request_uid_history meta.
+     * Each entry records the UID, timestamp, and source for audit purposes.
+     *
+     * @param WC_Order|int $order Order object or order ID.
+     * @param string       $uid   The page_request_uid value.
+     * @param string       $source Where it originated (e.g. main_gateway, hosted_fields).
+     */
+    public static function append_pruid_history($order, $uid, $source = '')
+    {
+        if (empty($uid)) {
+            return;
+        }
+        $order = is_object($order) ? $order : wc_get_order($order);
+        if (!$order) {
+            return;
+        }
+        $order_id = $order->get_id();
+        $raw = self::get_meta($order_id, 'payplus_page_request_uid_history', true);
+        $history = !empty($raw) ? json_decode($raw, true) : [];
+        if (!is_array($history)) {
+            $history = [];
+        }
+        // Avoid duplicates
+        foreach ($history as $entry) {
+            if (isset($entry['uid']) && $entry['uid'] === $uid) {
+                return;
+            }
+        }
+        $history[] = [
+            'uid'        => $uid,
+            'created_at' => current_time('Y-m-d H:i:s'),
+            'source'     => $source,
+        ];
+        self::update_meta($order, ['payplus_page_request_uid_history' => wp_json_encode($history)]);
+    }
+
+    /**
+     * Get the PRUID history array for an order.
+     * Falls back to the current payplus_page_request_uid if history is empty.
+     *
+     * @param int $order_id
+     * @return array
+     */
+    public static function get_pruid_history($order_id)
+    {
+        $raw = self::get_meta($order_id, 'payplus_page_request_uid_history', true);
+        $history = !empty($raw) ? json_decode($raw, true) : [];
+        if (!is_array($history)) {
+            $history = [];
+        }
+        // Include current PRUID if not already in history (legacy orders)
+        $current = self::get_meta($order_id, 'payplus_page_request_uid', true);
+        if ($current && !in_array($current, array_column($history, 'uid'), true)) {
+            array_unshift($history, [
+                'uid'        => $current,
+                'created_at' => '',
+                'source'     => 'legacy',
+            ]);
+        }
+        return $history;
+    }
+
     public static function sendMoreInfo($order, $newStatus, $transactionUid = null)
     {
         if (!is_null($transactionUid)) {

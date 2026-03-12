@@ -751,44 +751,43 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             return;
         }
         
-        $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+        $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
         
-        if (empty($payplus_page_request_uid)) {
+        if (empty($pruid_history)) {
             wp_send_json_error(array('message' => 'No page request UID found'));
             return;
         }
         
-        $mainGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN AJAX for Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
-        
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-        $status = $PayPlusAdminPayments->payplusIpn(
-            $order_id,
-            $_wpnonce,
-            $saveToken = false,
-            $isHostedPayment = true,
-            $allowUpdateStatuses = true,
-            $allowReturn = false,
-            $getInvoice = false,
-            $moreInfo = false,
-            $returnStatusOnly = true
-        );
+
+        foreach (array_reverse($pruid_history) as $entry) {
+            $uid = $entry['uid'];
+            $mainGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN AJAX for Hosted Fields Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Source: ' . ($entry['source'] ?? ''));
+            
+            $status = $PayPlusAdminPayments->payplusIpn(
+                $order_id, $_wpnonce,
+                false, true, true, false, false, false, true, false,
+                $uid
+            );
+            
+            $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields AJAX Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
         
-        $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields AJAX Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
-        
-        if ($status === "processing" || $status === "on-hold" || $status === "approved") {
-            $order = wc_get_order($order_id);
-            $redirect_url = $order ? $order->get_checkout_order_received_url() : '';
-            wp_send_json_success(array(
-                'status' => $status,
-                'redirect_url' => $redirect_url
-            ));
-        } else {
-            wp_send_json_success(array(
-                'status' => $status ? $status : 'pending',
-                'redirect_url' => ''
-            ));
+            if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                $order = wc_get_order($order_id);
+                $redirect_url = $order ? $order->get_checkout_order_received_url() : '';
+                wp_send_json_success(array(
+                    'status' => $status,
+                    'redirect_url' => $redirect_url
+                ));
+                return;
+            }
         }
+
+        wp_send_json_success(array(
+            'status' => 'pending',
+            'redirect_url' => ''
+        ));
     }
 
     public function complete_order_via_ajax()
@@ -857,42 +856,37 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             WC_PayPlus_Meta_Data::update_meta($order, ['payplus_pw_gift_cards' => wp_json_encode($this->pwGiftCardData)]);
         }
         
-        // Double check IPN if enabled and page request UID exists
+        // Double check IPN if enabled — iterate through PRUID history (newest first)
         $payplus_instance = WC_PayPlus::get_instance();
         $mainGateway = $payplus_instance->get_main_payplus_gateway();
         if ($mainGateway && isset($mainGateway->enableDoubleCheckIfPruidExists) && $mainGateway->enableDoubleCheckIfPruidExists) {
-            $payplus_page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
+            $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
             
-            if (!empty($payplus_page_request_uid)) {
-                $mainGateway->payplus_add_log_all('payplus_double_check', 'Double check IPN started for Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid);
+            if (!empty($pruid_history)) {
                 $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                 $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-                $status = $PayPlusAdminPayments->payplusIpn(
-                    $order_id,
-                    $_wpnonce,
-                    $saveToken = false,
-                    $isHostedPayment = true,
-                    $allowUpdateStatuses = true,
-                    $allowReturn = false,
-                    $getInvoice = false,
-                    $moreInfo = false,
-                    $returnStatusOnly = true
-                );
-                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Page Request UID: ' . $payplus_page_request_uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
-                
-                if ($status === "processing" || $status === "on-hold" || $status === "approved") {
-                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Status approved - Payment already processed');
-                    // Payment already processed, return success with redirect to order received
-                    $redirect_to = $order->get_checkout_order_received_url();
-                    return array(
-                        'result'   => 'success',
-                        'redirect' => $redirect_to,
+
+                foreach (array_reverse($pruid_history) as $entry) {
+                    $uid = $entry['uid'];
+                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields process_payment Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Source: ' . ($entry['source'] ?? ''));
+                    $status = $PayPlusAdminPayments->payplusIpn(
+                        $order_id, $_wpnonce,
+                        false, true, true, false, false, false, true, false,
+                        $uid
                     );
-                } else {
-                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | Status not approved (' . ($status ? $status : 'null/empty') . ') - Continuing with hosted fields payment');
+                    $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Response Status: ' . ($status ? $status : 'null/empty'));
+                    
+                    if ($status === "processing" || $status === "on-hold" || $status === "approved") {
+                        $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | PRUID: ' . $uid . ' | Status approved');
+                        return array(
+                            'result'   => 'success',
+                            'redirect' => $order->get_checkout_order_received_url(),
+                        );
+                    }
                 }
+                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | No approved PRUID found - Continuing');
             } else {
-                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | No Page Request UID found - Skipping double check');
+                $mainGateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Order ID: ' . $order_id . ' | No PRUID history found - Skipping');
             }
         }
         
