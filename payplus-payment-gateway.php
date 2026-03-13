@@ -1794,6 +1794,7 @@ body{
                             "isSavingCerditCards" => boolval(property_exists($this->payplus_payment_gateway_settings, 'create_pp_token') && $this->payplus_payment_gateway_settings->create_pp_token === 'yes'),
                             "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
+                            "showOrderTotal" => isset($this->hostedFieldsOptions['show_order_total']) && $this->hostedFieldsOptions['show_order_total'] === 'yes',
                         ]
                     );
                     if (!is_cart() && !is_product() && !is_shop()) {

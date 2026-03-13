@@ -272,6 +272,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'type' => 'checkbox',
                 'default' => 'no'
             ];
+            $this->form_fields['show_order_total'] = [
+                'title' => __('Show order total inside payment form', 'payplus-payment-gateway'),
+                'description' => __('Displays the current order total at the bottom of the PayPlus Embedded payment form. Updates automatically when coupons or shipping change.', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no'
+            ];
             unset($this->form_fields['display_mode']);
             unset($this->form_fields['iframe_height']);
             unset($this->form_fields['sub_hide_other_charge_methods']);
@@ -356,6 +362,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         $this->settings['hide_payments_field'] = isset($subOptionsettings['hide_payments_field']) ? $subOptionsettings['hide_payments_field'] : 'no';
         $this->settings['hide_loader_logo'] = isset($subOptionsettings['hide_loader_logo']) ? $subOptionsettings['hide_loader_logo'] : 'no';
         $this->settings['hosted_fields_is_main'] = isset($subOptionsettings['hosted_fields_is_main']) ? $subOptionsettings['hosted_fields_is_main'] : 'no';
+        $this->settings['show_order_total'] = isset($subOptionsettings['show_order_total']) ? $subOptionsettings['show_order_total'] : 'no';
         $this->settings['default_charge_method'] = $this->payplus_default_charge_method;
         $this->settings['sub_hide_other_charge_methods'] = isset($subOptionsettings['sub_hide_other_charge_methods']) ? $subOptionsettings['sub_hide_other_charge_methods'] : false;
 

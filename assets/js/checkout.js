@@ -1454,6 +1454,25 @@ jQuery(function ($) {
         }
     });
 
+    // Sync order total inside hosted fields card (classic checkout only)
+    function updateHostedFieldsTotal() {
+        var $totalEl = $('.order-total .woocommerce-Price-amount');
+        var $ppTotal = $('#ppOrderTotal');
+        if ($totalEl.length && $ppTotal.length) {
+            var totalHtml = $totalEl.first().html();
+            $ppTotal.find('.pp-total-amount').html(totalHtml);
+            $ppTotal.show();
+        }
+    }
+
+    if (payplus_script_checkout.isHostedFields && payplus_script_checkout.showOrderTotal) {
+        $(document.body).on('updated_checkout', function() {
+            updateHostedFieldsTotal();
+        });
+        // Initial load
+        setTimeout(updateHostedFieldsTotal, 500);
+    }
+
     // Hide main gateway visually when hosted fields is main (but keep it in DOM for token payments)
     if (payplus_script_checkout.hostedFieldsIsMain) {
         var hideMainGateway = function() {
