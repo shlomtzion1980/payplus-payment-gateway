@@ -321,6 +321,46 @@ if (isCheckout || hasOrder) {
         })();
     })();
 
+    // Order total display inside hosted fields (blocks checkout)
+    const showOrderTotalSetting = (function() {
+        try {
+            var hfData = window.wc.wcSettings.getPaymentMethodData('payplus-payment-gateway-hostedfields');
+            return hfData && hfData.show_order_total;
+        } catch(e) { return false; }
+    })();
+
+    if (showOrderTotalSetting) {
+        const { CART_STORE_KEY } = window.wc.wcBlocksData;
+        const cartStore = wp.data.select(CART_STORE_KEY);
+
+        function updateBlocksHostedTotal() {
+            var $ppTotal = document.getElementById('ppOrderTotal');
+            if (!$ppTotal) return;
+
+            try {
+                var cartTotals = cartStore.getCartTotals();
+                var totalPrice = parseInt(cartTotals.total_price, 10) || 0;
+                var decimals = parseInt(cartTotals.currency_minor_unit, 10) || 2;
+                var amount = (totalPrice / Math.pow(10, decimals)).toFixed(decimals);
+
+                var prefix = cartTotals.currency_prefix || '';
+                var suffix = cartTotals.currency_suffix || '';
+                var formatted = prefix + amount + suffix;
+
+                $ppTotal.querySelector('.pp-total-amount').innerHTML = formatted;
+                $ppTotal.style.display = '';
+            } catch(e) {}
+        }
+
+        wp.data.subscribe(function() {
+            var activeMethod = '';
+            try { activeMethod = payment.getActivePaymentMethod(); } catch(e) {}
+            if (activeMethod === 'payplus-payment-gateway-hostedfields') {
+                updateBlocksHostedTotal();
+            }
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", function () {
         // Function to start observing for the target element
         let loopImages = true;
