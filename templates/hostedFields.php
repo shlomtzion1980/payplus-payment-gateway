@@ -663,9 +663,15 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                             <span id="expiry" class="fld-frame"></span>
                         </div>
                         <div class="expiry-wrapper expireCvvClass <?php echo esc_attr($opposite); ?>">
-                            <span id="expirym" class="fld-frame"></span>
-                            <span class="seperator"> / </span>
-                            <span id="expiryy" class="fld-frame"></span>
+                            <?php if ($opposite === 'right') : ?>
+                                <span id="expiryy" class="fld-frame"></span>
+                                <span class="seperator"> / </span>
+                                <span id="expirym" class="fld-frame"></span>
+                            <?php else : ?>
+                                <span id="expirym" class="fld-frame"></span>
+                                <span class="seperator"> / </span>
+                                <span id="expiryy" class="fld-frame"></span>
+                            <?php endif; ?>
                         </div>
                         <div id="cvv-fld" class="expireCvvClass <?php echo esc_attr($direction); ?>">
                             <div class="hf-row" id="cvv-wrapper">
