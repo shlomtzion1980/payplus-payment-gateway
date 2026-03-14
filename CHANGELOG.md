@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.1.5]  - 12-03-2026 - (Stella)
+## [8.1.5]  - 15-03-2026 - (Stella)
 
 - Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
 - Fix       - Resolved an issue where saved payment tokens could override the PayPlus Embedded selection, causing the checkout to revert to a previously saved card instead of using newly entered card details.

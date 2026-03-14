@@ -276,7 +276,7 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'title' => __('Show order total inside payment form', 'payplus-payment-gateway'),
                 'description' => __('Displays the current order total at the bottom of the PayPlus Embedded payment form. Updates automatically when coupons or shipping change.', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'default' => 'no'
+                'default' => 'yes'
             ];
             unset($this->form_fields['display_mode']);
             unset($this->form_fields['iframe_height']);
