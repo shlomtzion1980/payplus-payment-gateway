@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Fix       - Fixed Hebrew character corruption (appearing as raw Unicode escapes) in PayPlus API payloads for certain server configurations.
 - Tweak     - PRUID history is now used by the cron job and the Orders Validator for more reliable order status recovery.
 - Fix       - Fixed expiry field order in PayPlus Embedded for LTR locales.
+- Fix       - The "Include Apple Pay Script" setting now correctly loads the Apple Pay script on Blocks checkout for all iframe display modes.
 
 ## [8.1.4]  - 10-03-2026 - (Dereshishishi)
 
