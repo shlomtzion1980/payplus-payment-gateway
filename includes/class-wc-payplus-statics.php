@@ -601,7 +601,7 @@ class WC_PayPlus_Statics
         {
             // If initial payload is an array, convert to JSON string.
             if (is_array($payload)) {
-                $payload = wp_json_encode($payload);
+                $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
             }
             // Now $payload is a string (if original was array) or original type (if not array e.g. already a string).
 

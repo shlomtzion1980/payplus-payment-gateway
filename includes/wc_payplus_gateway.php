@@ -2523,7 +2523,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 }
 
                 if ($productPrice) {
-                    $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                    $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                 }
             }
         }
@@ -2538,7 +2538,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'is_summary_item' => true,
 
             ];
-            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : (object) $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : (object) $itemDetails;
             $totalCartAmount += $productPrice;
         }
 
@@ -2578,7 +2578,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'quantity' => 1,
                     'price' => $productPrice,
                 ];
-                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                 $totalCartAmount += $productPrice;
             }
         }
@@ -2608,7 +2608,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'quantity' => 1,
                         'price' => round($shippingTC, $this->rounding_decimals),
                     ];
-                    $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                    $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                     $totalCartAmount += $shippingTC;
                 }
                 if ($totalCartAmount < $orderTotal) {
@@ -2619,7 +2619,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             'quantity' => 1,
                             'price' => $productPrice,
                         ];
-                        $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                        $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                         $totalCartAmount += $productPrice;
                     }
                 }
@@ -2643,7 +2643,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'quantity' => 1,
                 'price' => round($productCouponPrice, $this->rounding_decimals),
             ];
-            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
         }
 
         if (isset($this->pwGiftCardData) && isset($this->pwGiftCardData['gift_cards']) && is_array($this->pwGiftCardData['gift_cards'])) {
@@ -2660,7 +2660,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     'price' => $priceGift,
                 ];
 
-                $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                 $totalCartAmount += $priceGift;
             }
         }
@@ -2683,7 +2683,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 'quantity' => 1,
                 'price' => $priceGift,
             ];
-            $productsItems[] = ($json) ? wp_json_encode($itemDetails) : $itemDetails;
+            $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
             $totalCartAmount += $priceGift;
         }
 
@@ -2741,7 +2741,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $objectProducts = $this->payplus_get_products_by_order_id($order_id);
         }
 
-        $Customer = (count($customer)) ? '"customer":' . wp_json_encode($customer) . "," : "";
+        $Customer = (count($customer)) ? '"customer":' . wp_json_encode($customer, JSON_UNESCAPED_UNICODE) . "," : "";
         $payloadCustomer = count($customer) ? $customer : "";
         $returnUrl = add_query_arg('wc-api', 'payplus_gateway', $this->get_return_url($order));
         $redirectSuccess = ($isAdmin) ? $this->response_url . "&paymentPayPlusDashboard=" . $this->payplus_generate_key_dashboard . "&_wpnonce=" . wp_create_nonce('payload_link') : $this->response_url . "&success_order_id=$order_id&_wpnonce=" . wp_create_nonce('payload_link');
@@ -2926,7 +2926,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // $this->payplus_add_log_all("generate_payment_link_refactor_log", "New payload: \n" . wp_json_encode($payload) . "\n");
         // $this->payplus_add_log_all("generate_payment_link_refactor_log", "Legacy payload: \n" . wp_json_encode($payloadArray) . "\n");
 
-        $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray) : $payload = wp_json_encode($payload);
+        $this->useLegacyPayload ? $payload = wp_json_encode($payloadArray, JSON_UNESCAPED_UNICODE) : $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
         return $payload;
     }
 

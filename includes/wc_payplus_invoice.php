@@ -470,7 +470,7 @@ class PayplusInvoice
     public function createRefundInvoice($order_id, $documentType, $payload, $nameDocment)
     {
         $order = wc_get_order($order_id);
-        $payload = wp_json_encode($payload);
+        $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice_refund';
         $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . '  )');

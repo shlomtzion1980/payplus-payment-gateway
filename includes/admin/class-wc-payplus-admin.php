@@ -475,7 +475,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         ];
 
         $args = array(
-            'body' => wp_json_encode($payload),
+            'body' => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
             'timeout' => '60',
             'redirection' => '5',
             'httpversion' => '1.0',
@@ -722,7 +722,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $payload['initial_invoice'] = false;
             }
 
-            $payload = wp_json_encode($payload);
+            $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
             $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
             $response = WC_PayPlus_Statics::payPlusRemote($this->refund_url, $payload);
             if (is_wp_error($response)) {
@@ -1047,7 +1047,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             } else {
                                 $payload['more_info'] = $parent_id;
                             }
-                            $payload = wp_json_encode($payload);
+                            $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
                             $this->payplus_add_log_all($handle, 'New IPN Fired (' . $order_id . ')');
                             $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
                             $data['order_id'] = $order_id;
@@ -1079,7 +1079,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 } else {
 
                     $payload['more_info'] = $order_id;
-                    $payload = wp_json_encode($payload);
+                    $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
                     $this->payplus_add_log_all($handle, 'New IPN Fired (' . $order_id . ')');
                     $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
                     $this->requestPayPlusIpn($payload, array('order_id' => $order_id), 1);
@@ -1300,8 +1300,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
 
             $payload['related_transaction'] = true;
-            $this->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-            $payload = wp_json_encode($payload);
+            $this->payplus_add_log_all($handle, wp_json_encode($payload, JSON_UNESCAPED_UNICODE), 'payload');
+            $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
             $response = WC_PayPlus_Statics::payPlusRemote($this->ipn_url, $payload);
 
             $res = json_decode(wp_remote_retrieve_body($response));
@@ -2268,7 +2268,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             $payload['more_info'] = $orderId;
                         }
                         $payload['related_transaction'] = true;
-                        $payload = wp_json_encode($payload);
+                        $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
                         $data['order_id'] = $orderId;
                         $res = $this->requestPayPlusIpn($payload, $data, 1, 'payplus_process_payment', true);
                         WC_PayPlus_Meta_Data::update_meta($order, array('payplus_response' => wp_json_encode($res->data, true)));
