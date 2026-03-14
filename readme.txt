@@ -91,6 +91,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
 - Fix       - Resolved an issue where saved payment tokens could override the PayPlus Embedded selection, causing the checkout to revert to a previously saved card instead of using newly entered card details.
 - Fix       - Fixed token saving failure when the optional "Name for Invoice" or "Alternative ID/VAT" fields were filled during PayPlus Embedded checkout.
+- Feature   - PRUID history tracking: all payment page request UIDs are now stored with timestamps, enabling recovery of orders where the UID changed. The "Get PayPlus Data" button shows a selection popup with a "Try All" option.
+- Feature   - Optional order total display inside PayPlus Embedded payment form for both Classic and Blocks checkout, with automatic updates on coupon/shipping changes.
+- Tweak     - Reduced checkout order-status polling frequency to prevent excessive server load on slower sites.
+- Fix       - Fixed Hebrew character corruption (appearing as raw Unicode escapes) in PayPlus API payloads for certain server configurations.
+- Tweak     - PRUID history is now used by the cron job and the Orders Validator for more reliable order status recovery.
+- Fix       - Fixed expiry field order in PayPlus Embedded for LTR locales.
 
 == 8.1.4  - 10-03-2026 =
 
