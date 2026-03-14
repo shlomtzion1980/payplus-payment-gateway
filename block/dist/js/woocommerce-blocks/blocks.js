@@ -171,8 +171,11 @@ if (isCheckout || hasOrder) {
         }
     });
 
-    // Polling fallback: when iframe can't postMessage (sandbox/cross-origin), poll server for order status
+    var _payplusPollStarted = false;
+
     function startOrderStatusPoll(result) {
+        if (_payplusPollStarted) return;
+        _payplusPollStarted = true;
         if (!result || !result.order_id || !result.order_received_url) return;
 
         var redirectUrl = result.order_received_url;
@@ -186,7 +189,7 @@ if (isCheckout || hasOrder) {
         if (!orderKey) return;
 
         var attempts = 0;
-        var maxAttempts = 600; // 90 seconds (600 * 150ms)
+        var maxAttempts = 45; // 90 seconds (45 * 2s)
 
         function poll() {
             if (_payplusPollDone || attempts++ > maxAttempts) {
@@ -225,7 +228,7 @@ if (isCheckout || hasOrder) {
                 return;
             }
             poll();
-        }, 150);
+        }, 2000);
     }
 
     (() => {
