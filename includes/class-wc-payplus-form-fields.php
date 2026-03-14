@@ -721,8 +721,8 @@ class WC_PayPlus_Form_Fields
             'import_applepay_script' => [
                 'title' => __('Apple Pay', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Add Apple Pay Script', 'payplus-payment-gateway'),
-                'description' => __('Include Apple Pay Script', 'payplus-payment-gateway'),
+                'label' => __('Include Apple Pay Script (No matter if Apple Pay is disabled in the PayPlus Gateway)', 'payplus-payment-gateway'),
+                'description' => __('This will include Apple Pay Script for all iframes (Popup, Iframe, Same Page Iframe and Next Page Iframe) - No matter if Apple Pay is disabled in the PayPlus Gateway', 'payplus-payment-gateway'),
                 'desc_tip' => true,
                 'default' => 'yes'
             ],

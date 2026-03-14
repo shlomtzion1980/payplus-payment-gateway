@@ -621,6 +621,13 @@ if (isCheckout || hasOrder) {
                             ["samePageIframe", "popupIframe"].indexOf(
                                 gateWaySettings.displayMode
                             ) !== -1;
+                        const isAnyIframeMode =
+                            ["samePageIframe", "popupIframe", "iframe"].indexOf(
+                                gateWaySettings.displayMode
+                            ) !== -1;
+                        if (isAnyIframeMode && payPlusGateWay.importApplePayScript) {
+                            addScriptApple();
+                        }
                         console.log("isIframe?", isIframe);
                         if (
                             gateways.indexOf(
@@ -806,9 +813,6 @@ if (isCheckout || hasOrder) {
                 location.reload();
             });
             pp_iframe.appendChild(iframe);
-            if (payPlusGateWay.importApplePayScript) {
-                addScriptApple();
-            }
         }
     }
 

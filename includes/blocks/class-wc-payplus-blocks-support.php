@@ -69,7 +69,11 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->iFrameWidth = $this->settings['iframe_width'] ?? '40%';
         $this->hideOtherPayments = boolval(isset($this->settings['hide_other_charge_methods']) && $this->settings['hide_other_charge_methods']) ?? null;
         $this->applePaySettings = get_option('woocommerce_payplus-payment-gateway-applepay_settings');
-        $this->importApplePayScript = boolval(boolval(isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes') || boolval(isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === "yes"));
+        $this->importApplePayScript = boolval(
+            (isset($this->payPlusSettings['enable_apple_pay']) && $this->payPlusSettings['enable_apple_pay'] === 'yes')
+            || (isset($this->applePaySettings['enabled']) && $this->applePaySettings['enabled'] === 'yes')
+            || (isset($this->payPlusSettings['import_applepay_script']) && $this->payPlusSettings['import_applepay_script'] === 'yes')
+        );
         $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
         $this->customIcons = array_values(WC_PayPlus_Statics::getCardsLogos());
         $this->secretKey = $this->settings['secret_key'] ?? null;
