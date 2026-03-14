@@ -937,7 +937,8 @@ class WC_PayPlus
             $runIpn = true;
             $status = $order->get_status();
             if ($current_hour >= $hour - 2) {
-                $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
+                $paymentPageUid = !empty($pruid_history);
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
                 if ($paymentPageUid && $payPlusCronTested < 5) {
                     ++$payPlusCronTested;
@@ -956,22 +957,34 @@ class WC_PayPlus
                     }
                     if ($runIpn) {
                         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_cron_tested' => $payPlusCronTested]);
-                        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours - created at: $hour:$min diff calc (minutes): $calc - Running IPN - check order for results.\n");
+                        $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: created in the last two hours - created at: $hour:$min diff calc (minutes): $calc - Running IPN via PRUID history (" . count($pruid_history) . " UIDs) - check order for results.\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
                         $order->add_order_note('PayPlus Cron: Running IPN.');
-                        $PayPlusAdminPayments->payplusIpn(
-                            $order_id,
-                            $_wpnonce,
-                            $saveToken = false,
-                            $isHostedPayment = false,
-                            $allowUpdateStatuses = true,
-                            $allowReturn = false,
-                            $getInvoice = false,
-                            $moreInfo = false,
-                            $returnStatusOnly = false,
-                            $isCron = true
-                        );
+
+                        foreach (array_reverse($pruid_history) as $entry) {
+                            $uid = $entry['uid'];
+                            $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Cron IPN attempt with PRUID: $uid | Source: " . ($entry['source'] ?? 'legacy') . "\n");
+                            $PayPlusAdminPayments->payplusIpn(
+                                $order_id,
+                                $_wpnonce,
+                                $saveToken = false,
+                                $isHostedPayment = false,
+                                $allowUpdateStatuses = true,
+                                $allowReturn = false,
+                                $getInvoice = false,
+                                $moreInfo = false,
+                                $returnStatusOnly = false,
+                                $isCron = true,
+                                $uid
+                            );
+                            $refreshed_order = wc_get_order($order_id);
+                            $new_status = $refreshed_order ? $refreshed_order->get_status() : $status;
+                            if ($new_status !== $status) {
+                                $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Status changed to $new_status after PRUID $uid — stopping iteration.\n");
+                                break;
+                            }
+                        }
                     }
                 } else {
                     $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id - status = $status: Was already tested with cron more than 4 times - skipping.\n");

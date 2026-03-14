@@ -606,7 +606,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $outPut[$order_id]['statuses'] = $status;
                 $order = wc_get_order($order_id);
                 $runIpn = true;
-                $paymentPageUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') !== "" ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid') : false;
+                $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
+                $paymentPageUid = !empty($pruid_history);
                 echo esc_html("\nOrder #$order_id CURRENT STATUS: " . $order->get_status() . "\n");
                 if ($paymentPageUid) {
                     $hasInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send');
@@ -660,32 +661,56 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         echo esc_html("Order #$order_id Customer: $order_customer\n");
                         echo esc_html("Order #$order_id Phone: $order_phone\n");
                         $outPut[$order_id]['message'] = $ipnMessage;
-                        $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation.\n");
+                        $this->payplus_add_log_all('payplus-orders-verify-log', "$order_id: Running IPN validation via PRUID history (" . count($pruid_history) . " UIDs).\n");
                         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
                         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                        $original_status = $order->get_status();
 
-                        $ipnResponse = !$reportOnly ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice) : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice);
-                        if ($reportOnly) {
-                            echo "Report only mode.\n";
-                        }
-                        if ($ipnResponse) {
-                            if ($getInvoice && is_array($ipnResponse)) {
-                                echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
-                                $outPut[$order_id]['invoices'] = $ipnResponse;
-                            } else {
-                                if ($getInvoice) {
-                                    echo esc_html("Order #$order_id doesn't seem to have invoice+ docs...\n\n");
-                                    $outPut[$order_id]['message_invoices'] = "Order #$order_id doesn't seem to have invoice+ docs...";
+                        echo esc_html("Order #$order_id PRUID history contains " . count($pruid_history) . " UID(s) — iterating newest first.\n");
+                        $outPut[$order_id]['pruid_count'] = count($pruid_history);
+
+                        foreach (array_reverse($pruid_history) as $entry) {
+                            $uid = $entry['uid'];
+                            $source = $entry['source'] ?? 'legacy';
+                            echo esc_html("  → Trying PRUID: $uid (source: $source)\n");
+                            $outPut[$order_id]['pruid_tried'][] = $uid;
+
+                            $ipnResponse = !$reportOnly
+                                ? $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = true, $allowReturn = true, $getInvoice, $moreInfo = false, $returnStatusOnly = false, $isCron = false, $uid)
+                                : $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken = false, $isHostedPayment = false, $allowUpdateStatuses = false, $allowReturn = true, $getInvoice, $moreInfo = false, $returnStatusOnly = false, $isCron = false, $uid);
+
+                            if ($ipnResponse) {
+                                if ($getInvoice && is_array($ipnResponse)) {
+                                    echo esc_html("Order #$order_id invoices: " . wp_json_encode($ipnResponse) . "\n\n");
+                                    $outPut[$order_id]['invoices'] = $ipnResponse;
                                 } else {
-                                    echo esc_html("Order ipn data was updated, #$order_id status is: $ipnResponse\n\n");
-                                    $outPut[$order_id]['status_change'] = $ipnResponse;
+                                    if ($getInvoice) {
+                                        echo esc_html("Order #$order_id doesn't seem to have invoice+ docs...\n\n");
+                                        $outPut[$order_id]['message_invoices'] = "Order #$order_id doesn't seem to have invoice+ docs...";
+                                    } else {
+                                        echo esc_html("Order ipn data was updated, #$order_id status is: $ipnResponse (PRUID: $uid)\n\n");
+                                        $outPut[$order_id]['status_change'] = $ipnResponse;
+                                        $outPut[$order_id]['resolved_by_pruid'] = $uid;
+                                    }
                                 }
                             }
-                        } else {
-                            if ($reportOnly) {
-                                echo esc_html("Order #$order_id status did not change!\n\n");
+
+                            $refreshed_order = wc_get_order($order_id);
+                            $new_status = $refreshed_order ? $refreshed_order->get_status() : $original_status;
+                            if ($new_status !== $original_status) {
+                                echo esc_html("  ✓ Status changed from $original_status to $new_status — stopping PRUID iteration.\n\n");
+                                break;
+                            }
+                        }
+
+                        if ($reportOnly) {
+                            $refreshed_order = wc_get_order($order_id);
+                            $final_status = $refreshed_order ? $refreshed_order->get_status() : $original_status;
+                            if ($final_status === $original_status) {
+                                echo esc_html("Order #$order_id status did not change after all PRUIDs!\n\n");
                                 $outPut[$order_id]['status_change'] = "Order #$order_id status did not change!";
                             }
+                            echo "Report only mode.\n";
                         }
                     }
                 } else {
