@@ -1322,10 +1322,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if (isset($resultApps[$indexRow]->price) && $resultApps[$indexRow]->price > round($amount, $this->rounding_decimals)) {
                             $resultApps[$indexRow]->price = $amount * 100;
                         }
-                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified by WooCommerce before calling process_refund
+                        // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified by WooCommerce before calling process_refund
                         $refund_vat_type = isset($_POST['payplus_refund_vat_type']) && in_array($_POST['payplus_refund_vat_type'], ['vat-type-included', 'vat-type-exempt'], true)
                             ? sanitize_text_field(wp_unslash($_POST['payplus_refund_vat_type']))
                             : null;
+                        // phpcs:enable WordPress.Security.NonceVerification.Missing
                         $this->invoice_api->payPlusCreateRefundInvoicePlus(
                             $order_id,
                             $this->invoice_api->payplus_get_invoice_type_document_refund(),
