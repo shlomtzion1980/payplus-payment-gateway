@@ -134,6 +134,7 @@ jQuery(function ($) {
 
     // Layer 2: polling fallback
     function startOrderStatusPoll(result) {
+        if (!payplus_script_checkout.enableOrderStatusPoll) return;
         if (!result || !result.order_id || !result.order_received_url) return;
 
         var redirectUrl = result.order_received_url;

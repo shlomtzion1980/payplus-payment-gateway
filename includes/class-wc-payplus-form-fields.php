@@ -779,6 +779,13 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'no',
             ],
+            'enable_order_status_poll' => [
+                'title' => __('Enable Order Status Polling', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'description' => __('Polls the server for order completion while the payment iframe is open. This enables automatic redirect after payment and is required for the TV Power Down Effect. Disabling this may cause the customer to remain on the payment page after completing payment until manually redirected.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'yes',
+            ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',

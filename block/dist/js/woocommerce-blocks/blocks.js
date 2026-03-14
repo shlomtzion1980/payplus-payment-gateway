@@ -174,6 +174,7 @@ if (isCheckout || hasOrder) {
     var _payplusPollStarted = false;
 
     function startOrderStatusPoll(result) {
+        if (!payPlusGateWay.enableOrderStatusPoll) return;
         if (_payplusPollStarted) return;
         _payplusPollStarted = true;
         if (!result || !result.order_id || !result.order_received_url) return;

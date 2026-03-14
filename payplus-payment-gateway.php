@@ -1795,6 +1795,7 @@ body{
                             "isSubscriptionOrder" => $isSubscriptionOrder,
                             "iframeAutoHeight" => $this->iframeAutoHeight,
                             "popupTvEffect" => $this->popupTvEffect,
+                            "enableOrderStatusPoll" => !property_exists($this->payplus_payment_gateway_settings, 'enable_order_status_poll') || $this->payplus_payment_gateway_settings->enable_order_status_poll !== 'no',
                             "viewMode" => $this->payplus_payment_gateway_settings->display_mode ?? 'redirect',
                             "iframeWidth" => $this->payplus_payment_gateway_settings->iframe_width ?? '40%',
                             "hasSavedTokens" => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
