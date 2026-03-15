@@ -11,16 +11,151 @@ const isCheckout = !document.querySelector(
     ? false
     : true;
 
-if (isCheckout || hasOrder) {
-    console.log("checkout page?", isCheckout);
-    console.log("has order?", hasOrder);
+const isEditor = !!document.querySelector('.block-editor');
 
-    const customerId = store.getCustomerId();
-    const additionalFields = store.getAdditionalFields();
-    const orderId = store.getOrderId();
-    const payPlusGateWay = window.wc.wcSettings.getPaymentMethodData(
-        "payplus-payment-gateway"
-    );
+const payPlusGateWay = window.wc.wcSettings.getPaymentMethodData(
+    "payplus-payment-gateway"
+) || {};
+
+let gateways = (payPlusGateWay.gateways || []).slice();
+
+gateways = payPlusGateWay.isSubscriptionOrder
+    ? ["payplus-payment-gateway"]
+    : gateways;
+
+gateways =
+    payPlusGateWay.isSubscriptionOrder && payPlusGateWay.isLoggedIn
+        ? [
+              "payplus-payment-gateway",
+              "payplus-payment-gateway-hostedfields",
+          ]
+        : gateways;
+
+let customIcons = [];
+
+const w = window.React;
+for (let c = 0; c < (payPlusGateWay.customIcons || []).length; c++) {
+    customIcons[c] = (0, w.createElement)("img", {
+        src: payPlusGateWay.customIcons[c],
+        style: { maxHeight: "35px", height: "45px" },
+    });
+}
+
+const divCustomIcons = (0, w.createElement)(
+    "div",
+    {
+        className: "payplus-icons",
+        style: {
+            display: "flex",
+            flexWrap: "wrap",
+            width: "100%",
+            maxWidth: "100%",
+            gap: "5px",
+        },
+    },
+    customIcons
+);
+
+let isCustomeIcons = !!(payPlusGateWay.customIcons && payPlusGateWay.customIcons[0] && payPlusGateWay.customIcons[0].length);
+const hasSavedTokens =
+    payPlusGateWay.hasSavedTokens ? Object.keys(payPlusGateWay.hasSavedTokens).length > 0 : false;
+const hideMainPayPlusGateway = payPlusGateWay.hideMainPayPlusGateway;
+const hostedFieldsIsMain = payPlusGateWay.hostedFieldsIsMain;
+
+(() => {
+    ("use strict");
+    const e = window.React,
+        t = window.wc.wcBlocksRegistry,
+        a = window.wp.i18n,
+        p = window.wc.wcSettings,
+        n = window.wp.htmlEntities,
+        i = gateways,
+        s = (e) => (0, n.decodeEntities)(e.description || ""),
+        y = (t) => {
+            const { PaymentMethodLabel: a } = t.components;
+            return (0, e.createElement)(
+                "div",
+                { className: "payplus-method", style: { width: "100%" } },
+                (0, e.createElement)(a, {
+                    text: t.text,
+                    icon:
+                        t.icon !== ""
+                            ? (0, e.createElement)("img", {
+                                  style: {
+                                      width: "64px",
+                                      height: "32px",
+                                      maxHeight: "100%",
+                                      margin: "0px 10px",
+                                      objectPosition: "center",
+                                  },
+                                  src: t.icon,
+                              })
+                            : null,
+                }),
+                (0, e.createElement)(
+                    "div",
+                    { className: "pp_iframe" },
+                    (0, e.createElement)(
+                        "button",
+                        {
+                            className: "closeFrame",
+                            id: "closeFrame",
+                            style: {
+                                position: "absolute",
+                                top: "0px",
+                                fontSize: "20px",
+                                right: "0px",
+                                border: "none",
+                                color: "black",
+                                backgroundColor: "transparent",
+                                display: "none",
+                            },
+                        },
+                        "x"
+                    )
+                ),
+                t.icon && t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
+                    ? divCustomIcons
+                    : null
+            );
+        };
+    (() => {
+        for (let c = 0; c < i.length; c++) {
+            const l = i[c],
+                o = (0, p.getPaymentMethodData)(l, {}),
+                m = (0, a.__)(
+                    "Pay with Debit or Credit Card",
+                    "payplus-payment-gateway"
+                ),
+                r = (0, n.decodeEntities)(o?.title || "") || m,
+                wObj = {
+                    name: l,
+                    label: (0, e.createElement)(y, {
+                        text: r,
+                        icon: o.icon,
+                    }),
+                    content: (0, e.createElement)(s, {
+                        description: o.description,
+                    }),
+                    edit: (0, e.createElement)(s, {
+                        description: o.description,
+                    }),
+                    canMakePayment: () => !0,
+                    ariaLabel: r,
+                    supports: {
+                        showSaveOption:
+                            l === "payplus-payment-gateway"
+                                ? o.showSaveOption
+                                : false,
+                        features: o.supports,
+                    },
+                };
+            (0, t.registerPaymentMethod)(wObj);
+        }
+    })();
+})();
+
+if (isCheckout || hasOrder) {
 
     function addScriptApple() {
         if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
@@ -39,53 +174,6 @@ if (isCheckout || hasOrder) {
         }
         return true;
     }
-
-    let gateways = window.wc.wcSettings.getPaymentMethodData(
-        "payplus-payment-gateway"
-    ).gateways;
-
-    gateways = payPlusGateWay.isSubscriptionOrder
-        ? ["payplus-payment-gateway"]
-        : gateways;
-
-    gateways =
-        payPlusGateWay.isSubscriptionOrder && payPlusGateWay.isLoggedIn
-            ? [
-                  "payplus-payment-gateway",
-                  "payplus-payment-gateway-hostedfields",
-              ]
-            : gateways;
-
-    let customIcons = [];
-
-    const w = window.React;
-    for (let c = 0; c < payPlusGateWay.customIcons?.length; c++) {
-        customIcons[c] = (0, w.createElement)("img", {
-            src: payPlusGateWay.customIcons[c],
-            style: { maxHeight: "35px", height: "45px" },
-        });
-    }
-
-    const divCustomIcons = (0, w.createElement)(
-        "div",
-        {
-            className: "payplus-icons",
-            style: {
-                display: "flex",
-                flexWrap: "wrap",
-                width: "100%",
-                maxWidth: "100%",
-                gap: "5px",
-            },
-        },
-        customIcons
-    );
-
-    let isCustomeIcons = !!payPlusGateWay.customIcons[0]?.length;
-    const hasSavedTokens =
-        Object.keys(payPlusGateWay.hasSavedTokens).length > 0;
-    const hideMainPayPlusGateway = payPlusGateWay.hideMainPayPlusGateway;
-    const hostedFieldsIsMain = payPlusGateWay.hostedFieldsIsMain;
 
     // Auto-select hosted fields if hostedFieldsIsMain is true
     if (hostedFieldsIsMain) {
@@ -231,99 +319,6 @@ if (isCheckout || hasOrder) {
             poll();
         }, 2000);
     }
-
-    (() => {
-        ("use strict");
-        const e = window.React,
-            t = window.wc.wcBlocksRegistry,
-            a = window.wp.i18n,
-            p = window.wc.wcSettings,
-            n = window.wp.htmlEntities,
-            i = gateways,
-            s = (e) => (0, n.decodeEntities)(e.description || ""),
-            y = (t) => {
-                const { PaymentMethodLabel: a } = t.components;
-                return (0, e.createElement)(
-                    "div",
-                    { className: "payplus-method", style: { width: "100%" } },
-                    (0, e.createElement)(a, {
-                        text: t.text,
-                        icon:
-                            t.icon !== ""
-                                ? (0, e.createElement)("img", {
-                                      style: {
-                                          width: "64px",
-                                          height: "32px",
-                                          maxHeight: "100%",
-                                          margin: "0px 10px",
-                                          objectPosition: "center",
-                                      },
-                                      src: t.icon,
-                                  })
-                                : null,
-                    }),
-                    (0, e.createElement)(
-                        "div",
-                        { className: "pp_iframe" },
-                        (0, e.createElement)(
-                            "button",
-                            {
-                                className: "closeFrame",
-                                id: "closeFrame",
-                                style: {
-                                    position: "absolute",
-                                    top: "0px",
-                                    fontSize: "20px",
-                                    right: "0px",
-                                    border: "none",
-                                    color: "black",
-                                    backgroundColor: "transparent",
-                                    display: "none",
-                                },
-                            },
-                            "x"
-                        )
-                    ),
-                    t.icon.search("PayPlusLogo.svg") > 0 && isCustomeIcons
-                        ? divCustomIcons
-                        : null
-                );
-            };
-        (() => {
-            for (let c = 0; c < i.length; c++) {
-                const l = i[c],
-                    o = (0, p.getPaymentMethodData)(l, {}),
-                    m = (0, a.__)(
-                        "Pay with Debit or Credit Card",
-                        "payplus-payment-gateway"
-                    ),
-                    r = (0, n.decodeEntities)(o?.title || "") || m,
-                    w = {
-                        name: l,
-                        label: (0, e.createElement)(y, {
-                            text: r,
-                            icon: o.icon,
-                        }),
-                        content: (0, e.createElement)(s, {
-                            description: o.description,
-                        }),
-                        edit: (0, e.createElement)(s, {
-                            description: o.description,
-                        }),
-                        canMakePayment: () => !0,
-                        ariaLabel: r,
-                        supports: {
-                            showSaveOption:
-                                l === "payplus-payment-gateway"
-                                    ? o.showSaveOption
-                                    : false,
-                            features: o.supports,
-                        },
-                    };
-                (0, t.registerPaymentMethod)(w);
-            }
-        })();
-    })();
 
     // Order total display inside hosted fields (blocks checkout)
     const showOrderTotalSetting = (function() {
