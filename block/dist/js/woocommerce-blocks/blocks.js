@@ -157,6 +157,51 @@ const hostedFieldsIsMain = payPlusGateWay.hostedFieldsIsMain;
 
 if (isCheckout || hasOrder) {
 
+    var _checkoutDispatch = wp.data.dispatch(CHECKOUT_STORE_KEY);
+    var _paymentDispatch = wp.data.dispatch(PAYMENT_STORE_KEY);
+
+    // Will be assigned from within DOMContentLoaded so resetCheckoutState can re-attach the observer
+    var _startObserving = null;
+
+    /**
+     * Reset the Blocks checkout state machine so the customer can
+     * change payment method and click "Place Order" again without reloading.
+     */
+    function resetCheckoutState() {
+        // Stop any running poll
+        _payplusPollDone = true;
+        _payplusPollStarted = false;
+
+        // Hide & clean up the iframe popup
+        var ppIframes = document.querySelectorAll('.pp_iframe');
+        ppIframes.forEach(function (el) {
+            el.style.display = 'none';
+            var iframeChild = el.querySelector('iframe');
+            if (iframeChild) iframeChild.remove();
+        });
+
+        // Remove overlay
+        var overlay = document.getElementById('overlay');
+        if (overlay) overlay.remove();
+
+        // Restore body scroll
+        document.body.style.overflow = '';
+        document.body.style.backgroundColor = '';
+        document.body.style.opacity = '';
+
+        // Reset WC Blocks stores back to idle so the button re-enables
+        try { _checkoutDispatch.__internalSetIdle(); } catch (e) {}
+        try { _paymentDispatch.__internalSetPaymentIdle(); } catch (e) {}
+
+        // Allow the next Place Order click to re-trigger the observer
+        _payplusPollDone = false;
+
+        // Re-attach the observer after a tick so isComplete() is no longer true
+        if (_startObserving) {
+            setTimeout(function () { _startObserving(); }, 150);
+        }
+    }
+
     function addScriptApple() {
         if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
             const script = document.createElement("script");
@@ -384,6 +429,7 @@ if (isCheckout || hasOrder) {
 
         function startObserving(event) {
             console.log("observer started");
+            _startObserving = startObserving;
 
             const overlay = document.createElement("div");
             overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
@@ -552,7 +598,7 @@ if (isCheckout || hasOrder) {
                         pp_iframe.addEventListener("click", (e) => {
                             e.preventDefault();
                             pp_iframe.style.display = "none";
-                            location.reload();
+                            resetCheckoutState();
                         });
                         console.log(
                             getPaymentResult.paymentDetails.errorMessage
@@ -667,14 +713,14 @@ if (isCheckout || hasOrder) {
                                                         ? window.payplus_i18n.payment_page_failed
                                                         : 'Error: the payment page failed to load.');
                                                 alert(errMsg);
-                                                location.reload();
+                                                resetCheckoutState();
                                             }
                                         },
                                         error: function() {
                                             alert((window.payplus_i18n && window.payplus_i18n.payment_page_failed)
                                                 ? window.payplus_i18n.payment_page_failed
                                                 : 'Error: the payment page failed to load.');
-                                            location.reload();
+                                            resetCheckoutState();
                                         }
                                     });
                                 } else if (paymentDetails.paymentPageLink && paymentDetails.paymentPageLink.length > 0) {
@@ -693,7 +739,7 @@ if (isCheckout || hasOrder) {
                                             ? window.payplus_i18n.payment_page_failed
                                             : "Error: the payment page failed to load."
                                     );
-                                    location.reload();
+                                    resetCheckoutState();
                                 }
                             }
                             observer.disconnect();
@@ -802,10 +848,7 @@ if (isCheckout || hasOrder) {
             pp_iframe.firstElementChild.style.cursor = "pointer";
             pp_iframe.firstElementChild.addEventListener("click", (e) => {
                 e.preventDefault();
-                pp_iframe.style.display = "none";
-                var currentUrl = window.location.href;
-                var params = new URLSearchParams(currentUrl);
-                location.reload();
+                resetCheckoutState();
             });
             pp_iframe.appendChild(iframe);
         }
