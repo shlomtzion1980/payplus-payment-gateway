@@ -448,16 +448,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $WC_PayPlus_Gateway->payplus_add_log_all('payplus_double_check', 'Hosted Fields Blocks Order ID: ' . $this->orderId . ' | Already checked - Skipping');
             }
 
-            ++$hostedStarted;
-            if ($hostedStarted <= 1) {
-                WC()->session->set('hostedStarted', $hostedStarted);
-                $this->hostedFieldsData($this->orderId, true);
-                $payment_details = $result->payment_details;
-                $payment_details['order_id'] = $this->orderId;
-                $payment_details['secret_key'] = $this->secretKey;
-                $result->set_payment_details($payment_details);
-                $result->set_status('pending');
-            }
+            // Blocks: always run hostedFieldsData on every Place Order attempt.
+            // Each Store API request is a separate HTTP call so there is no
+            // risk of the hook firing twice in the same request.
+            // We do NOT clear hostedPayload here — the cache-match guard
+            // inside hostedFieldsData() compares the full JSON payload
+            // (which includes the order ID in more_info) and will naturally
+            // miss when the order or amounts change.  When the payload IS
+            // identical (e.g. immediate retry with same data), skipping the
+            // Update API call saves ~5 seconds.
+            WC()->session->set('hostedStarted', 1);
+
+            $this->hostedFieldsData($this->orderId, true);
+            $payment_details = $result->payment_details;
+            $payment_details['order_id'] = $this->orderId;
+            $payment_details['secret_key'] = $this->secretKey;
+            $result->set_payment_details($payment_details);
+            $result->set_status('pending');
         } else {
             if (!in_array($context->payment_method, $this->settings['gateways'])) {
                 return;

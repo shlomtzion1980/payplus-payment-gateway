@@ -553,7 +553,7 @@ hf.Upon("pp_responseFromServer", (e) => {
         showError(e.detail.data.message, "");
         jQuery(".blocks-payplus_loader_hosted").fadeOut();
         overlay(true);
-        isCheckout ? location.reload() : null;
+        !isCheckout ? location.reload() : null;
         return;
     }
 

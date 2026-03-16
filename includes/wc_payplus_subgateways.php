@@ -596,9 +596,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
-        add_action('wp_ajax_reset-hosted-blocks', [$this, 'resetHostedBlocks']);
-        add_action('wp_ajax_nopriv_reset-hosted-blocks', [$this, 'resetHostedBlocks']);
-        
         // Support tokenization for saved cards
         $this->supports = array_merge($this->supports, ['tokenization']);
     }
@@ -710,25 +707,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             'message' => 'regenerate sent',
             'order_id' => $order_id
         ));
-    }
-
-    /**
-     * Blocks-only reset: clear stale session state so hostedFieldsData() runs
-     * again on the next Place Order, but KEEP page_request_uid + hostedFieldsUUID
-     * so the existing PayPlus page is Updated (not re-Created) and the
-     * client-side hosted-fields iframe stays valid.
-     */
-    public function resetHostedBlocks()
-    {
-        check_ajax_referer('frontNonce', '_ajax_nonce');
-
-        WC()->session->set('hostedStarted', false);
-        WC()->session->set('hostedPayload', false);
-        WC()->session->set('hostedTimeStamp', false);
-        WC()->session->__unset('order_awaiting_payment');
-
-        $this->payplus_add_log_all('hosted-fields-data', 'Reset hosted blocks session (kept page_request_uid + hostedFieldsUUID)');
-        wp_send_json_success(array('message' => 'hosted blocks session reset'));
     }
 
     public function getHostedPayload()

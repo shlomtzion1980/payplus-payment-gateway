@@ -172,23 +172,6 @@ if (isCheckout || hasOrder) {
      * change payment method and click "Place Order" again without reloading.
      */
     function resetCheckoutState() {
-        // Reset server-side hosted-fields session so the next Place Order
-        // gets a fresh hostedFieldsData() call with updated amount/order.
-        // Uses reset-hosted-blocks (not regenerate-hosted-link) to KEEP
-        // page_request_uid + hostedFieldsUUID — the Update API will reuse
-        // the same PayPlus page the iframe already points to.
-        // Must check _paymentPageActive BEFORE clearing it below.
-        if (_paymentPageActive || document.querySelector('.blocks-payplus_loader_hosted[style*="display: block"]')) {
-            jQuery.ajax({
-                type: 'POST',
-                url: payplus_script.ajax_url,
-                data: {
-                    action: 'reset-hosted-blocks',
-                    _ajax_nonce: payplus_script.frontNonce,
-                },
-            });
-        }
-
         _paymentPageActive = false;
 
         // Stop any running poll
@@ -620,6 +603,22 @@ if (isCheckout || hasOrder) {
                         parentDiv.style.display = "none";
                     }
                 }
+                // Show hosted-fields loader as soon as checkout starts processing
+                // (before the Store API response arrives) so the user gets
+                // immediate visual feedback instead of waiting 5+ seconds.
+                if (
+                    activePaymentMethod.search("payplus-payment-gateway-hostedfields") === 0 &&
+                    store.isProcessing && store.isProcessing()
+                ) {
+                    var hfLoaderEl = document.querySelector('.blocks-payplus_loader_hosted');
+                    if (hfLoaderEl && hfLoaderEl.style.display !== 'block') {
+                        hfLoaderEl.style.display = 'block';
+                        document.body.style.overflow = 'hidden';
+                        document.body.style.backgroundColor = 'white';
+                        document.body.style.opacity = '0.7';
+                    }
+                }
+
                 if (store.hasError()) {
                     try {
                         let getPaymentResult = payment.getPaymentResult();
@@ -711,11 +710,14 @@ if (isCheckout || hasOrder) {
                         inputs.forEach((input) => {
                             input.disabled = true;
                         });
-                        hf.Upon("pp_responseFromServer", (e) => {
-                            if (e.detail.errors || e.detail?.data?.error || e.detail?.data?.status === "reject") {
-                                resetCheckoutState();
-                            }
-                        });
+                        if (!window._ppHfResponseHandlerRegistered) {
+                            window._ppHfResponseHandlerRegistered = true;
+                            hf.Upon("pp_responseFromServer", (e) => {
+                                if (e.detail.errors || e.detail?.data?.error || e.detail?.data?.status === "reject") {
+                                    resetCheckoutState();
+                                }
+                            });
+                        }
                         return;
                     }
 
