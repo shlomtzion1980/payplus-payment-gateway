@@ -172,6 +172,23 @@ if (isCheckout || hasOrder) {
      * change payment method and click "Place Order" again without reloading.
      */
     function resetCheckoutState() {
+        // Reset server-side hosted-fields session so the next Place Order
+        // gets a fresh hostedFieldsData() call with updated amount/order.
+        // Uses reset-hosted-blocks (not regenerate-hosted-link) to KEEP
+        // page_request_uid + hostedFieldsUUID — the Update API will reuse
+        // the same PayPlus page the iframe already points to.
+        // Must check _paymentPageActive BEFORE clearing it below.
+        if (_paymentPageActive || document.querySelector('.blocks-payplus_loader_hosted[style*="display: block"]')) {
+            jQuery.ajax({
+                type: 'POST',
+                url: payplus_script.ajax_url,
+                data: {
+                    action: 'reset-hosted-blocks',
+                    _ajax_nonce: payplus_script.frontNonce,
+                },
+            });
+        }
+
         _paymentPageActive = false;
 
         // Stop any running poll
@@ -682,7 +699,7 @@ if (isCheckout || hasOrder) {
                             input.disabled = true;
                         });
                         hf.Upon("pp_responseFromServer", (e) => {
-                            if (e.detail.errors) {
+                            if (e.detail.errors || e.detail?.data?.error || e.detail?.data?.status === "reject") {
                                 resetCheckoutState();
                             }
                         });
