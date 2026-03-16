@@ -184,10 +184,18 @@ if (isCheckout || hasOrder) {
         var overlay = document.getElementById('overlay');
         if (overlay) overlay.remove();
 
-        // Restore body scroll
+        // Restore body scroll & appearance (also undoes hosted-fields dimming)
         document.body.style.overflow = '';
         document.body.style.backgroundColor = '';
         document.body.style.opacity = '';
+
+        // Hide hosted-fields loader if it was shown
+        var hfLoader = document.querySelector('.blocks-payplus_loader_hosted');
+        if (hfLoader) hfLoader.style.display = 'none';
+
+        // Re-enable any inputs that were disabled during hosted-fields submission
+        var disabledInputs = document.querySelectorAll('input:disabled');
+        disabledInputs.forEach(function (inp) { inp.disabled = false; });
 
         // Reset WC Blocks stores back to idle so the button re-enables
         try { _checkoutDispatch.__internalSetIdle(); } catch (e) {}
@@ -640,7 +648,7 @@ if (isCheckout || hasOrder) {
                         });
                         hf.Upon("pp_responseFromServer", (e) => {
                             if (e.detail.errors) {
-                                location.reload();
+                                resetCheckoutState();
                             }
                         });
                         return;
