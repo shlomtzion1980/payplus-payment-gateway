@@ -163,16 +163,22 @@ if (isCheckout || hasOrder) {
     // Will be assigned from within DOMContentLoaded so resetCheckoutState can re-attach the observer
     var _startObserving = null;
 
+    // True while an iframe/popup payment page is showing or hosted-fields is mid-submission.
+    // Used by the cart-total watcher to auto-reset when the total changes under an active payment.
+    var _paymentPageActive = false;
+
     /**
      * Reset the Blocks checkout state machine so the customer can
      * change payment method and click "Place Order" again without reloading.
      */
     function resetCheckoutState() {
+        _paymentPageActive = false;
+
         // Stop any running poll
         _payplusPollDone = true;
         _payplusPollStarted = false;
 
-        // Hide & clean up the iframe popup
+        // Hide & clean up the iframe popup (payment-page flows only)
         var ppIframes = document.querySelectorAll('.pp_iframe');
         ppIframes.forEach(function (el) {
             el.style.display = 'none';
@@ -193,9 +199,10 @@ if (isCheckout || hasOrder) {
         var hfLoader = document.querySelector('.blocks-payplus_loader_hosted');
         if (hfLoader) hfLoader.style.display = 'none';
 
-        // Re-enable any inputs that were disabled during hosted-fields submission
-        var disabledInputs = document.querySelectorAll('input:disabled');
-        disabledInputs.forEach(function (inp) { inp.disabled = false; });
+        // Hosted-fields: collapse the container so the observer re-opens it
+        // fresh (this refreshes the HF iframe with up-to-date order data).
+        var ppIframeH = document.getElementsByClassName('pp_iframe_h')[0];
+        if (ppIframeH) ppIframeH.style.display = 'none';
 
         // Reset WC Blocks stores back to idle so the button re-enables
         try { _checkoutDispatch.__internalSetIdle(); } catch (e) {}
@@ -209,6 +216,32 @@ if (isCheckout || hasOrder) {
             setTimeout(function () { _startObserving(); }, 150);
         }
     }
+
+    // -------------------------------------------------------------------
+    // Watch for cart-total changes while a payment page / hosted-fields
+    // session is active.  When the total changes the open page has stale
+    // data so we must tear it down and let the customer re-submit.
+    // -------------------------------------------------------------------
+    (function () {
+        var CART_KEY = window.wc.wcBlocksData.CART_STORE_KEY;
+        var cartSelect = wp.data.select(CART_KEY);
+        var lastTotal = null;
+
+        try { lastTotal = cartSelect.getCartTotals().total_price; } catch (e) {}
+
+        wp.data.subscribe(function () {
+            var currentTotal;
+            try { currentTotal = cartSelect.getCartTotals().total_price; } catch (e) { return; }
+
+            if (lastTotal !== null && currentTotal !== lastTotal && _paymentPageActive) {
+                console.log('PayPlus: cart total changed while payment page active — resetting');
+                lastTotal = currentTotal;
+                resetCheckoutState();
+                return;
+            }
+            lastTotal = currentTotal;
+        });
+    })();
 
     function addScriptApple() {
         if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
@@ -291,7 +324,10 @@ if (isCheckout || hasOrder) {
             return;
         }
         
-        // No TV effect, redirect immediately
+        // No TV effect — hide any visible payment iframe before navigating
+        // so samePageIframe doesn't flash out of position during redirect.
+        jQuery('.pp_iframe').hide();
+
         window.location.href = url;
     }
 
@@ -633,6 +669,7 @@ if (isCheckout || hasOrder) {
                             "payplus-payment-gateway-hostedfields"
                         ) === 0
                     ) {
+                        _paymentPageActive = true;
                         hf.SubmitPayment();
                         document.body.style.overflow = "hidden";
                         document.body.style.backgroundColor = "white";
@@ -765,6 +802,7 @@ if (isCheckout || hasOrder) {
     });
 
     function startIframe(paymentPageLink, overlay, loader) {
+        _paymentPageActive = true;
         document.body.appendChild(overlay);
         overlay.appendChild(loader);
         const activePaymentMethod = payment.getActivePaymentMethod();
