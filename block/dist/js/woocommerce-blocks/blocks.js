@@ -194,6 +194,10 @@ if (isCheckout || hasOrder) {
         // Stop any running poll
         _payplusPollDone = true;
         _payplusPollStarted = false;
+        if (_payplusPollTimerId) {
+            clearInterval(_payplusPollTimerId);
+            _payplusPollTimerId = null;
+        }
 
         // Hide & clean up the iframe popup (payment-page flows only)
         var ppIframes = document.querySelectorAll('.pp_iframe');
@@ -293,6 +297,7 @@ if (isCheckout || hasOrder) {
 
     // Prevent double redirects when both postMessage and polling fire
     var _payplusPollDone = false;
+    var _payplusPollTimerId = null;
     var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
 
     // Helper: trigger TV power-down effect before redirect (BLOCKS CHECKOUT)
@@ -371,6 +376,13 @@ if (isCheckout || hasOrder) {
         _payplusPollStarted = true;
         if (!result || !result.order_id || !result.order_received_url) return;
 
+        // Clear any previous poll so we start fresh for this order
+        if (_payplusPollTimerId) {
+            clearInterval(_payplusPollTimerId);
+            _payplusPollTimerId = null;
+        }
+        _payplusPollDone = false;
+
         var redirectUrl = result.order_received_url;
         var orderKey = '';
         try {
@@ -415,9 +427,10 @@ if (isCheckout || hasOrder) {
         }
 
         poll();
-        var pollTimer = setInterval(function () {
+        _payplusPollTimerId = setInterval(function () {
             if (_payplusPollDone) {
-                clearInterval(pollTimer);
+                clearInterval(_payplusPollTimerId);
+                _payplusPollTimerId = null;
                 return;
             }
             poll();

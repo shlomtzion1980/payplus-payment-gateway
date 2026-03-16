@@ -76,6 +76,7 @@ jQuery(function ($) {
     // ──────────────────────────────────────────────────────────────────────────
 
     var _payplusPollDone = false; // shared flag so postMessage can cancel polling
+    var _payplusPollTimerId = null;
     var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
 
     // Helper: trigger TV power-down effect before redirect (popup mode only)
@@ -137,6 +138,13 @@ jQuery(function ($) {
         if (!payplus_script_checkout.enableOrderStatusPoll) return;
         if (!result || !result.order_id || !result.order_received_url) return;
 
+        // Clear any previous poll so we start fresh for this order
+        if (_payplusPollTimerId) {
+            clearInterval(_payplusPollTimerId);
+            _payplusPollTimerId = null;
+        }
+        _payplusPollDone = false;
+
         var redirectUrl = result.order_received_url;
         var orderKey = '';
         try {
@@ -180,13 +188,22 @@ jQuery(function ($) {
 
         // First poll immediately, then every 1.5s
         poll();
-        var pollTimer = setInterval(function() {
+        _payplusPollTimerId = setInterval(function() {
             if (_payplusPollDone) {
-                clearInterval(pollTimer);
+                clearInterval(_payplusPollTimerId);
+                _payplusPollTimerId = null;
                 return;
             }
             poll();
         }, 1500);
+    }
+
+    function stopOrderStatusPoll() {
+        _payplusPollDone = true;
+        if (_payplusPollTimerId) {
+            clearInterval(_payplusPollTimerId);
+            _payplusPollTimerId = null;
+        }
     }
 
     //function to hide other payment methods when subscription order
@@ -1611,6 +1628,7 @@ jQuery(function ($) {
             $("#pp_iframe").length &&
             ($("#pp_iframe").is(":visible") || force === true)
         ) {
+            stopOrderStatusPoll();
             $("#pp_iframe").fadeOut(() => {
                 $(".payplus-option-description-area").show();
                 $("#place_order").prop("disabled", false);
@@ -1665,6 +1683,7 @@ jQuery(function ($) {
         ppIframe.append(getIframePayment(src, "100%", height));
         $("#closeFrame").on("click", function (e) {
             e.preventDefault();
+            stopOrderStatusPoll();
             ppIframe.style.display = "none";
         });
         $("#place_order").prop("disabled", true);
@@ -1717,6 +1736,9 @@ jQuery(function ($) {
                             this.elements.dialog.style.height =
                                 windowWidth > 568 ? "82%" : "100%";
                             this.elements.content.style.top = "25px";
+                        },
+                        onclose: function () {
+                            stopOrderStatusPoll();
                         },
                     },
                 };
