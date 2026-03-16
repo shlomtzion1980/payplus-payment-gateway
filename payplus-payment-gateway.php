@@ -111,6 +111,11 @@ class WC_PayPlus
         add_action('woocommerce_thankyou', [$this, 'payplus_clear_pw_gift_cards_session'], 10, 1);
         add_action('wp_footer', [$this, 'payplus_thankyou_iframe_redirect_script'], 5);
 
+        add_action('woocommerce_cart_calculate_fees', [$this, 'maybe_add_weight_estimate_fee']);
+
+        add_action('wp_ajax_payplus_set_payment_method', [$this, 'ajax_set_payment_method']);
+        add_action('wp_ajax_nopriv_payplus_set_payment_method', [$this, 'ajax_set_payment_method']);
+
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
@@ -1260,6 +1265,22 @@ class WC_PayPlus
      * payload and runs payPlusRemote() after the checkout form has already unblocked,
      * so the 7-10 s PayPlus API delay is hidden behind the loading overlay.
      */
+
+    /**
+     * AJAX: set the chosen_payment_method in the WC session.
+     * Used by Blocks checkout so that woocommerce_cart_calculate_fees can
+     * read the active payment method and conditionally add fees.
+     */
+    public function ajax_set_payment_method()
+    {
+        check_ajax_referer('frontNonce', '_ajax_nonce');
+        $method = isset($_POST['payment_method']) ? sanitize_text_field(wp_unslash($_POST['payment_method'])) : '';
+        if ($method && WC()->session) {
+            WC()->session->set('chosen_payment_method', $method);
+        }
+        wp_send_json_success();
+    }
+
     public function ajax_get_iframe_link()
     {
         check_ajax_referer('frontNonce', '_ajax_nonce');
@@ -1910,6 +1931,48 @@ body{
 <?php
                 $html = ob_get_clean();
                 echo wp_kses_post($html);
+            }
+
+            /**
+             * Conditionally add a "Weight Estimate" fee when Authorization (J5)
+             * mode is active, the admin setting is enabled, and the chosen
+             * payment method belongs to a PayPlus gateway.
+             *
+             * @param WC_Cart $cart
+             * @return void
+             */
+            public function maybe_add_weight_estimate_fee($cart)
+            {
+                if (is_admin() && !wp_doing_ajax()) {
+                    return;
+                }
+
+                $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+
+                if (empty($settings['transaction_type']) || $settings['transaction_type'] !== '2') {
+                    return;
+                }
+
+                if (empty($settings['j5_weight_estimate_enabled']) || $settings['j5_weight_estimate_enabled'] !== 'yes') {
+                    return;
+                }
+
+                $chosen = WC()->session ? WC()->session->get('chosen_payment_method', '') : '';
+                if (strpos($chosen, 'payplus-payment-gateway') !== 0) {
+                    return;
+                }
+
+                $percentage = isset($settings['j5_weight_estimate_percentage']) ? intval($settings['j5_weight_estimate_percentage']) : 5;
+
+                $base = floatval($cart->get_subtotal()) - floatval($cart->get_discount_total())
+                      + floatval($cart->get_subtotal_tax()) - floatval($cart->get_discount_tax())
+                      + floatval($cart->get_shipping_total()) + floatval($cart->get_shipping_tax());
+
+                $fee = $base * ($percentage / 100);
+
+                if ($fee > 0) {
+                    $cart->add_fee(__('Weight Estimate', 'payplus-payment-gateway'), $fee, false);
+                }
             }
 
             /**

@@ -681,6 +681,25 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Transaction amount change', 'payplus-payment-gateway'),
                 'description' => __('Choose this to be able to charge a different amount higher/lower than the order total (A number field will appear beside the "Make Paymet" button)', 'payplus-payment-gateway'),
             ],
+            'j5_weight_estimate_enabled' => [
+                'title' => __('Edit J5 Cart amount by percentage', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => __('Add a Weight Estimate fee as a percentage of the cart total', 'payplus-payment-gateway'),
+                'description' => __('When enabled, a "Weight Estimate" fee line will be added to the cart when a PayPlus gateway is selected.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'j5_weight_estimate_percentage' => [
+                'title' => __('Weight Estimate Percentage', 'payplus-payment-gateway'),
+                'type' => 'select',
+                'options' => [
+                    '5'  => '5%',
+                    '10' => '10%',
+                    '15' => '15%',
+                    '20' => '20%',
+                ],
+                'default' => '5',
+            ],
             'checkout_page_title' => [
                 'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',
