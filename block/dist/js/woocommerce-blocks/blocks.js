@@ -284,15 +284,20 @@ if (isCheckout || hasOrder) {
         if (_payplusTvEffectInProgress) {
             return;
         }
-        
-        // Only apply TV effect if:
-        // 1. Feature is enabled (popupTvEffect setting)
-        // 2. .pp_iframe container exists
-        // 3. viewMode is popupIframe (trust the setting, not the CSS)
+
+        // Resolve the actual displayMode for the active payment method
+        var activeMode = '';
+        try {
+            var am = payment.getActivePaymentMethod();
+            var amData = window.wc.wcSettings.getPaymentMethodData(am);
+            activeMode = (amData && amData[am + '-settings'] && amData[am + '-settings'].displayMode) || '';
+        } catch (e) {}
+
+        // TV effect only for popupIframe
         if (
             payPlusGateWay && 
             payPlusGateWay.popupTvEffect &&
-            payPlusGateWay.viewMode === 'popupIframe' &&
+            activeMode === 'popupIframe' &&
             jQuery('.pp_iframe').length > 0
         ) {
             _payplusTvEffectInProgress = true;
@@ -300,7 +305,6 @@ if (isCheckout || hasOrder) {
             
             var $popup = jQuery('.pp_iframe');
             
-            // FORCE the correct popup positioning (in case something overrode it)
             $popup.css({
                 'position': 'fixed',
                 'top': '50%',
@@ -309,23 +313,17 @@ if (isCheckout || hasOrder) {
                 'z-index': '100000'
             });
             
-            // Add TV closing class to the .pp_iframe container div
             $popup.addClass('tv-closing-blocks');
-            
-            // Force a reflow to ensure CSS is applied
             $popup[0].offsetHeight;
             
-            // Wait for animation to complete (1000ms) then redirect
             setTimeout(function() {
                 window.location.href = url;
             }, 1050);
             
-            // IMPORTANT: Return without redirecting immediately
             return;
         }
         
-        // No TV effect — hide any visible payment iframe before navigating
-        // so samePageIframe doesn't flash out of position during redirect.
+        // All other modes — hide the iframe instantly before navigating
         jQuery('.pp_iframe').hide();
 
         window.location.href = url;
