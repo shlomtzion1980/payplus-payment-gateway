@@ -295,7 +295,7 @@ jQuery(function ($) {
                         ).hide();
                         const mainPayPlus =
                             "payment_method_payplus-payment-gateway";
-                        $("input#" + mainPayPlus).prop("checked", true);
+                        $("input#" + mainPayPlus).trigger("click");
                     }, 1000);
                 }
             }
@@ -481,6 +481,7 @@ jQuery(function ($) {
                 selectedPaymentMethod !== wc_checkout_form.selectedPaymentMethod
             ) {
                 $(document.body).trigger("payment_method_selected");
+                $(document.body).trigger("update_checkout", { update_shipping_method: false });
             }
 
             wc_checkout_form.selectedPaymentMethod = selectedPaymentMethod;

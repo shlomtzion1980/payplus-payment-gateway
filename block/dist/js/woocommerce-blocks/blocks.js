@@ -247,6 +247,59 @@ if (isCheckout || hasOrder) {
         });
     })();
 
+    // -------------------------------------------------------------------
+    // Watch for payment-method changes in Blocks checkout.  When the
+    // customer picks a different gateway we update chosen_payment_method
+    // in the WC session so woocommerce_cart_calculate_fees can decide
+    // whether to add the Weight Estimate fee, then invalidate the cart
+    // so totals refresh.  Also fires once on initial load so the session
+    // is in sync with the auto-selected method after a page reload.
+    // -------------------------------------------------------------------
+    (function () {
+        var CART_KEY = window.wc.wcBlocksData.CART_STORE_KEY;
+        var lastMethod = null;
+        var synced = false;
+
+        function syncMethod(method) {
+            var ajaxUrl = payPlusGateWay.ajax_url || (window.payplus_script && window.payplus_script.ajax_url);
+            var nonce = payPlusGateWay.frontNonce || (window.payplus_script && window.payplus_script.frontNonce);
+            if (!ajaxUrl || !method) return;
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'payplus_set_payment_method',
+                    _ajax_nonce: nonce,
+                    payment_method: method
+                },
+                success: function () {
+                    try {
+                        wp.data.dispatch(CART_KEY).invalidateResolutionForStoreSelector('getCartData');
+                    } catch (ignore) {}
+                }
+            });
+        }
+
+        wp.data.subscribe(function () {
+            var currentMethod;
+            try { currentMethod = payment.getActivePaymentMethod(); } catch (e) { return; }
+            if (!currentMethod) return;
+
+            if (!synced) {
+                synced = true;
+                lastMethod = currentMethod;
+                syncMethod(currentMethod);
+                return;
+            }
+
+            if (currentMethod !== lastMethod) {
+                lastMethod = currentMethod;
+                syncMethod(currentMethod);
+            }
+        });
+    })();
+
     function addScriptApple() {
         if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
             const script = document.createElement("script");
