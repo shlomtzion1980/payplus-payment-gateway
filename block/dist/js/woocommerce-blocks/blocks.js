@@ -199,10 +199,10 @@ if (isCheckout || hasOrder) {
         var hfLoader = document.querySelector('.blocks-payplus_loader_hosted');
         if (hfLoader) hfLoader.style.display = 'none';
 
-        // Hosted-fields: collapse the container so the observer re-opens it
-        // fresh (this refreshes the HF iframe with up-to-date order data).
-        var ppIframeH = document.getElementsByClassName('pp_iframe_h')[0];
-        if (ppIframeH) ppIframeH.style.display = 'none';
+        // Re-enable inputs that hosted-fields disabled before submission
+        document.querySelectorAll('input:disabled').forEach(function (inp) {
+            inp.disabled = false;
+        });
 
         // Reset WC Blocks stores back to idle so the button re-enables
         try { _checkoutDispatch.__internalSetIdle(); } catch (e) {}
