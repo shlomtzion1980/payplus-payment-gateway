@@ -300,6 +300,43 @@ if (isCheckout || hasOrder) {
         });
     })();
 
+    // -------------------------------------------------------------------
+    // Inject the Weight Estimate fee message below the fee row in Blocks
+    // checkout, mirroring the woocommerce_cart_totals_fee_html filter
+    // used for classic checkout.
+    // -------------------------------------------------------------------
+    (function () {
+        var feeName = payPlusGateWay.weightEstimateFeeName;
+        var feeMessage = payPlusGateWay.weightEstimateFeeMessage;
+        if (!feeMessage) return;
+
+        var observer = new MutationObserver(function () {
+            var feeRows = document.querySelectorAll('.wc-block-components-totals-fees .wc-block-components-totals-item');
+            if (!feeRows.length) {
+                feeRows = document.querySelectorAll('.wc-block-components-totals-item');
+            }
+            feeRows.forEach(function (row) {
+                var label = row.querySelector('.wc-block-components-totals-item__label');
+                if (!label) return;
+                if (label.textContent.trim() !== feeName) return;
+                if (row.querySelector('.pp-weight-estimate-msg')) return;
+
+                var msg = document.createElement('small');
+                msg.className = 'pp-weight-estimate-msg';
+                msg.style.cssText = 'display:block;font-size:0.8em;opacity:0.8;margin-top:2px;';
+                msg.textContent = feeMessage;
+                var desc = row.querySelector('.wc-block-components-totals-item__description');
+                if (desc) {
+                    desc.appendChild(msg);
+                } else {
+                    label.parentNode.appendChild(msg);
+                }
+            });
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    })();
+
     function addScriptApple() {
         if (isMyScriptLoaded(payPlusGateWay.importApplePayScript)) {
             const script = document.createElement("script");
