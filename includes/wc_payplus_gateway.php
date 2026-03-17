@@ -3115,6 +3115,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function get_payment_page($res)
     {
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        if (!empty($settings['prevent_double_render']) && $settings['prevent_double_render'] === 'yes') {
+            static $already_rendered = false;
+            if ($already_rendered) {
+                return;
+            }
+            $already_rendered = true;
+        }
+
         if (!$this->display_mode || $this->display_mode == 'default') {
             $mainPluginOptions = get_option('woocommerce_payplus-payment-gateway_settings');
             $this->display_mode = ($mainPluginOptions['display_mode'] ?: 'redirect');
