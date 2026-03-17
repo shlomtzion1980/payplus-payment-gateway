@@ -720,6 +720,14 @@ class WC_PayPlus_Form_Fields
                 'type' => 'title',
                 'description' => __('Setup for the woocommerce checkout page.', 'payplus-payment-gateway'),
             ],
+            'prevent_double_render' => [
+                'title' => __('Prevent double render of payment page', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'label' => __('Prevent duplicate payment page iframes on the receipt page', 'payplus-payment-gateway'),
+                'description' => __('Enable this if you see duplicate payment iframes on the receipt page (common with Elementor or other page builders).', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
             'hide_icon' => [
                 'title' => __('Hide PayPlus Icon', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
