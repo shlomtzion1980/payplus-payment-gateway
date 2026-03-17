@@ -908,13 +908,19 @@ if (
         jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage").closest("tr").fadeOut();
+        jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_name").closest("tr").fadeOut();
+        jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_message").closest("tr").fadeOut();
     } else {
         jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization").closest("tr").fadeIn();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").closest("tr").fadeIn();
         if (jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").is(":checked")) {
             jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage").closest("tr").fadeIn();
+            jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_name").closest("tr").fadeIn();
+            jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_message").closest("tr").fadeIn();
         } else {
             jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage").closest("tr").fadeOut();
+            jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_name").closest("tr").fadeOut();
+            jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_message").closest("tr").fadeOut();
         }
     }
     //display API mode
@@ -973,6 +979,12 @@ function payplusMenusDisplay() {
     const $j5WeightPercentage = jQuery(
         "#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage"
     );
+    const $j5WeightName = jQuery(
+        "#woocommerce_payplus-payment-gateway_j5_weight_estimate_name"
+    );
+    const $j5WeightMessage = jQuery(
+        "#woocommerce_payplus-payment-gateway_j5_weight_estimate_message"
+    );
 
     $transactionType.change(function (e) {
         if (Number(e.target.value) === 2) {
@@ -980,19 +992,27 @@ function payplusMenusDisplay() {
             $j5WeightEnabled.closest("tr").fadeIn();
             if ($j5WeightEnabled.is(":checked")) {
                 $j5WeightPercentage.closest("tr").fadeIn();
+                $j5WeightName.closest("tr").fadeIn();
+                $j5WeightMessage.closest("tr").fadeIn();
             }
         } else {
             $checkAmountAuthorization.closest("tr").fadeOut();
             $j5WeightEnabled.closest("tr").fadeOut();
             $j5WeightPercentage.closest("tr").fadeOut();
+            $j5WeightName.closest("tr").fadeOut();
+            $j5WeightMessage.closest("tr").fadeOut();
         }
     });
 
     $j5WeightEnabled.change(function () {
         if (jQuery(this).is(":checked")) {
             $j5WeightPercentage.closest("tr").fadeIn();
+            $j5WeightName.closest("tr").fadeIn();
+            $j5WeightMessage.closest("tr").fadeIn();
         } else {
             $j5WeightPercentage.closest("tr").fadeOut();
+            $j5WeightName.closest("tr").fadeOut();
+            $j5WeightMessage.closest("tr").fadeOut();
         }
     });
 

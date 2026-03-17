@@ -700,6 +700,21 @@ class WC_PayPlus_Form_Fields
                 ],
                 'default' => '5',
             ],
+            'j5_weight_estimate_name' => [
+                'title' => __('Weight Estimate Fee Name', 'payplus-payment-gateway'),
+                'type' => 'text',
+                'default' => __('Weight Estimate', 'payplus-payment-gateway'),
+                'description' => __('The label shown for the fee line in the cart and checkout.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'j5_weight_estimate_message' => [
+                'title' => __('Weight Estimate Message', 'payplus-payment-gateway'),
+                'type' => 'textarea',
+                'default' => '',
+                'description' => __('Optional message displayed below the fee line in the cart and checkout.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'css' => 'width: 400px; height: 65px;',
+            ],
             'checkout_page_title' => [
                 'title' => __('Checkout Page Options', 'payplus-payment-gateway'),
                 'type' => 'title',

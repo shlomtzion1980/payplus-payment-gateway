@@ -692,7 +692,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             ],
             'gateways' => $this->settings['gateways'],
             'customIcons' => $this->customIcons,
-            'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : ''
+            'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : '',
+            'weightEstimateFeeName' => !empty($this->payPlusSettings['j5_weight_estimate_name']) ? $this->payPlusSettings['j5_weight_estimate_name'] : __('Weight Estimate', 'payplus-payment-gateway'),
+            'weightEstimateFeeMessage' => !empty($this->payPlusSettings['j5_weight_estimate_message']) ? $this->payPlusSettings['j5_weight_estimate_message'] : '',
         ];
     }
 }

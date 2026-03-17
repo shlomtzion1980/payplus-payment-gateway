@@ -119,6 +119,7 @@ class WC_PayPlus
         //FILTER
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('woocommerce_available_payment_gateways', [$this, 'payplus_applepay_disable_manager']);
+        add_filter('woocommerce_cart_totals_fee_html', [$this, 'weight_estimate_fee_html'], 10, 2);
         add_filter('cron_schedules', [$this, 'payplus_add_custom_cron_schedule']);
         add_filter('pwgc_redeeming_session_data', [$this, 'modify_gift_card_session_data'], 10, 2);
 
@@ -1971,8 +1972,30 @@ body{
                 $fee = $base * ($percentage / 100);
 
                 if ($fee > 0) {
-                    $cart->add_fee(__('Weight Estimate', 'payplus-payment-gateway'), $fee, false);
+                    $fee_name = !empty($settings['j5_weight_estimate_name'])
+                        ? $settings['j5_weight_estimate_name']
+                        : __('Weight Estimate', 'payplus-payment-gateway');
+                    $cart->add_fee($fee_name, $fee, false);
                 }
+            }
+
+            /**
+             * Append the admin-defined message below the Weight Estimate fee
+             * line in the cart / checkout order review table.
+             */
+            public function weight_estimate_fee_html($cart_totals_fee_html, $fee)
+            {
+                $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                $fee_name = !empty($settings['j5_weight_estimate_name'])
+                    ? $settings['j5_weight_estimate_name']
+                    : __('Weight Estimate', 'payplus-payment-gateway');
+
+                if ($fee->name === $fee_name && !empty($settings['j5_weight_estimate_message'])) {
+                    $message = esc_html($settings['j5_weight_estimate_message']);
+                    $cart_totals_fee_html .= '<br><small style="font-size:0.8em;opacity:0.8;">' . $message . '</small>';
+                }
+
+                return $cart_totals_fee_html;
             }
 
             /**
