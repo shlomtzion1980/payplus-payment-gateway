@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.5
+Stable tag: 8.1.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,6 +86,17 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+== 8.1.6  - 18-03-2026 =
+
+- Fix       - PayPlus payment gateway now displays correctly in the WooCommerce Blocks checkout page editor (resolved "payment methods not supported" message).
+- Feature   - Blocks checkout: closing a payment page (iframe/popup) or re-selecting a payment method no longer requires a full page reload.
+- Fix       - Blocks checkout: PayPlus Embedded (hosted fields) no longer requires a full page reload on payment failure or when coupons/gift cards change.
+- Fix       - Order status polling now stops correctly when a payment page is closed or the cart total changes (both Classic and Blocks checkout).
+- Feature   - J5 Weight Estimate: added a configurable percentage-based cart fee (5%–20%) for Authorization (J5) mode, visible only when a PayPlus gateway is selected.
+- Feature   - J5 Weight Estimate: customizable fee name and optional description message displayed below the fee line.
+- Feature   - New option to prevent double rendering of the payment page iframe on the receipt page (common with Elementor or other page builders).
+- Tweak     - Removed TV power-down effect feature.
+
 == 8.1.5  - 15-03-2026 =
 
 - Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
@@ -102,51 +113,5 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 8.1.4  - 10-03-2026 =
 
 - Fix       - Fixed an issue where redirect URLs after payment could be malformed (& converted to &amp;), potentially causing broken thank-you page loads or missing order details.
-
-== 8.1.3  - 25-02-2026 =
-
-- Fix       - Resolved "Redirect" and "Next page iframe" display issues on the order-pay page for specific customer environments caused by an unnecessary static flag preventing proper rendering.
-- Feature   - Added inline loader to PayPlus Embedded "Place Order" button, providing immediate visual feedback during payment processing for improved user experience. 
-- Tweak     - Addressed WordPress Plugin Check (PCP) compliance requirements.
-- Fix       - Improved Invoice+ error message handling on the orders page to properly display API error details.
-
-== 8.1.2  - 24-02-2026 =
-
-- Feature   - Full PW Gift Cards integration for Blocks Checkout across all PayPlus payment methods, including correct discount handling, order totals, and debit timing.
-- Fix       - PW Gift Cards discount now applied correctly in Iframe (next page) and Redirect modes in Blocks Checkout, consistent with Popup and Same-Page Iframe behavior.
-- Feature   - Added option to mark the Customer Invoice Name field as required in both Classic and Blocks Checkout.
-- Feature   - Added option to set a custom label and placeholder for the Customer Invoice Name field in both Classic and Blocks Checkout.
-- Tweak     - PayPlus Embedded loader: when "Hide PayPlus logo when showing loader" is enabled, "Processing Payment..." (or its Hebrew translation) is now always centered in the loader and displayed clearly.
-
-== 8.1.1  - 23-02-2026 =
-
-- Fix       - TV power-down effect in Blocks Checkout is now driven by the plugin setting rather than CSS positioning, ensuring it triggers reliably regardless of theme styles.
-- Tweak     - Blocks Checkout popup and same-page iframe modes now open instantly — the PayPlus payment page link is fetched asynchronously after checkout submission instead of blocking the Store API response.
-
-== 8.1.0  - 22-02-2026 =
-
-- Fix       - Improved redirect handling across all browsers with a unified solution, eliminating the need for browser-specific settings and checkboxes.
-- Tweak     - Added translated "Payment received - redirecting..." screen that appears briefly when using fallback redirect method.
-- Fix       - Resolved issue where changing delivery method in classic checkout would incorrectly switch the selected payment method in the payment list.
-- Tweak     - Callback handler now processes orders in "failed" status (in addition to "pending") since callbacks occur after order creation and payment.
-- Added     - Optional TV power-down effect for popup iframe mode. When enabled via plugin settings, displays a classic CRT television shutdown animation before redirecting to thank you page.
-- Fix       - Order payment method now reflects the actual payment method used (e.g., credit card, Google Pay, Bit) rather than the initially selected gateway, ensuring accuracy in WooCommerce order details and invoices.
-
-== 8.0.9  - 18-02-2026 =
-
-- Fix       - Fixed default setting for Firefox-compatible redirect mode - polling fallback is now enabled by default as intended.
-
-== 8.0.7  - 18-02-2026 =
-
-- Tweak     - Added automatic polling fallback for iframe payment redirects in both blocks and classic checkouts. This ensures reliable redirects for Firefox users and other scenarios where the iframe cannot communicate via postMessage. The system polls the server for order completion status and redirects to the thank-you page automatically.
-- Fix       - Fixed EMV POS device functionality issue when only one admin user was configured.
-
-- Tweak - Improved the `payPlusRemote()` function to better handle `$payload` issues.
-- Tweak - Removed outdated logs and deprecated API calls.
-- Tweak - Optimized payment page logic to reuse existing pages when possible, reducing unnecessary API requests.
-- Tweak - Corrected inaccurate status reporting in "Orders Reports/Validator".
-- Tweak - Streamlined `callback_response` by removing redundant functions and passing data directly instead of using SQL.
-- Added - When "Update status in IPN" is enabled, the callback function will skip status updates and related checks.
-- Added - Disallow voucher payment for shipping - Enforce a minimum amount for non-voucher payments: voucher payments can no longer be used to pay for shipping, preventing customers from covering delivery costs with vouchers.
 
 [See changelog for all versions](https://plugins.svn.wordpress.org/payplus-payment-gateway/trunk/CHANGELOG.md).
