@@ -549,14 +549,6 @@ hf.Upon("pp_responseFromServer", (e) => {
         ? true
         : false;
 
-    if (e.detail?.data?.error || e.detail?.data?.status === "reject") {
-        showError(e.detail.data.message, "");
-        jQuery(".blocks-payplus_loader_hosted").fadeOut();
-        overlay(true);
-        !isCheckout ? location.reload() : null;
-        return;
-    }
-
     if (e.detail.errors) {
         let errorMessage =
             e.detail.errors[0].message === null
