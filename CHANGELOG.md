@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.6]  - 18-03-2026 - (Scary Good)
+
+- Fix       - PayPlus payment gateway now displays correctly in the WooCommerce Blocks checkout page editor (resolved "payment methods not supported" message).
+- Feature   - Blocks checkout: closing a payment page (iframe/popup) or re-selecting a payment method no longer requires a full page reload.
+- Fix       - Blocks checkout: PayPlus Embedded (hosted fields) no longer requires a full page reload on payment failure or when coupons/gift cards change.
+- Fix       - Order status polling now stops correctly when a payment page is closed or the cart total changes (both Classic and Blocks checkout).
+- Feature   - J5 Weight Estimate: added a configurable percentage-based cart fee (5%–20%) for Authorization (J5) mode, visible only when a PayPlus gateway is selected.
+- Feature   - J5 Weight Estimate: customizable fee name and optional description message displayed below the fee line.
+- Feature   - New option to prevent double rendering of the payment page iframe on the receipt page (common with Elementor or other page builders).
+- Tweak     - Removed TV power-down effect feature.
+
 ## [8.1.5]  - 15-03-2026 - (Stella)
 
 - Feature   - Added VAT selection prompt for partial refunds, allowing admins to choose whether the refunded amount includes VAT or is VAT-exempt.
