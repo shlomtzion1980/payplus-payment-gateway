@@ -943,7 +943,7 @@ class WC_PayPlus
             if ($current_hour >= $hour - 2) {
                 $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
                 $paymentPageUid = !empty($pruid_history);
-                $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 1;
+                $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 0;
                 if ($paymentPageUid && $payPlusCronTested < 5) {
                     ++$payPlusCronTested;
                     if ($status === 'cancelled' || $status === 'wc-cancelled') {
