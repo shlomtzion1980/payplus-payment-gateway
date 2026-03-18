@@ -77,41 +77,8 @@ jQuery(function ($) {
 
     var _payplusPollDone = false; // shared flag so postMessage can cancel polling
     var _payplusPollTimerId = null;
-    var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
 
-    // Helper: trigger TV power-down effect before redirect (popup mode only)
-    function redirectWithTvEffect(url) {
-        // Prevent multiple calls
-        if (_payplusTvEffectInProgress) {
-            return;
-        }
-        
-        // Only apply TV effect if:
-        // 1. Feature is enabled (popupTvEffect setting)
-        // 2. Display mode is popupIframe
-        // 3. Alertify popup exists
-        if (
-            payplus_script_checkout.popupTvEffect &&
-            payplus_script_checkout.viewMode === 'popupIframe' &&
-            typeof alertify !== 'undefined' &&
-            jQuery('.alertify').length > 0
-        ) {
-            _payplusTvEffectInProgress = true;
-            _payplusPollDone = true; // Stop polling from redirecting
-            
-            // Add TV closing class to trigger animation on .ajs-dialog
-            jQuery('.alertify').addClass('tv-closing');
-            
-            // Wait for animation to complete (1000ms) then redirect
-            setTimeout(function() {
-                window.location.href = url;
-            }, 1050);
-            
-            // IMPORTANT: Return without redirecting immediately
-            return;
-        }
-        
-        // No TV effect, redirect immediately
+    function payplusRedirect(url) {
         window.location.href = url;
     }
 
@@ -126,7 +93,7 @@ jQuery(function ($) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
-                redirectWithTvEffect(e.data.url);
+                payplusRedirect(e.data.url);
             }
         } catch (err) {
             // ignore invalid URL
@@ -179,7 +146,7 @@ jQuery(function ($) {
                         var s = res.data.status;
                         if (s === 'processing' || s === 'completed' || s === 'wc-processing' || s === 'wc-completed') {
                             _payplusPollDone = true;
-                            redirectWithTvEffect(res.data.redirect_url || redirectUrl);
+                            payplusRedirect(res.data.redirect_url || redirectUrl);
                         }
                     }
                 },
@@ -1211,9 +1178,9 @@ jQuery(function ($) {
                                         -1 ===
                                         result.redirect.indexOf("http://")
                                     ) {
-                                        redirectWithTvEffect(result.redirect);
+                                        payplusRedirect(result.redirect);
                                     } else {
-                                        redirectWithTvEffect(decodeURI(result.redirect));
+                                        payplusRedirect(decodeURI(result.redirect));
                                     }
                                 } else if ("failure" === result.result) {
                                     throw "Result failure";

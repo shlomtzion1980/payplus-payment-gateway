@@ -371,56 +371,9 @@ if (isCheckout || hasOrder) {
     // Prevent double redirects when both postMessage and polling fire
     var _payplusPollDone = false;
     var _payplusPollTimerId = null;
-    var _payplusTvEffectInProgress = false; // flag to prevent multiple redirects during TV effect
 
-    // Helper: trigger TV power-down effect before redirect (BLOCKS CHECKOUT)
-    function redirectWithTvEffect(url) {
-        // Prevent multiple calls
-        if (_payplusTvEffectInProgress) {
-            return;
-        }
-
-        // Resolve the actual displayMode for the active payment method
-        var activeMode = '';
-        try {
-            var am = payment.getActivePaymentMethod();
-            var amData = window.wc.wcSettings.getPaymentMethodData(am);
-            activeMode = (amData && amData[am + '-settings'] && amData[am + '-settings'].displayMode) || '';
-        } catch (e) {}
-
-        // TV effect only for popupIframe
-        if (
-            payPlusGateWay && 
-            payPlusGateWay.popupTvEffect &&
-            activeMode === 'popupIframe' &&
-            jQuery('.pp_iframe').length > 0
-        ) {
-            _payplusTvEffectInProgress = true;
-            _payplusPollDone = true; // Stop polling from redirecting
-            
-            var $popup = jQuery('.pp_iframe');
-            
-            $popup.css({
-                'position': 'fixed',
-                'top': '50%',
-                'left': '50%',
-                'transform': 'translate(-50%, -50%)',
-                'z-index': '100000'
-            });
-            
-            $popup.addClass('tv-closing-blocks');
-            $popup[0].offsetHeight;
-            
-            setTimeout(function() {
-                window.location.href = url;
-            }, 1050);
-            
-            return;
-        }
-        
-        // All other modes — hide the iframe instantly before navigating
+    function payplusRedirect(url) {
         jQuery('.pp_iframe').hide();
-
         window.location.href = url;
     }
 
@@ -434,7 +387,7 @@ if (isCheckout || hasOrder) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
-                redirectWithTvEffect(e.data.url);
+                payplusRedirect(e.data.url);
             }
         } catch (err) {
             // ignore invalid URL
@@ -492,7 +445,7 @@ if (isCheckout || hasOrder) {
                         if (status === 'processing' || status === 'completed' ||
                             status === 'wc-processing' || status === 'wc-completed') {
                             _payplusPollDone = true;
-                            redirectWithTvEffect(response.data.redirect_url || redirectUrl);
+                            payplusRedirect(response.data.redirect_url || redirectUrl);
                         }
                     }
                 }
