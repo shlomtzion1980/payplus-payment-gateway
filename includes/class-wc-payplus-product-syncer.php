@@ -15,6 +15,106 @@ class WC_PayPlus_Product_Syncer
     {
         add_action('wp_ajax_payplus_get_products_json', [__CLASS__, 'ajax_get_products_json']);
         add_action('wp_ajax_payplus_send_products_to_gateway', [__CLASS__, 'ajax_send_products_to_gateway']);
+
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        if (!empty($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes') {
+            add_action('rest_api_init', [__CLASS__, 'register_rest_routes']);
+        }
+    }
+
+    /**
+     * Register REST API routes for the product syncer.
+     */
+    public static function register_rest_routes()
+    {
+        register_rest_route('payplus/v1', '/products', [
+            'methods'             => 'GET',
+            'callback'            => [__CLASS__, 'rest_get_products'],
+            'permission_callback' => [__CLASS__, 'rest_permission_check'],
+            'args'                => [
+                'page' => [
+                    'default'           => 1,
+                    'sanitize_callback' => 'absint',
+                    'validate_callback' => function ($value) {
+                        return is_numeric($value) && intval($value) >= 1;
+                    },
+                ],
+                'per_page' => [
+                    'default'           => 50,
+                    'sanitize_callback' => 'absint',
+                    'validate_callback' => function ($value) {
+                        return is_numeric($value) && intval($value) >= 1 && intval($value) <= 200;
+                    },
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * Permission check for the REST endpoint.
+     * Validates the request via PayPlus API key + secret key sent in the Authorization header.
+     */
+    public static function rest_permission_check(WP_REST_Request $request)
+    {
+        $auth_header = $request->get_header('Authorization');
+        if (empty($auth_header)) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('Missing Authorization header.', 'payplus-payment-gateway'),
+                ['status' => 401]
+            );
+        }
+
+        $credentials = json_decode($auth_header, true);
+        if (!is_array($credentials) || empty($credentials['api_key']) || empty($credentials['secret_key'])) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('Invalid Authorization format. Expected JSON with api_key and secret_key.', 'payplus-payment-gateway'),
+                ['status' => 401]
+            );
+        }
+
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $test_mode = isset($settings['api_test_mode']) && $settings['api_test_mode'] === 'yes';
+
+        $stored_api_key    = $test_mode ? ($settings['dev_api_key'] ?? '') : ($settings['api_key'] ?? '');
+        $stored_secret_key = $test_mode ? ($settings['dev_secret_key'] ?? '') : ($settings['secret_key'] ?? '');
+
+        if (
+            !hash_equals($stored_api_key, $credentials['api_key']) ||
+            !hash_equals($stored_secret_key, $credentials['secret_key'])
+        ) {
+            return new WP_Error(
+                'rest_forbidden',
+                __('Invalid API credentials.', 'payplus-payment-gateway'),
+                ['status' => 403]
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * REST callback — returns products in PayPlus Commerce Format with pagination.
+     */
+    public static function rest_get_products(WP_REST_Request $request)
+    {
+        $page     = $request->get_param('page');
+        $per_page = $request->get_param('per_page');
+        $offset   = ($page - 1) * $per_page;
+
+        $total_products = self::get_products_count();
+        $total_pages    = max(1, intval(ceil($total_products / $per_page)));
+        $products       = self::get_commerce_format_data($offset, $per_page);
+
+        return new WP_REST_Response([
+            'page'           => $page,
+            'per_page'       => $per_page,
+            'total_products' => $total_products,
+            'total_pages'    => $total_pages,
+            'products_count' => count($products),
+            'products'       => $products,
+        ], 200);
     }
 
     /**
@@ -1038,7 +1138,7 @@ class WC_PayPlus_Product_Syncer
             'tags_to_handle' => $tags,
             'media_to_handle' => $media,
             'external_id' => array(
-                'platform_id' => intval(3), // WooCommerce platform ID
+                'platform_id' => intval(2), // WooCommerce platform ID
                 'external_id' => strval($product_id),
                 'external_id_source_field' => 'id'
             ),
@@ -1107,7 +1207,7 @@ class WC_PayPlus_Product_Syncer
             ),
             'external_ids' => array(
                 array(
-                    'platform_id' => intval(3),
+                    'platform_id' => intval(2),
                     'external_id' => intval($product->get_id()),
                     'external_id_source_field' => strval('id')
                 )
@@ -1223,7 +1323,7 @@ class WC_PayPlus_Product_Syncer
                 ),
                 'external_ids' => array(
                     array(
-                        'platform_id' => intval(3),
+                        'platform_id' => intval(2),
                         'external_id' => intval($variation_id),
                         'external_id_source_field' => strval('id')
                     )
@@ -1702,7 +1802,7 @@ class WC_PayPlus_Product_Syncer
                 'pricing' => $pricing,
                 'external_ids' => array(
                     array(
-                        'platform_id' => 3,
+                        'platform_id' => 2,
                         'external_id' => intval($variant->get_id()), // Use intval to match numeric format
                         'external_id_source_field' => 'id'
                     )
