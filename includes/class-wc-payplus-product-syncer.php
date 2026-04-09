@@ -135,16 +135,18 @@ class WC_PayPlus_Product_Syncer
      * REST callback — receives activation token from PayPlus after app-install login.
      * POST /wp-json/payplus/v1/products/activated
      * Authorization: {"api_key":"...","secret_key":"..."}
-     * Body: {"token":"..."}
+     * Body: {"token":"...", "success": true, "message": "Activated Successfully"}
      */
     public static function rest_activated(WP_REST_Request $request)
     {
-        $body  = $request->get_json_params();
-        $token = isset($body['token']) ? sanitize_text_field($body['token']) : '';
+        $body    = $request->get_json_params();
+        $token   = isset($body['token']) ? sanitize_text_field($body['token']) : '';
+        $success = isset($body['success']) ? (bool) $body['success'] : false;
+        $message = isset($body['message']) ? sanitize_text_field($body['message']) : '';
 
         $logger = wc_get_logger();
         $logCtx = array('source' => 'payplus-product-syncer');
-        $logger->info('Activated callback received. Token: ' . ($token ? substr($token, 0, 8) . '...' : '(empty)'), $logCtx);
+        $logger->info('Activated callback received. Token: ' . ($token ? substr($token, 0, 8) . '...' : '(empty)') . ' | success: ' . ($success ? 'true' : 'false') . ' | message: ' . $message, $logCtx);
 
         if (empty($token)) {
             return new WP_Error(
@@ -160,7 +162,7 @@ class WC_PayPlus_Product_Syncer
 
         return new WP_REST_Response(array(
             'success' => true,
-            'message' => 'Product Syncer activated.',
+            'message' => 'Activated Successfully',
         ), 200);
     }
 
