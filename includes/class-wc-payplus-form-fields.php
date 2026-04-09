@@ -100,27 +100,27 @@ class WC_PayPlus_Form_Fields
         add_menu_page(
             __('PayPlus Gateway', 'payplus-payment-gateway'),
             __('PayPlus Gateway', 'payplus-payment-gateway'),
-            "administrator",
+            'administrator',
             'payplus-payment-gateway',
             ['WC_PayPlus_Form_Fields', 'getGateway'],
             PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-icon.svg"
         );
         add_submenu_page(
-            'payplus-payment-gateway', //Page Title
+            'payplus-payment-gateway',
             __('PayPlus Invoice+', 'payplus-payment-gateway'),
             __('PayPlus Invoice+', 'payplus-payment-gateway'),
-            'administrator', //Capability
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice' //Page slug
+            'administrator',
+            'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice'
         );
 
         if ($showInvoiceRunnerButton) {
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Invoice Runner Management', 'payplus-payment-gateway'),
                 __('Invoice Runner Management', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'payplus-invoice-runner-admin', //Page slug
-                ['WC_PayPlus', 'payplus_invoice_runner_admin_page'] //Callback function
+                'administrator',
+                'payplus-invoice-runner-admin',
+                ['WC_PayPlus', 'payplus_invoice_runner_admin_page']
             );
         }
         if ($showSubGatewaysOnSide) {
@@ -128,62 +128,62 @@ class WC_PayPlus_Form_Fields
                 'payplus-payment-gateway',
                 __('bit', 'payplus-payment-gateway'),
                 __('bit', 'payplus-payment-gateway'),
-                'administrator', //Capability
+                'administrator',
                 'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
             );
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Google Pay', 'payplus-payment-gateway'),
                 __('Google Pay', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay' //Page slug
+                'administrator',
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay'
             );
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Apple Pay', 'payplus-payment-gateway'),
                 __('Apple Pay', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay' //Page slug
+                'administrator',
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay'
             );
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('MULTIPASS', 'payplus-payment-gateway'),
                 __('MULTIPASS', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass' //Page slug
+                'administrator',
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass'
             );
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('PayPal', 'payplus-payment-gateway'),
                 __('PayPal', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal' //Page slug
+                'administrator',
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal'
             );
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Tav zahav', 'payplus-payment-gateway'),
                 __('Tav Zahav', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav' //Page slug
+                'administrator',
+                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav'
             );
         }
         if ($showOrdersButton) {
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
                 __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'runPayPlusOrdersChecker', //Page slug
+                'administrator',
+                'runPayPlusOrdersChecker',
                 [__CLASS__, 'runPayPlusOrdersChecker']
             );
         }
         if ($showPartnersFeatures) {
             add_submenu_page(
-                'payplus-payment-gateway', //Page Title
+                'payplus-payment-gateway',
                 __('Product Syncer', 'payplus-payment-gateway'),
                 __('Product Syncer', 'payplus-payment-gateway'),
-                'administrator', //Capability
-                'payplus-product-syncer', //Page slug
+                'administrator',
+                'payplus-product-syncer',
                 ['WC_PayPlus_Product_Syncer', 'render_product_syncer_page']
             );
         }

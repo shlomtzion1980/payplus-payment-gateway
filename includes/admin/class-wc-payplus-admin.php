@@ -178,6 +178,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 echo '<div class="notice notice-success is-dismissible"><p>' . esc_html($integrity_check_result) . '</p></div>';
             }
         });
+
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        if (!empty($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes'
+            && class_exists('WC_PayPlus_Product_Syncer')) {
+            echo '<hr style="margin: 30px 0;">';
+            WC_PayPlus_Product_Syncer::render_product_syncer_page();
+        }
     }
 
     public function makeTokenPayment()
