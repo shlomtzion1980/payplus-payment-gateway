@@ -79,6 +79,12 @@ class WC_PayPlus_Product_Syncer
             'callback'            => [__CLASS__, 'rest_update_inventory_bulk'],
             'permission_callback' => [__CLASS__, 'rest_permission_check'],
         ]);
+
+        register_rest_route('payplus/v1', '/products/activated', [
+            'methods'             => 'POST',
+            'callback'            => [__CLASS__, 'rest_activated'],
+            'permission_callback' => [__CLASS__, 'rest_permission_check'],
+        ]);
     }
 
     /**
@@ -123,6 +129,39 @@ class WC_PayPlus_Product_Syncer
         }
 
         return true;
+    }
+
+    /**
+     * REST callback — receives activation token from PayPlus after app-install login.
+     * POST /wp-json/payplus/v1/products/activated
+     * Authorization: {"api_key":"...","secret_key":"..."}
+     * Body: {"token":"..."}
+     */
+    public static function rest_activated(WP_REST_Request $request)
+    {
+        $body  = $request->get_json_params();
+        $token = isset($body['token']) ? sanitize_text_field($body['token']) : '';
+
+        $logger = wc_get_logger();
+        $logCtx = array('source' => 'payplus-product-syncer');
+        $logger->info('Activated callback received. Token: ' . ($token ? substr($token, 0, 8) . '...' : '(empty)'), $logCtx);
+
+        if (empty($token)) {
+            return new WP_Error(
+                'missing_token',
+                __('No token provided.', 'payplus-payment-gateway'),
+                array('status' => 400)
+            );
+        }
+
+        update_option('payplus_product_syncer_token', $token);
+
+        $logger->info('Product Syncer activated successfully. Token stored.', $logCtx);
+
+        return new WP_REST_Response(array(
+            'success' => true,
+            'message' => 'Product Syncer activated.',
+        ), 200);
     }
 
     /**
@@ -476,84 +515,97 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
-     * AJAX handler — activate the Product Syncer service on PayPlus side.
+     * AJAX handler — request app-install URL from PayPlus and return redirect URL.
      */
     public static function ajax_activate_product_syncer()
     {
         check_ajax_referer('payplus_product_sync', 'nonce');
 
         if (!current_user_can('manage_woocommerce')) {
-            wp_send_json_error(['message' => __('Insufficient permissions', 'payplus-payment-gateway')]);
+            wp_send_json_error(array('message' => __('Insufficient permissions', 'payplus-payment-gateway')));
         }
 
-        $options   = get_option('woocommerce_payplus-payment-gateway_settings');
-        $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
-        $apiKey    = $testMode ? ($options['dev_api_key'] ?? '') : ($options['api_key'] ?? '');
-        $secretKey = $testMode ? ($options['dev_secret_key'] ?? '') : ($options['secret_key'] ?? '');
-        $pageUid   = $testMode
-            ? ($options['dev_payment_page_id'] ?? '')
-            : ($options['payment_page_id'] ?? '');
+        try {
+            $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+            $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
+            $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
 
-        $payload = [
-            'payment_page_uid' => $pageUid,
-            'domain'           => home_url(),
-            'platform'         => 'woocommerce',
-        ];
+            $storeUrl = site_url('/');
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+            $url = add_query_arg('store_url', rawurlencode($storeUrl), 'https://henevent-gateway.invoiceplus.co.il/v1/api/wc-app/app-install');
 
-        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
-        $url = !empty($_POST['activation_url']) ? esc_url_raw(wp_unslash($_POST['activation_url'])) : self::get_activation_endpoint_url();
-
-        $args = [
-            'body'    => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
-            'timeout' => 60,
-            'headers' => [
+            $headers_arr = array(
                 'domain'        => home_url(),
-                'User-Agent'    => "WordPress $userAgent",
+                'User-Agent'    => 'WordPress ' . $userAgent,
                 'Content-Type'  => 'application/json',
                 'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
-            ],
-        ];
+            );
 
-        $logger = wc_get_logger();
-        $logCtx = ['source' => 'payplus-product-syncer'];
-        $logger->info('Activation handshake — URL: ' . $url, $logCtx);
+            $args = array(
+                'timeout' => 60,
+                'headers' => $headers_arr,
+            );
 
-        $response = wp_remote_post($url, $args);
+            $request_debug = array(
+                'method'  => 'GET',
+                'url'     => $url,
+                'headers' => $headers_arr,
+            );
 
-        if (is_wp_error($response)) {
-            $logger->error('Activation handshake — WP Error: ' . $response->get_error_message(), $logCtx);
-            wp_send_json_error(['message' => $response->get_error_message()]);
+            $logger = wc_get_logger();
+            $logCtx = array('source' => 'payplus-product-syncer');
+            $logger->info('App Install — URL: ' . $url, $logCtx);
+            $logger->info('App Install — store_url: ' . site_url('/'), $logCtx);
+
+            $response = wp_remote_get($url, $args);
+
+            if (is_wp_error($response)) {
+                $logger->error('App Install — WP Error: ' . $response->get_error_message(), $logCtx);
+                wp_send_json_error(array(
+                    'message' => $response->get_error_message(),
+                    'request' => $request_debug,
+                ));
+            }
+
+            $code = wp_remote_retrieve_response_code($response);
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+
+            $response_headers = array();
+            try {
+                $raw_headers = wp_remote_retrieve_headers($response);
+                if (is_object($raw_headers) && method_exists($raw_headers, 'getAll')) {
+                    $response_headers = $raw_headers->getAll();
+                } elseif ($raw_headers instanceof \ArrayIterator || $raw_headers instanceof \IteratorAggregate) {
+                    $response_headers = iterator_to_array($raw_headers);
+                } elseif (is_array($raw_headers)) {
+                    $response_headers = $raw_headers;
+                }
+            } catch (\Exception $e) {
+                $response_headers = array('_error' => 'Could not parse headers');
+            }
+
+            $logger->info('App Install — Response HTTP ' . $code . ': ' . substr($body, 0, 2000), $logCtx);
+
+            $result = array(
+                'status_code'      => $code,
+                'response'         => $data ? $data : $body,
+                'response_headers' => $response_headers,
+                'request'          => $request_debug,
+            );
+
+            if ($code >= 200 && $code < 300) {
+                wp_send_json_success($result);
+            } else {
+                $result['message'] = is_array($data) && !empty($data['message']) ? $data['message'] : __('Activation failed.', 'payplus-payment-gateway');
+                wp_send_json_error($result);
+            }
+        } catch (\Exception $e) {
+            wp_send_json_error(array('message' => 'PHP Exception: ' . $e->getMessage()));
+        } catch (\Error $e) {
+            wp_send_json_error(array('message' => 'PHP Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()));
         }
-
-        $code = wp_remote_retrieve_response_code($response);
-        $body = wp_remote_retrieve_body($response);
-        $data = json_decode($body, true);
-
-        $logger->info('Activation handshake — Response HTTP ' . $code . ': ' . substr($body, 0, 2000), $logCtx);
-
-        if ($code >= 200 && $code < 300 && is_array($data) && !empty($data['token'])) {
-            update_option('payplus_product_syncer_token', sanitize_text_field($data['token']));
-            wp_send_json_success([
-                'token'       => $data['token'],
-                'status_code' => $code,
-            ]);
-        } else {
-            $error_msg = is_array($data) && !empty($data['message']) ? $data['message'] : __('Activation failed. No token received.', 'payplus-payment-gateway');
-            wp_send_json_error([
-                'message'     => $error_msg,
-                'status_code' => $code,
-                'response'    => $data ?: $body,
-            ]);
-        }
-    }
-
-    /**
-     * Get the activation endpoint URL.
-     * Update this value when the final URL is known.
-     */
-    private static function get_activation_endpoint_url()
-    {
-        return 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/products/activate';
     }
 
     /**
@@ -572,9 +624,6 @@ class WC_PayPlus_Product_Syncer
         
         // Get sample products
         $sample_products = self::get_sample_products(10);
-
-        // Check activation status
-        $syncer_token = get_option('payplus_product_syncer_token', '');
 
         ?>
         <div class="wrap">
@@ -621,26 +670,21 @@ class WC_PayPlus_Product_Syncer
             <div class="payplus-syncer-activation" style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
                 <h2><?php echo esc_html__('Service Activation', 'payplus-payment-gateway'); ?></h2>
                 <div id="payplus-activation-area">
+                    <?php $syncer_token = get_option('payplus_product_syncer_token', ''); ?>
                     <?php if (!empty($syncer_token)) : ?>
                         <p style="color: green; font-weight: bold;">
                             <?php echo esc_html__('Service is activated.', 'payplus-payment-gateway'); ?>
                         </p>
                         <p>
                             <strong><?php echo esc_html__('Token:', 'payplus-payment-gateway'); ?></strong>
-                            <code id="payplus-syncer-token"><?php echo esc_html($syncer_token); ?></code>
+                            <code><?php echo esc_html(substr($syncer_token, 0, 16) . '...'); ?></code>
                         </p>
-                    <?php else : ?>
-                        <p><?php echo esc_html__('Activate the Product Syncer service to connect your store with PayPlus.', 'payplus-payment-gateway'); ?></p>
-                        <p style="margin-bottom: 12px;">
-                            <label for="payplus-activation-url"><strong><?php echo esc_html__('Activation Endpoint URL:', 'payplus-payment-gateway'); ?></strong></label><br>
-                            <input type="url" id="payplus-activation-url" style="width: 100%; max-width: 600px; margin-top: 4px;" placeholder="<?php echo esc_attr(self::get_activation_endpoint_url()); ?>" value="<?php echo esc_attr(self::get_activation_endpoint_url()); ?>" />
-                            <span class="description" style="display: block; margin-top: 4px;"><?php echo esc_html__('Change only if instructed by PayPlus.', 'payplus-payment-gateway'); ?></span>
-                        </p>
-                        <button type="button" id="payplus-activate-btn" class="button button-primary" style="padding: 8px 24px; font-size: 14px;">
-                            <?php echo esc_html__('Activate Product Syncer', 'payplus-payment-gateway'); ?>
-                        </button>
-                        <span id="payplus-activation-status" style="margin-left: 10px; display: none;"></span>
                     <?php endif; ?>
+                    <p><?php echo esc_html__('Connect your store with PayPlus Product Syncer.', 'payplus-payment-gateway'); ?></p>
+                    <button type="button" id="payplus-activate-btn" class="button button-primary" style="padding: 8px 24px; font-size: 14px;">
+                        <?php echo esc_html__('Activate Product Syncer', 'payplus-payment-gateway'); ?>
+                    </button>
+                    <span id="payplus-activation-status" style="margin-left: 10px; display: none;"></span>
                 </div>
             </div>
 
@@ -692,42 +736,86 @@ class WC_PayPlus_Product_Syncer
                 var $btn = $(this);
                 var $status = $('#payplus-activation-status');
 
-                if (!confirm('<?php echo esc_js(__('Activate Product Syncer service on PayPlus?', 'payplus-payment-gateway')); ?>')) {
-                    return;
-                }
-
-                var customUrl = $('#payplus-activation-url').val().trim();
-                if (!customUrl) {
-                    $status.show().css('color', 'red').text('<?php echo esc_js(__('Please enter an activation endpoint URL.', 'payplus-payment-gateway')); ?>');
-                    return;
-                }
-
                 $btn.prop('disabled', true);
-                $status.show().css('color', '#666').text('<?php echo esc_js(__('Activating...', 'payplus-payment-gateway')); ?>');
+                $status.show().css('color', '#666').text('<?php echo esc_js(__('Connecting...', 'payplus-payment-gateway')); ?>');
 
                 $.ajax({
                     url: ajaxurl,
                     type: 'POST',
                     data: {
                         action: 'payplus_activate_product_syncer',
-                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>',
-                        activation_url: customUrl
+                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>'
                     },
                     success: function(response) {
+                        $btn.prop('disabled', false);
+                        var d = response.data || {};
+                        var html = '';
+
+                        // Build request debug block
+                        var reqInfo = d.request || {};
+                        html += '<div style="margin-top:8px;">';
+                        html += '<strong><?php echo esc_js(__('Request:', 'payplus-payment-gateway')); ?></strong>';
+                        html += '<pre style="background:#f5f5f5;border:1px solid #ddd;padding:8px;margin:4px 0 10px;max-height:200px;overflow:auto;font-size:12px;white-space:pre-wrap;">';
+                        html += $('<span>').text(
+                            (reqInfo.method || 'GET') + ' ' + (reqInfo.url || '') + '\n\n' +
+                            'Headers:\n' + JSON.stringify(reqInfo.headers || {}, null, 2) + '\n\n' +
+                            'Body:\n' + JSON.stringify(reqInfo.body || {}, null, 2)
+                        ).html();
+                        html += '</pre>';
+
+                        // Build response debug block
+                        html += '<strong><?php echo esc_js(__('Response:', 'payplus-payment-gateway')); ?> HTTP ' + (d.status_code || '?') + '</strong>';
+                        var respHeaders = d.response_headers || {};
+                        var respBody = d.response || '';
+                        var respRaw = typeof respBody === 'object' ? JSON.stringify(respBody, null, 2) : respBody;
+                        html += '<pre style="background:#f5f5f5;border:1px solid #ddd;padding:8px;margin:4px 0 10px;max-height:300px;overflow:auto;font-size:12px;white-space:pre-wrap;">';
+                        html += $('<span>').text(
+                            'Headers:\n' + JSON.stringify(respHeaders, null, 2) + '\n\n' +
+                            'Body:\n' + respRaw
+                        ).html();
+                        html += '</pre>';
+
                         if (response.success) {
-                            var html = '<p style="color: green; font-weight: bold;">';
-                            html += '<?php echo esc_js(__('Service is activated.', 'payplus-payment-gateway')); ?>';
-                            html += '</p><p><strong><?php echo esc_js(__('Token:', 'payplus-payment-gateway')); ?></strong> ';
-                            html += '<code id="payplus-syncer-token">' + $('<span>').text(response.data.token).html() + '</code></p>';
-                            $('#payplus-activation-area').html(html);
+                            var data = d.response || d;
+                            var redirectUrl = '';
+
+                            // Check response headers for Location redirect
+                            if (respHeaders.location) {
+                                redirectUrl = respHeaders.location;
+                            }
+
+                            if (!redirectUrl) {
+                                if (typeof data === 'string') {
+                                    var urlMatch = data.match(/https?:\/\/[^\s"'<>]+/);
+                                    if (urlMatch) redirectUrl = urlMatch[0];
+                                } else if (typeof data === 'object') {
+                                    redirectUrl = data.redirect_url || data.url || data.redirect
+                                        || data.redirectUrl || data.login_url || data.loginUrl
+                                        || data.link || data.location || '';
+                                }
+                            }
+
+                            if (redirectUrl) {
+                                html = '<p><span style="color:green;font-weight:bold;"><?php echo esc_js(__('Ready!', 'payplus-payment-gateway')); ?></span> <a href="' + redirectUrl + '" target="_blank" style="font-weight:bold;"><?php echo esc_js(__('Click here to login', 'payplus-payment-gateway')); ?></a></p>' + html;
+                                $status.html(html);
+                                window.open(redirectUrl, '_blank');
+                            } else {
+                                html = '<p style="color:#666;"><?php echo esc_js(__('No redirect URL found in response.', 'payplus-payment-gateway')); ?></p>' + html;
+                                $status.html(html);
+                            }
                         } else {
-                            $btn.prop('disabled', false);
-                            $status.css('color', 'red').text('<?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + (response.data.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>'));
+                            var msg = d.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>';
+                            html = '<p style="color:red;font-weight:bold;"><?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + $('<span>').text(msg).html() + '</p>' + html;
+                            $status.html(html);
                         }
                     },
                     error: function(xhr, status, error) {
                         $btn.prop('disabled', false);
-                        $status.css('color', 'red').text('<?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error);
+                        var html = '<p style="color:red;font-weight:bold;"><?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + $('<span>').text(error).html() + '</p>';
+                        html += '<pre style="background:#fff5f5;border:1px solid #dcc;padding:8px;margin-top:6px;max-height:200px;overflow:auto;font-size:12px;white-space:pre-wrap;">';
+                        html += $('<span>').text('Status: ' + status + '\nHTTP: ' + xhr.status + ' ' + xhr.statusText + '\nResponse:\n' + (xhr.responseText || '(empty)')).html();
+                        html += '</pre>';
+                        $status.html(html);
                     }
                 });
             });
