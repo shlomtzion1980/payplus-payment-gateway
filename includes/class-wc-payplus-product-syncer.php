@@ -22,6 +22,7 @@ class WC_PayPlus_Product_Syncer
         add_action('wp_ajax_payplus_activate_product_syncer', [__CLASS__, 'ajax_activate_product_syncer']);
         add_action('wp_ajax_payplus_deactivate_product_syncer', [__CLASS__, 'ajax_deactivate_product_syncer']);
         add_action('wp_ajax_payplus_toggle_auto_sync', [__CLASS__, 'ajax_toggle_auto_sync']);
+        add_action('payplus_run_export_job', [__CLASS__, 'run_export_job'], 10, 1);
 
         $settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if (!empty($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes') {
@@ -290,12 +291,43 @@ class WC_PayPlus_Product_Syncer
 
         if (!file_exists($export_dir)) {
             wp_mkdir_p($export_dir);
+            // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
             @file_put_contents($export_dir . '/.htaccess', "Options -Indexes\n");
+        }
+
+        $job_id = wp_generate_password(16, false);
+
+        wp_schedule_single_event(time(), 'payplus_run_export_job', array($job_id));
+        spawn_cron();
+
+        return new WP_REST_Response(array(
+            'status'  => 'processing',
+            'job_id'  => $job_id,
+            'message' => __('Export started in background. Results will be posted to the gateway when complete.', 'payplus-payment-gateway'),
+        ), 202);
+    }
+
+    /**
+     * Background cron handler — runs the actual export and POSTs result to gateway.
+     *
+     * @param string $job_id Unique job identifier.
+     */
+    public static function run_export_job($job_id)
+    {
+        $logger = wc_get_logger();
+        $logCtx = array('source' => 'payplus-product-syncer');
+        $logger->info('Export job started — job_id: ' . $job_id, $logCtx);
+
+        $upload_dir = wp_upload_dir();
+        $export_dir = trailingslashit($upload_dir['basedir']) . 'payplus-exports';
+
+        if (!file_exists($export_dir)) {
+            wp_mkdir_p($export_dir);
         }
 
         $total_products = self::get_products_count();
         $batch_size     = 50;
-        $all_products   = [];
+        $all_products   = array();
         $offset         = 0;
 
         while ($offset < $total_products) {
@@ -304,31 +336,60 @@ class WC_PayPlus_Product_Syncer
             $offset += $batch_size;
         }
 
-        $token    = wp_generate_password(16, false);
-        $filename = 'payplus-products-' . gmdate('Y-m-d-His') . '-' . $token . '.json';
+        $filename = 'payplus-products-' . gmdate('Y-m-d-His') . '-' . $job_id . '.json';
         $filepath = trailingslashit($export_dir) . $filename;
 
+        // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
         $written = file_put_contents(
             $filepath,
             wp_json_encode($all_products, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)
         );
 
         if ($written === false) {
-            return new WP_Error(
-                'export_failed',
-                __('Failed to write export file.', 'payplus-payment-gateway'),
-                ['status' => 500]
-            );
+            $logger->error('Export job failed — could not write file: ' . $filepath, $logCtx);
+            return;
         }
 
         $download_url = trailingslashit($upload_dir['baseurl']) . 'payplus-exports/' . $filename;
 
-        return new WP_REST_Response([
-            'total_products' => count($all_products),
-            'file'           => $filename,
-            'download_url'   => $download_url,
-            'generated_at'   => gmdate('Y-m-d\TH:i:s\Z'),
-        ], 201);
+        $logger->info(sprintf('Export job complete — %d products, file: %s', count($all_products), $filename), $logCtx);
+
+        $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+        $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
+        $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
+        $pageUid   = $testMode
+            ? (isset($options['dev_payment_page_id']) ? $options['dev_payment_page_id'] : '')
+            : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
+
+        $payload = array(
+            'payment_page_uid' => $pageUid,
+            'job_id'           => $job_id,
+            'total_products'   => count($all_products),
+            'file'             => $filename,
+            'download_url'     => $download_url,
+            'generated_at'     => gmdate('Y-m-d\TH:i:s\Z'),
+        );
+
+        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/bulk-operation/products';
+        $args = array(
+            'body'    => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
+            'timeout' => 30,
+            'headers' => array(
+                'domain'        => home_url(),
+                'Content-Type'  => 'application/json',
+                'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+            ),
+        );
+
+        $response = wp_remote_post($url, $args);
+
+        if (is_wp_error($response)) {
+            $logger->error('Export job — gateway POST failed: ' . $response->get_error_message(), $logCtx);
+        } else {
+            $code = wp_remote_retrieve_response_code($response);
+            $logger->info('Export job — gateway POST response HTTP ' . $code, $logCtx);
+        }
     }
 
     /**
@@ -2761,15 +2822,15 @@ class WC_PayPlus_Product_Syncer
             return;
         }
 
-        $product_id = self::resolve_parent_id($product->get_id());
+        $product_id = $product->get_id();
 
-        $key = 'update_' . $product_id;
+        $key = 'stock_' . $product_id;
         if (isset(self::$sent_product_ids[$key])) {
             return;
         }
         self::$sent_product_ids[$key] = true;
 
-        self::send_single_product($product_id, '/products/update');
+        self::send_inventory_update($product);
     }
 
     public static function on_variation_stock_changed($variation)
@@ -2778,18 +2839,61 @@ class WC_PayPlus_Product_Syncer
             return;
         }
 
-        $parent_id = $variation->get_parent_id();
-        if (!$parent_id) {
-            return;
-        }
+        $variation_id = $variation->get_id();
 
-        $key = 'update_' . $parent_id;
+        $key = 'stock_' . $variation_id;
         if (isset(self::$sent_product_ids[$key])) {
             return;
         }
         self::$sent_product_ids[$key] = true;
 
-        self::send_single_product($parent_id, '/products/update');
+        self::send_inventory_update($variation);
+    }
+
+    /**
+     * Send a lightweight inventory update to the gateway.
+     * POST /v1/wc-hooks/inventory/update
+     *
+     * @param WC_Product $product The product or variation whose stock changed.
+     */
+    private static function send_inventory_update($product)
+    {
+        $product_id     = $product->get_id();
+        $stock_quantity = $product->get_stock_quantity();
+
+        $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+        $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
+        $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
+        $pageUid   = $testMode
+            ? (isset($options['dev_payment_page_id']) ? $options['dev_payment_page_id'] : '')
+            : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
+
+        $payload = array(
+            'payment_page_uid' => $pageUid,
+            'external_id'      => strval($product_id),
+            'stock_quantity'   => $stock_quantity !== null ? intval($stock_quantity) : 0,
+        );
+
+        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/inventory/update';
+        $args = array(
+            'body'      => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
+            'timeout'   => 0.01,
+            'blocking'  => false,
+            'headers'   => array(
+                'domain'        => home_url(),
+                'Content-Type'  => 'application/json',
+                'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+            ),
+        );
+
+        wp_remote_post($url, $args);
+
+        $logger = wc_get_logger();
+        $logger->info(
+            sprintf('Inventory webhook — #%d stock_quantity=%s to %s', $product_id, ($stock_quantity !== null ? $stock_quantity : 'null'), $url),
+            array('source' => 'payplus-product-syncer')
+        );
     }
 }
 
