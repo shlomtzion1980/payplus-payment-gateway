@@ -2002,6 +2002,7 @@ class WC_PayPlus_Product_Syncer
             'is_main' => boolval($is_main),
             'system_default' => boolval(false),
             'inventory_status' => strval($inventory_status),
+            'inventory_quantity' => $stock_quantity !== null ? intval($stock_quantity) : 0,
             'continue_selling_out_of_stock' => $continue_selling,
             'item_type' => strval('P'),
             'pricing' => array(
@@ -2022,7 +2023,7 @@ class WC_PayPlus_Product_Syncer
                 )
             ),
             'media' => self::transform_variant_media($product),
-            'properties' => array(), // Simple products don't have variant properties
+            'properties' => array(),
             'created_at' => $product->get_date_created() ? strval($product->get_date_created()->date('c')) : strval(gmdate('c')),
             'updated_at' => $product->get_date_modified() ? strval($product->get_date_modified()->date('c')) : strval(gmdate('c')),
             'deleted_at' => null,
@@ -2118,6 +2119,7 @@ class WC_PayPlus_Product_Syncer
                 'is_main' => boolval($is_first),
                 'system_default' => boolval(false),
                 'inventory_status' => strval($inventory_status),
+                'inventory_quantity' => $stock_quantity !== null ? intval($stock_quantity) : 0,
                 'continue_selling_out_of_stock' => $continue_selling,
                 'item_type' => strval('P'),
                 'pricing' => array(
@@ -2606,13 +2608,14 @@ class WC_PayPlus_Product_Syncer
                 'price' => floatval($price),
                 'value' => floatval($price),
                 'inventory_status' => $inventory_status,
+                'inventory_quantity' => $stock_quantity !== null ? intval($stock_quantity) : 0,
                 'continue_selling_out_of_stock' => $continue_selling,
                 'item_type' => 'P',
                 'pricing' => $pricing,
                 'external_ids' => array(
                     array(
                         'platform_id' => 2,
-                        'external_id' => intval($variant->get_id()), // Use intval to match numeric format
+                        'external_id' => intval($variant->get_id()),
                         'external_id_source_field' => 'id'
                     )
                 ),
