@@ -16,6 +16,7 @@ class WC_PayPlus_Product_Syncer
         add_action('wp_ajax_payplus_get_products_json', [__CLASS__, 'ajax_get_products_json']);
         add_action('wp_ajax_payplus_send_products_to_gateway', [__CLASS__, 'ajax_send_products_to_gateway']);
         add_action('wp_ajax_payplus_activate_product_syncer', [__CLASS__, 'ajax_activate_product_syncer']);
+        add_action('wp_ajax_payplus_deactivate_product_syncer', [__CLASS__, 'ajax_deactivate_product_syncer']);
 
         $settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if (!empty($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes') {
@@ -611,6 +612,84 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
+     * AJAX handler — deactivate (uninstall) the Product Syncer on PayPlus side.
+     */
+    public static function ajax_deactivate_product_syncer()
+    {
+        check_ajax_referer('payplus_product_sync', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(array('message' => __('Insufficient permissions', 'payplus-payment-gateway')));
+        }
+
+        try {
+            $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+            $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+            $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
+            $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
+
+            $storeUrl  = site_url('/');
+            $url       = 'https://henevent-gateway.invoiceplus.co.il/v1/api/wc-app/app-uninstall';
+
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+
+            $headers_arr = array(
+                'domain'        => home_url(),
+                'User-Agent'    => 'WordPress ' . $userAgent,
+                'Content-Type'  => 'application/json',
+                'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+            );
+
+            $payload = array(
+                'store_url' => $storeUrl,
+            );
+
+            $args = array(
+                'body'    => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
+                'timeout' => 60,
+                'headers' => $headers_arr,
+            );
+
+            $logger = wc_get_logger();
+            $logCtx = array('source' => 'payplus-product-syncer');
+            $logger->info('App Uninstall — URL: ' . $url, $logCtx);
+
+            $response = wp_remote_post($url, $args);
+
+            if (is_wp_error($response)) {
+                $logger->error('App Uninstall — WP Error: ' . $response->get_error_message(), $logCtx);
+                wp_send_json_error(array('message' => $response->get_error_message()));
+            }
+
+            $code = wp_remote_retrieve_response_code($response);
+            $body = wp_remote_retrieve_body($response);
+            $data = json_decode($body, true);
+
+            $logger->info('App Uninstall — Response HTTP ' . $code . ': ' . substr($body, 0, 2000), $logCtx);
+
+            if ($code >= 200 && $code < 300) {
+                delete_option('payplus_product_syncer_token');
+                $logger->info('Product Syncer deactivated. Token removed.', $logCtx);
+                wp_send_json_success(array(
+                    'status_code' => $code,
+                    'response'    => $data ? $data : $body,
+                ));
+            } else {
+                $error_msg = is_array($data) && !empty($data['message']) ? $data['message'] : __('Deactivation failed.', 'payplus-payment-gateway');
+                wp_send_json_error(array(
+                    'message'     => $error_msg,
+                    'status_code' => $code,
+                    'response'    => $data ? $data : $body,
+                ));
+            }
+        } catch (\Exception $e) {
+            wp_send_json_error(array('message' => 'PHP Exception: ' . $e->getMessage()));
+        } catch (\Error $e) {
+            wp_send_json_error(array('message' => 'PHP Error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()));
+        }
+    }
+
+    /**
      * Render the product syncer admin page
      *
      * @return void
@@ -681,11 +760,15 @@ class WC_PayPlus_Product_Syncer
                             <strong><?php echo esc_html__('Token:', 'payplus-payment-gateway'); ?></strong>
                             <code><?php echo esc_html(substr($syncer_token, 0, 16) . '...'); ?></code>
                         </p>
+                        <button type="button" id="payplus-deactivate-btn" class="button" style="padding: 8px 24px; font-size: 14px; background: #d63638; color: #fff; border-color: #d63638;">
+                            <?php echo esc_html__('Deactivate Product Syncer', 'payplus-payment-gateway'); ?>
+                        </button>
+                    <?php else : ?>
+                        <p><?php echo esc_html__('Connect your store with PayPlus Product Syncer.', 'payplus-payment-gateway'); ?></p>
+                        <button type="button" id="payplus-activate-btn" class="button button-primary" style="padding: 8px 24px; font-size: 14px;">
+                            <?php echo esc_html__('Activate Product Syncer', 'payplus-payment-gateway'); ?>
+                        </button>
                     <?php endif; ?>
-                    <p><?php echo esc_html__('Connect your store with PayPlus Product Syncer.', 'payplus-payment-gateway'); ?></p>
-                    <button type="button" id="payplus-activate-btn" class="button button-primary" style="padding: 8px 24px; font-size: 14px;">
-                        <?php echo esc_html__('Activate Product Syncer', 'payplus-payment-gateway'); ?>
-                    </button>
                     <span id="payplus-activation-status" style="margin-left: 10px; display: none;"></span>
                 </div>
             </div>
@@ -818,6 +901,41 @@ class WC_PayPlus_Product_Syncer
                         html += $('<span>').text('Status: ' + status + '\nHTTP: ' + xhr.status + ' ' + xhr.statusText + '\nResponse:\n' + (xhr.responseText || '(empty)')).html();
                         html += '</pre>';
                         $status.html(html);
+                    }
+                });
+            });
+
+            // Deactivation handler
+            $('#payplus-deactivate-btn').on('click', function() {
+                var $btn = $(this);
+                var $status = $('#payplus-activation-status');
+
+                if (!confirm('<?php echo esc_js(__('Are you sure you want to deactivate the Product Syncer?', 'payplus-payment-gateway')); ?>')) {
+                    return;
+                }
+
+                $btn.prop('disabled', true);
+                $status.show().css('color', '#666').text('<?php echo esc_js(__('Deactivating...', 'payplus-payment-gateway')); ?>');
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'payplus_deactivate_product_syncer',
+                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $status.css('color', 'green').text('<?php echo esc_js(__('Deactivated successfully. Reloading...', 'payplus-payment-gateway')); ?>');
+                            setTimeout(function() { location.reload(); }, 1500);
+                        } else {
+                            $btn.prop('disabled', false);
+                            $status.css('color', 'red').text('<?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + (response.data.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $btn.prop('disabled', false);
+                        $status.css('color', 'red').text('<?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error);
                     }
                 });
             });
