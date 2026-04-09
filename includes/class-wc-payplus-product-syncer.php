@@ -8,6 +8,10 @@ if (!defined('ABSPATH')) {
  */
 class WC_PayPlus_Product_Syncer
 {
+    private static $skip_stock_sync = false;
+
+    private static $sent_product_ids = array();
+
     /**
      * Constructor - Register AJAX handlers
      */
@@ -17,10 +21,21 @@ class WC_PayPlus_Product_Syncer
         add_action('wp_ajax_payplus_send_products_to_gateway', [__CLASS__, 'ajax_send_products_to_gateway']);
         add_action('wp_ajax_payplus_activate_product_syncer', [__CLASS__, 'ajax_activate_product_syncer']);
         add_action('wp_ajax_payplus_deactivate_product_syncer', [__CLASS__, 'ajax_deactivate_product_syncer']);
+        add_action('wp_ajax_payplus_toggle_auto_sync', [__CLASS__, 'ajax_toggle_auto_sync']);
 
         $settings = get_option('woocommerce_payplus-payment-gateway_settings');
         if (!empty($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes') {
             add_action('rest_api_init', [__CLASS__, 'register_rest_routes']);
+
+            $token     = get_option('payplus_product_syncer_token', '');
+            $auto_sync = get_option('payplus_product_syncer_auto_sync', 'no');
+            if (!empty($token) && $auto_sync === 'yes') {
+                add_action('woocommerce_new_product', [__CLASS__, 'on_product_created'], 10, 1);
+                add_action('woocommerce_update_product', [__CLASS__, 'on_product_updated'], 10, 1);
+                add_action('wp_trash_post', [__CLASS__, 'on_product_trashed'], 10, 1);
+                add_action('woocommerce_product_set_stock', [__CLASS__, 'on_product_stock_changed'], 10, 1);
+                add_action('woocommerce_variation_set_stock', [__CLASS__, 'on_variation_stock_changed'], 10, 1);
+            }
         }
     }
 
@@ -85,6 +100,25 @@ class WC_PayPlus_Product_Syncer
             'methods'             => 'POST',
             'callback'            => [__CLASS__, 'rest_activated'],
             'permission_callback' => [__CLASS__, 'rest_permission_check'],
+        ]);
+
+        register_rest_route('payplus/v1', '/products/(?P<id>\d+)', [
+            'methods'             => 'GET',
+            'callback'            => [__CLASS__, 'rest_get_single_product'],
+            'permission_callback' => [__CLASS__, 'rest_permission_check'],
+            'args'                => [
+                'id' => [
+                    'required'          => true,
+                    'sanitize_callback' => 'absint',
+                ],
+                'by' => [
+                    'default'           => 'id',
+                    'sanitize_callback' => 'sanitize_text_field',
+                    'validate_callback' => function ($value) {
+                        return in_array($value, ['id', 'external_id'], true);
+                    },
+                ],
+            ],
         ]);
     }
 
@@ -164,6 +198,61 @@ class WC_PayPlus_Product_Syncer
         return new WP_REST_Response(array(
             'success' => true,
             'message' => 'Activated Successfully',
+        ), 200);
+    }
+
+    /**
+     * REST callback — return a single product in PayPlus Commerce Format.
+     * GET /wp-json/payplus/v1/products/{id}
+     * Optional query: ?by=external_id  (default: by=id)
+     */
+    public static function rest_get_single_product(WP_REST_Request $request)
+    {
+        $lookup_id = absint($request->get_param('id'));
+        $by        = $request->get_param('by') ?: 'id';
+
+        if ($by === 'external_id') {
+            $product = wc_get_product($lookup_id);
+        } else {
+            $product = wc_get_product($lookup_id);
+        }
+
+        if (!$product) {
+            return new WP_Error(
+                'product_not_found',
+                /* translators: %d: product ID */
+                sprintf(__('Product %d not found.', 'payplus-payment-gateway'), $lookup_id),
+                array('status' => 404)
+            );
+        }
+
+        if ($product->is_type('variation')) {
+            $product = wc_get_product($product->get_parent_id());
+            if (!$product) {
+                return new WP_Error(
+                    'parent_not_found',
+                    __('Parent product not found for this variation.', 'payplus-payment-gateway'),
+                    array('status' => 404)
+                );
+            }
+        }
+
+        $options = get_option('woocommerce_payplus-payment-gateway_settings');
+        $company = array(
+            'id'   => isset($options['api_key']) ? crc32($options['api_key']) : 1,
+            'uuid' => isset($options['api_key']) ? md5($options['api_key']) : '',
+        );
+
+        $testMode = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+        $pageUid  = $testMode
+            ? (isset($options['dev_payment_page_id']) ? $options['dev_payment_page_id'] : '')
+            : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
+
+        $commerce_data = self::transform_to_commerce_format($product, $company);
+
+        return new WP_REST_Response(array(
+            'payment_page_uid' => $pageUid,
+            'products'         => array($commerce_data),
         ), 200);
     }
 
@@ -268,7 +357,8 @@ class WC_PayPlus_Product_Syncer
             );
         }
 
-        if (!@unlink($filepath)) {
+        wp_delete_file($filepath);
+        if (file_exists($filepath)) {
             return new WP_Error(
                 'delete_failed',
                 __('Failed to delete export file.', 'payplus-payment-gateway'),
@@ -381,6 +471,7 @@ class WC_PayPlus_Product_Syncer
         if (!$product) {
             return new WP_Error(
                 'product_not_found',
+                /* translators: %d: product ID */
                 sprintf(__('Product %d not found.', 'payplus-payment-gateway'), $product_id),
                 ['status' => 404]
             );
@@ -388,11 +479,13 @@ class WC_PayPlus_Product_Syncer
 
         $previous_qty = $product->get_stock_quantity();
 
+        self::$skip_stock_sync = true;
         wc_update_product_stock($product, $stock_quantity, 'set');
 
         $new_status = $stock_quantity > 0 ? 'instock' : 'outofstock';
         $product->set_stock_status($new_status);
         $product->save();
+        self::$skip_stock_sync = false;
 
         $logger = wc_get_logger();
         $logger->info(
@@ -426,7 +519,7 @@ class WC_PayPlus_Product_Syncer
 
         $offset = isset($_POST['offset']) ? intval($_POST['offset']) : 0;
         $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 50;
-        $format = isset($_POST['format']) ? sanitize_text_field($_POST['format']) : 'woocommerce';
+        $format = isset($_POST['format']) ? sanitize_text_field(wp_unslash($_POST['format'])) : 'woocommerce';
         $limit = max(10, min(200, $limit)); // Clamp between 10-200
 
         if ($format === 'commerce') {
@@ -459,6 +552,7 @@ class WC_PayPlus_Product_Syncer
             wp_send_json_error(['message' => __('Insufficient permissions', 'payplus-payment-gateway')]);
         }
 
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON payload validated by json_decode below.
         $raw = isset($_POST['products_json']) ? wp_unslash($_POST['products_json']) : '';
         $products = json_decode($raw, true);
         if (!is_array($products)) {
@@ -690,6 +784,22 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
+     * AJAX handler — toggle auto-sync option.
+     */
+    public static function ajax_toggle_auto_sync()
+    {
+        check_ajax_referer('payplus_product_sync', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(array('message' => __('Insufficient permissions', 'payplus-payment-gateway')));
+        }
+
+        $enabled = isset($_POST['enabled']) && $_POST['enabled'] === 'yes' ? 'yes' : 'no';
+        update_option('payplus_product_syncer_auto_sync', $enabled);
+        wp_send_json_success(array('auto_sync' => $enabled));
+    }
+
+    /**
      * Render the product syncer admin page
      *
      * @return void
@@ -697,7 +807,7 @@ class WC_PayPlus_Product_Syncer
     public static function render_product_syncer_page()
     {
         if (!current_user_can('manage_woocommerce')) {
-            wp_die(__('You do not have permission to access this page.', 'payplus-payment-gateway'));
+            wp_die(esc_html__('You do not have permission to access this page.', 'payplus-payment-gateway'));
         }
 
         // Get products count
@@ -763,6 +873,14 @@ class WC_PayPlus_Product_Syncer
                         <button type="button" id="payplus-deactivate-btn" class="button" style="padding: 8px 24px; font-size: 14px; background: #d63638; color: #fff; border-color: #d63638;">
                             <?php echo esc_html__('Deactivate Product Syncer', 'payplus-payment-gateway'); ?>
                         </button>
+
+                        <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
+                            <?php $auto_sync = get_option('payplus_product_syncer_auto_sync', 'no'); ?>
+                            <label>
+                                <input type="checkbox" id="payplus-auto-sync-checkbox" <?php checked($auto_sync, 'yes'); ?>>
+                                <?php echo esc_html__('Automatically sync product changes (create, update, delete, stock) to PayPlus', 'payplus-payment-gateway'); ?>
+                            </label>
+                        </div>
                     <?php else : ?>
                         <p><?php echo esc_html__('Connect your store with PayPlus Product Syncer.', 'payplus-payment-gateway'); ?></p>
                         <button type="button" id="payplus-activate-btn" class="button button-primary" style="padding: 8px 24px; font-size: 14px;">
@@ -936,6 +1054,19 @@ class WC_PayPlus_Product_Syncer
                     error: function(xhr, status, error) {
                         $btn.prop('disabled', false);
                         $status.css('color', 'red').text('<?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error);
+                    }
+                });
+            });
+
+            $('#payplus-auto-sync-checkbox').on('change', function() {
+                var enabled = $(this).is(':checked') ? 'yes' : 'no';
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'payplus_toggle_auto_sync',
+                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>',
+                        enabled: enabled
                     }
                 });
             });
@@ -2518,6 +2649,147 @@ class WC_PayPlus_Product_Syncer
     private static function get_product_attributes($product)
     {
         return self::get_product_attributes_complete($product);
+    }
+
+    // ── Product Sync Webhook Callbacks ──────────────────────────────
+
+    /**
+     * Send a single product to the PayPlus gateway in Commerce Format.
+     *
+     * @param int    $product_id    WooCommerce product (or parent) ID.
+     * @param string $endpoint_path e.g. '/products/create', '/products/update', '/products/delete'.
+     */
+    private static function send_single_product($product_id, $endpoint_path)
+    {
+        $product = wc_get_product($product_id);
+        if (!$product) {
+            return;
+        }
+
+        $options   = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode  = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
+        $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
+        $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
+        $pageUid   = $testMode
+            ? (isset($options['dev_payment_page_id']) ? $options['dev_payment_page_id'] : '')
+            : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
+
+        $company = array(
+            'id'   => isset($options['api_key']) ? crc32($options['api_key']) : 1,
+            'uuid' => isset($options['api_key']) ? md5($options['api_key']) : '',
+        );
+
+        $commerce_data = self::transform_to_commerce_format($product, $company);
+
+        $payload = array(
+            'payment_page_uid' => $pageUid,
+            'products'         => array($commerce_data),
+        );
+
+        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks' . $endpoint_path;
+        $args = array(
+            'body'      => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
+            'timeout'   => 0.01,
+            'blocking'  => false,
+            'headers'   => array(
+                'domain'        => home_url(),
+                'Content-Type'  => 'application/json',
+                'Authorization' => '{"api_key":"' . $apiKey . '","secret_key":"' . $secretKey . '"}',
+            ),
+        );
+
+        wp_remote_post($url, $args);
+
+        $logger = wc_get_logger();
+        $logger->info(
+            sprintf('Product webhook — %s #%d to %s', $endpoint_path, $product_id, $url),
+            array('source' => 'payplus-product-syncer')
+        );
+    }
+
+    /**
+     * Resolve a product ID to its parent if it is a variation.
+     *
+     * @param  int $product_id
+     * @return int The parent product ID, or the same ID if not a variation.
+     */
+    private static function resolve_parent_id($product_id)
+    {
+        $product = wc_get_product($product_id);
+        if ($product && $product->is_type('variation')) {
+            return $product->get_parent_id();
+        }
+        return $product_id;
+    }
+
+    public static function on_product_created($product_id)
+    {
+        $product = wc_get_product($product_id);
+        if (!$product || $product->is_type('variation')) {
+            return;
+        }
+        self::send_single_product($product_id, '/products/create');
+    }
+
+    public static function on_product_updated($product_id)
+    {
+        $product = wc_get_product($product_id);
+        if (!$product || $product->is_type('variation')) {
+            return;
+        }
+
+        $key = 'update_' . $product_id;
+        if (isset(self::$sent_product_ids[$key])) {
+            return;
+        }
+        self::$sent_product_ids[$key] = true;
+
+        self::send_single_product($product_id, '/products/update');
+    }
+
+    public static function on_product_trashed($post_id)
+    {
+        if (get_post_type($post_id) !== 'product') {
+            return;
+        }
+        self::send_single_product($post_id, '/products/delete');
+    }
+
+    public static function on_product_stock_changed($product)
+    {
+        if (self::$skip_stock_sync) {
+            return;
+        }
+
+        $product_id = self::resolve_parent_id($product->get_id());
+
+        $key = 'update_' . $product_id;
+        if (isset(self::$sent_product_ids[$key])) {
+            return;
+        }
+        self::$sent_product_ids[$key] = true;
+
+        self::send_single_product($product_id, '/products/update');
+    }
+
+    public static function on_variation_stock_changed($variation)
+    {
+        if (self::$skip_stock_sync) {
+            return;
+        }
+
+        $parent_id = $variation->get_parent_id();
+        if (!$parent_id) {
+            return;
+        }
+
+        $key = 'update_' . $parent_id;
+        if (isset(self::$sent_product_ids[$key])) {
+            return;
+        }
+        self::$sent_product_ids[$key] = true;
+
+        self::send_single_product($parent_id, '/products/update');
     }
 }
 
