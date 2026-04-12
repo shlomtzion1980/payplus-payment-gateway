@@ -239,15 +239,14 @@ class WC_PayPlus_Product_Syncer
         }
 
         $options = get_option('woocommerce_payplus-payment-gateway_settings');
-        $company = array(
-            'id'   => isset($options['api_key']) ? crc32($options['api_key']) : 1,
-            'uuid' => isset($options['api_key']) ? md5($options['api_key']) : '',
-        );
-
         $testMode = isset($options['api_test_mode']) && $options['api_test_mode'] === 'yes';
         $pageUid  = $testMode
             ? (isset($options['dev_payment_page_id']) ? $options['dev_payment_page_id'] : '')
             : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
+
+        $company = array(
+            'id' => $pageUid,
+        );
 
         $commerce_data = self::transform_to_commerce_format($product, $company);
 
@@ -1847,13 +1846,14 @@ class WC_PayPlus_Product_Syncer
         $products = wc_get_products($args);
         $products_data = array();
         
-        // Get PayPlus settings for company info
         $payplus_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-        $company_id = isset($payplus_settings['api_key']) ? crc32($payplus_settings['api_key']) : 1; // Generate pseudo company_id from API key
-        $company_uuid = isset($payplus_settings['api_key']) ? md5($payplus_settings['api_key']) : ''; // Generate pseudo company_uuid from API key
+        $testMode = isset($payplus_settings['api_test_mode']) && $payplus_settings['api_test_mode'] === 'yes';
+        $pageUid  = $testMode
+            ? (isset($payplus_settings['dev_payment_page_id']) ? $payplus_settings['dev_payment_page_id'] : '')
+            : (isset($payplus_settings['payment_page_id']) ? $payplus_settings['payment_page_id'] : '');
+
         $company = array(
-            'id' => $company_id,
-            'uuid' => $company_uuid,
+            'id' => $pageUid,
         );
         
         foreach ($products as $product) {
@@ -1867,7 +1867,7 @@ class WC_PayPlus_Product_Syncer
      * Transform WooCommerce product to PayPlus Commerce format
      *
      * @param WC_Product $product
-     * @param array $company Company info with 'id' and 'uuid'
+     * @param array $company Company info with 'id' (payment_page_uid)
      * @return array
      */
     private static function transform_to_commerce_format($product, $company)
@@ -1926,8 +1926,7 @@ class WC_PayPlus_Product_Syncer
         }
 
         $commerce_product = array(
-            'company_id' => intval($company['id']),
-            'company_uuid' => strval($company['uuid']),
+            'company_id' => strval($company['id']),
             'name' => strval($product->get_name()),
             'external_id' => strval($product_id),
             'description' => strval($description),
@@ -2742,8 +2741,7 @@ class WC_PayPlus_Product_Syncer
             : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
 
         $company = array(
-            'id'   => isset($options['api_key']) ? crc32($options['api_key']) : 1,
-            'uuid' => isset($options['api_key']) ? md5($options['api_key']) : '',
+            'id' => $pageUid,
         );
 
         $commerce_data = self::transform_to_commerce_format($product, $company);
