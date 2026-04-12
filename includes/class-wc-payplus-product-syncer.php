@@ -12,6 +12,16 @@ class WC_PayPlus_Product_Syncer
 
     private static $sent_product_ids = array();
 
+    private static function get_site_uid()
+    {
+        $uid = get_option('payplus_site_uid');
+        if (empty($uid)) {
+            $uid = wp_generate_uuid4();
+            add_option('payplus_site_uid', $uid, '', 'no');
+        }
+        return $uid;
+    }
+
     /**
      * Constructor - Register AJAX handlers
      */
@@ -245,7 +255,7 @@ class WC_PayPlus_Product_Syncer
             : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
 
         $company = array(
-            'id' => $pageUid,
+            'id' => self::get_site_uid(),
         );
 
         $commerce_data = self::transform_to_commerce_format($product, $company);
@@ -1853,7 +1863,7 @@ class WC_PayPlus_Product_Syncer
             : (isset($payplus_settings['payment_page_id']) ? $payplus_settings['payment_page_id'] : '');
 
         $company = array(
-            'id' => $pageUid,
+            'id' => self::get_site_uid(),
         );
         
         foreach ($products as $product) {
@@ -2741,7 +2751,7 @@ class WC_PayPlus_Product_Syncer
             : (isset($options['payment_page_id']) ? $options['payment_page_id'] : '');
 
         $company = array(
-            'id' => $pageUid,
+            'id' => self::get_site_uid(),
         );
 
         $commerce_data = self::transform_to_commerce_format($product, $company);
