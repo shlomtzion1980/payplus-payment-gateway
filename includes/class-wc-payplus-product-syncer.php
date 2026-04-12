@@ -1929,6 +1929,7 @@ class WC_PayPlus_Product_Syncer
             'company_id' => intval($company['id']),
             'company_uuid' => strval($company['uuid']),
             'name' => strval($product->get_name()),
+            'external_id' => strval($product_id),
             'description' => strval($description),
             'valid' => strtolower($product->get_status()) === 'publish',
             'vat_type' => $vat_type,
@@ -1946,10 +1947,12 @@ class WC_PayPlus_Product_Syncer
             'categories_to_handle' => $categories,
             'tags_to_handle' => $tags,
             'media_to_handle' => $media,
-            'external_id' => array(
-                'platform_id' => intval(2), // WooCommerce platform ID
-                'external_id' => strval($product_id),
-                'external_id_source_field' => 'id'
+            'external_ids' => array(
+                array(
+                    'platform_id' => intval(2),
+                    'external_id' => strval($product_id),
+                    'external_id_source_field' => 'id',
+                ),
             ),
             'source_type' => 'woocommerce',
         );
