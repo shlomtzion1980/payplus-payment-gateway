@@ -2237,6 +2237,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $items = $order->get_items(['line_item', 'fee', 'coupon']);
         if (count($items)) {
             foreach ($items as $item => $item_data) {
+                if ($item_data->get_type() === 'coupon') {
+                    continue;
+                }
                 $transactionTypeValue = get_post_meta($item_data['product_id'], 'payplus_transaction_type', true);
                 if ($transactionTypeValue == $checkChargemMethod) {
                     return true;
@@ -2452,6 +2455,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         foreach ($items as $item => $item_data) {
+            if ($item_data->get_type() === 'coupon') {
+                $couponName = str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_data->get_name()));
+                $allProductSku .= (empty($allProductSku)) ? " ( " . $couponName : ' , ' . $couponName;
+                continue;
+            }
+
             $discount = 0;
             $tempTaxValue = 0;
             $product = new WC_Product($item_data['product_id']);
@@ -2466,9 +2475,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ));
             $quantity = ($item_data['quantity'] ? round($item_data['quantity'], $this->rounding_decimals) : '1');
 
-            if ($item_data['type'] == "coupon") {
-                $allProductSku .= (empty($allProductSku)) ? " ( " . $name : ' , ' . $name;
-            } else {
                 if ($item_data['type'] == "fee") {
                     $productPrice = $item_data['line_total'];
                     if ($this->rounding_decimals != 0 && $wc_tax_enabled) {
@@ -2550,7 +2556,6 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 if ($productPrice) {
                     $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
                 }
-            }
         }
 
         if ($this->rounding_decimals == 0 && $order->get_total_tax()) {

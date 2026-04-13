@@ -733,6 +733,12 @@ class PayplusInvoice
         }
 
         foreach ($items as $item => $item_data) {
+            if ($this->couponAsProduct && $item_data->get_type() === 'coupon') {
+                $couponName = str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_data->get_name()));
+                $allProductSku .= (empty($allProductSku)) ? " ( " . $couponName : ' , ' . $couponName;
+                continue;
+            }
+
             $discount = 0;
             $product = new WC_Product($item_data['product_id']);
             $balanceName = WC_PayPlus_Meta_Data::get_meta($item_data['product_id'], 'payplus_balance_name', true);
@@ -752,9 +758,6 @@ class PayplusInvoice
                 'autop' => false
             ));
 
-            if ($this->couponAsProduct && $item_data['type'] === "coupon") {
-                $allProductSku .= (empty($allProductSku)) ? " ( " . $name : ' , ' . $name;
-            } else {
                 if ($item_data['type'] == "fee") {
                     $productPrice = $item_data['total'];
                     if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
@@ -838,7 +841,6 @@ class PayplusInvoice
                 }
 
                 $productsItems[] = $itemDetails;
-            }
         }
 
         $shipping_methods = $order->get_shipping_methods();
