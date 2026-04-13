@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.7]  - 20-04-2026
+
+- Fix       - Resolved WC_Order_Item_Coupon::offsetGet deprecation notice (since WooCommerce 4.4.0) when coupons are applied at checkout.
+
 ## [8.1.6]  - 18-03-2026 - (Scary Good)
 
 - Fix       - PayPlus payment gateway now displays correctly in the WooCommerce Blocks checkout page editor (resolved "payment methods not supported" message).
