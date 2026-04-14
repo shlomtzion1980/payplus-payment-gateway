@@ -44,6 +44,7 @@ class WC_PayPlus_Product_Syncer
                 add_action('woocommerce_new_product', [__CLASS__, 'on_product_created'], 10, 1);
                 add_action('woocommerce_update_product', [__CLASS__, 'on_product_updated'], 10, 1);
                 add_action('wp_trash_post', [__CLASS__, 'on_product_trashed'], 10, 1);
+                add_action('delete_post', [__CLASS__, 'on_variation_deleted'], 10, 1);
                 add_action('woocommerce_product_set_stock', [__CLASS__, 'on_product_stock_changed'], 10, 1);
                 add_action('woocommerce_variation_set_stock', [__CLASS__, 'on_variation_stock_changed'], 10, 1);
             }
@@ -2828,6 +2829,26 @@ class WC_PayPlus_Product_Syncer
             return;
         }
         self::send_single_product($post_id, '/products/delete');
+    }
+
+    public static function on_variation_deleted($post_id)
+    {
+        if (get_post_type($post_id) !== 'product_variation') {
+            return;
+        }
+
+        $parent_id = wp_get_post_parent_id($post_id);
+        if (!$parent_id) {
+            return;
+        }
+
+        $key = 'update_' . $parent_id;
+        if (isset(self::$sent_product_ids[$key])) {
+            return;
+        }
+        self::$sent_product_ids[$key] = true;
+
+        self::send_single_product($parent_id, '/products/update');
     }
 
     public static function on_product_stock_changed($product)
