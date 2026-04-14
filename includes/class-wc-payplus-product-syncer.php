@@ -2894,6 +2894,7 @@ class WC_PayPlus_Product_Syncer
     private static function send_inventory_update($product)
     {
         $product_id     = $product->get_id();
+        $parent_id      = $product->get_parent_id();
         $stock_quantity = $product->get_stock_quantity();
 
         $options   = get_option('woocommerce_payplus-payment-gateway_settings');
@@ -2906,6 +2907,8 @@ class WC_PayPlus_Product_Syncer
 
         $payload = array(
             'payment_page_uid' => $pageUid,
+            'company_id'       => self::get_site_uid(),
+            'parent_id'        => strval($parent_id ? $parent_id : $product_id),
             'external_id'      => strval($product_id),
             'stock_quantity'   => $stock_quantity !== null ? intval($stock_quantity) : 0,
         );
