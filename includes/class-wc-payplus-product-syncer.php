@@ -47,8 +47,12 @@ class WC_PayPlus_Product_Syncer
                 add_action('woocommerce_update_product', [__CLASS__, 'on_product_updated'], 10, 1);
                 add_action('wp_trash_post', [__CLASS__, 'on_product_trashed'], 10, 1);
                 add_action('delete_post', [__CLASS__, 'on_variation_deleted'], 10, 1);
-                add_action('woocommerce_reduce_order_stock', [__CLASS__, 'set_order_stock_context'], 10, 1);
-                add_action('woocommerce_restore_order_stock', [__CLASS__, 'set_order_stock_context'], 10, 1);
+                add_action('woocommerce_payment_complete', [__CLASS__, 'set_order_stock_context'], 5, 1);
+                add_action('woocommerce_order_status_completed', [__CLASS__, 'set_order_stock_context'], 5, 1);
+                add_action('woocommerce_order_status_processing', [__CLASS__, 'set_order_stock_context'], 5, 1);
+                add_action('woocommerce_order_status_on-hold', [__CLASS__, 'set_order_stock_context'], 5, 1);
+                add_action('woocommerce_order_status_cancelled', [__CLASS__, 'set_order_stock_context'], 5, 1);
+                add_action('woocommerce_order_status_pending', [__CLASS__, 'set_order_stock_context'], 5, 1);
                 add_action('woocommerce_product_set_stock', [__CLASS__, 'on_product_stock_changed'], 10, 1);
                 add_action('woocommerce_variation_set_stock', [__CLASS__, 'on_variation_stock_changed'], 10, 1);
             }
