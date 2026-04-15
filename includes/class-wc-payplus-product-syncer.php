@@ -1909,9 +1909,10 @@ class WC_PayPlus_Product_Syncer
      *
      * @param WC_Product $product
      * @param array $company Company info with 'id' (payment_page_uid)
+     * @param array $exclude_variation_ids Variation IDs to exclude.
      * @return array
      */
-    private static function transform_to_commerce_format($product, $company)
+    private static function transform_to_commerce_format($product, $company, $exclude_variation_ids = array())
     {
         $product_id = intval($product->get_id());
         $product_type = strval($product->get_type());
@@ -1928,6 +1929,9 @@ class WC_PayPlus_Product_Syncer
         if ($product_type === 'variable') {
             $variation_ids = $product->get_children();
             foreach ($variation_ids as $variation_id) {
+                if (in_array($variation_id, $exclude_variation_ids, true)) {
+                    continue;
+                }
                 $variation = wc_get_product($variation_id);
                 if ($variation) {
                     $product_variants[] = $variation;
@@ -2765,8 +2769,9 @@ class WC_PayPlus_Product_Syncer
      *
      * @param int    $product_id    WooCommerce product (or parent) ID.
      * @param string $endpoint_path e.g. '/products/create', '/products/update', '/products/delete'.
+     * @param array  $exclude_variation_ids Variation IDs to exclude from the payload.
      */
-    private static function send_single_product($product_id, $endpoint_path)
+    private static function send_single_product($product_id, $endpoint_path, $exclude_variation_ids = array())
     {
         $product = wc_get_product($product_id);
         if (!$product) {
@@ -2785,7 +2790,7 @@ class WC_PayPlus_Product_Syncer
             'id' => self::get_site_uid(),
         );
 
-        $commerce_data = self::transform_to_commerce_format($product, $company);
+        $commerce_data = self::transform_to_commerce_format($product, $company, $exclude_variation_ids);
 
         $payload = array(
             'payment_page_uid' => $pageUid,
@@ -2878,7 +2883,7 @@ class WC_PayPlus_Product_Syncer
         }
         self::$sent_product_ids[$key] = true;
 
-        self::send_single_product($parent_id, '/products/update');
+        self::send_single_product($parent_id, '/products/update', array(intval($post_id)));
     }
 
     public static function set_order_stock_context($order)
