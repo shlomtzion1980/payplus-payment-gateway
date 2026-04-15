@@ -452,16 +452,17 @@ class WC_PayPlus_Product_Syncer
         $body       = $request->get_json_params();
         $product_id = isset($body['product_id']) ? absint($body['product_id']) : 0;
         $delta      = isset($body['delta']) ? intval($body['delta']) : null;
+        $timestamp  = isset($body['timestamp']) ? sanitize_text_field($body['timestamp']) : '';
 
-        if (!$product_id || $delta === null || $delta === 0) {
+        if (!$product_id || $delta === null || $delta === 0 || $timestamp === '') {
             return new WP_Error(
                 'missing_params',
-                __('product_id and a non-zero delta are required.', 'payplus-payment-gateway'),
+                __('product_id, a non-zero delta, and timestamp are required.', 'payplus-payment-gateway'),
                 ['status' => 400]
             );
         }
 
-        $result = self::apply_stock_update($product_id, $delta);
+        $result = self::apply_stock_update($product_id, $delta, $timestamp);
 
         if (is_wp_error($result)) {
             return $result;
@@ -472,7 +473,7 @@ class WC_PayPlus_Product_Syncer
 
     /**
      * REST callback — bulk update inventory for multiple products.
-     * Body: { "products": [ { "product_id": 123, "delta": -2 }, ... ] }
+     * Body: { "products": [ { "product_id": 123, "delta": -2, "timestamp": "..." }, ... ] }
      */
     public static function rest_update_inventory_bulk(WP_REST_Request $request)
     {
@@ -494,18 +495,19 @@ class WC_PayPlus_Product_Syncer
         foreach ($products as $item) {
             $product_id = isset($item['product_id']) ? absint($item['product_id']) : 0;
             $delta      = isset($item['delta']) ? intval($item['delta']) : null;
+            $timestamp  = isset($item['timestamp']) ? sanitize_text_field($item['timestamp']) : '';
 
-            if (!$product_id || $delta === null || $delta === 0) {
+            if (!$product_id || $delta === null || $delta === 0 || $timestamp === '') {
                 $failed++;
                 $results[] = [
                     'product_id' => $product_id,
                     'success'    => false,
-                    'error'      => __('product_id and a non-zero delta are required.', 'payplus-payment-gateway'),
+                    'error'      => __('product_id, a non-zero delta, and timestamp are required.', 'payplus-payment-gateway'),
                 ];
                 continue;
             }
 
-            $result = self::apply_stock_update($product_id, $delta);
+            $result = self::apply_stock_update($product_id, $delta, $timestamp);
 
             if (is_wp_error($result)) {
                 $failed++;
@@ -529,14 +531,24 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
-     * Apply a stock update to a single WooCommerce product or variation.
+     * Apply a stock delta to a single WooCommerce product or variation.
+     * Uses a transient to prevent the same timestamp from being applied twice.
      *
-     * @param int $product_id
-     * @param int $stock_quantity
+     * @param int    $product_id
+     * @param int    $delta
+     * @param string $timestamp  Unique identifier from PayPlus for idempotency.
      * @return array|WP_Error
      */
-    private static function apply_stock_update($product_id, $delta)
+    private static function apply_stock_update($product_id, $delta, $timestamp)
     {
+        $transient_key = 'payplus_inv_' . $product_id . '_' . md5($timestamp);
+
+        $cached = get_transient($transient_key);
+        if ($cached !== false) {
+            $cached['skipped'] = true;
+            return $cached;
+        }
+
         $product = wc_get_product($product_id);
 
         if (!$product) {
@@ -569,7 +581,7 @@ class WC_PayPlus_Product_Syncer
             ['source' => 'payplus-product-syncer']
         );
 
-        return [
+        $result = [
             'product_id'     => $product_id,
             'success'        => true,
             'name'           => $product->get_name(),
@@ -579,6 +591,10 @@ class WC_PayPlus_Product_Syncer
             'new_stock'      => $new_qty,
             'stock_status'   => $new_status,
         ];
+
+        set_transient($transient_key, $result, DAY_IN_SECONDS);
+
+        return $result;
     }
 
     /**
