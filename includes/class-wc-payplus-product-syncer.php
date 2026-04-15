@@ -12,6 +12,8 @@ class WC_PayPlus_Product_Syncer
 
     private static $sent_product_ids = array();
 
+    private static $order_stock_context = null;
+
     private static function get_site_uid()
     {
         $uid = get_option('payplus_site_uid');
@@ -45,6 +47,8 @@ class WC_PayPlus_Product_Syncer
                 add_action('woocommerce_update_product', [__CLASS__, 'on_product_updated'], 10, 1);
                 add_action('wp_trash_post', [__CLASS__, 'on_product_trashed'], 10, 1);
                 add_action('delete_post', [__CLASS__, 'on_variation_deleted'], 10, 1);
+                add_action('woocommerce_reduce_order_stock', [__CLASS__, 'set_order_stock_context'], 10, 1);
+                add_action('woocommerce_restore_order_stock', [__CLASS__, 'set_order_stock_context'], 10, 1);
                 add_action('woocommerce_product_set_stock', [__CLASS__, 'on_product_stock_changed'], 10, 1);
                 add_action('woocommerce_variation_set_stock', [__CLASS__, 'on_variation_stock_changed'], 10, 1);
             }
@@ -2873,6 +2877,15 @@ class WC_PayPlus_Product_Syncer
         self::send_single_product($parent_id, '/products/update');
     }
 
+    public static function set_order_stock_context($order)
+    {
+        if ($order instanceof WC_Order) {
+            self::$order_stock_context = $order->get_id();
+        } elseif (is_numeric($order)) {
+            self::$order_stock_context = intval($order);
+        }
+    }
+
     public static function on_product_stock_changed($product)
     {
         if (self::$skip_stock_sync) {
@@ -2933,7 +2946,12 @@ class WC_PayPlus_Product_Syncer
             'parent_id'        => strval($parent_id ? $parent_id : $product_id),
             'external_id'      => strval($product_id),
             'stock_quantity'   => $stock_quantity !== null ? intval($stock_quantity) : 0,
+            'source_type'      => self::$order_stock_context ? 'order' : 'manual_adjustment',
         );
+
+        if (self::$order_stock_context) {
+            $payload['order_id'] = self::$order_stock_context;
+        }
 
         $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/inventory/update';
         $args = array(
