@@ -451,17 +451,17 @@ class WC_PayPlus_Product_Syncer
     {
         $body       = $request->get_json_params();
         $product_id = isset($body['product_id']) ? absint($body['product_id']) : 0;
-        $stock_qty  = isset($body['stock_quantity']) ? intval($body['stock_quantity']) : null;
+        $delta      = isset($body['delta']) ? intval($body['delta']) : null;
 
-        if (!$product_id || $stock_qty === null) {
+        if (!$product_id || $delta === null || $delta === 0) {
             return new WP_Error(
                 'missing_params',
-                __('product_id and stock_quantity are required.', 'payplus-payment-gateway'),
+                __('product_id and a non-zero delta are required.', 'payplus-payment-gateway'),
                 ['status' => 400]
             );
         }
 
-        $result = self::apply_stock_update($product_id, $stock_qty);
+        $result = self::apply_stock_update($product_id, $delta);
 
         if (is_wp_error($result)) {
             return $result;
@@ -472,7 +472,7 @@ class WC_PayPlus_Product_Syncer
 
     /**
      * REST callback — bulk update inventory for multiple products.
-     * Body: { "products": [ { "product_id": 123, "stock_quantity": 10 }, ... ] }
+     * Body: { "products": [ { "product_id": 123, "delta": -2 }, ... ] }
      */
     public static function rest_update_inventory_bulk(WP_REST_Request $request)
     {
@@ -493,19 +493,19 @@ class WC_PayPlus_Product_Syncer
 
         foreach ($products as $item) {
             $product_id = isset($item['product_id']) ? absint($item['product_id']) : 0;
-            $stock_qty  = isset($item['stock_quantity']) ? intval($item['stock_quantity']) : null;
+            $delta      = isset($item['delta']) ? intval($item['delta']) : null;
 
-            if (!$product_id || $stock_qty === null) {
+            if (!$product_id || $delta === null || $delta === 0) {
                 $failed++;
                 $results[] = [
                     'product_id' => $product_id,
                     'success'    => false,
-                    'error'      => __('product_id and stock_quantity are required.', 'payplus-payment-gateway'),
+                    'error'      => __('product_id and a non-zero delta are required.', 'payplus-payment-gateway'),
                 ];
                 continue;
             }
 
-            $result = self::apply_stock_update($product_id, $stock_qty);
+            $result = self::apply_stock_update($product_id, $delta);
 
             if (is_wp_error($result)) {
                 $failed++;
@@ -535,7 +535,7 @@ class WC_PayPlus_Product_Syncer
      * @param int $stock_quantity
      * @return array|WP_Error
      */
-    private static function apply_stock_update($product_id, $stock_quantity)
+    private static function apply_stock_update($product_id, $delta)
     {
         $product = wc_get_product($product_id);
 
@@ -549,18 +549,23 @@ class WC_PayPlus_Product_Syncer
         }
 
         $previous_qty = $product->get_stock_quantity();
+        $previous_qty = $previous_qty !== null ? intval($previous_qty) : 0;
+
+        $operation = $delta > 0 ? 'increase' : 'decrease';
+        $abs_delta = absint($delta);
 
         self::$skip_stock_sync = true;
-        wc_update_product_stock($product, $stock_quantity, 'set');
+        wc_update_product_stock($product, $abs_delta, $operation);
 
-        $new_status = $stock_quantity > 0 ? 'instock' : 'outofstock';
+        $new_qty    = $previous_qty + $delta;
+        $new_status = $new_qty > 0 ? 'instock' : 'outofstock';
         $product->set_stock_status($new_status);
         $product->save();
         self::$skip_stock_sync = false;
 
         $logger = wc_get_logger();
         $logger->info(
-            sprintf('Inventory update — Product #%d: %s → %d (status: %s)', $product_id, $previous_qty ?? 'null', $stock_quantity, $new_status),
+            sprintf('Inventory update — Product #%d: %d %+d → %d (status: %s)', $product_id, $previous_qty, $delta, $new_qty, $new_status),
             ['source' => 'payplus-product-syncer']
         );
 
@@ -570,7 +575,8 @@ class WC_PayPlus_Product_Syncer
             'name'           => $product->get_name(),
             'sku'            => $product->get_sku() ?: null,
             'previous_stock' => $previous_qty,
-            'new_stock'      => $stock_quantity,
+            'delta'          => $delta,
+            'new_stock'      => $new_qty,
             'stock_status'   => $new_status,
         ];
     }
