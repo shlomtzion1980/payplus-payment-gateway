@@ -4292,8 +4292,47 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payplus_status_active = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_status_active', true);
 
             if (empty($payplus_status_active)) {
-                $token = get_user_meta($order->user_id, 'cc_token', true);
-                $this->payplus_add_log_all($handle, 'Subscription Started. Order ID:( ' . $order->get_id() . ' )- Token: ' . $token);
+                $token = '';
+                $token_source = '';
+
+                $subscription_id = WC_PayPlus_Meta_Data::get_meta($order->get_id(), '_subscription_renewal', true);
+                $cc_token_user_meta = get_user_meta($order->get_user_id(), 'cc_token', true);
+                $this->payplus_add_log_all($handle, 'Token resolution for renewal order #' . $order->get_id() . ' | subscription_id: ' . ($subscription_id ?: 'none') . ' | user cc_token: ' . ($cc_token_user_meta ?: 'empty'));
+
+                if ($subscription_id) {
+                    $token = WC_PayPlus_Meta_Data::get_meta($subscription_id, 'payplus_token_uid', true);
+                    if ($token) {
+                        $token_source = 'subscription #' . $subscription_id;
+                        $this->payplus_add_log_all($handle, 'Token found on subscription #' . $subscription_id . ': ' . $token);
+                    }
+
+                    if (empty($token)) {
+                        $this->payplus_add_log_all($handle, 'No token on subscription #' . $subscription_id . ', checking parent order');
+                        $subscription_post = $this->payplus_get_posts_id($subscription_id);
+                        if ($subscription_post && $subscription_post[0]->post_parent) {
+                            $parent_order_id = $subscription_post[0]->post_parent;
+                            $token = WC_PayPlus_Meta_Data::get_meta($parent_order_id, 'payplus_token_uid', true);
+                            if ($token) {
+                                $token_source = 'parent order #' . $parent_order_id;
+                                $this->payplus_add_log_all($handle, 'Token found on parent order #' . $parent_order_id . ': ' . $token);
+                            } else {
+                                $this->payplus_add_log_all($handle, 'No token on parent order #' . $parent_order_id . ' either', 'warning');
+                            }
+                        }
+                    }
+
+                    if (!empty($token) && $token !== $cc_token_user_meta) {
+                        $this->payplus_add_log_all($handle, 'TOKEN MISMATCH PREVENTED: order/subscription token (' . $token . ') differs from user cc_token (' . ($cc_token_user_meta ?: 'empty') . ') - using order token', 'warning');
+                    }
+                }
+
+                if (empty($token)) {
+                    $token = $cc_token_user_meta;
+                    $token_source = 'user meta (cc_token) fallback';
+                    $this->payplus_add_log_all($handle, 'Falling back to user meta cc_token: ' . ($token ?: 'empty'), 'warning');
+                }
+
+                $this->payplus_add_log_all($handle, 'Subscription Started. Order ID:( ' . $order->get_id() . ' ) - Token: ' . $token . ' - Source: ' . $token_source);
 
                 $result = $this->receipt_page($order->get_id(), $token, true, 'WP_SUB_' . $order->get_id(), $amount_to_charge, false, $move_token);
 

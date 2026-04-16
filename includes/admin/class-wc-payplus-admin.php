@@ -1067,7 +1067,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                                 if ($StatusCode == "000") {
                                     $token = $returnIpn->data->token_uid;
                                     $order->update_status('wc-active');
-                                    add_user_meta($userID, 'cc_token', $token);
+                                    update_user_meta($userID, 'cc_token', $token);
                                     WC_PayPlus_Meta_Data::update_meta($order, array('payplus_token_uid' => $token));
                                     $order = wc_get_order($parent_id);
                                     $order->add_order_note('Update token:' . $token);
