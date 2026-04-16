@@ -665,71 +665,114 @@ if (isCheckout || hasOrder) {
                 if (store.hasError()) {
                     try {
                         let getPaymentResult = payment.getPaymentResult();
+                        let errorMsg = '';
 
                         if (
                             getPaymentResult === null ||
                             getPaymentResult === undefined ||
                             getPaymentResult === ""
                         ) {
-                            throw new Error(
-                                "Payment result is empty, null, or undefined."
-                            );
+                            errorMsg = (window.payplus_i18n && window.payplus_i18n.payment_error)
+                                ? window.payplus_i18n.payment_error
+                                : "An error occurred while processing your payment. Please try again.";
+                        } else if (
+                            getPaymentResult.paymentDetails &&
+                            getPaymentResult.paymentDetails.errorMessage !== undefined
+                        ) {
+                            errorMsg = getPaymentResult.paymentDetails.errorMessage;
+                        } else if (getPaymentResult.message) {
+                            errorMsg = getPaymentResult.message;
+                        } else {
+                            errorMsg = (window.payplus_i18n && window.payplus_i18n.payment_error)
+                                ? window.payplus_i18n.payment_error
+                                : "An error occurred while processing your payment. Please try again.";
                         }
 
-                        // Process the result here
-                        console.log("Payment result:", getPaymentResult);
-                        let pp_iframe =
-                            document.querySelectorAll(".pp_iframe")[0];
-                        pp_iframe.style.width =
-                            window.innerWidth <= 768 ? "95%" : "55%";
-                        pp_iframe.style.height = "200px";
-                        pp_iframe.style.position = "fixed";
-                        pp_iframe.style.backgroundColor = "white";
-                        pp_iframe.style.display = "flex";
-                        pp_iframe.style.alignItems = "center";
-                        pp_iframe.style.textAlign = "center";
-                        pp_iframe.style.justifyContent = "center";
-                        pp_iframe.style.top = "50%";
-                        pp_iframe.style.left = "50%";
-                        pp_iframe.style.transform = "translate(-50%, -50%)";
-                        pp_iframe.style.zIndex = 100000;
-                        pp_iframe.style.boxShadow = "10px 10px 10px 10px grey";
-                        pp_iframe.style.borderRadius = "25px";
-                        pp_iframe.innerHTML =
-                            getPaymentResult.paymentDetails.errorMessage !==
-                            undefined
-                                ? getPaymentResult.paymentDetails.errorMessage +
-                                  "<br>" +
-                                  ((window.payplus_i18n && window.payplus_i18n.click_to_close) 
-                                      ? window.payplus_i18n.click_to_close 
-                                      : "Click this to close.")
-                                : getPaymentResult.message +
-                                  "<br>" +
-                                  ((window.payplus_i18n && window.payplus_i18n.click_to_close) 
-                                      ? window.payplus_i18n.click_to_close 
-                                      : "Click this to close.");
+                        let closeText = (window.payplus_i18n && window.payplus_i18n.click_to_close)
+                            ? window.payplus_i18n.click_to_close
+                            : "Click to close";
 
-                        pp_iframe.addEventListener("click", (e) => {
-                            e.preventDefault();
+                        let pp_iframe = document.querySelectorAll(".pp_iframe")[0];
+                        pp_iframe.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+                            + 'z-index:100000;display:flex;flex-direction:column;align-items:center;'
+                            + 'justify-content:center;text-align:center;background:#fff;border-radius:16px;'
+                            + 'box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:32px 24px;cursor:pointer;'
+                            + (window.innerWidth <= 768 ? 'width:90%;max-width:400px;' : 'width:440px;');
+
+                        pp_iframe.innerHTML =
+                            '<div style="width:48px;height:48px;margin:0 auto 16px;border-radius:50%;'
+                            + 'background:#fee2e2;display:flex;align-items:center;justify-content:center;">'
+                            + '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" '
+                            + 'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+                            + '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/>'
+                            + '<line x1="9" y1="9" x2="15" y2="15"/></svg></div>'
+                            + '<div style="font-size:15px;line-height:1.5;color:#1a1a1a;margin-bottom:16px;">'
+                            + errorMsg + '</div>'
+                            + '<span style="font-size:13px;color:#6b7280;">' + closeText + '</span>';
+
+                        // Show overlay behind the error popup
+                        var errorOverlay = document.getElementById('overlay');
+                        if (!errorOverlay) {
+                            errorOverlay = document.createElement('div');
+                            errorOverlay.id = 'overlay';
+                            errorOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;'
+                                + 'background:rgba(0,0,0,0.5);z-index:99999;';
+                            document.body.appendChild(errorOverlay);
+                        }
+                        errorOverlay.addEventListener("click", function () {
                             pp_iframe.style.display = "none";
                             resetCheckoutState();
                         });
-                        console.log(
-                            getPaymentResult.paymentDetails.errorMessage
-                        );
-                        if (
-                            getPaymentResult.paymentDetails.errorMessage !==
-                            undefined
-                        ) {
-                            alert(getPaymentResult.paymentDetails.errorMessage);
-                        } else {
-                            alert(getPaymentResult.message);
-                        }
+
+                        pp_iframe.addEventListener("click", function () {
+                            pp_iframe.style.display = "none";
+                            resetCheckoutState();
+                        });
 
                         observer.disconnect();
                     } catch (error) {
-                        // Handle the error here
                         console.error("An error occurred:", error.message);
+                        var fallbackMsg = (window.payplus_i18n && window.payplus_i18n.payment_error)
+                            ? window.payplus_i18n.payment_error
+                            : "An error occurred while processing your payment. Please try again.";
+                        var fallbackClose = (window.payplus_i18n && window.payplus_i18n.click_to_close)
+                            ? window.payplus_i18n.click_to_close
+                            : "Click to close";
+
+                        var fallbackOverlay = document.getElementById('overlay');
+                        if (!fallbackOverlay) {
+                            fallbackOverlay = document.createElement('div');
+                            fallbackOverlay.id = 'overlay';
+                            fallbackOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;'
+                                + 'background:rgba(0,0,0,0.5);z-index:99999;';
+                            document.body.appendChild(fallbackOverlay);
+                        }
+
+                        var fallbackPopup = document.createElement('div');
+                        fallbackPopup.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);'
+                            + 'z-index:100000;display:flex;flex-direction:column;align-items:center;'
+                            + 'justify-content:center;text-align:center;background:#fff;border-radius:16px;'
+                            + 'box-shadow:0 8px 32px rgba(0,0,0,0.18);padding:32px 24px;cursor:pointer;'
+                            + (window.innerWidth <= 768 ? 'width:90%;max-width:400px;' : 'width:440px;');
+                        fallbackPopup.innerHTML =
+                            '<div style="width:48px;height:48px;margin:0 auto 16px;border-radius:50%;'
+                            + 'background:#fee2e2;display:flex;align-items:center;justify-content:center;">'
+                            + '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" '
+                            + 'stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+                            + '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/>'
+                            + '<line x1="9" y1="9" x2="15" y2="15"/></svg></div>'
+                            + '<div style="font-size:15px;line-height:1.5;color:#1a1a1a;margin-bottom:16px;">'
+                            + fallbackMsg + '</div>'
+                            + '<span style="font-size:13px;color:#6b7280;">' + fallbackClose + '</span>';
+                        document.body.appendChild(fallbackPopup);
+
+                        function dismissFallback() {
+                            fallbackPopup.remove();
+                            resetCheckoutState();
+                        }
+                        fallbackOverlay.addEventListener("click", dismissFallback);
+                        fallbackPopup.addEventListener("click", dismissFallback);
+                        observer.disconnect();
                     }
                 }
                 if (store.isComplete()) {

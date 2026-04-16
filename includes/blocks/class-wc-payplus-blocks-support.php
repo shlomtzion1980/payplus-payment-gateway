@@ -638,6 +638,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'generating_page' => __('Generating payment page', 'payplus-payment-gateway'),
                 'loading_page' => __('Loading payment page', 'payplus-payment-gateway'),
                 'click_to_close' => __('Click this to close.', 'payplus-payment-gateway'),
+                'payment_error' => __('An error occurred while processing your payment. Please try again.', 'payplus-payment-gateway'),
                 'payment_page_failed' => __('Error: the payment page failed to load.', 'payplus-payment-gateway'),
             ]
         );
