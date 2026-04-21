@@ -479,6 +479,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             return $this->id === 'payplus-payment-gateway';
         }
 
+        if ($this->id === 'payplus-payment-gateway'
+            && isset($this->settings['hide_main_pp_checkout'])
+            && $this->settings['hide_main_pp_checkout'] === 'yes'
+            && !is_admin()
+        ) {
+            return false;
+        }
+
         // Default availability check
         return parent::is_available();
     }

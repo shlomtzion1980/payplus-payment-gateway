@@ -962,12 +962,9 @@ function payplus_filter_checkout_gateways($available_gateways)
                     unset($available_gateways['payplus-payment-gateway']);
                 }
             } else {
-                // Hosted fields is NOT main; only check hide_main_pp_checkout when Hosted Fields is enabled
-                if ($hostedfields_enabled) {
-                    $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
-                    if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
-                        unset($available_gateways['payplus-payment-gateway']);
-                    }
+                $main_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                if (isset($main_settings['hide_main_pp_checkout']) && $main_settings['hide_main_pp_checkout'] === 'yes') {
+                    unset($available_gateways['payplus-payment-gateway']);
                 }
             }
         }
