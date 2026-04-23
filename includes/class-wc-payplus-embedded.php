@@ -275,12 +275,42 @@ class WC_PayPlus_Embedded extends WC_PayPlus_HostedFields
 
         $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
         $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, true);
-        $pageRequestUid = json_decode($hostedResponse, true)['data']['page_request_uid'];   
+        $hostedResponseArray = json_decode($hostedResponse, true);
+
+        $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
+            && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+
+        if (!$updateOk) {
+            $this->get_payplus_gateway()->payplus_add_log_all(
+                'hosted-fields-data',
+                "Embedded Update FAILED for Order #$order_id – retrying with fresh generateLink. Response: $hostedResponse"
+            );
+            WC()->session->set('page_request_uid', false);
+            WC()->session->__unset('hostedFieldsUUID');
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, false);
+            $hostedResponseArray = json_decode($hostedResponse, true);
+
+            $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
+                && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+
+            if (!$updateOk) {
+                $this->get_payplus_gateway()->payplus_add_log_all(
+                    'hosted-fields-data',
+                    "Embedded generateLink ALSO FAILED for Order #$order_id. Response: $hostedResponse"
+                );
+                WC()->session->set('payplus_hosted_update_failed', true);
+                return;
+            }
+        }
+
+        WC()->session->set('payplus_hosted_update_failed', false);
+
+        $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $pageRequestUid]);
         WC_PayPlus_Meta_Data::append_pruid_history($order, $pageRequestUid, 'embedded');
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
-        $hostedPayload = WC()->session->set('hostedPayload', $payload);
-        $hostedResponse = WC()->session->set('hostedResponse', $hostedResponse);
+        WC()->session->set('hostedPayload', $payload);
+        WC()->session->set('hostedResponse', $hostedResponse);
     }
 }

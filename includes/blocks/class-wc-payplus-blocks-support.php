@@ -347,17 +347,37 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         WC()->session->set('hostedPayload', $payload);
 
         $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
-
         $hostedResponseArray = json_decode($hostedResponse, true);
+
+        $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
+            && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+
+        if (!$updateOk) {
+            $WC_PayPlus_Gateway->payplus_add_log_all(
+                'hosted-fields-data',
+                "Blocks Update FAILED for Order #$order_id – retrying with fresh generateLink. Response: $hostedResponse"
+            );
+            WC()->session->__unset('page_request_uid');
+            WC()->session->__unset('hostedFieldsUUID');
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, false);
+            $hostedResponseArray = json_decode($hostedResponse, true);
+
+            $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
+                && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+        }
+
+        if (!$updateOk) {
+            $WC_PayPlus_Gateway->payplus_add_log_all(
+                'hosted-fields-data',
+                "Blocks generateLink ALSO FAILED for Order #$order_id. Response: $hostedResponse"
+            );
+            return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
+        }
+
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $hostedResponseArray['data']['page_request_uid']]);
         WC_PayPlus_Meta_Data::append_pruid_history($order, $hostedResponseArray['data']['page_request_uid'], 'blocks_hosted');
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
-
-        if ($hostedResponseArray['results']['status'] === "error") {
-            WC()->session->__unset('page_request_uid');
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
-        }
 
         return $hostedResponse;
     }
@@ -459,7 +479,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             // Update API call saves ~5 seconds.
             WC()->session->set('hostedStarted', 1);
 
-            $this->hostedFieldsData($this->orderId, true);
+            $hostedResp = $this->hostedFieldsData($this->orderId, true);
+            $hostedRespArr = json_decode($hostedResp, true);
+            if (isset($hostedRespArr['results']['status']) && $hostedRespArr['results']['status'] === 'error') {
+                $payment_details = $result->payment_details;
+                $payment_details['errorMessage'] = __('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway');
+                $result->set_payment_details($payment_details);
+                $result->set_status('error');
+                return;
+            }
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;
             $payment_details['secret_key'] = $this->secretKey;

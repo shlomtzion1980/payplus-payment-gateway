@@ -897,6 +897,14 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         }
         
         if ($this->id === "payplus-payment-gateway-hostedfields") {
+            if (WC()->session && WC()->session->get('payplus_hosted_update_failed')) {
+                WC()->session->set('payplus_hosted_update_failed', false);
+                wc_add_notice(__('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway'), 'error');
+                return array(
+                    'result'  => 'failure',
+                    'redirect' => '',
+                );
+            }
             WC()->session->set('order_awaiting_payment', $order_id);
         }
         return array(

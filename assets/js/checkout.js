@@ -1097,12 +1097,18 @@ jQuery(function ($) {
                                     const hostedResponse = JSON.parse(
                                         response.data.hostedResponse
                                     );
+                                    var updateOk = hostedResponse &&
+                                        hostedResponse.results &&
+                                        hostedResponse.results.status === 'success' &&
+                                        hostedResponse.data &&
+                                        hostedResponse.data.page_request_uid;
+
                                     if (
+                                        updateOk &&
                                         hostedPayload.more_info &&
                                         !isNaN(hostedPayload.more_info) &&
                                         typeof hostedPayload.more_info === 'number'
                                     ) {
-                                        // Proceed with payment submission
                                         overlay();
                                         jQuery(
                                             ".blocks-payplus_loader_hosted"
@@ -1112,7 +1118,7 @@ jQuery(function ($) {
                                             .unblock();
                                         hf.SubmitPayment();
                                     } else {
-                                        window.onbeforeunload = null; // If `onbeforeunload` is set directly
+                                        window.onbeforeunload = null;
                                         window.removeEventListener(
                                             "beforeunload",
                                             wc_checkout_form.detachUnloadEventsOnSubmit()
@@ -1120,7 +1126,6 @@ jQuery(function ($) {
                                         alert(
                                             "The payment page has expired, refresh the page to continue"
                                         );
-                                        // Then reload the page
                                         location.reload();
                                     }
                                 },
