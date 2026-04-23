@@ -1374,13 +1374,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         'payplus_total_refunded_amount' => round($refunded_amount + $amount, 2),
                     );
                     WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
+
+                    // phpcs:disable WordPress.Security.NonceVerification.Missing -- Nonce verified by WooCommerce before calling process_refund
+                    $cancellationFeeNote = '';
+                    if (isset($_POST['payplus_cancellation_fee']) && floatval($_POST['payplus_cancellation_fee']) > 0) {
+                        $cancellationFee = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_cancellation_fee']))), 2);
+                        $originalRefundAmount = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_original_refund_amount']))), 2);
+                        $cancellationFeeNote = sprintf(
+                            '<br />' . __('Cancellation Fee Applied: %1$s %2$s (Original refund request: %3$s %2$s)', 'payplus-payment-gateway'),
+                            $cancellationFee,
+                            $order->get_currency(),
+                            $originalRefundAmount
+                        );
+                    }
+                    // phpcs:enable WordPress.Security.NonceVerification.Missing
+
                     $order->add_order_note(sprintf(
                         'PayPlus Refund is Successful<br />Refund Transaction Number: %1$s<br />Amount: %2$s %3$s<br />Reason: %4$s',
                         $res->data->transaction->number,
                         $res->data->transaction->amount,
                         $order->get_currency(),
                         $reason
-                    ));
+                    ) . $cancellationFeeNote);
                     $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                     $flag = true;
                 } else {

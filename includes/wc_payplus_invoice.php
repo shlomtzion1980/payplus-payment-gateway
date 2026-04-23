@@ -381,19 +381,47 @@ class PayplusInvoice
             }
         }
 
-        if ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
+        // phpcs:disable WordPress.Security.NonceVerification.Missing
+        $isCancellationFeeFullRefund = false;
+        $cancellationFeeAmount = 0;
+        if (!empty($_POST['payplus_cancellation_fee']) && floatval($_POST['payplus_cancellation_fee']) > 0
+            && !empty($_POST['payplus_original_refund_amount'])) {
+            $postCancellationFee = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_cancellation_fee']))), $WC_PayPlus_Gateway->rounding_decimals);
+            $postOriginalAmount = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_original_refund_amount']))), $WC_PayPlus_Gateway->rounding_decimals);
+            if ($postOriginalAmount == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
+                $isCancellationFeeFullRefund = true;
+                $cancellationFeeAmount = $postCancellationFee;
+            }
+        }
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
+
+        if ($isCancellationFeeFullRefund) {
+            $productsItems = $payloadInvoiceData ? $payloadInvoiceData['items'] : $objectProducts->productsItems;
+            $feeItemPrice = round($cancellationFeeAmount * $dual * -1, $WC_PayPlus_Gateway->rounding_decimals);
+            $feeItem = array(
+                'name' => __('Cancellation Fee', 'payplus-payment-gateway'),
+                'price' => $feeItemPrice,
+                'quantity' => 1,
+            );
+            if ($vat_type_code_override && in_array($vat_type_code_override, ['vat-type-included', 'vat-type-exempt'], true)) {
+                $feeItem['vat_type_code'] = $vat_type_code_override;
+            }
+            $productsItems[] = $feeItem;
+            $fullAmount = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : $objectProducts->amount;
+            $sum = round($fullAmount + $feeItemPrice, $WC_PayPlus_Gateway->rounding_decimals);
+        } elseif ($sum == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
             $productsItems = $payloadInvoiceData ? $payloadInvoiceData['items'] : $objectProducts->productsItems;
             $sum = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : $objectProducts->amount;
         }
 
         $payload['currency_code'] = $payloadInvoiceData ? $payloadInvoiceData['currency_code'] : $order->get_currency();
         $payload['autocalculate_rate'] = $payloadInvoiceData ? $payloadInvoiceData['autocalculate_rate'] : true;
-        $payload['totalAmount'] = $payloadInvoiceData ? $payloadInvoiceData['totalAmount'] : round($sum, $WC_PayPlus_Gateway->rounding_decimals);
+        $payload['totalAmount'] = ($payloadInvoiceData && !$isCancellationFeeFullRefund) ? $payloadInvoiceData['totalAmount'] : round($sum, $WC_PayPlus_Gateway->rounding_decimals);
         $payload['language'] = $payloadInvoiceData ? $payloadInvoiceData['language'] : $payplus_invoice_option['payplus_langrage_invoice'];
         $payload['more_info'] = $order_id;
 
         if (count($productsItems) && !$this->hide_products_invoice) {
-            $payload['items'] = $payloadInvoiceData ? $payloadInvoiceData['items'] : $productsItems;
+            $payload['items'] = ($payloadInvoiceData && !$isCancellationFeeFullRefund) ? $payloadInvoiceData['items'] : $productsItems;
         } else {
             $sum = $sum * $dual;
             $sum = round($sum, $WC_PayPlus_Gateway->rounding_decimals);

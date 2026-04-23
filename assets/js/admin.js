@@ -4,13 +4,20 @@ let table_payment = null;
 const allSum = document.getElementById("all-sum");
 
 jQuery(function ($) {
-    // Inject payplus_refund_vat_type into WooCommerce refund AJAX requests
+    // Inject payplus_refund_vat_type and cancellation fee data into WooCommerce refund AJAX requests
     $.ajaxPrefilter(function (options, originalOptions) {
         if (originalOptions.data && typeof originalOptions.data === 'object'
-            && originalOptions.data.action === 'woocommerce_refund_line_items'
-            && window.payplusRefundVatType) {
-            options.data += '&payplus_refund_vat_type=' + encodeURIComponent(window.payplusRefundVatType);
-            window.payplusRefundVatType = null;
+            && originalOptions.data.action === 'woocommerce_refund_line_items') {
+            if (window.payplusRefundVatType) {
+                options.data += '&payplus_refund_vat_type=' + encodeURIComponent(window.payplusRefundVatType);
+                window.payplusRefundVatType = null;
+            }
+            if (window.payplusCancellationFee) {
+                options.data += '&payplus_cancellation_fee=' + encodeURIComponent(window.payplusCancellationFee);
+                options.data += '&payplus_original_refund_amount=' + encodeURIComponent(window.payplusOriginalRefundAmount);
+                window.payplusCancellationFee = null;
+                window.payplusOriginalRefundAmount = null;
+            }
         }
     });
 
@@ -28,6 +35,79 @@ jQuery(function ($) {
             orderTotal = parseFloat(totalText.replace(/[^\d.]/g, '')) || 0;
         }
 
+        // --- Cancellation fee gate ---
+        var feeEnabled = typeof payplus_script_payment !== 'undefined'
+            && payplus_script_payment.cancellation_fee_enabled === 'yes';
+
+        if (feeEnabled && btn.dataset.payplusFeeApplied !== 'true') {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            var pct = payplus_script_payment.cancellation_fee_percent || 5;
+            var cap = payplus_script_payment.cancellation_fee_max || 100;
+            var fee = Math.min(refundAmount * pct / 100, cap);
+            fee = Math.round(fee * 100) / 100;
+            var netRefund = Math.round((refundAmount - fee) * 100) / 100;
+            var currency = payplus_script_payment.currency_symbol || '';
+
+            var lblMsg = payplus_script_payment.cancellation_fee_confirm_msg || 'Cancellation fee will be deducted from this refund:';
+            var lblFee = payplus_script_payment.cancellation_fee_label || 'Cancellation fee';
+            var lblNet = payplus_script_payment.cancellation_fee_net || 'Net refund to customer';
+            var lblOrig = payplus_script_payment.cancellation_fee_original || 'Original refund amount';
+            var lblConfirm = payplus_script_payment.cancellation_fee_confirm || 'Confirm Refund';
+            var lblCancel = payplus_script_payment.cancellation_fee_cancel || 'Cancel';
+
+            var feeOverlay = $('<div>').css({
+                position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                background: 'rgba(0,0,0,0.5)', zIndex: 100000,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+            });
+            var feeBox = $('<div>').css({
+                background: '#fff', padding: '24px', borderRadius: '4px',
+                maxWidth: '460px', width: '90%', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+            });
+
+            feeBox.html(
+                '<p style="margin:0 0 16px; line-height:1.5; font-size:14px; font-weight:600;">' + lblMsg + '</p>' +
+                '<table style="width:100%; border-collapse:collapse; margin-bottom:16px;">' +
+                '<tr><td style="padding:6px 0; color:#666;">' + lblOrig + '</td><td style="padding:6px 0; text-align:right; font-weight:500;">' + currency + refundAmount.toFixed(2) + '</td></tr>' +
+                '<tr><td style="padding:6px 0; color:#666;">' + lblFee + ' (' + pct + '%' + (fee >= cap ? ', max ' + currency + cap : '') + ')</td><td style="padding:6px 0; text-align:right; color:#d63638; font-weight:500;">-' + currency + fee.toFixed(2) + '</td></tr>' +
+                '<tr style="border-top:1px solid #ddd;"><td style="padding:8px 0; font-weight:600;">' + lblNet + '</td><td style="padding:8px 0; text-align:right; font-weight:700; font-size:15px;">' + currency + netRefund.toFixed(2) + '</td></tr>' +
+                '</table>' +
+                '<div style="display:flex; gap:10px; justify-content:flex-end;">' +
+                '<button type="button" class="button button-primary pp-fee-confirm">' + lblConfirm + '</button>' +
+                '<button type="button" class="button pp-fee-cancel">' + lblCancel + '</button>' +
+                '</div>'
+            );
+            feeOverlay.append(feeBox);
+            $('body').append(feeOverlay);
+
+            var closeFee = function () { feeOverlay.remove(); };
+            feeOverlay.on('click', function (ev) {
+                if (ev.target === feeOverlay[0]) closeFee();
+            });
+
+            feeBox.find('.pp-fee-confirm').on('click', function () {
+                closeFee();
+                window.payplusCancellationFee = fee;
+                window.payplusOriginalRefundAmount = refundAmount;
+                $('#refund_amount').val(netRefund.toFixed(2));
+                btn.dataset.payplusFeeApplied = 'true';
+                btn.click();
+            });
+            feeBox.find('.pp-fee-cancel').on('click', function () {
+                closeFee();
+                $('.wc-order-refund-items .cancel-action').trigger('click');
+            });
+            return;
+        }
+        if (btn.dataset.payplusFeeApplied === 'true') {
+            btn.dataset.payplusFeeApplied = '';
+            refundAmount = parseFloat($('#refund_amount').val()) || 0;
+        }
+
+        // --- Existing VAT dialog gate (partial refunds only) ---
         if (refundAmount >= orderTotal) return;
 
         if (btn.dataset.payplusVatChosen === 'true') {

@@ -1195,6 +1195,35 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'desc_tip' => true,
                 'description' => __('POS Override Gateways - divide by commas - the payment gateways that will be overridden by the PayPlus EMV POS device.', 'payplus-payment-gateway'),
             ],
+            'cancellation_fee_title' => [
+                'title' => __('Cancellation Fee (Consumer Protection Law)', 'payplus-payment-gateway'),
+                'type' => 'title',
+                'description' => __('Automatically deduct a cancellation fee from refunds per Israeli Consumer Protection regulations (5% or 100 NIS, whichever is lower).', 'payplus-payment-gateway'),
+            ],
+            'enable_cancellation_fee' => [
+                'title' => __('Enable Cancellation Fee', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Deduct cancellation fee from refunds', 'payplus-payment-gateway'),
+                'default' => 'no',
+                'description' => __('When enabled, a cancellation fee will be deducted from every refund per Israeli Consumer Protection regulations.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+            ],
+            'cancellation_fee_percent' => [
+                'title' => __('Cancellation Fee Percentage', 'payplus-payment-gateway'),
+                'type' => 'number',
+                'default' => '5',
+                'description' => __('Percentage of the refund amount (default: 5%)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'custom_attributes' => ['min' => '0', 'max' => '100', 'step' => '0.1'],
+            ],
+            'cancellation_fee_max' => [
+                'title' => __('Maximum Cancellation Fee', 'payplus-payment-gateway'),
+                'type' => 'number',
+                'default' => '100',
+                'description' => __('Maximum fee amount in the order currency (default: 100)', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'custom_attributes' => ['min' => '0', 'step' => '0.01'],
+            ],
         ];
         return $formFields;
     }

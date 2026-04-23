@@ -2719,6 +2719,15 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'vat_refund_partial_hint' => __('Since this is a partial refund, we can\'t automatically determine the VAT status of the refunded amount. Please choose based on whether the item being refunded is subject to VAT or not.', 'payplus-payment-gateway'),
                 "displayOnProductPage" => __('Display on product page', 'payplus-payment-gateway'),
                 "enableExpressOnProductPageMessage" => __('For Express in product page you ALSO need to select: Either Shipping by Woocommerce or Global the one you choose will be used in the product page.', 'payplus-payment-gateway'),
+                'cancellation_fee_enabled' => isset($this->allSettings['enable_cancellation_fee']) ? $this->allSettings['enable_cancellation_fee'] : 'no',
+                'cancellation_fee_percent' => floatval(isset($this->allSettings['cancellation_fee_percent']) ? $this->allSettings['cancellation_fee_percent'] : 5),
+                'cancellation_fee_max'     => floatval(isset($this->allSettings['cancellation_fee_max']) ? $this->allSettings['cancellation_fee_max'] : 100),
+                'cancellation_fee_confirm_msg' => __('Cancellation fee will be deducted from this refund:', 'payplus-payment-gateway'),
+                'cancellation_fee_label'   => __('Cancellation fee', 'payplus-payment-gateway'),
+                'cancellation_fee_net'     => __('Net refund to customer', 'payplus-payment-gateway'),
+                'cancellation_fee_original' => __('Original refund amount', 'payplus-payment-gateway'),
+                'cancellation_fee_confirm' => __('Confirm Refund', 'payplus-payment-gateway'),
+                'cancellation_fee_cancel'  => __('Cancel', 'payplus-payment-gateway'),
             )
         );
         wp_enqueue_script('wc-payplus-gateway-admin');

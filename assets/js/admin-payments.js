@@ -140,23 +140,79 @@ jQuery(document).ready(function ($) {
 
     $(".do-api-refund-payplus").click(async function (event) {
         event.preventDefault();
-        $(this).addClass("button-loading");
+        var self = this;
+        $(self).addClass("button-loading");
 
-        const parentRow = $(this).parents("tr").attr("class").split(" ");
+        const parentRow = $(self).parents("tr").attr("class").split(" ");
         const orderID = $("#post_ID").val();
-        const id = $(this).attr("data-id");
-        const transactionUid = $(this).attr("data-transaction-uid");
-        const amount = parseFloat($(".sum-" + parentRow[1]).val());
-        const method = $(this).attr("data-method");
-        const refund = $(this).attr("data-refund");
+        const id = $(self).attr("data-id");
+        const transactionUid = $(self).attr("data-transaction-uid");
+        var amount = parseFloat($(".sum-" + parentRow[1]).val());
+        const method = $(self).attr("data-method");
+        const refund = $(self).attr("data-refund");
 
         if (
             0 >= parseFloat(amount) ||
             parseFloat(amount) > parseFloat(refund)
         ) {
-            $(this).removeClass("button-loading");
+            $(self).removeClass("button-loading");
             alert(payplus_script_admin.payplus_refund_error);
             return false;
+        }
+
+        var feeEnabled = typeof payplus_script_payment !== 'undefined'
+            && payplus_script_payment.cancellation_fee_enabled === 'yes';
+
+        if (feeEnabled) {
+            var pct = payplus_script_payment.cancellation_fee_percent || 5;
+            var cap = payplus_script_payment.cancellation_fee_max || 100;
+            var fee = Math.min(amount * pct / 100, cap);
+            fee = Math.round(fee * 100) / 100;
+            var netRefund = Math.round((amount - fee) * 100) / 100;
+            var currency = payplus_script_payment.currency_symbol || '';
+
+            var lblMsg = payplus_script_payment.cancellation_fee_confirm_msg || 'Cancellation fee will be deducted from this refund:';
+            var lblFee = payplus_script_payment.cancellation_fee_label || 'Cancellation fee';
+            var lblNet = payplus_script_payment.cancellation_fee_net || 'Net refund to customer';
+            var lblOrig = payplus_script_payment.cancellation_fee_original || 'Original refund amount';
+            var lblConfirm = payplus_script_payment.cancellation_fee_confirm || 'Confirm Refund';
+            var lblCancel = payplus_script_payment.cancellation_fee_cancel || 'Cancel';
+
+            $(self).removeClass("button-loading");
+
+            var confirmed = await new Promise(function (resolve) {
+                var feeOverlay = $('<div>').css({
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.5)', zIndex: 100000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                });
+                var feeBox = $('<div>').css({
+                    background: '#fff', padding: '24px', borderRadius: '4px',
+                    maxWidth: '460px', width: '90%', boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
+                });
+                feeBox.html(
+                    '<p style="margin:0 0 16px; line-height:1.5; font-size:14px; font-weight:600;">' + lblMsg + '</p>' +
+                    '<table style="width:100%; border-collapse:collapse; margin-bottom:16px;">' +
+                    '<tr><td style="padding:6px 0; color:#666;">' + lblOrig + '</td><td style="padding:6px 0; text-align:right; font-weight:500;">' + currency + amount.toFixed(2) + '</td></tr>' +
+                    '<tr><td style="padding:6px 0; color:#666;">' + lblFee + ' (' + pct + '%' + (fee >= cap ? ', max ' + currency + cap : '') + ')</td><td style="padding:6px 0; text-align:right; color:#d63638; font-weight:500;">-' + currency + fee.toFixed(2) + '</td></tr>' +
+                    '<tr style="border-top:1px solid #ddd;"><td style="padding:8px 0; font-weight:600;">' + lblNet + '</td><td style="padding:8px 0; text-align:right; font-weight:700; font-size:15px;">' + currency + netRefund.toFixed(2) + '</td></tr>' +
+                    '</table>' +
+                    '<div style="display:flex; gap:10px; justify-content:flex-end;">' +
+                    '<button type="button" class="button button-primary pp-fee-confirm">' + lblConfirm + '</button>' +
+                    '<button type="button" class="button pp-fee-cancel">' + lblCancel + '</button>' +
+                    '</div>'
+                );
+                feeOverlay.append(feeBox);
+                $('body').append(feeOverlay);
+                var closeFee = function () { feeOverlay.remove(); };
+                feeOverlay.on('click', function (ev) { if (ev.target === feeOverlay[0]) { closeFee(); resolve(false); } });
+                feeBox.find('.pp-fee-confirm').on('click', function () { closeFee(); resolve(true); });
+                feeBox.find('.pp-fee-cancel').on('click', function () { closeFee(); resolve(false); });
+            });
+
+            if (!confirmed) return false;
+            amount = netRefund;
+            $(self).addClass("button-loading");
         }
 
         const data = new FormData();
@@ -179,7 +235,7 @@ jQuery(document).ready(function ($) {
         })
             .then((response) => response.json())
             .then((response) => {
-                $(this).removeClass("button-loading");
+                $(self).removeClass("button-loading");
                 location.href = response.urlredirect;
             });
     });
