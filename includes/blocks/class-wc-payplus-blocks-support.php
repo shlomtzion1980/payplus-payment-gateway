@@ -371,6 +371,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'hosted-fields-data',
                 "Blocks generateLink ALSO FAILED for Order #$order_id. Response: $hostedResponse"
             );
+            WC()->session->__unset('hostedPayload');
+            WC()->session->__unset('hostedResponse');
             return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
         }
 
@@ -480,8 +482,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             WC()->session->set('hostedStarted', 1);
 
             $hostedResp = $this->hostedFieldsData($this->orderId, true);
-            $hostedRespArr = json_decode($hostedResp, true);
-            if (isset($hostedRespArr['results']['status']) && $hostedRespArr['results']['status'] === 'error') {
+            $hostedRespArr = !empty($hostedResp) ? json_decode($hostedResp, true) : null;
+            if (empty($hostedRespArr) || (isset($hostedRespArr['results']['status']) && $hostedRespArr['results']['status'] === 'error')) {
                 $payment_details = $result->payment_details;
                 $payment_details['errorMessage'] = __('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway');
                 $result->set_payment_details($payment_details);
