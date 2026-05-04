@@ -979,4 +979,4 @@ function payplus_filter_checkout_gateways($available_gateways)
     }
     return $available_gateways;
 }
-add_filter('woocommerce_available_payment_gateways', 'payplus_filter_checkout_gateways', 20); // Use priority 20 to run after default checks
+add_filter('woocommerce_available_payment_gateways', 'payplus_filter_checkout_gateways', 20);

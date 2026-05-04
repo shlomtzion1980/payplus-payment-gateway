@@ -1180,6 +1180,14 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'default' => 'yes',
                 'custom_attributes' => array('disabled' => 'disabled'),
             ],
+            'pos_only_mode' => [
+                'title' => __('POS Only Mode', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Enable POS Only Mode (EMV devices only)', 'payplus-payment-gateway'),
+                'default' => 'no',
+                'desc_tip' => true,
+                'description' => __('When enabled, PayPlus will only provide EMV POS device functionality. All checkout page hooks, payment page redirects, hosted fields, express checkout, and other frontend features will be disabled so they do not interfere with other payment gateways (e.g. Tranzilla). Requires a page refresh / save to take effect.', 'payplus-payment-gateway'),
+            ],
             'pos_override' => [
                 'title' => __('POS Override', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

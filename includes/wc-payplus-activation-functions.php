@@ -3,6 +3,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+/**
+ * Check if POS Only Mode is enabled in PayPlus settings.
+ * Used to conditionally skip checkout-affecting hooks.
+ */
+function payplus_is_pos_only_mode()
+{
+    $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+    return is_array($settings) && isset($settings['pos_only_mode']) && $settings['pos_only_mode'] === 'yes';
+}
+
 add_action('init', 'payplus_register_order_statuses');
 /**
  * @return void
@@ -133,7 +143,9 @@ add_action('payplus_cron_send_order', function () {
  * @param string $payment_id
  * @return string
  */
-add_filter('woocommerce_gateway_title', 'payplus_change_payment_gateway_title', 100, 2);
+if (!payplus_is_pos_only_mode()) {
+    add_filter('woocommerce_gateway_title', 'payplus_change_payment_gateway_title', 100, 2);
+}
 
 function payplus_change_payment_gateway_title($title, $payment_id)
 {
@@ -513,9 +525,11 @@ function payplus_Add_log_payplus($last_error)
     $logger->add('error-db-payplus', $beforeMsg . "\n" . $last_error . "\n" . str_repeat("=", 232));
 }
 
-add_filter('woocommerce_price_trim_zeros', '__return_true');
-add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
-add_filter('woocommerce_billing_fields', 'payplus_add_custom_checkout_fields', 10, 1);
+if (!payplus_is_pos_only_mode()) {
+    add_filter('woocommerce_price_trim_zeros', '__return_true');
+    add_filter('woocommerce_admin_billing_fields', 'payplus_order_admin_custom_fields');
+    add_filter('woocommerce_billing_fields', 'payplus_add_custom_checkout_fields', 10, 1);
+}
 
 function payplus_add_custom_checkout_fields($fields)
 {
@@ -616,13 +630,17 @@ function payplus_order_admin_custom_fields($fields)
     return $fields;
 }
 
-add_action('woocommerce_after_checkout_billing', 'payplus_add_vat_number_nonce_field');
+if (!payplus_is_pos_only_mode()) {
+    add_action('woocommerce_after_checkout_billing', 'payplus_add_vat_number_nonce_field');
+}
 function payplus_add_vat_number_nonce_field()
 {
     wp_nonce_field('vat_number_nonce_action', 'vat_number_nonce');
 }
 
-add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invoice_name', 10, 1);
+if (!payplus_is_pos_only_mode()) {
+    add_action('woocommerce_checkout_update_order_meta', 'payplus_save_customer_invoice_name', 10, 1);
+}
 function payplus_save_customer_invoice_name($order_id)
 {
     $order = wc_get_order($order_id);
@@ -686,7 +704,9 @@ function payplus_save_customer_invoice_name($order_id)
 }
 
 // Hook to save blocks checkout field values to our unified meta keys
-add_action('woocommerce_set_additional_field_value', 'payplus_sync_blocks_checkout_fields', 10, 4);
+if (!payplus_is_pos_only_mode()) {
+    add_action('woocommerce_set_additional_field_value', 'payplus_sync_blocks_checkout_fields', 10, 4);
+}
 function payplus_sync_blocks_checkout_fields($key, $value, $group, $wc_object)
 {
     // Check if this is our customer invoice name field
@@ -718,7 +738,9 @@ function payplus_sync_blocks_checkout_fields($key, $value, $group, $wc_object)
     }
 }
 
-add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
+if (!payplus_is_pos_only_mode()) {
+    add_action('woocommerce_process_shop_order_meta', 'payplus_checkout_field_update_order_meta', 10,);
+}
 function payplus_checkout_field_update_order_meta($order_id)
 {
     if (!isset($_POST['vat_number_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['vat_number_nonce'])), 'vat_number_nonce_action')) {
