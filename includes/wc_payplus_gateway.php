@@ -1390,8 +1390,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $originalRefundAmount = isset($_POST['payplus_original_refund_amount'])
                             ? round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_original_refund_amount']))), 2)
                             : $amount;
-                        /* translators: %1$s: cancellation fee amount, %2$s: currency code, %3$s: original refund amount */
                         $cancellationFeeNote = sprintf(
+                            /* translators: %1$s: cancellation fee amount, %2$s: currency code, %3$s: original refund amount */
                             '<br />' . __('Cancellation Fee Applied: %1$s %2$s (Original refund request: %3$s %2$s)', 'payplus-payment-gateway'),
                             $cancellationFee,
                             $order->get_currency(),
