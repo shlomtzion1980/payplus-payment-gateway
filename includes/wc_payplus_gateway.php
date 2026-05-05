@@ -18,6 +18,8 @@ define('PAYPLUS_LOG_INFO_LEVEL', 'info');
 class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 {
 
+    private static $page_protect_registered = false;
+
     public $id = 'payplus-payment-gateway';
     public $add_product_field_transaction_type;
     public $disable_menu_side;
@@ -296,8 +298,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         /****** FILTER START ******/
 
-        add_filter('user_has_cap', [$this, 'payplus_disbale_page_delete'], 10, 3);
-        add_filter('page_row_actions', [$this, 'payplus_remove_row_actions_post'], 10, 1);
+        if (is_admin() && !self::$page_protect_registered) {
+            self::$page_protect_registered = true;
+            add_filter('user_has_cap', [$this, 'payplus_disbale_page_delete'], 10, 3);
+            add_filter('page_row_actions', [$this, 'payplus_remove_row_actions_post'], 10, 1);
+        }
 
         /****** FILTER END ******/
 
@@ -985,9 +990,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function payplus_disbale_page_delete($allcaps, $caps, $args)
     {
-        $post_id = get_option('error_page_payplus');
-        if (isset($args[0]) && isset($args[2]) && $args[2] == $post_id && ($args[0] == 'delete_post' || $args[0] == 'edit_pages')) {
+        static $post_id = null;
+        if ($post_id === null) {
+            $post_id = get_option('error_page_payplus');
+        }
 
+        if ($post_id && isset($args[0]) && isset($args[2]) && $args[2] == $post_id && ($args[0] == 'delete_post' || $args[0] == 'edit_pages')) {
             $allcaps[$caps[0]] = false;
         }
         return $allcaps;
