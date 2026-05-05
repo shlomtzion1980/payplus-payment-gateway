@@ -5,12 +5,11 @@ All notable changes to this project will be documented in this file.
 ## [8.1.7]  - 05-05-2026 - (Doctorine)
 
 - Fix       - Resolved WC_Order_Item_Coupon::offsetGet deprecation notice (since WooCommerce 4.4.0) when coupons are applied at checkout.
-- Feature   - Refund fee: automatic 5% or 100 NIS (whichever is lower) refund fee for PayPlus refunds.
-- Feature   - POS Only Mode for dedicated POS terminal setups.
+- Feature   - Refund fee: Option to automatic 5% or 100 NIS (whichever is lower) refund fee for PayPlus refunds.
+- Feature   - POS Only Mode option for dedicated POS terminal setups.
 - Fix       - Hide PayPlus Gateway checkbox now works reliably for all checkout types (Classic and Blocks), regardless of Hosted Fields or EMV configuration.
 - Fix       - Hosted Fields: resolved duplicate rendering issues on Blocks checkout.
-- Fix       - Hosted Fields: fixed various issues on Classic checkout.
-- Fix       - Subscriptions: token now correctly retrieved from subscription or parent order.
+- Fix       - Subscriptions: token now correctly retrieved from subscription or parent order (ON ALL CASES).
 - Fix       - Blocks checkout: payment errors now display correctly to frontend users.
 - Fix       - Cron job no longer fires at order creation, only at scheduled intervals.
 - Tweak     - Optimized user_has_cap filter: now registers only once and only in admin, eliminating ~200ms overhead on every frontend request.
