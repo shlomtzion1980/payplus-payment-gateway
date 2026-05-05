@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.6
+Stable tag: 8.1.7
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,9 +86,18 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.1.7  - 20-04-2026 =
+== 8.1.7  - 05-05-2026 =
 
 - Fix       - Resolved WC_Order_Item_Coupon::offsetGet deprecation notice (since WooCommerce 4.4.0) when coupons are applied at checkout.
+- Feature   - Refund fee: automatic 5% or 100 NIS (whichever is lower) refund fee for PayPlus refunds.
+- Feature   - POS Only Mode for dedicated POS terminal setups.
+- Fix       - Hide PayPlus Gateway checkbox now works reliably for all checkout types (Classic and Blocks), regardless of Hosted Fields or EMV configuration.
+- Fix       - Hosted Fields: resolved duplicate rendering issues on Blocks checkout.
+- Fix       - Hosted Fields: fixed various issues on Classic checkout.
+- Fix       - Subscriptions: token now correctly retrieved from subscription or parent order.
+- Fix       - Blocks checkout: payment errors now display correctly to frontend users.
+- Fix       - Cron job no longer fires at order creation, only at scheduled intervals.
+- Tweak     - Optimized user_has_cap filter: now registers only once and only in admin, eliminating ~200ms overhead on every frontend request.
 
 == 8.1.6  - 18-03-2026 =
 
