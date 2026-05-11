@@ -71,6 +71,7 @@ let globalDiscount = 0;
 let appleTotalPrice = 0;
 let globalPayingVat = true;
 let ArrayCheckoutItemsApplePay = [];
+let cachedCartData = null;
 let isProductPage = !!productID;
 const payment_url_google_pay_iframe =
     payplus_script.payment_url_google_pay_iframe;
@@ -397,6 +398,44 @@ async function onPaymentAuthorized(event, session) {
     }
 }
 
+function applyCartDataToAppleConfig(data) {
+    appleTotalPrice = 0;
+    for (const product in data["products"]) {
+        appleTotalPrice +=
+            Number(data["products"][product]["quantity"]) *
+            Number(data["products"][product]["priceProductWithTax"]);
+    }
+
+    const {
+        arrayItemApple,
+        totalPrice,
+        totalPriceWithoutTax,
+        discountPrice,
+        taxGlobal,
+    } = formatedProductsArrayApple(data);
+
+    globalPriceProductsWithTax = totalPrice;
+    globalPriceProductsWithoutTax = totalPriceWithoutTax;
+    globalDiscount = discountPrice;
+    globalTaxForProducts = taxGlobal;
+    ArrayCheckoutItemsApplePay = [...arrayItemApple];
+    applePayConfig.lineItems = [...ArrayCheckoutItemsApplePay];
+    applePayConfig.total.amount = totalPrice;
+}
+
+function prefetchCartData() {
+    getTotalPriceCart().then(function (data) {
+        cachedCartData = data;
+    }).catch(function () {});
+}
+
+if (document.getElementById("applePayButton")) {
+    prefetchCartData();
+    jQuery(document).on("change", ".qty, .quantity input", function () {
+        prefetchCartData();
+    });
+}
+
 async function handleApplePayClick(event) {
     try {
         event.preventDefault();
@@ -405,6 +444,11 @@ async function handleApplePayClick(event) {
         let session;
         applePayConfig.total.type = "pending";
         ArrayCheckoutItemsApplePay = [];
+
+        if (cachedCartData) {
+            applyCartDataToAppleConfig(cachedCartData);
+        }
+
         session = new ApplePaySession(3, applePayConfig);
         session.begin();
 
@@ -416,30 +460,8 @@ async function handleApplePayClick(event) {
             }
             session.completeMerchantValidation(data.payment_response);
 
-            const data2 = await getTotalPriceCart();
-
-            appleTotalPrice = 0;
-            for (const product in data2["products"]) {
-                appleTotalPrice +=
-                    Number(data2["products"][product]["quantity"]) *
-                    Number(data2["products"][product]["priceProductWithTax"]);
-            }
-
-            const {
-                arrayItemApple,
-                totalPrice,
-                totalPriceWithoutTax,
-                discountPrice,
-                taxGlobal,
-            } = formatedProductsArrayApple(data2);
-
-            globalPriceProductsWithTax = totalPrice;
-            globalPriceProductsWithoutTax = totalPriceWithoutTax;
-            globalDiscount = discountPrice;
-            globalTaxForProducts = taxGlobal;
-            ArrayCheckoutItemsApplePay.push(...arrayItemApple);
-            applePayConfig.lineItems = [...ArrayCheckoutItemsApplePay];
-            applePayConfig.total.amount = totalPrice;
+            const freshCartData = await getTotalPriceCart();
+            applyCartDataToAppleConfig(freshCartData);
         };
         session.onshippingcontactselected = async function (event) {
             await onShippingContactSelected(event, session);
@@ -451,7 +473,6 @@ async function handleApplePayClick(event) {
             await onPaymentAuthorized(event, session);
         };
     } catch (e) {
-        AllShippingPayPlus;
         displayMsgError(textError + e.message);
     }
 }
