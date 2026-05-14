@@ -432,6 +432,7 @@ class WC_PayPlus_Admin_Settings
                         'cod' => esc_html__('Cash on Delivery', 'payplus-payment-gateway'),
                         'pos_card' => esc_html__('POS Card', 'payplus-payment-gateway'),
                         'pos_chip_and_pin' => esc_html__('POS chip and pin', 'payplus-payment-gateway'),
+                        'payplus-payment-gateway-pos-emv' => esc_html__('POS EMV', 'payplus-payment-gateway'),
                     ]
                 );
                 $settings[$section][] = array(

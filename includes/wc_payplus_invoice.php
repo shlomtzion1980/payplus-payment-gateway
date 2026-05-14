@@ -1126,6 +1126,21 @@ class PayplusInvoice
 
         $order = wc_get_order($order_id);
 
+        if (isset($this->payplus_invoice_option['do-not-create']) && is_array($this->payplus_invoice_option['do-not-create'])) {
+            $doNotCreate = $this->payplus_invoice_option['do-not-create'];
+            $typePaymentMethodEarly = $order->get_payment_method();
+
+            // POS EMV orders store payment_method as 'payplus-payment-gateway'
+            // but can be identified by the payplus_response_emv meta
+            $isEmvOrder = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
+            $effectiveMethod = $isEmvOrder ? 'payplus-payment-gateway-pos-emv' : $typePaymentMethodEarly;
+
+            if (in_array($effectiveMethod, $doNotCreate, true)) {
+                $order->add_order_note('This payment method is set as: Not to create documents automatically');
+                return;
+            }
+        }
+
         if (isset($this->payplus_invoice_option['zero_total_dont_create']) && $this->payplus_invoice_option['zero_total_dont_create'] == "yes") {
             if (floatval($order->get_total()) === 0.0) {
                 $order->add_order_note(__('Invoice not created: Order total is zero and "Do not create documents for zero-total orders" is enabled.', 'payplus-payment-gateway'));
