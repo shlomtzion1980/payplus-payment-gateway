@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.8]  - 14-05-2026 - (Express)
+
+- Feature   - Invoice+ Documents: Added POS EMV to the "Do not create documents" exclusion list.
+- Fix       - Invoice+ Documents: POS EMV exclusion now works correctly (POS EMV orders are detected via transaction meta).
+
 ## [8.1.7]  - 05-05-2026 - (Doctorine)
 
 - Fix       - Resolved WC_Order_Item_Coupon::offsetGet deprecation notice (since WooCommerce 4.4.0) when coupons are applied at checkout.
