@@ -33,6 +33,7 @@ class WC_PayPlus_Product_Syncer
         add_action('wp_ajax_payplus_send_products_to_gateway', [__CLASS__, 'ajax_send_products_to_gateway']);
         add_action('wp_ajax_payplus_activate_product_syncer', [__CLASS__, 'ajax_activate_product_syncer']);
         add_action('wp_ajax_payplus_deactivate_product_syncer', [__CLASS__, 'ajax_deactivate_product_syncer']);
+        add_action('wp_ajax_payplus_force_deactivate_product_syncer', [__CLASS__, 'ajax_force_deactivate_product_syncer']);
         add_action('wp_ajax_payplus_toggle_auto_sync', [__CLASS__, 'ajax_toggle_auto_sync']);
         add_action('payplus_run_export_job', [__CLASS__, 'run_export_job'], 10, 1);
 
@@ -885,6 +886,29 @@ class WC_PayPlus_Product_Syncer
     }
 
     /**
+     * AJAX handler — force deactivate: clears local token and auto-sync without calling the remote API.
+     * Use when the remote service is unreachable or the token is from a test/stale environment.
+     */
+    public static function ajax_force_deactivate_product_syncer()
+    {
+        check_ajax_referer('payplus_product_sync', 'nonce');
+
+        if (!current_user_can('manage_woocommerce')) {
+            wp_send_json_error(array('message' => __('Insufficient permissions', 'payplus-payment-gateway')));
+        }
+
+        $logger = wc_get_logger();
+        $logCtx = array('source' => 'payplus-product-syncer');
+
+        delete_option('payplus_product_syncer_token');
+        delete_option('payplus_product_syncer_auto_sync');
+
+        $logger->info('Product Syncer FORCE deactivated. Local token and auto-sync cleared.', $logCtx);
+
+        wp_send_json_success(array('message' => __('Force deactivated. Token cleared.', 'payplus-payment-gateway')));
+    }
+
+    /**
      * AJAX handler — toggle auto-sync option.
      */
     public static function ajax_toggle_auto_sync()
@@ -973,6 +997,9 @@ class WC_PayPlus_Product_Syncer
                         </p>
                         <button type="button" id="payplus-deactivate-btn" class="button" style="padding: 8px 24px; font-size: 14px; background: #d63638; color: #fff; border-color: #d63638;">
                             <?php echo esc_html__('Deactivate Product Syncer', 'payplus-payment-gateway'); ?>
+                        </button>
+                        <button type="button" id="payplus-force-deactivate-btn" class="button" style="padding: 8px 24px; font-size: 14px; background: #888; color: #fff; border-color: #888; margin-left: 8px;">
+                            <?php echo esc_html__('Force Deactivate (Clear Token)', 'payplus-payment-gateway'); ?>
                         </button>
 
                         <div style="margin-top: 15px; padding: 10px; background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px;">
@@ -1146,6 +1173,41 @@ class WC_PayPlus_Product_Syncer
                     success: function(response) {
                         if (response.success) {
                             $status.css('color', 'green').text('<?php echo esc_js(__('Deactivated successfully. Reloading...', 'payplus-payment-gateway')); ?>');
+                            setTimeout(function() { location.reload(); }, 1500);
+                        } else {
+                            $btn.prop('disabled', false);
+                            $status.css('color', 'red').text('<?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + (response.data.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>'));
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        $btn.prop('disabled', false);
+                        $status.css('color', 'red').text('<?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error);
+                    }
+                });
+            });
+
+            // Force deactivation handler — clears local token without calling the remote API
+            $('#payplus-force-deactivate-btn').on('click', function() {
+                var $btn = $(this);
+                var $status = $('#payplus-activation-status');
+
+                if (!confirm('<?php echo esc_js(__('This will clear the local token without notifying PayPlus. Use only if normal deactivation fails (e.g. test/stale token). Continue?', 'payplus-payment-gateway')); ?>')) {
+                    return;
+                }
+
+                $btn.prop('disabled', true);
+                $status.show().css('color', '#666').text('<?php echo esc_js(__('Clearing token...', 'payplus-payment-gateway')); ?>');
+
+                $.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'payplus_force_deactivate_product_syncer',
+                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>'
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $status.css('color', 'green').text('<?php echo esc_js(__('Token cleared. Reloading...', 'payplus-payment-gateway')); ?>');
                             setTimeout(function() { location.reload(); }, 1500);
                         } else {
                             $btn.prop('disabled', false);
