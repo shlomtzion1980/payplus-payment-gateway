@@ -149,8 +149,16 @@ class WC_PayPlus_Product_Syncer
      */
     public static function rest_permission_check(WP_REST_Request $request)
     {
+        $logger = wc_get_logger();
+        $logCtx = array('source' => 'payplus-product-syncer');
+        $route  = $request->get_route();
+        $method = $request->get_method();
+
+        $logger->info("REST permission_check — {$method} {$route}", $logCtx);
+
         $auth_header = $request->get_header('Authorization');
         if (empty($auth_header)) {
+            $logger->error('REST permission_check — Missing Authorization header.', $logCtx);
             return new WP_Error(
                 'rest_forbidden',
                 __('Missing Authorization header.', 'payplus-payment-gateway'),
@@ -158,8 +166,11 @@ class WC_PayPlus_Product_Syncer
             );
         }
 
+        $logger->info('REST permission_check — Auth header received (length: ' . strlen($auth_header) . ')', $logCtx);
+
         $credentials = json_decode($auth_header, true);
         if (!is_array($credentials) || empty($credentials['api_key']) || empty($credentials['secret_key'])) {
+            $logger->error('REST permission_check — Invalid Authorization format. Raw (first 80): ' . substr($auth_header, 0, 80), $logCtx);
             return new WP_Error(
                 'rest_forbidden',
                 __('Invalid Authorization format. Expected JSON with api_key and secret_key.', 'payplus-payment-gateway'),
@@ -172,6 +183,12 @@ class WC_PayPlus_Product_Syncer
 
         $stored_api_key    = $test_mode ? ($settings['dev_api_key'] ?? '') : ($settings['api_key'] ?? '');
         $stored_secret_key = $test_mode ? ($settings['dev_secret_key'] ?? '') : ($settings['secret_key'] ?? '');
+
+        $logger->info('REST permission_check — test_mode: ' . ($test_mode ? 'yes' : 'no')
+            . ' | stored_api_key set: ' . (!empty($stored_api_key) ? 'yes (ends …' . substr($stored_api_key, -4) . ')' : 'NO')
+            . ' | incoming_api_key ends: …' . substr($credentials['api_key'], -4)
+            . ' | keys_match: ' . (hash_equals($stored_api_key, $credentials['api_key']) ? 'yes' : 'NO')
+            . ' | secrets_match: ' . (hash_equals($stored_secret_key, $credentials['secret_key']) ? 'yes' : 'NO'), $logCtx);
 
         if (
             !hash_equals($stored_api_key, $credentials['api_key']) ||
@@ -195,16 +212,24 @@ class WC_PayPlus_Product_Syncer
      */
     public static function rest_activated(WP_REST_Request $request)
     {
+        $logger = wc_get_logger();
+        $logCtx = array('source' => 'payplus-product-syncer');
+
+        $raw_body = $request->get_body();
+        $logger->info('Activated callback — raw body (first 500): ' . substr($raw_body, 0, 500), $logCtx);
+
         $body    = $request->get_json_params();
         $token   = isset($body['token']) ? sanitize_text_field($body['token']) : '';
         $success = isset($body['success']) ? (bool) $body['success'] : false;
         $message = isset($body['message']) ? sanitize_text_field($body['message']) : '';
 
-        $logger = wc_get_logger();
-        $logCtx = array('source' => 'payplus-product-syncer');
-        $logger->info('Activated callback received. Token: ' . ($token ? substr($token, 0, 8) . '...' : '(empty)') . ' | success: ' . ($success ? 'true' : 'false') . ' | message: ' . $message, $logCtx);
+        $logger->info('Activated callback — parsed: token=' . ($token ? substr($token, 0, 8) . '…' : '(empty)')
+            . ' | success=' . ($success ? 'true' : 'false')
+            . ' | message=' . $message
+            . ' | all body keys: ' . implode(',', array_keys($body ?: [])), $logCtx);
 
         if (empty($token)) {
+            $logger->error('Activated callback — REJECTED: no token in body.', $logCtx);
             return new WP_Error(
                 'missing_token',
                 __('No token provided.', 'payplus-payment-gateway'),
@@ -214,7 +239,8 @@ class WC_PayPlus_Product_Syncer
 
         update_option('payplus_product_syncer_token', $token);
 
-        $logger->info('Product Syncer activated successfully. Token stored.', $logCtx);
+        $stored = get_option('payplus_product_syncer_token', '');
+        $logger->info('Activated callback — Token stored. Verify read-back: ' . ($stored === $token ? 'OK' : 'MISMATCH — stored=' . substr($stored, 0, 8)), $logCtx);
 
         return new WP_REST_Response(array(
             'success' => true,
@@ -390,7 +416,7 @@ class WC_PayPlus_Product_Syncer
             'generated_at'     => gmdate('Y-m-d\TH:i:s\Z'),
         );
 
-        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/bulk-operation/products';
+        $url  = 'https://eg.invoiceplus.co.il/v1/wc-hooks/bulk-operation/products';
         $args = array(
             'body'    => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
             'timeout' => 30,
@@ -686,7 +712,7 @@ class WC_PayPlus_Product_Syncer
             ],
         ];
 
-        $url = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/products/create';
+        $url = 'https://eg.invoiceplus.co.il/v1/wc-hooks/products/create';
 
         $logger = wc_get_logger();
         $logCtx = ['source' => 'payplus-product-syncer'];
@@ -730,9 +756,16 @@ class WC_PayPlus_Product_Syncer
             $apiKey    = $testMode ? (isset($options['dev_api_key']) ? $options['dev_api_key'] : '') : (isset($options['api_key']) ? $options['api_key'] : '');
             $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
 
-            $storeUrl = site_url('/');
+            // Derive the store base URL from rest_url() so it works even when
+            // WordPress is installed in a subdirectory (e.g. /wp/).
+            // rest_url() returns the correct public REST base; we strip the
+            // prefix to get the URL that PayPlus should use as callback root.
+            $rest_prefix = rest_get_url_prefix(); // usually "wp-json"
+            $full_rest   = rest_url('/');          // e.g. https://example.com/wp-json/
+            $storeUrl    = preg_replace('#' . preg_quote($rest_prefix, '#') . '/?$#', '', $full_rest);
+
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
-            $url = add_query_arg('store_url', rawurlencode($storeUrl), 'https://henevent-gateway.invoiceplus.co.il/v1/api/wc-app/app-install');
+            $url = add_query_arg('store_url', rawurlencode($storeUrl), 'https://eg.invoiceplus.co.il/v1/api/wc-app/app-install');
 
             $headers_arr = array(
                 'domain'        => home_url(),
@@ -754,8 +787,10 @@ class WC_PayPlus_Product_Syncer
 
             $logger = wc_get_logger();
             $logCtx = array('source' => 'payplus-product-syncer');
-            $logger->info('App Install — URL: ' . $url, $logCtx);
-            $logger->info('App Install — store_url: ' . site_url('/'), $logCtx);
+            $logger->info('App Install — Request URL: ' . $url, $logCtx);
+            $logger->info('App Install — store_url (sent): ' . $storeUrl . ' | site_url: ' . site_url('/') . ' | home_url: ' . home_url('/') . ' | test_mode: ' . ($testMode ? 'yes' : 'no'), $logCtx);
+            $logger->info('App Install — Callback endpoint that PayPlus should call: ' . rest_url('payplus/v1/products/activated'), $logCtx);
+            $logger->info('App Install — Current token before activation: ' . (get_option('payplus_product_syncer_token', '') ? 'exists' : 'empty'), $logCtx);
 
             $response = wp_remote_get($url, $args);
 
@@ -825,7 +860,7 @@ class WC_PayPlus_Product_Syncer
             $secretKey = $testMode ? (isset($options['dev_secret_key']) ? $options['dev_secret_key'] : '') : (isset($options['secret_key']) ? $options['secret_key'] : '');
 
             $storeUrl  = site_url('/');
-            $url       = 'https://henevent-gateway.invoiceplus.co.il/v1/api/wc-app/app-uninstall';
+            $url       = 'https://eg.invoiceplus.co.il/v1/api/wc-app/app-uninstall';
 
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
 
@@ -2859,7 +2894,7 @@ class WC_PayPlus_Product_Syncer
             'products'         => array($commerce_data),
         );
 
-        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks' . $endpoint_path;
+        $url  = 'https://eg.invoiceplus.co.il/v1/wc-hooks' . $endpoint_path;
         $args = array(
             'body'      => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
             'timeout'   => 0.01,
@@ -3024,7 +3059,7 @@ class WC_PayPlus_Product_Syncer
             $payload['order_id'] = self::$order_stock_context;
         }
 
-        $url  = 'https://henevent-gateway.invoiceplus.co.il/v1/wc-hooks/inventory/update';
+        $url  = 'https://eg.invoiceplus.co.il/v1/wc-hooks/inventory/update';
         $args = array(
             'body'      => wp_json_encode($payload, JSON_UNESCAPED_UNICODE),
             'timeout'   => 0.01,
