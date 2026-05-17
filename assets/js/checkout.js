@@ -1469,29 +1469,91 @@ jQuery(function ($) {
     // to PayPlus, reload iframes, wait 2 s for them to finish loading, then fade in.
     if (payplus_script_checkout.isHostedFields) {
         var _hfFrameIds = ['hsted-Flds--apple-pay-iframe', 'hsted-Flds--google-pay-iframe'];
-        var _hfBusy = false;
-        var _hfPending = false;
-        var _hfReady = false;
         var _hfLastTotal = null;
+        var _hfBusy = false;
+        var _hfDebounce = null;
+        var _hfReady = false;
+        var _hfHidden = true;
+
+        // Hide iframes instantly when they appear in the DOM via MutationObserver.
+        // This catches fragment-replacement-created iframes before they paint.
+        function hideFrame(f) {
+            f.style.setProperty('visibility', 'hidden', 'important');
+        }
+        function showAllFrames() {
+            _hfFrameIds.forEach(function(id) {
+                var f = document.getElementById(id);
+                if (f) f.style.setProperty('visibility', 'visible', 'important');
+            });
+            _hfHidden = false;
+        }
+        function hideAllFrames() {
+            _hfFrameIds.forEach(function(id) {
+                var f = document.getElementById(id);
+                if (f) hideFrame(f);
+            });
+            _hfHidden = true;
+        }
+
+        var _hfObserver = new MutationObserver(function(mutations) {
+            if (!_hfHidden) return;
+            mutations.forEach(function(m) {
+                m.addedNodes.forEach(function(node) {
+                    if (node.nodeType !== 1) return;
+                    if (_hfFrameIds.indexOf(node.id) !== -1) {
+                        hideFrame(node);
+                    }
+                    // Also check children (iframe might be inside an added container)
+                    _hfFrameIds.forEach(function(id) {
+                        var f = node.querySelector && node.querySelector('#' + id);
+                        if (f) hideFrame(f);
+                    });
+                });
+            });
+        });
+        _hfObserver.observe(document.body, { childList: true, subtree: true });
+
+        // Inject spinner keyframes + loader style
+        var _hfSpinStyle = document.createElement('style');
+        _hfSpinStyle.textContent = '@keyframes ppHfSpin{to{transform:rotate(360deg)}} #pp-hf-loader{display:none;text-align:center;padding:12px 0;font-size:13px;color:#888;} #pp-hf-loader .pp-hf-spinner{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#666;border-radius:50%;animation:ppHfSpin .7s linear infinite;vertical-align:middle;margin-right:6px;}';
+        document.head.appendChild(_hfSpinStyle);
+
+        // Hide any already-existing iframes
+        hideAllFrames();
+
+        function showLoader() {
+            // Only create the loader once iframes exist (SDK has initialized)
+            if (!document.getElementById('pp-hf-loader')) {
+                var hfFrame = document.getElementById('hsted-Flds--google-pay-iframe') || document.getElementById('hsted-Flds--apple-pay-iframe');
+                if (hfFrame) {
+                    var parent = hfFrame.parentNode;
+                    if (parent) {
+                        var loader = document.createElement('div');
+                        loader.id = 'pp-hf-loader';
+                        loader.innerHTML = '<span class="pp-hf-spinner"></span>Updating payment buttons...';
+                        parent.insertBefore(loader, hfFrame);
+                    }
+                }
+            }
+            var l = document.getElementById('pp-hf-loader');
+            if (l) l.style.display = 'block';
+        }
+
+        function hideLoader() {
+            var l = document.getElementById('pp-hf-loader');
+            if (l) l.style.display = 'none';
+        }
 
         function getCheckoutTotal() {
             var el = document.querySelector('.order-total .woocommerce-Price-amount');
             return el ? el.textContent : null;
         }
 
-        function reloadPayFrames() {
-            _hfFrameIds.forEach(function(id) {
-                var f = document.getElementById(id);
-                if (f) f.src = f.src;
-            });
-        }
-
-        function pushAndReload() {
-            if (_hfBusy) { _hfPending = true; return; }
+        function pushAndReveal() {
+            if (_hfBusy) return;
             _hfBusy = true;
-
-            if (!document.getElementById(_hfFrameIds[0]) &&
-                !document.getElementById(_hfFrameIds[1])) { _hfBusy = false; return; }
+            hideAllFrames();
+            showLoader();
 
             $.ajax({
                 url: payplus_script_checkout.ajax_url,
@@ -1501,29 +1563,51 @@ jQuery(function ($) {
                     _ajax_nonce: payplus_script_checkout.frontNonce
                 },
                 success: function() {
-                    reloadPayFrames();
+                    _hfFrameIds.forEach(function(id) {
+                        var f = document.getElementById(id);
+                        if (f) f.src = f.src;
+                    });
+                    setTimeout(function() {
+                        hideLoader();
+                        showAllFrames();
+                        _hfLastTotal = getCheckoutTotal();
+                        _hfBusy = false;
+                        _hfReady = true;
+                    }, 600);
                 },
-                complete: function() {
-                    _hfReady = true;
+                error: function() {
+                    hideLoader();
+                    showAllFrames();
                     _hfLastTotal = getCheckoutTotal();
                     _hfBusy = false;
-                    if (_hfPending) { _hfPending = false; pushAndReload(); }
+                    _hfReady = true;
                 }
             });
         }
 
         $(document.body).on('updated_checkout', function() {
-            if (!_hfReady) return;
-            var nowTotal = getCheckoutTotal();
-            if (nowTotal && nowTotal === _hfLastTotal) return;
-            _hfLastTotal = nowTotal;
-            pushAndReload();
+            if (_hfBusy) return;
+            hideAllFrames();
+            if (_hfDebounce) clearTimeout(_hfDebounce);
+            _hfDebounce = setTimeout(function() {
+                if (!_hfReady) {
+                    showAllFrames();
+                    return;
+                }
+                var nowTotal = getCheckoutTotal();
+                if (nowTotal && nowTotal === _hfLastTotal) {
+                    showAllFrames();
+                    return;
+                }
+                pushAndReveal();
+            }, 1500);
         });
 
+        // Initial: poll for iframes then push
         var _hfInitPoll = setInterval(function() {
             if (document.getElementById(_hfFrameIds[0]) || document.getElementById(_hfFrameIds[1])) {
                 clearInterval(_hfInitPoll);
-                pushAndReload();
+                pushAndReveal();
             }
         }, 200);
     }
