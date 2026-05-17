@@ -86,6 +86,8 @@ hf.SetMainFields({
     .AddField("custom_invoice_name", "#invoice-name", "#invoice-name-wrapper")
     .AddField("notes", "[name=notes]", ".notes-wrapper")
     .SetRecaptcha("#recaptcha")
+    .SetGooglePay("#googlePayButton")
+	.SetApplePay("#applePayButton")
     .SetHostedFieldsStyles(
         "::placeholder {color: #A2ADB5;} .hf-inp-name-cc {font-size:1rem !important;text-align: " +
         direction +

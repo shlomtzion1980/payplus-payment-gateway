@@ -503,6 +503,77 @@ if (isCheckout || hasOrder) {
         });
     }
 
+    // Keep Google Pay / Apple Pay hosted-fields buttons in sync with the Blocks cart total.
+    // On load and on every cart change: hide buttons instantly, push updated total
+    // to PayPlus, reload iframes, wait 2 s for them to finish loading, then fade in.
+    (function () {
+        var CART_KEY = window.wc.wcBlocksData.CART_STORE_KEY;
+        var cartSel = wp.data.select(CART_KEY);
+        var lastBtnTotal = null;
+        var busy = false;
+        var pending = false;
+        var ready = false;
+        var frameIds = ['hsted-Flds--apple-pay-iframe', 'hsted-Flds--google-pay-iframe'];
+
+        try { lastBtnTotal = cartSel.getCartTotals().total_price; } catch (e) {}
+
+        function reloadPayFrames() {
+            frameIds.forEach(function(id) {
+                var f = document.getElementById(id);
+                if (f) f.src = f.src;
+            });
+        }
+
+        function pushAndReload() {
+            if (busy) { pending = true; return; }
+            busy = true;
+
+            if (!document.getElementById(frameIds[0]) &&
+                !document.getElementById(frameIds[1])) { busy = false; return; }
+
+            var ajaxUrl = (window.payplus_script && window.payplus_script.ajax_url) || '';
+            var nonce = (window.payplus_script && window.payplus_script.frontNonce) || '';
+            if (!ajaxUrl || !nonce) { busy = false; return; }
+
+            jQuery.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'payplus_update_hosted_buttons',
+                    _ajax_nonce: nonce
+                },
+                success: function () {
+                    reloadPayFrames();
+                },
+                complete: function () {
+                    ready = true;
+                    try { lastBtnTotal = cartSel.getCartTotals().total_price; } catch(e) {}
+                    busy = false;
+                    if (pending) { pending = false; pushAndReload(); }
+                }
+            });
+        }
+
+        wp.data.subscribe(function () {
+            if (!ready) return;
+            var currentTotal;
+            try { currentTotal = cartSel.getCartTotals().total_price; } catch (e) { return; }
+
+            if (lastBtnTotal !== null && currentTotal !== lastBtnTotal) {
+                lastBtnTotal = currentTotal;
+                pushAndReload();
+            }
+            lastBtnTotal = currentTotal;
+        });
+
+        var _initPoll = setInterval(function() {
+            if (document.getElementById(frameIds[0]) || document.getElementById(frameIds[1])) {
+                clearInterval(_initPoll);
+                pushAndReload();
+            }
+        }, 200);
+    })();
+
     document.addEventListener("DOMContentLoaded", function () {
         // Function to start observing for the target element
         let loopImages = true;
