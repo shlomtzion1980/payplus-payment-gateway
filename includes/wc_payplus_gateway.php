@@ -4093,12 +4093,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $expected_payment_method = isset($payplus_method_map[$actual_method]) ? $payplus_method_map[$actual_method] : 'payplus-payment-gateway';
             
             // If the current payment method doesn't match what was actually used, update it
+            // Set on object but do NOT save yet — meta must be stored first to avoid
+            // hooks (e.g. automatic invoice creation) running before payment data exists.
             if ($current_payment_method !== $expected_payment_method) {
                 $order->set_payment_method($expected_payment_method);
                 $order->set_payment_method_title($this->get_payment_method_title($expected_payment_method));
-                $order->save();
                 
-                // Add order note about the payment method change
                 $old_title = $this->get_payment_method_title($current_payment_method);
                 $new_title = $this->get_payment_method_title($expected_payment_method);
                 $order->add_order_note(
@@ -4113,7 +4113,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         }
         
+        // Store all meta first, then save once — ensures payment data is available
+        // when hooks (like automatic invoice creation) fire on save.
         WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
+        $order->save();
     }
     
     /**
