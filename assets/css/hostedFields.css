@@ -12796,16 +12796,3 @@ textarea {
     cursor: not-allowed;
 }
 
-.hsted-Flds--apple-pay-iframe,
-.hsted-Flds--google-pay-iframe {
-    width: 100% !important;
-    height: 40px !important;
-    max-height: 40px !important;
-}
-
-#googlePayButton,
-#applePayButton {
-    margin-bottom: 6px;
-}
-
-

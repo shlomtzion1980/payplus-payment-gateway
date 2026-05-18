@@ -596,8 +596,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
         add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
         add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
-        add_action('wp_ajax_payplus_update_hosted_buttons', [$this, 'updateHostedButtonsData']);
-        add_action('wp_ajax_nopriv_payplus_update_hosted_buttons', [$this, 'updateHostedButtonsData']);
         // Support tokenization for saved cards
         $this->supports = array_merge($this->supports, ['tokenization']);
     }
@@ -740,122 +738,6 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         ));
     }
 
-
-    public function updateHostedButtonsData()
-    {
-        check_ajax_referer('frontNonce', '_ajax_nonce');
-
-        if (!WC()->session || !WC()->cart) {
-            wp_send_json_error(['message' => 'No active session']);
-            return;
-        }
-
-        $pageRequestUid = WC()->session->get('page_request_uid');
-        $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
-
-        if (!$pageRequestUid || !$hostedFieldsUUID) {
-            wp_send_json_error(['message' => 'No active hosted fields session']);
-            return;
-        }
-
-        $existingPayload = WC()->session->get('hostedPayload');
-        if (empty($existingPayload)) {
-            wp_send_json_error(['message' => 'No existing payload']);
-            return;
-        }
-
-        $data = json_decode($existingPayload);
-        if (!$data) {
-            wp_send_json_error(['message' => 'Invalid payload']);
-            return;
-        }
-
-        WC()->cart->calculate_totals();
-        $cart = WC()->cart->get_cart();
-
-        $mainSettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
-        $vat4All = isset($mainSettings['paying_vat_all_order']) && $mainSettings['paying_vat_all_order'] === 'yes';
-        $wc_tax_enabled = wc_tax_enabled();
-        $isTaxIncluded = wc_prices_include_tax();
-
-        $data->items = [];
-        foreach ($cart as $cart_item) {
-            $productId = $cart_item['product_id'];
-            $item = new stdClass();
-
-            if (!empty($cart_item['variation_id'])) {
-                $product = new WC_Product_Variable($productId);
-                $productData = $product->get_available_variation($cart_item['variation_id']);
-                $tax = (WC()->cart->get_total_tax()) ? WC()->cart->get_total_tax() / $cart_item['quantity'] : 0;
-                $tax = number_format($tax, 2, '.', '');
-                $item->price = number_format($productData['display_price'] + $tax, 2, '.', '');
-            } else {
-                $product = new WC_Product($productId);
-                $item->price = number_format(wc_get_price_including_tax($product), 2, '.', '');
-            }
-
-            $item->name = $product->get_name();
-            $item->quantity = $cart_item['quantity'];
-            $item->barcode = ($product->get_sku()) ? (string) $product->get_sku() : (string) $productId;
-
-            $productVat = 0;
-            if ($wc_tax_enabled) {
-                $productVat = $isTaxIncluded && $product->get_tax_status() === 'taxable' ? 0 : 1;
-                $productVat = $product->get_tax_status() === 'none' ? 2 : $productVat;
-                $productVat = $vat4All ? 0 : $productVat;
-            }
-            $item->vat_type = $productVat;
-
-            $data->items[] = $item;
-        }
-
-        $shippingTotal = floatval(WC()->cart->get_shipping_total());
-        if ($wc_tax_enabled) {
-            $shippingTotal += floatval(WC()->cart->get_shipping_tax());
-        }
-        if ($shippingTotal > 0) {
-            $shippingItem = new stdClass();
-            $shippingItem->name = __('Shipping', 'payplus-payment-gateway');
-            $shippingItem->quantity = 1;
-            $shippingItem->price = number_format($shippingTotal, 2, '.', '');
-            $shippingItem->barcode = 'shipping';
-            $data->items[] = $shippingItem;
-        }
-
-        if (WC()->cart->get_total_discount()) {
-            $discountItem = new stdClass();
-            $discountItem->name = __('Discount coupons', 'payplus-payment-gateway');
-            $discountItem->barcode = 'discount';
-            $discountItem->quantity = 1;
-            $discountPrice = floatval(WC()->cart->get_discount_total());
-            if ($wc_tax_enabled) {
-                $discountPrice += floatval(WC()->cart->get_discount_tax());
-            }
-            $discountItem->price = number_format(-1 * $discountPrice, 2, '.', '');
-            $data->items[] = $discountItem;
-        }
-
-        $totalAmount = 0;
-        foreach ($data->items as $item) {
-            $totalAmount += $item->price * $item->quantity;
-        }
-        $data->amount = number_format($totalAmount, 2, '.', '');
-
-        $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
-        WC()->session->set('hostedPayload', $payload);
-
-        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, true);
-        $hostedResponseArray = json_decode($hostedResponse, true);
-
-        $isSuccess = isset($hostedResponseArray['data']['page_request_uid'])
-            && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
-
-        if ($isSuccess) {
-            wp_send_json_success(['message' => 'Payment buttons updated']);
-        } else {
-            wp_send_json_error(['message' => 'Failed to update payment page']);
-        }
-    }
 
     public function double_check_ipn_via_ajax()
     {

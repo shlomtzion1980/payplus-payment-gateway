@@ -615,9 +615,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                                                                                     }  ?>
                         </div>
                     </div>
-                    <div id="googlePayButton"></div>
-                    <div id="applePayButton"></div>
-                    <div id="customer-name-wrapper" class="fld-wrapper">
+                    <div id="card-holder-name-wrapper" class="fld-wrapper">
                         <label><?php echo esc_html__('Name', 'payplus-payment-gateway'); ?></label>
                         <input type="text" id="card-holder-name" class="forms-control" value="" />
                     </div>
