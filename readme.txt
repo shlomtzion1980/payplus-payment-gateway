@@ -86,10 +86,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.1.8  - 14-05-2026 =
+== 8.1.8  - 19-05-2026 =
 
 - Feature   - Invoice+ Documents: Added POS EMV to the "Do not create documents" exclusion list.
 - Fix       - Invoice+ Documents: POS EMV exclusion now works correctly (POS EMV orders are detected via transaction meta).
+- Fix       - Invoice+ Documents: Payment method detection now uses alternative_method_name (bit, apple-pay, google-pay) when available.
+- Fix       - Invoice+ Documents: Payment query is now HPOS-compatible (queries correct meta table on High-Performance Order Storage sites) - Fix for docs that came out as other instead of payment app.
+- Fix       - Payment meta is now fully stored before order save, preventing race conditions with automatic invoice creation hooks.
 
 == 8.1.7  - 05-05-2026 =
 
