@@ -1450,10 +1450,13 @@ body{
     {
         global $wp;
         $error_page_payplus = get_option('error_page_payplus');
+        if (empty($error_page_payplus)) {
+            return;
+        }
         $postIdcurrenttUrl = url_to_postid(home_url($wp->request));
-        if (intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
+        if ($postIdcurrenttUrl > 0 && intval($postIdcurrenttUrl) === intval($error_page_payplus)) {
         ?>
-            <meta name=" robots" content="noindex,nofollow">
+            <meta name="robots" content="noindex,nofollow">
         <?php
         }
     }
