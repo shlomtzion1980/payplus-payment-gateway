@@ -1054,45 +1054,6 @@ class WC_PayPlus_Product_Syncer
                 </div>
             </div>
 
-            <div class="payplus-syncer-actions" style="background: #fff; padding: 20px; margin: 20px 0; border: 1px solid #ccc; border-radius: 5px;">
-                <h2><?php echo esc_html__('Sync Actions', 'payplus-payment-gateway'); ?></h2>
-                <form method="post" id="payplus-product-sync-form">
-                    <?php wp_nonce_field('payplus_product_sync', 'payplus_product_sync_nonce'); ?>
-                    
-                    <p>
-                        <label for="products_per_batch"><?php echo esc_html__('Products per batch:', 'payplus-payment-gateway'); ?></label>
-                        <input type="number" name="products_per_batch" id="products_per_batch" value="50" min="10" max="200" step="10" />
-                        <span class="description"><?php echo esc_html__('Number of products to sync in each request (10-200)', 'payplus-payment-gateway'); ?></span>
-                    </p>
-
-                    <p>
-                        <button type="submit" name="start_sync" class="button button-primary button-large" style="padding: 10px 30px; font-size: 16px;">
-                            <?php echo esc_html__('Start Sync', 'payplus-payment-gateway'); ?>
-                        </button>
-                    </p>
-                </form>
-
-                <div id="payplus-sync-progress" style="display: none; margin-top: 20px;">
-                    <h3><?php echo esc_html__('Sync Progress', 'payplus-payment-gateway'); ?></h3>
-                    <div style="background: #f0f0f0; border: 1px solid #ddd; padding: 10px; border-radius: 3px;">
-                        <div id="payplus-sync-status"><?php echo esc_html__('Initializing...', 'payplus-payment-gateway'); ?></div>
-                        <div style="margin-top: 10px;">
-                            <progress id="payplus-sync-progressbar" value="0" max="100" style="width: 100%; height: 30px;"></progress>
-                        </div>
-                        <div id="payplus-sync-details" style="margin-top: 10px; font-size: 12px; color: #666;"></div>
-                    </div>
-                </div>
-
-                <div id="payplus-sync-results" style="display: none; margin-top: 20px;">
-                    <h3><?php echo esc_html__('WooCommerce Raw Data', 'payplus-payment-gateway'); ?></h3>
-                    <div id="payplus-sync-results-content" style="background: #f0f0f0; border: 1px solid #ddd; padding: 10px; border-radius: 3px;"></div>
-                </div>
-
-                <div id="payplus-commerce-results" style="display: none; margin-top: 20px;">
-                    <h3><?php echo esc_html__('PayPlus Commerce Format', 'payplus-payment-gateway'); ?></h3>
-                    <div id="payplus-commerce-results-content" style="background: #f0f0f0; border: 1px solid #ddd; padding: 10px; border-radius: 3px;"></div>
-                </div>
-            </div>
         </div>
 
         <script type="text/javascript">
@@ -1269,248 +1230,24 @@ class WC_PayPlus_Product_Syncer
                 });
             });
 
-            var allProductsData = [];
-            var allCommerceData = [];
-            var totalProducts = 0;
-            var currentOffset = 0;
-            var currentFormat = 'woocommerce';
-
-            $('#payplus-product-sync-form').on('submit', function(e) {
-                e.preventDefault();
-                
-                if (!confirm('<?php echo esc_js(__('Are you sure you want to get all products data?', 'payplus-payment-gateway')); ?>')) {
-                    return;
-                }
-
-                var $form = $(this);
-                var $button = $form.find('button[name="start_sync"]');
-                var productsPerBatch = parseInt($('#products_per_batch').val());
-                
-                // Reset data
-                allProductsData = [];
-                allCommerceData = [];
-                totalProducts = 0;
-                currentOffset = 0;
-                currentFormat = 'woocommerce';
-                
-                // Disable form and show progress
-                $button.prop('disabled', true);
-                $form.find('input').prop('disabled', true);
-                $('#payplus-sync-progress').show();
-                $('#payplus-sync-results').hide();
-                $('#payplus-commerce-results').hide();
-                
-                $('#payplus-sync-status').text('<?php echo esc_js(__('Loading WooCommerce products...', 'payplus-payment-gateway')); ?>');
-                $('#payplus-sync-progressbar').val(0);
-                
-                // Start loading products
-                loadProductsBatch(productsPerBatch, $button, $form);
-            });
-
-            function loadProductsBatch(batchSize, $button, $form) {
-                $.ajax({
-                    url: ajaxurl,
-                    type: 'POST',
-                    data: {
-                        action: 'payplus_get_products_json',
-                        nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>',
-                        offset: currentOffset,
-                        limit: batchSize,
-                        format: currentFormat
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            var data = response.data;
-                            
-                            if (currentFormat === 'woocommerce') {
-                                allProductsData = allProductsData.concat(data.products);
-                            } else {
-                                allCommerceData = allCommerceData.concat(data.products);
-                            }
-                            
-                            totalProducts = data.total;
-                            currentOffset += batchSize;
-                            
-                            var progress = Math.min((data.processed / totalProducts) * 100, 100);
-                            $('#payplus-sync-progressbar').val(progress);
-                            
-                            var formatLabel = currentFormat === 'woocommerce' ? 'WooCommerce' : 'Commerce';
-                            $('#payplus-sync-status').text('<?php echo esc_js(__('Loading', 'payplus-payment-gateway')); ?> ' + formatLabel + ' <?php echo esc_js(__('products:', 'payplus-payment-gateway')); ?> ' + data.processed + ' / ' + totalProducts);
-                            $('#payplus-sync-details').text('<?php echo esc_js(__('Batch size:', 'payplus-payment-gateway')); ?> ' + batchSize + ' | <?php echo esc_js(__('Current offset:', 'payplus-payment-gateway')); ?> ' + currentOffset);
-                            
-                            if (data.has_more) {
-                                // Load next batch
-                                setTimeout(function() {
-                                    loadProductsBatch(batchSize, $button, $form);
-                                }, 100);
-                            } else {
-                                // Check if we need to load commerce format
-                                if (currentFormat === 'woocommerce') {
-                                    displayResults('woocommerce');
-                                    // Now load commerce format
-                                    currentOffset = 0;
-                                    currentFormat = 'commerce';
-                                    $('#payplus-sync-progressbar').val(0);
-                                    loadProductsBatch(batchSize, $button, $form);
-                                } else {
-                                    // All done
-                                    displayResults('commerce');
-                                    $button.prop('disabled', false);
-                                    $form.find('input').prop('disabled', false);
-                                    $('#payplus-sync-status').html('<span style="color: green;"><?php echo esc_js(__('Complete! Loaded', 'payplus-payment-gateway')); ?> ' + allProductsData.length + ' <?php echo esc_js(__('products in both formats', 'payplus-payment-gateway')); ?></span>');
-                                }
-                            }
-                        } else {
-                            $('#payplus-sync-status').html('<span style="color: red;"><?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + (response.data.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>') + '</span>');
-                            $button.prop('disabled', false);
-                            $form.find('input').prop('disabled', false);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        $('#payplus-sync-status').html('<span style="color: red;"><?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error + '</span>');
-                        $button.prop('disabled', false);
-                        $form.find('input').prop('disabled', false);
-                    }
-                });
-            }
-
-            function displayResults(format) {
-                if (format === 'woocommerce') {
-                    $('#payplus-sync-results').show();
-                    var jsonOutput = JSON.stringify(allProductsData, null, 2);
-                    var resultHtml = '<div style="margin-bottom: 10px;">';
-                    resultHtml += '<button id="copy-wc-json-btn" class="button"><?php echo esc_js(__('Copy JSON to Clipboard', 'payplus-payment-gateway')); ?></button> ';
-                    resultHtml += '<button id="download-wc-json-btn" class="button"><?php echo esc_js(__('Download JSON File', 'payplus-payment-gateway')); ?></button>';
-                    resultHtml += '</div>';
-                    resultHtml += '<textarea readonly style="width: 100%; height: 400px; font-family: monospace; font-size: 12px; padding: 10px;">' + jsonOutput + '</textarea>';
-                    
-                    $('#payplus-sync-results-content').html(resultHtml);
-                    
-                    // Copy to clipboard handler
-                    $('#copy-wc-json-btn').on('click', function() {
-                        var $textarea = $('#payplus-sync-results-content textarea');
-                        $textarea.select();
-                        document.execCommand('copy');
-                        alert('<?php echo esc_js(__('JSON copied to clipboard!', 'payplus-payment-gateway')); ?>');
-                    });
-                    
-                    // Download JSON handler
-                    $('#download-wc-json-btn').on('click', function() {
-                        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonOutput);
-                        var downloadAnchorNode = document.createElement('a');
-                        downloadAnchorNode.setAttribute("href", dataStr);
-                        downloadAnchorNode.setAttribute("download", "payplus-woocommerce-products-" + Date.now() + ".json");
-                        document.body.appendChild(downloadAnchorNode);
-                        downloadAnchorNode.click();
-                        downloadAnchorNode.remove();
-                    });
-                } else {
-                    $('#payplus-commerce-results').show();
-                    var jsonOutput = JSON.stringify(allCommerceData, null, 2);
-                    var resultHtml = '<div style="margin-bottom: 10px;">';
-                    resultHtml += '<button id="copy-commerce-json-btn" class="button button-primary"><?php echo esc_js(__('Copy Commerce JSON to Clipboard', 'payplus-payment-gateway')); ?></button> ';
-                    resultHtml += '<button id="download-commerce-json-btn" class="button button-primary"><?php echo esc_js(__('Download Commerce JSON File', 'payplus-payment-gateway')); ?></button> ';
-                    resultHtml += '<button id="send-commerce-json-btn" class="button" style="background:#00a32a;color:#fff;border-color:#00a32a;"><?php echo esc_js(__('Send to PayPlus', 'payplus-payment-gateway')); ?></button>';
-                    resultHtml += '<span id="send-commerce-status" style="margin-left:10px;display:none;"></span>';
-                    resultHtml += '</div>';
-                    resultHtml += '<textarea readonly style="width: 100%; height: 400px; font-family: monospace; font-size: 12px; padding: 10px;">' + jsonOutput + '</textarea>';
-                    
-                    $('#payplus-commerce-results-content').html(resultHtml);
-                    
-                    // Copy to clipboard handler
-                    $('#copy-commerce-json-btn').on('click', function() {
-                        var $textarea = $('#payplus-commerce-results-content textarea');
-                        $textarea.select();
-                        document.execCommand('copy');
-                        alert('<?php echo esc_js(__('Commerce JSON copied to clipboard!', 'payplus-payment-gateway')); ?>');
-                    });
-                    
-                    // Download JSON handler
-                    $('#download-commerce-json-btn').on('click', function() {
-                        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(jsonOutput);
-                        var downloadAnchorNode = document.createElement('a');
-                        downloadAnchorNode.setAttribute("href", dataStr);
-                        downloadAnchorNode.setAttribute("download", "payplus-commerce-products-" + Date.now() + ".json");
-                        document.body.appendChild(downloadAnchorNode);
-                        downloadAnchorNode.click();
-                        downloadAnchorNode.remove();
-                    });
-
-                    // Send to PayPlus handler
-                    $('#send-commerce-json-btn').on('click', function() {
-                        var $btn = $(this);
-                        var $status = $('#send-commerce-status');
-
-                        if (!confirm('<?php echo esc_js(__('Send all products to PayPlus?', 'payplus-payment-gateway')); ?>')) {
-                            return;
-                        }
-
-                        $btn.prop('disabled', true);
-                        $status.show().css('color', '#666').text('<?php echo esc_js(__('Sending...', 'payplus-payment-gateway')); ?>');
-
-                        $.ajax({
-                            url: ajaxurl,
-                            type: 'POST',
-                            data: {
-                                action: 'payplus_send_products_to_gateway',
-                                nonce: '<?php echo esc_js(wp_create_nonce('payplus_product_sync')); ?>',
-                                products_json: JSON.stringify(allCommerceData)
-                            },
-                            success: function(response) {
-                                $btn.prop('disabled', false);
-                                if (response.success) {
-                                    $status.css('color', 'green').text('<?php echo esc_js(__('Sent successfully!', 'payplus-payment-gateway')); ?> (HTTP ' + response.data.status_code + ')');
-                                } else {
-                                    $status.css('color', 'red').text('<?php echo esc_js(__('Error:', 'payplus-payment-gateway')); ?> ' + (response.data.message || '<?php echo esc_js(__('Unknown error', 'payplus-payment-gateway')); ?>'));
-                                }
-                            },
-                            error: function(xhr, status, error) {
-                                $btn.prop('disabled', false);
-                                $status.css('color', 'red').text('<?php echo esc_js(__('AJAX Error:', 'payplus-payment-gateway')); ?> ' + error);
-                            }
-                        });
-                    });
-                }
-            }
         });
         </script>
 
         <style>
         .payplus-syncer-stats,
         .payplus-syncer-sample,
-        .payplus-syncer-activation,
-        .payplus-syncer-actions {
+        .payplus-syncer-activation {
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .payplus-syncer-stats h2,
         .payplus-syncer-sample h2,
-        .payplus-syncer-activation h2,
-        .payplus-syncer-actions h2 {
+        .payplus-syncer-activation h2 {
             margin-top: 0;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
         
-        #payplus-sync-progressbar {
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        
-        #payplus-sync-progressbar::-webkit-progress-bar {
-            background-color: #f0f0f0;
-            border-radius: 3px;
-        }
-        
-        #payplus-sync-progressbar::-webkit-progress-value {
-            background-color: #2271b1;
-            border-radius: 3px;
-        }
-        
-        #payplus-sync-progressbar::-moz-progress-bar {
-            background-color: #2271b1;
-            border-radius: 3px;
-        }
         </style>
         <?php
     }
