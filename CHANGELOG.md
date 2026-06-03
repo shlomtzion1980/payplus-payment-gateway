@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.1.9]  - 03-06-2026 - (Elbaph)
+
+- Fix       - Blocks checkout: validation errors (missing address, phone, etc.) no longer show a persistent PayPlus error popup; WooCommerce native inline notices are used instead.
+- Fix       - Blocks checkout: corrected set_payment_details calls to pass arrays instead of strings, preventing PHP foreach warnings.
+- Fix       - Hosted Fields: card number field now shows a green checkmark when card brand is detected (via pp_ccTypeChange).
+- Fix       - Hosted Fields: lock and CVV icons inside iframes now use inline base64 data URIs, eliminating CORS errors on local/dev environments.
+- Fix       - SEO: noindex meta tag for PayPlus error page no longer incorrectly applied to other pages when the option is empty.
+
 ## [8.1.8]  - 19-05-2026 - (Elbaph)
 
 - Feature   - Invoice+ Documents: Added POS EMV to the "Do not create documents" exclusion list.

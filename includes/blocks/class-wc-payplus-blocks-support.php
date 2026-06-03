@@ -545,13 +545,13 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $counts = array_count_values($main_gateway->get_payment_ips());
                 $howMany = isset($counts[$client_ip]) ? $counts[$client_ip] : 0;
                 if (in_array($client_ip, $main_gateway->get_payment_ips()) && $howMany >= $main_gateway->block_ip_transactions_hour) {
-                    $result->set_payment_details('');
-                    $payment_details['errorMessage'] = __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway');
-                    $result->set_payment_details($payment_details);
+                    $result->set_payment_details([
+                        'errorMessage' => __('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway'),
+                    ]);
                     wp_die(esc_html__('Something went wrong with the payment page - This Ip is blocked', 'payplus-payment-gateway'));
                 }
             } else {
-                $result->set_payment_details('');
+                $result->set_payment_details([]);
             }
 
             // Restore PW Gift Cards data onto the gateway instance before building the payload.

@@ -665,17 +665,38 @@ if (isCheckout || hasOrder) {
                 if (store.hasError()) {
                     try {
                         let getPaymentResult = payment.getPaymentResult();
-                        let errorMsg = '';
 
+                        // If there's no payment result, this is a WooCommerce
+                        // validation error (e.g. missing address field), not a
+                        // PayPlus payment error.  Let WooCommerce handle it
+                        // natively with its own inline notices.
                         if (
                             getPaymentResult === null ||
                             getPaymentResult === undefined ||
                             getPaymentResult === ""
                         ) {
-                            errorMsg = (window.payplus_i18n && window.payplus_i18n.payment_error)
-                                ? window.payplus_i18n.payment_error
-                                : "An error occurred while processing your payment. Please try again.";
-                        } else if (
+                            // Undo any hosted-fields loader/dimming that may
+                            // have been triggered during the processing phase.
+                            var hfLoaderEl2 = document.querySelector('.blocks-payplus_loader_hosted');
+                            if (hfLoaderEl2) hfLoaderEl2.style.display = 'none';
+                            document.body.style.overflow = '';
+                            document.body.style.backgroundColor = '';
+                            document.body.style.opacity = '';
+
+                            // Re-enable hosted-fields button if it was disabled
+                            var hfBtn = document.querySelector('.payplus-hosted-place-order');
+                            if (hfBtn) {
+                                hfBtn.disabled = false;
+                                hfBtn.style.opacity = '';
+                                var hfBtnLoader = hfBtn.querySelector('.button-loader');
+                                if (hfBtnLoader) hfBtnLoader.style.display = 'none';
+                            }
+                            return;
+                        }
+
+                        let errorMsg = '';
+
+                        if (
                             getPaymentResult.paymentDetails &&
                             getPaymentResult.paymentDetails.errorMessage !== undefined
                         ) {

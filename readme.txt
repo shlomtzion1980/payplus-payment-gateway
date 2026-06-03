@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 8.1.8
+Stable tag: 8.1.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.1.9  - 03-06-2026 =
+
+- Fix       - Blocks checkout: validation errors no longer show a persistent PayPlus error popup; WooCommerce native inline notices are used instead.
+- Fix       - Blocks checkout: corrected set_payment_details calls to pass arrays instead of strings, preventing PHP foreach warnings.
+- Fix       - Hosted Fields: card number field now shows a green checkmark when card brand is detected.
+- Fix       - Hosted Fields: lock and CVV icons now use inline data URIs, eliminating CORS errors on local/dev environments.
+- Fix       - SEO: noindex meta tag for error page no longer incorrectly applied to other pages.
 
 == 8.1.8  - 19-05-2026 =
 
