@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.1.9]  - 03-06-2026 - (Elbaph)
+## [8.1.9]  - 03-06-2026 - (Blanka)
 
 - Fix       - Blocks checkout: validation errors (missing address, phone, etc.) no longer show a persistent PayPlus error popup; WooCommerce native inline notices are used instead.
 - Fix       - Blocks checkout: corrected set_payment_details calls to pass arrays instead of strings, preventing PHP foreach warnings.
