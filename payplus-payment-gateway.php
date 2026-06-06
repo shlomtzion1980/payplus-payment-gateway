@@ -901,7 +901,7 @@ class WC_PayPlus
     public function getPayplusCron()
     {
         $now = time();
-        $min_age_minutes = 30;
+        $min_age_minutes = 10;
         $max_age_hours = 2;
 
         $date_start = gmdate('Y-m-d H:i:s', $now - ($max_age_hours * HOUR_IN_SECONDS));
@@ -953,6 +953,13 @@ class WC_PayPlus
             $created_at_local = wp_date('H:i', $order_created_ts);
             $runIpn = true;
             if ($age_minutes >= $min_age_minutes) {
+                // Skip orders that were manually cancelled by an admin (flagged via checkbox setting)
+                $admin_cancelled = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_admin_cancelled', true);
+                if (!empty($admin_cancelled)) {
+                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Skipping - manually cancelled by admin (payplus_admin_cancelled flag set).\n");
+                    continue;
+                }
+
                 $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
                 $paymentPageUid = !empty($pruid_history);
                 $payPlusCronTested = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested')) ? WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_cron_tested') : 0;

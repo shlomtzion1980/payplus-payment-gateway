@@ -118,6 +118,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $posOverrideGateways;
     public $pw_gift_card_auto_cancel_unpaid_order;
     public $delete_page_request_uid_on_cancel;
+    private static $_order_status_hook_registered = false;
 
     /**
      *
@@ -311,8 +312,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             add_action('woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduled_subscription_payment'), 10, 2);
         }
 
-        // Hook to handle order status changes for deleting page request UID on cancel
-        add_action('woocommerce_order_status_changed', array($this, 'handle_order_status_change'), 10, 4);
+        // Hook to handle order status changes — register only once across all gateway instances
+        if (empty(self::$_order_status_hook_registered)) {
+            self::$_order_status_hook_registered = true;
+            add_action('woocommerce_order_status_changed', array($this, 'handle_order_status_change'), 10, 4);
+        }
 
         $this->invoice_api = new PayplusInvoice();
         $payplus_invoice_option = get_option('payplus_invoice_option');
@@ -4721,31 +4725,35 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $payment_method = $order->get_payment_method();
             if (strpos($payment_method, 'payplus') !== false) {
 
-                // Check if payplus_page_request_uid exists before deleting
-                $page_request_uid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid', true);
-
-                if (!empty($page_request_uid)) {
-                    // Delete the meta data
-                    $order->delete_meta_data('payplus_page_request_uid');
+                // Only flag once — avoid duplicate notes if hook fires multiple times
+                $already_flagged = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_admin_cancelled', true);
+                if (empty($already_flagged)) {
+                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_admin_cancelled' => '1']);
                     $order->save();
 
-                    // Add order note for tracking
                     $order->add_order_note(
-                        __('PayPlus page request UID meta data deleted due to order cancellation.', 'payplus-payment-gateway')
+                        __('PayPlus: Order marked as manually cancelled by admin — excluded from cron processing.', 'payplus-payment-gateway')
                     );
 
-                    // Log the action if logging is enabled
                     if ($this->logging) {
                         $this->payplus_add_log_all(
-                            'payplus_meta_deletion',
+                            'payplus_admin_cancel',
                             sprintf(
-                                'Deleted payplus_page_request_uid (%s) for cancelled order %d',
-                                $page_request_uid,
+                                'Order %d manually cancelled by admin — flagged payplus_admin_cancelled for cron exclusion.',
                                 $order_id
                             )
                         );
                     }
                 }
+            }
+        }
+
+        // If the order is being un-cancelled (moved back from cancelled), remove the flag
+        if ($old_status === 'cancelled' && $new_status !== 'cancelled') {
+            $admin_cancelled = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_admin_cancelled', true);
+            if (!empty($admin_cancelled)) {
+                $order->delete_meta_data('payplus_admin_cancelled');
+                $order->save();
             }
         }
     }
