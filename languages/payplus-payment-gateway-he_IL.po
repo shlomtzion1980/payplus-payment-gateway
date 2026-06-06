@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
-"POT-Creation-Date: 2026-06-06 18:53+0300\n"
-"PO-Revision-Date: 2026-06-06 18:58+0300\n"
+"POT-Creation-Date: 2026-06-06 19:29+0300\n"
+"PO-Revision-Date: 2026-06-06 19:29+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -2463,16 +2463,22 @@ msgstr "החרגת הזמנות שבוטלו באופן ידני מתהליך ה
 
 #: includes/class-wc-payplus-form-fields.php:1151
 msgid ""
-"When an admin manually cancels an order, exclude it from PayPlus cron "
-"processing"
+"When an admin or shop manager manually cancels an order, exclude it from "
+"PayPlus cron processing"
 msgstr ""
-"כאשר מנהל מערכת מבטל הזמנה באופן ידני, ההזמנה תוחרג מעיבוד ה־Cron של PayPlus"
+"כאשר מנהל מערכת או מנהל חנות מבטלים הזמנה באופן ידני, ההזמנה תוחרג מעיבוד "
+"ה־Cron של PayPlus"
 
 #: includes/class-wc-payplus-form-fields.php:1154
+#, fuzzy
+#| msgid ""
+#| "When enabled, orders cancelled manually by an admin will be flagged and "
+#| "skipped by the PayPlus cron job. No data is deleted — the order is simply "
+#| "excluded from automatic IPN checks."
 msgid ""
-"When enabled, orders cancelled manually by an admin will be flagged and "
-"skipped by the PayPlus cron job. No data is deleted — the order is simply "
-"excluded from automatic IPN checks."
+"When enabled, orders cancelled manually by an admin or shop manager will be "
+"flagged and skipped by the PayPlus cron job. No data is deleted — the order is "
+"simply excluded from automatic IPN checks."
 msgstr ""
 "כאשר האפשרות מופעלת, הזמנות שבוטלו באופן ידני על ידי מנהל מערכת יסומנו וידולגו "
 "על ידי משימת ה־Cron של PayPlus. לא יימחק כל מידע — ההזמנה פשוט תוחרג מבדיקות "
@@ -3330,7 +3336,7 @@ msgstr "המנוי בפיי פלוס חודש בהצלחה<br/>מספר אישו
 msgid "PayPlus Subscription Payment Failure<br/>error : %s"
 msgstr "חידוש המנוי בפיי פלוס נכשל<br/>מספר אישור: %s"
 
-#: includes/wc_payplus_gateway.php:4735
+#: includes/wc_payplus_gateway.php:4736
 msgid ""
 "PayPlus: Order marked as manually cancelled by admin — excluded from cron "
 "processing."
