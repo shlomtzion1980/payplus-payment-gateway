@@ -3115,10 +3115,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $this->payplus_add_log_all($handle, 'Response body: ' . wp_remote_retrieve_body($response));
                 $this->payplus_add_log_all($handle, 'Response code: ' . wp_remote_retrieve_response_code($response));
 
-                // Build detailed error message for display
-                $error_message = __('Error: The payment page failed to load - please check your page uid and domain settings.', 'payplus-payment-gateway');
+                $response_code = wp_remote_retrieve_response_code($response);
+                $response_body = wp_remote_retrieve_body($response);
+
+                $error_message = __('Error: The payment page failed to load – please check your page uid and domain settings.', 'payplus-payment-gateway');
                 $error_message .= '<br/><br/><strong>Response Details:</strong><br/>';
-                $error_message .= 'Response Code: ' . wp_remote_retrieve_response_code($response) . '<br/>';
+                $error_message .= 'Response Code: ' . $response_code . '<br/>';
 
                 if (isset($res->results)) {
                     $error_message .= 'Status: ' . (isset($res->results->status) ? $res->results->status : 'N/A') . '<br/>';
@@ -3126,7 +3128,13 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 }
 
                 $error_message .= '<br/><strong>Full Response:</strong><br/>';
-                $error_message .= '<pre>' . esc_html(wp_json_encode($res, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) . '</pre>';
+                if ($res !== null) {
+                    $error_message .= '<pre>' . esc_html(wp_json_encode($res, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)) . '</pre>';
+                } elseif (!empty($response_body)) {
+                    $error_message .= '<pre>' . esc_html($response_body) . '</pre>';
+                } else {
+                    $error_message .= '<pre>' . esc_html__('Empty response from PayPlus API', 'payplus-payment-gateway') . '</pre>';
+                }
 
                 wc_add_notice($error_message, 'error');
 
