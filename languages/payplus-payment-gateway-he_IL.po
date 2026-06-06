@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PayPlus Payment Gateway\n"
 "POT-Creation-Date: 2026-06-06 19:29+0300\n"
-"PO-Revision-Date: 2026-06-06 19:29+0300\n"
+"PO-Revision-Date: 2026-06-06 19:31+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: he_IL\n"
@@ -2467,7 +2467,7 @@ msgid ""
 "PayPlus cron processing"
 msgstr ""
 "כאשר מנהל מערכת או מנהל חנות מבטלים הזמנה באופן ידני, ההזמנה תוחרג מעיבוד "
-"ה־Cron של PayPlus"
+"ה־Cron־ של PayPlus"
 
 #: includes/class-wc-payplus-form-fields.php:1154
 #, fuzzy
