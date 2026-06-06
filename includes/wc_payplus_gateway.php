@@ -4712,9 +4712,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function handle_order_status_change($order_id, $old_status, $new_status, $order)
     {
-        // Only proceed if the status was changed manually by an admin
-        // Exclude automatic changes, AJAX requests, and REST API calls
-        if (!is_admin() || wp_doing_ajax() || (defined('REST_REQUEST') && REST_REQUEST)) {
+        // Only proceed if the status was changed by a logged-in user who can edit orders
+        // (admin, shop manager, etc.) — this covers admin screen, AJAX, and REST saves.
+        // Automated changes (cron, IPN callbacks) have no logged-in user with this capability.
+        if (!current_user_can('edit_shop_orders')) {
             return;
         }
 

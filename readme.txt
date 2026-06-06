@@ -2,9 +2,9 @@
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 6.2
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 8.1.9
+Stable tag: 8.2.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.2.0  - 06-06-2026 =
+
+- Fix       - Cron: when "Exclude manually cancelled orders from cron" checkbox is enabled, orders cancelled by an admin or shop manager are now excluded from cron instead of deleting payment data.
+- Fix       - Cron: order status change hook registers only once, preventing duplicate order notes. Works for admins and shop managers via admin, AJAX, or REST.
+- Fix       - Cron: minimum order age reduced to 10 minutes for faster processing.
+- Tweak     - Settings: cancel checkbox relabeled to "Exclude manually cancelled orders from cron".
 
 == 8.1.9  - 03-06-2026 =
 

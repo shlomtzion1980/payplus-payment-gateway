@@ -1148,10 +1148,10 @@ Orders that were successful and cancelled manually will not be tested or updated
             ],
             'delete_page_request_uid_on_cancel' => [
                 'title' => __('Exclude manually cancelled orders from cron', 'payplus-payment-gateway'),
-                'label' => __('When an admin manually cancels an order, exclude it from PayPlus cron processing', 'payplus-payment-gateway'),
+                'label' => __('When an admin or shop manager manually cancels an order, exclude it from PayPlus cron processing', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
                 'default' => 'no',
-                'description' => __('When enabled, orders cancelled manually by an admin will be flagged and skipped by the PayPlus cron job. No data is deleted — the order is simply excluded from automatic IPN checks.', 'payplus-payment-gateway'),
+                'description' => __('When enabled, orders cancelled manually by an admin or shop manager will be flagged and skipped by the PayPlus cron job. No data is deleted — the order is simply excluded from automatic IPN checks.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
             'enable_dev_mode' => [
