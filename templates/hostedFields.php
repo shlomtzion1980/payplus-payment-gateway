@@ -363,23 +363,38 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                     text-align: inherit;
                 }
 
-                #cCard {
+                #cCard,
+                #cvv-wrapper {
                     position: relative;
+                }
 
-                    &.validated::after {
-                        content: '';
-                        position: absolute;
-                        top: 50%;
-                        <?php echo esc_attr($direction); ?>: 15px;
-                        transform: translateY(-50%);
-                        width: 8px;
-                        height: 6px;
-                        background-image: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg')); ?>');
-                        background-size: contain;
-                        background-repeat: no-repeat;
-                        pointer-events: none;
-                        z-index: 1;
-                    }
+                #cCard.validated::after,
+                #cvv-wrapper.validated::after {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    <?php echo esc_attr($direction); ?>: 15px;
+                    transform: translateY(-50%);
+                    width: 8px;
+                    height: 6px;
+                    background-image: url('<?php echo esc_url(site_url('/wp-content/plugins/payplus-payment-gateway/assets/images/vi.svg')); ?>');
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    pointer-events: none;
+                    z-index: 1;
+                }
+
+                #cCard.invalid::after {
+                    content: '✕';
+                    position: absolute;
+                    top: 50%;
+                    <?php echo esc_attr($direction); ?>: 15px;
+                    transform: translateY(-50%);
+                    font-size: 10px;
+                    font-weight: bold;
+                    color: #dc2626;
+                    pointer-events: none;
+                    z-index: 1;
                 }
 
                 .forms-control {
