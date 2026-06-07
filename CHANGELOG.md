@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.2.0]  - 06-06-2026 - (Loki)
+## [8.2.0]  - 07-06-2026 - (Loki)
 
 - Fix       - Cron: when "Exclude manually cancelled orders from cron" checkbox is enabled, orders cancelled by an admin or shop manager are now excluded from cron processing via a meta flag instead of deleting payment data.
 - Fix       - Cron: order status change hook now registers only once, preventing duplicate order notes on cancellation. Works for any user with order editing capability (admin, shop manager) via admin, AJAX, or REST.

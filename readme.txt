@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.2.0  - 06-06-2026 =
+== 8.2.0  - 07-06-2026 =
 
 - Fix       - Cron: when "Exclude manually cancelled orders from cron" checkbox is enabled, orders cancelled by an admin or shop manager are now excluded from cron instead of deleting payment data.
 - Fix       - Cron: order status change hook registers only once, preventing duplicate order notes. Works for admins and shop managers via admin, AJAX, or REST.
