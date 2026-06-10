@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.1]  - 10-06-2026 - (DrDoom)
+
+- Fix       - Payment page: prevented duplicate payment page creation per order by saving the meta fields (payplus_time_link, payplus_generate_products_link) that the existing 30-minute duplicate-prevention guard relies on. This eliminates duplicate page_request_uid entries in PRUID history.
+
 ## [8.2.0]  - 07-06-2026 - (Loki)
 
 - Fix       - Cron: when "Exclude manually cancelled orders from cron" checkbox is enabled, orders cancelled by an admin or shop manager are now excluded from cron processing via a meta flag instead of deleting payment data.

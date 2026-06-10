@@ -3097,8 +3097,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (isset($res->data)) {
                 try {
                     if (property_exists($res->data, 'page_request_uid')) {
-                        $pageRequestUid = array('payplus_page_request_uid' => $res->data->page_request_uid);
-                        WC_PayPlus_Meta_Data::update_meta($order, $pageRequestUid);
+                        $metaToSave = ['payplus_page_request_uid' => $res->data->page_request_uid];
+
+                        // Save the metadata that checkPayemntPageTime() needs to detect
+                        // an already-created page on subsequent calls (within 30 min, same products).
+                        // Without these, the guard at line 3056 is dead code and every call
+                        // creates a duplicate page request.
+                        if (property_exists($res->data, 'payment_page_link') && $this->validateUrl($res->data->payment_page_link)) {
+                            $metaToSave['payplus_payment_page_link']        = $res->data->payment_page_link;
+                            $metaToSave['payplus_time_link']                = $dateNow;
+                            $metaToSave['payplus_generate_products_link']   = $check_payplus_generate_products_link;
+                        }
+
+                        WC_PayPlus_Meta_Data::update_meta($order, $metaToSave);
                         WC_PayPlus_Meta_Data::append_pruid_history($order, $res->data->page_request_uid, 'main_gateway');
                     }
                 } catch (Exception $e) {
