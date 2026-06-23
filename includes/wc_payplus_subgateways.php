@@ -802,9 +802,35 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $payment_response = isset($_POST['payment_response']['data']['result']) ? sanitize_text_field(wp_unslash($_POST['payment_response']['data']['result'])) : '';
 
-        $order = wc_get_order($order_id);
+        if (!$order_id) {
+            wp_send_json_error(array('message' => 'Invalid order ID'));
+            return;
+        }
 
-        if ($order && $payment_response === "success") {
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            wp_send_json_error(array('message' => 'Order not found'));
+            return;
+        }
+
+        $order_key_param = isset($_POST['order_key']) ? sanitize_text_field(wp_unslash($_POST['order_key'])) : '';
+        $session_order_id = WC()->session ? WC()->session->get('order_awaiting_payment') : null;
+        $owns_order = false;
+
+        if ($order_key_param && hash_equals($order->get_order_key(), $order_key_param)) {
+            $owns_order = true;
+        } elseif ($session_order_id && absint($session_order_id) === absint($order_id)) {
+            $owns_order = true;
+        } elseif (is_user_logged_in() && $order->get_user_id() === get_current_user_id()) {
+            $owns_order = true;
+        }
+
+        if (!$owns_order) {
+            wp_send_json_error(array('message' => 'Unauthorized'));
+            return;
+        }
+
+        if ($payment_response === "success") {
             WC()->cart->empty_cart();
             $redirect_to = $order->get_checkout_order_received_url();
             $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_response');

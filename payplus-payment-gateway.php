@@ -524,6 +524,35 @@ class WC_PayPlus
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $this->payplus_gateway = $this->get_main_payplus_gateway();
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
+
+        if (!$order_id) {
+            wp_send_json_error(['result' => 'fail', 'message' => 'Invalid order ID']);
+            return;
+        }
+
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            wp_send_json_error(['result' => 'fail', 'message' => 'Order not found']);
+            return;
+        }
+
+        $order_key_param = isset($_POST['order_key']) ? sanitize_text_field(wp_unslash($_POST['order_key'])) : '';
+        $session_order_id = WC()->session ? WC()->session->get('order_awaiting_payment') : null;
+        $owns_order = false;
+
+        if ($order_key_param && hash_equals($order->get_order_key(), $order_key_param)) {
+            $owns_order = true;
+        } elseif ($session_order_id && absint($session_order_id) === absint($order_id)) {
+            $owns_order = true;
+        } elseif (is_user_logged_in() && $order->get_user_id() === get_current_user_id()) {
+            $owns_order = true;
+        }
+
+        if (!$owns_order) {
+            wp_send_json_error(['result' => 'fail', 'message' => 'Unauthorized']);
+            return;
+        }
+
         $pwGiftCardData = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
         $decodedCardData = json_decode($pwGiftCardData, true);
 
@@ -541,28 +570,24 @@ class WC_PayPlus
                 }
             }
         }
-        $order = wc_get_order($order_id);
-        if ($order) {
-            $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
-            $linkRedirect = esc_url_raw($this->payplus_gateway->get_return_url($order));
-            $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
-            WC_PayPlus_Meta_Data::update_meta($order, $metaData);
-            if (!empty($metaData['payplus_page_request_uid'])) {
-                WC_PayPlus_Meta_Data::append_pruid_history($order, $metaData['payplus_page_request_uid'], 'hosted_callback');
-            }
-            $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
-            $_wpnonce = wp_create_nonce('_wp_payplusIpn');
-            $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
-            WC()->session->set('hostedTimeStamp', false);
-            WC()->session->set('hostedPayload', false);
-            WC()->session->set('page_request_uid', false);
-            WC()->session->set('hostedResponse', false);
-            WC()->session->__unset('order_awaiting_payment');
-            WC()->session->__unset('hostedFieldsUUID');
-            WC()->session->set('hostedStarted', false);
-            WC()->session->set('randomHash', bin2hex(random_bytes(16)));
-            wp_send_json_success(array('result' => "success"));
+        $saveToken = isset($_POST['saveToken']) ? filter_var(wp_unslash($_POST['saveToken']), FILTER_VALIDATE_BOOLEAN) : false;
+        $metaData['payplus_page_request_uid'] = isset($_POST['page_request_uid']) ? sanitize_text_field(wp_unslash($_POST['page_request_uid'])) : null;
+        WC_PayPlus_Meta_Data::update_meta($order, $metaData);
+        if (!empty($metaData['payplus_page_request_uid'])) {
+            WC_PayPlus_Meta_Data::append_pruid_history($order, $metaData['payplus_page_request_uid'], 'hosted_callback');
         }
+        $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
+        $_wpnonce = wp_create_nonce('_wp_payplusIpn');
+        $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
+        WC()->session->set('hostedTimeStamp', false);
+        WC()->session->set('hostedPayload', false);
+        WC()->session->set('page_request_uid', false);
+        WC()->session->set('hostedResponse', false);
+        WC()->session->__unset('order_awaiting_payment');
+        WC()->session->__unset('hostedFieldsUUID');
+        WC()->session->set('hostedStarted', false);
+        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+        wp_send_json_success(array('result' => "success"));
     }
 
     public function payPlusCronDeactivate()
