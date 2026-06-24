@@ -382,7 +382,7 @@ if (isCheckout || hasOrder) {
     function showPayPlusRedirectLoader() {
         if (!payPlusGateWay.showIframeRedirectLoader) return;
         if (document.getElementById('pp-redirect-loader')) return;
-        var msg = payPlusGateWay.redirectingText || 'Redirecting\u2026';
+        var msg = payPlusGateWay.redirectingText || 'Redirecting\u2026 Please wait \u2014 do not close this page';
         var overlay = document.createElement('div');
         overlay.id = 'pp-redirect-loader';
         overlay.setAttribute('style',

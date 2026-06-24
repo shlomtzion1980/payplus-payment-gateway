@@ -1896,7 +1896,7 @@ body{
                             "iframeAutoHeight" => $this->iframeAutoHeight,
                             "enableOrderStatusPoll" => !property_exists($this->payplus_payment_gateway_settings, 'enable_order_status_poll') || $this->payplus_payment_gateway_settings->enable_order_status_poll !== 'no',
                             "showIframeRedirectLoader" => property_exists($this->payplus_payment_gateway_settings, 'show_iframe_redirect_loader') && $this->payplus_payment_gateway_settings->show_iframe_redirect_loader === 'yes',
-                            "redirectingText" => __('Redirecting to confirmation page…', 'payplus-payment-gateway'),
+                            "redirectingText" => __('Redirecting… Please wait — do not close this page', 'payplus-payment-gateway'),
                             "processingPaymentText" => __('Processing payment…', 'payplus-payment-gateway'),
                             "viewMode" => $this->payplus_payment_gateway_settings->display_mode ?? 'redirect',
                             "iframeWidth" => $this->payplus_payment_gateway_settings->iframe_width ?? '40%',

@@ -85,7 +85,7 @@ jQuery(function ($) {
     function showPayPlusRedirectLoader() {
         if (!payplus_script_checkout.showIframeRedirectLoader) return;
         if (document.getElementById('pp-redirect-loader')) return;
-        var msg = payplus_script_checkout.redirectingText || 'Redirecting…';
+        var msg = payplus_script_checkout.redirectingText || 'Redirecting\u2026 Please wait \u2014 do not close this page';
         var overlay = document.createElement('div');
         overlay.id = 'pp-redirect-loader';
         overlay.setAttribute('style',
