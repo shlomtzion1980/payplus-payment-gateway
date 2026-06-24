@@ -88,7 +88,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == 8.2.2  - 24-06-2026 =
 
-- Security  - Hosted payment and order completion AJAX handlers now verify order ownership before acting. Prevents unauthenticated metadata tampering and order-key disclosure.
+- Security  - Hosted payment and order completion AJAX handlers now verify order ownership before acting. Prevents unauthenticated metadata tampering and order-key disclosure. (Reported by Pedro Pinho and kevin @OPCIA via WPScan/Automattic)
 - Fix       - Checkout: "Place Order" button no longer flickers when switching payment methods.
 - Fix       - Cron: when "Payment Completed" is enabled, cron-recovered orders now correctly fire the woocommerce_payment_complete hook.
 
