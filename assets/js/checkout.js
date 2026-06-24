@@ -82,6 +82,56 @@ jQuery(function ($) {
         window.location.href = url;
     }
 
+    function showPayPlusRedirectLoader() {
+        if (!payplus_script_checkout.showIframeRedirectLoader) return;
+        if (document.getElementById('pp-redirect-loader')) return;
+        var msg = payplus_script_checkout.redirectingText || 'Redirecting…';
+        var overlay = document.createElement('div');
+        overlay.id = 'pp-redirect-loader';
+        overlay.setAttribute('style',
+            'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483647;' +
+            'background:rgba(255,255,255,0.95);display:flex;flex-direction:column;' +
+            'align-items:center;justify-content:center;gap:18px;');
+        overlay.innerHTML =
+            '<style>@keyframes pp-redir-spin{to{transform:rotate(360deg)}}</style>' +
+            '<div style="width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#2563eb;' +
+            'border-radius:50%;animation:pp-redir-spin .8s linear infinite;"></div>' +
+            '<p dir="auto" style="margin:0;font-size:16px;font-weight:500;color:#333;text-align:center;padding:0 20px;' +
+            'unicode-bidi:plaintext;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' + msg + '</p>';
+        document.body.appendChild(overlay);
+    }
+
+    function showPayPlusProcessingOverlay() {
+        if (!payplus_script_checkout.showIframeRedirectLoader) return;
+        if (document.getElementById('pp-processing-overlay')) return;
+        var iframe = document.getElementById('pp_iframe');
+        if (!iframe || !iframe.parentElement) return;
+        var parent = iframe.parentElement;
+        if (window.getComputedStyle(parent).position === 'static') {
+            parent.style.position = 'relative';
+        }
+        var msg = payplus_script_checkout.processingPaymentText || 'Processing payment…';
+        var overlay = document.createElement('div');
+        overlay.id = 'pp-processing-overlay';
+        overlay.setAttribute('style',
+            'position:absolute;inset:0;z-index:2147483646;background:rgba(255,255,255,0.7);' +
+            'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+            'gap:18px;pointer-events:auto;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);');
+        overlay.innerHTML =
+            '<style>@keyframes pp-proc-spin{to{transform:rotate(360deg)}}</style>' +
+            '<div style="width:54px;height:54px;border:4px solid rgba(224,224,224,0.9);border-top-color:#2563eb;' +
+            'border-radius:50%;animation:pp-proc-spin .8s linear infinite;box-shadow:0 2px 12px rgba(0,0,0,0.08);"></div>' +
+            '<p style="margin:0;font-size:16px;font-weight:600;color:#1f2937;text-align:center;padding:8px 16px;' +
+            'background:rgba(255,255,255,0.85);border-radius:6px;' +
+            'unicode-bidi:plaintext;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' + msg + '</p>';
+        parent.appendChild(overlay);
+    }
+
+    function hidePayPlusProcessingOverlay() {
+        var el = document.getElementById('pp-processing-overlay');
+        if (el) el.remove();
+    }
+
     // Layer 1: postMessage listener (fast-path)
     // The IPN page (loaded inside the iframe) sends this message after processing.
     // We validate the URL is same-origin before redirecting.
@@ -93,6 +143,8 @@ jQuery(function ($) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
+                hidePayPlusProcessingOverlay();
+                showPayPlusRedirectLoader();
                 payplusRedirect(e.data.url);
             }
         } catch (err) {
@@ -100,12 +152,11 @@ jQuery(function ($) {
         }
     });
 
-    // Layer 2: polling fallback
+    // Layer 2: polling fallback — runs when EITHER enableOrderStatusPoll OR showIframeRedirectLoader is on
     function startOrderStatusPoll(result) {
-        if (!payplus_script_checkout.enableOrderStatusPoll) return;
+        if (!payplus_script_checkout.enableOrderStatusPoll && !payplus_script_checkout.showIframeRedirectLoader) return;
         if (!result || !result.order_id || !result.order_received_url) return;
 
-        // Clear any previous poll so we start fresh for this order
         if (_payplusPollTimerId) {
             clearInterval(_payplusPollTimerId);
             _payplusPollTimerId = null;
@@ -123,7 +174,7 @@ jQuery(function ($) {
         if (!orderKey) return;
 
         var pollCount = 0;
-        var maxPolls = 200; // ~5 min at 1.5s interval
+        var maxPolls = 200;
 
         function poll() {
             if (_payplusPollDone) return;
@@ -146,6 +197,8 @@ jQuery(function ($) {
                         var s = res.data.status;
                         if (s === 'processing' || s === 'completed' || s === 'wc-processing' || s === 'wc-completed') {
                             _payplusPollDone = true;
+                            hidePayPlusProcessingOverlay();
+                            showPayPlusRedirectLoader();
                             payplusRedirect(res.data.redirect_url || redirectUrl);
                         }
                     }
@@ -153,7 +206,6 @@ jQuery(function ($) {
             });
         }
 
-        // First poll immediately, then every 1.5s
         poll();
         _payplusPollTimerId = setInterval(function() {
             if (_payplusPollDone) {
@@ -1675,6 +1727,13 @@ jQuery(function ($) {
         iframe.id = "pp_iframe";
         iframe.name = "payplus-iframe";
         iframe.src = src;
+        var _ppLoadCount = 0;
+        iframe.addEventListener("load", function () {
+            _ppLoadCount++;
+            if (_ppLoadCount >= 2) {
+                showPayPlusProcessingOverlay();
+            }
+        });
         if(iframeAutoHeight) {
             iframe.height = "100%";
             iframe.maxHeight = "100vh";
@@ -1706,6 +1765,7 @@ jQuery(function ($) {
         $("#closeFrame").on("click", function (e) {
             e.preventDefault();
             stopOrderStatusPoll();
+            hidePayPlusProcessingOverlay();
             ppIframe.style.display = "none";
         });
         $("#place_order").prop("disabled", true);
@@ -1761,6 +1821,7 @@ jQuery(function ($) {
                         },
                         onclose: function () {
                             stopOrderStatusPoll();
+                            hidePayPlusProcessingOverlay();
                         },
                     },
                 };

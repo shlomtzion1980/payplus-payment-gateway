@@ -847,6 +847,14 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'yes',
             ],
+            'show_iframe_redirect_loader' => [
+                'title' => __('Show loader during iframe payment & redirect', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Show loader during iframe payment & redirect (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('Display a "Processing payment…" overlay on top of the iframe once payment is being processed, and a full-screen "Redirecting…" loader during the final redirect to the thank-you page. Only applies to iframe display modes.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'hide_identification_id' => [
                 'title' => __('Hide ID Field In Payment Page', 'payplus-payment-gateway'),
                 'type' => 'select',

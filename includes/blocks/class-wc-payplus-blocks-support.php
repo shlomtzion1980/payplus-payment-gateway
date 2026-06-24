@@ -712,6 +712,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'show_order_total' => isset($this->hostedFieldsSettings['show_order_total']) && $this->hostedFieldsSettings['show_order_total'] === 'yes',
             'enableDoubleCheckIfPruidExists' => isset($this->payPlusSettings['enable_double_check_if_pruid_exists']) && $this->payPlusSettings['enable_double_check_if_pruid_exists'] === 'yes' ? true : false,
             'enableOrderStatusPoll' => !isset($this->payPlusSettings['enable_order_status_poll']) || $this->payPlusSettings['enable_order_status_poll'] !== 'no',
+            'showIframeRedirectLoader' => isset($this->payPlusSettings['show_iframe_redirect_loader']) && $this->payPlusSettings['show_iframe_redirect_loader'] === 'yes',
+            'redirectingText' => __('Redirecting to confirmation page…', 'payplus-payment-gateway'),
+            'processingPaymentText' => __('Processing payment…', 'payplus-payment-gateway'),
             'viewMode' => $this->displayMode !== 'default' ? $this->displayMode : ($this->payPlusSettings['display_mode'] ?? 'redirect'),
             "{$this->name}-settings" => [
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],

@@ -194,6 +194,8 @@ if (isCheckout || hasOrder) {
         var overlay = document.getElementById('overlay');
         if (overlay) overlay.remove();
 
+        hidePayPlusProcessingOverlay();
+
         // Restore body scroll & appearance (also undoes hosted-fields dimming)
         document.body.style.overflow = '';
         document.body.style.backgroundColor = '';
@@ -377,6 +379,56 @@ if (isCheckout || hasOrder) {
         window.location.href = url;
     }
 
+    function showPayPlusRedirectLoader() {
+        if (!payPlusGateWay.showIframeRedirectLoader) return;
+        if (document.getElementById('pp-redirect-loader')) return;
+        var msg = payPlusGateWay.redirectingText || 'Redirecting\u2026';
+        var overlay = document.createElement('div');
+        overlay.id = 'pp-redirect-loader';
+        overlay.setAttribute('style',
+            'position:fixed;inset:0;width:100vw;height:100vh;z-index:2147483647;' +
+            'background:rgba(255,255,255,0.95);display:flex;flex-direction:column;' +
+            'align-items:center;justify-content:center;gap:18px;');
+        overlay.innerHTML =
+            '<style>@keyframes pp-redir-spin{to{transform:rotate(360deg)}}</style>' +
+            '<div style="width:48px;height:48px;border:4px solid #e0e0e0;border-top-color:#2563eb;' +
+            'border-radius:50%;animation:pp-redir-spin .8s linear infinite;"></div>' +
+            '<p dir="auto" style="margin:0;font-size:16px;font-weight:500;color:#333;text-align:center;padding:0 20px;' +
+            'unicode-bidi:plaintext;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' + msg + '</p>';
+        document.body.appendChild(overlay);
+    }
+
+    function showPayPlusProcessingOverlay() {
+        if (!payPlusGateWay.showIframeRedirectLoader) return;
+        if (document.getElementById('pp-processing-overlay')) return;
+        var iframe = document.getElementById('pp_iframe');
+        if (!iframe || !iframe.parentElement) return;
+        var parent = iframe.parentElement;
+        if (window.getComputedStyle(parent).position === 'static') {
+            parent.style.position = 'relative';
+        }
+        var msg = payPlusGateWay.processingPaymentText || 'Processing payment\u2026';
+        var overlay = document.createElement('div');
+        overlay.id = 'pp-processing-overlay';
+        overlay.setAttribute('style',
+            'position:absolute;inset:0;z-index:2147483646;background:rgba(255,255,255,0.7);' +
+            'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+            'gap:18px;pointer-events:auto;backdrop-filter:blur(1px);-webkit-backdrop-filter:blur(1px);');
+        overlay.innerHTML =
+            '<style>@keyframes pp-proc-spin{to{transform:rotate(360deg)}}</style>' +
+            '<div style="width:54px;height:54px;border:4px solid rgba(224,224,224,0.9);border-top-color:#2563eb;' +
+            'border-radius:50%;animation:pp-proc-spin .8s linear infinite;box-shadow:0 2px 12px rgba(0,0,0,0.08);"></div>' +
+            '<p style="margin:0;font-size:16px;font-weight:600;color:#1f2937;text-align:center;padding:8px 16px;' +
+            'background:rgba(255,255,255,0.85);border-radius:6px;' +
+            'unicode-bidi:plaintext;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;">' + msg + '</p>';
+        parent.appendChild(overlay);
+    }
+
+    function hidePayPlusProcessingOverlay() {
+        var el = document.getElementById('pp-processing-overlay');
+        if (el) el.remove();
+    }
+
     // Firefox blocks cross-origin iframe from navigating top window. When PayPlus iframe sends
     // postMessage with redirect URL (or thank-you page loads in iframe), parent performs the redirect.
     window.addEventListener("message", function (e) {
@@ -387,6 +439,8 @@ if (isCheckout || hasOrder) {
             var u = new URL(e.data.url, window.location.origin);
             if (u.origin === window.location.origin) {
                 _payplusPollDone = true;
+                hidePayPlusProcessingOverlay();
+                showPayPlusRedirectLoader();
                 payplusRedirect(e.data.url);
             }
         } catch (err) {
@@ -397,7 +451,7 @@ if (isCheckout || hasOrder) {
     var _payplusPollStarted = false;
 
     function startOrderStatusPoll(result) {
-        if (!payPlusGateWay.enableOrderStatusPoll) return;
+        if (!payPlusGateWay.enableOrderStatusPoll && !payPlusGateWay.showIframeRedirectLoader) return;
         if (_payplusPollStarted) return;
         _payplusPollStarted = true;
         if (!result || !result.order_id || !result.order_received_url) return;
@@ -445,6 +499,8 @@ if (isCheckout || hasOrder) {
                         if (status === 'processing' || status === 'completed' ||
                             status === 'wc-processing' || status === 'wc-completed') {
                             _payplusPollDone = true;
+                            hidePayPlusProcessingOverlay();
+                            showPayPlusRedirectLoader();
                             payplusRedirect(response.data.redirect_url || redirectUrl);
                         }
                     }
@@ -961,6 +1017,14 @@ if (isCheckout || hasOrder) {
         // payplus_redirect_graceful immediately JS-redirects to the clean thank-you URL.
         iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
 
+        var _ppLoadCount = 0;
+        iframe.addEventListener("load", function () {
+            _ppLoadCount++;
+            if (_ppLoadCount >= 2) {
+                showPayPlusProcessingOverlay();
+            }
+        });
+
         iframe.src = paymentPageLink;
         let pp_iframes = document.querySelectorAll(".pp_iframe");
         let pp_iframe = document
@@ -1031,6 +1095,7 @@ if (isCheckout || hasOrder) {
             pp_iframe.firstElementChild.style.cursor = "pointer";
             pp_iframe.firstElementChild.addEventListener("click", (e) => {
                 e.preventDefault();
+                hidePayPlusProcessingOverlay();
                 resetCheckoutState();
             });
             pp_iframe.appendChild(iframe);
