@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 8.2.1
+Stable tag: 8.2.2
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,12 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.2.2  - 24-06-2026 =
+
+- Security  - Hosted payment and order completion AJAX handlers now verify order ownership before acting. Prevents unauthenticated metadata tampering and order-key disclosure.
+- Fix       - Checkout: "Place Order" button no longer flickers when switching payment methods.
+- Fix       - Cron: when "Payment Completed" is enabled, cron-recovered orders now correctly fire the woocommerce_payment_complete hook.
 
 == 8.2.1  - 10-06-2026 =
 

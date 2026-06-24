@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.2]  - 24-06-2026 - (Driver)
+
+- Security  - Hosted payment and order completion AJAX handlers now verify order ownership (session, order key, or logged-in user) before acting. Prevents unauthenticated metadata tampering and order-key disclosure. (Reported by Pedro Pinho and kevin @OPCIA via WPScan/Automattic)
+- Fix       - Checkout: "Place Order" button no longer flickers when switching payment methods. The checkout refresh now only fires when switching to/from a PayPlus gateway, and the button is visually preserved during the refresh cycle.
+- Fix       - Cron: when "Payment Completed" (fire_completed) is enabled, cron-recovered orders now correctly fire the `woocommerce_payment_complete` hook after a successful IPN status change.
+
 ## [8.2.1]  - 10-06-2026 - (DrDoom)
 
 - Fix       - Payment page: prevented duplicate payment page creation per order by saving the meta fields (payplus_time_link, payplus_generate_products_link) that the existing 30-minute duplicate-prevention guard relies on. This eliminates duplicate page_request_uid entries in PRUID history.
