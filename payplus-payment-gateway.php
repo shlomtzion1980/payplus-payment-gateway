@@ -583,10 +583,10 @@ class WC_PayPlus
         WC()->session->set('hostedPayload', false);
         WC()->session->set('page_request_uid', false);
         WC()->session->set('hostedResponse', false);
-        WC()->session->__unset('order_awaiting_payment');
         WC()->session->__unset('hostedFieldsUUID');
         WC()->session->set('hostedStarted', false);
         WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+        WC()->session->set('payplus_verified_order', $order_id);
         wp_send_json_success(array('result' => "success"));
     }
 

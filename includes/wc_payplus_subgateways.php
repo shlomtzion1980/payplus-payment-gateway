@@ -815,11 +815,14 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
 
         $order_key_param = isset($_POST['order_key']) ? sanitize_text_field(wp_unslash($_POST['order_key'])) : '';
         $session_order_id = WC()->session ? WC()->session->get('order_awaiting_payment') : null;
+        $verified_order_id = WC()->session ? WC()->session->get('payplus_verified_order') : null;
         $owns_order = false;
 
         if ($order_key_param && hash_equals($order->get_order_key(), $order_key_param)) {
             $owns_order = true;
         } elseif ($session_order_id && absint($session_order_id) === absint($order_id)) {
+            $owns_order = true;
+        } elseif ($verified_order_id && absint($verified_order_id) === absint($order_id)) {
             $owns_order = true;
         } elseif (is_user_logged_in() && $order->get_user_id() === get_current_user_id()) {
             $owns_order = true;
@@ -863,6 +866,10 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 }
             }
 
+            if (WC()->session) {
+                WC()->session->__unset('order_awaiting_payment');
+                WC()->session->__unset('payplus_verified_order');
+            }
             wp_send_json_success(array(
                 'redirect_url' => $redirect_to
             ));
