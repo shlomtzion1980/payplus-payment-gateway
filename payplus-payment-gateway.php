@@ -1037,10 +1037,6 @@ class WC_PayPlus
                             $refreshed_order = wc_get_order($order_id);
                             $new_status = $refreshed_order ? $refreshed_order->get_status() : $status;
                             if ($new_status !== $status) {
-                                if ($this->payplus_gateway->fire_completed && in_array($new_status, ['processing', 'completed', 'wc-processing', 'wc-completed'], true)) {
-                                    $refreshed_order->payment_complete();
-                                    $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Cron fired payment_complete() (fire_completed setting enabled).\n");
-                                }
                                 $this->payplus_gateway->payplus_add_log_all('payplus-cron-log', "$order_id: Status changed to $new_status after PRUID $uid — stopping iteration.\n");
                                 break;
                             }
