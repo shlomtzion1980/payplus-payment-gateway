@@ -1018,7 +1018,15 @@ if (isCheckout || hasOrder) {
         iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation");
 
         var _ppLoadCount = 0;
+        var _ppCountingStarted = false;
         iframe.addEventListener("load", function () {
+            if (!_ppCountingStarted) {
+                if (iframe.src && iframe.src !== 'about:blank') {
+                    _ppCountingStarted = true;
+                    _ppLoadCount = 1;
+                }
+                return;
+            }
             _ppLoadCount++;
             if (_ppLoadCount >= 2) {
                 showPayPlusProcessingOverlay();
