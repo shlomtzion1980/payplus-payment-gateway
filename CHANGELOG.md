@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.3]  - 08-07-2026 - (Soka)
+
+- Feature   - New "Show loader during iframe payment & redirect" option: displays a "Processing payment…" spinner overlay on the iframe when the user submits payment (detected via iframe load event), then transitions to a full-screen "Redirecting…" loader when order status reaches processing/completed (via polling or postMessage). Gated by `show_iframe_redirect_loader` checkbox. Works on both Classic and Blocks checkout.
+- Fix       - Classic checkout: reopening an iframe popup or same-page payment after closing without paying no longer falls back to redirect mode. The duplicate payment page fix (`checkPayemntPageTime`) now correctly returns the cached link in the expected object format for inline (popup/samePage) modes.
+- Fix       - Blocks checkout: processing loader, if activated, no longer appears immediately when the iframe opens in async mode. The load counter now ignores the initial `about:blank` load and only starts counting once the actual payment page URL is set.
+- Fix       - Cron: `payment_complete()` is now called while the order is still in `pending` status (matching the regular callback path in `updateOrderStatus`), ensuring the WooCommerce "Payment complete" order note is recorded. Only applies when `$isCron === true`; non-cron callers of `payplusIpn()` retain their existing behavior.
+
 ## [8.2.2]  - 24-06-2026 - (Driver)
 
 - Security  - Hosted payment and order completion AJAX handlers now verify order ownership (session, order key, or logged-in user) before acting. Prevents unauthenticated metadata tampering and order-key disclosure. (Reported by Pedro Pinho and kevin @OPCIA via WPScan/Automattic)
