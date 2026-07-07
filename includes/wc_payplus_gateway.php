@@ -3055,6 +3055,9 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         if ($payplus_payment_page_link) {
             if ($this->checkPayemntPageTime($order_id, $check_payplus_generate_products_link)) {
+                if ($token || $inline) {
+                    return (object) ['data' => (object) ['payment_page_link' => $payplus_payment_page_link]];
+                }
                 $this->get_payment_page($payplus_payment_page_link);
                 return;
             }
