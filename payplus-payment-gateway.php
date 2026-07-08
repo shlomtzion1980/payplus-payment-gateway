@@ -82,7 +82,7 @@ class WC_PayPlus
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
         add_action('init', [$this, 'load_textdomain'], 10);
-        add_action('plugins_loaded', [$this, 'init']);
+        add_action('plugins_loaded', [$this, 'init'], 20);
         add_action('woocommerce_api_payplus_gateway', [$this, 'ipn_response']);
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
         add_filter('cron_schedules', [$this, 'payplus_add_custom_cron_schedule']);
@@ -1731,8 +1731,16 @@ body{
             public function init()
             {
                 $isPayPlusEnabled = isset($this->payplus_payment_gateway_settings->enabled) && $this->payplus_payment_gateway_settings->enabled === 'yes';
-                if (class_exists("WooCommerce")) {
-                    $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
+                if (!class_exists("WooCommerce")) {
+                    add_action('before_woocommerce_init', [$this, 'init']);
+                    return;
+                }
+                if (did_action('payplus_gateway_initialized')) {
+                    return;
+                }
+                do_action('payplus_gateway_initialized');
+
+                $this->_wpnonce = wp_create_nonce('_wp_payplusIpn');
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-statics.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/admin/class-wc-payplus-admin-settings.php';
                     require_once PAYPLUS_PLUGIN_DIR . '/includes/wc_payplus_gateway.php';
@@ -1775,7 +1783,11 @@ body{
                         new WC_PayPlus_Embedded();
                     }
 
-                    add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+                    if (did_action('woocommerce_blocks_loaded')) {
+                        $this->woocommerce_payplus_woocommerce_block_support();
+                    } else {
+                        add_action('woocommerce_blocks_loaded', [$this, 'woocommerce_payplus_woocommerce_block_support']);
+                    }
                     add_action('init', [$this, 'register_customer_invoice_name_blocks_field'], 20);
                     add_action('init', [$this, 'register_customer_other_id_blocks_field'], 20);
                     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
@@ -1828,7 +1840,6 @@ body{
                     if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                         payplus_add_file_ApplePay();
                     }
-                }
             }
 
             public function isHostedInitiated()
