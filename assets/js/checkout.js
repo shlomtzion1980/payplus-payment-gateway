@@ -1509,42 +1509,6 @@ jQuery(function ($) {
         }
     });
 
-    // Prevent the Place Order button flicker during update_checkout AJAX cycles.
-    // WooCommerce replaces the order-review fragment which momentarily removes
-    // and re-inserts #place_order.  We freeze a visual clone of the button in
-    // its current position while the fragment refreshes.
-    var _payplusBtnClone = null;
-    $(document.body).on('update_checkout', function () {
-        var $btn = $('#place_order');
-        if (!$btn.length || _payplusBtnClone) return;
-
-        var offset = $btn.offset();
-        var clone = $btn.clone();
-        clone
-            .attr('id', 'place_order_pp_clone')
-            .removeAttr('name')
-            .css({
-                position: 'absolute',
-                top: offset.top + 'px',
-                left: offset.left + 'px',
-                width: $btn.outerWidth() + 'px',
-                height: $btn.outerHeight() + 'px',
-                margin: 0,
-                'pointer-events': 'none',
-                'z-index': 9999
-            })
-            .prop('disabled', true);
-
-        $('body').append(clone);
-        _payplusBtnClone = clone;
-    });
-
-    $(document.body).on('updated_checkout', function () {
-        if (_payplusBtnClone) {
-            _payplusBtnClone.remove();
-            _payplusBtnClone = null;
-        }
-    });
 
     // Sync order total inside hosted fields card (classic checkout only)
     function updateHostedFieldsTotal() {
