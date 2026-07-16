@@ -501,17 +501,19 @@ jQuery(function ($) {
             ) {
                 $(document.body).trigger("payment_method_selected");
 
-                // Only refresh checkout when switching INTO or OUT OF a PayPlus
-                // gateway, since that's the only case where cart totals can
-                // change (e.g. the j5 weight-estimate fee that depends on the
-                // chosen payment method).  Avoids the Place Order button flicker
-                // on unrelated method switches.
-                var prev = wc_checkout_form.selectedPaymentMethod || "";
-                var next = selectedPaymentMethod || "";
-                var prevIsPayPlus = prev.indexOf("payplus") !== -1;
-                var nextIsPayPlus = next.indexOf("payplus") !== -1;
-                if (prevIsPayPlus !== nextIsPayPlus) {
-                    $(document.body).trigger("update_checkout", { update_shipping_method: false });
+                // Only refresh when J5 Weight Estimate fee is active and the
+                // customer crosses the PayPlus boundary — that's the only case
+                // where cart totals can change from a payment-method switch.
+                if (payplus_script_checkout.j5WeightEstimateEnabled) {
+                    var prev = wc_checkout_form.selectedPaymentMethod || "";
+                    var next = selectedPaymentMethod || "";
+                    var prevIsPayPlus = prev.indexOf("payplus") !== -1;
+                    var nextIsPayPlus = next.indexOf("payplus") !== -1;
+                    if (prevIsPayPlus !== nextIsPayPlus) {
+                        $(document.body).trigger("update_checkout", {
+                            update_shipping_method: false
+                        });
+                    }
                 }
             }
 

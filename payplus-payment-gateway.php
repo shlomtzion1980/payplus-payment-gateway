@@ -1976,6 +1976,12 @@ body{
                             "enableDoubleCheckIfPruidExists" => isset($this->payplus_gateway) && $this->payplus_gateway->enableDoubleCheckIfPruidExists ? true : false,
                             "hostedPayload" => WC()->session ? WC()->session->get('hostedPayload') : null,
                             "showOrderTotal" => isset($this->hostedFieldsOptions['show_order_total']) && $this->hostedFieldsOptions['show_order_total'] === 'yes',
+                            "j5WeightEstimateEnabled" => (
+                                isset($this->payplus_payment_gateway_settings->transaction_type)
+                                && $this->payplus_payment_gateway_settings->transaction_type === '2'
+                                && isset($this->payplus_payment_gateway_settings->j5_weight_estimate_enabled)
+                                && $this->payplus_payment_gateway_settings->j5_weight_estimate_enabled === 'yes'
+                            ),
                         ]
                     );
                     if (!is_cart() && !is_product() && !is_shop()) {
