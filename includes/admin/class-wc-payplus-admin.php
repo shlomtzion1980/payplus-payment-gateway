@@ -598,7 +598,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                 if ($allowUpdateStatuses) {
                     $status = "";
-                    if ($responseBody['data']['status'] === 'approved' && $responseBody['data']['status_code'] === '000') {
+                    // Keep original cron/admin branching exactly — only normalize status_code (0 vs "000").
+                    if (
+                        $responseBody['data']['status'] === 'approved'
+                        && $this->isApprovedStatusCode($responseBody['data']['status_code'] ?? '')
+                    ) {
                         if ($responseBody['data']['type'] === 'Charge') {
                             if ($isCron && $this->fire_completed) {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete(cron)', $transactionUid);

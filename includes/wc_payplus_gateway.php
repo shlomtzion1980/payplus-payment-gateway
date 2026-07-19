@@ -3513,18 +3513,21 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $titleMethod = str_replace(array('<span>', "</span>"), '', $titleMethod);
         $order->set_payment_method_title($titleMethod);
 
+        // Normalize status_code: redirect/callback data sometimes yields 0 instead of "000".
+        if (isset($data['status_code'])) {
+            $data['status_code'] = $this->normalizePayPlusStatusCode($data['status_code']);
+        }
+
         $this->payplus_add_log_all($handle, 'New  ipn  Fired (' . $order_id . ')');
         $this->payplus_add_log_all($handle, 'Result: ' . wp_json_encode($data));
 
-        if ($data['type'] === 'Approval' && $data['status_code'] === '000') {
-            // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->wc-on-hold', $transaction_uid);
+        // Original validateOrder status transitions (unchanged), with normalized status_code.
+        if ($data['type'] === 'Approval' && $this->isApprovedStatusCode($data['status_code'])) {
             $order->update_status('wc-on-hold');
-        } elseif ($data['type'] === 'Charge' && $data['status_code'] === '000') {
+        } elseif ($data['type'] === 'Charge' && $this->isApprovedStatusCode($data['status_code'])) {
             if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->firePaymentComplete', $transaction_uid);
                 $order->payment_complete();
             } elseif ($this->successful_order_status !== 'default-woo') {
-                // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'validateOrder->' . $this->successful_order_status, $transaction_uid);
                 $order->update_status($this->successful_order_status);
             }
         }
@@ -3554,23 +3557,72 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     }
 
     /**
-     * @param $order
-     * @param $type
-     * @param $res
+     * Normalize PayPlus status codes so "000", 0 and "0" all compare as success.
+     *
+     * @param mixed $status_code
+     * @return string
+     */
+    public function normalizePayPlusStatusCode($status_code)
+    {
+        if ($status_code === null || $status_code === '') {
+            return '';
+        }
+        $digits = preg_replace('/\D/', '', (string) $status_code);
+        if ($digits === '') {
+            return (string) $status_code;
+        }
+        return str_pad($digits, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * @param mixed $status_code
      * @return bool
+     */
+    public function isApprovedStatusCode($status_code)
+    {
+        return $this->normalizePayPlusStatusCode($status_code) === '000';
+    }
+
+    /**
+     * Apply paid/auth order status from callback/IPN.
+     * Same transitions as before, plus WooCommerce guards so a second concurrent
+     * path does not fire payment_complete()/status hooks again.
+     *
+     * @param int|string $order_id
+     * @param string $type
+     * @param object|null $res
+     * @return WC_Order|bool|null
      */
     public function updateOrderStatus($order_id, $type, $res = null)
     {
-        $indexRow = 0;
         $order = wc_get_order($order_id);
+        if (!$order) {
+            return null;
+        }
+
         if ($this->updateStatusesIpn) {
             $this->payplus_add_log_all('payplus_callback_secured', "NOT UPDATING STATUS IN CALLBACK BECAUSE: updateStatusesIpn is true. \n");
             return $order;
         }
-        $status = $order->get_status();
-        if ($status === 'processing' || $status === 'completed' || $status === 'wc-processing' || $status === 'wc-completed') {
+
+        if (empty($type) && $res && isset($res->data->type)) {
+            $type = $res->data->type;
+        }
+
+        // Re-load: success redirect / cron may already have completed this order.
+        $order = wc_get_order($order_id);
+        if (!$order) {
+            return null;
+        }
+
+        if ($order->is_paid() || $order->has_status(['processing', 'completed'])) {
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "$order_id - status update skipped (already paid / status={$order->get_status()})\n"
+            );
             return $order;
         }
+
         if (isset($res->data->recurring_type)) {
             if ($this->recurring_order_set_to_paid == 'yes') {
                 $order->payment_complete();
@@ -3578,27 +3630,26 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $order->update_status('wc-recsubc');
             $order->save();
             return false;
-        } else {
-            if ($type == "Charge") {
-                if ($this->fire_completed) {
-                    $order->payment_complete();
-                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
-                }
-                $order = wc_get_order($order_id);
-                if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
-                    $order->update_status($this->successful_order_status);
-                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
-                }
-            } else {
-                $order->update_status('wc-on-hold');
-                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
-            }
-            $order->save();
-
-            $data = array('status' => $order->get_status(), 'update_at' => current_time('Y-m-d H:i:s'));
-            $where = array('order_id' => $order_id);
-            return $order;
         }
+
+        if ($type == "Charge") {
+            if ($this->fire_completed) {
+                // WC payment_complete() no-ops when status is no longer valid for it.
+                $order->payment_complete();
+                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
+            }
+            $order = wc_get_order($order_id);
+            if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
+                $order->update_status($this->successful_order_status);
+                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
+            }
+        } else {
+            $order->update_status('wc-on-hold');
+            $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
+        }
+        $order->save();
+
+        return $order;
     }
     public function getOrderPayplus($order_id)
     {
@@ -3658,6 +3709,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $userID = 0;
         $order = wc_get_order($order_id);
 
+        $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' requestPayPlusIpn start (via ' . $handleLog . ')');
+
         WC_PayPlus_Meta_Data::update_meta($order, array('payplus_function_end' => $handleLog));
         $this->updateOrderPayplus($order_id, $handleLog);
 
@@ -3687,7 +3740,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             // Log retry attempt
                             $this->payplus_add_log_all(
                                 $handle,
-                                "Network error (attempt $networkErrorRetry/$maxRetries): " . wp_json_encode($error) . " - Retrying in {$retryDelay}s...",
+                                "Order #{$order_id} Network error (attempt $networkErrorRetry/$maxRetries): " . wp_json_encode($error) . " - Retrying in {$retryDelay}s...",
                                 'warning'
                             );
 
@@ -3696,7 +3749,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             $retryDelay *= 2; // Double the delay for next retry
                         } else {
                             // Max retries reached - log final error
-                            $this->payplus_add_log_all($handle, "Network error after $maxRetries retries: " . wp_json_encode($error), 'error');
+                            $this->payplus_add_log_all($handle, "Order #{$order_id} Network error after $maxRetries retries: " . wp_json_encode($error), 'error');
 
                             // Add order note with retry information
                             $html = '<div style="font-weight:600;border-bottom: 1px solid #000;padding: 5px 0px; color: #d63638;">
@@ -3722,7 +3775,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     } else {
                         // Success - break out of retry loop
                         if ($networkErrorRetry > 0) {
-                            $this->payplus_add_log_all($handle, "IPN request succeeded after $networkErrorRetry retry attempts", 'info');
+                            $this->payplus_add_log_all($handle, "Order #{$order_id} IPN request succeeded after $networkErrorRetry retry attempts", 'info');
                         }
                         break;
                     }
@@ -3730,14 +3783,28 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                 // Only proceed if we have a valid response
                 if (!is_wp_error($response)) {
-                    $this->payplus_add_log_all('payplus_callback_secured', $order_id . ' requestPayPlusIpn->Response: ' . wp_remote_retrieve_body($response) . "\n");
-                    $res = json_decode(wp_remote_retrieve_body($response));
+                    $response_body = wp_remote_retrieve_body($response);
+                    $this->payplus_add_log_all('payplus_callback_secured', $order_id . ' requestPayPlusIpn->Response: ' . $response_body . "\n");
+                    $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' requestPayPlusIpn->Response: ' . $response_body);
+                    $res = json_decode($response_body);
                     $orderPayplus = $this->getOrderPayplus($order_id);
                     $payplus_function_end = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_function_end', true);
-                    if ($payplus_function_end && $payplus_function_end != $handleLog || $orderPayplus->function_end != $handleLog) {
-                        $flagPayplus = false;
-                        $flagProcess = false;
-                        break;
+                    $orderPayplusEnd = ($orderPayplus && isset($orderPayplus->function_end)) ? $orderPayplus->function_end : '';
+                    // Race between Callback and Payment paths: do NOT abort status update.
+                    // The loser skips duplicate notes/meta work; updateOrderStatus uses WC guards.
+                    $lostRace = (
+                        ($payplus_function_end && $payplus_function_end != $handleLog)
+                        || ($orderPayplusEnd && $orderPayplusEnd != $handleLog)
+                    );
+                    if ($lostRace) {
+                        $this->payplus_add_log_all(
+                            'payplus_callback_secured',
+                            "$order_id - requestPayPlusIpn lost race (meta_end={$payplus_function_end}, db_end={$orderPayplusEnd}, this={$handleLog}) - will still ensure status once\n"
+                        );
+                        $this->payplus_add_log_all(
+                            $handle,
+                            'Order #' . $order_id . " requestPayPlusIpn lost race (meta_end={$payplus_function_end}, db_end={$orderPayplusEnd}, this={$handleLog}) - will still ensure status once"
+                        );
                     }
                     if ($inline) {
                         return $res;
@@ -3745,7 +3812,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
                     if ($res->results->status == "error" || $res->results->status == "rejected") {
 
-                        $this->payplus_add_log_all($handle, 'Error IPN Error: ' . wp_json_encode($res), 'error');
+                        $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' Error IPN Error: ' . wp_json_encode($res), 'error');
                         $this->store_payment_ip();
                         // Only change to failed status if the setting allows it
                         if (!$this->prevent_failed_on_ipn_error) {
@@ -3754,13 +3821,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             }
                         } else {
                             // If prevented, log that we're not changing status
-                            $this->payplus_add_log_all($handle, 'IPN Error detected but status change to failed prevented by setting', 'info');
+                            $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' IPN Error detected but status change to failed prevented by setting');
                         }
                         // Translators: %s will be replaced with the transaction UID received from the payment gateway.
                         $order->add_order_note(sprintf(__('PayPlus IPN Failed<br/>Transaction UID: %s', 'payplus-payment-gateway'), $transaction_uid));
                         break;
                     } else {
                         $inData = array_merge($data, (array) $res->data);
+                        if (empty($type) && !empty($res->data->type)) {
+                            $type = $res->data->type;
+                        }
                         if (property_exists($res->data, 'related_transactions')) {
                             $insertMeta['payplus_related_transactions'] = 1;
                             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
@@ -3770,16 +3840,26 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         if (!count($rowOrder)) {
                             $this->payplus_add_order($order_id, $inData);
                         }
-                        $this->payplus_add_log_all($handle, 'status:' . $res->data->status_code);
-                        if ($res->data->status_code === '000') {
+                        $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' status:' . $res->data->status_code);
+                        if ($this->isApprovedStatusCode($res->data->status_code)) {
 
-                            $this->logOrderBegin($order_id, __FUNCTION__ . ':start');
-                            $this->updateMetaData($order_id, $inData);
+                            if (!$lostRace || !WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid', true)) {
+                                $this->logOrderBegin($order_id, __FUNCTION__ . ':start');
+                                $this->updateMetaData($order_id, $inData);
+                            }
                             $this->payplus_add_log_all('payplus_callback_secured', $order_id . " requestPayPlusIpn->updating statuses now: \n");
+                            $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' requestPayPlusIpn->updating statuses now');
                             $returnStatus = $this->updateOrderStatus($order_id, $type, $res);
                             $this->logOrderBegin($order_id, __FUNCTION__ . ':end');
 
-                            $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
+                            $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' ' . wp_json_encode($res), 'completed');
+
+                            // Skip duplicate side-effects when the other concurrent path owns the race.
+                            if ($lostRace) {
+                                $flagPayplus = false;
+                                break;
+                            }
+
                             if ($this->add_product_field_transaction_type) {
                                 if ($this->payplus_check_all_product($order, "2")) {
                                     $insertMeta['payplus_transaction_type'] = "2";
@@ -4498,6 +4578,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 break;
             case 'completed':
                 $this->logging->log(PAYPLUS_LOG_INFO_LEVEL, $beforeMsg . 'WP Remote Post Completed ' . $msg . "\n" . $this->payplus_get_space(), array('source' => $handle));
+                break;
+            case 'warning':
+            case 'info':
+                $this->logging->log(PAYPLUS_LOG_INFO_LEVEL, $beforeMsg . $msg, array('source' => $handle));
                 break;
             case 'space':
                 $this->logging->log(PAYPLUS_LOG_INFO_LEVEL, $this->payplus_get_space(), array('source' => $handle));
