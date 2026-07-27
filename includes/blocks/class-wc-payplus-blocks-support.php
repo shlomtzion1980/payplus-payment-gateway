@@ -57,6 +57,11 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
     /**
      * Initializes the payment method type.
+     *
+     * WooCommerce Blocks docs: called on every request — settings/options only.
+     * Do not call WC()->payment_gateways->payment_gateways() here.
+     *
+     * @see https://developer.woocommerce.com/docs/block-development/extensible-blocks/cart-and-checkout-blocks/checkout-payment-methods/payment-method-integration/
      */
     public function initialize()
     {
@@ -77,14 +82,23 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
         $this->customIcons = array_values(WC_PayPlus_Statics::getCardsLogos());
         $this->secretKey = $this->settings['secret_key'] ?? null;
-        $gateways = WC()->payment_gateways->payment_gateways();
 
-        $this->settings['gateways'] = [];
-        foreach (array_keys($gateways) as $payPlusGateWay) {
-            $this->settings['gateways'][] = strpos($payPlusGateWay, 'payplus-payment-gateway') === 0 ? $payPlusGateWay : null;
-        }
-        $this->settings['gateways'] = array_values(array_filter($this->settings['gateways']));
-        $this->gateway = $gateways[$this->name];
+        // PayPlus gateway IDs from known list (options-level), not by booting all WC gateways.
+        $this->settings['gateways'] = [
+            'payplus-payment-gateway',
+            'payplus-payment-gateway-bit',
+            'payplus-payment-gateway-googlepay',
+            'payplus-payment-gateway-applepay',
+            'payplus-payment-gateway-multipass',
+            'payplus-payment-gateway-paypal',
+            'payplus-payment-gateway-tavzahav',
+            'payplus-payment-gateway-valuecard',
+            'payplus-payment-gateway-finitione',
+            'payplus-payment-gateway-hostedfields',
+            'payplus-payment-gateway-pos-emv',
+            'payplus-payment-gateway-wire-transfers',
+        ];
+
         // Filter out POS EMV gateway if "Show in Blocks Checkout" is not enabled
         $pos_emv_settings = get_option('woocommerce_payplus-payment-gateway-pos-emv_settings', []);
         $show_in_blocks_checkout = isset($pos_emv_settings['show_in_blocks_checkout']) && $pos_emv_settings['show_in_blocks_checkout'] === 'yes';
@@ -602,10 +616,27 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      *
      * @return boolean
      */
+    /**
+     * WooCommerce Blocks docs: decide activity from settings, not by constructing gateways.
+     *
+     * @return bool
+     */
     public function is_active()
     {
+        if (empty($this->settings['enabled']) || $this->settings['enabled'] !== 'yes') {
+            return false;
+        }
 
-        return $this->gateway->is_available();
+        if (
+            $this->name === 'payplus-payment-gateway'
+            && !is_admin()
+            && isset($this->payPlusSettings['hide_main_pp_checkout'])
+            && $this->payPlusSettings['hide_main_pp_checkout'] === 'yes'
+        ) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -693,11 +724,42 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             }
         }
 
+        $supports = ['products'];
+        if (
+            ($this->payPlusSettings['create_pp_token'] ?? '') === 'yes'
+            || $this->name === 'payplus-payment-gateway'
+            || $this->name === 'payplus-payment-gateway-hostedfields'
+        ) {
+            $supports[] = 'tokenization';
+        }
+
+        // Per-method icons from known asset paths (same as each subgateway's iconURL).
+        // Do not construct gateways here — initialize must stay options-only.
+        $hide_icon = $this->get_setting('hide_icon', 'no');
+        $icon_paths = [
+            'payplus-payment-gateway' => 'assets/images/PayPlusLogo.svg',
+            'payplus-payment-gateway-bit' => 'assets/images/bitLogo.png',
+            'payplus-payment-gateway-googlepay' => 'assets/images/google-payLogo.png',
+            'payplus-payment-gateway-applepay' => 'assets/images/apple-payLogo.png',
+            'payplus-payment-gateway-multipass' => 'assets/images/multipassLogo.png',
+            'payplus-payment-gateway-paypal' => 'assets/images/paypalLogo.png',
+            'payplus-payment-gateway-tavzahav' => 'assets/images/verifoneLogo.png',
+            'payplus-payment-gateway-valuecard' => 'assets/images/valuecardLogo.png',
+            'payplus-payment-gateway-finitione' => 'assets/images/finitioneLogo.png',
+            'payplus-payment-gateway-hostedfields' => 'assets/images/PayPlusLogo.svg',
+            'payplus-payment-gateway-pos-emv' => 'assets/images/PayPlusLogo.svg',
+            'payplus-payment-gateway-wire-transfers' => 'assets/images/wire-transfers.png',
+        ];
+        $icon = '';
+        if ($hide_icon === 'no' && isset($icon_paths[$this->name])) {
+            $icon = PAYPLUS_PLUGIN_URL . $icon_paths[$this->name];
+        }
+
         return [
             'title' => $this->get_setting('title'),
             'description' => $this->get_setting('description'),
-            'supports' => array_filter($this->gateway->supports, [$this->gateway, 'supports']),
-            'showSaveOption' => $this->settings['create_pp_token'] == 'yes' ? true : false,
+            'supports' => $supports,
+            'showSaveOption' => (($this->settings['create_pp_token'] ?? ($this->payPlusSettings['create_pp_token'] ?? '')) == 'yes') ? true : false,
             'hasSavedTokens' => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
             'secretKey' => $this->secretKey,
             'hideOtherPayments' => $this->hideOtherPayments,
@@ -725,7 +787,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             ],
             'gateways' => $this->settings['gateways'],
             'customIcons' => $this->customIcons,
-            'icon' => ($this->gateway->hide_icon == "no") ? $this->gateway->icon : '',
+            'icon' => $icon,
             'weightEstimateFeeName' => !empty($this->payPlusSettings['j5_weight_estimate_name']) ? $this->payPlusSettings['j5_weight_estimate_name'] : __('Weight Estimate', 'payplus-payment-gateway'),
             'weightEstimateFeeMessage' => !empty($this->payPlusSettings['j5_weight_estimate_message']) ? $this->payPlusSettings['j5_weight_estimate_message'] : '',
         ];
