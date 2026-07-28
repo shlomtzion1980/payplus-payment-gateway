@@ -61,6 +61,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $hide_payments_field;
     public $default_charge_method;
     public $hide_other_charge_methods;
+    public $send_payment_page_language;
     public $vat_number_field;
     public $sendEmailApproval;
     public $sendEmailFailure;
@@ -213,6 +214,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->hide_payments_field = $this->get_option('hide_payments_field');
         $this->default_charge_method = $this->get_option('default_charge_method');
         $this->hide_other_charge_methods = $this->get_option('hide_other_charge_methods');
+        $this->send_payment_page_language = $this->get_option('send_payment_page_language') === 'yes';
         $this->sendEmailApproval = $this->get_option('sendEmailApproval');
         $this->sendEmailFailure = $this->get_option('sendEmailFailure');
         $this->recurring_order_set_to_paid = $this->get_option('recurring_order_set_to_paid');
@@ -2796,10 +2798,56 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      * @param $custom_more_info
      * @return string
      */
+    /**
+     * Language code for PayPlus payment pages (e.g. he, en, ru).
+     * Checkbox off: same as before — first segment of get_locale().
+     * Checkbox on: displayed storefront language (Polylang / WPML / locale).
+     *
+     * @return string
+     */
+    public function get_payment_page_language_code()
+    {
+        // Unchecked: exact previous behavior.
+        if (empty($this->send_payment_page_language)) {
+            $langCode = explode('_', get_locale());
+            return trim(strtolower($langCode[0]));
+        }
+
+        $code = null;
+
+        // Prefer the displayed front language from multilingual plugins.
+        if (function_exists('pll_current_language')) {
+            $pll = pll_current_language('slug');
+            if (is_string($pll) && $pll !== '') {
+                $code = $pll;
+            }
+        }
+
+        if (empty($code)) {
+            $wpml = apply_filters('wpml_current_language', null);
+            if (is_string($wpml) && $wpml !== '' && $wpml !== 'all') {
+                $code = $wpml;
+            }
+        }
+
+        if (empty($code)) {
+            $locale = function_exists('determine_locale') ? determine_locale() : get_locale();
+            $parts = explode('_', str_replace('-', '_', (string) $locale));
+            $code = $parts[0] ?? '';
+        }
+
+        $code = strtolower(trim((string) $code));
+        if ($code === 'iw') {
+            $code = 'he';
+        }
+
+        return $code !== '' ? $code : 'he';
+    }
+
     public function generatePaymentLink($order_id, $isAdmin = false, $token = null, $subscription = false, $custom_more_info = '', $move_token = false, $options = [])
     {
         $order = wc_get_order($order_id);
-        $langCode = explode("_", get_locale());
+        $language_code = $this->get_payment_page_language_code();
         $customer_country_iso = $order->get_billing_country();
         $totallCart = round($order->get_total(), $this->rounding_decimals);
 
@@ -2933,7 +2981,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $payload['charge_method'] = $chargeMethod;
         $payload['expiry_datetime'] = "30";
         $payload['hide_other_charge_methods'] = $hideOtherChargeMethods === 'true' ? true : false;
-        $payload['language_code'] = trim(strtolower($langCode[0]));
+        $payload['language_code'] = $language_code;
         $payload['refURL_success'] = $redirectSuccess . '&charge_method=' . $this->default_charge_method;
         $payload['refURL_failure'] = $this->response_error_url;
         $payload['refURL_callback'] = $callback;
@@ -2963,7 +3011,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             ' . $addChargeLine . '
             "expiry_datetime": "30",
             "hide_other_charge_methods": ' . $hideOtherChargeMethods . ',
-            "language_code": "' . trim(strtolower($langCode[0])) . '",
+            "language_code": "' . $language_code . '",
             "refURL_success": "' . $redirectSuccess . '&charge_method=' . $this->default_charge_method . '",
             "refURL_failure": "' . $this->response_error_url . '",
             "refURL_callback": "' . $callback . '",
@@ -4339,11 +4387,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $customerData = wp_json_encode($customerBilling);
 
-        $langCode = explode("_", get_locale());
+        $language_code = $this->get_payment_page_language_code();
         $payload = '{
             "payment_page_uid": "' . $this->payment_page_id . '",
             "charge_method": 5,
-            "language_code": "' . $langCode[0] . '",
+            "language_code": "' . $language_code . '",
             "expiry_datetime": "30",
             "refURL_success": "' . $success_url_with_nonce . '",
             "refURL_failure": "' . wc_get_endpoint_url('add-payment-method') . '",

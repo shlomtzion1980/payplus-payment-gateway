@@ -891,6 +891,14 @@ class WC_PayPlus_Form_Fields
                 when the customer selects payment with Google Pay he will only see the Google Pay in the payment page and will not see the CC fields.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
             ],
+            'send_payment_page_language' => [
+                'title' => __('Open payment page in website language', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Open payment page in website language (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('When enabled, the PayPlus payment page opens in the storefront language (e.g. en, ru, he). When disabled, language_code is sent as before (from the WordPress locale).', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'enable_double_check_if_pruid_exists' => [
                 'title' => __('Double check ipn', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

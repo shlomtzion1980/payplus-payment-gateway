@@ -406,8 +406,11 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
      */
     public function add_payment_request_order_meta(PaymentContext $context, PaymentResult &$result)
     {
+        if ($this->name !== $context->payment_method) {
+            return;
+        }
+
         $data = $context->payment_data;
-        $is_payplus_payment_method = $this->name === $context->payment_method;
         // Use cached gateway instance for better performance
         $main_gateway              = $this->get_main_payplus_gateway();
         $this->orderId = $context->order->get_id();
