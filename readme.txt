@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 8.2.3
+Stable tag: 8.2.4
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,15 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.2.4  - 10-08-2026 =
+
+- Feature   - New "Open payment page in website language" option: when enabled, the payment page uses the storefront language; when disabled, previous locale behavior is unchanged.
+- Fix       - Blocks: payment method initialize no longer boots all WooCommerce gateways on every page; payment method icons restored.
+- Fix       - Blocks checkout: payment payload is built once for the selected method instead of once per registered PayPlus method.
+- Fix       - Classic checkout: Place Order button no longer flickers when switching methods unless J5 Weight Estimate refresh is required.
+- Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
+- Tweak     - Ensure WooCommerce is active before loading PayPlus payment gateways.
 
 == 8.2.3  - 08-07-2026 =
 

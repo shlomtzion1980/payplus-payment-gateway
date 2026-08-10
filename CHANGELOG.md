@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.4]  - 08-10-2026 - (Soda)
+
+- Feature   - New "Open payment page in website language" option under Payment Page Options. When enabled, `language_code` is sent from the storefront language (Polylang / WPML / locale). When disabled, behavior is unchanged (`get_locale()`).
+- Fix       - Blocks: `initialize()` no longer calls `payment_gateways()` on every request (settings/options only), avoiding unnecessary gateway boot (e.g. PayPal/Jetpack) site-wide. Per-method payment icons restored via known asset paths.
+- Fix       - Blocks checkout: payment processing hook now runs only for the selected PayPlus method, preventing repeated `generatePaymentLink()` builds (~once per registered method).
+- Fix       - Classic checkout: Place Order button flicker when switching payment methods — checkout refresh now runs only when J5 Weight Estimate is enabled (Authorization + fee option).
+- Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
+- Tweak     - Plugin bootstrap waits until WooCommerce is active before loading payment gateways on both Classic and Blocks checkout.
+
 ## [8.2.3]  - 08-07-2026 - (Soka)
 
 - Feature   - New "Show loader during iframe payment & redirect" option: displays a "Processing payment…" spinner overlay on the iframe when the user submits payment (detected via iframe load event), then transitions to a full-screen "Redirecting…" loader when order status reaches processing/completed (via polling or postMessage). Gated by `show_iframe_redirect_loader` checkbox. Works on both Classic and Blocks checkout.
