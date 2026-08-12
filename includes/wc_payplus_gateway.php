@@ -3306,6 +3306,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $data['more_info'] = $response['transaction']['more_info'] ?? null;
         $data['alternative_method_name'] = $response['transaction']['alternative_method_name'] ?? null;
         $data['amount'] = $response['transaction']['amount'] ?? null;
+        // Callback has no top-level `method`. Club/alternative payments only send
+        // alternative_method_name (e.g. multipass). Without this, updateMetaData
+        // defaults method to credit-card and Invoice+ prints "Other".
+        if (!empty($data['alternative_method_name'])) {
+            $data['method'] = $data['alternative_method_name'];
+        }
         return $data;
     }
 
@@ -4178,7 +4184,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     || $response['alternative_method_name'] == "multipass" ||
                     $response['alternative_method_name'] == "paypal" ||
                     $response['alternative_method_name'] == "tav-zahav" ||
-                    $response['alternative_method_name'] == "valuecard"
+                    $response['alternative_method_name'] == "valuecard" ||
+                    $response['alternative_method_name'] == "finitione"
 
                 ) {
                     $method = $response['alternative_method_name'];
@@ -4271,6 +4278,12 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // when hooks (like automatic invoice creation) fire on save.
         WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
         $order->save();
+
+        // Status may already be processing from an earlier redirect, so the status
+        // hook will not fire again. Create the invoice now that the real method exists.
+        if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+            $this->invoice_api->payplus_invoice_create_order($order_id);
+        }
     }
     
     /**
@@ -4726,7 +4739,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $wpdb->update($table, array('delete_at' => 1), array('order_id' => $order_id));
             }
 
-            if (!empty($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay'))) {
+            if (!empty($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay', 'bit', 'multipass', 'paypal', 'tav-zahav', 'valuecard', 'finitione'), true)) {
                 $dataRow['method'] = $dataRow['alternative_method_name'];
             }
             /* parent payment */
@@ -4781,7 +4794,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $dataMultiples = $dataRow['related_transactions'];
                 for ($i = 0; $i < count($dataMultiples); $i++) {
                     $dataRow = (array) $dataMultiples[$i];
-                    if (isset($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay'))) {
+                    if (isset($dataRow['alternative_method_name']) && in_array($dataRow['alternative_method_name'], array('google-pay', 'apple-pay', 'bit', 'multipass', 'paypal', 'tav-zahav', 'valuecard', 'finitione'), true)) {
                         $dataRow['method'] = $dataRow['alternative_method_name'];
                     }
                     $data = array(

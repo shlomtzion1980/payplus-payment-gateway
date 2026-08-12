@@ -446,25 +446,12 @@ class PayplusInvoice
         }
 
         if (!count($resultApps)) {
-            $method_payment = strtolower(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
-            $alt_method = strtolower(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true));
+            $method_payment = $this->payplus_resolve_actual_method($order_id, $order);
+            $all_supported_methods = $this->payplus_supported_invoice_methods();
+            $direct_methods = array_merge($all_supported_methods, ['cash', 'bank-transfer', 'payment-check']);
 
-            if (!empty($alt_method) && in_array($alt_method, $this->payment_method, true)) {
-                $method_payment = $alt_method;
-            } elseif (empty($method_payment)) {
-                $method_payment = 'other';
-            }
-
-            if ($method_payment === 'credit-card') {
-                $paymentArray['method_payment'] = 'credit-card';
-                $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
-                $paymentArray['brand_name'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
-                $paymentArray['price'] = ($dual * $sum) * 100;
-                $resultApps[] = (object) $paymentArray;
-            } elseif (in_array($method_payment, $this->payment_method, true) && $method_payment !== 'credit-card') {
-                $paymentArray['method_payment'] = $method_payment;
-                $paymentArray['price'] = ($dual * $sum) * 100;
-                $resultApps[] = (object) $paymentArray;
+            if (in_array($method_payment, $direct_methods, true)) {
+                $resultApps[] = $this->payplus_invoice_payment_row($order_id, $method_payment, ($dual * $sum) * 100);
             } else {
                 $method_payment = 'other';
                 $otherMethod = strtolower($order->get_payment_method_title());
@@ -1074,6 +1061,16 @@ class PayplusInvoice
             $resultApps = $wpdb->get_results($sql, OBJECT);
             $resultApps = $this->payplus_set_object_payment($order_id, $resultApps);
         }
+        if (!empty($resultApps) && is_array($resultApps)) {
+            foreach ($resultApps as $row) {
+                if (isset($row->method_payment)) {
+                    $row->method_payment = strtolower((string) $row->method_payment);
+                }
+                if (empty($row->method_payment) && !empty($row->alternative_method_name)) {
+                    $row->method_payment = strtolower((string) $row->alternative_method_name);
+                }
+            }
+        }
         return $resultApps;
     }
 
@@ -1092,6 +1089,146 @@ class PayplusInvoice
             $arr[] = $objectPayment;
         }
         return $arr;
+    }
+
+    /**
+     * Invoice+ method identifiers we can send (regular + club).
+     *
+     * @return string[]
+     */
+    private function payplus_supported_invoice_methods()
+    {
+        return array_merge($this->payment_method, $this->payment_method_club);
+    }
+
+    /**
+     * Map a WooCommerce gateway ID to an Invoice+ payment method.
+     * Used when the invoice is created on status change before PayPlus meta exists.
+     *
+     * @param string $wc_method
+     * @return string
+     */
+    private function payplus_wc_gateway_to_invoice_method($wc_method)
+    {
+        $map = [
+            'payplus-payment-gateway-bit' => 'bit',
+            'payplus-payment-gateway-googlepay' => 'google-pay',
+            'payplus-payment-gateway-applepay' => 'apple-pay',
+            'payplus-payment-gateway-multipass' => 'multipass',
+            'payplus-payment-gateway-paypal' => 'paypal',
+            'payplus-payment-gateway-tavzahav' => 'tav-zahav',
+            'payplus-payment-gateway-valuecard' => 'valuecard',
+            'payplus-payment-gateway-finitione' => 'finitione',
+            'payplus-payment-gateway-wire-transfers' => 'bank-transfer',
+            'bacs' => 'bank-transfer',
+            'cod' => 'cash',
+            'cheque' => 'payment-check',
+            'wire-transfers' => 'bank-transfer',
+        ];
+        return $map[$wc_method] ?? '';
+    }
+
+    /**
+     * Extract an Invoice+ method from a PayPlus IPN or callback JSON blob.
+     *
+     * @param mixed $json
+     * @return string
+     */
+    private function payplus_method_from_json($json)
+    {
+        if (empty($json)) {
+            return '';
+        }
+        $response = is_array($json) ? $json : json_decode($json, true);
+        if (!is_array($response)) {
+            return '';
+        }
+        $supported = $this->payplus_supported_invoice_methods();
+        $alt = strtolower((string) ($response['alternative_method_name'] ?? $response['transaction']['alternative_method_name'] ?? ''));
+        if (in_array($alt, $supported, true)) {
+            return $alt;
+        }
+        $method = strtolower((string) ($response['method'] ?? ''));
+        if (in_array($method, $supported, true)) {
+            return $method;
+        }
+        return '';
+    }
+
+    /**
+     * Resolve the actual payment method used for an order.
+     * Priority:
+     *   1. payplus_alternative_method_name
+     *   2. payplus_method (when it is a known Invoice+ method)
+     *   3. payplus_response / payplus_callback_response JSON
+     *   4. WooCommerce payment method ID (available even before IPN/callback meta)
+     *
+     * @param int $order_id
+     * @param \WC_Order|null $order
+     * @return string Lowercased Invoice+ method identifier.
+     */
+    private function payplus_resolve_actual_method($order_id, $order = null)
+    {
+        $supported = $this->payplus_supported_invoice_methods();
+
+        $alt = strtolower((string) WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true));
+        if (in_array($alt, $supported, true)) {
+            return $alt;
+        }
+
+        $method = strtolower((string) WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
+        if (in_array($method, $supported, true)) {
+            return $method;
+        }
+
+        $fromResponse = $this->payplus_method_from_json(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true));
+        if ($fromResponse !== '') {
+            return $fromResponse;
+        }
+
+        $fromCallback = $this->payplus_method_from_json(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response', true));
+        if ($fromCallback !== '') {
+            return $fromCallback;
+        }
+
+        if (!$order) {
+            $order = wc_get_order($order_id);
+        }
+        if ($order) {
+            $fromWc = $this->payplus_wc_gateway_to_invoice_method($order->get_payment_method());
+            if ($fromWc !== '') {
+                return $fromWc;
+            }
+        }
+
+        return $method !== '' ? $method : 'other';
+    }
+
+    /**
+     * Build a single Invoice+ payment row from a resolved method.
+     *
+     * @param int $order_id
+     * @param string $method_payment
+     * @param float $price
+     * @param bool $include_payments_count
+     * @return object
+     */
+    private function payplus_invoice_payment_row($order_id, $method_payment, $price, $include_payments_count = false)
+    {
+        $paymentArray = [
+            'method_payment' => $method_payment,
+            'price' => $price,
+        ];
+        if ($method_payment === 'credit-card' || in_array($method_payment, $this->payment_method_club, true)) {
+            $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
+        }
+        if ($method_payment === 'credit-card') {
+            $paymentArray['brand_name'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
+            if ($include_payments_count) {
+                $paymentArray['number_of_payments'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true);
+            }
+        }
+        return (object) $paymentArray;
     }
 
     /**
@@ -1148,6 +1285,22 @@ class PayplusInvoice
         $invoice_manual = $this->payplus_get_create_invoice_manual();
 
         $order = wc_get_order($order_id);
+
+        // Do not guess credit-card for the main/hosted PayPlus gateways. Club payments
+        // (multipass, valuecard, tav-zahav, finitione) are chosen on the payment page;
+        // the invoice must wait for IPN/callback so we send payment_app = that club.
+        $wc_method = $order ? $order->get_payment_method() : '';
+        $generic_payplus = in_array($wc_method, [
+            'payplus-payment-gateway',
+            'payplus-payment-gateway-hostedfields',
+            'payplus-payment-gateway-pos-emv',
+        ], true);
+        $has_payplus_payment_data = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true))
+            || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true))
+            || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
+        if ($generic_payplus && !$has_payplus_payment_data && !$isCashPayment) {
+            return;
+        }
 
         if (isset($this->payplus_invoice_option['do-not-create']) && is_array($this->payplus_invoice_option['do-not-create'])) {
             $doNotCreate = $this->payplus_invoice_option['do-not-create'];
@@ -1326,27 +1479,12 @@ class PayplusInvoice
                     $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 
                     if (!count($resultApps)) {
-                        $method_payment = strtolower(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
-                        $alt_method = strtolower(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true));
+                        $method_payment = $this->payplus_resolve_actual_method($order_id, $order);
+                        $all_supported_methods = $this->payplus_supported_invoice_methods();
+                        $direct_methods = array_merge($all_supported_methods, ['cash', 'bank-transfer', 'payment-check']);
 
-                        // alternative_method_name takes priority (bit, google-pay, apple-pay, etc.)
-                        if (!empty($alt_method) && in_array($alt_method, $this->payment_method, true)) {
-                            $method_payment = $alt_method;
-                        } elseif (empty($method_payment)) {
-                            $method_payment = 'other';
-                        }
-
-                        if ($method_payment === 'credit-card') {
-                            $paymentArray['method_payment'] = 'credit-card';
-                            $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
-                            $paymentArray['brand_name'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
-                            $paymentArray['number_of_payments'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true);
-                            $paymentArray['price'] = ($dual * $totalCartAmount) * 100;
-                            $resultApps[] = (object) $paymentArray;
-                        } elseif (in_array($method_payment, $this->payment_method, true) && $method_payment !== 'credit-card') {
-                            $paymentArray['method_payment'] = $method_payment;
-                            $paymentArray['price'] = ($dual * $totalCartAmount) * 100;
-                            $resultApps[] = (object) $paymentArray;
+                        if (in_array($method_payment, $direct_methods, true)) {
+                            $resultApps[] = $this->payplus_invoice_payment_row($order_id, $method_payment, ($dual * $totalCartAmount) * 100, true);
                         } else {
                             $method_payment = 'other';
                             $method_payment = ($order->get_payment_method() === "bacs") ? 'bank-transfer' : $method_payment;
@@ -1570,6 +1708,7 @@ class PayplusInvoice
 
                 $resultApp = $resultApps[$i];
                 $create_at = property_exists($resultApp, 'create_at') ? $resultApp->create_at : null;
+                $resultApp->method_payment = strtolower((string) $resultApp->method_payment);
                 $paymentType = 'payment-app';
                 $typePayment = array();
                 if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax', 'wire-transfers'))) {

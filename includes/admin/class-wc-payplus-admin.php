@@ -569,12 +569,25 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     if (isset($responseBody['data']['transaction_uid'])) $responseArray['payplus_transaction_uid'] = esc_html($responseBody['data']['transaction_uid']);
                     if (isset($responseBody['data']['type'])) $responseArray['payplus_type'] = esc_html($responseBody['data']['type']);
                     if (isset($responseBody['data']['brand_name'])) $responseArray['payplus_brand_name'] = esc_html($responseBody['data']['brand_name']);
-                    if (isset($responseBody['data']['method'])) $responseArray['payplus_method'] = esc_html($responseBody['data']['method']);
+                    $alt_method = isset($responseBody['data']['alternative_method_name']) ? strtolower(trim((string) $responseBody['data']['alternative_method_name'])) : '';
+                    $raw_method = isset($responseBody['data']['method']) ? strtolower(trim((string) $responseBody['data']['method'])) : '';
+                    $club_methods = ['bit', 'multipass', 'paypal', 'tav-zahav', 'valuecard', 'finitione'];
+                    if ($alt_method !== '' && in_array($alt_method, $club_methods, true)) {
+                        $method_key = $alt_method;
+                    } elseif ($raw_method !== '' && in_array($raw_method, $club_methods, true)) {
+                        $method_key = $raw_method;
+                    } else {
+                        $method_key = 'credit-card';
+                    }
+                    $responseArray['payplus_method'] = esc_html($method_key);
+                    if ($alt_method !== '') {
+                        $responseArray['payplus_alternative_method_name'] = esc_html($alt_method);
+                    }
                     if (isset($responseBody['data']['number'])) $responseArray['payplus_number'] = esc_html($responseBody['data']['number']);
                     if (isset($responseBody['data']['number_of_payments'])) $responseArray['payplus_number_of_payments'] = esc_html($responseBody['data']['number_of_payments']);
                     if (isset($responseBody['data']['clearing_name'])) $responseArray['payplus_clearing_name'] = esc_html($responseBody['data']['clearing_name']);
                     if (isset($responseBody['data']['credit_terms'])) $responseArray['payplus_credit_terms'] = esc_html($responseBody['data']['credit_terms']);
-                    if (isset($responseBody['data']['amount'])) $responseArray['payplus_credit-card'] = esc_html($responseBody['data']['amount']);
+                    if (isset($responseBody['data']['amount'])) $responseArray['payplus_' . $method_key] = esc_html($responseBody['data']['amount']);
                     if (isset($responseBody['data']['customer_name'])) $responseArray['payplus_customer_name'] = esc_html($responseBody['data']['customer_name']);
                     if (isset($responseBody['data']['expiry_month'])) $responseArray['payplus_expiry_month'] = esc_html($responseBody['data']['expiry_month']);
                     if (isset($responseBody['data']['expiry_year'])) $responseArray['payplus_expiry_year'] = esc_html($responseBody['data']['expiry_year']);
@@ -592,6 +605,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 // Update meta on success, add order note on failure (but skip notes for status-only checks)
                 if ($responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000") {
                     WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
+                    if ($this->payPlusInvoice && $this->payPlusInvoice->payplus_get_invoice_enable()) {
+                        $this->payPlusInvoice->payplus_invoice_create_order($order_id);
+                    }
                 }
 
                 $transactionUid = $responseBody['data']['transaction_uid'];
