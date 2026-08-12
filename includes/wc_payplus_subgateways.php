@@ -929,12 +929,43 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             if (WC()->session && WC()->session->get('payplus_hosted_update_failed')) {
                 WC()->session->set('payplus_hosted_update_failed', false);
+                WC()->session->set('payplus_hosted_updated_for_order', 0);
                 wc_add_notice(__('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway'), 'error');
                 return array(
                     'result'  => 'failure',
                     'redirect' => '',
                 );
             }
+
+            // Hard guarantee: only allow the charge if the PayPlus payment page
+            // was successfully updated with THIS order's real data in the current
+            // request (via WC_PayPlus_HostedFields::on_woocommerce_checkout_order_processed
+            // → update_hosted_page_for_order).
+            // If the flag is not set for this exact order id, the browser would
+            // otherwise charge the initial "setup" page that still has placeholder
+            // customer info (general-first-name / general-last-name) and a random
+            // hash in more_info instead of the real order id.
+            $verifiedOrderId = WC()->session ? WC()->session->get('payplus_hosted_updated_for_order') : 0;
+            if (absint($verifiedOrderId) !== absint($order_id)) {
+                $payplus_instance = WC_PayPlus::get_instance();
+                $mainGateway = $payplus_instance->get_main_payplus_gateway();
+                if ($mainGateway) {
+                    $mainGateway->payplus_add_log_all(
+                        'hosted-fields-data',
+                        "HostedFields process_payment REFUSED for Order #$order_id – payment page was not verified as updated (verifiedOrderId=" . ($verifiedOrderId ?: 'null') . "). Refusing charge to prevent placeholder-data payment."
+                    );
+                }
+                WC()->session->set('page_request_uid', false);
+                WC()->session->__unset('hostedFieldsUUID');
+                WC()->session->set('hostedPayload', false);
+                WC()->session->set('hostedResponse', false);
+                wc_add_notice(__('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway'), 'error');
+                return array(
+                    'result'   => 'failure',
+                    'redirect' => '',
+                );
+            }
+
             WC()->session->set('order_awaiting_payment', $order_id);
         }
         return array(

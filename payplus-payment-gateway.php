@@ -1837,8 +1837,10 @@ body{
                     new WC_PayPlus_Product_Syncer();
 
                     if (is_array($this->hostedFieldsOptions) && boolval($this->hostedFieldsOptions['enabled'] === "yes")) {
-                        require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-embedded.php';
-                        new WC_PayPlus_Embedded();
+                        // Register the plugin-init hooks that used to live on WC_PayPlus_Embedded
+                        // (woocommerce_checkout_order_processed strict-Update + pwgc gift-card session capture).
+                        // Both responsibilities now live on WC_PayPlus_HostedFields directly.
+                        WC_PayPlus_HostedFields::register_hooks();
                     }
 
                     if (did_action('woocommerce_blocks_loaded')) {

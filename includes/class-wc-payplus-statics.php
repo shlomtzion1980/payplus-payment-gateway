@@ -667,7 +667,21 @@ class WC_PayPlus_Statics
             return $response;
         }
 
-        public static function createUpdateHostedPaymentPageLink($payload, $isPlaceOrder = false)
+        /**
+         * Create or Update a Hosted Fields payment page on PayPlus.
+         *
+         * @param string $payload       JSON payload for PayPlus.
+         * @param bool   $isPlaceOrder  True when this call must UPDATE the existing page
+         *                              (i.e. the one the browser's hosted fields are bound to).
+         * @param bool   $strictUpdate  When true and $isPlaceOrder is true, if the session
+         *                              is missing the bound page_request_uid/hostedFieldsUUID
+         *                              we refuse to silently fall back to generateLink
+         *                              (which would create a new page the browser can't reach
+         *                              and would leave the initial setup page open to being
+         *                              charged with placeholder customer data and a random-hash
+         *                              more_info instead of the real order id).
+         */
+        public static function createUpdateHostedPaymentPageLink($payload, $isPlaceOrder = false, $strictUpdate = false)
         {
             $options = get_option('woocommerce_payplus-payment-gateway_settings');
             $testMode = boolval($options['api_test_mode'] === 'yes');
@@ -678,6 +692,16 @@ class WC_PayPlus_Statics
 
             if ($pageRequestUid && $hostedFieldsUUID && $isPlaceOrder) {
                 $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
+            } elseif ($isPlaceOrder && $strictUpdate) {
+                // Requested a strict Update but session lost the binding — refuse.
+                // The caller MUST NOT create a new page here.
+                return wp_json_encode([
+                    'results' => [
+                        'status'  => 'error',
+                        'message' => 'strict-update-unavailable: missing bound page_request_uid/hostedFieldsUUID',
+                    ],
+                    'data' => new stdClass(),
+                ]);
             }
 
             $hostedResponse = WC_PayPlus_Statics::payPlusRemote($apiUrl, $payload, "post");

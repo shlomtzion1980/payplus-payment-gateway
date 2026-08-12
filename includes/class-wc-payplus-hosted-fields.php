@@ -22,6 +22,273 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public $showSubmitButton;
     public $pwGiftCardData;
 
+    /**
+     * Static holder for WP GiftCards session data.
+     * Populated by the pwgc_redeeming_session_data filter (see modify_gift_card_session_data).
+     * Was $this->pwGiftCardData on the former WC_PayPlus_Embedded class — kept as a static
+     * so the plugin-init hook path does not have to instantiate this class (whose
+     * constructor is the heavy page-load setup for Hosted Fields).
+     */
+    public static $pwGiftCardDataStatic = null;
+
+    /**
+     * Register the plugin-init hooks previously owned by WC_PayPlus_Embedded.
+     *
+     * Called once at plugin bootstrap (see payplus-payment-gateway.php). Must NOT be
+     * called from the page-load setup path — that path uses the heavy constructor
+     * directly (new WC_PayPlus_HostedFields) to render the template + enqueue assets.
+     */
+    public static function register_hooks()
+    {
+        add_action('woocommerce_checkout_order_processed', [__CLASS__, 'on_woocommerce_checkout_order_processed'], 25, 3);
+        add_filter('pwgc_redeeming_session_data', [__CLASS__, 'capture_gift_card_session_data'], 10, 2);
+    }
+
+    /**
+     * Hook callback: woocommerce_checkout_order_processed (priority 25).
+     *
+     * When a Hosted Fields order is created, run the strict Update against the same
+     * PayPlus payment page the browser's hosted-fields DOM is bound to. This is what
+     * guarantees the real order data (real customer + real order id in more_info)
+     * reaches PayPlus BEFORE the charge is authorized. Only fires for Hosted Fields
+     * payment method — all other gateways are ignored.
+     */
+    public static function on_woocommerce_checkout_order_processed($order_id, $posted_data, $order)
+    {
+        if (strpos($order->get_payment_method(), 'payplus-payment-gateway-hostedfields') !== 0) {
+            return;
+        }
+        WC()->session->set('order_awaiting_payment', $order_id);
+        self::update_hosted_page_for_order($order_id, $order);
+    }
+
+    /**
+     * Filter callback: pwgc_redeeming_session_data.
+     *
+     * Cache WP GiftCards session data for later use by update_hosted_page_for_order()
+     * when it builds the Update payload. Kept as a static so the plugin-init flow
+     * doesn't need an instance of WC_PayPlus_HostedFields (whose constructor is heavy).
+     *
+     * Renamed from modify_gift_card_session_data (its name on the former
+     * WC_PayPlus_Embedded class) to avoid shadowing WC_PayPlus's same-named instance
+     * method which has a different signature. Filter callbacks are wired by name,
+     * so the rename has no runtime effect.
+     */
+    public static function capture_gift_card_session_data($session_data, $gift_card_number)
+    {
+        self::$pwGiftCardDataStatic = $session_data;
+        return $session_data;
+    }
+
+    /**
+     * Strict Update path — builds the real-order payload and calls PayPlus
+     * /Update/{page_request_uid} for the SAME page the browser is bound to.
+     *
+     * If the Update fails for any reason, this refuses to fall back to generateLink
+     * (which would create a new page the browser cannot reach and let the old
+     * placeholder page be charged) and instead flags the session so
+     * WC_PayPlus_Gateway_HostedFields::process_payment refuses to authorize the
+     * charge. The customer is then asked to refresh and start with a new setup page.
+     *
+     * Previously lived on WC_PayPlus_Embedded::hostedFieldsData($order_id) — merged
+     * here so the whole Hosted Fields feature lives on one class.
+     *
+     * @param int      $order_id Real order id (numeric).
+     * @param WC_Order $order    WC order object for that id.
+     */
+    public static function update_hosted_page_for_order($order_id, $order)
+    {
+        $payplus_gateway = WC_PayPlus::get_instance()->get_main_payplus_gateway();
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings');
+        $testMode = boolval(isset($settings['api_test_mode']) && $settings['api_test_mode'] === 'yes');
+        $paymentPageUid = $testMode ? $settings['dev_payment_page_id'] : $settings['payment_page_id'];
+        $vat4All = isset($settings['paying_vat_all_order']) ? boolval($settings['paying_vat_all_order'] === 'yes') : false;
+        $pwGiftCardData = self::$pwGiftCardDataStatic;
+
+        if (!is_int($order_id) || !$order) {
+            $payplus_gateway->payplus_add_log_all(
+                'hosted-fields-data',
+                'HostedFields update ABORTED — non-numeric order_id or missing order object.'
+            );
+            return;
+        }
+
+        $payplus_gateway->payplus_add_log_all(
+            'hosted-fields-data',
+            'PayPlus Hosted Fields update for order #: (' . $order_id . ')'
+        );
+
+        $products = [];
+        $merchantCountryCode = substr(get_option('woocommerce_default_country'), 0, 2);
+        WC()->customer->set_shipping_country($merchantCountryCode);
+        WC()->cart->calculate_totals();
+        $wc_tax_enabled = wc_tax_enabled();
+
+        if (isset($pwGiftCardData) && $pwGiftCardData && !empty($pwGiftCardData['gift_cards']) && is_array($pwGiftCardData['gift_cards'])) {
+            foreach ($pwGiftCardData['gift_cards'] as $giftCardId => $giftCard) {
+                $priceGift = number_format(-1 * ($giftCard), 2, '.', '');
+                $products[] = [
+                    'title' => __('PW Gift Card', 'payplus-payment-gateway'),
+                    'barcode' => $giftCardId,
+                    'quantity' => 1,
+                    'priceProductWithTax' => $priceGift,
+                ];
+            }
+        }
+        $objectProducts = $payplus_gateway->payplus_get_products_by_order_id($order_id);
+        foreach ($objectProducts->productsItems as $item) {
+            $product = json_decode($item, true);
+            $productId = isset($product['barcode']) ? $product['barcode'] : str_replace(' ', '', $product['name']);
+            $products[] = [
+                'title' => $product['name'],
+                'priceProductWithTax' => number_format($product['price'], 2, '.', ''),
+                'barcode' => $productId,
+                'quantity' => $product['quantity'],
+                'vat_type' => isset($product['vat_type']) ? $product['vat_type'] : 0,
+            ];
+        }
+
+        $data = new stdClass();
+        $data->payment_page_uid = $paymentPageUid;
+        $data->refURL_success = site_url() . '?wc-api=payplus_gateway&hostedFields=true';
+        $_wpnonce = wp_create_nonce('PayPlusGateWayNonce');
+        $data->refURL_callback = get_site_url(null, '/?wc-api=callback_response&_wpnonce=' . $_wpnonce);
+        $data->refURL_failure = site_url() . '/error-payment-payplus/';
+        $data->refURL_cancel = site_url() . '/cancel-payment-payplus/';
+        $data->create_token = true;
+        $data->currency_code = get_woocommerce_currency();
+        $data->charge_method = intval($payplus_gateway->settings['transaction_type']);
+        $data->refURL_origin = site_url();
+        $data->hosted_fields = true;
+
+        $payPlusInvoice = new PayplusInvoice;
+        $customer = $payPlusInvoice->payplus_get_client_by_order_id($order_id);
+        $data->customer = new stdClass();
+
+        // Use real billing name for customer_name so tokens are saved with the correct
+        // billing identity ($customer['name'] may contain the invoice-name override).
+        $billingName = '';
+        if ($payplus_gateway->exist_company && !empty($order->get_billing_company())) {
+            $billingName = $order->get_billing_company();
+        } else {
+            if (!empty($order->get_billing_first_name()) || !empty($order->get_billing_last_name())) {
+                $billingName = trim($order->get_billing_first_name() . ' ' . $order->get_billing_last_name());
+            }
+            if (!$billingName) {
+                $billingName = $order->get_billing_company();
+            } elseif ($order->get_billing_company()) {
+                $billingName .= ' (' . $order->get_billing_company() . ')';
+            }
+        }
+        $data->customer->customer_name = !empty($billingName) ? $billingName : $customer['name'];
+        $data->customer->email = $customer['email'];
+        $data->customer->phone = $customer['phone'];
+        $data->customer->address = $customer['street_name'];
+        $data->customer->city = $customer['city'];
+        $data->customer->postal_code = $customer['postal_code'];
+        $data->customer->country_iso = $customer['country_iso'];
+        $data->customer->customer_external_number = $order->get_customer_id();
+
+        $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
+        if (!empty($customer_invoice_name)) {
+            $data->customer->customer_name_invoice = $customer_invoice_name;
+        }
+
+        $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
+        if (!empty($customer_other_id)) {
+            $data->customer->vat_number = $customer_other_id;
+        } elseif ($payplus_gateway->vat_number_field && $order->get_meta($payplus_gateway->vat_number_field)) {
+            $data->customer->vat_number = $order->get_meta($payplus_gateway->vat_number_field);
+        }
+
+        $payingVat = isset($payplus_gateway->settings['paying_vat']) && in_array($payplus_gateway->settings['paying_vat'], [0, 1, 2]) ? $payplus_gateway->settings['paying_vat'] : false;
+        if ($payingVat) {
+            $payingVat = $payingVat === '0' ? true : false;
+            $payingVat = $payingVat === '1' ? false : true;
+            $payingVat = $payingVat === '2' ? ($customer['country_iso'] !== trim(strtolower($payplus_gateway->settings['paying_vat_iso_code'])) ? false : true) : $payingVat;
+            $data->paying_vat = $payingVat;
+        }
+
+        foreach ($products as $product) {
+            $item = new stdClass();
+            $item->name = $product['title'];
+            $item->quantity = $product['quantity'];
+            $item->barcode = $product['barcode'];
+            $item->price = $product['priceProductWithTax'];
+            if (isset($product['vat_type'])) {
+                $item->vat_type = $product['vat_type'];
+            }
+            $data->items[] = $item;
+        }
+
+        $data->more_info = $order_id;
+        $totalAmount = 0;
+        foreach ($data->items as $item) {
+            $totalAmount += $item->price * $item->quantity;
+        }
+        $data->amount = number_format($totalAmount, 2, '.', '');
+
+        $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
+
+        // Capture the exact page_request_uid + hostedFieldsUUID the browser is bound to
+        // (set into session by the initial setup-page create at page load).
+        // We MUST update THAT page — creating a new page here would leave the browser
+        // bound to the old (placeholder) page, and any subsequent charge would hit
+        // that stale page with placeholder customer data + random-hash more_info.
+        $boundPageRequestUid = WC()->session->get('page_request_uid');
+        $boundHostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
+
+        if (empty($boundPageRequestUid) || empty($boundHostedFieldsUUID)) {
+            $payplus_gateway->payplus_add_log_all(
+                'hosted-fields-data',
+                "HostedFields Update ABORTED for Order #$order_id – no bound page_request_uid/hostedFieldsUUID in session. Customer must refresh."
+            );
+            WC()->session->set('payplus_hosted_update_failed', true);
+            WC()->session->set('payplus_hosted_updated_for_order', 0);
+            return;
+        }
+
+        // Strict Update. No fallback to generateLink — that would create a new page
+        // that the browser cannot reach and lets the old (placeholder) page get charged.
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, true, true);
+        $hostedResponseArray = json_decode($hostedResponse, true);
+
+        $returnedPageRequestUid = isset($hostedResponseArray['data']['page_request_uid'])
+            ? $hostedResponseArray['data']['page_request_uid']
+            : null;
+
+        $updateOk = $returnedPageRequestUid === $boundPageRequestUid
+            && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+
+        if (!$updateOk) {
+            $payplus_gateway->payplus_add_log_all(
+                'hosted-fields-data',
+                "HostedFields Update FAILED for Order #$order_id – aborting charge. Bound PRUID: $boundPageRequestUid | Returned PRUID: " . ($returnedPageRequestUid ?: 'null') . " | Response: $hostedResponse"
+            );
+            WC()->session->set('page_request_uid', false);
+            WC()->session->__unset('hostedFieldsUUID');
+            WC()->session->set('hostedPayload', false);
+            WC()->session->set('hostedResponse', false);
+            WC()->session->set('payplus_hosted_update_failed', true);
+            WC()->session->set('payplus_hosted_updated_for_order', 0);
+            return;
+        }
+
+        // Update succeeded on the SAME page the browser is bound to.
+        WC()->session->set('payplus_hosted_update_failed', false);
+        WC()->session->set('payplus_hosted_updated_for_order', $order_id);
+
+        $pageRequestUid = $hostedResponseArray['data']['page_request_uid'];
+        // Meta key names are preserved verbatim from the former Embedded class so
+        // historical order reads (e.g. wc_payplus_subgateways.php::getHostedPayload)
+        // keep working against existing orders in the database.
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $pageRequestUid]);
+        WC_PayPlus_Meta_Data::append_pruid_history($order, $pageRequestUid, 'embedded');
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_payload' => $payload]);
+        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
+        WC()->session->set('hostedPayload', $payload);
+        WC()->session->set('hostedResponse', $hostedResponse);
+    }
 
     /**
      *
@@ -325,12 +592,55 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         // this will be the create initial order data function that calls the curl to create at it's end.
         $checkout = WC()->checkout();
 
-        // Get posted checkout data
-        $billing_first_name = !empty($checkout->get_value('billing_first_name')) ? $checkout->get_value('billing_first_name') : "general-first-name";
-        $billing_last_name  = !empty($checkout->get_value('billing_last_name')) ? $checkout->get_value('billing_last_name') : "general-last-name";
-        $billing_email      = !empty($checkout->get_value('billing_email')) ? $checkout->get_value('billing_email') : "general@payplus.co.il";
-        $shipping_address   = !empty($checkout->get_value('shipping_address_1')) ? $checkout->get_value('shipping_address_1') : "general-shipping-address";
-        $phone              = !empty($checkout->get_value('billing_phone')) ? $checkout->get_value('billing_phone') : "050-0000000";
+        // Best-effort prefill: prefer posted checkout data → WC customer session →
+        // logged-in user meta. Placeholders are only used as a last resort. Note that
+        // the real order data is guaranteed to overwrite this via the Update flow in
+        // WC_PayPlus_HostedFields::on_woocommerce_checkout_order_processed before the
+        // charge is authorized (process_payment refuses to complete otherwise).
+        $wc_customer = WC()->customer;
+        $current_user = is_user_logged_in() ? wp_get_current_user() : null;
+
+        $billing_first_name = $checkout->get_value('billing_first_name');
+        if (empty($billing_first_name) && $wc_customer) {
+            $billing_first_name = $wc_customer->get_billing_first_name();
+        }
+        if (empty($billing_first_name) && $current_user) {
+            $billing_first_name = $current_user->first_name ?: get_user_meta($current_user->ID, 'billing_first_name', true);
+        }
+        $billing_first_name = !empty($billing_first_name) ? $billing_first_name : "general-first-name";
+
+        $billing_last_name = $checkout->get_value('billing_last_name');
+        if (empty($billing_last_name) && $wc_customer) {
+            $billing_last_name = $wc_customer->get_billing_last_name();
+        }
+        if (empty($billing_last_name) && $current_user) {
+            $billing_last_name = $current_user->last_name ?: get_user_meta($current_user->ID, 'billing_last_name', true);
+        }
+        $billing_last_name = !empty($billing_last_name) ? $billing_last_name : "general-last-name";
+
+        $billing_email = $checkout->get_value('billing_email');
+        if (empty($billing_email) && $wc_customer) {
+            $billing_email = $wc_customer->get_billing_email();
+        }
+        if (empty($billing_email) && $current_user && !empty($current_user->user_email)) {
+            $billing_email = $current_user->user_email;
+        }
+        $billing_email = !empty($billing_email) ? $billing_email : "general@payplus.co.il";
+
+        $shipping_address = $checkout->get_value('shipping_address_1');
+        if (empty($shipping_address) && $wc_customer) {
+            $shipping_address = $wc_customer->get_shipping_address_1() ?: $wc_customer->get_billing_address_1();
+        }
+        $shipping_address = !empty($shipping_address) ? $shipping_address : "general-shipping-address";
+
+        $phone = $checkout->get_value('billing_phone');
+        if (empty($phone) && $wc_customer) {
+            $phone = $wc_customer->get_billing_phone();
+        }
+        if (empty($phone) && $current_user) {
+            $phone = get_user_meta($current_user->ID, 'billing_phone', true);
+        }
+        $phone = !empty($phone) ? $phone : "050-0000000";
 
         // Building sample request to create a payment page
         $data = new stdClass();
@@ -506,4 +816,14 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return false;
         }
     }
+}
+
+// Backward compatibility: WC_PayPlus_Embedded used to be a thin subclass of
+// WC_PayPlus_HostedFields that only registered woocommerce_checkout_order_processed
+// and re-implemented hostedFieldsData for the strict Update path. Both responsibilities
+// now live on WC_PayPlus_HostedFields directly (register_hooks() + update_hosted_page_for_order()).
+// The alias keeps any lingering `new WC_PayPlus_Embedded()` / `instanceof WC_PayPlus_Embedded`
+// references working — the old subclass never added any state of its own.
+if (!class_exists('WC_PayPlus_Embedded', false)) {
+    class_alias('WC_PayPlus_HostedFields', 'WC_PayPlus_Embedded');
 }

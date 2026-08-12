@@ -360,34 +360,69 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
         WC()->session->set('hostedPayload', $payload);
 
-        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder);
-        $hostedResponseArray = json_decode($hostedResponse, true);
+        // Capture the exact page_request_uid + hostedFieldsUUID the browser's hosted
+        // fields DOM is bound to (set into session by the initial setup-page create at
+        // Blocks page load — same session keys as the classic path). When Place Order
+        // fires, we MUST update THAT page — silently creating a new page via generateLink
+        // would leave the browser bound to the old (placeholder) page, and the subsequent
+        // charge would hit that stale page with placeholder customer data + random-hash
+        // more_info. This mirrors the strict-Update guarantee applied to the classic
+        // Hosted Fields flow in WC_PayPlus_HostedFields::update_hosted_page_for_order().
+        $boundPageRequestUid = WC()->session->get('page_request_uid');
+        $boundHostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-        $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
-            && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
-
-        if (!$updateOk) {
+        if ($isPlaceOrder && (empty($boundPageRequestUid) || empty($boundHostedFieldsUUID))) {
             $WC_PayPlus_Gateway->payplus_add_log_all(
                 'hosted-fields-data',
-                "Blocks Update FAILED for Order #$order_id – retrying with fresh generateLink. Response: $hostedResponse"
+                "Blocks Update ABORTED for Order #$order_id – no bound page_request_uid/hostedFieldsUUID in session. Customer must refresh."
             );
-            WC()->session->__unset('page_request_uid');
-            WC()->session->__unset('hostedFieldsUUID');
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, false);
-            $hostedResponseArray = json_decode($hostedResponse, true);
+            WC()->session->set('payplus_hosted_update_failed', true);
+            WC()->session->set('payplus_hosted_updated_for_order', 0);
+            WC()->session->__unset('hostedPayload');
+            WC()->session->__unset('hostedResponse');
+            return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
+        }
 
-            $updateOk = isset($hostedResponseArray['data']['page_request_uid'])
+        // Strict Update when this is a real Place Order (isPlaceOrder=true). No fallback
+        // to generateLink — that would create a new PayPlus page the browser cannot reach
+        // and would let the old placeholder page get charged.
+        $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $isPlaceOrder, $isPlaceOrder);
+        $hostedResponseArray = json_decode($hostedResponse, true);
+
+        $returnedPageRequestUid = isset($hostedResponseArray['data']['page_request_uid'])
+            ? $hostedResponseArray['data']['page_request_uid']
+            : null;
+
+        if ($isPlaceOrder) {
+            // Must succeed AND must have updated the SAME page the browser is bound to.
+            $updateOk = $returnedPageRequestUid === $boundPageRequestUid
+                && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
+        } else {
+            // Non-place-order create: legacy behavior — any successful response is OK.
+            $updateOk = !empty($returnedPageRequestUid)
                 && (!isset($hostedResponseArray['results']['status']) || $hostedResponseArray['results']['status'] !== 'error');
         }
 
         if (!$updateOk) {
             $WC_PayPlus_Gateway->payplus_add_log_all(
                 'hosted-fields-data',
-                "Blocks generateLink ALSO FAILED for Order #$order_id. Response: $hostedResponse"
+                "Blocks Update FAILED for Order #$order_id – aborting charge. Bound PRUID: " . ($boundPageRequestUid ?: 'null') . " | Returned PRUID: " . ($returnedPageRequestUid ?: 'null') . " | Response: $hostedResponse"
             );
+            // Invalidate the session so the customer is forced to refresh (which will
+            // create a fresh setup page with a fresh page_request_uid).
+            WC()->session->__unset('page_request_uid');
+            WC()->session->__unset('hostedFieldsUUID');
             WC()->session->__unset('hostedPayload');
             WC()->session->__unset('hostedResponse');
+            WC()->session->set('payplus_hosted_update_failed', true);
+            WC()->session->set('payplus_hosted_updated_for_order', 0);
             return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
+        }
+
+        // Update succeeded on the SAME page the browser is bound to.
+        if ($isPlaceOrder) {
+            WC()->session->set('payplus_hosted_update_failed', false);
+            WC()->session->set('payplus_hosted_updated_for_order', $order_id);
         }
 
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_page_request_uid' => $hostedResponseArray['data']['page_request_uid']]);
@@ -507,6 +542,34 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $result->set_status('error');
                 return;
             }
+
+            // Hard guarantee (mirrors classic HostedFields::process_payment): only allow
+            // the charge if the PayPlus payment page was verified as updated with THIS
+            // order's real data in the current request. If the flag doesn't match, the
+            // browser would otherwise submit the card against the initial "setup" page
+            // that still has placeholder customer info (general-first-name/…) and a
+            // random hash in more_info instead of the real order id.
+            $verifiedOrderId = WC()->session ? WC()->session->get('payplus_hosted_updated_for_order') : 0;
+            if (absint($verifiedOrderId) !== absint($this->orderId) || WC()->session->get('payplus_hosted_update_failed')) {
+                if ($WC_PayPlus_Gateway) {
+                    $WC_PayPlus_Gateway->payplus_add_log_all(
+                        'hosted-fields-data',
+                        "Blocks REFUSED to authorize charge for Order #{$this->orderId} – payment page not verified as updated (verifiedOrderId=" . ($verifiedOrderId ?: 'null') . "). Refusing to prevent placeholder-data payment."
+                    );
+                }
+                WC()->session->set('payplus_hosted_update_failed', false);
+                WC()->session->set('payplus_hosted_updated_for_order', 0);
+                WC()->session->__unset('page_request_uid');
+                WC()->session->__unset('hostedFieldsUUID');
+                WC()->session->__unset('hostedPayload');
+                WC()->session->__unset('hostedResponse');
+                $payment_details = $result->payment_details;
+                $payment_details['errorMessage'] = __('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway');
+                $result->set_payment_details($payment_details);
+                $result->set_status('error');
+                return;
+            }
+
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;
             $payment_details['secret_key'] = $this->secretKey;
