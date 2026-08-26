@@ -590,12 +590,9 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         // Enable payment fields only when hosted_fields_is_main and there are saved tokens
         $this->has_fields = $this->should_show_payment_fields();
         
-        add_action('wp_ajax_complete_order', [$this, 'complete_order_via_ajax']);
-        add_action('wp_ajax_nopriv_complete_order', [$this, 'complete_order_via_ajax']);
-        add_action('wp_ajax_get-hosted-payload', [$this, 'getHostedPayload']);
-        add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'getHostedPayload']);
-        add_action('wp_ajax_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
-        add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'regenerateHostedLink']);
+        // AJAX actions are registered once from WC_PayPlus (plugin bootstrap),
+        // not here — gateway constructors can run more than once and must not
+        // stack duplicate admin-ajax handlers.
         // Support tokenization for saved cards
         $this->supports = array_merge($this->supports, ['tokenization']);
     }
