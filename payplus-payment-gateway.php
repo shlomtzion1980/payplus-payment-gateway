@@ -97,6 +97,14 @@ class WC_PayPlus
             add_action('wp_ajax_make-hosted-payment', [$this, 'hostedPayment']);
             add_action('wp_ajax_nopriv_make-hosted-payment', [$this, 'hostedPayment']);
 
+            // Hosted Fields AJAX — registered once at plugin level (not in gateway __construct).
+            add_action('wp_ajax_complete_order', [$this, 'ajax_hosted_fields_complete_order']);
+            add_action('wp_ajax_nopriv_complete_order', [$this, 'ajax_hosted_fields_complete_order']);
+            add_action('wp_ajax_get-hosted-payload', [$this, 'ajax_hosted_fields_get_payload']);
+            add_action('wp_ajax_nopriv_get-hosted-payload', [$this, 'ajax_hosted_fields_get_payload']);
+            add_action('wp_ajax_regenerate-hosted-link', [$this, 'ajax_hosted_fields_regenerate_link']);
+            add_action('wp_ajax_nopriv_regenerate-hosted-link', [$this, 'ajax_hosted_fields_regenerate_link']);
+
             add_action('wp_ajax_payplus_check_order_redirect', [$this, 'ajax_payplus_check_order_redirect']);
             add_action('wp_ajax_nopriv_payplus_check_order_redirect', [$this, 'ajax_payplus_check_order_redirect']);
 
@@ -517,6 +525,56 @@ class WC_PayPlus
             </p>
         </div>
     <?php
+    }
+
+    /**
+     * Resolve the WC-managed Hosted Fields gateway instance.
+     *
+     * @return WC_PayPlus_Gateway_HostedFields|null
+     */
+    public function get_hosted_fields_gateway()
+    {
+        if (!function_exists('WC') || !WC()->payment_gateways) {
+            return null;
+        }
+        $gateways = WC()->payment_gateways->payment_gateways();
+        if (
+            isset($gateways['payplus-payment-gateway-hostedfields'])
+            && $gateways['payplus-payment-gateway-hostedfields'] instanceof WC_PayPlus_Gateway_HostedFields
+        ) {
+            return $gateways['payplus-payment-gateway-hostedfields'];
+        }
+        return null;
+    }
+
+    public function ajax_hosted_fields_complete_order()
+    {
+        $gateway = $this->get_hosted_fields_gateway();
+        if (!$gateway) {
+            wp_send_json_error(['message' => 'Hosted Fields gateway unavailable'], 400);
+            return;
+        }
+        $gateway->complete_order_via_ajax();
+    }
+
+    public function ajax_hosted_fields_get_payload()
+    {
+        $gateway = $this->get_hosted_fields_gateway();
+        if (!$gateway) {
+            wp_send_json_error(['message' => 'Hosted Fields gateway unavailable'], 400);
+            return;
+        }
+        $gateway->getHostedPayload();
+    }
+
+    public function ajax_hosted_fields_regenerate_link()
+    {
+        $gateway = $this->get_hosted_fields_gateway();
+        if (!$gateway) {
+            wp_send_json_error(['message' => 'Hosted Fields gateway unavailable'], 400);
+            return;
+        }
+        $gateway->regenerateHostedLink();
     }
 
     public function hostedPayment()
