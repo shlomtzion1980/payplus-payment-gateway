@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.2.5]  - 09-02-2026 - (Chihiro)
+
+- Fix       - Hosted Fields (PayPlus Embedded): checkout no longer binds to a generic customer or the wrong order id; payload and completion use the real WooCommerce order.
+- Fix       - Invoice+: Multipass (and other club/alternative methods) no longer print as "Other" on documents — the actual method name is stored and used.
+- Tweak     - Optional "Prevent duplicate payment complete" setting (default off). When enabled, overlapping redirect/callback/IPN success paths cannot fire payment_complete() twice.
+- Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set (approval). Prevents the Google Pay iframe from loading on checkout without a valid UID.
+
 ## [8.2.4]  - 08-10-2026 - (Soda)
 
 - Feature   - New "Open payment page in website language" option under Payment Page Options. When enabled, `language_code` is sent from the storefront language (Polylang / WPML / locale). When disabled, behavior is unchanged (`get_locale()`).
@@ -10,7 +17,6 @@ All notable changes to this project will be documented in this file.
 - Fix       - Classic checkout: Place Order button flicker when switching payment methods — checkout refresh now runs only when J5 Weight Estimate is enabled (Authorization + fee option).
 - Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
 - Tweak     - Plugin bootstrap waits until WooCommerce is active before loading payment gateways on both Classic and Blocks checkout.
-- Tweak     - Optional "Prevent duplicate payment complete" setting (default off). When enabled, overlapping redirect/callback/IPN success paths cannot fire payment_complete() twice.
 
 ## [8.2.3]  - 08-07-2026 - (Soka)
 

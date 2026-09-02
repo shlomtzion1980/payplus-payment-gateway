@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 8.2.4
+Stable tag: 8.2.5
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -86,6 +86,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+== 8.2.5  - 02-09-2026 =
+
+- Fix       - Hosted Fields (PayPlus Embedded): no longer uses a generic customer or the wrong order id.
+- Fix       - Invoice+: Multipass and other club/alternative methods are no longer shown as "Other" on documents.
+- Tweak     - Optional "Prevent duplicate payment complete" setting (default off) to stop double Payment complete notes and New order / Processing emails.
+- Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set.
+
 == 8.2.4  - 10-08-2026 =
 
 - Feature   - New "Open payment page in website language" option: when enabled, the payment page uses the storefront language; when disabled, previous locale behavior is unchanged.
@@ -94,7 +101,6 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Fix       - Classic checkout: Place Order button no longer flickers when switching methods unless J5 Weight Estimate refresh is required.
 - Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
 - Tweak     - Ensure WooCommerce is active before loading PayPlus payment gateways.
-- Tweak     - Optional "Prevent duplicate payment complete" setting (default off) to stop double Payment complete notes and New order / Processing emails.
 
 == 8.2.3  - 08-07-2026 =
 
