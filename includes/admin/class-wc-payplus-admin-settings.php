@@ -682,6 +682,7 @@ class WC_PayPlus_Admin_Settings
                     'name' => __('Google Pay', 'payplus-payment-gateway'),
                     'id' => 'woocommerce_payplus-payment-gateway_settings[enable_google_pay]',
                     'type' => 'checkbox',
+                    'default' => 'no',
                     'class' => 'enable_google_pay enable_checkout',
                     'desc' => '<div style="color:red" class="error-express-checkout"></div>
                                 <div class="loading-express">

@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Fix       - Classic checkout: Place Order button flicker when switching payment methods — checkout refresh now runs only when J5 Weight Estimate is enabled (Authorization + fee option).
 - Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
 - Tweak     - Plugin bootstrap waits until WooCommerce is active before loading payment gateways on both Classic and Blocks checkout.
+- Tweak     - Optional "Prevent duplicate payment complete" setting (default off). When enabled, overlapping redirect/callback/IPN success paths cannot fire payment_complete() twice.
 
 ## [8.2.3]  - 08-07-2026 - (Soka)
 

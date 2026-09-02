@@ -2001,7 +2001,7 @@ body{
 
                 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Core WordPress filter
                 $isElementor = in_array('elementor/elementor.php', apply_filters('active_plugins', get_option('active_plugins')));
-                $isEnableOneClick = (isset($this->payplus_payment_gateway_settings->enable_google_pay) && $this->payplus_payment_gateway_settings->enable_google_pay === "yes") ||
+                $isEnableOneClick = (class_exists('WC_PayPlus_Gateway') && WC_PayPlus_Gateway::is_google_pay_express_enabled($this->payplus_payment_gateway_settings)) ||
                     (isset($this->payplus_payment_gateway_settings->enable_apple_pay) && $this->payplus_payment_gateway_settings->enable_apple_pay === "yes");
                 if (is_checkout() || is_product() || is_cart() || $isElementor) {
                     if (

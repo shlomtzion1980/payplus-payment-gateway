@@ -614,9 +614,24 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                 if ($allowUpdateStatuses) {
                     $status = "";
+                    $skipAdminStatus = false;
+                    $adminStatusLocked = false;
+                    if ($this->preventDuplicatePaymentComplete) {
+                        $adminStatusLocked = $this->acquireOrderStatusLock($order_id);
+                        if (!$adminStatusLocked) {
+                            $skipAdminStatus = true;
+                        } else {
+                            $order = wc_get_order($order_id);
+                            if ($this->orderAlreadyPaidOrComplete($order)) {
+                                $skipAdminStatus = true;
+                            }
+                        }
+                    }
+                    try {
                     // Keep original cron/admin branching exactly — only normalize status_code (0 vs "000").
                     if (
-                        $responseBody['data']['status'] === 'approved'
+                        !$skipAdminStatus
+                        && $responseBody['data']['status'] === 'approved'
                         && $this->isApprovedStatusCode($responseBody['data']['status_code'] ?? '')
                     ) {
                         if ($responseBody['data']['type'] === 'Charge') {
@@ -648,6 +663,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         if ($this->create_pp_token && $isHostedPayment && $saveToken) {
                             $user_id = $order->get_user_id();
                             $this->save_token($responseBody['data'], $user_id);
+                        }
+                    }
+                    } finally {
+                        if ($adminStatusLocked) {
+                            $this->releaseOrderStatusLock($order_id);
                         }
                     }
                 }

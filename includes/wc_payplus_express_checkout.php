@@ -17,7 +17,9 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
 
         $this->payPlusGateWaySettings = get_option('woocommerce_payplus-payment-gateway_settings', []);
         $this->isAppleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_apple_pay']) && $this->payPlusGateWaySettings['enable_apple_pay'] === 'yes');
-        $this->isGoogleEnabled = boolval(isset($this->payPlusGateWaySettings['enable_google_pay']) && $this->payPlusGateWaySettings['enable_google_pay'] === 'yes');
+        $this->isGoogleEnabled = class_exists('WC_PayPlus_Gateway')
+            ? WC_PayPlus_Gateway::is_google_pay_express_enabled($this->payPlusGateWaySettings)
+            : false;
         $this->paymentPageId = isset($this->payPlusGateWaySettings['api_test_mode']) && $this->payPlusGateWaySettings['api_test_mode'] === 'yes' ? $this->payPlusGateWaySettings['dev_payment_page_id'] ?? null : $this->payPlusGateWaySettings['payment_page_id'] ?? null;
 
         add_action('wp_ajax_apple-onvalidate-merchant', [$this, 'ajax_payplus_apple_onvalidate_merchant']);
@@ -395,7 +397,11 @@ class WC_PayPlus_Express_Checkout extends WC_PayPlus
                     }
 
                     if ($method == "google-pay") {
-                        $payplus_payment_gateway_settings['enable_google_pay'] = "yes";
+                        $uid = trim((string) ($this->paymentPageId ?? ''));
+                        if ($uid !== '') {
+                            $payplus_payment_gateway_settings['enable_google_pay'] = "yes";
+                            $payplus_payment_gateway_settings['google_pay_page_uid'] = $uid;
+                        }
                     } else {
                         $payplus_payment_gateway_settings['enable_apple_pay'] = "yes";
                     }

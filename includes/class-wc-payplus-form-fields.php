@@ -941,6 +941,14 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'default' => 'yes',
             ],
+            'prevent_duplicate_payment_complete' => [
+                'title' => __('Prevent duplicate payment complete', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Prevent duplicate payment complete (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('When enabled, only one success path (redirect, callback, or IPN) can mark the order paid. Prevents double “Payment complete” notes and duplicate New order / Processing emails if those requests overlap. Leave unchecked to keep existing behavior.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'failure_order_status' => [
                 'title' => __('Failure Order Status', 'payplus-payment-gateway'),
                 'type' => 'select',

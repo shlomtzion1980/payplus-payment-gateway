@@ -395,6 +395,15 @@ jQuery(function ($) {
     if (enableGooglePay && enableGooglePay.prop("checked") === false) {
         googlePayPageUid.parents("tr").fadeOut();
     }
+    if (
+        enableGooglePay &&
+        enableGooglePay.prop("checked") === true &&
+        googlePayPageUid &&
+        !String(googlePayPageUid.val() || "").trim()
+    ) {
+        enableGooglePay.prop("checked", false);
+        googlePayPageUid.parents("tr").fadeOut();
+    }
 
     let hideOtherExpressShipping = () => {
         globalShipping.closest("tr").fadeOut();

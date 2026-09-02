@@ -94,6 +94,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Fix       - Classic checkout: Place Order button no longer flickers when switching methods unless J5 Weight Estimate refresh is required.
 - Fix       - Callback/IPN: more reliable order status updates when multiple success responses arrive for the same payment.
 - Tweak     - Ensure WooCommerce is active before loading PayPlus payment gateways.
+- Tweak     - Optional "Prevent duplicate payment complete" setting (default off) to stop double Payment complete notes and New order / Processing emails.
 
 == 8.2.3  - 08-07-2026 =
 

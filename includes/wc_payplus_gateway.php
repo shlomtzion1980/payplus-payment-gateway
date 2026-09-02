@@ -74,6 +74,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $allowSendCallBack;
     public $logging;
     public $fire_completed;
+    public $preventDuplicatePaymentComplete;
     public $invoice_lang;
     public $response_url;
     public $payplus_generate_key_dashboard;
@@ -229,6 +230,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $this->logging = wc_get_logger();
         $this->fire_completed = $this->get_option('fire_completed') == 'yes' ? true : false;
+        $this->preventDuplicatePaymentComplete = $this->get_option('prevent_duplicate_payment_complete') === 'yes';
         $this->invoice_lang = $this->get_option('invoice_lang') == 'en' ? 'en' : '';
 
         //wc-api=payplus_gateway added to the response url will initiate the woocommerce_api_payplus_gateway action - which will start the ipn_response
@@ -270,7 +272,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->global_shipping_tax_rate = $this->get_option('global_shipping_tax_rate');
         $this->token_apple_pay = $this->get_option('apple_pay_identifier');
         $this->google_apple_pay_page_uid = $this->get_option('google_apple_pay_page_uid');
-        $this->enable_google_pay = $this->get_option('enable_google_pay') == 'yes' ? true : false;
+        $this->enable_google_pay = self::is_google_pay_express_enabled($this->settings);
         $this->enable_apple_pay = $this->get_option('enable_apple_pay') == 'yes' ? true : false;
         $this->enable_product = $this->get_option('enable_product') == 'yes' ? true : false;
         $this->enable_create_user = $this->get_option('enable_create_user') == 'yes' ? true : false;
@@ -3576,14 +3578,34 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'Result: ' . wp_json_encode($data));
 
         // Original validateOrder status transitions (unchanged), with normalized status_code.
-        if ($data['type'] === 'Approval' && $this->isApprovedStatusCode($data['status_code'])) {
-            $order->update_status('wc-on-hold');
-        } elseif ($data['type'] === 'Charge' && $this->isApprovedStatusCode($data['status_code'])) {
-            if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                $order->payment_complete();
-            } elseif ($this->successful_order_status !== 'default-woo') {
-                $order->update_status($this->successful_order_status);
+        $applyValidateStatus = true;
+        $validateStatusLocked = false;
+        if ($this->preventDuplicatePaymentComplete) {
+            $validateStatusLocked = $this->acquireOrderStatusLock($order_id);
+            if (!$validateStatusLocked) {
+                $this->payplus_add_log_all($handle, "Order #{$order_id} validateOrder status skipped (duplicate-payment lock not acquired)");
+                $applyValidateStatus = false;
+            } else {
+                $order = wc_get_order($order_id);
+                if ($this->orderAlreadyPaidOrComplete($order)) {
+                    $this->payplus_add_log_all($handle, "Order #{$order_id} validateOrder status skipped (already paid / status={$order->get_status()})");
+                    $applyValidateStatus = false;
+                }
             }
+        }
+        if ($applyValidateStatus) {
+            if ($data['type'] === 'Approval' && $this->isApprovedStatusCode($data['status_code'])) {
+                $order->update_status('wc-on-hold');
+            } elseif ($data['type'] === 'Charge' && $this->isApprovedStatusCode($data['status_code'])) {
+                if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                    $order->payment_complete();
+                } elseif ($this->successful_order_status !== 'default-woo') {
+                    $order->update_status($this->successful_order_status);
+                }
+            }
+        }
+        if ($validateStatusLocked) {
+            $this->releaseOrderStatusLock($order_id);
         }
 
         $payload = [];
@@ -3638,6 +3660,66 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     }
 
     /**
+     * Express Google Pay is on only when the checkbox is yes AND Active page UID Google Pay is set.
+     *
+     * @param array|object|null $settings Gateway settings.
+     * @return bool
+     */
+    public static function is_google_pay_express_enabled($settings = null)
+    {
+        if ($settings === null) {
+            $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        }
+        if (is_object($settings)) {
+            $settings = (array) $settings;
+        }
+        if (!is_array($settings) || ($settings['enable_google_pay'] ?? '') !== 'yes') {
+            return false;
+        }
+        $uid = trim((string) ($settings['google_pay_page_uid'] ?? ''));
+        if ($uid === '') {
+            $uid = trim((string) ($settings['google_apple_pay_page_uid'] ?? ''));
+        }
+        return $uid !== '';
+    }
+
+    /**
+     * Serialize paid-status updates for one order (MySQL GET_LOCK).
+     * Used only when prevent_duplicate_payment_complete is enabled.
+     *
+     * @param int|string $order_id
+     * @return bool True if this request may apply the status change.
+     */
+    protected function acquireOrderStatusLock($order_id)
+    {
+        global $wpdb;
+        $got = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', 'payplus_os_' . (int) $order_id, 15));
+        if ($got === null) {
+            return true;
+        }
+        return (string) $got === '1';
+    }
+
+    /**
+     * @param int|string $order_id
+     * @return void
+     */
+    protected function releaseOrderStatusLock($order_id)
+    {
+        global $wpdb;
+        $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', 'payplus_os_' . (int) $order_id));
+    }
+
+    /**
+     * @param WC_Order $order
+     * @return bool
+     */
+    protected function orderAlreadyPaidOrComplete($order)
+    {
+        return $order && ($order->is_paid() || $order->has_status(['processing', 'completed']));
+    }
+
+    /**
      * Apply paid/auth order status from callback/IPN.
      * Same transitions as before, plus WooCommerce guards so a second concurrent
      * path does not fire payment_complete()/status hooks again.
@@ -3663,47 +3745,65 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $type = $res->data->type;
         }
 
-        // Re-load: success redirect / cron may already have completed this order.
-        $order = wc_get_order($order_id);
-        if (!$order) {
-            return null;
-        }
-
-        if ($order->is_paid() || $order->has_status(['processing', 'completed'])) {
-            $this->payplus_add_log_all(
-                'payplus_callback_secured',
-                "$order_id - status update skipped (already paid / status={$order->get_status()})\n"
-            );
-            return $order;
-        }
-
-        if (isset($res->data->recurring_type)) {
-            if ($this->recurring_order_set_to_paid == 'yes') {
-                $order->payment_complete();
+        $statusLocked = false;
+        if ($this->preventDuplicatePaymentComplete) {
+            $statusLocked = $this->acquireOrderStatusLock($order_id);
+            if (!$statusLocked) {
+                $this->payplus_add_log_all(
+                    'payplus_callback_secured',
+                    "$order_id - status update skipped (duplicate-payment lock not acquired)\n"
+                );
+                return wc_get_order($order_id);
             }
-            $order->update_status('wc-recsubc');
-            $order->save();
-            return false;
         }
 
-        if ($type == "Charge") {
-            if ($this->fire_completed) {
-                // WC payment_complete() no-ops when status is no longer valid for it.
-                $order->payment_complete();
-                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
-            }
+        try {
+            // Re-load: success redirect / cron may already have completed this order.
             $order = wc_get_order($order_id);
-            if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
-                $order->update_status($this->successful_order_status);
-                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
+            if (!$order) {
+                return null;
             }
-        } else {
-            $order->update_status('wc-on-hold');
-            $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
-        }
-        $order->save();
 
-        return $order;
+            if ($order->is_paid() || $order->has_status(['processing', 'completed'])) {
+                $this->payplus_add_log_all(
+                    'payplus_callback_secured',
+                    "$order_id - status update skipped (already paid / status={$order->get_status()})\n"
+                );
+                return $order;
+            }
+
+            if (isset($res->data->recurring_type)) {
+                if ($this->recurring_order_set_to_paid == 'yes') {
+                    $order->payment_complete();
+                }
+                $order->update_status('wc-recsubc');
+                $order->save();
+                return false;
+            }
+
+            if ($type == "Charge") {
+                if ($this->fire_completed) {
+                    // WC payment_complete() no-ops when status is no longer valid for it.
+                    $order->payment_complete();
+                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->firePaymentComplete\n");
+                }
+                $order = wc_get_order($order_id);
+                if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
+                    $order->update_status($this->successful_order_status);
+                    $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->$this->successful_order_status\n");
+                }
+            } else {
+                $order->update_status('wc-on-hold');
+                $this->payplus_add_log_all('payplus_callback_secured', "payplus_update_order_status_request_ipn->Update status to->wc-on-hold\n");
+            }
+            $order->save();
+
+            return $order;
+        } finally {
+            if ($statusLocked) {
+                $this->releaseOrderStatusLock($order_id);
+            }
+        }
     }
     public function getOrderPayplus($order_id)
     {
