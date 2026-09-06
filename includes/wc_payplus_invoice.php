@@ -1081,13 +1081,39 @@ class PayplusInvoice
         foreach ($resultApps as $key => $resultApp) {
             $objectPayment = new stdClass();
             $objectPayment->order_id = $order_id;
-            $objectPayment->method_payment = str_replace("payplus_", '', $resultApp->meta_key);
+            $objectPayment->method_payment = strtolower(str_replace("payplus_", '', $resultApp->meta_key));
             $objectPayment->price = round(floatval($resultApp->meta_value) * 100, $WC_PayPlus_Gateway->rounding_decimals);
             $objectPayment->four_digits = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
             $objectPayment->brand_name = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_brand_name', true);
             $objectPayment->number_of_payments = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_number_of_payments', true);
             $arr[] = $objectPayment;
         }
+
+        // Main-gateway club payments (charge_default=multipass etc.) also write payplus_credit-card
+        // for the same amount. Drop that ghost only — never a real split (different amounts).
+        $actual = $this->payplus_resolve_actual_method($order_id);
+        if (in_array($actual, $this->payment_method_club, true)) {
+            $clubRows = [];
+            $ccRows = [];
+            $otherRows = [];
+            foreach ($arr as $row) {
+                if ($row->method_payment === $actual) {
+                    $clubRows[] = $row;
+                } elseif ($row->method_payment === 'credit-card') {
+                    $ccRows[] = $row;
+                } else {
+                    $otherRows[] = $row;
+                }
+            }
+            $clubPrice = isset($clubRows[0]) ? (float) $clubRows[0]->price : null;
+            $ccPrice = isset($ccRows[0]) ? (float) $ccRows[0]->price : null;
+            if ($clubPrice !== null && $ccPrice !== null && $clubPrice === $ccPrice) {
+                $arr = array_merge($otherRows, $clubRows);
+            } elseif (empty($clubRows) && !empty($ccRows)) {
+                $arr = array_merge($otherRows, [$this->payplus_invoice_payment_row($order_id, $actual, $ccRows[0]->price)]);
+            }
+        }
+
         return $arr;
     }
 
