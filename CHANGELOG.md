@@ -6,8 +6,11 @@ All notable changes to this project will be documented in this file.
 
 - Fix       - Hosted Fields (PayPlus Embedded): checkout no longer binds to a generic customer or the wrong order id; payload and completion use the real WooCommerce order.
 - Fix       - Invoice+: Multipass (and other club/alternative methods) no longer print as "Other" on documents — the actual method name is stored and used.
+- Fix       - Invoice+: overlapping callback and redirect no longer create a second document (`unique-identifier-exists`) or a duplicate invoice payload.
+- Fix       - PayPlus order fields are written once when callback and the success URL finish the same payment (HPOS no longer stacks the same custom field twice).
 - Tweak     - Optional "Prevent duplicate payment complete" setting (default off). When enabled, overlapping redirect/callback/IPN success paths cannot fire payment_complete() twice.
 - Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set (approval). Prevents the Google Pay iframe from loading on checkout without a valid UID.
+- Tweak     - WordPress "Tested up to" set to 7.1.
 
 ## [8.2.4]  - 08-10-2026 - (Soda)
 

@@ -2,7 +2,7 @@
 Contributors: payplus
 Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscriptions, Tokenization
 Requires at least: 6.2
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 8.2.5
 PlugIn URL: https://www.payplus.co.il/wordpress
@@ -90,8 +90,11 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 - Fix       - Hosted Fields (PayPlus Embedded): no longer uses a generic customer or the wrong order id.
 - Fix       - Invoice+: Multipass and other club/alternative methods are no longer shown as "Other" on documents.
+- Fix       - Invoice+: callback and redirect no longer create a second document or duplicate invoice fields.
+- Fix       - PayPlus order custom fields are saved once when callback and success URL run together (no stacked HPOS rows).
 - Tweak     - Optional "Prevent duplicate payment complete" setting (default off) to stop double Payment complete notes and New order / Processing emails.
 - Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set.
+- Tweak     - Tested up to WordPress 7.1.
 
 == 8.2.4  - 10-08-2026 =
 

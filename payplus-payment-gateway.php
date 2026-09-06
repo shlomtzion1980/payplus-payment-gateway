@@ -5,7 +5,7 @@
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
  * Version: 8.2.5
- * Tested up to: 7.0
+ * Tested up to: 7.1
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
  * Requires PHP: 7.4

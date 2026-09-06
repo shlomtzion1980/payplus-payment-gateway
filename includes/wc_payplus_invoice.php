@@ -253,14 +253,14 @@ class PayplusInvoice
         $postal_code = str_replace(["'", '"', "\\"], '', $order->get_billing_postcode());
         $customer_country_iso = $order->get_billing_country();
         $customerName = "";
-        
+
         // VAT Number Priority Logic:
         // 1. Customer "Other ID" field (_billing_customer_other_id) - HIGHEST PRIORITY (overrides everything)
         // 2. Payment response identification_number (if display_customer_id_in_invoice setting is enabled)
         // 3. Regular VAT number field (_billing_vat_number) - FALLBACK
         $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
         $vat_number = !empty($customer_other_id) ? $customer_other_id : WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_vat_number');
-        
+
         $company = $order->get_billing_company();
 
         if ($WC_PayPlus_Gateway->exist_company && !empty($company)) {
@@ -275,13 +275,13 @@ class PayplusInvoice
                 $customerName .= " (" . $company . ")";
             }
         }
-        
+
         // Check if customer invoice name exists and use it
         $customer_invoice_name = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_invoice_name');
         if (!empty($customer_invoice_name)) {
             $customerName = $customer_invoice_name;
         }
-        
+
         if (empty($customerName)) {
             $customer['name'] = __("General Customer - לקוח כללי", 'payplus-payment-gateway');
         } else {
@@ -384,8 +384,10 @@ class PayplusInvoice
         // phpcs:disable WordPress.Security.NonceVerification.Missing
         $isCancellationFeeFullRefund = false;
         $cancellationFeeAmount = 0;
-        if (!empty($_POST['payplus_cancellation_fee']) && floatval($_POST['payplus_cancellation_fee']) > 0
-            && !empty($_POST['payplus_original_refund_amount'])) {
+        if (
+            !empty($_POST['payplus_cancellation_fee']) && floatval($_POST['payplus_cancellation_fee']) > 0
+            && !empty($_POST['payplus_original_refund_amount'])
+        ) {
             $postCancellationFee = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_cancellation_fee']))), $WC_PayPlus_Gateway->rounding_decimals);
             $postOriginalAmount = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_original_refund_amount']))), $WC_PayPlus_Gateway->rounding_decimals);
             if ($postOriginalAmount == round($order->get_total(), $WC_PayPlus_Gateway->rounding_decimals)) {
@@ -469,13 +471,13 @@ class PayplusInvoice
                 if (!empty($found_in_other) || !empty($found_in_or_other)) {
                     $method_payment = 'paypal';
                 }
-                
+
                 // Validate donation receipt cannot have 'other' payment method
                 if ($payplus_invoice_type_document_refund === 'inv_don_receipt' && $method_payment === 'other') {
                     $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
                     throw new Exception(esc_html__('Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
                 }
-                
+
                 $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $sum) * 100);
                 $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
                 $resultApps[] = $objectInvoicePaymentNoPayplus;
@@ -785,89 +787,89 @@ class PayplusInvoice
                 'autop' => false
             ));
 
-                if ($item_data['type'] == "fee") {
-                    $productPrice = $item_data['total'];
-                    if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
-                        $productPrice += $item_data['total_tax'];
+            if ($item_data['type'] == "fee") {
+                $productPrice = $item_data['total'];
+                if ($WC_PayPlus_Gateway->rounding_decimals != 0 && $wc_tax_enabled) {
+                    $productPrice += $item_data['total_tax'];
+                }
+                $productPrice *= $dual;
+                $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
+                $totalCartAmount += ($productPrice);
+            } else {
+                if ($WC_PayPlus_Gateway->single_quantity_per_line == 'yes') {
+                    $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled) * $quantity * $dual;
+                    $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
+                    $totalCartAmount += $productPrice;
+                    $item_name .= ' ×  ' . $quantity;
+                    $quantity = 1;
+                } else {
+                    if ($WC_PayPlus_Gateway->rounding_decimals == 0 && $wc_tax_enabled) {
+                        $productPrice = $order->get_item_subtotal($item_data);
+                    } else {
+                        $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled);
                     }
                     $productPrice *= $dual;
                     $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
-                    $totalCartAmount += ($productPrice);
-                } else {
-                    if ($WC_PayPlus_Gateway->single_quantity_per_line == 'yes') {
-                        $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled) * $quantity * $dual;
-                        $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
-                        $totalCartAmount += $productPrice;
-                        $item_name .= ' ×  ' . $quantity;
-                        $quantity = 1;
-                    } else {
-                        if ($WC_PayPlus_Gateway->rounding_decimals == 0 && $wc_tax_enabled) {
-                            $productPrice = $order->get_item_subtotal($item_data);
-                        } else {
-                            $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled);
+                    if (!$this->couponAsProduct && $item_data->get_subtotal() !== $item_data->get_total()) {
+                        $discount = (($item_data->get_subtotal() - $item_data->get_total()) * $tax);
+                        if ($dual == -1) {
+                            $discount *= $dual;
                         }
-                        $productPrice *= $dual;
-                        $productPrice = round($productPrice, $WC_PayPlus_Gateway->rounding_decimals);
-                        if (!$this->couponAsProduct && $item_data->get_subtotal() !== $item_data->get_total()) {
-                            $discount = (($item_data->get_subtotal() - $item_data->get_total()) * $tax);
-                            if ($dual == -1) {
-                                $discount *= $dual;
-                            }
-                            $discount = round($discount, $WC_PayPlus_Gateway->rounding_decimals);
-                        }
-
-                        $totalCartAmount += ($productPrice * $quantity) - $discount;
+                        $discount = round($discount, $WC_PayPlus_Gateway->rounding_decimals);
                     }
-                }
 
-                //LearnPress
-                if (get_class($item_data) === "WC_Order_Item_LP_Course") {
-                    $product = new WC_Product_LP_Course($item_data['product_id']);
-                    $productImageData = wp_get_attachment_image_src(WC_PayPlus_Meta_Data::get_meta($item_data['product_id'], '_thumbnail_id', true), 'full');
-                } else {
-                    $product = new WC_Product($item_data['product_id']);
-                    $productImageData = wp_get_attachment_image_src($product->get_image_id(), 'full');
+                    $totalCartAmount += ($productPrice * $quantity) - $discount;
                 }
-                $productSKU = ($product->get_sku()) ? $product->get_sku() : $item_data['product_id'];
+            }
 
-                if (!empty($dataArr['variation_id'])) {
-                    $productVariation = new WC_Product_Variation($dataArr['variation_id']);
-                    $productSKU = $productVariation->get_sku();
-                }
+            //LearnPress
+            if (get_class($item_data) === "WC_Order_Item_LP_Course") {
+                $product = new WC_Product_LP_Course($item_data['product_id']);
+                $productImageData = wp_get_attachment_image_src(WC_PayPlus_Meta_Data::get_meta($item_data['product_id'], '_thumbnail_id', true), 'full');
+            } else {
+                $product = new WC_Product($item_data['product_id']);
+                $productImageData = wp_get_attachment_image_src($product->get_image_id(), 'full');
+            }
+            $productSKU = ($product->get_sku()) ? $product->get_sku() : $item_data['product_id'];
 
-                $itemDetails = [
-                    'name' => str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_name)),
-                    'barcode' => (string) $productSKU,
-                    'quantity' => ($quantity ? $quantity : '1'),
-                    'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
-                ];
-                if ($discount) {
-                    $itemDetails['discount_type'] = 'amount';
-                    $itemDetails['discount_value'] = $discount;
-                }
-                if ($productImageData && isset($productImageData[0])) {
-                    $itemDetails['image_url'] = $productImageData[0];
-                }
+            if (!empty($dataArr['variation_id'])) {
+                $productVariation = new WC_Product_Variation($dataArr['variation_id']);
+                $productSKU = $productVariation->get_sku();
+            }
 
-                if (!empty($meta_html) && $WC_PayPlus_Gateway->send_variations) {
-                    $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
-                }
+            $itemDetails = [
+                'name' => str_replace(["'", '"', "\n", "\\", '”'], '', wp_strip_all_tags($item_name)),
+                'barcode' => (string) $productSKU,
+                'quantity' => ($quantity ? $quantity : '1'),
+                'price' => round($productPrice, $WC_PayPlus_Gateway->rounding_decimals),
+            ];
+            if ($discount) {
+                $itemDetails['discount_type'] = 'amount';
+                $itemDetails['discount_value'] = $discount;
+            }
+            if ($productImageData && isset($productImageData[0])) {
+                $itemDetails['image_url'] = $productImageData[0];
+            }
 
-                if (isset($WC_PayPlus_Gateway->settings['paying_vat_all_order']) && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes")) {
-                    $itemDetails['vat_type_code'] = 'vat-type-included';
-                } else {
-                    $itemDetails['vat_type_code'] = 'vat-type-exempt';
-                }
+            if (!empty($meta_html) && $WC_PayPlus_Gateway->send_variations) {
+                $itemDetails['product_invoice_extra_details'] = str_replace(["'", '"', "\n", "\\"], '', wp_strip_all_tags($meta_html));
+            }
 
-                if ($wc_tax_enabled) {
-                    $itemDetails['vat_type_code'] = $product->get_tax_status() === 'taxable' ? 'vat-type-included' : 'vat-type-exempt';
-                    $itemDetails['vat_type_code'] = $product->get_tax_status() === 'none' ? 'vat-type-exempt' : $itemDetails['vat_type_code'];
-                }
-                if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
-                    $itemDetails['vat_type_code'] = 'vat-type-included';
-                }
+            if (isset($WC_PayPlus_Gateway->settings['paying_vat_all_order']) && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes")) {
+                $itemDetails['vat_type_code'] = 'vat-type-included';
+            } else {
+                $itemDetails['vat_type_code'] = 'vat-type-exempt';
+            }
 
-                $productsItems[] = $itemDetails;
+            if ($wc_tax_enabled) {
+                $itemDetails['vat_type_code'] = $product->get_tax_status() === 'taxable' ? 'vat-type-included' : 'vat-type-exempt';
+                $itemDetails['vat_type_code'] = $product->get_tax_status() === 'none' ? 'vat-type-exempt' : $itemDetails['vat_type_code'];
+            }
+            if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                $itemDetails['vat_type_code'] = 'vat-type-included';
+            }
+
+            $productsItems[] = $itemDetails;
         }
 
         $shipping_methods = $order->get_shipping_methods();
@@ -1303,404 +1305,440 @@ class PayplusInvoice
         $payload = array();
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';
+        $invoiceLockName = 'payplus_inv_' . (int) $order_id;
+        $invoiceLocked = WC_PayPlus_Meta_Data::claim_single_write($invoiceLockName);
+        if (!$invoiceLocked) {
+            return;
+        }
 
         $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send', true);
         $payplusErrorInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_error_invoice', true);
         $payplusTransactionUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid', true);
+        $payplusInvoiceDocUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_docUID', true);
         $j5Amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
         $invoice_manual = $this->payplus_get_create_invoice_manual();
 
         $order = wc_get_order($order_id);
-
-        // Do not guess credit-card for the main/hosted PayPlus gateways. Club payments
-        // (multipass, valuecard, tav-zahav, finitione) are chosen on the payment page;
-        // the invoice must wait for IPN/callback so we send payment_app = that club.
-        $wc_method = $order ? $order->get_payment_method() : '';
-        $generic_payplus = in_array($wc_method, [
-            'payplus-payment-gateway',
-            'payplus-payment-gateway-hostedfields',
-            'payplus-payment-gateway-pos-emv',
-        ], true);
-        $has_payplus_payment_data = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true))
-            || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true))
-            || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
-        if ($generic_payplus && !$has_payplus_payment_data && !$isCashPayment) {
+        if ($this->payplus_invoice_already_created($checkInvoiceSend, $payplusInvoiceDocUid, $payplusErrorInvoice)) {
+            WC_PayPlus_Meta_Data::release_single_write($invoiceLockName);
             return;
         }
 
-        if (isset($this->payplus_invoice_option['do-not-create']) && is_array($this->payplus_invoice_option['do-not-create'])) {
-            $doNotCreate = $this->payplus_invoice_option['do-not-create'];
-            $typePaymentMethodEarly = $order->get_payment_method();
+        try {
 
-            // POS EMV orders store payment_method as 'payplus-payment-gateway'
-            // but can be identified by the payplus_response_emv meta
-            $isEmvOrder = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
-            $effectiveMethod = $isEmvOrder ? 'payplus-payment-gateway-pos-emv' : $typePaymentMethodEarly;
-
-            if (in_array($effectiveMethod, $doNotCreate, true)) {
-                $order->add_order_note('This payment method is set as: Not to create documents automatically');
+            // Do not guess credit-card for the main/hosted PayPlus gateways. Club payments
+            // (multipass, valuecard, tav-zahav, finitione) are chosen on the payment page;
+            // the invoice must wait for IPN/callback so we send payment_app = that club.
+            $wc_method = $order ? $order->get_payment_method() : '';
+            $generic_payplus = in_array($wc_method, [
+                'payplus-payment-gateway',
+                'payplus-payment-gateway-hostedfields',
+                'payplus-payment-gateway-pos-emv',
+            ], true);
+            $has_payplus_payment_data = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response', true))
+                || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_alternative_method_name', true))
+                || !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_method', true));
+            if ($generic_payplus && !$has_payplus_payment_data && !$isCashPayment) {
                 return;
             }
-        }
 
-        if (isset($this->payplus_invoice_option['zero_total_dont_create']) && $this->payplus_invoice_option['zero_total_dont_create'] == "yes") {
-            if (floatval($order->get_total()) === 0.0) {
-                $order->add_order_note(__('Invoice not created: Order total is zero and "Do not create documents for zero-total orders" is enabled.', 'payplus-payment-gateway'));
-                return;
+            if (isset($this->payplus_invoice_option['do-not-create']) && is_array($this->payplus_invoice_option['do-not-create'])) {
+                $doNotCreate = $this->payplus_invoice_option['do-not-create'];
+                $typePaymentMethodEarly = $order->get_payment_method();
+
+                // POS EMV orders store payment_method as 'payplus-payment-gateway'
+                // but can be identified by the payplus_response_emv meta
+                $isEmvOrder = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
+                $effectiveMethod = $isEmvOrder ? 'payplus-payment-gateway-pos-emv' : $typePaymentMethodEarly;
+
+                if (in_array($effectiveMethod, $doNotCreate, true)) {
+                    $order->add_order_note('This payment method is set as: Not to create documents automatically');
+                    return;
+                }
             }
-        }
 
-        if ($payplusErrorInvoice !== "unique-identifier-exists") {
-            if (!$checkInvoiceSend && $this->payplus_get_invoice_enable()) {
+            if (isset($this->payplus_invoice_option['zero_total_dont_create']) && $this->payplus_invoice_option['zero_total_dont_create'] == "yes") {
+                if (floatval($order->get_total()) === 0.0) {
+                    $order->add_order_note(__('Invoice not created: Order total is zero and "Do not create documents for zero-total orders" is enabled.', 'payplus-payment-gateway'));
+                    return;
+                }
+            }
 
-                $payplusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
-                $payplusUniqueIdentifier = "payplus_order_$typeInvoice" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
+            if ($payplusErrorInvoice !== "unique-identifier-exists") {
+                if (!$checkInvoiceSend && $this->payplus_get_invoice_enable()) {
 
-                $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
+                    $payplusType = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_type', true);
+                    $payplusUniqueIdentifier = "payplus_order_$typeInvoice" . $order_id . $this->payplus_unique_identifier . $this->payplus_invoice_option['payplus_website_code'];
 
-                if ($invoice_manual || $j5 || ($this->payplus_gateway_option['enabled'] === "no" || ($this->payplus_gateway_option['transaction_type'] !== "2"
-                    && $payplusType !== "Check" && $payplusType !== "Approval"))) {
-                    $payplus_document_type = ($typeInvoice) ? $typeInvoice : $this->payplus_invoice_option['payplus_invoice_type_document'];
-                    $typePaymentMethod = $order->get_payment_method();
-                    if ($this->payplus_get_create_invoice_automatic() && ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod")) {
-                        $payplus_document_type = 'inv_tax';
-                    }
-                    $dual = 1;
-                    $resultApps = $this->payplus_get_payments($order_id);
+                    $j5 = ($this->payplus_get_invoice_enable() && $payplusType === "Charge");
 
-                    // Validate donation receipt cannot have 'other' payment method
-                    if ($payplus_document_type === 'inv_don_receipt') {
-                        foreach ($resultApps as $payment) {
-                            if (isset($payment->method_payment) && $payment->method_payment === 'other') {
-                                $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
-                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
-                                return;
+                    if ($invoice_manual || $j5 || ($this->payplus_gateway_option['enabled'] === "no" || ($this->payplus_gateway_option['transaction_type'] !== "2"
+                        && $payplusType !== "Check" && $payplusType !== "Approval"))) {
+                        $payplus_document_type = ($typeInvoice) ? $typeInvoice : $this->payplus_invoice_option['payplus_invoice_type_document'];
+                        $typePaymentMethod = $order->get_payment_method();
+                        if ($this->payplus_get_create_invoice_automatic() && ($typePaymentMethod == "bacs" || $typePaymentMethod == "cod")) {
+                            $payplus_document_type = 'inv_tax';
+                        }
+                        $dual = 1;
+                        $resultApps = $this->payplus_get_payments($order_id);
+
+                        // Validate donation receipt cannot have 'other' payment method
+                        if ($payplus_document_type === 'inv_don_receipt') {
+                            foreach ($resultApps as $payment) {
+                                if (isset($payment->method_payment) && $payment->method_payment === 'other') {
+                                    $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
+                                    return;
+                                }
                             }
                         }
-                    }
 
-                    if ($payplus_document_type === "inv_refund_receipt") {
-                        $dual = -1;
-                        $payplus_document_type = "inv_receipt";
-                    }
+                        if ($payplus_document_type === "inv_refund_receipt") {
+                            $dual = -1;
+                            $payplus_document_type = "inv_receipt";
+                        }
 
-                    $date = new DateTime();
-                    $date = $date->format('m-d-Y H:i');
-                    $order = wc_get_order($order_id);
-                    $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
-                    $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
-                    $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
-                    
-                    // VAT Number Override Logic:
-                    // If customer filled "Other ID" field, it has HIGHEST priority and should NEVER be overridden
-                    // Only apply display_customer_id_in_invoice setting if Other ID is empty
-                    $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
-                    $has_other_id = !empty($customer_other_id);
-                    
-                    // Apply identification_number ONLY if:
-                    // 1. Customer did NOT specify an Other ID (customer's choice takes priority)
-                    // 2. AND display_customer_id_in_invoice setting is enabled
-                    // 3. AND identification_number exists in payment response
-                    $display_customer_id = isset($this->payplus_invoice_option['display_customer_id_in_invoice']) && ($this->payplus_invoice_option['display_customer_id_in_invoice'] === 'yes' || $this->payplus_invoice_option['display_customer_id_in_invoice'] === 'on');
-                    if (!$has_other_id && $display_customer_id && isset($payPlusResponse['identification_number']) && !empty($payPlusResponse['identification_number'])) {
-                        $payload['customer']['vat_number'] = $payPlusResponse['identification_number'];
-                    }
-                    $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
-                    if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
-                        $payload['customer']['paying_vat'] = true;
-                    }
+                        $date = new DateTime();
+                        $date = $date->format('m-d-Y H:i');
+                        $order = wc_get_order($order_id);
+                        $payload['customer'] = $this->payplus_get_client_by_order_id($order_id);
+                        $ppResJson = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response');
+                        $payPlusResponse = !empty($ppResJson) ? json_decode($ppResJson, true) : null;
 
-                    if (!empty($payplusTransactionUid)) {
-                        $payload['transaction_uuid'] = $payplusTransactionUid;
-                    }
+                        // VAT Number Override Logic:
+                        // If customer filled "Other ID" field, it has HIGHEST priority and should NEVER be overridden
+                        // Only apply display_customer_id_in_invoice setting if Other ID is empty
+                        $customer_other_id = WC_PayPlus_Meta_Data::get_meta($order_id, '_billing_customer_other_id');
+                        $has_other_id = !empty($customer_other_id);
 
-                    $isEmv = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
+                        // Apply identification_number ONLY if:
+                        // 1. Customer did NOT specify an Other ID (customer's choice takes priority)
+                        // 2. AND display_customer_id_in_invoice setting is enabled
+                        // 3. AND identification_number exists in payment response
+                        $display_customer_id = isset($this->payplus_invoice_option['display_customer_id_in_invoice']) && ($this->payplus_invoice_option['display_customer_id_in_invoice'] === 'yes' || $this->payplus_invoice_option['display_customer_id_in_invoice'] === 'on');
+                        if (!$has_other_id && $display_customer_id && isset($payPlusResponse['identification_number']) && !empty($payPlusResponse['identification_number'])) {
+                            $payload['customer']['vat_number'] = $payPlusResponse['identification_number'];
+                        }
+                        $payload['customer']['country_iso'] === "IL" && boolval($WC_PayPlus_Gateway->settings['paying_vat_all_order'] === "yes") ? $payload['customer']['paying_vat'] = true : null;
+                        if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                            $payload['customer']['paying_vat'] = true;
+                        }
 
-                    if (!empty($this->payplus_invoice_brand_uid) && !$isEmv) {
-                        $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
-                    }
+                        if (!empty($payplusTransactionUid)) {
+                            $payload['transaction_uuid'] = $payplusTransactionUid;
+                        }
 
-                    if (!empty($this->payplus_invoice_emv_pos_brand_uid) && $isEmv) {
-                        $payload['brand_uuid'] = $this->payplus_invoice_emv_pos_brand_uid;
-                    }
+                        $isEmv = !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_response_emv'));
 
-                    $payplusPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload');
-                    $payPlusPwGiftCards = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+                        if (!empty($this->payplus_invoice_brand_uid) && !$isEmv) {
+                            $payload['brand_uuid'] = $this->payplus_invoice_brand_uid;
+                        }
 
-                    $payplus_instance = WC_PayPlus::get_instance();
-                    $pwGiftCardData = $payplus_instance->pwGiftCardData;
-                    $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
-                    $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
+                        if (!empty($this->payplus_invoice_emv_pos_brand_uid) && $isEmv) {
+                            $payload['brand_uuid'] = $this->payplus_invoice_emv_pos_brand_uid;
+                        }
 
-                    if (!empty($payPlusPwGiftCards) && !empty($payplusPayload)) {
-                        $payloadArray = json_decode($payplusPayload, true);
-                        $itemsAsJson = [];
-                        $totalPWAmount = 0;
-                        isset($payloadArray['products']) ? $payloadArray['items'] = $payloadArray['products'] : null;
-                        foreach ($payloadArray['items'] as $key => $item) {
-                            if (strpos($item['name'], 'PW Gift Card') !== false) {
-                                $totalCartAmount == 0 ? $item['price'] = 0 : null;
-                                $itemsAsJson['productsItems'][$key]['name'] = $item['name'];
-                                $itemsAsJson['productsItems'][$key]['price'] = $item['price'];
-                                $itemsAsJson['productsItems'][$key]['barcode'] = $item['barcode'];
-                                $itemsAsJson['productsItems'][$key]['quantity'] = $item['quantity'];
-                                if (isset($item['vat_type'])) {
-                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type'];
-                                } else {
-                                    isset($item['vat_type_code']) ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type_code'] : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                        $payplusPayload = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_payload');
+                        $payPlusPwGiftCards = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_pw_gift_cards');
+
+                        $payplus_instance = WC_PayPlus::get_instance();
+                        $pwGiftCardData = $payplus_instance->pwGiftCardData;
+                        $objectProducts = $this->payplus_get_products_by_order_id($order_id, $dual);
+                        $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
+
+                        if (!empty($payPlusPwGiftCards) && !empty($payplusPayload)) {
+                            $payloadArray = json_decode($payplusPayload, true);
+                            $itemsAsJson = [];
+                            $totalPWAmount = 0;
+                            isset($payloadArray['products']) ? $payloadArray['items'] = $payloadArray['products'] : null;
+                            foreach ($payloadArray['items'] as $key => $item) {
+                                if (strpos($item['name'], 'PW Gift Card') !== false) {
+                                    $totalCartAmount == 0 ? $item['price'] = 0 : null;
+                                    $itemsAsJson['productsItems'][$key]['name'] = $item['name'];
+                                    $itemsAsJson['productsItems'][$key]['price'] = $item['price'];
+                                    $itemsAsJson['productsItems'][$key]['barcode'] = $item['barcode'];
+                                    $itemsAsJson['productsItems'][$key]['quantity'] = $item['quantity'];
+                                    if (isset($item['vat_type'])) {
+                                        $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type'];
+                                    } else {
+                                        isset($item['vat_type_code']) ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = $item['vat_type_code'] : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                                    }
+                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-exempt';
+                                    if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
+                                        $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                                    }
+                                    if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
+                                        $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included';
+                                    }
+                                    $totalPWAmount += $item['price'];
                                 }
-                                $itemsAsJson['productsItems'][$key]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-exempt';
-                                if ($itemsAsJson['productsItems'][$key]['vat_type_code'] === null) {
-                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = 0;
+                                $objectProductsPW = (object)$itemsAsJson;
+                            }
+                        } elseif (!empty($pwGiftCardData) && is_array($pwGiftCardData) || !empty($payPlusPwGiftCards) && empty($pwGiftCardData)) {
+                            empty($pwGiftCardData) ? $pwGiftCardData = json_decode($payPlusPwGiftCards, true) : null;
+                            $c = 0;
+                            $totalPWAmount = 0;
+                            foreach ($pwGiftCardData['gift_cards'] as $key => $item) {
+                                $itemPrice = $item;
+                                $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['discount_value'] = $itemPrice : null;
+                                $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['discount_type'] = 'amount' : null;
+                                $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['price'] = $itemPrice : $itemsAsJson['productsItems'][$c]['price'] = -$itemPrice;;
+                                $itemsAsJson['productsItems'][$c]['name'] = "PW Gift Card";
+                                $itemsAsJson['productsItems'][$c]['barcode'] = $key;
+                                $itemsAsJson['productsItems'][$c]['quantity'] = 1;
+                                $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
+                                $itemsAsJson['productsItems'][$c]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-exempt';
+                                if ($itemsAsJson['productsItems'][$c]['vat_type_code'] === null) {
+                                    $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
                                 }
                                 if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
-                                    $itemsAsJson['productsItems'][$key]['vat_type_code'] = 'vat-type-included';
+                                    $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included';
                                 }
-                                $totalPWAmount += $item['price'];
+                                $totalPWAmount += -$item;
+                                ++$c;
                             }
                             $objectProductsPW = (object)$itemsAsJson;
                         }
-                    } elseif (!empty($pwGiftCardData) && is_array($pwGiftCardData) || !empty($payPlusPwGiftCards) && empty($pwGiftCardData)) {
-                        empty($pwGiftCardData) ? $pwGiftCardData = json_decode($payPlusPwGiftCards, true) : null;
-                        $c = 0;
-                        $totalPWAmount = 0;
-                        foreach ($pwGiftCardData['gift_cards'] as $key => $item) {
-                            $itemPrice = $item;
-                            $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['discount_value'] = $itemPrice : null;
-                            $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['discount_type'] = 'amount' : null;
-                            $totalCartAmount == 0 ? $itemsAsJson['productsItems'][$c]['price'] = $itemPrice : $itemsAsJson['productsItems'][$c]['price'] = -$itemPrice;;
-                            $itemsAsJson['productsItems'][$c]['name'] = "PW Gift Card";
-                            $itemsAsJson['productsItems'][$c]['barcode'] = $key;
-                            $itemsAsJson['productsItems'][$c]['quantity'] = 1;
-                            $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
-                            $itemsAsJson['productsItems'][$c]['vat_type_code'] === 0 ? $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included' : $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-exempt';
-                            if ($itemsAsJson['productsItems'][$c]['vat_type_code'] === null) {
-                                $itemsAsJson['productsItems'][$c]['vat_type_code'] = 0;
-                            }
-                            if ($WC_PayPlus_Gateway->settings['allways_pay_vat'] === "yes") {
-                                $itemsAsJson['productsItems'][$c]['vat_type_code'] = 'vat-type-included';
-                            }
-                            $totalPWAmount += -$item;
-                            ++$c;
+
+                        if (isset($objectProductsPW)) {
+                            $objectProducts = (object) array_merge_recursive((array) $objectProducts, (array) $objectProductsPW);
+                            $objectProducts->amount += $totalPWAmount;
+                            $objectProducts->amount < 0 ? $objectProducts->amount = 0 : null;
                         }
-                        $objectProductsPW = (object)$itemsAsJson;
-                    }
 
-                    if (isset($objectProductsPW)) {
-                        $objectProducts = (object) array_merge_recursive((array) $objectProducts, (array) $objectProductsPW);
-                        $objectProducts->amount += $totalPWAmount;
-                        $objectProducts->amount < 0 ? $objectProducts->amount = 0 : null;
-                    }
-
-                    $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
-                    $payplusBalanceNames = isset($objectProducts->balanceNames) ? $objectProducts->balanceNames : null;
-                    $productsItems = $objectProducts->productsItems;
-                    $payload['currency_code'] = $order->get_currency();
-                    $payload['autocalculate_rate'] = true;
-                    $payload['totalAmount'] = $dual * $totalCartAmount;
-                    $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
-                    $payload['more_info'] = $order_id;
-                    $payload['unique_identifier'] = $payplusUniqueIdentifier;
-                    $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
-                    $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
-
-                    if (!count($resultApps)) {
-                        $method_payment = $this->payplus_resolve_actual_method($order_id, $order);
-                        $all_supported_methods = $this->payplus_supported_invoice_methods();
-                        $direct_methods = array_merge($all_supported_methods, ['cash', 'bank-transfer', 'payment-check']);
-
-                        if (in_array($method_payment, $direct_methods, true)) {
-                            $resultApps[] = $this->payplus_invoice_payment_row($order_id, $method_payment, ($dual * $totalCartAmount) * 100, true);
-                        } else {
-                            $method_payment = 'other';
-                            $method_payment = ($order->get_payment_method() === "bacs") ? 'bank-transfer' : $method_payment;
-                            $method_payment = ($order->get_payment_method() === "cod") ? 'cash' : $method_payment;
-                            $method_payment = ($order->get_payment_method() === "cheque") ? 'payment-check' : $method_payment;
-                            $method_payment = ($order->get_payment_method() === "wire-transfers") ? 'bank-transfer' : $method_payment;
-                            $otherMethod = strtolower($order->get_payment_method_title());
-                            $orOtherMethod = strtolower($order->get_payment_method());
-                            $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
-
-                            $found_in_other = array_filter($search_terms, function ($term) use ($otherMethod) {
-                                return strpos($otherMethod, $term) !== false;
-                            });
-
-                            $found_in_or_other = array_filter($search_terms, function ($term) use ($orOtherMethod) {
-                                return strpos($orOtherMethod, $term) !== false;
-                            });
-
-                            if (!empty($found_in_other) || !empty($found_in_or_other)) {
-                                $method_payment = 'paypal';
-                            }
-                            
-                            // Validate donation receipt cannot have 'other' payment method
-                            if ($payplus_document_type === 'inv_don_receipt' && $method_payment === 'other') {
-                                $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
-                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
-                                return;
-                            }
-                            
-                            if (
-                                isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create']) ||
-                                isset($this->payplus_invoice_option['do-not-create']) && in_array($order->get_payment_method(), $this->payplus_invoice_option['do-not-create'])
-                            ) {
-                                $order->add_order_note('This payment method is set as: Not to create documents automatically');
-                                return;
-                            }
-                            $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
-                            $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
-                            $resultApps[] = $objectInvoicePaymentNoPayplus;
-                        }
-                    }
-
-                    $sumPayment = floatval($this->payplus_sum_payment($resultApps));
-
-                    $checkWithHoldingtTax = $this->payplus_check_sum_withholding_tax($resultApps);
-                    if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total() || $checkWithHoldingtTax) {
-                        $payload['items'] = $productsItems;
+                        $totalCartAmount = round($objectProducts->amount, $WC_PayPlus_Gateway->rounding_decimals);
+                        $payplusBalanceNames = isset($objectProducts->balanceNames) ? $objectProducts->balanceNames : null;
+                        $productsItems = $objectProducts->productsItems;
+                        $payload['currency_code'] = $order->get_currency();
+                        $payload['autocalculate_rate'] = true;
                         $payload['totalAmount'] = $dual * $totalCartAmount;
-                    } else {
-                        $payload['items'][] = [
-                            'name' => __('General product', 'payplus-payment-gateway'),
-                            'quantity' => 1,
-                            'price' => $sumPayment,
-                        ];
-                        $payload['totalAmount'] = $dual * $sumPayment;
-                    }
+                        $payload['language'] = $this->payplus_invoice_option['payplus_langrage_invoice'];
+                        $payload['more_info'] = $order_id;
+                        $payload['unique_identifier'] = $payplusUniqueIdentifier;
+                        $payload['send_document_email'] = $this->payplus_invoice_send_document_email;
+                        $payload['send_document_sms'] = $this->payplus_invoice_send_document_sms;
 
-                    $payplusApprovalNum = WC_PayPlus_Meta_Data::get_meta($order_id, "payplus_approval_num", true);
-                    $payplusApprovalNumPaypl = $order->get_transaction_id();
-                    $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
-                    $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
+                        if (!count($resultApps)) {
+                            $method_payment = $this->payplus_resolve_actual_method($order_id, $order);
+                            $all_supported_methods = $this->payplus_supported_invoice_methods();
+                            $direct_methods = array_merge($all_supported_methods, ['cash', 'bank-transfer', 'payment-check']);
 
-                    if (isset($payload['payments'][0]['payment_app']) && $payload['payments'][0]['payment_app'] === "-1") {
-                        if (is_array($payPlusResponse)) {
-                            $payments = [];
-                            $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'] ?? 1;
-                            for ($c = 0; $c < $numberOfPayments; $c++) {
-                                isset($payPlusResponse['method']) ? $payments[$c]['payment_type'] = $payPlusResponse['method'] : null;
-                                isset($payPlusResponse['amount']) ? $payments[$c]['amount'] = $payPlusResponse['amount'] : null;
-                                isset($payPlusResponse['brand_name']) ? $payments[$c]['card_type'] = $payPlusResponse['brand_name'] : null;
-                                isset($payPlusResponse['four_digits']) ? $payments[$c]['four_digits'] =  $payPlusResponse['four_digits'] : null;
-                            }
-                            $payload['payments'] = $payments;
-                        }
-                    }
-
-                    if (is_array($payPlusResponse)) {
-                        isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['payments'] = $payPlusResponse['number_of_payments'] : null;
-                        isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['transaction_type'] = 'payments' : 'normal';
-                        isset($payPlusResponse['first_payment_amount']) ? $payload['payments'][0]['first_payment'] = $payPlusResponse['first_payment_amount'] : null;
-                        isset($payPlusResponse['rest_payments_amount']) ? $payload['payments'][0]['subsequent_payments'] = $payPlusResponse['rest_payments_amount'] : null;
-                    }
-
-                    if ($j5Amount) {
-                        $payload['items'] = $productsItems;
-                        $totalJ5ItemsAmount = 0;
-
-                        foreach ($payload['items'] as $item) {
-                            if (isset($item['discount_value']) && isset($item['discount_type']) && $item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
-                                $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
+                            if (in_array($method_payment, $direct_methods, true)) {
+                                $resultApps[] = $this->payplus_invoice_payment_row($order_id, $method_payment, ($dual * $totalCartAmount) * 100, true);
                             } else {
-                                $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
+                                $method_payment = 'other';
+                                $method_payment = ($order->get_payment_method() === "bacs") ? 'bank-transfer' : $method_payment;
+                                $method_payment = ($order->get_payment_method() === "cod") ? 'cash' : $method_payment;
+                                $method_payment = ($order->get_payment_method() === "cheque") ? 'payment-check' : $method_payment;
+                                $method_payment = ($order->get_payment_method() === "wire-transfers") ? 'bank-transfer' : $method_payment;
+                                $otherMethod = strtolower($order->get_payment_method_title());
+                                $orOtherMethod = strtolower($order->get_payment_method());
+                                $search_terms = ['paypal', 'pay_pal', 'pay pal', 'pay-pal', 'פייפל', 'פיי-פל', 'פיי-פאל', 'פיי פאל', 'פיי פל', 'פיפל', 'פי פל', 'פייפאל', 'פיי פאל', 'פיפאל'];
+
+                                $found_in_other = array_filter($search_terms, function ($term) use ($otherMethod) {
+                                    return strpos($otherMethod, $term) !== false;
+                                });
+
+                                $found_in_or_other = array_filter($search_terms, function ($term) use ($orOtherMethod) {
+                                    return strpos($orOtherMethod, $term) !== false;
+                                });
+
+                                if (!empty($found_in_other) || !empty($found_in_or_other)) {
+                                    $method_payment = 'paypal';
+                                }
+
+                                // Validate donation receipt cannot have 'other' payment method
+                                if ($payplus_document_type === 'inv_don_receipt' && $method_payment === 'other') {
+                                    $order->add_order_note(__('Invoice not created: Donation invoice-receipts cannot have "Other" as the payment method. Please select a different payment method.', 'payplus-payment-gateway'));
+                                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: Donation invoice-receipt creation blocked - payment method is 'other'", 'error');
+                                    return;
+                                }
+
+                                if (
+                                    isset($this->payplus_invoice_option['do-not-create']) && in_array($method_payment, $this->payplus_invoice_option['do-not-create']) ||
+                                    isset($this->payplus_invoice_option['do-not-create']) && in_array($order->get_payment_method(), $this->payplus_invoice_option['do-not-create'])
+                                ) {
+                                    $order->add_order_note('This payment method is set as: Not to create documents automatically');
+                                    return;
+                                }
+                                $objectInvoicePaymentNoPayplus = array('method_payment' => $method_payment, 'price' => ($dual * $totalCartAmount) * 100);
+                                $objectInvoicePaymentNoPayplus = (object) $objectInvoicePaymentNoPayplus;
+                                $resultApps[] = $objectInvoicePaymentNoPayplus;
                             }
                         }
 
-                        $j5Amount = number_format($j5Amount, 2, '.', '');
-                        $totalJ5ItemsAmount = number_format($totalJ5ItemsAmount, 2, '.', '');
-                        $payload['totalAmount'] = $dual * $j5Amount;
-                        if ($j5Amount && (abs($j5Amount - $totalJ5ItemsAmount) >  0.02)) {
+                        $sumPayment = floatval($this->payplus_sum_payment($resultApps));
+
+                        $checkWithHoldingtTax = $this->payplus_check_sum_withholding_tax($resultApps);
+                        if ($totalCartAmount == $sumPayment || $totalCartAmount == $order->get_total() || $checkWithHoldingtTax) {
+                            $payload['items'] = $productsItems;
+                            $payload['totalAmount'] = $dual * $totalCartAmount;
+                        } else {
+                            $payload['items'][] = [
+                                'name' => __('General product', 'payplus-payment-gateway'),
+                                'quantity' => 1,
+                                'price' => $sumPayment,
+                            ];
+                            $payload['totalAmount'] = $dual * $sumPayment;
+                        }
+
+                        $payplusApprovalNum = WC_PayPlus_Meta_Data::get_meta($order_id, "payplus_approval_num", true);
+                        $payplusApprovalNumPaypl = $order->get_transaction_id();
+                        $payplusApprovalNum = ($payplusApprovalNum) ? $payplusApprovalNum : $payplusApprovalNumPaypl;
+                        $payload = array_merge($payload, $this->payplus_get_payments_invoice($resultApps, $payplusApprovalNum, $dual, $order->get_total()));
+
+                        if (isset($payload['payments'][0]['payment_app']) && $payload['payments'][0]['payment_app'] === "-1") {
+                            if (is_array($payPlusResponse)) {
+                                $payments = [];
+                                $numberOfPayments = isset($payPlusResponse['transaction']['payments']['number_of_payments']) ? $payPlusResponse['transaction']['payments']['number_of_payments'] : $payPlusResponse['number_of_payments'] ?? 1;
+                                for ($c = 0; $c < $numberOfPayments; $c++) {
+                                    isset($payPlusResponse['method']) ? $payments[$c]['payment_type'] = $payPlusResponse['method'] : null;
+                                    isset($payPlusResponse['amount']) ? $payments[$c]['amount'] = $payPlusResponse['amount'] : null;
+                                    isset($payPlusResponse['brand_name']) ? $payments[$c]['card_type'] = $payPlusResponse['brand_name'] : null;
+                                    isset($payPlusResponse['four_digits']) ? $payments[$c]['four_digits'] =  $payPlusResponse['four_digits'] : null;
+                                }
+                                $payload['payments'] = $payments;
+                            }
+                        }
+
+                        if (is_array($payPlusResponse)) {
+                            isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['payments'] = $payPlusResponse['number_of_payments'] : null;
+                            isset($payPlusResponse['number_of_payments']) && $payPlusResponse['number_of_payments'] > 1 ? $payload['payments'][0]['transaction_type'] = 'payments' : 'normal';
+                            isset($payPlusResponse['first_payment_amount']) ? $payload['payments'][0]['first_payment'] = $payPlusResponse['first_payment_amount'] : null;
+                            isset($payPlusResponse['rest_payments_amount']) ? $payload['payments'][0]['subsequent_payments'] = $payPlusResponse['rest_payments_amount'] : null;
+                        }
+
+                        if ($j5Amount) {
+                            $payload['items'] = $productsItems;
+                            $totalJ5ItemsAmount = 0;
+
+                            foreach ($payload['items'] as $item) {
+                                if (isset($item['discount_value']) && isset($item['discount_type']) && $item['discount_value'] && $item['discount_type'] === 'amount' && $item['discount_value']) {
+                                    $totalJ5ItemsAmount += ($item['price'] * $item['quantity']) - $item['discount_value'];
+                                } else {
+                                    $item['price'] != 0 ? $totalJ5ItemsAmount += $item['price'] * $item['quantity'] : 0;
+                                }
+                            }
+
+                            $j5Amount = number_format($j5Amount, 2, '.', '');
+                            $totalJ5ItemsAmount = number_format($totalJ5ItemsAmount, 2, '.', '');
+                            $payload['totalAmount'] = $dual * $j5Amount;
+                            if ($j5Amount && (abs($j5Amount - $totalJ5ItemsAmount) >  0.02)) {
+                                $payload['items'] = [];
+                                $payload['items'][] = [
+                                    'name' => __('General product', 'payplus-payment-gateway'),
+                                    'quantity' => 1,
+                                    'price' => $j5Amount,
+                                ];
+                                $payload['payments'][0]['amount'] = $dual * $j5Amount;
+                            } elseif ($j5Amount) {
+                                $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
+                                $payload['totalAmount'] = $dual * $totalJ5ItemsAmount;
+                            }
+                        }
+
+                        if ($this->hide_products_invoice) {
                             $payload['items'] = [];
                             $payload['items'][] = [
                                 'name' => __('General product', 'payplus-payment-gateway'),
                                 'quantity' => 1,
-                                'price' => $j5Amount,
+                                'price' => $dual * $order->get_total(),
                             ];
-                            $payload['payments'][0]['amount'] = $dual * $j5Amount;
-                        } elseif ($j5Amount) {
-                            $payload['payments'][0]['amount'] = $dual * $totalJ5ItemsAmount;
-                            $payload['totalAmount'] = $dual * $totalJ5ItemsAmount;
+                            $payload['totalAmount'] = $dual * $order->get_total();
+                            $payload['payments'][0]['amount'] = $dual * $order->get_total();
                         }
-                    }
 
-                    if ($this->hide_products_invoice) {
-                        $payload['items'] = [];
-                        $payload['items'][] = [
-                            'name' => __('General product', 'payplus-payment-gateway'),
-                            'quantity' => 1,
-                            'price' => $dual * $order->get_total(),
-                        ];
-                        $payload['totalAmount'] = $dual * $order->get_total();
-                        $payload['payments'][0]['amount'] = $dual * $order->get_total();
-                    }
-
-                    if (isset($WC_PayPlus_Gateway->balance_name) && $WC_PayPlus_Gateway->balance_name && isset($payplusBalanceNames) && count($payplusBalanceNames)) {
-                        if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
-                            $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
-                        } else {
-                            $order->add_order_note(__("We will not send a balance number to create an invoice because you have more than one product with a balance number", 'payplus-payment-gateway'));
-                        }
-                    }
-
-                    $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
-                    WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
-
-                    $logCashPayment = !$isCashPayment ? 'No' : 'Yes';
-                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')' . ' is CashePayment: ' . $logCashPayment);
-                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
-
-                    if (!$isCashPayment) {
-                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Doing post:  (' . $order_id . ')');
-                        $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $payplus_document_type, $payload);
-                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Response: ' . wp_json_encode($response));
-                    }
-
-                    if (is_wp_error($response)) {
-                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($response), 'error');
-                    } else {
-                        $res = json_decode(wp_remote_retrieve_body($response));
-
-                        if ($res->status === "success") {
-                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
-                            $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
-                            $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
-                            if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
-                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                        if (isset($WC_PayPlus_Gateway->balance_name) && $WC_PayPlus_Gateway->balance_name && isset($payplusBalanceNames) && count($payplusBalanceNames)) {
+                            if (count($payplusBalanceNames) == COUNT_BALANCE_NAME) {
+                                $payload['customer']['balance_name'] = $payplusBalanceNames[COUNT_BALANCE_NAME - 1];
                             } else {
-                                $exists = 0;
-                                $keys = ['inv_receipt', 'inv_tax'];
-                                foreach ($payPlusInvoiceTypes as $key => $value) {
-                                    if (in_array($key, $keys)) {
-                                        $exists++;
-                                    }
-                                }
-                                $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                                $order->add_order_note(__("We will not send a balance number to create an invoice because you have more than one product with a balance number", 'payplus-payment-gateway'));
                             }
-                            $insetData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
-                            $insetData['payplus_invoice_type'] = $payplus_document_type;
-                            $insetData['payplus_invoice_docUID'] = $res->details->docUID;
-                            $insetData['payplus_invoice_numberD'] = $res->details->number;
-                            $insetData['payplus_invoice_originalDocAddress'] = $res->details->originalDocAddress;
-                            $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
-                            $insetData['payplus_invoice_customer_uuid'] = $res->details->customer_uuid;
-                            WC_PayPlus_Meta_Data::update_meta($order, $insetData);
-                            if (!$this->invoice_notes_no) {
-                                $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
-                             <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
-                            }
+                        }
+
+                        $payload = wp_json_encode($payload, JSON_UNESCAPED_UNICODE);
+                        WC_PayPlus_Meta_Data::update_meta($order, ['payplus_payload_invoice' => $payload]);
+
+                        $logCashPayment = !$isCashPayment ? 'No' : 'Yes';
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Fired  (' . $order_id . ')' . ' is CashePayment: ' . $logCashPayment);
+                        $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($payload), 'payload');
+
+                        if (!$isCashPayment) {
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Doing post:  (' . $order_id . ')');
+                            $response = WC_PayPlus_Statics::payPlusRemote($this->url_payplus_create_invoice . $payplus_document_type, $payload);
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, 'Response: ' . wp_json_encode($response));
+                        }
+
+                        if (is_wp_error($response)) {
+                            $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($response), 'error');
                         } else {
-                            // Only log and add notes if we actually have a response with error data
-                            if (!empty($response)) {
-                                WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $response));
-                                $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
-                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
+                            $res = json_decode(wp_remote_retrieve_body($response));
+
+                            if ($res->status === "success") {
+                                $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
+                                $payPlusInvoiceTypes = !empty(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs')) ? json_decode(WC_PayPlus_Meta_Data::get_meta($order, 'payplus_invoice_plus_docs'), true) : [];
+                                $payPlusInvoiceTypes[$payplus_document_type][$res->details->number] = $res->details->originalDocAddress;
+                                if (array_key_exists('inv_tax_receipt', $payPlusInvoiceTypes) || array_key_exists('inv_don_receipt', $payPlusInvoiceTypes)) {
+                                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                                } else {
+                                    $exists = 0;
+                                    $keys = ['inv_receipt', 'inv_tax'];
+                                    foreach ($payPlusInvoiceTypes as $key => $value) {
+                                        if (in_array($key, $keys)) {
+                                            $exists++;
+                                        }
+                                    }
+                                    $exists > 1 ? WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true)) : null;
+                                }
+                                $insetData['payplus_invoice_plus_docs'] = wp_json_encode($payPlusInvoiceTypes);
+                                $insetData['payplus_invoice_type'] = $payplus_document_type;
+                                $insetData['payplus_invoice_docUID'] = $res->details->docUID;
+                                $insetData['payplus_invoice_numberD'] = $res->details->number;
+                                $insetData['payplus_invoice_originalDocAddress'] = $res->details->originalDocAddress;
+                                $insetData['payplus_invoice_copyDocAddress'] = $res->details->copyDocAddress;
+                                $insetData['payplus_invoice_customer_uuid'] = $res->details->customer_uuid;
+                                WC_PayPlus_Meta_Data::update_meta($order, $insetData);
+                                if (!$this->invoice_notes_no) {
+                                    $order->add_order_note('<div style="font-weight:600">PayPlus Document</div>
+                             <a class="link-invoice" target="_blank" href="' . $res->details->originalDocAddress . '">' . __('Link Document  ', 'payplus-payment-gateway') . '</a>');
+                                }
+                            } else {
+                                $invoiceError = (is_object($res) && isset($res->error)) ? (string) $res->error : '';
+                                if ($invoiceError === 'unique-identifier-exists') {
+                                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_check_invoice_send' => true));
+                                    WC_PayPlus_Meta_Data::delete_meta($order, 'payplus_error_invoice');
+                                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, "Order {$order_id}: invoice already exists — skipped duplicate create", 'completed');
+                                } elseif (!empty($response)) {
+                                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_error_invoice' => $response));
+                                    $order->add_order_note('<div style="font-weight:600">PayPlus Error Invoice</div>' . $res->error);
+                                    $WC_PayPlus_Gateway->payplus_add_log_all($handle, wp_json_encode($res), 'error');
+                                }
                             }
-                            // If response is empty/null, do nothing - might be OK or will retry later
                         }
                     }
                 }
             }
+        } finally {
+            WC_PayPlus_Meta_Data::release_single_write($invoiceLockName);
         }
+    }
+
+    /**
+     * @param mixed $checkInvoiceSend
+     * @param mixed $docUid
+     * @param mixed $errorInvoice
+     * @return bool
+     */
+    private function payplus_invoice_already_created($checkInvoiceSend, $docUid, $errorInvoice)
+    {
+        if ($checkInvoiceSend || !empty($docUid)) {
+            return true;
+        }
+        if (empty($errorInvoice)) {
+            return false;
+        }
+        $error = is_string($errorInvoice) ? $errorInvoice : wp_json_encode($errorInvoice);
+        return strpos($error, 'unique-identifier-exists') !== false;
     }
 
     /**

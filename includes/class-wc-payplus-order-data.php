@@ -25,19 +25,60 @@ class WC_PayPlus_Meta_Data
 
     public static function update_meta($order, $values)
     {
-        if ($order) {
-            $isHPOS = WC_PayPlus_Meta_Data::isHPOS();
-            if ($isHPOS) {
-                foreach ($values as $key => $value) {
-                    $order->update_meta_data($key, $value);
-                }
-            } else {
-                $id = $order->get_id();
-                foreach ($values as $key => $value) {
-                    update_post_meta($id, $key, $value);
-                }
-            }
-            $order->save();
+        if (!$order || !is_array($values)) {
+            return;
+        }
+        if (!is_object($order)) {
+            $order = wc_get_order($order);
+        }
+        if (!$order) {
+            return;
+        }
+
+        // WooCommerce HPOS recipe: CRUD on the order, then one save.
+        // delete_meta_data removes every copy of the key before we write one value.
+        $order->read_meta_data(true);
+        foreach ($values as $key => $value) {
+            $order->delete_meta_data($key);
+            $order->update_meta_data($key, $value);
+        }
+        $order->save();
+    }
+
+    /**
+     * First caller wins. Used so callback + redirect do not both write payment meta.
+     * WordPress add_option is atomic; no direct $wpdb.
+     *
+     * @param string $name
+     * @param int $stale_seconds
+     * @return bool
+     */
+    public static function claim_single_write($name, $stale_seconds = 30)
+    {
+        $name = sanitize_key($name);
+        if ($name === '') {
+            return true;
+        }
+        if (add_option($name, time(), '', false)) {
+            return true;
+        }
+        $started = (int) get_option($name);
+        if ($started && (time() - $started) > (int) $stale_seconds) {
+            delete_option($name);
+            return (bool) add_option($name, time(), '', false);
+        }
+        return false;
+    }
+
+    /**
+     * @param string $name
+     * @return void
+     */
+    public static function release_single_write($name)
+    {
+        $name = sanitize_key($name);
+        if ($name !== '') {
+            delete_option($name);
         }
     }
 
