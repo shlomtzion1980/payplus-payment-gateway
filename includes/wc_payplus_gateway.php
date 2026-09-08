@@ -2835,7 +2835,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         if (empty($code)) {
-            $wpml = apply_filters('wpml_current_language', null);
+            $wpml = apply_filters('wpml_current_language', null); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WPML third-party filter.
             if (is_string($wpml) && $wpml !== '' && $wpml !== 'all') {
                 $code = $wpml;
             }

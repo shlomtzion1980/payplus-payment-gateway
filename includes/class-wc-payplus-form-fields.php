@@ -145,6 +145,18 @@ class WC_PayPlus_Form_Fields
     }
 
     /**
+     * Current admin page/section for menu highlighting only (not form processing).
+     *
+     * @return array{0:string,1:string}
+     */
+    private static function get_current_admin_query()
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Menu highlight only.
+        $section = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Menu highlight only.
+        return [$page, $section];
+    }
+
+    /**
      * Keep WooCommerce open and highlight PayPlus when viewing a PayPlus tool.
      *
      * @param string $parent_file
@@ -152,8 +164,7 @@ class WC_PayPlus_Form_Fields
      */
     public static function filter_admin_parent_file($parent_file)
     {
-        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-        $section = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : '';
+        [$page, $section] = self::get_current_admin_query();
         if (in_array($page, ['payplus-payment-gateway', 'payplus-product-syncer', 'payplus-invoice-runner-admin', 'runPayPlusOrdersChecker'], true)) {
             return 'woocommerce';
         }
@@ -169,8 +180,7 @@ class WC_PayPlus_Form_Fields
      */
     public static function filter_admin_submenu_file($submenu_file)
     {
-        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-        $section = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : '';
+        [$page, $section] = self::get_current_admin_query();
         if (
             in_array($page, ['payplus-payment-gateway', 'payplus-product-syncer', 'payplus-invoice-runner-admin', 'runPayPlusOrdersChecker'], true)
             || ($page === 'wc-settings' && strpos($section, 'payplus') === 0)
