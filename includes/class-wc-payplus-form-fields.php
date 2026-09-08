@@ -82,111 +82,211 @@ class WC_PayPlus_Form_Fields
     }
 
     /**
+     * Pages that belong under WooCommerce → PayPlus Payment Gateway.
+     *
+     * @return array<int, array{title:string,url:string,page:string}>
+     */
+    public static function get_woocommerce_payplus_children()
+    {
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $invoice_option = get_option('payplus_invoice_option');
+        $is_payplus = isset($settings['enabled']) && $settings['enabled'] === 'yes';
+        $children = [
+            [
+                'title' => __('PayPlus Invoice+', 'payplus-payment-gateway'),
+                'url' => admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-invoice'),
+                'page' => 'wc-settings',
+            ],
+        ];
+
+        if (isset($invoice_option['show_invoice_runner_button']) && ($invoice_option['show_invoice_runner_button'] === 'yes' || $invoice_option['show_invoice_runner_button'] === 'on')) {
+            $children[] = [
+                'title' => __('Invoice Runner Management', 'payplus-payment-gateway'),
+                'url' => admin_url('admin.php?page=payplus-invoice-runner-admin'),
+                'page' => 'payplus-invoice-runner-admin',
+            ];
+        }
+
+        if (isset($settings['payplus_show_sub_gateways_side_menu']) && $settings['payplus_show_sub_gateways_side_menu'] === 'yes') {
+            $subgateways = [
+                'payplus-payment-gateway-bit' => __('bit', 'payplus-payment-gateway'),
+                'payplus-payment-gateway-googlepay' => __('Google Pay', 'payplus-payment-gateway'),
+                'payplus-payment-gateway-applepay' => __('Apple Pay', 'payplus-payment-gateway'),
+                'payplus-payment-gateway-multipass' => __('MULTIPASS', 'payplus-payment-gateway'),
+                'payplus-payment-gateway-paypal' => __('PayPal', 'payplus-payment-gateway'),
+                'payplus-payment-gateway-tavzahav' => __('Tav Zahav', 'payplus-payment-gateway'),
+            ];
+            foreach ($subgateways as $section => $title) {
+                $children[] = [
+                    'title' => $title,
+                    'url' => admin_url('admin.php?page=wc-settings&tab=checkout&section=' . $section),
+                    'page' => 'wc-settings',
+                ];
+            }
+        }
+
+        if ($is_payplus && isset($settings['payplus_orders_check_button']) && $settings['payplus_orders_check_button'] === 'yes') {
+            $children[] = [
+                'title' => __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
+                'url' => admin_url('admin.php?page=runPayPlusOrdersChecker'),
+                'page' => 'runPayPlusOrdersChecker',
+            ];
+        }
+
+        if (isset($settings['enable_partners_features']) && $settings['enable_partners_features'] === 'yes' && class_exists('WC_PayPlus_Product_Syncer')) {
+            $children[] = [
+                'title' => __('Product Syncer', 'payplus-payment-gateway'),
+                'url' => admin_url('admin.php?page=payplus-product-syncer'),
+                'page' => 'payplus-product-syncer',
+            ];
+        }
+
+        return $children;
+    }
+
+    /**
+     * Keep WooCommerce open and highlight PayPlus when viewing a PayPlus tool.
+     *
+     * @param string $parent_file
+     * @return string
+     */
+    public static function filter_admin_parent_file($parent_file)
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        $section = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : '';
+        if (in_array($page, ['payplus-payment-gateway', 'payplus-product-syncer', 'payplus-invoice-runner-admin', 'runPayPlusOrdersChecker'], true)) {
+            return 'woocommerce';
+        }
+        if ($page === 'wc-settings' && strpos($section, 'payplus') === 0) {
+            return 'woocommerce';
+        }
+        return $parent_file;
+    }
+
+    /**
+     * @param string $submenu_file
+     * @return string
+     */
+    public static function filter_admin_submenu_file($submenu_file)
+    {
+        $page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
+        $section = isset($_GET['section']) ? sanitize_text_field(wp_unslash($_GET['section'])) : '';
+        if (
+            in_array($page, ['payplus-payment-gateway', 'payplus-product-syncer', 'payplus-invoice-runner-admin', 'runPayPlusOrdersChecker'], true)
+            || ($page === 'wc-settings' && strpos($section, 'payplus') === 0)
+        ) {
+            return 'payplus-payment-gateway';
+        }
+        return $submenu_file;
+    }
+
+    /**
+     * @return void
+     */
+    public static function enqueue_woocommerce_submenu_assets()
+    {
+        $settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        if (isset($settings['disable_menu_side']) && $settings['disable_menu_side'] === 'yes') {
+            return;
+        }
+        wp_register_style('payplus-wc-admin-menu', false, [], PAYPLUS_VERSION);
+        wp_enqueue_style('payplus-wc-admin-menu');
+        wp_add_inline_style(
+            'payplus-wc-admin-menu',
+            '#toplevel_page_woocommerce .payplus-wc-children{display:none;margin:0;padding:0 0 6px;position:static;box-shadow:none;background:transparent;border:0;width:auto;left:auto;overflow:visible;}'
+            . '#toplevel_page_woocommerce.wp-menu-open .payplus-wc-children,'
+            . '#toplevel_page_woocommerce.opensub .payplus-wc-children,'
+            . '#toplevel_page_woocommerce li.payplus-wc-parent:hover > .payplus-wc-children{display:block;}'
+            . '#toplevel_page_woocommerce .payplus-wc-children li{margin:0;}'
+            . '#toplevel_page_woocommerce .payplus-wc-children a{padding-inline-start:28px !important;font-size:12px;opacity:.9;}'
+        );
+        wp_register_script('payplus-wc-admin-menu', '', [], PAYPLUS_VERSION, true);
+        wp_enqueue_script('payplus-wc-admin-menu');
+        wp_add_inline_script(
+            'payplus-wc-admin-menu',
+            'document.addEventListener("DOMContentLoaded",function(){var wc=document.querySelector("#toplevel_page_woocommerce .wp-submenu");if(!wc){return;}var link=wc.querySelector(\'a[href*="page=payplus-payment-gateway"]\');if(!link){return;}var parent=link.closest("li");if(!parent){return;}parent.classList.add("payplus-wc-parent");var items=' . wp_json_encode(self::get_woocommerce_payplus_children()) . ';if(!items.length){return;}var here=window.location.search;var ul=document.createElement("ul");ul.className="payplus-wc-children";items.forEach(function(item){var li=document.createElement("li");var a=document.createElement("a");a.href=item.url;a.textContent=item.title;var needle=item.url.split("?")[1]||"";if(needle&&here.indexOf(needle)!==-1){li.className="current";a.setAttribute("aria-current","page");}li.appendChild(a);ul.appendChild(li);});parent.appendChild(ul);});'
+        );
+    }
+
+    /**
      * @return void
      */
     public static function addAdminPageMenu()
     {
-        global $submenu;
-        $parent_slug = 'payplus-payment-gateway';
-        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-        $payplus_invoice_option = get_option('payplus_invoice_option');
+        $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+        $hide_side = isset($payplus_payment_gateway_settings['disable_menu_side']) && $payplus_payment_gateway_settings['disable_menu_side'] === 'yes';
+        $visible_parent = $hide_side ? 'options.php' : 'woocommerce';
+        $capability = 'manage_woocommerce';
 
+        add_submenu_page(
+            $visible_parent,
+            __('PayPlus Payment Gateway', 'payplus-payment-gateway'),
+            __('PayPlus Payment Gateway', 'payplus-payment-gateway'),
+            $capability,
+            'payplus-payment-gateway',
+            ['WC_PayPlus_Form_Fields', 'getGateway']
+        );
+
+        $hidden_parent = 'payplus-payment-gateway';
+
+        add_submenu_page(
+            $hidden_parent,
+            __('PayPlus Invoice+', 'payplus-payment-gateway'),
+            __('PayPlus Invoice+', 'payplus-payment-gateway'),
+            $capability,
+            'payplus-invoice-redirect',
+            ['WC_PayPlus_Form_Fields', 'redirect_invoice_settings']
+        );
+
+        $payplus_invoice_option = get_option('payplus_invoice_option');
         $isPayPlus = boolval(isset($payplus_payment_gateway_settings['enabled']) && $payplus_payment_gateway_settings['enabled'] === 'yes');
         $showOrdersButton = boolval($isPayPlus && isset($payplus_payment_gateway_settings['payplus_orders_check_button']) && $payplus_payment_gateway_settings['payplus_orders_check_button'] === 'yes');
-        $showSubGatewaysOnSide = boolval(isset($payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu']) && $payplus_payment_gateway_settings['payplus_show_sub_gateways_side_menu'] === 'yes');
         $showInvoiceRunnerButton = boolval(isset($payplus_invoice_option['show_invoice_runner_button']) && ($payplus_invoice_option['show_invoice_runner_button'] === 'yes' || $payplus_invoice_option['show_invoice_runner_button'] === 'on'));
         $showPartnersFeatures = boolval(isset($payplus_payment_gateway_settings['enable_partners_features']) && $payplus_payment_gateway_settings['enable_partners_features'] === 'yes');
 
-        add_menu_page(
-            __('PayPlus Gateway', 'payplus-payment-gateway'),
-            __('PayPlus Gateway', 'payplus-payment-gateway'),
-            'administrator',
-            'payplus-payment-gateway',
-            ['WC_PayPlus_Form_Fields', 'getGateway'],
-            PAYPLUS_PLUGIN_URL_ASSETS_IMAGES . "payplus-icon.svg"
-        );
-        add_submenu_page(
-            'payplus-payment-gateway',
-            __('PayPlus Invoice+', 'payplus-payment-gateway'),
-            __('PayPlus Invoice+', 'payplus-payment-gateway'),
-            'administrator',
-            'admin.php?page=wc-settings&tab=checkout&section=payplus-invoice'
-        );
-
         if ($showInvoiceRunnerButton) {
             add_submenu_page(
-                'payplus-payment-gateway',
+                $hidden_parent,
                 __('Invoice Runner Management', 'payplus-payment-gateway'),
                 __('Invoice Runner Management', 'payplus-payment-gateway'),
-                'administrator',
+                $capability,
                 'payplus-invoice-runner-admin',
                 ['WC_PayPlus', 'payplus_invoice_runner_admin_page']
             );
         }
-        if ($showSubGatewaysOnSide) {
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('bit', 'payplus-payment-gateway'),
-                __('bit', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-bit'
-            );
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('Google Pay', 'payplus-payment-gateway'),
-                __('Google Pay', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-googlepay'
-            );
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('Apple Pay', 'payplus-payment-gateway'),
-                __('Apple Pay', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-applepay'
-            );
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('MULTIPASS', 'payplus-payment-gateway'),
-                __('MULTIPASS', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-multipass'
-            );
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('PayPal', 'payplus-payment-gateway'),
-                __('PayPal', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-paypal'
-            );
-            add_submenu_page(
-                'payplus-payment-gateway',
-                __('Tav zahav', 'payplus-payment-gateway'),
-                __('Tav Zahav', 'payplus-payment-gateway'),
-                'administrator',
-                'admin.php?page=wc-settings&tab=checkout&section=payplus-payment-gateway-tavzahav'
-            );
-        }
         if ($showOrdersButton) {
             add_submenu_page(
-                'payplus-payment-gateway',
+                $hidden_parent,
                 __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
                 __('Run PayPlus Orders Reports/Validator', 'payplus-payment-gateway'),
-                'administrator',
+                $capability,
                 'runPayPlusOrdersChecker',
                 [__CLASS__, 'runPayPlusOrdersChecker']
             );
         }
-        if ($showPartnersFeatures) {
+        if ($showPartnersFeatures && class_exists('WC_PayPlus_Product_Syncer')) {
             add_submenu_page(
-                'payplus-payment-gateway',
+                $hidden_parent,
                 __('Product Syncer', 'payplus-payment-gateway'),
                 __('Product Syncer', 'payplus-payment-gateway'),
-                'administrator',
+                $capability,
                 'payplus-product-syncer',
                 ['WC_PayPlus_Product_Syncer', 'render_product_syncer_page']
             );
         }
+
+        add_action('admin_enqueue_scripts', [__CLASS__, 'enqueue_woocommerce_submenu_assets']);
+        add_filter('parent_file', [__CLASS__, 'filter_admin_parent_file']);
+        add_filter('submenu_file', [__CLASS__, 'filter_admin_submenu_file']);
+    }
+
+    /**
+     * @return void
+     */
+    public static function redirect_invoice_settings()
+    {
+        wp_safe_redirect(admin_url('admin.php?page=wc-settings&tab=checkout&section=payplus-invoice'));
+        exit;
     }
 
     public static function runPayPlusOrdersChecker()
@@ -1161,9 +1261,9 @@ Orders that were successful and cancelled manually will not be tested or updated
             'disable_menu_side' => [
                 'title' => __('Hide the side menu', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'description' =>  __('Hide the PayPlus side menu', 'payplus-payment-gateway'),
+                'description' =>  __('Hide PayPlus items in the WooCommerce admin menu', 'payplus-payment-gateway'),
                 'desc_tip' => true,
-                'label' => __('Hide the PayPlus side menu', 'payplus-payment-gateway'),
+                'label' => __('Hide PayPlus items in the WooCommerce admin menu', 'payplus-payment-gateway'),
             ],
             'hide_custom_fields_buttons' => [
                 'title'   => __('Disable custom fields editing in orders', 'payplus-payment-gateway'),

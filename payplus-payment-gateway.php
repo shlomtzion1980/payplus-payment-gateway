@@ -1816,6 +1816,7 @@ body{
                         }
 
                         add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
+                        $this->register_payplus_admin_menus();
                         payplusUpdateActivate();
                         return;
                     }
@@ -1890,6 +1891,7 @@ body{
 
                     add_action('save_post', [$this, 'payplus_save_meta_box_data']);
                     add_filter('woocommerce_payment_gateways', [$this, 'add_payplus_gateway'], 20);
+                    $this->register_payplus_admin_menus();
                     payplusUpdateActivate();
                     if ($this->isApplePayGateWayEnabled || $this->isApplePayExpressEnabled) {
                         payplus_add_file_ApplePay();
@@ -2468,6 +2470,24 @@ body{
             }
 
             /**
+             * Register admin bar and WooCommerce submenu items on every admin request.
+             * Do not hook these from woocommerce_payment_gateways — WooCommerce no longer
+             * boots gateways on every admin screen.
+             *
+             * @return void
+             */
+            public function register_payplus_admin_menus()
+            {
+                require_once PAYPLUS_PLUGIN_DIR . '/includes/class-wc-payplus-form-fields.php';
+                $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings', []);
+                $hide_header = isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] === 'yes';
+                if (!$hide_header) {
+                    add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
+                }
+                add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 59);
+            }
+
+            /**
              * @param array $methods
              * @return array
              */
@@ -2490,15 +2510,6 @@ body{
                     $methods[] = 'WC_PayPlus_Gateway_HostedFields';
                     $methods[] = 'WC_PayPlus_Gateway_POS_EMV';
                     $methods[] = 'WC_PayPlus_Gateway_WireTransfer';
-                }
-                $payplus_payment_gateway_settings = get_option('woocommerce_payplus-payment-gateway_settings');
-                if ($payplus_payment_gateway_settings) {
-                    if (isset($payplus_payment_gateway_settings['disable_menu_header']) && $payplus_payment_gateway_settings['disable_menu_header'] !== "yes") {
-                        add_action('admin_bar_menu', ['WC_PayPlus_Form_Fields', 'adminBarMenu'], 100);
-                    }
-                    if (isset($payplus_payment_gateway_settings['disable_menu_side']) && $payplus_payment_gateway_settings['disable_menu_side'] !== "yes") {
-                        add_action('admin_menu', ['WC_PayPlus_Form_Fields', 'addAdminPageMenu'], 99);
-                    }
                 }
                 return $methods;
             }
