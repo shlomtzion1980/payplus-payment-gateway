@@ -95,6 +95,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak     - Optional "Prevent duplicate payment complete" setting (default off) to stop double Payment complete notes and New order / Processing emails.
 - Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set.
 - Tweak     - Tested up to WordPress 7.1.
+- Feature   - Apple Pay: optional setting to hide the standalone checkout option while keeping Apple Pay available on the main PayPlus payment page.
 
 == 8.2.4  - 10-08-2026 =
 

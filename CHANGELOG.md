@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Tweak     - Optional "Prevent duplicate payment complete" setting (default off). When enabled, overlapping redirect/callback/IPN success paths cannot fire payment_complete() twice.
 - Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set (approval). Prevents the Google Pay iframe from loading on checkout without a valid UID.
 - Tweak     - WordPress "Tested up to" set to 7.1.
+- Feature   - Apple Pay: optional "Hide Apple Pay as a standalone checkout option" — keeps Apple Pay enabled for the main PayPlus payment page, but removes it as its own method on Classic and Blocks checkout.
 
 ## [8.2.4]  - 08-10-2026 - (Soda)
 

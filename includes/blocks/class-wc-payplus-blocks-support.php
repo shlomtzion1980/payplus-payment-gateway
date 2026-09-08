@@ -105,6 +105,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         if (!$show_in_blocks_checkout) {
             $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-pos-emv']));
         }
+
+        if (isset($this->applePaySettings['hide_apple_pay_checkout']) && $this->applePaySettings['hide_apple_pay_checkout'] === 'yes') {
+            $this->settings['gateways'] = array_values(array_diff($this->settings['gateways'], ['payplus-payment-gateway-applepay']));
+        }
     }
 
     /**
@@ -704,6 +708,15 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             && !is_admin()
             && isset($this->payPlusSettings['hide_main_pp_checkout'])
             && $this->payPlusSettings['hide_main_pp_checkout'] === 'yes'
+        ) {
+            return false;
+        }
+
+        if (
+            $this->name === 'payplus-payment-gateway-applepay'
+            && !is_admin()
+            && isset($this->settings['hide_apple_pay_checkout'])
+            && $this->settings['hide_apple_pay_checkout'] === 'yes'
         ) {
             return false;
         }

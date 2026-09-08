@@ -241,6 +241,16 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
                 'default' => '3'
             ]
         ];
+        if ($this->id === 'payplus-payment-gateway-applepay') {
+            $this->form_fields['hide_apple_pay_checkout'] = [
+                'title' => __('Hide Apple Pay as a standalone checkout option', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Hide Apple Pay as a standalone checkout option (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('Keeps Apple Pay enabled so it can appear on the main PayPlus payment page, but does not show Apple Pay as its own method in Classic or Blocks checkout.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ];
+        }
         if ($this->id === 'payplus-payment-gateway-googlepay' || $this->id === 'payplus-payment-gateway-applepay' || $this->id === 'payplus-payment-gateway-bit') {
             $this->form_fields['hide_payments_field'] = [
                 'title' => __('Hide Number Of Payments In Payment Page', 'payplus-payment-gateway'),
@@ -374,6 +384,10 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
         if ($this->id === 'payplus-payment-gateway-pos-emv') {
             $this->settings['show_in_regular_checkout'] = isset($subOptionsettings['show_in_regular_checkout']) ? $subOptionsettings['show_in_regular_checkout'] : 'no';
             $this->settings['show_in_blocks_checkout'] = isset($subOptionsettings['show_in_blocks_checkout']) ? $subOptionsettings['show_in_blocks_checkout'] : 'no';
+        }
+
+        if ($this->id === 'payplus-payment-gateway-applepay') {
+            $this->settings['hide_apple_pay_checkout'] = isset($subOptionsettings['hide_apple_pay_checkout']) ? $subOptionsettings['hide_apple_pay_checkout'] : 'no';
         }
     }
 
@@ -1030,6 +1044,13 @@ function payplus_filter_checkout_gateways($available_gateways)
             
             if (!$show_in_regular_checkout) {
                 unset($available_gateways['payplus-payment-gateway-pos-emv']);
+            }
+        }
+
+        if (isset($available_gateways['payplus-payment-gateway-applepay'])) {
+            $apple_pay_settings = get_option('woocommerce_payplus-payment-gateway-applepay_settings', []);
+            if (isset($apple_pay_settings['hide_apple_pay_checkout']) && $apple_pay_settings['hide_apple_pay_checkout'] === 'yes') {
+                unset($available_gateways['payplus-payment-gateway-applepay']);
             }
         }
 
