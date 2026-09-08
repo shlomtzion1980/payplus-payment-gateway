@@ -1,4 +1,102 @@
 const hf = new PayPlusHostedFieldsDom();
+const _ppHfOrigSubmit = typeof hf.SubmitPayment === "function" ? hf.SubmitPayment.bind(hf) : null;
+
+function payplusMoreInfoIsOrderId(value) {
+    return value !== null && value !== undefined && /^\d+$/.test(String(value)) && parseInt(value, 10) > 0;
+}
+
+function payplusResetHostedSubmitState() {
+    window._ppHfSubmitInFlight = false;
+    window._ppHfChargeSubmitted = false;
+}
+
+function payplusWaitAndSubmitHostedPayment() {
+    if (window._ppHfSubmitInFlight) {
+        return;
+    }
+    window._ppHfSubmitInFlight = true;
+
+    var ajaxUrl = (window.payplus_script_hosted && payplus_script_hosted.ajax_url) ||
+        (window.payplus_script_checkout && payplus_script_checkout.ajax_url);
+    var nonce = (window.payplus_script_hosted && payplus_script_hosted.frontNonce) ||
+        (window.payplus_script_checkout && payplus_script_checkout.frontNonce);
+    var tries = 0;
+    var maxTries = 40;
+
+    function failAndReset() {
+        payplusResetHostedSubmitState();
+        if (typeof resetPlaceOrderButton === "function") {
+            resetPlaceOrderButton();
+        }
+        jQuery(".blocks-payplus_loader_hosted").fadeOut();
+        if (typeof overlay === "function") {
+            overlay(true);
+        }
+        var lang = document.documentElement.lang;
+        alert(
+            lang !== "he-IL"
+                ? "Could not confirm the payment page update. Please try again."
+                : "לא ניתן לאשר את עדכון דף התשלום. נסה/י שוב."
+        );
+    }
+
+    function attempt() {
+        if (!ajaxUrl || !nonce) {
+            failAndReset();
+            return;
+        }
+        jQuery.ajax({
+            type: "post",
+            dataType: "json",
+            url: ajaxUrl,
+            data: {
+                action: "get-hosted-payload",
+                _ajax_nonce: nonce,
+            },
+            success: function (response) {
+                var data = response && response.data ? response.data : {};
+                var moreInfo = data.more_info;
+                if (moreInfo === undefined && data.hostedPayload) {
+                    try {
+                        var payload = typeof data.hostedPayload === "string"
+                            ? JSON.parse(data.hostedPayload)
+                            : data.hostedPayload;
+                        moreInfo = payload && payload.more_info;
+                    } catch (e) {
+                        moreInfo = null;
+                    }
+                }
+                if (data.can_submit && payplusMoreInfoIsOrderId(moreInfo) && _ppHfOrigSubmit) {
+                    window._ppHfChargeSubmitted = true;
+                    _ppHfOrigSubmit();
+                    window._ppHfSubmitInFlight = false;
+                    return;
+                }
+                tries += 1;
+                if (tries >= maxTries) {
+                    failAndReset();
+                    return;
+                }
+                setTimeout(attempt, 500);
+            },
+            error: function () {
+                tries += 1;
+                if (tries >= maxTries) {
+                    failAndReset();
+                    return;
+                }
+                setTimeout(attempt, 500);
+            },
+        });
+    }
+
+    attempt();
+}
+
+hf.SubmitPayment = function () {
+    payplusWaitAndSubmitHostedPayment();
+};
+
 var resp = JSON.parse(payplus_script_hosted.hostedResponse);
 let payload;
 const pageLang = document.documentElement.lang;
@@ -147,6 +245,7 @@ function hideElement(element) {
 }
 
 function resetPlaceOrderButton() {
+    payplusResetHostedSubmitState();
     // Reset the place order button state
     jQuery("#submit-payment").prop("disabled", false);
     jQuery("#submit-payment .button-loader").css("display", "none");
@@ -560,6 +659,7 @@ hf.Upon("pp_responseFromServer", (e) => {
                 : e.detail.errors[0].field;
 
         const ifError = (event) => {
+            payplusResetHostedSubmitState();
             showError(errorMessage, errorCode);
             jQuery(".blocks-payplus_loader_hosted").fadeOut();
             overlay(true);
@@ -583,6 +683,20 @@ hf.Upon("pp_responseFromServer", (e) => {
 
     if (e.detail.data?.status_code === "000") {
         let orderId = e.detail.data.more_info;
+        if (!orderId || isNaN(orderId) || parseInt(orderId, 10) <= 0) {
+            payplusResetHostedSubmitState();
+            resetPlaceOrderButton();
+            jQuery(".blocks-payplus_loader_hosted").fadeOut();
+            if (typeof overlay === "function") {
+                overlay(true);
+            }
+            alert(
+                pageLang !== "he-IL"
+                    ? "Payment page was not bound to the WooCommerce order. Please try again."
+                    : "דף התשלום לא קושר להזמנה. נסה/י שוב."
+            );
+            return;
+        }
         let token = e.detail.data.token_uid;
         let pageRequestdUid = e.detail.data.page_request_uid;
         jQuery.ajax({

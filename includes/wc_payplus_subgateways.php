@@ -693,6 +693,15 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         check_ajax_referer('frontNonce', '_ajax_nonce');
         $order_id = '000';
 
+        if (WC_PayPlus_HostedFields::hosted_charge_lock_order_id()) {
+            $this->payplus_add_log_all('hosted-fields-data', 'Regenerate hosted link refused — charge lock active');
+            wp_send_json_success(array(
+                'message' => 'regenerate skipped',
+                'order_id' => WC_PayPlus_HostedFields::hosted_charge_lock_order_id(),
+            ));
+            return;
+        }
+
         WC()->session->set('hostedTimeStamp', false);
         WC()->session->set('page_request_uid', false);
         WC()->session->set('hostedResponse', false);
@@ -728,10 +737,36 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             $hostedPayload = WC()->session->get('hostedPayload');
             $hostedResponse = WC()->session->get('hostedResponse');
         }
-        
+
+        $payloadArr = [];
+        if (is_array($hostedPayload)) {
+            $payloadArr = $hostedPayload;
+        } elseif (is_string($hostedPayload) && $hostedPayload !== '') {
+            $decoded = json_decode($hostedPayload, true);
+            $payloadArr = is_array($decoded) ? $decoded : [];
+        }
+        $responseArr = [];
+        if (is_array($hostedResponse)) {
+            $responseArr = $hostedResponse;
+        } elseif (is_string($hostedResponse) && $hostedResponse !== '') {
+            $decoded = json_decode($hostedResponse, true);
+            $responseArr = is_array($decoded) ? $decoded : [];
+        }
+
+        $moreInfo = isset($payloadArr['more_info']) ? (string) $payloadArr['more_info'] : '';
+        $moreInfoIsOrder = $moreInfo !== '' && (bool) preg_match('/^\d+$/', $moreInfo) && (int) $moreInfo > 0;
+        $verified = (int) WC()->session->get('payplus_hosted_updated_for_order');
+        $updateFailed = (bool) WC()->session->get('payplus_hosted_update_failed');
+        $responseOk = isset($responseArr['results']['status']) && $responseArr['results']['status'] === 'success'
+            && !empty($responseArr['data']['page_request_uid']);
+        $canSubmit = $moreInfoIsOrder && !$updateFailed && $responseOk && $verified === (int) $moreInfo;
+
         wp_send_json_success(array(
             'hostedPayload' => $hostedPayload,
-            'hostedResponse' => $hostedResponse
+            'hostedResponse' => $hostedResponse,
+            'can_submit' => $canSubmit,
+            'more_info' => $moreInfo,
+            'update_verified' => $verified,
         ));
     }
 
@@ -831,6 +866,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         }
 
         if ($payment_response === "success") {
+            WC_PayPlus_HostedFields::reset_hosted_fields_session();
             WC()->cart->empty_cart();
             $redirect_to = $order->get_checkout_order_received_url();
             $payPlusResponse = WC_PayPlus_Meta_Data::get_meta($order, 'payplus_response');

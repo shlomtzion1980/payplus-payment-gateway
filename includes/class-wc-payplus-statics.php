@@ -689,8 +689,29 @@ class WC_PayPlus_Statics
 
             $pageRequestUid = WC()->session->get('page_request_uid');
             $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
+            $lockOrder = class_exists('WC_PayPlus_HostedFields') ? WC_PayPlus_HostedFields::hosted_charge_lock_order_id() : 0;
 
-            if ($pageRequestUid && $hostedFieldsUUID && $isPlaceOrder) {
+            $refuseNewPage = static function ($reason) {
+                $existing = WC()->session ? WC()->session->get('hostedResponse') : '';
+                if (!empty($existing)) {
+                    return $existing;
+                }
+                return wp_json_encode([
+                    'results' => [
+                        'status'  => 'error',
+                        'message' => $reason,
+                    ],
+                    'data' => new stdClass(),
+                ]);
+            };
+
+            // Never open a second PayPlus page after Place Order started (slow Blocks re-render).
+            if (!$isPlaceOrder && $lockOrder) {
+                return $refuseNewPage('hosted-charge-locked: refuse generateLink');
+            }
+
+            if ($pageRequestUid && $hostedFieldsUUID) {
+                // Same bound page only — Update, never generateLink.
                 $apiUrl = str_replace("/generateLink", "/Update/$pageRequestUid", $apiUrl);
             } elseif ($isPlaceOrder && $strictUpdate) {
                 // Requested a strict Update but session lost the binding — refuse.
@@ -702,6 +723,8 @@ class WC_PayPlus_Statics
                     ],
                     'data' => new stdClass(),
                 ]);
+            } elseif ($lockOrder) {
+                return $refuseNewPage('hosted-charge-locked: refuse generateLink without bound page');
             }
 
             $hostedResponse = WC_PayPlus_Statics::payPlusRemote($apiUrl, $payload, "post");

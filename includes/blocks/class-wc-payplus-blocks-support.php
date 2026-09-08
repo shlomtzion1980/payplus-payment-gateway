@@ -383,6 +383,10 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
         }
 
+        if ($isPlaceOrder && is_numeric($order_id) && (int) $order_id > 0) {
+            WC_PayPlus_HostedFields::begin_hosted_charge_lock((int) $order_id);
+        }
+
         // Strict Update when this is a real Place Order (isPlaceOrder=true). No fallback
         // to generateLink — that would create a new PayPlus page the browser cannot reach
         // and would let the old placeholder page get charged.
@@ -416,6 +420,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             WC()->session->__unset('hostedResponse');
             WC()->session->set('payplus_hosted_update_failed', true);
             WC()->session->set('payplus_hosted_updated_for_order', 0);
+            WC_PayPlus_HostedFields::release_hosted_charge_lock();
             return wp_json_encode(['results' => ['status' => 'error'], 'data' => []]);
         }
 
@@ -532,6 +537,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             // identical (e.g. immediate retry with same data), skipping the
             // Update API call saves ~5 seconds.
             WC()->session->set('hostedStarted', 1);
+            WC_PayPlus_HostedFields::begin_hosted_charge_lock((int) $this->orderId);
 
             $hostedResp = $this->hostedFieldsData($this->orderId, true);
             $hostedRespArr = !empty($hostedResp) ? json_decode($hostedResp, true) : null;

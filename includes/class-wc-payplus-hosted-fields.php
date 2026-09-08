@@ -113,6 +113,9 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
 
+        // Lock before the Update API so a parallel checkout render cannot generateLink.
+        self::begin_hosted_charge_lock($order_id);
+
         $payplus_gateway->payplus_add_log_all(
             'hosted-fields-data',
             'PayPlus Hosted Fields update for order #: (' . $order_id . ')'
@@ -245,6 +248,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             );
             WC()->session->set('payplus_hosted_update_failed', true);
             WC()->session->set('payplus_hosted_updated_for_order', 0);
+            self::release_hosted_charge_lock();
             return;
         }
 
@@ -271,6 +275,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             WC()->session->set('hostedResponse', false);
             WC()->session->set('payplus_hosted_update_failed', true);
             WC()->session->set('payplus_hosted_updated_for_order', 0);
+            self::release_hosted_charge_lock();
             return;
         }
 
@@ -288,6 +293,80 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         WC_PayPlus_Meta_Data::update_meta($order, ['payplus_embedded_update_page_response' => $hostedResponse]);
         WC()->session->set('hostedPayload', $payload);
         WC()->session->set('hostedResponse', $hostedResponse);
+    }
+
+    /**
+     * Real Woo order id locked for Hosted Fields charge, or 0.
+     *
+     * @return int
+     */
+    public static function hosted_charge_lock_order_id()
+    {
+        if (!function_exists('WC') || !WC()->session) {
+            return 0;
+        }
+        $id = 0;
+        foreach (['payplus_hosted_charge_lock', 'payplus_hosted_updated_for_order'] as $key) {
+            $value = WC()->session->get($key);
+            if (is_numeric($value) && (int) $value > 0) {
+                $id = (int) $value;
+                break;
+            }
+        }
+        if ($id > 0) {
+            $order = wc_get_order($id);
+            if ($order && $order->is_paid()) {
+                self::reset_hosted_fields_session();
+                return 0;
+            }
+        }
+        return $id;
+    }
+
+    /**
+     * @param int $order_id
+     * @return void
+     */
+    public static function begin_hosted_charge_lock($order_id)
+    {
+        if (!function_exists('WC') || !WC()->session || !is_numeric($order_id) || (int) $order_id <= 0) {
+            return;
+        }
+        WC()->session->set('payplus_hosted_charge_lock', (int) $order_id);
+    }
+
+    /**
+     * @return void
+     */
+    public static function release_hosted_charge_lock()
+    {
+        if (!function_exists('WC') || !WC()->session) {
+            return;
+        }
+        WC()->session->set('payplus_hosted_charge_lock', 0);
+        WC()->session->set('payplus_hosted_updated_for_order', 0);
+        WC()->session->set('payplus_hosted_update_failed', false);
+    }
+
+    /**
+     * Clear Hosted Fields session so the next checkout can create a new setup page.
+     *
+     * @return void
+     */
+    public static function reset_hosted_fields_session()
+    {
+        if (!function_exists('WC') || !WC()->session) {
+            return;
+        }
+        self::release_hosted_charge_lock();
+        WC()->session->set('hostedTimeStamp', false);
+        WC()->session->set('hostedPayload', false);
+        WC()->session->set('page_request_uid', false);
+        WC()->session->set('hostedResponse', false);
+        WC()->session->__unset('hostedFieldsUUID');
+        WC()->session->set('hostedStarted', false);
+        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+        WC()->session->__unset('payplus_verified_order');
     }
 
     /**
@@ -339,7 +418,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $this->apiUrl = $this->testMode ? PAYPLUS_API_URL_DEV : PAYPLUS_API_URL_PROD;
 
         $available_gateways = WC()->payment_gateways()->get_available_payment_gateways();
-        if (WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) {
+        if ((WC()->cart->get_subtotal() <= 0 || empty($available_gateways)) && !self::hosted_charge_lock_order_id()) {
             WC()->session->set('hostedTimeStamp', false);
             WC()->session->set('hostedPayload', false);
             WC()->session->set('page_request_uid', false);
@@ -763,9 +842,17 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $order = wc_get_order($order_id);
         $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
-        if(!$this->isPlaceOrder){
+        if (!$this->isPlaceOrder) {
+            if (self::hosted_charge_lock_order_id()) {
+                $this->payPlusGateway->payplus_add_log_all(
+                    'hosted-fields-data',
+                    'Create skipped — charge already locked for order ' . self::hosted_charge_lock_order_id()
+                );
+                $existing = WC()->session->get('hostedResponse');
+                return !empty($existing) ? $existing : $hostedResponse;
+            }
             $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "Create for new Order: ($order_id) - \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
-            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, $this->isPlaceOrder = false);
+            $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, false);
         }
 
         $hostedResponseArray = json_decode($hostedResponse, true);
@@ -781,6 +868,10 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     public function checkHostedTime()
     {
         $savedTimestamp = WC()->session->get('hostedTimeStamp');
+        if (self::hosted_charge_lock_order_id()) {
+            return true;
+        }
+
         if (!$savedTimestamp) {
             WC()->session->__unset('hostedPayload');
             WC()->session->set('page_request_uid', false);
@@ -801,6 +892,8 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $timeLimit = 30 * 60; // 30 minutes
 
         if (($currentTimestamp - $savedTimestamp) <= $timeLimit) {
+            return true;
+        } elseif (self::hosted_charge_lock_order_id()) {
             return true;
         } else {
             $this->payplus_gateway->payplus_add_log_all("hosted-fields-data", "HostedFields timestamp ended: $currentTimestamp");

@@ -637,13 +637,7 @@ class WC_PayPlus
         $PayPlusAdminPayments = new WC_PayPlus_Admin_Payments;
         $_wpnonce = wp_create_nonce('_wp_payplusIpn');
         $PayPlusAdminPayments->payplusIpn($order_id, $_wpnonce, $saveToken, true);
-        WC()->session->set('hostedTimeStamp', false);
-        WC()->session->set('hostedPayload', false);
-        WC()->session->set('page_request_uid', false);
-        WC()->session->set('hostedResponse', false);
-        WC()->session->__unset('hostedFieldsUUID');
-        WC()->session->set('hostedStarted', false);
-        WC()->session->set('randomHash', bin2hex(random_bytes(16)));
+        WC_PayPlus_HostedFields::reset_hosted_fields_session();
         WC()->session->set('payplus_verified_order', $order_id);
         wp_send_json_success(array('result' => "success"));
     }

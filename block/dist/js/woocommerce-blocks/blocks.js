@@ -172,6 +172,8 @@ if (isCheckout || hasOrder) {
      * change payment method and click "Place Order" again without reloading.
      */
     function resetCheckoutState() {
+        window._ppHfSubmitInFlight = false;
+        window._ppHfChargeSubmitted = false;
         _paymentPageActive = false;
 
         // Stop any running poll

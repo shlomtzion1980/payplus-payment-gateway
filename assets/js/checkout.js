@@ -1147,55 +1147,12 @@ jQuery(function ($) {
                     dataType: "json",
                     success: function (result) {
                         if (result.method === "hostedFields") {
-                            jQuery.ajax({
-                                type: "post",
-                                dataType: "json",
-                                url: payplus_script_checkout.ajax_url,
-                                data: {
-                                    action: "get-hosted-payload",
-                                    _ajax_nonce:
-                                        payplus_script_checkout.frontNonce,
-                                },
-                                success: function (response) {
-                                    const hostedPayload = JSON.parse(
-                                        response.data.hostedPayload
-                                    );
-                                    const hostedResponse = JSON.parse(
-                                        response.data.hostedResponse
-                                    );
-                                    var updateOk = hostedResponse &&
-                                        hostedResponse.results &&
-                                        hostedResponse.results.status === 'success' &&
-                                        hostedResponse.data &&
-                                        hostedResponse.data.page_request_uid;
-
-                                    if (
-                                        updateOk &&
-                                        hostedPayload.more_info &&
-                                        !isNaN(hostedPayload.more_info) &&
-                                        typeof hostedPayload.more_info === 'number'
-                                    ) {
-                                        overlay();
-                                        jQuery(
-                                            ".blocks-payplus_loader_hosted"
-                                        ).fadeIn();
-                                        wc_checkout_form.$checkout_form
-                                            .removeClass("processing")
-                                            .unblock();
-                                        hf.SubmitPayment();
-                                    } else {
-                                        window.onbeforeunload = null;
-                                        window.removeEventListener(
-                                            "beforeunload",
-                                            wc_checkout_form.detachUnloadEventsOnSubmit()
-                                        );
-                                        alert(
-                                            "The payment page has expired, refresh the page to continue"
-                                        );
-                                        location.reload();
-                                    }
-                                },
-                            });
+                            overlay();
+                            jQuery(".blocks-payplus_loader_hosted").fadeIn();
+                            wc_checkout_form.$checkout_form
+                                .removeClass("processing")
+                                .unblock();
+                            hf.SubmitPayment();
                         } else {
                             // Detach the unload handler that prevents a reload / redirect
                             wc_checkout_form.detachUnloadEventsOnSubmit();
