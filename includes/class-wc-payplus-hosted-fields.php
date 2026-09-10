@@ -296,7 +296,31 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
     }
 
     /**
-     * Real Woo order id locked for Hosted Fields charge, or 0.
+     * Whether the session has a Hosted Fields API response the form can render.
+     *
+     * @param mixed $response
+     * @return bool
+     */
+    public static function hosted_response_can_render($response)
+    {
+        if (empty($response) || !is_string($response)) {
+            return false;
+        }
+        $arr = json_decode($response, true);
+        if (!isset($arr['results']['status']) || $arr['results']['status'] !== 'success') {
+            return false;
+        }
+        $uuid = WC()->session ? WC()->session->get('hostedFieldsUUID') : '';
+        if (!empty($uuid)) {
+            return true;
+        }
+        return !empty($arr['data']['hosted_fields_uuid']);
+    }
+
+    /**
+     * Real Woo order id locked for an in-flight Hosted Fields charge, or 0.
+     * Do not treat payplus_hosted_updated_for_order as a lock — leftover values
+     * after a failed/paid attempt hide the form for the next checkout.
      *
      * @return int
      */
@@ -305,20 +329,25 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         if (!function_exists('WC') || !WC()->session) {
             return 0;
         }
-        $id = 0;
-        foreach (['payplus_hosted_charge_lock', 'payplus_hosted_updated_for_order'] as $key) {
-            $value = WC()->session->get($key);
-            if (is_numeric($value) && (int) $value > 0) {
-                $id = (int) $value;
-                break;
-            }
+        $id = (int) WC()->session->get('payplus_hosted_charge_lock');
+        if ($id <= 0) {
+            return 0;
         }
-        if ($id > 0) {
-            $order = wc_get_order($id);
-            if ($order && $order->is_paid()) {
-                self::reset_hosted_fields_session();
-                return 0;
-            }
+
+        $lock_time = (int) WC()->session->get('payplus_hosted_charge_lock_time');
+        if ($lock_time > 0 && (time() - $lock_time) > 180) {
+            self::release_hosted_charge_lock();
+            return 0;
+        }
+
+        $order = wc_get_order($id);
+        if (!$order || $order->has_status(['failed', 'cancelled', 'refunded'])) {
+            self::release_hosted_charge_lock();
+            return 0;
+        }
+        if ($order->is_paid() && $lock_time > 0 && (time() - $lock_time) > 30) {
+            self::reset_hosted_fields_session();
+            return 0;
         }
         return $id;
     }
@@ -333,6 +362,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
         WC()->session->set('payplus_hosted_charge_lock', (int) $order_id);
+        WC()->session->set('payplus_hosted_charge_lock_time', time());
     }
 
     /**
@@ -344,6 +374,7 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             return;
         }
         WC()->session->set('payplus_hosted_charge_lock', 0);
+        WC()->session->__unset('payplus_hosted_charge_lock_time');
         WC()->session->set('payplus_hosted_updated_for_order', 0);
         WC()->session->set('payplus_hosted_update_failed', false);
     }
@@ -438,7 +469,22 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
             $hostedResponseArray['results']['status'] === "error" ? $this->updateOrderId() : null;
         }
 
-        if (isset($hostedResponse) && $hostedResponse && isset(json_decode($hostedResponse, true)['results']['status']) && json_decode($hostedResponse, true)['results']['status'] === "success") {
+        $form_appeared = self::hosted_response_can_render($hostedResponse);
+        $form_uuid = WC()->session ? (string) WC()->session->get('hostedFieldsUUID') : '';
+        $form_lock = (int) WC()->session->get('payplus_hosted_charge_lock');
+        $form_reason = $form_appeared
+            ? 'success-response'
+            : (isset($hostedResponseArray['results']['status']) ? 'status-' . $hostedResponseArray['results']['status'] : 'no-success-response');
+        $this->payPlusGateway->payplus_add_log_all(
+            'hosted-fields-data',
+            ($form_appeared ? 'Form appeared' : 'Form did not appear')
+            . ' — more_info=' . $this->order_id
+            . ' uuid=' . ($form_uuid !== '' ? 'yes' : 'no')
+            . ' lock=' . $form_lock
+            . ' reason=' . $form_reason
+        );
+
+        if ($form_appeared) {
             $script_version = filemtime(plugin_dir_path(__DIR__) . 'assets/js/hostedFieldsScript.min.js');
             $template_path = plugin_dir_path(__DIR__) . 'templates/hostedFields.php';
 
@@ -843,13 +889,27 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         $hostedFieldsUUID = WC()->session->get('hostedFieldsUUID');
 
         if (!$this->isPlaceOrder) {
-            if (self::hosted_charge_lock_order_id()) {
+            $lock_id = self::hosted_charge_lock_order_id();
+            $existing = WC()->session->get('hostedResponse');
+            if ($lock_id && self::hosted_response_can_render($existing)) {
                 $this->payPlusGateway->payplus_add_log_all(
                     'hosted-fields-data',
-                    'Create skipped — charge already locked for order ' . self::hosted_charge_lock_order_id()
+                    'Create skipped — charge already locked for order ' . $lock_id
                 );
-                $existing = WC()->session->get('hostedResponse');
-                return !empty($existing) ? $existing : $hostedResponse;
+                return $existing;
+            }
+            if ($lock_id && !self::hosted_response_can_render($existing)) {
+                $this->payPlusGateway->payplus_add_log_all(
+                    'hosted-fields-data',
+                    'Charge lock for order ' . $lock_id . ' would hide the form — resetting and creating a setup page.'
+                );
+                self::reset_hosted_fields_session();
+                $randomHash = WC()->session->get('randomHash') ? WC()->session->get('randomHash') : bin2hex(random_bytes(16));
+                WC()->session->set('randomHash', $randomHash);
+                $order_id = $this->updateOrderId($randomHash);
+                $data->more_info = $order_id;
+                $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
+                WC()->session->set('hostedPayload', $payload);
             }
             $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "Create for new Order: ($order_id) - \n$payload\nhostedFieldsUUID: $hostedFieldsUUID");
             $hostedResponse = WC_PayPlus_Statics::createUpdateHostedPaymentPageLink($payload, false);

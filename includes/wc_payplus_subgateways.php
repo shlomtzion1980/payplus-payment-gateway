@@ -921,6 +921,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 'redirect_url' => $redirect_to
             ));
         } else {
+            WC_PayPlus_HostedFields::release_hosted_charge_lock();
             wp_send_json_error(array('message' => 'Payment failed'));
         }
     }
@@ -979,7 +980,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         if ($this->id === "payplus-payment-gateway-hostedfields") {
             if (WC()->session && WC()->session->get('payplus_hosted_update_failed')) {
                 WC()->session->set('payplus_hosted_update_failed', false);
-                WC()->session->set('payplus_hosted_updated_for_order', 0);
+                WC_PayPlus_HostedFields::release_hosted_charge_lock();
                 wc_add_notice(__('Payment setup could not be completed. Please refresh the page and try again.', 'payplus-payment-gateway'), 'error');
                 return array(
                     'result'  => 'failure',
@@ -1005,6 +1006,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                         "HostedFields process_payment REFUSED for Order #$order_id – payment page was not verified as updated (verifiedOrderId=" . ($verifiedOrderId ?: 'null') . "). Refusing charge to prevent placeholder-data payment."
                     );
                 }
+                WC_PayPlus_HostedFields::release_hosted_charge_lock();
                 WC()->session->set('page_request_uid', false);
                 WC()->session->__unset('hostedFieldsUUID');
                 WC()->session->set('hostedPayload', false);
