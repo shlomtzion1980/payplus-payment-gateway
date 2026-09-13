@@ -209,6 +209,11 @@ jQuery(function ($) {
 
     const iframeAutoHeight = $("#woocommerce_payplus-payment-gateway_iframe_auto_height");
 
+    const enableDevMode = $("#woocommerce_payplus-payment-gateway_enable_dev_mode");
+    const preventUnpaidZeroTotalOrders = $(
+        "#woocommerce_payplus-payment-gateway_prevent_unpaid_zero_total_orders"
+    );
+
     const deleteError = $(".payplus-delete-error");
     const createInvoiceManual = $(".create-invoice-manual");
     const invoiceManualList = $(".invoice-manual-list");
@@ -347,6 +352,20 @@ jQuery(function ($) {
         }
     });
     /******    block  end ******/
+    /******    partners dev mode start ******/
+    if (enableDevMode.length && preventUnpaidZeroTotalOrders.length) {
+        if (!enableDevMode.prop("checked")) {
+            preventUnpaidZeroTotalOrders.closest("tr").fadeOut();
+        }
+        enableDevMode.change(function () {
+            if (enableDevMode.prop("checked")) {
+                preventUnpaidZeroTotalOrders.closest("tr").fadeIn();
+            } else {
+                preventUnpaidZeroTotalOrders.closest("tr").fadeOut();
+            }
+        });
+    }
+    /******    partners dev mode end ******/
 
     let enableExpressOnProductPageMessage = "";
     let displayOnProductPage = "";

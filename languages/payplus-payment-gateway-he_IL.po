@@ -4620,6 +4620,21 @@ msgstr "הסתרת אפל פיי כאפשרות נפרדת בקופה"
 msgid "Prevent duplicate payment complete (Default: Unchecked)"
 msgstr "מניעת השלמת תשלום כפולה (ברירת מחדל: כבוי)"
 
+msgid "Block unpaid $0 orders from session desync"
+msgstr "חסימת הזמנות ללא תשלום בסכום 0 עקב חוסר סנכרון בסשן"
+
+msgid "Block unpaid $0 orders from session desync (Default: Unchecked)"
+msgstr "חסימת הזמנות ללא תשלום בסכום 0 עקב חוסר סנכרון בסשן (ברירת מחדל: כבוי)"
+
+msgid "Stops checkout when the cart still has products but the order total dropped to 0 without a real 100% coupon or gift card (WooCommerce session desync / Instagram and similar apps). Also blocks checkout if WooCommerce thinks payment is not needed while the total is still greater than 0. Leave unchecked to keep existing behavior."
+msgstr "עוצר את הקופה כאשר בעגלה יש מוצרים אבל סכום ההזמנה ירד ל-0 בלי קופון 100% או כרטיס מתנה אמיתי (חוסר סנכרון בסשן של ווקומרס / אינסטגרם ואפליקציות דומות). גם חוסם קופה אם ווקומרס חושב שאין צורך בתשלום בעוד הסכום גדול מ-0. השאר/י כבוי כדי לשמור על ההתנהגות הקיימת."
+
+msgid "An error occurred while calculating your order total. Please refresh the page and try again."
+msgstr "אירעה שגיאה בחישוב סכום ההזמנה. רענן/י את העמוד ונסה/י שוב."
+
+msgid "This order requires payment and cannot be completed without it. Please try again."
+msgstr "הזמנה זו מחייבת תשלום ולא ניתן להשלים אותה בלעדיו. נסה/י שוב."
+
 msgid "Open payment page in website language (Default: Unchecked)"
 msgstr "פתיחת דף התשלום בשפת האתר (ברירת מחדל: כבוי)"
 

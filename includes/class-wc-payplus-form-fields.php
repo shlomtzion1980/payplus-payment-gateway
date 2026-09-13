@@ -1295,6 +1295,14 @@ Orders that were successful and cancelled manually will not be tested or updated
                 'type'    => 'checkbox',
                 'default' => 'no',
             ],
+            'prevent_unpaid_zero_total_orders' => [
+                'title' => __('Block unpaid $0 orders from session desync', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Block unpaid $0 orders from session desync (Default: Unchecked)', 'payplus-payment-gateway'),
+                'description' => __('Stops checkout when the cart still has products but the order total dropped to 0 without a real 100% coupon or gift card (WooCommerce session desync / Instagram and similar apps). Also blocks checkout if WooCommerce thinks payment is not needed while the total is still greater than 0. Leave unchecked to keep existing behavior.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'enable_partners_features' => [
                 'title'   => __('Enable Partners Features', 'payplus-payment-gateway'),
                 'desc_tip' => true,

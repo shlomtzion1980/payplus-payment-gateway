@@ -96,6 +96,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Fix       - Express Checkout Google Pay is off by default and stays off unless Active page UID Google Pay is set.
 - Tweak     - Tested up to WordPress 7.1.
 - Feature   - Apple Pay: optional setting to hide the standalone checkout option while keeping Apple Pay available on the main PayPlus payment page.
+- Feature   - Partners Dev Mode: optional "Block unpaid $0 orders from session desync" (shown only when Enable partners dev mode is on; default off).
+- Fix       - Classic $0 / PW Gift Card thank-you now empties the cart.
 
 == 8.2.4  - 10-08-2026 =
 
