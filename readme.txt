@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.2.5  - 02-09-2026 =
+== 8.2.5  - 14-09-2026 =
 
 - Fix       - Hosted Fields (PayPlus Embedded): no longer uses a generic customer or the wrong order id.
 - Fix       - Invoice+: Multipass and other club/alternative methods are no longer shown as "Other" on documents.

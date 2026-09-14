@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.2.5]  - 09-02-2026 - (Chihiro)
+## [8.2.5]  - 09-14-2026 - (Chihiro)
 
 - Fix       - Hosted Fields (PayPlus Embedded): checkout no longer binds to a generic customer or the wrong order id; payload and completion use the real WooCommerce order.
 - Fix       - Invoice+: Multipass (and other club/alternative methods) no longer print as "Other" on documents — the actual method name is stored and used.
