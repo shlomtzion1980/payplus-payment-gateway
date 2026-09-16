@@ -668,6 +668,41 @@ class WC_PayPlus_Statics
         }
 
         /**
+         * PayPlus more_info must be digits-only to be a WooCommerce order id.
+         * intval('8c9955fd…') is 8 and would wrongly attach a setup-page charge to order 8.
+         *
+         * @param mixed $more_info
+         * @return int Order id or 0.
+         */
+        public static function order_id_from_more_info($more_info)
+        {
+            if (is_int($more_info) || is_float($more_info)) {
+                $more_info = (string) (int) $more_info;
+            } else {
+                $more_info = trim((string) $more_info);
+            }
+            if ($more_info === '' || !preg_match('/^\d+$/', $more_info)) {
+                return 0;
+            }
+            $order_id = (int) $more_info;
+            return $order_id > 0 ? $order_id : 0;
+        }
+
+        /**
+         * True only when more_info is a real order id and it is THIS order.
+         *
+         * @param mixed $more_info
+         * @param mixed $order_id
+         * @return bool
+         */
+        public static function more_info_matches_order($more_info, $order_id)
+        {
+            $from_more = self::order_id_from_more_info($more_info);
+            $from_order = self::order_id_from_more_info($order_id);
+            return $from_more > 0 && $from_order > 0 && $from_more === $from_order;
+        }
+
+        /**
          * Create or Update a Hosted Fields payment page on PayPlus.
          *
          * @param string $payload       JSON payload for PayPlus.

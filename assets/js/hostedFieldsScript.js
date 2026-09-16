@@ -66,7 +66,15 @@ function payplusWaitAndSubmitHostedPayment() {
                         moreInfo = null;
                     }
                 }
-                if (data.can_submit && payplusMoreInfoIsOrderId(moreInfo) && _ppHfOrigSubmit) {
+                var expectedOrderId = data.expected_order_id;
+                if (
+                    data.can_submit &&
+                    payplusMoreInfoIsOrderId(moreInfo) &&
+                    payplusMoreInfoIsOrderId(expectedOrderId) &&
+                    parseInt(moreInfo, 10) === parseInt(expectedOrderId, 10) &&
+                    _ppHfOrigSubmit
+                ) {
+                    window._ppHfExpectedOrderId = parseInt(expectedOrderId, 10);
                     window._ppHfChargeSubmitted = true;
                     _ppHfOrigSubmit();
                     window._ppHfSubmitInFlight = false;
@@ -96,6 +104,7 @@ function payplusWaitAndSubmitHostedPayment() {
 hf.SubmitPayment = function () {
     payplusWaitAndSubmitHostedPayment();
 };
+window.hf = hf;
 
 var resp = JSON.parse(payplus_script_hosted.hostedResponse);
 let payload;
@@ -246,12 +255,27 @@ function hideElement(element) {
 
 function resetPlaceOrderButton() {
     payplusResetHostedSubmitState();
-    // Reset the place order button state
-    jQuery("#submit-payment").prop("disabled", false);
-    jQuery("#submit-payment .button-loader").css("display", "none");
-    jQuery(".payplus-hosted-place-order").prop("disabled", false).css("opacity", "1");
-    jQuery(".payplus-hosted-place-order .button-loader").css("display", "none");
+    var $buttons = jQuery("#submit-payment, .payplus-hosted-place-order");
+    $buttons.prop("disabled", false).css("opacity", "1");
+    $buttons.find(".button-loader").hide().attr("style", "display: none;");
+    jQuery(".container.hostedFields .button-loader, #payment-form .button-loader")
+        .hide()
+        .attr("style", "display: none;");
 }
+
+function payplusHostedPlaceOrderClick(btn) {
+    var $btn = jQuery(btn);
+    $btn.prop("disabled", true);
+    $btn.find(".button-loader").css("display", "inline-block");
+    var $form = jQuery("form[name='checkout']");
+    $form.trigger("submit");
+    setTimeout(function () {
+        if (!$form.hasClass("processing")) {
+            resetPlaceOrderButton();
+        }
+    }, 400);
+}
+window.payplusHostedPlaceOrderClick = payplusHostedPlaceOrderClick;
 
 function showError(message, code) {
     // Hide loader on the hosted fields place order buttons
@@ -683,7 +707,11 @@ hf.Upon("pp_responseFromServer", (e) => {
 
     if (e.detail.data?.status_code === "000") {
         let orderId = e.detail.data.more_info;
-        if (!orderId || isNaN(orderId) || parseInt(orderId, 10) <= 0) {
+        if (
+            !payplusMoreInfoIsOrderId(orderId) ||
+            (window._ppHfExpectedOrderId &&
+                parseInt(orderId, 10) !== parseInt(window._ppHfExpectedOrderId, 10))
+        ) {
             payplusResetHostedSubmitState();
             resetPlaceOrderButton();
             jQuery(".blocks-payplus_loader_hosted").fadeOut();
@@ -850,6 +878,10 @@ jQuery(document).ready(function () {
             jQuery(this).addClass("validated");
         }
     });
+    jQuery(document.body).on("checkout_error", function () {
+        resetPlaceOrderButton();
+    });
+
     jQuery("#id-number").on("blur", function () {
         // Get the input value and trim any extra spaces
         let id = jQuery(this).val().trim();

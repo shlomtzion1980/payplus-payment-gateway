@@ -1273,6 +1273,13 @@ jQuery(function ($) {
                 .trigger("blur");
             wc_checkout_form.scroll_to_notices();
             $(document.body).trigger("checkout_error", [error_message]);
+            if (typeof resetPlaceOrderButton === "function") {
+                resetPlaceOrderButton();
+            } else {
+                var $hostedButtons = $("#submit-payment, .payplus-hosted-place-order");
+                $hostedButtons.prop("disabled", false).css("opacity", "1");
+                $hostedButtons.find(".button-loader").hide().attr("style", "display: none;");
+            }
         },
         scroll_to_notices: function () {
             var scrollElement = $(

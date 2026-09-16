@@ -722,7 +722,7 @@ $numPaymentsAllowed = max(1, min($numPaymentsAllowed, 99)); // Enforce max 99 an
                         </select>
                     </div>
                     <button type="button" id="submit-payment" class="btn btn-primary"
-                        onclick="(function(btn) { jQuery(btn).prop('disabled', true); jQuery(btn).find('.button-loader').css('display', 'inline-block'); jQuery('form[name=\'checkout\']').trigger('submit'); })(this);">
+                        onclick="payplusHostedPlaceOrderClick(this);">
                         <span class="button-text"><?php echo esc_html__('Place Order', 'payplus-payment-gateway'); ?></span>
                         <span class="button-loader" style="display: none; margin-left: 8px;">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="animation: spin 1s linear infinite; vertical-align: middle;">

@@ -862,7 +862,7 @@ if (isCheckout || hasOrder) {
                         ) === 0
                     ) {
                         _paymentPageActive = true;
-                        hf.SubmitPayment();
+                        (window.hf || hf).SubmitPayment();
                         document.body.style.overflow = "hidden";
                         document.body.style.backgroundColor = "white";
                         document.body.style.opacity = "0.7";
