@@ -703,6 +703,30 @@ class WC_PayPlus_Statics
         }
 
         /**
+         * Setup pages are built from the cart (e.g. 153.25). The Woo order can be
+         * higher (shipping/tax). Do not charge unless the PayPlus page amount matches.
+         *
+         * @param mixed    $payload_amount
+         * @param WC_Order $order
+         * @return bool
+         */
+        public static function hosted_amount_matches_order($payload_amount, $order)
+        {
+            if (!$order instanceof WC_Order) {
+                return false;
+            }
+            if ($payload_amount === null || $payload_amount === '') {
+                return false;
+            }
+            $page_amount = round((float) $payload_amount, 2);
+            $order_total = round((float) $order->get_total('edit'), 2);
+            if ($page_amount <= 0 && $order_total <= 0) {
+                return true;
+            }
+            return abs($page_amount - $order_total) < 0.02;
+        }
+
+        /**
          * Create or Update a Hosted Fields payment page on PayPlus.
          *
          * @param string $payload       JSON payload for PayPlus.

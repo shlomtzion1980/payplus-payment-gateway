@@ -69,12 +69,14 @@ function payplusWaitAndSubmitHostedPayment() {
                 var expectedOrderId = data.expected_order_id;
                 if (
                     data.can_submit &&
+                    data.amount_matches &&
                     payplusMoreInfoIsOrderId(moreInfo) &&
                     payplusMoreInfoIsOrderId(expectedOrderId) &&
                     parseInt(moreInfo, 10) === parseInt(expectedOrderId, 10) &&
                     _ppHfOrigSubmit
                 ) {
                     window._ppHfExpectedOrderId = parseInt(expectedOrderId, 10);
+                    window._ppHfExpectedAmount = parseFloat(data.expected_amount);
                     window._ppHfChargeSubmitted = true;
                     _ppHfOrigSubmit();
                     window._ppHfSubmitInFlight = false;
@@ -707,10 +709,25 @@ hf.Upon("pp_responseFromServer", (e) => {
 
     if (e.detail.data?.status_code === "000") {
         let orderId = e.detail.data.more_info;
+        var chargedAmount = e.detail.data.amount;
+        var amountOk = true;
+        if (
+            window._ppHfExpectedAmount &&
+            chargedAmount !== undefined &&
+            chargedAmount !== null &&
+            chargedAmount !== ""
+        ) {
+            var charged = parseFloat(chargedAmount);
+            var expected = parseFloat(window._ppHfExpectedAmount);
+            amountOk =
+                Math.abs(charged - expected) < 0.02 ||
+                Math.abs(charged / 100 - expected) < 0.02;
+        }
         if (
             !payplusMoreInfoIsOrderId(orderId) ||
             (window._ppHfExpectedOrderId &&
-                parseInt(orderId, 10) !== parseInt(window._ppHfExpectedOrderId, 10))
+                parseInt(orderId, 10) !== parseInt(window._ppHfExpectedOrderId, 10)) ||
+            !amountOk
         ) {
             payplusResetHostedSubmitState();
             resetPlaceOrderButton();

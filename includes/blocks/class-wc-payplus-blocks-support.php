@@ -567,7 +567,8 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 $hostedPayloadArr = is_array($decodedPayload) ? $decodedPayload : [];
             }
             $payloadMoreInfo = isset($hostedPayloadArr['more_info']) ? $hostedPayloadArr['more_info'] : '';
-            if (absint($verifiedOrderId) !== absint($this->orderId) || WC()->session->get('payplus_hosted_update_failed') || !WC_PayPlus_Statics::more_info_matches_order($payloadMoreInfo, $this->orderId)) {
+            $payloadAmount = isset($hostedPayloadArr['amount']) ? $hostedPayloadArr['amount'] : '';
+            if (absint($verifiedOrderId) !== absint($this->orderId) || WC()->session->get('payplus_hosted_update_failed') || !WC_PayPlus_Statics::more_info_matches_order($payloadMoreInfo, $this->orderId) || !WC_PayPlus_Statics::hosted_amount_matches_order($payloadAmount, $order)) {
                 if ($WC_PayPlus_Gateway) {
                     $WC_PayPlus_Gateway->payplus_add_log_all(
                         'hosted-fields-data',

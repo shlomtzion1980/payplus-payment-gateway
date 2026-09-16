@@ -768,14 +768,17 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
         }
 
         $moreInfo = isset($payloadArr['more_info']) ? (string) $payloadArr['more_info'] : '';
+        $payloadAmount = isset($payloadArr['amount']) ? $payloadArr['amount'] : '';
         $currentOrderId = WC_PayPlus_Statics::order_id_from_more_info($order_id);
         $moreInfoOrderId = WC_PayPlus_Statics::order_id_from_more_info($moreInfo);
         $verified = (int) WC()->session->get('payplus_hosted_updated_for_order');
         $updateFailed = (bool) WC()->session->get('payplus_hosted_update_failed');
         $responseOk = isset($responseArr['results']['status']) && $responseArr['results']['status'] === 'success'
             && !empty($responseArr['data']['page_request_uid']);
+        $currentOrder = ($currentOrderId > 0) ? wc_get_order($currentOrderId) : false;
         $belongsToCurrentOrder = WC_PayPlus_Statics::more_info_matches_order($moreInfo, $currentOrderId);
-        $canSubmit = $belongsToCurrentOrder && !$updateFailed && $responseOk && $verified === $currentOrderId && $moreInfoOrderId === $currentOrderId;
+        $amountMatches = WC_PayPlus_Statics::hosted_amount_matches_order($payloadAmount, $currentOrder);
+        $canSubmit = $belongsToCurrentOrder && $amountMatches && !$updateFailed && $responseOk && $verified === $currentOrderId && $moreInfoOrderId === $currentOrderId;
 
         wp_send_json_success(array(
             'hostedPayload' => $hostedPayload,
@@ -783,6 +786,9 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
             'can_submit' => $canSubmit,
             'more_info' => $moreInfo,
             'expected_order_id' => $currentOrderId,
+            'expected_amount' => $currentOrder instanceof WC_Order ? round((float) $currentOrder->get_total('edit'), 2) : 0,
+            'page_amount' => $payloadAmount,
+            'amount_matches' => $amountMatches,
             'update_verified' => $verified,
         ));
     }
@@ -1007,7 +1013,12 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 $hostedPayloadArr = is_array($decodedPayload) ? $decodedPayload : [];
             }
             $payloadMoreInfo = isset($hostedPayloadArr['more_info']) ? $hostedPayloadArr['more_info'] : '';
-            if (absint($verifiedOrderId) !== absint($order_id) || !WC_PayPlus_Statics::more_info_matches_order($payloadMoreInfo, $order_id)) {
+            $payloadAmount = isset($hostedPayloadArr['amount']) ? $hostedPayloadArr['amount'] : '';
+            if (
+                absint($verifiedOrderId) !== absint($order_id)
+                || !WC_PayPlus_Statics::more_info_matches_order($payloadMoreInfo, $order_id)
+                || !WC_PayPlus_Statics::hosted_amount_matches_order($payloadAmount, $order)
+            ) {
                 $payplus_instance = WC_PayPlus::get_instance();
                 $mainGateway = $payplus_instance->get_main_payplus_gateway();
                 if ($mainGateway) {
