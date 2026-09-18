@@ -86,6 +86,14 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
+== 8.2.6  - 18-09-2026 =
+
+- Security  - Fixed CVSS 6.5 Broken Access Control vulnerability: merchant PayPlus API secret key is no longer exposed in WooCommerce Blocks frontend payment data or Store API checkout response. (Reported by mamgad via Patchstack)
+- Security  - Unauthenticated webhook endpoint now requires manage_woocommerce capability after HMAC verification, preventing gateway settings manipulation via leaked credentials.
+- Security  - Callback hash comparison changed from === to hash_equals() for constant-time verification, preventing timing attacks.
+- Security  - Debug endpoint callback_response_hash now requires manage_woocommerce capability (only active when WP_DEBUG_LOG is enabled).
+- Fix       - Blocks support class now correctly selects dev_secret_key in sandbox mode instead of always using live production secret.
+
 == 8.2.5  - 14-09-2026 =
 
 - Fix       - Hosted Fields (PayPlus Embedded): no longer uses a generic customer or the wrong order id.
