@@ -81,7 +81,9 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         );
         $this->isAutoPPCC = boolval(isset($this->settings['auto_load_payplus_cc_method']) && $this->settings['auto_load_payplus_cc_method'] === 'yes');
         $this->customIcons = array_values(WC_PayPlus_Statics::getCardsLogos());
-        $this->secretKey = $this->settings['secret_key'] ?? null;
+        // SECURITY FIX: respect test_mode (sandbox) and select dev_secret_key when in test mode, not always live secret
+        $testMode = isset($this->payPlusSettings['api_test_mode']) && $this->payPlusSettings['api_test_mode'] === 'yes';
+        $this->secretKey = $testMode ? ($this->payPlusSettings['dev_secret_key'] ?? null) : ($this->payPlusSettings['secret_key'] ?? null);
 
         // PayPlus gateway IDs from known list (options-level), not by booting all WC gateways.
         $this->settings['gateways'] = [
@@ -590,7 +592,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
 
             $payment_details = $result->payment_details;
             $payment_details['order_id'] = $this->orderId;
-            $payment_details['secret_key'] = $this->secretKey;
+            // REMOVED secret_key - SECURITY FIX: never publish the shared HMAC secret to the frontend
             $result->set_payment_details($payment_details);
             $result->set_status('pending');
         } else {
@@ -685,7 +687,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             $payment_details = $result->payment_details;
             $payment_details['order_id']            = $this->orderId;
             $payment_details['order_key']           = $order->get_order_key();
-            $payment_details['secret_key']          = $this->secretKey;
+            // REMOVED secret_key - SECURITY FIX: never publish the shared HMAC secret to the frontend
             $payment_details['order_received_url']  = $order->get_checkout_order_received_url();
             $payment_details['payplus_iframe_async'] = true;
 
@@ -854,7 +856,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
             'supports' => $supports,
             'showSaveOption' => (($this->settings['create_pp_token'] ?? ($this->payPlusSettings['create_pp_token'] ?? '')) == 'yes') ? true : false,
             'hasSavedTokens' => WC_Payment_Tokens::get_customer_tokens(get_current_user_id()),
-            'secretKey' => $this->secretKey,
+            // REMOVED secretKey - SECURITY FIX: never publish the shared HMAC secret to the frontend
             'hideOtherPayments' => $this->hideOtherPayments,
             'hideMainPayPlusGateway' => $this->hideMainPayPlusGateway,
             'hostedFieldsIsMain' => (isset($this->hostedFieldsSettings['enabled']) && $this->hostedFieldsSettings['enabled'] === 'yes' && isset($this->hostedFieldsSettings['hosted_fields_is_main']) && $this->hostedFieldsSettings['hosted_fields_is_main'] === 'yes'),
@@ -875,7 +877,7 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
                 'displayMode' => $this->displayMode !== 'default' ? $this->displayMode : $this->payPlusSettings['display_mode'],
                 'iFrameHeight' => $this->iFrameHeight . 'px',
                 'iFrameWidth' => $this->iFrameWidth,
-                'secretKey' => $this->secretKey,
+                // REMOVED secretKey - SECURITY FIX: never publish the shared HMAC secret to the frontend
                 'hideOtherPayments' => $this->hideOtherPayments,
             ],
             'gateways' => $this->settings['gateways'],

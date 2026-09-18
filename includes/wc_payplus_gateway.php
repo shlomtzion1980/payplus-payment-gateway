@@ -835,6 +835,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             exit;
         }
 
+        // SECURITY FIX: HMAC alone is not enough because the secret was published to the frontend.
+        // Require manage_woocommerce capability for browser-originated requests.
+        if (!current_user_can('manage_woocommerce')) {
+            $message = "Webhook received for $methodType with action: {$postData['action']} but user lacks manage_woocommerce capability.";
+            wp_send_json_error($message, 403);
+            exit;
+        }
+
         if (json_last_error() === JSON_ERROR_NONE) {
             // Handle the data...
             $methodOptions = get_option(sanitize_text_field($methodsOptions[$methodType]));
@@ -3345,6 +3353,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      */
     public function callback_response_hash()
     {
+        // SECURITY FIX: this is a signing oracle - require manage_woocommerce capability
+        if (!current_user_can('manage_woocommerce')) {
+            wp_die('Forbidden', '', array('response' => 403));
+        }
         $json = file_get_contents('php://input');
         $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
         die(esc_html($payplusGenHash));

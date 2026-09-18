@@ -4,7 +4,7 @@
  * Plugin Name: PayPlus Payment Gateway
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
- * Version: 8.2.5
+ * Version: 8.2.6
  * Tested up to: 7.1
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
@@ -19,8 +19,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '8.2.5');
-define('PAYPLUS_VERSION_DB', 'payplus_8_2_5');
+define('PAYPLUS_VERSION', '8.2.6');
+define('PAYPLUS_VERSION_DB', 'payplus_8_2_6');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
 {
@@ -2581,7 +2581,8 @@ body{
                 $payplusHash = isset($_SERVER['HTTP_HASH']) ? sanitize_text_field($_SERVER['HTTP_HASH']) : ""; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash
                 $payplusGenHash = base64_encode(hash_hmac('sha256', $json, $this->secret_key, true));
 
-                if ($payplusGenHash === $payplusHash) {
+                // SECURITY FIX: use constant-time comparison to prevent timing attacks
+                if (hash_equals($payplusGenHash, $payplusHash)) {
                     $this->payplus_gateway = $this->get_main_payplus_gateway();
                     $order_id = WC_PayPlus_Statics::order_id_from_more_info(
                         isset($response['transaction']['more_info']) ? $response['transaction']['more_info'] : ''
