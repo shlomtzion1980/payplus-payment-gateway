@@ -613,7 +613,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $status = "";
                     $skipAdminStatus = false;
                     $adminStatusLocked = false;
-                    if ($this->preventDuplicatePaymentComplete) {
+                    // Hosted Fields is completed by the browser and by the PayPlus callback together.
+                    // Other methods keep the optional duplicate setting only.
+                    $hostedFieldsOrder = $isHostedPayment
+                        || ($order && $order->get_payment_method() === 'payplus-payment-gateway-hostedfields');
+                    if ($this->preventDuplicatePaymentComplete || $hostedFieldsOrder) {
                         $adminStatusLocked = $this->acquireOrderStatusLock($order_id);
                         if (!$adminStatusLocked) {
                             $skipAdminStatus = true;

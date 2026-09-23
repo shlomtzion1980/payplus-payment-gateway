@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 8.2.8  - 23-09-2026 =
 
 - Fix       - Invoice+: the payment callback (payplusIpn) no longer creates a document when Invoice Creation Mode is Manual. Automatic callers cannot issue a document in Manual mode; the order-page create action still can.
+- Fix       - Hosted Fields: Payment complete, New order, and Processing order emails are sent once. The browser completion and the PayPlus callback no longer both mark the order paid. Other payment methods are unchanged.
 
 == 8.2.7  - 23-09-2026 =
 

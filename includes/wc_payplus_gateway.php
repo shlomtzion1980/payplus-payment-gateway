@@ -3770,8 +3770,10 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $type = $res->data->type;
         }
 
+        // Hosted Fields callback races the browser completion. Other methods lock only when the setting is on.
         $statusLocked = false;
-        if ($this->preventDuplicatePaymentComplete) {
+        $hostedFieldsOrder = $order->get_payment_method() === 'payplus-payment-gateway-hostedfields';
+        if ($this->preventDuplicatePaymentComplete || $hostedFieldsOrder) {
             $statusLocked = $this->acquireOrderStatusLock($order_id);
             if (!$statusLocked) {
                 $this->payplus_add_log_all(

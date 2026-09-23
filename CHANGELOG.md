@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [8.2.8]  - 09-23-2026 - (Bomber)
 
 - Fix       - Invoice+: the payment callback (`payplusIpn`) no longer creates a document when Invoice Creation Mode is Manual. `payplus_invoice_create_order()` now refuses every automatic caller in Manual mode. The admin create-document action still issues the document.
+- Fix       - Hosted Fields: the browser completion and the PayPlus callback no longer both call payment_complete(). The second path skips once the order is already paid, so "Payment complete", "New order", and "Processing order" are sent once. Other payment methods are unchanged.
 
 ## [8.2.7]  - 09-23-2026 - (Bomber)
 

@@ -898,26 +898,35 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 $status_code = $payPlusResponse['status_code'];
                 $transactionType = $payPlusResponse['type'];
                 $transactionUid = $payPlusResponse['transaction_uid'];
-                $isDone = $order->get_status() === "processing" ? " - Done. \n" : " - Not done. \n";
-                $this->payplus_add_log_all('hosted-fields-data', "Order ($order_id) status: " . $order->get_status() . $isDone . "\n");
-                if (str_replace("wc-", "", $this->successful_order_status) !== str_replace("wc-", "", $order->get_status())) {
-                    if ($status_code === "000") {
-                        if ($transactionType == "Charge") {
-                            if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                                // WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment_ajax->firePaymentComplete', $transactionUid);
-                                $order->payment_complete();
-                                // $this->payplus_add_log_all('hosted-fields-data', 'process_payment_ajax->firePaymentComplete');
+                $statusLocked = $this->acquireOrderStatusLock($order_id);
+                try {
+                    if ($statusLocked) {
+                        $order = wc_get_order($order_id);
+                    }
+                    $isDone = ($order && $order->get_status() === "processing") ? " - Done. \n" : " - Not done. \n";
+                    $this->payplus_add_log_all('hosted-fields-data', "Order ($order_id) status: " . ($order ? $order->get_status() : 'missing') . $isDone . "\n");
+                    if (
+                        $statusLocked
+                        && $order
+                        && !$this->orderAlreadyPaidOrComplete($order)
+                        && str_replace("wc-", "", $this->successful_order_status) !== str_replace("wc-", "", $order->get_status())
+                    ) {
+                        if ($status_code === "000") {
+                            if ($transactionType == "Charge") {
+                                if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
+                                    $order->payment_complete();
+                                }
+                                if ($this->successful_order_status !== 'default-woo') {
+                                    $order->update_status($this->successful_order_status);
+                                }
+                            } else {
+                                $order->update_status('wc-on-hold');
                             }
-                            if ($this->successful_order_status !== 'default-woo') {
-                                // WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment_ajax->' . $this->successful_order_status, $transactionUid);
-                                $order->update_status($this->successful_order_status);
-                                // $this->payplus_add_log_all('hosted-fields-data', 'process_payment_ajax->' . $this->successful_order_status);
-                            }
-                        } else {
-                            // WC_PayPlus_Meta_Data::sendMoreInfo($order,  'process_payment_ajax->wc-on-hold', $transactionUid);
-                            $order->update_status('wc-on-hold');
-                            // $this->payplus_add_log_all('hosted-fields-data', 'process_payment_ajax->wc-on-hold');
                         }
+                    }
+                } finally {
+                    if ($statusLocked) {
+                        $this->releaseOrderStatusLock($order_id);
                     }
                 }
             }
