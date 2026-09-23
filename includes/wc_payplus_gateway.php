@@ -667,10 +667,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         } else {
                             if (!$reportOnly) {
                                 echo esc_html("Order #$order_id with forceinvoice ! - RUNNING invoice+ process!\n");
-                                $this->invoice_api->payplus_invoice_create_order($order_id);
+                                if (!$this->invoice_api->payplus_get_create_invoice_manual()) {
+                                    $this->invoice_api->payplus_invoice_create_order($order_id);
+                                }
                             } else {
                                 echo esc_html("Order #$order_id with forceinvoice & report only! - RUNNING invoice+ process ONLY!\n");
-                                $this->invoice_api->payplus_invoice_create_order($order_id);
+                                if (!$this->invoice_api->payplus_get_create_invoice_manual()) {
+                                    $this->invoice_api->payplus_invoice_create_order($order_id);
+                                }
                             }
                         }
                     }
@@ -4264,7 +4268,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $existingUid = (string) $order->get_meta('payplus_transaction_uid');
         if ($existingUid !== '' && ($incomingUid === '' || $existingUid === $incomingUid)) {
-            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
                 $this->invoice_api->payplus_invoice_create_order($order_id);
             }
             return;
@@ -4272,7 +4276,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $writeKey = 'payplus_update_meta_' . (int) $order_id;
         if (!WC_PayPlus_Meta_Data::claim_single_write($writeKey)) {
-            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
                 $this->invoice_api->payplus_invoice_create_order($order_id);
             }
             return;
@@ -4428,7 +4432,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
             // Status may already be processing from an earlier redirect, so the status
             // hook will not fire again. Create the invoice now that the real method exists.
-            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+            if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
                 $this->invoice_api->payplus_invoice_create_order($order_id);
             }
         } finally {

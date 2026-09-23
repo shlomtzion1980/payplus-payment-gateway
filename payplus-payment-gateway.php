@@ -4,7 +4,7 @@
  * Plugin Name: PayPlus Payment Gateway
  * Description: Accept credit/debit card payments or other methods such as bit, Apple Pay, Google Pay in one page. Create digitally signed invoices & much more.
  * Plugin URI: https://www.payplus.co.il/wordpress
- * Version: 8.2.6
+ * Version: 8.2.7
  * Tested up to: 7.1
  * Requires Plugins: woocommerce
  * Requires at least: 6.2
@@ -19,8 +19,8 @@ defined('ABSPATH') or die('Hey, You can\'t access this file!'); // Exit if acces
 define('PAYPLUS_PLUGIN_URL', plugins_url('/', __FILE__));
 define('PAYPLUS_PLUGIN_URL_ASSETS_IMAGES', PAYPLUS_PLUGIN_URL . "assets/images/");
 define('PAYPLUS_PLUGIN_DIR', dirname(__FILE__));
-define('PAYPLUS_VERSION', '8.2.6');
-define('PAYPLUS_VERSION_DB', 'payplus_8_2_6');
+define('PAYPLUS_VERSION', '8.2.7');
+define('PAYPLUS_VERSION_DB', 'payplus_8_2_7');
 define('PAYPLUS_TABLE_PROCESS', 'payplus_payment_process');
 class WC_PayPlus
 {
@@ -1090,7 +1090,7 @@ class WC_PayPlus
 
                 try {
                     // Create invoice using the invoice API
-                    if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable()) {
+                    if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
                         $this->invoice_api->payplus_invoice_create_order($order_id);
                         $order->add_order_note('PayPlus Invoice Runner: Invoice created automatically.');
                         $results['invoices_created']++;
