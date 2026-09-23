@@ -443,7 +443,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $createInvoice = isset($_POST['create_invoice']) && sanitize_text_field(wp_unslash($_POST['create_invoice']));
         if ($createInvoice) {
             $this->payplus_add_log_all('payplus-ipn', 'Creating invoice for order: ' . $order_id, 'default');
-            $this->payPlusInvoice->payplus_invoice_create_order($order_id);
+            $this->payPlusInvoice->payplus_invoice_create_order($order_id, false, false, true);
             return;
         }
 
@@ -598,7 +598,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 // Update meta on success, add order note on failure (but skip notes for status-only checks)
                 if ($responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000") {
                     WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
-                    if ($this->payPlusInvoice && $this->payPlusInvoice->payplus_get_invoice_enable()) {
+                    if (
+                        $this->payPlusInvoice
+                        && $this->payPlusInvoice->payplus_get_invoice_enable()
+                        && !$this->payPlusInvoice->payplus_get_create_invoice_manual()
+                    ) {
                         $this->payPlusInvoice->payplus_invoice_create_order($order_id);
                     }
                 }
@@ -977,7 +981,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 $this->payplus_add_payments($order_id, $payments);
             }
 
-            $this->payPlusInvoice->payplus_invoice_create_order($order_id, $type_document);
+            $this->payPlusInvoice->payplus_invoice_create_order($order_id, $type_document, false, true);
             echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
             wp_die();
         }

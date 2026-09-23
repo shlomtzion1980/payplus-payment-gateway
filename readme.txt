@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 8.2.7
+Stable tag: 8.2.8
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.2.8  - 23-09-2026 =
+
+- Fix       - Invoice+: the payment callback (payplusIpn) no longer creates a document when Invoice Creation Mode is Manual. Automatic callers cannot issue a document in Manual mode; the order-page create action still can.
 
 == 8.2.7  - 23-09-2026 =
 

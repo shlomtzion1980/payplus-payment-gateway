@@ -1300,8 +1300,14 @@ class PayplusInvoice
      * @param $order_id
      * @return void
      */
-    public function payplus_invoice_create_order($order_id, $typeInvoice = false, $isCashPayment = false)
+    public function payplus_invoice_create_order($order_id, $typeInvoice = false, $isCashPayment = false, $allowWhenManual = false)
     {
+        // Manual mode: only the admin "create document" action may issue a document.
+        // Callback, IPN, status hooks, and cron must not.
+        if ($this->payplus_get_create_invoice_manual() && !$allowWhenManual) {
+            return;
+        }
+
         $payload = array();
         $WC_PayPlus_Gateway = $this->get_main_payplus_gateway();
         $handle = 'payplus_process_invoice';
