@@ -451,6 +451,7 @@ Orders that were successful and cancelled manually will not be tested or updated
     'Brand' => 'חברה',
     'Issuer' => 'מנפיק',
     'Last Digits' => 'ספרות אחרונות',
+    'Account' => 'חשבון',
     'Expiry Date' => 'תאריך תפוגה',
     'Voucher #' => 'מס ואוצ\'ר',
     'Approval #' => 'מספר אישור',

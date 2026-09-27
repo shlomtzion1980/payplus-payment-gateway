@@ -2917,6 +2917,9 @@ msgstr "מנפיק"
 msgid "Last Digits"
 msgstr "ספרות אחרונות"
 
+msgid "Account"
+msgstr "חשבון"
+
 #: includes/class-wc-payplus-statics.php:409
 msgid "Expiry Date"
 msgstr "תאריך תפוגה"

@@ -1792,6 +1792,9 @@ class PayplusInvoice
                 $resultApp = $resultApps[$i];
                 $create_at = property_exists($resultApp, 'create_at') ? $resultApp->create_at : null;
                 $resultApp->method_payment = strtolower((string) $resultApp->method_payment);
+                if ($resultApp->method_payment === 'wire-transfers') {
+                    $resultApp->method_payment = 'bank-transfer';
+                }
                 $paymentType = 'payment-app';
                 $typePayment = array();
                 if (in_array($resultApp->method_payment, array('credit-card', 'paypal', 'other', 'cash', 'payment-check', 'bank-transfer', 'withholding-tax', 'wire-transfers'))) {
@@ -1841,6 +1844,24 @@ class PayplusInvoice
                     $typePayment['bank_number'] = $resultApp->bank_number;
                     if ($paymentType == 'payment-check') {
                         $typePayment['check_number'] = $resultApp->check_number;
+                    }
+                }
+                if ($paymentType == "bank-transfer" && empty($typePayment['description'])) {
+                    $bankAccount = '';
+                    $rawDigits = trim((string) ($resultApp->four_digits ?? ''));
+                    if ($rawDigits === '' && !empty($resultApp->payplus_response)) {
+                        $savedIpn = json_decode($resultApp->payplus_response, true);
+                        if (is_array($savedIpn)) {
+                            $rawDigits = trim((string) ($savedIpn['four_digits'] ?? ($savedIpn['extra_3'] ?? '')));
+                        }
+                    }
+                    if ($rawDigits !== '' && !preg_match('/^\d{3,4}$/', $rawDigits)) {
+                        $bankAccount = $rawDigits;
+                    } elseif (!empty($resultApp->account_number)) {
+                        $bankAccount = (string) $resultApp->account_number;
+                    }
+                    if ($bankAccount !== '') {
+                        $typePayment['description'] = $bankAccount;
                     }
                 }
                 if (!empty($create_at)) {
