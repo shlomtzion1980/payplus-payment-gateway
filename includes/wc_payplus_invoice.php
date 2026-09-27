@@ -1254,7 +1254,7 @@ class PayplusInvoice
             'method_payment' => $method_payment,
             'price' => $price,
         ];
-        if ($method_payment === 'credit-card' || in_array($method_payment, $this->payment_method_club, true)) {
+        if ($method_payment === 'credit-card' || $method_payment === 'wire-transfers' || in_array($method_payment, $this->payment_method_club, true)) {
             $paymentArray['four_digits'] = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_four_digits', true);
         }
         if ($method_payment === 'credit-card') {
