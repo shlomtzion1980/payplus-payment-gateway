@@ -1369,15 +1369,42 @@ class WC_PayPlus
      */
     public function ipn_response()
     {
+        // Payment page "POST" return mode (redirect / iframe / popup): the fields arrive in the body.
+        $isPostReturn = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' && !(isset($_GET['hostedFields']) && $_GET['hostedFields'] === "true"); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- gateway return URL; payment is confirmed server-side via PayPlus IPN
+        if ($isPostReturn) {
+            $postBody = $_POST; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified below / via PayPlus IPN
+            if (empty($postBody)) {
+                $rawBody = file_get_contents('php://input');
+                if (!empty($rawBody)) {
+                    $postBody = json_decode($rawBody, true);
+                    if (!is_array($postBody)) {
+                        $postBody = [];
+                        parse_str($rawBody, $postBody);
+                    }
+                }
+            }
+            if (is_array($postBody) && !isset($postBody['more_info']) && isset($postBody['data']) && is_array($postBody['data'])) {
+                $postBody = array_merge($postBody, $postBody['data']);
+            }
+            if (is_array($postBody) && !empty($postBody)) {
+                $_REQUEST = array_merge($_REQUEST, $postBody); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- gateway return URL; payment is confirmed server-side via PayPlus IPN
+            }
+        }
+
         $nonce = isset($_REQUEST['_wpnonce']) ? sanitize_text_field(wp_unslash($_REQUEST['_wpnonce'])) : '';
         if (!wp_verify_nonce($nonce, 'payload_link')) {
             $order_id = WC_PayPlus_Statics::order_id_from_more_info(
                 isset($_REQUEST['more_info']) ? sanitize_text_field(wp_unslash($_REQUEST['more_info'])) : ''
             );
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- nonce cannot survive a cross-site POST; payment is confirmed server-side via PayPlus IPN
+            if (!$order_id && $isPostReturn && isset($_GET['success_order_id'])) {
+                $order_id = absint($_GET['success_order_id']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            }
             if ($order_id) {
                 //failed nonce check, will be redirected to regular thank you page with ipn
                 $order = wc_get_order($order_id);
-                $this->updateStatusesIpn ? $this->checkRunIpnResponse($order_id, $order, 1) : null;
+                // POST returns never carry the session cookie, so the nonce always fails — confirm with PayPlus IPN.
+                ($this->updateStatusesIpn || ($isPostReturn && $order)) ? $this->checkRunIpnResponse($order_id, $order, 1) : null;
                 if (WC()->cart) {
                     WC()->cart->empty_cart();
                 }
@@ -1386,6 +1413,9 @@ class WC_PayPlus
                 }
                 $this->payplus_clear_pw_gift_cards_session_data();
                 $redirect_to = add_query_arg('order-received', $order_id, get_permalink(wc_get_page_id('checkout')));
+                if ($isPostReturn && $order) {
+                    $redirect_to = $this->get_main_payplus_gateway()->get_return_url($order);
+                }
                 $this->payplus_redirect_graceful($redirect_to);
             } else {
                 // no order id
