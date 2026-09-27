@@ -4236,6 +4236,15 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                     if ($alternative_method_name == 'valuecard' || $alternative_method_name == 'finitione') {
                         $insertMeta['payplus_four_digits_' . $alternative_method_name] = $relatedTransactionsOther->four_digits;
                     }
+                } elseif (
+                    $alternative_method_name == "wire-transfers"
+                    || (!empty($relatedTransactionsOther->alternative_method) && isset($relatedTransactionsOther->method) && $relatedTransactionsOther->method == "bank")
+                ) {
+                    if (!isset($tempArrrelatedTransactions['wire-transfers'])) {
+                        $tempArrrelatedTransactions['wire-transfers'] = floatval($relatedTransactionsOther->amount);
+                    } else {
+                        $tempArrrelatedTransactions['wire-transfers'] += floatval($relatedTransactionsOther->amount);
+                    }
                 } else {
                     $tempArrrelatedTransactions['credit-card'] = floatval($relatedTransactionsOther->amount);
                     $insertMeta['payplus_four_digits'] = $relatedTransactionsOther->four_digits;
@@ -4334,6 +4343,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $method = (isset($response['method'])) ? $response['method'] : 'credit-card';
                 if (!empty($response['alternative_method_name'])) {
                     if (
+                        $response['alternative_method_name'] == "wire-transfers"
+                        || (!empty($response['alternative_method']) && isset($response['method']) && $response['method'] == "bank")
+                    ) {
+                        $method = "wire-transfers";
+                    } elseif (
                         $response['alternative_method_name'] == "bit"
                         || $response['alternative_method_name'] == "multipass" ||
                         $response['alternative_method_name'] == "paypal" ||

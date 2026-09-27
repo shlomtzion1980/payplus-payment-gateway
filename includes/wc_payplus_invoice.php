@@ -99,7 +99,7 @@ class PayplusInvoice
 
         $this->logging = true;
 
-        $this->payment_method = array('credit-card', 'bit', 'apple-pay', 'google-pay', 'paypal');
+        $this->payment_method = array('credit-card', 'bit', 'apple-pay', 'google-pay', 'paypal', 'wire-transfers');
         $this->payment_method_club = array('multipass', 'valuecard', 'tav-zahav', 'finitione');
         $this->url_payplus_create_invoice .= $this->payplus_api_url . "books/docs/new/";
         $this->url_payplus_get_invoice .= $this->payplus_api_url . "books/docs/getBy/unique_identifier/";
