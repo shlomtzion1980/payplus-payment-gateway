@@ -4393,53 +4393,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $insertMeta['payplus_refunded'] = $order->get_total();
             $insertMeta['payplus_response'] = wp_json_encode($response, true);
 
-            // Update WooCommerce payment method if it differs from what was actually used
-            // Only for single payment methods (not multiple/split payments)
-            if (empty($response['related_transactions']) && isset($method)) {
-                $current_payment_method = $order->get_payment_method();
-
-                // Determine the actual payment method used
-                // Priority: alternative_method_name > method
-                $actual_method = $method; // Default to 'method' field (e.g., 'credit-card')
-
-                // If alternative_method_name exists, use it (e.g., 'google-pay', 'apple-pay', 'bit', etc.)
-                if (!empty($response['alternative_method_name'])) {
-                    $actual_method = $response['alternative_method_name'];
-                }
-
-                $payplus_method_map = [
-                    'credit-card' => 'payplus-payment-gateway',
-                    'bit' => 'payplus-payment-gateway-bit',
-                    'multipass' => 'payplus-payment-gateway-multipass',
-                    'paypal' => 'payplus-payment-gateway-paypal',
-                    'tav-zahav' => 'payplus-payment-gateway-tavzahav',
-                    'valuecard' => 'payplus-payment-gateway-valuecard',
-                    'google-pay' => 'payplus-payment-gateway-googlepay',
-                    'apple-pay' => 'payplus-payment-gateway-applepay',
-                ];
-
-                // Get the payment method ID that should be used based on actual payment method
-                $expected_payment_method = isset($payplus_method_map[$actual_method]) ? $payplus_method_map[$actual_method] : 'payplus-payment-gateway';
-
-                // If the current payment method doesn't match what was actually used, update it
-                // Set on object but do NOT save yet — meta must be stored first to avoid
-                // hooks (e.g. automatic invoice creation) running before payment data exists.
-                if ($current_payment_method !== $expected_payment_method) {
-                    $order->set_payment_method($expected_payment_method);
-                    $order->set_payment_method_title($this->get_payment_method_title($expected_payment_method));
-
-                    $old_title = $this->get_payment_method_title($current_payment_method);
-                    $new_title = $this->get_payment_method_title($expected_payment_method);
-                    $order->add_order_note(
-                        sprintf(
-                            // Translators: %1$s is the old payment method title, %2$s is the new payment method title, %3$s is the actual payment method identifier.
-                            __('Payment method updated from %1$s to %2$s based on actual payment method used (%3$s)', 'payplus-payment-gateway'),
-                            $old_title,
-                            $new_title,
-                            $actual_method
-                        )
-                    );
-                }
+            if (isset($method)) {
+                $this->payplus_sync_order_payment_method($order, $response, $method);
             }
 
             // Store all meta first (update_meta already saves). A second $order->save()
@@ -4453,6 +4408,72 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
         } finally {
             WC_PayPlus_Meta_Data::release_single_write($writeKey);
+        }
+    }
+
+    /**
+     * Update the WooCommerce payment method if it differs from what was actually used.
+     * Only for single payment methods (not multiple/split payments).
+     * Sets on the object but does NOT save — the caller's meta update saves it, so hooks
+     * (e.g. automatic invoice creation) do not run before payment data exists.
+     *
+     * @param WC_Order $order
+     * @param array $response
+     * @param string $method
+     * @return void
+     */
+    public function payplus_sync_order_payment_method($order, $response, $method)
+    {
+        if (!$order || !empty($response['related_transactions'])) {
+            return;
+        }
+        $current_payment_method = $order->get_payment_method();
+
+        // Priority: alternative_method_name > method
+        $actual_method = $method;
+        if (!empty($response['alternative_method_name'])) {
+            $actual_method = $response['alternative_method_name'];
+        }
+
+        $payplus_method_map = [
+            'credit-card' => 'payplus-payment-gateway',
+            'bit' => 'payplus-payment-gateway-bit',
+            'multipass' => 'payplus-payment-gateway-multipass',
+            'paypal' => 'payplus-payment-gateway-paypal',
+            'tav-zahav' => 'payplus-payment-gateway-tavzahav',
+            'valuecard' => 'payplus-payment-gateway-valuecard',
+            'google-pay' => 'payplus-payment-gateway-googlepay',
+            'apple-pay' => 'payplus-payment-gateway-applepay',
+            'wire-transfers' => 'payplus-payment-gateway-wire-transfers',
+        ];
+
+        $expected_payment_method = isset($payplus_method_map[$actual_method]) ? $payplus_method_map[$actual_method] : 'payplus-payment-gateway';
+        $expected_title = $this->get_payment_method_title($expected_payment_method);
+
+        // Same gateway ID but the title of another PayPlus gateway (checkout re-submitted with a different method).
+        $staleTitle = false;
+        if ($current_payment_method === $expected_payment_method) {
+            foreach ($payplus_method_map as $gatewayId) {
+                if ($gatewayId !== $expected_payment_method && $order->get_payment_method_title() === $this->get_payment_method_title($gatewayId)) {
+                    $staleTitle = true;
+                    break;
+                }
+            }
+        }
+
+        if ($current_payment_method !== $expected_payment_method || $staleTitle) {
+            $old_title = $order->get_payment_method_title() ?: $this->get_payment_method_title($current_payment_method);
+            $order->set_payment_method($expected_payment_method);
+            $order->set_payment_method_title($expected_title);
+            $order->add_order_note(
+                sprintf(
+                    // Translators: %1$s is the old payment method title, %2$s is the new payment method title, %3$s is the actual payment method identifier.
+                    __('Payment method updated from %1$s to %2$s based on actual payment method used (%3$s)', 'payplus-payment-gateway'),
+                    $old_title,
+                    $expected_title,
+                    $actual_method
+                )
+            );
         }
     }
 

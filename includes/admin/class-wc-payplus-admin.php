@@ -597,6 +597,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
                 // Update meta on success, add order note on failure (but skip notes for status-only checks)
                 if ($responseBody['data']['status'] === "approved" && $responseBody['data']['status_code'] === "000") {
+                    $this->payplus_sync_order_payment_method($order, $responseBody['data'], $method_key);
                     WC_PayPlus_Meta_Data::update_meta($order, $responseArray);
                     if (
                         $this->payPlusInvoice
