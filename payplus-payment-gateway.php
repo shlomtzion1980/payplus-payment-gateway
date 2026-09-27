@@ -1051,6 +1051,7 @@ class WC_PayPlus
 
             // Check if order uses PayPlus payment method
             $payment_method = $order->get_payment_method();
+            $doNotCreateMethod = in_array($payment_method, ['ppcp-gateway', 'ppcp-credit-card-gateway', 'ppec_paypal', 'payplus-payment-gateway-paypal'], true) ? 'paypal' : $payment_method;
 
             // Process all orders regardless of payment method
             $payPlusInvoiceOptions = get_option('payplus_invoice_option');
@@ -1058,7 +1059,7 @@ class WC_PayPlus
             if (
                 isset($payPlusInvoiceOptions['do-not-create']) &&
                 is_array($payPlusInvoiceOptions['do-not-create']) &&
-                in_array($payment_method, $payPlusInvoiceOptions['do-not-create'])
+                in_array($doNotCreateMethod, $payPlusInvoiceOptions['do-not-create'])
             ) {
 
                 $this->payplus_gateway->payplus_add_log_all('payplus-invoice-runner-log', "$order_id: Payment method '$payment_method' is in do-not-create list - skipping invoice creation.\n");
