@@ -914,10 +914,12 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                         if ($status_code === "000") {
                             if ($transactionType == "Charge") {
                                 if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                                    $order->payment_complete();
+                                    $this->payplusPaymentComplete($order, 'hosted fields completion (complete_order_via_ajax)');
                                 }
                                 if ($this->successful_order_status !== 'default-woo') {
+                                    $statusBefore = $order->get_status();
                                     $order->update_status($this->successful_order_status);
+                                    $this->payplusEnsurePaymentCompleteHook($order, 'hosted fields completion (complete_order_via_ajax)', $statusBefore);
                                 }
                             } else {
                                 $order->update_status('wc-on-hold');

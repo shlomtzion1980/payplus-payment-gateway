@@ -626,6 +626,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             $order = wc_get_order($order_id);
                             if ($this->orderAlreadyPaidOrComplete($order)) {
                                 $skipAdminStatus = true;
+                                $this->payplusLogPaymentCompleteSkipped($order, $isCron ? 'payplusIpn (cron)' : 'payplusIpn');
                             }
                         }
                     }
@@ -639,7 +640,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         if ($responseBody['data']['type'] === 'Charge') {
                             if ($isCron && $this->fire_completed) {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete(cron)', $transactionUid);
-                                $order->payment_complete();
+                                $this->payplusPaymentComplete($order, 'payplusIpn (cron)');
                                 $order = wc_get_order($order->get_id());
                                 if ($this->successful_order_status !== 'default-woo' && $order->get_status() != $this->successful_order_status) {
                                     WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->' . $this->successful_order_status, $transactionUid);
@@ -647,10 +648,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                                 }
                             } elseif ($this->fire_completed && $this->successful_order_status === 'default-woo') {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->firePaymentComplete', $transactionUid);
-                                $order->payment_complete();
+                                $this->payplusPaymentComplete($order, 'payplusIpn');
                             } elseif ($this->successful_order_status !== 'default-woo') {
                                 WC_PayPlus_Meta_Data::sendMoreInfo($order, 'process_payment->' . $this->successful_order_status, $transactionUid);
+                                $statusBefore = $order->get_status();
                                 $order->update_status($this->successful_order_status);
+                                $this->payplusEnsurePaymentCompleteHook($order, 'payplusIpn', $statusBefore);
                             }
                         } elseif ($responseBody['data']['type'] === 'Approval') {
                             WC_PayPlus_Meta_Data::sendMoreInfo($order, 'wc-on-hold', $transactionUid);
@@ -1293,7 +1296,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                             'payplus_brand_name' => $res->data->data->card_information->brand_name,
                             'payplus_type' => $type,
                         ]);
-                        $this->updateOrderStatus($order_id, $type, $res = null);
+                        $this->updateOrderStatus($order_id, $type, $res = null, 'POS EMV device transaction');
                         if ($isPosAction) {
                             return "success";
                         }
@@ -1379,13 +1382,13 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
                 if (isset($res->data->recurring_type)) {
                     if ($this->recurring_order_set_to_paid == 'yes') {
-                        $order->payment_complete();
+                        $this->payplusPaymentComplete($order, 'admin payment check (recurring)');
                     }
                     $order->update_status('wc-recsubc');
                 } else {
                     if ($type == "Charge") {
                         if ($this->fire_completed) {
-                            $order->payment_complete();
+                            $this->payplusPaymentComplete($order, 'admin payment check (ajax_payplus_payment_api)');
                         }
                         if ($this->successful_order_status !== 'default-woo') {
                             $order->update_status($this->successful_order_status);
@@ -2606,7 +2609,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $order->add_order_note(sprintf('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
                     WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
                     $_POST['order_status'] = $order->needs_processing() ? 'wc-processing' : 'wc-completed';
-                    $order->payment_complete();
+                    $this->payplusPaymentComplete($order, 'admin token charge (ajax_payplus_token_payment)');
 
                     echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => true));
                     wp_die();
@@ -2893,7 +2896,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
             $order->add_order_note(sprintf('PayPlus Charge is Successful<br />Charge Transaction Number: %s<br />Amount: %s %s', $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency()));
             $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
-            $order->payment_complete();
+            $this->payplusPaymentComplete($order, 'admin charge of approval (process_make_payment)');
         } else {
             $order->add_order_note(sprintf('PayPlus Charge is Failed<br />Status: %s<br />Description: %s', $res->results->status, $res->results->description));
             $this->payplus_add_log_all($handle, wp_json_encode($res), 'error');
