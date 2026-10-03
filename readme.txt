@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 8.2.8
+Stable tag: 8.2.9
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,15 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.2.9  - 28-09-2026 =
+
+- Fix       - The woocommerce_payment_complete hook is now sent on every PayPlus success path (return URL, POST return, double-check, Hosted Fields, saved card) when "Payment Completed" is on, including orders where the customer returned before the callback. Status changes and emails are unchanged; the hook is sent once per order.
+- Tweak     - New payplus_payment_complete log showing which process sent woocommerce_payment_complete, or why it was not sent.
+- Feature   - Payment page "POST" return mode (redirect, iframe, popup) is now supported: the order is confirmed with PayPlus and updated the same as GET.
+- Fix       - The order payment method updates to the method actually used on the payment page (e.g. opened as bit, paid by credit card).
+- Fix       - Invoice+: wire / bank transfers are documented as bank transfer with the account number; the order metabox shows "Account" for bank transfers.
+- Fix       - Invoice+: PayPal orders are no longer blocked by the PayPlus Authorization setting and are matched by the "do not create" list.
 
 == 8.2.8  - 23-09-2026 =
 
