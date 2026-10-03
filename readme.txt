@@ -88,6 +88,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == 8.2.9  - 28-09-2026 =
 
+- Security  - Fixed critical payment bypass: a forged request to the payment return URL could mark an unpaid order as Processing. Orders are now updated only after PayPlus confirms the transaction server-side, the return must match a payment page created for that order, and a transaction of one order can no longer be used to mark another order paid. (Reported by VF Israel / VFC security scan)
+
 - Fix       - The woocommerce_payment_complete hook is now sent on every PayPlus success path (return URL, POST return, double-check, Hosted Fields, saved card) when "Payment Completed" is on, including orders where the customer returned before the callback. Status changes and emails are unchanged; the hook is sent once per order.
 - Tweak     - New payplus_payment_complete log showing which process sent woocommerce_payment_complete, or why it was not sent.
 - Feature   - Payment page "POST" return mode (redirect, iframe, popup) is now supported: the order is confirmed with PayPlus and updated the same as GET.

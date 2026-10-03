@@ -3605,49 +3605,17 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->payplus_add_log_all($handle, 'New  ipn  Fired (' . $order_id . ')');
         $this->payplus_add_log_all($handle, 'Result: ' . wp_json_encode($data));
 
-        // Original validateOrder status transitions (unchanged), with normalized status_code.
-        $applyValidateStatus = true;
-        $validateStatusLocked = false;
-        if ($this->preventDuplicatePaymentComplete) {
-            $validateStatusLocked = $this->acquireOrderStatusLock($order_id);
-            if (!$validateStatusLocked) {
-                $this->payplus_add_log_all($handle, "Order #{$order_id} validateOrder status skipped (duplicate-payment lock not acquired)");
-                $applyValidateStatus = false;
-            } else {
-                $order = wc_get_order($order_id);
-                if ($this->orderAlreadyPaidOrComplete($order)) {
-                    $this->payplus_add_log_all($handle, "Order #{$order_id} validateOrder status skipped (already paid / status={$order->get_status()})");
-                    $applyValidateStatus = false;
-                }
-            }
-        }
-        if ($applyValidateStatus) {
-            if ($data['type'] === 'Approval' && $this->isApprovedStatusCode($data['status_code'])) {
-                $order->update_status('wc-on-hold');
-            } elseif ($data['type'] === 'Charge' && $this->isApprovedStatusCode($data['status_code'])) {
-                if ($this->fire_completed && $this->successful_order_status === 'default-woo') {
-                    $this->payplusPaymentComplete($order, 'return URL (validateOrder)');
-                } elseif ($this->successful_order_status !== 'default-woo') {
-                    $statusBefore = $order->get_status();
-                    $order->update_status($this->successful_order_status);
-                    $this->payplusEnsurePaymentCompleteHook($order, 'return URL (validateOrder)', $statusBefore);
-                }
-            }
-        } elseif ($order && $this->orderAlreadyPaidOrComplete($order)) {
-            $this->payplusLogPaymentCompleteSkipped($order, 'return URL (validateOrder)');
-        }
-        if ($validateStatusLocked) {
-            $this->releaseOrderStatusLock($order_id);
+        // Return-URL fields (type, status_code, uids) are user-controlled and are never trusted:
+        // the status is set only by requestPayPlusIpn() -> updateOrderStatus() after PayPlus confirms
+        // the transaction server-side, and only a payment page this order created may be checked.
+        $orderPageRequestUids = array_column(WC_PayPlus_Meta_Data::get_pruid_history($order_id), 'uid');
+        if (empty($page_request_uid) || !in_array($page_request_uid, $orderPageRequestUids, true)) {
+            $this->payplus_add_log_all($handle, "Order #{$order_id} return URL ignored: page_request_uid " . sanitize_text_field((string) $page_request_uid) . ' was not created for this order. Left to the PayPlus callback / IPN check.', 'error');
+            return $order;
         }
 
         $payload = [];
-        if (!empty($page_request_uid)) {
-            $payload['payment_request_uid'] = $page_request_uid;
-        } elseif (!empty($transaction_uid)) {
-            $payload['transaction_uid'] = $transaction_uid;
-        } else {
-            $payload['more_info'] = $order_id;
-        }
+        $payload['payment_request_uid'] = $page_request_uid;
         $payload['related_transaction'] = true;
 
         $payload = wp_json_encode($payload);
@@ -4136,8 +4104,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                         $order->add_order_note(sprintf(__('PayPlus IPN Failed<br/>Transaction UID: %s', 'payplus-payment-gateway'), $transaction_uid));
                         break;
                     } else {
+                        $resMoreInfo = isset($res->data->more_info) ? $res->data->more_info : '';
+                        if ($resMoreInfo !== '' && !WC_PayPlus_Statics::more_info_matches_order($resMoreInfo, $order_id)) {
+                            $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' REJECTED: PayPlus transaction belongs to more_info ' . sanitize_text_field((string) $resMoreInfo) . ', not this order. Nothing changed.', 'error');
+                            $order->add_order_note(__('PayPlus: a payment check returned a transaction that belongs to a different order. The order was not changed.', 'payplus-payment-gateway'));
+                            $flagPayplus = false;
+                            $flagProcess = false;
+                            break;
+                        }
                         $inData = array_merge($data, (array) $res->data);
-                        if (empty($type) && !empty($res->data->type)) {
+                        if (!empty($res->data->type)) {
                             $type = $res->data->type;
                         }
                         if (property_exists($res->data, 'related_transactions')) {

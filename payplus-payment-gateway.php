@@ -1417,6 +1417,8 @@ class WC_PayPlus
                     $redirect_to = $this->get_main_payplus_gateway()->get_return_url($order);
                 }
                 $this->payplus_redirect_graceful($redirect_to);
+                // payplus_redirect_graceful() returns without exiting for non-browser requests.
+                exit;
             } else {
                 // no order id
                 wp_die('Invalid request');

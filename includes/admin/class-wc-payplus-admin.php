@@ -440,22 +440,25 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_die();
         }
 
-        $createInvoice = isset($_POST['create_invoice']) && sanitize_text_field(wp_unslash($_POST['create_invoice']));
+        // Request-supplied ids/flags are for the admin order-page buttons only. On customer-facing
+        // calls (e.g. the payment page POST return) $_POST is attacker-controlled: use the order's own data.
+        $adminRequest = current_user_can('edit_shop_orders');
+        $createInvoice = $adminRequest && isset($_POST['create_invoice']) && sanitize_text_field(wp_unslash($_POST['create_invoice']));
         if ($createInvoice) {
             $this->payplus_add_log_all('payplus-ipn', 'Creating invoice for order: ' . $order_id, 'default');
             $this->payPlusInvoice->payplus_invoice_create_order($order_id, false, false, true);
             return;
         }
 
-        $getInvoice = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? true : $getInvoice;
-        $moreInfo = isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? $order_id : $moreInfo;
-        $transactionUid = isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid');
+        $getInvoice = $adminRequest && isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? true : $getInvoice;
+        $moreInfo = $adminRequest && isset($_POST['get_invoice']) && sanitize_text_field(wp_unslash($_POST['get_invoice'])) ? $order_id : $moreInfo;
+        $transactionUid = $adminRequest && isset($_POST['transaction_uid']) ? sanitize_text_field(wp_unslash($_POST['transaction_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid');
         $this->payplus_add_log_all('payplus-ipn', 'PayPlus IPN:', 'default');
         $this->payplus_add_log_all('payplus-ipn', 'Begin for order: ' . $order_id, 'default');
         if ($payment_request_uid_override) {
             $payment_request_uid = $payment_request_uid_override;
         } else {
-            $payment_request_uid = isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
+            $payment_request_uid = $adminRequest && isset($_POST['payment_request_uid']) ? sanitize_text_field(wp_unslash($_POST['payment_request_uid'])) : WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_page_request_uid');
             !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response')) && isset(json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid']) ? $payment_request_uid = json_decode(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_callback_response'), true)['transaction']['payment_page_request_uid'] : null;
         }
 
@@ -532,6 +535,14 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 }
             }
         } else {
+            if (
+                !empty($responseBody['data']['more_info'])
+                && !WC_PayPlus_Statics::more_info_matches_order($responseBody['data']['more_info'], $order_id)
+            ) {
+                $this->payplus_add_log_all('payplus-ipn', 'Order #' . $order_id . ' REJECTED: PayPlus transaction belongs to more_info ' . sanitize_text_field((string) $responseBody['data']['more_info']) . ', not this order. Nothing changed.', 'error');
+                $order->add_order_note(__('PayPlus: a payment check returned a transaction that belongs to a different order. The order was not changed.', 'payplus-payment-gateway'));
+                return false;
+            }
             if (!empty($responseBody['data'])) {
                 $type = $responseBody['data']['type'];
 
