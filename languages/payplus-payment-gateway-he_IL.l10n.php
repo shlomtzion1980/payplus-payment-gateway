@@ -266,6 +266,7 @@ return array (
     'Missing ID' => 'חסר מספר תעודת זהות',
     'Recaptcha confirmation is missing' => '(מבחן אבטחה כדי לוודא שהמשתמש הוא אדם ולא רובוט) חסר או לא הושלםStatus',
     'Credit card number not validated' => 'מספר הכרטיס אינו תקין',
+    'Declined - the transaction was not approved' => 'סירוב העסקה לא אושרה',
     'Card holder name' => 'שם בעל הכרטיס',
     'CVV' => 'CVV',
     'Card holder ID' => 'תעודת זהות בעל הכרטיס',
