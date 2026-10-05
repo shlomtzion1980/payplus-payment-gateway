@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.2.9  - 28-09-2026 =
+== 8.2.9  - 05-10-2026 =
 
 - Security  - Fixed critical payment bypass: a forged request to the payment return URL could mark an unpaid order as Processing. Orders are now updated only after PayPlus confirms the transaction server-side, the return must match a payment page created for that order, and a transaction of one order can no longer be used to mark another order paid. (Reported by VF Israel / VFC security scan)
 

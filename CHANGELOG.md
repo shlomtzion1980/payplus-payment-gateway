@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.2.9]  - 09-28-2026 - (Man)
+## [8.2.9]  - 10-05-2026 - (Man)
 
 - Security  - Fixed critical payment bypass: a forged request to the payment return URL (`?wc-api=payplus_gateway`) could move an unpaid pending order to Processing (emails, stock, integrations) without payment. `ipn_response()` now exits after `payplus_redirect_graceful()` (non-browser requests no longer fall through), and `validateOrder()` no longer sets any status from return-URL fields - the status is set only after PayPlus confirms the transaction server-side (IPN). (Reported by VF Israel / VFC security scan)
 - Security  - The return URL is checked only against a payment page created for that order (`page_request_uid` history), and an IPN result whose `more_info` belongs to a different order is rejected - a paid transaction of one order can no longer be replayed to mark another order paid.
