@@ -901,7 +901,7 @@ class WC_PayPlus_Gateway_HostedFields extends WC_PayPlus_Subgateway
                 $statusLocked = $this->acquireOrderStatusLock($order_id);
                 try {
                     if ($statusLocked) {
-                        $order = wc_get_order($order_id);
+                        $order = $this->getFreshOrder($order_id);
                     }
                     $isDone = ($order && $order->get_status() === "processing") ? " - Done. \n" : " - Not done. \n";
                     $this->payplus_add_log_all('hosted-fields-data', "Order ($order_id) status: " . ($order ? $order->get_status() : 'missing') . $isDone . "\n");

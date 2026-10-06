@@ -3695,6 +3695,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         global $wpdb;
         $got = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, %d)', 'payplus_os_' . (int) $order_id, 15));
         if ($got === null) {
+            $this->payplusLogPaymentComplete($order_id, 'order lock', 'WARNING: database did not return a lock result (GET_LOCK unsupported or failed: ' . sanitize_text_field((string) $wpdb->last_error) . ') - continuing without lock');
             return true;
         }
         return (string) $got === '1';
@@ -3717,6 +3718,32 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     protected function orderAlreadyPaidOrComplete($order)
     {
         return $order && ($order->is_paid() || $order->has_status(['processing', 'completed']));
+    }
+
+    /**
+     * Load the order as saved now, not the copy this request cached earlier: another request
+     * (return URL / callback) may have completed it while this one waited for the status lock.
+     * Clears the same caches as WooCommerce's order data store clear_caches().
+     *
+     * @param int|string $order_id
+     * @return WC_Order|false
+     */
+    protected function getFreshOrder($order_id)
+    {
+        $order_id = (int) $order_id;
+        clean_post_cache($order_id);
+        if (
+            class_exists('\Automattic\WooCommerce\Utilities\OrderUtil')
+            && class_exists('\Automattic\WooCommerce\Caches\OrderCache')
+            && \Automattic\WooCommerce\Utilities\OrderUtil::orders_cache_usage_is_enabled()
+        ) {
+            wc_get_container()->get(\Automattic\WooCommerce\Caches\OrderCache::class)->remove($order_id);
+        }
+        $dataStore = WC_Data_Store::load('order');
+        if (is_callable([$dataStore->get_current_class_name(), 'clear_cached_data'])) {
+            $dataStore->clear_cached_data([$order_id]);
+        }
+        return wc_get_order($order_id);
     }
 
     /**
@@ -3865,26 +3892,31 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             $type = $res->data->type;
         }
 
-        // Hosted Fields callback races the browser completion. Other methods lock only when the setting is on.
-        $statusLocked = false;
-        $hostedFieldsOrder = $order->get_payment_method() === 'payplus-payment-gateway-hostedfields';
-        if ($this->preventDuplicatePaymentComplete || $hostedFieldsOrder) {
-            $statusLocked = $this->acquireOrderStatusLock($order_id);
-            if (!$statusLocked) {
-                $this->payplus_add_log_all(
-                    'payplus_callback_secured',
-                    "$order_id - status update skipped (duplicate-payment lock not acquired)\n"
-                );
-                return wc_get_order($order_id);
-            }
+        // The return URL and the PayPlus callback both reach here for the same payment: only one may mark it paid.
+        $cachedStatus = $order->get_status();
+        $lockStart = microtime(true);
+        $statusLocked = $this->acquireOrderStatusLock($order_id);
+        $lockWait = number_format(microtime(true) - $lockStart, 2);
+        if (!$statusLocked) {
+            $this->payplus_add_log_all(
+                'payplus_callback_secured',
+                "$order_id - status update skipped (duplicate-payment lock not acquired)\n"
+            );
+            $this->payplusLogPaymentComplete($order_id, $source, "skipped: another process is completing this order (lock not acquired after {$lockWait}s)");
+            return wc_get_order($order_id);
         }
 
         try {
-            // Re-load: success redirect / cron may already have completed this order.
-            $order = wc_get_order($order_id);
+            // Re-load: success redirect / callback / cron may already have completed this order.
+            $order = $this->getFreshOrder($order_id);
             if (!$order) {
                 return null;
             }
+            $this->payplusLogPaymentComplete(
+                $order_id,
+                $source,
+                "lock acquired after {$lockWait}s | status in this request's copy: '$cachedStatus' | status re-read now: '" . $order->get_status() . "'"
+            );
 
             if ($order->is_paid() || $order->has_status(['processing', 'completed'])) {
                 $this->payplus_add_log_all(
@@ -4391,6 +4423,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 
         $writeKey = 'payplus_update_meta_' . (int) $order_id;
         if (!WC_PayPlus_Meta_Data::claim_single_write($writeKey)) {
+            $this->payplusLogPaymentComplete($order_id, 'updateMetaData', 'payment data: skipped (another process is saving it right now)');
             if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
                 $this->invoice_api->payplus_invoice_create_order($order_id);
             }
@@ -4398,6 +4431,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         try {
+            // The other path may have saved this payment while this request waited.
+            $order = $this->getFreshOrder($order_id);
+            $existingUid = $order ? (string) $order->get_meta('payplus_transaction_uid') : '';
+            if (!$order || ($existingUid !== '' && ($incomingUid === '' || $existingUid === $incomingUid))) {
+                $this->payplusLogPaymentComplete($order_id, 'updateMetaData', 'payment data: skipped (re-read shows another process already saved it)');
+                if ($order && $this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
+                    $this->invoice_api->payplus_invoice_create_order($order_id);
+                }
+                return;
+            }
+            $this->payplusLogPaymentComplete($order_id, 'updateMetaData', 'payment data: saving (first process for this payment)');
+
             $insertMeta = array();
             $appVars = array(
                 'type',

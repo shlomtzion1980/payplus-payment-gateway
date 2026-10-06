@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 8.2.9
+Stable tag: 8.3.0
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,13 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.3.0  - 06-10-2026 =
+
+- Fix       - Return URL and PayPlus callback arriving together could both mark the order paid (duplicate "Payment complete" notes, emails, stock reduction and woocommerce_payment_complete). The order is now re-read fresh after the order lock, and every automatic status update (callback, return, POST return, cron, Hosted Fields) always takes the lock - no need for "Prevent duplicate payment complete".
+- Tweak     - payplus_payment_complete log shows lock wait, status before/after the lock and skipped duplicates.
+- Fix       - "Payment method updated" note is no longer added twice when the return and the callback overlap.
+- Tweak     - Error code 4 (terminal type 6) translated: "Declined - the transaction was not approved".
 
 == 8.2.9  - 05-10-2026 =
 

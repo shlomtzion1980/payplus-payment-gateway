@@ -391,6 +391,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             wp_die();
         }
 
+        // Only the admin "check status" button calls without an order id; every automatic caller passes one.
+        $manualAdminCheck = empty($order_id) && current_user_can('edit_shop_orders');
         $orderId = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order_id = boolval(empty($order_id)) ? $orderId : $order_id;
 
@@ -625,16 +627,25 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     $status = "";
                     $skipAdminStatus = false;
                     $adminStatusLocked = false;
-                    // Hosted Fields is completed by the browser and by the PayPlus callback together.
-                    // Other methods keep the optional duplicate setting only.
+                    // Automatic calls (POST return, callback, cron, Hosted Fields) race the PayPlus callback / browser
+                    // return, so they always lock. The manual admin button keeps the optional duplicate setting.
                     $hostedFieldsOrder = $isHostedPayment
                         || ($order && $order->get_payment_method() === 'payplus-payment-gateway-hostedfields');
-                    if ($this->preventDuplicatePaymentComplete || $hostedFieldsOrder) {
+                    if ($this->preventDuplicatePaymentComplete || $hostedFieldsOrder || !$manualAdminCheck) {
+                        $cachedStatus = $order ? $order->get_status() : '';
+                        $lockStart = microtime(true);
                         $adminStatusLocked = $this->acquireOrderStatusLock($order_id);
+                        $lockWait = number_format(microtime(true) - $lockStart, 2);
                         if (!$adminStatusLocked) {
                             $skipAdminStatus = true;
+                            $this->payplusLogPaymentComplete($order_id, $isCron ? 'payplusIpn (cron)' : 'payplusIpn', "skipped: another process is completing this order (lock not acquired after {$lockWait}s)");
                         } else {
-                            $order = wc_get_order($order_id);
+                            $order = $this->getFreshOrder($order_id);
+                            $this->payplusLogPaymentComplete(
+                                $order_id,
+                                $isCron ? 'payplusIpn (cron)' : 'payplusIpn',
+                                "lock acquired after {$lockWait}s | status in this request's copy: '$cachedStatus' | status re-read now: '" . ($order ? $order->get_status() : 'missing') . "'"
+                            );
                             if ($this->orderAlreadyPaidOrComplete($order)) {
                                 $skipAdminStatus = true;
                                 $this->payplusLogPaymentCompleteSkipped($order, $isCron ? 'payplusIpn (cron)' : 'payplusIpn');

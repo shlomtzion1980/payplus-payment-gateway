@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.0]  - 10-06-2026 - (Woman)
+
+- Fix       - Return URL and PayPlus callback arriving together could both mark the order paid (two "Payment complete" notes, duplicate New order / Processing emails, stock reduced and `woocommerce_payment_complete` sent twice). The request that waited for the order lock re-read its own cached copy of the order (WooCommerce order cache / post cache), still saw "pending" and completed it again. The order is now re-read fresh after the lock, and every automatic status update - callback, GET return, POST return (`payplusIpn()`), cron and Hosted Fields - always takes the lock (no longer depends on "Prevent duplicate payment complete"; the setting now applies only to the manual admin "check status" button). POST return mode was affected on every order, because PayPlus posts the return and the callback at the same moment.
+- Tweak     - `payplus_payment_complete` log shows the lock wait, the order status this request had versus the status re-read after the lock, skipped payment-data saves, and a warning if the database does not support the order lock (`GET_LOCK`).
+- Fix       - Same race in payment meta: the second request no longer re-saves the payment data, so "Payment method updated from ... based on actual payment method used" is added once.
+- Tweak     - Error code `error-codes-terminal-type-6-code-4` translated: "Declined - the transaction was not approved" (Hebrew: סירוב העסקה לא אושרה).
+
 ## [8.2.9]  - 10-05-2026 - (Man)
 
 - Security  - Fixed critical payment bypass: a forged request to the payment return URL (`?wc-api=payplus_gateway`) could move an unpaid pending order to Processing (emails, stock, integrations) without payment. `ipn_response()` now exits after `payplus_redirect_graceful()` (non-browser requests no longer fall through), and `validateOrder()` no longer sets any status from return-URL fields - the status is set only after PayPlus confirms the transaction server-side (IPN). (Reported by VF Israel / VFC security scan)
