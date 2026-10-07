@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.3.0  - 06-10-2026 =
+== 8.3.0  - 07-10-2026 =
 
 - Tweak     - Improved order locking between the return URL and the PayPlus callback - payment complete runs once per order.
 - Tweak     - Shorter payment method change note and more payment-complete log details.

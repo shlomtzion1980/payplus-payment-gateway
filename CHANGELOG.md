@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.3.0]  - 10-06-2026 - (Woman)
+## [8.3.0]  - 10-07-2026 - (Woman)
 
 - Tweak     - Improved order locking between the return URL and the PayPlus callback: payment complete, order data and payment method sync now run once per order, with or without "Prevent duplicate payment complete".
 - Tweak     - Shorter "Payment method changed from ... to ..." order note, and more details in the `payplus_payment_complete` log.
