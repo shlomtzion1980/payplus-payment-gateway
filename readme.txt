@@ -88,9 +88,8 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == 8.3.0  - 06-10-2026 =
 
-- Fix       - Return URL and PayPlus callback arriving together could both mark the order paid (duplicate "Payment complete" notes, emails, stock reduction and woocommerce_payment_complete). The order is now re-read fresh after the order lock, and every automatic status update (callback, return, POST return, cron, Hosted Fields) always takes the lock - no need for "Prevent duplicate payment complete".
-- Tweak     - payplus_payment_complete log shows lock wait, status before/after the lock and skipped duplicates.
-- Fix       - "Payment method updated" note is no longer added twice when the return and the callback overlap.
+- Tweak     - Improved order locking between the return URL and the PayPlus callback - payment complete runs once per order.
+- Tweak     - Shorter payment method change note and more payment-complete log details.
 - Tweak     - Error code 4 (terminal type 6) translated: "Declined - the transaction was not approved".
 
 == 8.2.9  - 05-10-2026 =

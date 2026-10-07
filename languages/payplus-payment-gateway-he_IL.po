@@ -1635,6 +1635,12 @@ msgstr "מספר הכרטיס אינו תקין"
 msgid "Declined - the transaction was not approved"
 msgstr "סירוב העסקה לא אושרה"
 
+#. Translators: %1$s is the old payment method title, %2$s is the new payment method title.
+#: includes/wc_payplus_gateway.php
+#, php-format
+msgid "Payment method changed from %1$s to %2$s"
+msgstr "אמצעי התשלום שונה מ־%1$s ל־%2$s"
+
 #: includes/class-wc-payplus-error-handler.php:22
 msgid "Card holder name"
 msgstr "שם בעל הכרטיס"

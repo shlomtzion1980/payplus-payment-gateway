@@ -4611,18 +4611,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         if ($current_payment_method !== $expected_payment_method || $staleTitle) {
+            // The return and the callback both sync the method: the second one finds it already saved.
+            $saved = $this->getFreshOrder($order->get_id());
+            if ($saved && $saved->get_payment_method() === $expected_payment_method && $saved->get_payment_method_title() === $expected_title) {
+                $this->payplusLogPaymentComplete($order->get_id(), 'payment method sync', "skipped: already '$expected_payment_method' (synced by another process)");
+                return;
+            }
             $old_title = $order->get_payment_method_title() ?: $this->get_payment_method_title($current_payment_method);
             $order->set_payment_method($expected_payment_method);
             $order->set_payment_method_title($expected_title);
-            $order->add_order_note(
-                sprintf(
-                    // Translators: %1$s is the old payment method title, %2$s is the new payment method title, %3$s is the actual payment method identifier.
-                    __('Payment method updated from %1$s to %2$s based on actual payment method used (%3$s)', 'payplus-payment-gateway'),
-                    $old_title,
-                    $expected_title,
-                    $actual_method
-                )
-            );
+            // Translators: %1$s is the old payment method title, %2$s is the new payment method title.
+            $order->add_order_note(sprintf(__('Payment method changed from %1$s to %2$s', 'payplus-payment-gateway'), $old_title, $expected_title));
+            $this->payplusLogPaymentComplete($order->get_id(), 'payment method sync', "payment method: '$current_payment_method' => '$expected_payment_method' ($actual_method)");
         }
     }
 
