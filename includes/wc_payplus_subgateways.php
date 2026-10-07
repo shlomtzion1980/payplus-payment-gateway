@@ -22,6 +22,12 @@ abstract class WC_PayPlus_Subgateway extends WC_PayPlus_Gateway
     {
 
         parent::__construct();
+        // Only card-based methods can charge subscription renewals with a saved card.
+        if (!in_array($this->id, ['payplus-payment-gateway-googlepay', 'payplus-payment-gateway-applepay', 'payplus-payment-gateway-hostedfields'], true)) {
+            $this->supports = array_values(array_filter($this->supports, function ($feature) {
+                return strpos($feature, 'subscription') === false;
+            }));
+        }
         if ($this->hide_icon == "no") {
             $this->icon = PAYPLUS_PLUGIN_URL . $this->iconURL;
         }
