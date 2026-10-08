@@ -1641,6 +1641,10 @@ msgstr "סירוב העסקה לא אושרה"
 msgid "Payment method changed from %1$s to %2$s"
 msgstr "אמצעי התשלום שונה מ־%1$s ל־%2$s"
 
+#: includes/wc_payplus_invoice.php
+msgid "Invoice+ document not created: the payment method is PayPlus but no PayPlus payment was recorded for this order. Change the payment method to the one actually used, or charge the order via PayPlus."
+msgstr "מסמך Invoice+ לא הופק: אמצעי התשלום בהזמנה הוא PayPlus אך לא נרשם עבורה תשלום ב-PayPlus. יש לשנות את אמצעי התשלום לאמצעי שבו שולם בפועל, או לחייב את ההזמנה דרך PayPlus."
+
 #: includes/class-wc-payplus-error-handler.php:22
 msgid "Card holder name"
 msgstr "שם בעל הכרטיס"

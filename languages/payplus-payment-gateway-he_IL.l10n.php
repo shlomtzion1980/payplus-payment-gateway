@@ -268,6 +268,7 @@ return array (
     'Credit card number not validated' => 'מספר הכרטיס אינו תקין',
     'Declined - the transaction was not approved' => 'סירוב העסקה לא אושרה',
     'Payment method changed from %1$s to %2$s' => 'אמצעי התשלום שונה מ־%1$s ל־%2$s',
+    'Invoice+ document not created: the payment method is PayPlus but no PayPlus payment was recorded for this order. Change the payment method to the one actually used, or charge the order via PayPlus.' => 'מסמך Invoice+ לא הופק: אמצעי התשלום בהזמנה הוא PayPlus אך לא נרשם עבורה תשלום ב-PayPlus. יש לשנות את אמצעי התשלום לאמצעי שבו שולם בפועל, או לחייב את ההזמנה דרך PayPlus.',
     'Card holder name' => 'שם בעל הכרטיס',
     'CVV' => 'CVV',
     'Card holder ID' => 'תעודת זהות בעל הכרטיס',
