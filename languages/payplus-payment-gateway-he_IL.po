@@ -4637,6 +4637,19 @@ msgstr "הסתרת אפל פיי כאפשרות נפרדת בקופה"
 msgid "Prevent duplicate payment complete (Default: Unchecked)"
 msgstr "מניעת השלמת תשלום כפולה (ברירת מחדל: כבוי)"
 
+#. Translators: %d is the order number.
+msgid "Invoice+ document was not created for order #%d."
+msgstr "מסמך Invoice+ לא הופק עבור הזמנה מספר %d."
+
+msgid "The payment method on this order is PayPlus, but no PayPlus payment was recorded for it."
+msgstr "אמצעי התשלום בהזמנה הוא PayPlus, אך לא נרשם עבורה תשלום ב-PayPlus."
+
+msgid "To fix it: in the order Billing section, change \"Payment method\" to \"Other\" (or to \"N/A\" - no payment method), click \"Update\", and create the document again."
+msgstr "לתיקון: באזור החיוב (Billing) של ההזמנה, יש לשנות את \"אמצעי תשלום\" ל\"אחר\" (או ל\"N/A\" - ללא אמצעי תשלום), ללחוץ \"עדכון\" ולהפיק את המסמך שוב."
+
+msgid "If it is still not created, create the document manually from the Invoice+ (PayPlus) box and add the payment there."
+msgstr "אם המסמך עדיין לא מופק, יש להפיק אותו ידנית מתיבת Invoice+ (PayPlus) ולהוסיף בה את התשלום."
+
 msgid "Prevent duplicate payment records"
 msgstr "מניעת רישומי תשלום כפולים"
 

@@ -1367,6 +1367,9 @@ class PayplusInvoice
                     $order->update_meta_data('_payplus_invoice_no_payment_data_noted', time());
                     $order->save_meta_data();
                 }
+                if (is_admin() && current_user_can('edit_shop_orders')) {
+                    set_transient('payplus_invoice_no_data_popup_' . get_current_user_id(), (int) $order_id, 5 * MINUTE_IN_SECONDS);
+                }
                 return;
             }
 

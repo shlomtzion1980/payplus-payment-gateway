@@ -2765,6 +2765,18 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             )
         );
         wp_enqueue_script('payplus-admin-payment');
+        if (!empty($order_id)) {
+            $popupKey = 'payplus_invoice_no_data_popup_' . get_current_user_id();
+            if ((int) get_transient($popupKey) === (int) $order_id) {
+                delete_transient($popupKey);
+                // Translators: %d is the order number.
+                $popupMessage = sprintf(__('Invoice+ document was not created for order #%d.', 'payplus-payment-gateway'), $order_id) . "\n\n"
+                    . __('The payment method on this order is PayPlus, but no PayPlus payment was recorded for it.', 'payplus-payment-gateway') . "\n\n"
+                    . __('To fix it: in the order Billing section, change "Payment method" to "Other" (or to "N/A" - no payment method), click "Update", and create the document again.', 'payplus-payment-gateway') . "\n"
+                    . __('If it is still not created, create the document manually from the Invoice+ (PayPlus) box and add the payment there.', 'payplus-payment-gateway');
+                wp_add_inline_script('payplus-admin-payment', 'jQuery(function(){ alert(' . wp_json_encode($popupMessage) . '); });');
+            }
+        }
         wp_register_script('wc-payplus-gateway-admin', PAYPLUS_PLUGIN_URL . 'assets/js/admin.min.js', ['jquery'], time(), true);
         wp_localize_script(
             'wc-payplus-gateway-admin',
