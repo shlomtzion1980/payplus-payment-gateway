@@ -90,6 +90,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 - Tweak     - Improved order locking between the return URL and the PayPlus callback - payment complete runs once per order.
 - Tweak     - Shorter payment method change note and more payment-complete log details.
+- Tweak     - New advanced option "Prevent duplicate payment records" (default on) - success note, payment row and saved token are created once.
 - Tweak     - Error code 4 (terminal type 6) translated: "Declined - the transaction was not approved".
 
 == 8.2.9  - 05-10-2026 =

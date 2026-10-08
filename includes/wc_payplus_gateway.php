@@ -75,6 +75,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $logging;
     public $fire_completed;
     public $preventDuplicatePaymentComplete;
+    public $preventDuplicateSideEffects;
     public $invoice_lang;
     public $response_url;
     public $payplus_generate_key_dashboard;
@@ -231,6 +232,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->logging = wc_get_logger();
         $this->fire_completed = $this->get_option('fire_completed') == 'yes' ? true : false;
         $this->preventDuplicatePaymentComplete = $this->get_option('prevent_duplicate_payment_complete') === 'yes';
+        $this->preventDuplicateSideEffects = $this->get_option('prevent_duplicate_side_effects', 'yes') === 'yes';
         $this->invoice_lang = $this->get_option('invoice_lang') == 'en' ? 'en' : '';
 
         //wc-api=payplus_gateway added to the response url will initiate the woocommerce_api_payplus_gateway action - which will start the ipn_response
@@ -4152,10 +4154,19 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                             $insertMeta['payplus_related_transactions'] = 1;
                             WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
                         }
-                        $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
+                        $paymentRowLocked = $this->preventDuplicateSideEffects && $this->acquireOrderStatusLock($order_id);
+                        try {
+                            $rowOrder = $this->invoice_api->payplus_get_payments($order_id);
 
-                        if (!count($rowOrder)) {
-                            $this->payplus_add_order($order_id, $inData);
+                            if (!count($rowOrder)) {
+                                $this->payplus_add_order($order_id, $inData);
+                            } elseif ($this->preventDuplicateSideEffects) {
+                                $this->payplusLogPaymentComplete($order_id, "payment row ($handleLog)", 'skipped: PayPlus payment row already saved');
+                            }
+                        } finally {
+                            if ($paymentRowLocked) {
+                                $this->releaseOrderStatusLock($order_id);
+                            }
                         }
                         $this->payplus_add_log_all($handle, 'Order #' . $order_id . ' status:' . $res->data->status_code);
                         if ($this->isApprovedStatusCode($res->data->status_code)) {
@@ -4184,6 +4195,8 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                     $insertMeta['payplus_transaction_type'] = "1";
                                 }
                             }
+                            $sideEffectsLocked = $this->preventDuplicateSideEffects && $this->acquireOrderStatusLock($order_id);
+                            try {
                             if ($this->create_pp_token && $token_uid && $userID && $createToken) {
                                 $this->save_token($data, $userID);
                             }
@@ -4191,7 +4204,16 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                 update_user_meta($userID, 'cc_token', $data['token_uid']);
                             }
 
-                            if (empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_print_log', true))) {
+                            if ($this->preventDuplicateSideEffects) {
+                                $order->read_meta_data(true);
+                                $successNoteDone = $order->get_meta('payplus_print_log', true);
+                                if (!empty($successNoteDone)) {
+                                    $this->payplusLogPaymentComplete($order_id, "success note ($handleLog)", 'skipped: "PayPlus ... Successful" note already added by another process');
+                                }
+                            } else {
+                                $successNoteDone = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_print_log', true);
+                            }
+                            if (empty($successNoteDone)) {
                                 WC_PayPlus_Meta_Data::update_meta($order, array('payplus_print_log' => 1));
                                 if (property_exists($res->data, 'related_transactions')) {
 
@@ -4309,6 +4331,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                                             ));
                                         }
                                     }
+                                }
+                            }
+                            } finally {
+                                if ($sideEffectsLocked) {
+                                    $this->releaseOrderStatusLock($order_id);
                                 }
                             }
 

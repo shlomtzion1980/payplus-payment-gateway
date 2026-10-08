@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 - Tweak     - Improved order locking between the return URL and the PayPlus callback: payment complete, order data and payment method sync now run once per order, with or without "Prevent duplicate payment complete".
 - Tweak     - Shorter "Payment method changed from ... to ..." order note, and more details in the `payplus_payment_complete` log.
+- Tweak     - New advanced option "Prevent duplicate payment records" (default on): the "PayPlus ... Successful" note, the PayPlus payment row and the saved card token are created once per order.
 - Tweak     - Error code `error-codes-terminal-type-6-code-4` translated: "Declined - the transaction was not approved" (Hebrew: סירוב העסקה לא אושרה).
 
 ## [8.2.9]  - 10-05-2026 - (Man)
