@@ -270,6 +270,14 @@ function payplus_check_set_payplus_options()
     $newPayPlusOptionsYes = ['hide_custom_fields_buttons', 'show_payplus_data_metabox'];
     $newPayPlusOptionsNo  = ['use_old_fields', 'enable_design_checkout', 'balance_name', 'add_product_field_transaction_type', 'payplus_data_save_order_note'];
 
+    // On for new installs, off for stores that already had PayPlus settings before this version.
+    $newStoreOnlyOptions = ['prevent_duplicate_side_effects', 'skip_repeated_payment_checks'];
+    if (!empty($payPlusOptions)) {
+        $newPayPlusOptionsNo = array_merge($newPayPlusOptionsNo, $newStoreOnlyOptions);
+    } else {
+        $newPayPlusOptionsYes = array_merge($newPayPlusOptionsYes, $newStoreOnlyOptions);
+    }
+
     $newInvoicOptionsYes  = ['dedicated_invoice_metabox'];
     $newInvoiceOptionsNo  = ['invoices_notes_no', 'payplus_invoice_enable', 'display_only_invoice_docs'];
 

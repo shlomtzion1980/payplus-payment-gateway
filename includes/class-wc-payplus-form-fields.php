@@ -1160,10 +1160,18 @@ class WC_PayPlus_Form_Fields
             'prevent_duplicate_side_effects' => [
                 'title' => __('Prevent duplicate payment records', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
-                'label' => __('Prevent duplicate payment records (Default: Checked)', 'payplus-payment-gateway'),
+                'label' => __('Prevent duplicate payment records (Default: Checked on new installs)', 'payplus-payment-gateway'),
                 'description' => __('When the return page and the PayPlus callback arrive together, the "PayPlus ... Successful" order note, the PayPlus payment row (used for Invoice+ documents) and the saved card token are created only once.', 'payplus-payment-gateway'),
                 'desc_tip' => true,
-                'default' => 'no',
+                'default' => 'yes',
+            ],
+            'skip_repeated_payment_checks' => [
+                'title' => __('Skip repeated payment checks', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Skip repeated payment checks (Default: Checked on new installs)', 'payplus-payment-gateway'),
+                'description' => __('When the return page already verified and saved the payment, the PayPlus callback for the same transaction does not check it with PayPlus again, and Invoice+ is not called again for an order that already has a document. Fewer API calls, same order result.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'yes',
             ],
             'pw_gift_card_auto_cancel_unpaid_order' => [
                 'title' => __('Auto Cancel (PWGiftCards) Unpaid Orders', 'payplus-payment-gateway'),

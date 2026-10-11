@@ -1327,10 +1327,24 @@ class PayplusInvoice
             return;
         }
 
-        $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_check_invoice_send', true);
-        $payplusErrorInvoice = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_error_invoice', true);
+        $documentSource = $order_id;
+        if ($WC_PayPlus_Gateway && !empty($WC_PayPlus_Gateway->skipRepeatedPaymentChecks)) {
+            $documentSource = $WC_PayPlus_Gateway->getFreshOrder($order_id) ?: $order_id;
+        }
+        $checkInvoiceSend = WC_PayPlus_Meta_Data::get_meta($documentSource, 'payplus_check_invoice_send', true);
+        $payplusErrorInvoice = WC_PayPlus_Meta_Data::get_meta($documentSource, 'payplus_error_invoice', true);
         $payplusTransactionUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_transaction_uid', true);
-        $payplusInvoiceDocUid = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_invoice_docUID', true);
+        $payplusInvoiceDocUid = WC_PayPlus_Meta_Data::get_meta($documentSource, 'payplus_invoice_docUID', true);
+        if ($documentSource !== $order_id) {
+            $WC_PayPlus_Gateway->payplusLogSkipRepeatedChecks(
+                $order_id,
+                'Invoice+',
+                'document check read from database - payplus_check_invoice_send: ' . ($checkInvoiceSend ? 'yes' : 'no')
+                    . ', payplus_invoice_docUID: ' . ($payplusInvoiceDocUid ? sanitize_text_field((string) $payplusInvoiceDocUid) : '-')
+                    . ' => ' . ($this->payplus_invoice_already_created($checkInvoiceSend, $payplusInvoiceDocUid, $payplusErrorInvoice) ? 'skipped (document already exists, Invoice+ not called)' : 'continuing to create the document'),
+                $handle
+            );
+        }
         $j5Amount = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount', true);
         $invoice_manual = $this->payplus_get_create_invoice_manual();
 
