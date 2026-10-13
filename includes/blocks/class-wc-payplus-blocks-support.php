@@ -827,6 +827,22 @@ class WC_Gateway_Payplus_Payment_Block extends AbstractPaymentMethodType
         ) {
             $supports[] = 'tokenization';
         }
+        // Blocks hides a method from subscription carts unless these match the PHP gateway's supports
+        // (WooCommerce Subscriptions with "Accept manual renewals" off).
+        if (in_array($this->name, ['payplus-payment-gateway', 'payplus-payment-gateway-hostedfields', 'payplus-payment-gateway-googlepay', 'payplus-payment-gateway-applepay'], true)) {
+            $supports = array_merge($supports, [
+                'subscriptions',
+                'subscription_cancellation',
+                'subscription_suspension',
+                'subscription_reactivation',
+                'subscription_amount_changes',
+                'subscription_date_changes',
+                'subscription_payment_method_change',
+                'subscription_payment_method_change_customer',
+                'subscription_payment_method_change_admin',
+                'multiple_subscriptions',
+            ]);
+        }
 
         // Per-method icons from known asset paths (same as each subgateway's iconURL).
         // Do not construct gateways here — initialize must stay options-only.

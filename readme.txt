@@ -92,6 +92,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 - Tweak     - New advanced option "Skip repeated payment checks" (on for new installs, off for existing stores) - fewer PayPlus and Invoice+ calls.
 - Tweak     - Invoice+: reason logged when a document is not created, with an order note and popup for a PayPlus method without PayPlus payment.
 - Tweak     - Subscription support shown only for the main PayPlus, Embedded, Google Pay and Apple Pay gateways.
+- Fix       - Blocks checkout shows PayPlus and Embedded for subscription carts when "Accept manual renewals" is off.
 
 == 8.3.0  - 07-10-2026 =
 
