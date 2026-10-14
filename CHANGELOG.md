@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.3.1]  - 10-11-2026 - (Animals)
+## [8.3.1]  - 14-11-2026 - (Animals)
 
 - Tweak     - New advanced option "Prevent duplicate payment records" (on for new installs, off for existing stores): the "PayPlus ... Successful" note, the PayPlus payment row and the saved card token are created once per order.
 - Tweak     - New advanced option "Skip repeated payment checks" (on for new installs, off for existing stores): fewer PayPlus and Invoice+ calls when the return page already verified the payment, logged in `payplus_skip_repeated_checks`.

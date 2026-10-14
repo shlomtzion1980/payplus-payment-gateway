@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.3.1  - 11-10-2026 =
+== 8.3.1  - 14-10-2026 =
 
 - Tweak     - New advanced option "Prevent duplicate payment records" (on for new installs, off for existing stores) - success note, payment row and saved token are created once.
 - Tweak     - New advanced option "Skip repeated payment checks" (on for new installs, off for existing stores) - fewer PayPlus and Invoice+ calls.
