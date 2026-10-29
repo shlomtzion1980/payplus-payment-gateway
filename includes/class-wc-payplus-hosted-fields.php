@@ -870,15 +870,19 @@ class WC_PayPlus_HostedFields extends WC_PayPlus
         }
 
         $hostedResponse = WC()->session->get('hostedPayload');
-        $hostedResponseArray = !empty($hostedResponse) ? json_decode($hostedResponse, true) : '{}';
+        $hostedResponseArray = !empty($hostedResponse) && is_string($hostedResponse) ? json_decode($hostedResponse, true) : [];
+        if (!is_array($hostedResponseArray)) {
+            $hostedResponseArray = [];
+        }
+        $hostedPageUid = !empty($hostedResponseArray['payment_page_uid']) ? $hostedResponseArray['payment_page_uid'] : $data->payment_page_uid;
 
         $data->amount = number_format($totalAmount, 2, '.', '');
         $firstMessage = $order_id === "000" ? "-=#* 1st field generated *%=- - " : "";
 
         $payload = wp_json_encode($data, JSON_UNESCAPED_UNICODE);
         if (is_int($data->more_info) && $data->more_info === $order_id) {
-            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedResponseArray['payment_page_uid'], 'payplus_payload' => $payload]);
-            WC_PayPlus_Meta_Data::append_pruid_history($order, $hostedResponseArray['payment_page_uid'], 'hosted_fields');
+            WC_PayPlus_Meta_Data::update_meta($order, ['payplus_hosted_page_request_uid' => $hostedPageUid, 'payplus_payload' => $payload]);
+            WC_PayPlus_Meta_Data::append_pruid_history($order, $hostedPageUid, 'hosted_fields');
         }
 
         // $this->payPlusGateway->payplus_add_log_all("hosted-fields-data", "HostedFields-hostedFieldsData-Class Payload: \n$payload");

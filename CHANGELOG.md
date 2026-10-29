@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.2]  - 10-29-2026
+
+- Fix       - Embedded (Hosted Fields): checkout no longer shows a critical error ("Cannot access offset of type string on string") when a customer returns to a pending order after the session payload was reset.
+
 ## [8.3.1]  - 14-11-2026 - (Animals)
 
 - Tweak     - New advanced option "Prevent duplicate payment records" (on for new installs, off for existing stores): the "PayPlus ... Successful" note, the PayPlus payment row and the saved card token are created once per order.
