@@ -3891,6 +3891,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     {
         $order_id = $order->get_id();
         $statusNow = $order->get_status();
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WooCommerce core filter
         $unpaid = apply_filters('woocommerce_valid_order_statuses_for_payment_complete', ['on-hold', 'pending', 'failed', 'cancelled'], $order);
         if (!in_array($statusBefore, $unpaid, true) || in_array($statusNow, $unpaid, true)) {
             return;

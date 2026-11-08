@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.3.2]  - 10-29-2026 - (Elections)
+## [8.3.2]  - 11-08-2026 - (Elections)
 
 - Fix       - Embedded (Hosted Fields): checkout no longer shows a critical error ("Cannot access offset of type string on string") when a customer returns to a pending order after the session payload was reset.
 

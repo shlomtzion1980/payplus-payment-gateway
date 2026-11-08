@@ -86,7 +86,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 == Changelog ==
 
-== 8.3.2  - 29-10-2026 =
+== 8.3.2  - 08-11-2026 =
 
 - Fix       - Embedded (Hosted Fields): checkout no longer shows a critical error when returning to a pending order after the session was reset.
 
