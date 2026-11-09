@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.3]  - 11-09-2026
+
+- Fix       - Invoice+: the automatic document is created only when the order reaches the selected "Order status for issuing an invoice" (it was created as soon as the payment was saved, regardless of the selected status).
+
 ## [8.3.2]  - 11-08-2026 - (Elections)
 
 - Fix       - Embedded (Hosted Fields): checkout no longer shows a critical error ("Cannot access offset of type string on string") when a customer returns to a pending order after the session payload was reset.

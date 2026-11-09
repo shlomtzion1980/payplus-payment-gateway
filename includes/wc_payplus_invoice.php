@@ -1282,6 +1282,32 @@ class PayplusInvoice
             $this->payplus_invoice_create_order($order_id, 'inv_tax', true);
         }
     }
+
+    /**
+     * Create the document after payment data is saved, only when the order is already in
+     * the "Order status for issuing an invoice". Otherwise the status hook creates it later.
+     *
+     * @param int $order_id
+     * @param string $source
+     * @return void
+     */
+    public function payplus_invoice_create_order_if_status_matches($order_id, $source)
+    {
+        $gateway = $this->get_main_payplus_gateway();
+        $order = $gateway ? $gateway->getFreshOrder($order_id) : wc_get_order($order_id);
+        if (!$order) {
+            return;
+        }
+        $orderStatus = $order->get_status();
+        $invoiceStatus = $this->payplus_get_invoice_status_order();
+        if ($orderStatus !== $invoiceStatus) {
+            if ($gateway) {
+                $gateway->payplus_add_log_all('payplus_process_invoice', "Order {$order_id}: document not created by $source - order status is '$orderStatus', the document is created when the status becomes '$invoiceStatus'");
+            }
+            return;
+        }
+        $this->payplus_invoice_create_order($order_id);
+    }
     public function payplus_check_sum_withholding_tax($payments)
     {
 

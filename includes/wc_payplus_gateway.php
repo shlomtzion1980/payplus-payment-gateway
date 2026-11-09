@@ -4498,7 +4498,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $existingUid = (string) $order->get_meta('payplus_transaction_uid');
         if ($existingUid !== '' && ($incomingUid === '' || $existingUid === $incomingUid)) {
             if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
-                $this->invoice_api->payplus_invoice_create_order($order_id);
+                $this->invoice_api->payplus_invoice_create_order_if_status_matches($order_id, "updateMetaData");
             }
             return;
         }
@@ -4507,7 +4507,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         if (!WC_PayPlus_Meta_Data::claim_single_write($writeKey)) {
             $this->payplusLogPaymentComplete($order_id, 'updateMetaData', 'payment data: skipped (another process is saving it right now)');
             if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
-                $this->invoice_api->payplus_invoice_create_order($order_id);
+                $this->invoice_api->payplus_invoice_create_order_if_status_matches($order_id, "updateMetaData");
             }
             return;
         }
@@ -4519,7 +4519,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             if (!$order || ($existingUid !== '' && ($incomingUid === '' || $existingUid === $incomingUid))) {
                 $this->payplusLogPaymentComplete($order_id, 'updateMetaData', 'payment data: skipped (re-read shows another process already saved it)');
                 if ($order && $this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
-                    $this->invoice_api->payplus_invoice_create_order($order_id);
+                    $this->invoice_api->payplus_invoice_create_order_if_status_matches($order_id, "updateMetaData");
                 }
                 return;
             }
@@ -4635,7 +4635,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             // Status may already be processing from an earlier redirect, so the status
             // hook will not fire again. Create the invoice now that the real method exists.
             if ($this->invoice_api && $this->invoice_api->payplus_get_invoice_enable() && !$this->invoice_api->payplus_get_create_invoice_manual()) {
-                $this->invoice_api->payplus_invoice_create_order($order_id);
+                $this->invoice_api->payplus_invoice_create_order_if_status_matches($order_id, "updateMetaData");
             }
         } finally {
             WC_PayPlus_Meta_Data::release_single_write($writeKey);

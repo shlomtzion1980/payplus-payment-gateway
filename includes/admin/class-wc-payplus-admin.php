@@ -617,7 +617,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         && $this->payPlusInvoice->payplus_get_invoice_enable()
                         && !$this->payPlusInvoice->payplus_get_create_invoice_manual()
                     ) {
-                        $this->payPlusInvoice->payplus_invoice_create_order($order_id);
+                        $this->payPlusInvoice->payplus_invoice_create_order_if_status_matches($order_id, "Get PayPlus Data");
                     }
                 }
 
