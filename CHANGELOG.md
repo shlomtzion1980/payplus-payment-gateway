@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [8.3.3]  - 11-09-2026
+## [8.3.3]  - 11-09-2026 - (didWeWin?)
 
 - Fix       - Invoice+: the automatic document is created only when the order reaches the selected "Order status for issuing an invoice" (it was created as soon as the payment was saved, regardless of the selected status).
 
