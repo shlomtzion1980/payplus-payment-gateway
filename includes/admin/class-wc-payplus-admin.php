@@ -106,6 +106,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // admin notices
         add_action('admin_notices', [$this, 'admin_notices'], 15);
         add_action('wp_ajax_payplus-token-payment', [$this, 'ajax_payplus_token_payment']);
+        add_action('wp_ajax_payplus-cancel-j5', [$this, 'ajax_payplus_cancel_j5']);
         add_action('wp_ajax_payplus-api-payment', [$this, 'ajax_payplus_payment_api']);
         add_action('wp_ajax_generate-link-payment', [$this, 'ajax_payplus_generate_link_payment']);
         add_action('wp_ajax_payment-payplus-transaction-review', [$this, 'ajax_payment_payplus_transaction_review']);
@@ -304,7 +305,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                     <?php wp_nonce_field('payplus_display_meta_action_' . $order_id, 'payplus_display_meta_nonce'); ?>
                 </p>
                 <?php
-                if ($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) {
+                if (($order->get_status() === 'pending' || $this->showGetPayPlusDataButton) && empty($order->get_meta('payplus_j5_cancelled'))) {
                     if (!empty($payplusResponse) || !empty($pageRequestUid) || !empty($transactionUid)) {
                         $payplusResponse = json_decode($payplusResponse, true);
                         $pageRequestUid = isset($payplusResponse['page_request_uid']) ? $payplusResponse['page_request_uid'] : $pageRequestUid;
@@ -2537,6 +2538,12 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 return;
             }
 
+            if (!empty($order->get_meta('payplus_j5_cancelled'))) {
+                $this->payplus_add_log_all($handle, "Order #$order_id: charge skipped - J5 was cancelled");
+                echo wp_json_encode(array("urlredirect" => $urlEdit, "status" => false));
+                wp_die();
+            }
+
             $OrderType = $order->get_meta('payplus_type');
 
             $chargeByItems = false;
@@ -2747,6 +2754,9 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 "payplus_refund_club_amount" => wp_create_nonce('payplus_refund_club_amount'),
                 "payplusApiPaymentRefund" => wp_create_nonce('payplus_api_payment_refund'),
                 "payplusTokenPayment" => wp_create_nonce('payplus_token_payment'),
+                "payplusCancelJ5" => wp_create_nonce('payplus_cancel_j5'),
+                "cancelJ5ConfirmMessage" => __('Cancel the J5 authorization in PayPlus and set this order to Cancelled? This cannot be undone.', 'payplus-payment-gateway'),
+                "cancelJ5ErrorMessage" => __('J5 cancel failed:', 'payplus-payment-gateway'),
                 "payplusApiPayment" => wp_create_nonce('payplus_api_payment'),
                 "payplusTransactionReview" => wp_create_nonce('payplus_transaction_review'),
                 "payplusGenerateLinkPayment" => wp_create_nonce('payplus_generate_link_payment'),
@@ -2820,6 +2830,111 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     }
 
     /**
+     * Cancel a J5 (Approval) transaction in PayPlus and set the order to Cancelled.
+     *
+     * @return void
+     */
+    public function ajax_payplus_cancel_j5()
+    {
+        check_ajax_referer('payplus_cancel_j5', '_ajax_nonce');
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error(['message' => __('You do not have permission to edit orders.', 'payplus-payment-gateway')]);
+        }
+        $this->isInitiated();
+        $handle = 'payplus_process_j5_cancel';
+        if ($this->get_option('enable_j5_cancel', 'no') !== 'yes') {
+            wp_send_json_error(['message' => __('J5 cancel is not enabled in the PayPlus settings.', 'payplus-payment-gateway')]);
+        }
+        $order_id = isset($_POST['order_id']) ? absint($_POST['order_id']) : 0;
+        if (!$order_id || !wc_get_order($order_id)) {
+            wp_send_json_error(['message' => __('Order not found.', 'payplus-payment-gateway')]);
+        }
+
+        if (!$this->acquireOrderStatusLock($order_id)) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel skipped - another process is updating this order");
+            wp_send_json_error(['message' => __('Another process is updating this order, try again in a few seconds.', 'payplus-payment-gateway')]);
+        }
+        try {
+            list($success, $message) = $this->payplus_cancel_j5_order($order_id, $handle);
+        } finally {
+            $this->releaseOrderStatusLock($order_id);
+        }
+        if ($success) {
+            wp_send_json_success(['message' => $message]);
+        }
+        wp_send_json_error(['message' => $message]);
+    }
+
+    /**
+     * Runs under the order lock. Returns [success, message].
+     *
+     * @param int $order_id
+     * @param string $handle
+     * @return array
+     */
+    private function payplus_cancel_j5_order($order_id, $handle)
+    {
+        $order = $this->getFreshOrder($order_id);
+        $type = $order->get_meta('payplus_type');
+        if (!in_array($type, ['Approval', 'Check'], true)) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel skipped - transaction type is '$type', not J5");
+            return [false, __('This order has no J5 authorization to cancel.', 'payplus-payment-gateway')];
+        }
+        if (!empty($order->get_meta('payplus_charged_j5_amount'))) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel skipped - J5 already charged");
+            return [false, __('This J5 authorization was already charged. Use a refund instead.', 'payplus-payment-gateway')];
+        }
+        if (!empty($order->get_meta('payplus_j5_cancelled'))) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel skipped - J5 already cancelled");
+            return [false, __('This J5 authorization was already cancelled.', 'payplus-payment-gateway')];
+        }
+
+        $response = json_decode((string) $order->get_meta('payplus_response'), true);
+        $response = is_array($response) ? $response : [];
+        $payload = [
+            'terminal_uid' => sanitize_text_field($response['terminal_uid'] ?? ''),
+            'transaction_uid' => sanitize_text_field($order->get_meta('payplus_transaction_uid') ?: ($response['transaction_uid'] ?? '')),
+            'cashier_uid' => sanitize_text_field($response['cashier_uid'] ?? ''),
+        ];
+        $missing = array_keys(array_filter($payload, function ($value) {
+            return $value === '';
+        }));
+        if ($missing) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel skipped - missing in the PayPlus response: " . implode(', ', $missing));
+            return [false, __('The PayPlus response of this order is missing:', 'payplus-payment-gateway') . ' ' . implode(', ', $missing)];
+        }
+
+        $this->payplus_add_log_all($handle, "Order #$order_id: cancel J5 requested by user #" . get_current_user_id() . ' - ' . wp_json_encode($payload));
+        $remote = WC_PayPlus_Statics::payPlusRemote($this->api_url . 'Transactions/Cancel', $payload);
+        if (is_wp_error($remote)) {
+            $this->payplus_add_log_all($handle, "Order #$order_id: cancel failed - " . $remote->get_error_message(), 'error');
+            return [false, $remote->get_error_message()];
+        }
+        $body = wp_remote_retrieve_body($remote);
+        $this->payplus_add_log_all($handle, "Order #$order_id: PayPlus response (HTTP " . wp_remote_retrieve_response_code($remote) . "): $body");
+        $result = json_decode($body, true);
+        if (($result['results']['status'] ?? '') !== 'success') {
+            $reason = sanitize_text_field($result['results']['description'] ?? $result['results']['message'] ?? __('Unknown error', 'payplus-payment-gateway'));
+            // Translators: %s is the PayPlus error description.
+            $order->add_order_note(sprintf(__('PayPlus J5 cancel failed: %s', 'payplus-payment-gateway'), $reason));
+            return [false, $reason];
+        }
+
+        $user = wp_get_current_user();
+        WC_PayPlus_Meta_Data::update_meta($order, [
+            'payplus_j5_cancelled' => current_time('mysql'),
+            'payplus_j5_cancelled_by' => $user ? sanitize_text_field($user->user_login) : '',
+        ]);
+        $order->update_status('cancelled', sprintf(
+            // Translators: %s is the admin user name.
+            __('PayPlus J5 authorization cancelled by admin (%s) - the credit hold was released.', 'payplus-payment-gateway'),
+            $user ? $user->user_login : ''
+        ));
+        $this->payplus_add_log_all($handle, "Order #$order_id: J5 cancelled, order set to Cancelled", 'completed');
+        return [true, __('J5 cancelled.', 'payplus-payment-gateway')];
+    }
+
+    /**
      * @param $post_id
      * @return void
      */
@@ -2833,6 +2948,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
 
         $order = wc_get_order($post_id);
         $total = $order->get_total();
+
+        if (!empty($order->get_meta('payplus_j5_cancelled'))) {
+            return;
+        }
 
         if ($order->get_status() !== "processing" || $order->get_status() === "wc-processing") {
             $class = ($this->check_amount_authorization) ? 'payplus-visibility' : '';
@@ -2848,6 +2967,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                         </div>
                     </div>
                 </li>";
+            if ($this->get_option('enable_j5_cancel', 'no') === 'yes' && current_user_can('edit_shop_orders') && empty($order->get_meta('payplus_charged_j5_amount'))) {
+                echo "<li class='wide payplus-cancel-j5'>
+                        <button id='payplus-cancel-j5' type='button' class='button' data-order-id='" . esc_attr($post_id) . "'><span class='dashicons dashicons-dismiss'></span> " . esc_html__('Cancel J5', 'payplus-payment-gateway') . "</button>
+                        <div class='payplus_loader'>
+                            <div class='loader'>
+                                <div class='loader-background'><div class='text'></div></div>
+                            </div>
+                        </div>
+                    </li>";
+            }
         }
     }
 
@@ -2871,7 +3000,7 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         $this->isInitiated();
         $charged_amount = 0;
         $charged_amount = (float) $order->get_meta('payplus_charged_j5_amount');
-        if ($charged_amount) {
+        if ($charged_amount || !empty($order->get_meta('payplus_j5_cancelled'))) {
             return;
         }
 

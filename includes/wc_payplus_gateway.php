@@ -632,6 +632,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $outPut[$order_id]['force_all'] = $forceAll;
                 $outPut[$order_id]['statuses'] = $status;
                 $order = wc_get_order($order_id);
+                if ($order && !empty($order->get_meta('payplus_j5_cancelled'))) {
+                    echo esc_html("\nOrder #$order_id - J5 authorization was cancelled by admin - SKIPPING\n");
+                    $outPut[$order_id]['message'] = "J5 authorization was cancelled by admin - skipped";
+                    continue;
+                }
                 $runIpn = true;
                 $pruid_history = WC_PayPlus_Meta_Data::get_pruid_history($order_id);
                 $paymentPageUid = !empty($pruid_history);

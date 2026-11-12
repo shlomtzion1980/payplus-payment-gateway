@@ -1438,3 +1438,36 @@ function payplusMenusDisplay() {
         });
     })(jQuery);
 }
+
+jQuery(function ($) {
+    $(document).on("click", "#payplus-cancel-j5", function (event) {
+        event.preventDefault();
+        const $button = $(this);
+        const $loader = $button.closest(".payplus-cancel-j5").find(".payplus_loader");
+        if (!window.confirm(payplus_script_admin.cancelJ5ConfirmMessage)) {
+            return;
+        }
+        $button.prop("disabled", true);
+        $loader.fadeIn();
+        $.post(payplus_script_admin.ajax_url, {
+            action: "payplus-cancel-j5",
+            order_id: $button.data("order-id"),
+            _ajax_nonce: payplus_script_admin.payplusCancelJ5,
+        })
+            .done(function (response) {
+                if (response && response.success) {
+                    location.reload();
+                    return;
+                }
+                const reason = response && response.data && response.data.message ? response.data.message : "";
+                $loader.fadeOut();
+                alert(payplus_script_admin.cancelJ5ErrorMessage + " " + reason);
+                $button.prop("disabled", false);
+            })
+            .fail(function () {
+                $loader.fadeOut();
+                alert(payplus_script_admin.cancelJ5ErrorMessage);
+                $button.prop("disabled", false);
+            });
+    });
+});

@@ -4700,3 +4700,57 @@ msgstr "כאשר האפשרות מופעלת, רק נתיב הצלחה אחד (�
 
 msgid "Allow customers to securely save credit card information as tokens for convenient future or recurring purchases.\n                <br>Saving cards can be done either during purchase or through the \"My Account\" section in the website."
 msgstr "אפשר ללקוחות (עם חשבון) לשמור מידע כרטיס אשראי (בעזרת טוקן מאובטח) לשימוש לעסקאות עתידיות <br>ניתן לשמור כרטיסים או בעת רכישה או דרך \"החשבון שלי\" באתר."
+
+msgid "Allow J5 cancel"
+msgstr "אפשר ביטול J5"
+
+msgid "Show a \"Cancel J5\" button on authorized (J5) orders"
+msgstr "הצג כפתור \"ביטול J5\" בהזמנות עם אישור מסגרת (J5)"
+
+msgid "Cancels the J5 authorization in PayPlus (releases the credit hold) and sets the order to Cancelled. PayPlus allows it only before the daily deposit (by default the same day until 23:00); after that, use a refund."
+msgstr "מבטל את אישור המסגרת (J5) ב-PayPlus (משחרר את המסגרת בכרטיס) ומעביר את ההזמנה לסטטוס \"בוטל\". PayPlus מאפשרת זאת רק לפני השידור היומי (כברירת מחדל באותו היום עד 23:00); לאחר מכן יש לבצע זיכוי."
+
+msgid "Cancel J5"
+msgstr "ביטול J5"
+
+msgid "Cancel the J5 authorization in PayPlus and set this order to Cancelled? This cannot be undone."
+msgstr "לבטל את אישור המסגרת (J5) ב-PayPlus ולהעביר את ההזמנה לסטטוס \"בוטל\"? לא ניתן לשחזר פעולה זו."
+
+msgid "J5 cancel failed:"
+msgstr "ביטול J5 נכשל:"
+
+msgid "J5 cancel is not enabled in the PayPlus settings."
+msgstr "ביטול J5 אינו מופעל בהגדרות PayPlus."
+
+msgid "Order not found."
+msgstr "ההזמנה לא נמצאה."
+
+msgid "Another process is updating this order, try again in a few seconds."
+msgstr "תהליך אחר מעדכן את ההזמנה כעת, נסו שוב בעוד מספר שניות."
+
+msgid "This order has no J5 authorization to cancel."
+msgstr "אין בהזמנה זו אישור מסגרת (J5) לביטול."
+
+msgid "This J5 authorization was already charged. Use a refund instead."
+msgstr "אישור המסגרת (J5) כבר חויב. יש לבצע זיכוי במקום."
+
+msgid "This J5 authorization was already cancelled."
+msgstr "אישור המסגרת (J5) כבר בוטל."
+
+msgid "The PayPlus response of this order is missing:"
+msgstr "בתגובת PayPlus של הזמנה זו חסרים:"
+
+msgid "PayPlus J5 cancel failed: %s"
+msgstr "ביטול J5 ב-PayPlus נכשל: %s"
+
+msgid "PayPlus J5 authorization cancelled by admin (%s) - the credit hold was released."
+msgstr "אישור המסגרת (J5) ב-PayPlus בוטל על ידי מנהל (%s) - המסגרת בכרטיס שוחררה."
+
+msgid "J5 cancelled."
+msgstr "J5 בוטל."
+
+msgid "J5 Cancelled by admin"
+msgstr "J5 בוטל על ידי מנהל"
+
+msgid "You do not have permission to edit orders."
+msgstr "אין לך הרשאה לערוך הזמנות."

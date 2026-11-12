@@ -283,6 +283,9 @@ class WC_PayPlus_Statics
                                 $status = $status === "rejected" ? "<span style='color: red;'>Rejected</span>" : $status;
                                 $status = $status === "approved" ? "Approved" : $status;
                                 $status = isset($responseArray['data']['transaction']['approval_number']) ? "Approved" : $status;
+                                if (!empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_j5_cancelled', true))) {
+                                    $status = "<span style='color: red;'>" . esc_html__('J5 Cancelled by admin', 'payplus-payment-gateway') . "</span>";
+                                }
                                 $tokeUid = $responseArray['token_uid'] ?? $responseArray['data']['data']['card_information']['token_number'] ?? null;
                                 $j5Charge = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_charged_j5_amount') ?? null;
                                 $identificationNumber = $responseArray['identification_number'] ?? $responseArray['data']['transaction']['identification_number'] ?? null;

@@ -817,6 +817,14 @@ class WC_PayPlus_Form_Fields
                 'label' => __('Transaction amount change', 'payplus-payment-gateway'),
                 'description' => __('Choose this to be able to charge a different amount higher/lower than the order total (A number field will appear beside the "Make Paymet" button)', 'payplus-payment-gateway'),
             ],
+            'enable_j5_cancel' => [
+                'title' => __('Allow J5 cancel', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'default' => 'no',
+                'desc_tip' => true,
+                'label' => __('Show a "Cancel J5" button on authorized (J5) orders', 'payplus-payment-gateway'),
+                'description' => __('Cancels the J5 authorization in PayPlus (releases the credit hold) and sets the order to Cancelled. PayPlus allows it only before the daily deposit (by default the same day until 23:00); after that, use a refund.', 'payplus-payment-gateway'),
+            ],
             'j5_weight_estimate_enabled' => [
                 'title' => __('Edit J5 Cart amount by percentage', 'payplus-payment-gateway'),
                 'type' => 'checkbox',
