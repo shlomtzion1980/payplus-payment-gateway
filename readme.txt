@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 8.3.4  - 12-11-2026 =
 
 - Feature   - New option "Allow J5 cancel": a "Cancel J5" button on authorized orders cancels the J5 in PayPlus (releases the credit hold) and sets the order to Cancelled.
+- Fix       - Saved cards: the card is saved when the PayPlus payment page returns by POST and "Save card" was ticked.
 
 == 8.3.3  - 09-11-2026 =
 

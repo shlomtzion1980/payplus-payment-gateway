@@ -688,7 +688,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                                 );
                             }
                         }
-                        if ($this->create_pp_token && $isHostedPayment && $saveToken) {
+                        $saveCardRequested = $isHostedPayment
+                            ? $saveToken
+                            : ($order->get_user_id() && !empty($responseBody['data']['token_uid']) && !empty(WC_PayPlus_Meta_Data::get_meta($order_id, 'save_payment_method')));
+                        if ($this->create_pp_token && $saveCardRequested) {
                             $user_id = $order->get_user_id();
                             $this->save_token($responseBody['data'], $user_id);
                         }

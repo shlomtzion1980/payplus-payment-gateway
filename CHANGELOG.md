@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [8.3.4]  - 11-12-2026 - (Pita)
 
 - Feature   - New option "Allow J5 cancel" (default off): a "Cancel J5" button on authorized (J5) orders cancels the transaction in PayPlus (Transactions/Cancel, releases the credit hold) and sets the order to Cancelled. The PayPlus metabox shows "J5 Cancelled by admin", and the cron, Orders Validator and charge actions skip cancelled J5 orders. Logged in `payplus_process_j5_cancel`.
+- Fix       - Saved cards: when the PayPlus payment page returns by POST, the card is now saved to the customer's account if "Save card" was ticked at checkout (it was saved only with a GET return or Embedded).
 
 ## [8.3.3]  - 11-09-2026 - (didWeWin?)
 
