@@ -4754,3 +4754,24 @@ msgstr "J5 בוטל על ידי מנהל"
 
 msgid "You do not have permission to edit orders."
 msgstr "אין לך הרשאה לערוך הזמנות."
+
+msgid "This saved card cannot be used for this subscription. Please choose another card."
+msgstr "לא ניתן להשתמש בכרטיס השמור הזה עבור המנוי. נא לבחור כרטיס אחר."
+
+msgid "saved card ending in %s"
+msgstr "כרטיס שמור המסתיים ב-%s"
+
+msgid "new card ending in %s"
+msgstr "כרטיס חדש המסתיים ב-%s"
+
+msgid "Your card for this subscription was updated."
+msgstr "הכרטיס עבור המנוי עודכן."
+
+msgid "PayPlus: the card used for renewals was changed (%s)."
+msgstr "PayPlus: הכרטיס לחיובי המנוי הוחלף (%s)."
+
+msgid "PayPlus card token (empty = the card of the original order)"
+msgstr "טוקן כרטיס PayPlus (ריק = הכרטיס של ההזמנה המקורית)"
+
+msgid "PayPlus could not find this card token. Check the token and try again."
+msgstr "PayPlus לא מצאה את טוקן הכרטיס. נא לבדוק את הטוקן ולנסות שוב."

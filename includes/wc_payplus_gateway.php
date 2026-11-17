@@ -19,6 +19,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
 {
 
     private static $page_protect_registered = false;
+    private static $subscription_pm_hooks_registered = false;
 
     public $id = 'payplus-payment-gateway';
     public $add_product_field_transaction_type;
@@ -319,6 +320,14 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         // Subscription Handler
         if (class_exists('WC_Subscriptions_Order') && $this->disable_woocommerce_scheduler !== 'yes') {
             add_action('woocommerce_scheduled_subscription_payment_' . $this->id, array($this, 'scheduled_subscription_payment'), 10, 2);
+        }
+
+        // Change payment method (WooCommerce Subscriptions): main gateway only, registered once.
+        if ($this->id === 'payplus-payment-gateway' && class_exists('WC_Subscriptions_Order') && !self::$subscription_pm_hooks_registered) {
+            self::$subscription_pm_hooks_registered = true;
+            add_action('woocommerce_api_payplus_subscription_pm', [$this, 'subscription_payment_method_response']);
+            add_filter('woocommerce_subscription_payment_meta', [$this, 'subscription_payment_meta'], 10, 2);
+            add_action('woocommerce_subscription_validate_payment_meta_' . $this->id, [$this, 'validate_subscription_payment_meta'], 10, 2);
         }
 
         // Hook to handle order status changes — register only once across all gateway instances
@@ -2056,6 +2065,11 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
         $handle = 'payplus_payment_using_token';
         $order = wc_get_order($order_id);
+
+        // WooCommerce Subscriptions "Change payment method" passes the subscription itself: save a card, never charge.
+        if ($this->id === 'payplus-payment-gateway' && $order && function_exists('wcs_is_subscription') && wcs_is_subscription($order)) {
+            return $this->process_subscription_payment_method_change($order);
+        }
 
         $payplus_instance = WC_PayPlus::get_instance();
         $this->pwGiftCardData = $payplus_instance->pwGiftCardData;
@@ -4889,21 +4903,322 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         }
 
         if (isset($_REQUEST['status']) && sanitize_text_field(wp_unslash(($_REQUEST['status']))) == "approved" && isset($_REQUEST['status_code']) && sanitize_text_field(wp_unslash($_REQUEST['status_code'])) == "000" && isset($_REQUEST['token_uid']) && sanitize_text_field(wp_unslash($_REQUEST['token_uid']))) {
-            wc_add_notice(__('Your new payment method has been added', 'payplus-payment-gateway'));
             $this->payplus_add_log_all($handle, wp_json_encode(wc_clean($_REQUEST)), 'completed');
+            // The return URL is customer controlled: the card goes to the logged-in user only, after PayPlus confirms the token.
             $user_id = get_current_user_id();
-            if (isset($_REQUEST['more_info'])) {
-                $user_id = explode("_", sanitize_text_field(wp_unslash($_REQUEST['more_info'])));
-                $user_id = $user_id[2];
+            $more_info_parts = isset($_REQUEST['more_info']) ? explode("_", sanitize_text_field(wp_unslash($_REQUEST['more_info']))) : [];
+            $more_info_user_id = isset($more_info_parts[2]) ? absint($more_info_parts[2]) : 0;
+            $card = ($user_id && (!$more_info_user_id || $more_info_user_id === $user_id)) ? $this->payplus_check_token(sanitize_text_field(wp_unslash($_REQUEST['token_uid']))) : false;
+            if ($card) {
+                wc_add_notice(__('Your new payment method has been added', 'payplus-payment-gateway'));
+                update_user_meta($user_id, 'cc_token', $card['token_uid']);
+                $this->save_token($card, $user_id);
+            } else {
+                wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
+                $this->payplus_add_log_all($handle, 'Card not saved: user ' . $user_id . ', more_info user ' . $more_info_user_id . ' - not the logged-in user or token not confirmed by PayPlus', 'error');
             }
-            update_user_meta($user_id, 'cc_token', sanitize_text_field(wp_unslash($_REQUEST['token_uid'])));
-            $this->save_token($_REQUEST, $user_id);
         } else {
             wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
             $this->payplus_add_log_all($handle, 'IPN Error: There was a problem adding this card', 'error');
         }
         wp_safe_redirect(wc_get_endpoint_url('payment-methods', '', wc_get_page_permalink('myaccount')));
         exit;
+    }
+
+    /**
+     * Ask PayPlus whether a card token exists on this terminal.
+     *
+     * @param string $token_uid
+     * @return array|false Token data from PayPlus (token_uid, four_digits, expiry_month, expiry_year, brand_id...) or false.
+     */
+    public function payplus_check_token($token_uid)
+    {
+        $handle = 'payplus_check_token';
+        $token_uid = sanitize_text_field((string) $token_uid);
+        if (!preg_match('/^[A-Za-z0-9-]{8,80}$/', $token_uid)) {
+            $this->payplus_add_log_all($handle, 'Invalid token format: ' . $token_uid, 'error');
+            return false;
+        }
+
+        $response = WC_PayPlus_Statics::payPlusRemote($this->api_url . 'Token/Check/' . rawurlencode($token_uid), [], 'get');
+        if (is_wp_error($response)) {
+            $this->payplus_add_log_all($handle, 'Token ' . $token_uid . ' - request error: ' . $response->get_error_message(), 'error');
+            return false;
+        }
+
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        if (!is_array($body) || ($body['results']['status'] ?? '') !== 'success' || empty($body['data']['token_uid']) || !hash_equals((string) $body['data']['token_uid'], $token_uid)) {
+            $this->payplus_add_log_all($handle, 'Token ' . $token_uid . ' - not confirmed by PayPlus: ' . wp_remote_retrieve_body($response), 'error');
+            return false;
+        }
+
+        return $body['data'];
+    }
+
+    /**
+     * WooCommerce Subscriptions "Change payment method": a saved card is set right away,
+     * a new card goes through a PayPlus token page (no charge) and is set on return.
+     *
+     * @param WC_Subscription $subscription
+     * @return array
+     */
+    public function process_subscription_payment_method_change($subscription)
+    {
+        $handle = 'payplus_subscription_payment_method';
+        $subscription_id = $subscription->get_id();
+        // phpcs:disable WordPress.Security.NonceVerification.Missing -- WooCommerce Subscriptions verifies its own nonce before calling process_payment().
+        $token_id = isset($_POST['wc-' . $this->id . '-payment-token']) ? sanitize_text_field(wp_unslash($_POST['wc-' . $this->id . '-payment-token'])) : '';
+        $update_all = !empty($_POST['update_all_subscriptions_payment_method']);
+        // phpcs:enable WordPress.Security.NonceVerification.Missing
+
+        if ($token_id !== '' && $token_id !== 'new') {
+            $token = WC_Payment_Tokens::get(absint($token_id));
+            if (!$token || $token->get_gateway_id() !== $this->id || (int) $token->get_user_id() !== (int) $subscription->get_user_id() || !$this->checkValidateCard($token)) {
+                $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: saved card {$token_id} rejected (not found, not this customer's card, or expired).", 'error');
+                wc_add_notice(__('This saved card cannot be used for this subscription. Please choose another card.', 'payplus-payment-gateway'), 'error');
+                return ['result' => 'fail', 'redirect' => ''];
+            }
+            // translators: %s: last 4 digits of the card.
+            $this->payplus_set_subscription_token($subscription_id, $token->get_token(), sprintf(__('saved card ending in %s', 'payplus-payment-gateway'), $token->get_last4()));
+            return ['result' => 'success', 'redirect' => $subscription->get_view_order_url()];
+        }
+
+        $secret = wp_generate_password(32, false);
+        WC_PayPlus_Meta_Data::update_meta($subscription_id, [
+            '_payplus_pm_change' => [
+                'secret_hash' => wp_hash_password($secret),
+                'time' => time(),
+                'update_all' => $update_all,
+            ],
+        ]);
+
+        $success_url = add_query_arg([
+            'wc-api' => 'payplus_subscription_pm',
+            'subscription_id' => $subscription_id,
+            'pm_key' => $secret,
+        ], home_url('/'));
+
+        $customer_name = trim($subscription->get_billing_first_name() . ' ' . $subscription->get_billing_last_name());
+        if ($this->exist_company && $subscription->get_billing_company()) {
+            $customer_name = $subscription->get_billing_company();
+        }
+        $payload = [
+            'payment_page_uid' => $this->payment_page_id,
+            'charge_method' => 5,
+            'language_code' => $this->get_payment_page_language_code(),
+            'expiry_datetime' => '30',
+            'refURL_success' => $success_url,
+            'refURL_failure' => $subscription->get_view_order_url(),
+            'refURL_callback' => null,
+            'customer' => [
+                'customer_name' => $customer_name ?: $subscription->get_billing_email(),
+                'email' => $subscription->get_billing_email(),
+                'phone' => $subscription->get_billing_phone(),
+                'customer_external_number' => $subscription->get_user_id(),
+            ],
+            'amount' => 1,
+            'currency_code' => $subscription->get_currency(),
+            'sendEmailApproval' => false,
+            'sendEmailFailure' => false,
+            'create_token' => true,
+            'more_info' => 'wp_subpm_' . $subscription_id,
+        ];
+
+        $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: creating PayPlus token page for a new card.");
+        $response = WC_PayPlus_Statics::payPlusRemote($this->payment_url, $payload);
+        $res = is_wp_error($response) ? null : json_decode(wp_remote_retrieve_body($response), true);
+        if (empty($res['data']['payment_page_link']) || !$this->validateUrl($res['data']['payment_page_link'])) {
+            $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: token page failed: " . (is_wp_error($response) ? $response->get_error_message() : wp_remote_retrieve_body($response)), 'error');
+            wc_add_notice(__('Something went wrong with the payment page', 'payplus-payment-gateway'), 'error');
+            return ['result' => 'fail', 'redirect' => ''];
+        }
+
+        // WooCommerce Subscriptions redirects with wp_safe_redirect(), which falls back to the admin dashboard for external hosts.
+        $payment_host = wp_parse_url($res['data']['payment_page_link'], PHP_URL_HOST);
+        add_filter('allowed_redirect_hosts', function ($hosts) use ($payment_host) {
+            $hosts[] = $payment_host;
+            return $hosts;
+        });
+        $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: redirecting the customer to the PayPlus token page ({$payment_host}).");
+
+        return ['result' => 'success', 'redirect' => $res['data']['payment_page_link']];
+    }
+
+    /**
+     * Return from the PayPlus token page opened by process_subscription_payment_method_change().
+     * Login cookies are often missing on a POST return, so the subscription is bound by a one-time key instead.
+     *
+     * @return void
+     */
+    public function subscription_payment_method_response()
+    {
+        $handle = 'payplus_subscription_payment_method';
+        // phpcs:disable WordPress.Security.NonceVerification.Recommended -- Bound by the one-time pm_key stored on the subscription; the token is confirmed with PayPlus.
+        $subscription_id = isset($_GET['subscription_id']) ? absint($_GET['subscription_id']) : 0;
+        $pm_key = isset($_GET['pm_key']) ? sanitize_text_field(wp_unslash($_GET['pm_key'])) : '';
+        $token_uid = isset($_REQUEST['token_uid']) ? sanitize_text_field(wp_unslash($_REQUEST['token_uid'])) : '';
+        $status = isset($_REQUEST['status']) ? sanitize_text_field(wp_unslash($_REQUEST['status'])) : '';
+        // phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+        $subscription = ($subscription_id && function_exists('wcs_get_subscription')) ? wcs_get_subscription($subscription_id) : false;
+        $redirect = $subscription ? $subscription->get_view_order_url() : wc_get_page_permalink('myaccount');
+        $pending = $subscription ? WC_PayPlus_Meta_Data::get_meta($subscription_id, '_payplus_pm_change', true) : null;
+
+        if (!$subscription || !is_array($pending) || empty($pending['secret_hash']) || $pm_key === '' || !wp_check_password($pm_key, $pending['secret_hash']) || (time() - (int) $pending['time']) > HOUR_IN_SECONDS) {
+            $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: return rejected (unknown subscription, wrong or expired key).", 'error');
+            wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
+            wp_safe_redirect($redirect);
+            exit;
+        }
+
+        WC_PayPlus_Meta_Data::delete_meta($subscription, '_payplus_pm_change');
+
+        $card = ($status === '' || $status === 'approved') ? $this->payplus_check_token($token_uid) : false;
+        if (!$card) {
+            $this->payplus_add_log_all($handle, "Subscription #{$subscription_id}: new card not saved (status: {$status}, token: {$token_uid}). The previous card is kept.", 'error');
+            wc_add_notice(__('There was a problem adding this card', 'payplus-payment-gateway'), 'error');
+            wp_safe_redirect($redirect);
+            exit;
+        }
+
+        // translators: %s: last 4 digits of the card.
+        $source = sprintf(__('new card ending in %s', 'payplus-payment-gateway'), sanitize_text_field($card['four_digits'] ?? ''));
+        $this->payplus_set_subscription_token($subscription_id, $card['token_uid'], $source);
+
+        if (!empty($pending['update_all']) && function_exists('wcs_get_users_subscriptions')) {
+            foreach (wcs_get_users_subscriptions($subscription->get_user_id()) as $other) {
+                if ($other->get_id() !== $subscription_id && $other->get_payment_method() === $this->id && $other->has_status(['active', 'on-hold', 'pending'])) {
+                    $this->payplus_set_subscription_token($other->get_id(), $card['token_uid'], $source);
+                }
+            }
+        }
+
+        if ($this->create_pp_token && $subscription->get_user_id()) {
+            $this->save_token($card, $subscription->get_user_id());
+        }
+
+        wc_add_notice(__('Your card for this subscription was updated.', 'payplus-payment-gateway'));
+        wp_safe_redirect($redirect);
+        exit;
+    }
+
+    /**
+     * @param int $subscription_id
+     * @param string $token_uid
+     * @param string $source
+     * @return void
+     */
+    private function payplus_set_subscription_token($subscription_id, $token_uid, $source, $changed_by = 'customer')
+    {
+        $subscription = wc_get_order($subscription_id);
+        if (!$subscription) {
+            return;
+        }
+        $before = $this->payplus_describe_renewal_token($subscription);
+        WC_PayPlus_Meta_Data::update_meta($subscription, ['payplus_token_uid' => sanitize_text_field($token_uid)]);
+        // translators: %s: where the card came from, e.g. "new card ending in 1234".
+        $subscription->add_order_note(sprintf(__('PayPlus: the card used for renewals was changed (%s).', 'payplus-payment-gateway'), $source));
+        $this->payplus_log_subscription_token_change($subscription, $before, $changed_by . ' - ' . $source);
+    }
+
+    /**
+     * Which token the next renewal would charge, using the same order as scheduled_subscription_payment():
+     * subscription payplus_token_uid, then the parent order, then the user's cc_token.
+     *
+     * @param WC_Order $subscription
+     * @return string
+     */
+    private function payplus_describe_renewal_token($subscription)
+    {
+        $subscription_id = $subscription->get_id();
+        $user_id = (int) $subscription->get_user_id();
+        $token = (string) WC_PayPlus_Meta_Data::get_meta($subscription_id, 'payplus_token_uid', true);
+        $from = 'on the subscription';
+        if ($token === '' && $subscription->get_parent_id()) {
+            $token = (string) WC_PayPlus_Meta_Data::get_meta($subscription->get_parent_id(), 'payplus_token_uid', true);
+            $from = 'from parent order #' . $subscription->get_parent_id();
+        }
+        if ($token === '' && $user_id) {
+            $token = (string) get_user_meta($user_id, 'cc_token', true);
+            $from = "from the customer's cc_token (fallback)";
+        }
+        if ($token === '') {
+            return 'none';
+        }
+        $last4 = '';
+        foreach ($user_id ? WC_Payment_Tokens::get_customer_tokens($user_id, $this->id) : [] as $saved) {
+            if ($saved->get_token() === $token) {
+                $last4 = ' card ending ' . $saved->get_last4();
+                break;
+            }
+        }
+        return $token . $last4 . ' (' . $from . ')';
+    }
+
+    /**
+     * @param WC_Order $subscription
+     * @param string $before Output of payplus_describe_renewal_token() before the change.
+     * @param string $changed_by
+     * @return void
+     */
+    private function payplus_log_subscription_token_change($subscription, $before, $changed_by)
+    {
+        $after = $this->payplus_describe_renewal_token(wc_get_order($subscription->get_id()));
+        $this->payplus_add_log_all(
+            'payplus_subscription_payment_method',
+            "TOKEN CHANGED - Subscription #" . $subscription->get_id() . " (customer #" . $subscription->get_user_id() . ")\n"
+                . "  Changed by: {$changed_by}\n"
+                . "  Before:     {$before}\n"
+                . "  After:      {$after}\n"
+                . "  The next renewal charges the 'After' token; its log shows 'Token found on subscription #" . $subscription->get_id() . "'."
+        );
+    }
+
+    /**
+     * Shows the PayPlus token on the admin edit subscription screen, and lets
+     * WooCommerce Subscriptions copy it when a customer updates all subscriptions.
+     *
+     * @param array $payment_meta
+     * @param WC_Subscription $subscription
+     * @return array
+     */
+    public function subscription_payment_meta($payment_meta, $subscription)
+    {
+        $payment_meta[$this->id] = [
+            'post_meta' => [
+                'payplus_token_uid' => [
+                    'value' => (string) WC_PayPlus_Meta_Data::get_meta($subscription->get_id(), 'payplus_token_uid', true),
+                    'label' => __('PayPlus card token (empty = the card of the original order)', 'payplus-payment-gateway'),
+                ],
+            ],
+        ];
+        return $payment_meta;
+    }
+
+    /**
+     * @param array $payment_meta
+     * @param WC_Subscription|null $subscription
+     * @return void
+     * @throws Exception When PayPlus does not know the token.
+     */
+    public function validate_subscription_payment_meta($payment_meta, $subscription = null)
+    {
+        $token_uid = isset($payment_meta['post_meta']['payplus_token_uid']['value']) ? trim((string) $payment_meta['post_meta']['payplus_token_uid']['value']) : '';
+        $current = $subscription ? (string) WC_PayPlus_Meta_Data::get_meta($subscription->get_id(), 'payplus_token_uid', true) : '';
+        if ($token_uid !== '' && $token_uid !== $current && !$this->payplus_check_token($token_uid)) {
+            $this->payplus_add_log_all('payplus_subscription_payment_method', 'Subscription #' . ($subscription ? $subscription->get_id() : 0) . ": admin token '{$token_uid}' rejected - PayPlus does not know it. Nothing was changed.", 'error');
+            throw new Exception(esc_html__('PayPlus could not find this card token. Check the token and try again.', 'payplus-payment-gateway'));
+        }
+        if ($subscription && $token_uid !== $current) {
+            $before = $this->payplus_describe_renewal_token($subscription);
+            $admin = wp_get_current_user();
+            $changed_by = 'admin (' . ($admin && $admin->exists() ? $admin->user_login : 'unknown') . ') - edit subscription screen';
+            add_action('woocommerce_process_shop_subscription_meta', function ($post_id) use ($subscription, $before, $changed_by) {
+                if ((int) $post_id === (int) $subscription->get_id()) {
+                    $this->payplus_log_subscription_token_change($subscription, $before, $changed_by);
+                }
+            }, 1000);
+        }
     }
 
     //subscription

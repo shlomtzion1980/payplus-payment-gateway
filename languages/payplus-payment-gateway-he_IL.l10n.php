@@ -664,5 +664,12 @@ Orders that were successful and cancelled manually will not be tested or updated
     'J5 cancelled.' => 'J5 בוטל.',
     'J5 Cancelled by admin' => 'J5 בוטל על ידי מנהל',
     'You do not have permission to edit orders.' => 'אין לך הרשאה לערוך הזמנות.',
+    'This saved card cannot be used for this subscription. Please choose another card.' => 'לא ניתן להשתמש בכרטיס השמור הזה עבור המנוי. נא לבחור כרטיס אחר.',
+    'saved card ending in %s' => 'כרטיס שמור המסתיים ב-%s',
+    'new card ending in %s' => 'כרטיס חדש המסתיים ב-%s',
+    'Your card for this subscription was updated.' => 'הכרטיס עבור המנוי עודכן.',
+    'PayPlus: the card used for renewals was changed (%s).' => 'PayPlus: הכרטיס לחיובי המנוי הוחלף (%s).',
+    'PayPlus card token (empty = the card of the original order)' => 'טוקן כרטיס PayPlus (ריק = הכרטיס של ההזמנה המקורית)',
+    'PayPlus could not find this card token. Check the token and try again.' => 'PayPlus לא מצאה את טוקן הכרטיס. נא לבדוק את הטוקן ולנסות שוב.',
   ),
 );

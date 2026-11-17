@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.5]  - 11-17-2026
+
+- Feature   - WooCommerce Subscriptions "Change payment method": customers can replace the card used for renewals with a saved card or a new card (PayPlus token page, no charge), and admins can edit the "PayPlus card token" on the edit subscription screen. New tokens are confirmed with PayPlus (Token/Check) before they are saved. Every change is logged in `payplus_subscription_payment_method` with the previous and the new token.
+- Tweak     - Add payment method: the new card is saved to the logged-in customer only, after PayPlus confirms the token.
+
 ## [8.3.4]  - 11-12-2026 - (Pita)
 
 - Feature   - New option "Allow J5 cancel" (default off): a "Cancel J5" button on authorized (J5) orders cancels the transaction in PayPlus (Transactions/Cancel, releases the credit hold) and sets the order to Cancelled. The PayPlus metabox shows "J5 Cancelled by admin", and the cron, Orders Validator and charge actions skip cancelled J5 orders. Logged in `payplus_process_j5_cancel`.
