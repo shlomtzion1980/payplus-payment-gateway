@@ -90,6 +90,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 
 - Feature   - WooCommerce Subscriptions "Change payment method": customers can replace the renewal card (saved or new card, no charge) and admins can edit the PayPlus card token on the subscription. Changes are logged in `payplus_subscription_payment_method`.
 - Tweak     - Add payment method: the new card is saved to the logged-in customer only, after PayPlus confirms the token.
+- Tweak     - Improved permission checks for the admin order actions.
 
 == 8.3.4  - 12-11-2026 =
 

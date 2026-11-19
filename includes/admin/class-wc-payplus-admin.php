@@ -185,6 +185,11 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     {
         check_ajax_referer('payplus_token_payment', '_ajax_nonce');
 
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
+
         $this->isInitiated();
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : wp_die('No order id received.');
         $order = wc_get_order($order_id);
@@ -356,6 +361,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function ajax_check_order_status()
     {
         check_ajax_referer('payplus_payplus_ipn', '_ajax_nonce');
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
         $order_id = isset($_POST['order_id']) ? intval($_POST['order_id']) : 0;
         $order = wc_get_order($order_id);
         if (!$order) {
@@ -1109,6 +1118,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
     public function ajax_payment_payplus_transaction_review()
     {
         check_ajax_referer('payplus_transaction_review', '_ajax_nonce');
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error('You do not have permission to edit orders.');
+            wp_die();
+        }
         if (!empty($_POST) && !empty($_POST['order_id'])) {
             $handle = "payplus_process_payment";
             $this->isInitiated();
@@ -1197,6 +1210,10 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
         // Verify the nonce using the sanitized order ID
         check_ajax_referer('payplus_display_meta_action_' . $order_id, 'payplus_display_meta_nonce');
 
+        if (!current_user_can('edit_shop_orders')) {
+            wp_send_json_error('You do not have permission to edit orders.');
+        }
+
         if (!$order_id) {
             wp_send_json_error('Invalid order ID.');
         }
@@ -1232,7 +1249,8 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
      */
     public function ajax_payplus_generate_link_payment($oid = null, $_wpnonce = null, $isProcessPayment = false)
     {
-        if (isset($_wpnonce) && !wp_verify_nonce($_wpnonce, 'ajax_payplus_generate_link_payment')) {
+        // Internal callers (POS EMV checkout / POS override) pass a nonce created in the same request; every AJAX request gets the referer + capability check.
+        if (!isset($_wpnonce) || !wp_verify_nonce($_wpnonce, 'ajax_payplus_generate_link_payment')) {
             check_ajax_referer('payplus_generate_link_payment', '_ajax_nonce');
             if (!current_user_can('edit_shop_orders')) {
                 wp_send_json_error('You do not have permission to edit orders.');
