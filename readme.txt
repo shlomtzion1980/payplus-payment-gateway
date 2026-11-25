@@ -89,6 +89,7 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 == 8.3.6  - 25-11-2026 =
 
 - Feature   - Split-payment refunds: on orders paid with multiple PayPlus payment methods (e.g. Multipass / bit + credit card), WooCommerce's Refund panel lets admins choose which payment(s) and amount(s) to refund individually.
+- Tweak     - New option "Prevent double coupon discount & rounding drift" (default off) for stores where a pricing/bundle plugin already deducts coupons from item subtotals or 0-decimal rounding causes amount mismatches.
 
 == 8.3.5  - 19-11-2026 =
 

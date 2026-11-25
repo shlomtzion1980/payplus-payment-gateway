@@ -693,5 +693,8 @@ Orders that were successful and cancelled manually will not be tested or updated
     'The sum of selected PayPlus payments must match the refund amount.' => 'סכום תשלומי PayPlus שנבחרו חייב להיות תואם לסכום הזיכוי.',
     'Unknown PayPlus refund error' => 'שגיאת זיכוי לא ידועה ב-PayPlus',
     'Partial split refund: %1$s %2$s was refunded in PayPlus and recorded on the order, but another payment failed: %3$s' => 'זיכוי מפוצל חלקי: %1$s %2$s זוכו ב-PayPlus ונרשמו בהזמנה, אך תשלום נוסף נכשל: %3$s',
+    'Prevent double coupon discount & rounding drift' => 'מניעת כפל הנחת קופון והפרשי עיגול',
+    'Skip duplicate coupon line and avoid per-unit rounding drift when building PayPlus items' => 'דלג על שורת קופון כפולה ומנע הפרשי עיגול ליחידה בעת בניית פריטי PayPlus',
+    'Enable if a pricing/discount or bundle plugin already applies coupon discounts to item subtotals (causing PayPlus to deduct the coupon twice) or if 0-decimal rounding causes the PayPlus amount to differ from the WooCommerce order total.' => 'הפעל אם תוסף הנחות/תמחור או מארזים כבר מחיל את הנחת הקופון על מחירי הפריטים (וגורם ל-PayPlus להפחית את הקופון פעמיים) או אם עיגול ללא אגורות גורם לסכום ב-PayPlus להיות שונה מסכום ההזמנה ב-WooCommerce.',
   ),
 );

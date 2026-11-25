@@ -32,6 +32,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
     public $block_ip_transactions_hour;
     public $is_Local_pickup;
     public $single_quantity_per_line;
+    public $prevent_double_coupon_discount;
     public $rounding_decimals;
     public $hide_icon;
     public $api_key;
@@ -206,6 +207,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
         $this->paying_vat_iso_code = $this->get_option('paying_vat_iso_code');
         $this->foreign_invoices_lang = $this->get_option('foreign_invoices_lang');
         $this->send_products = $this->get_option('send_products') == 'yes' ? true : false;
+        $this->prevent_double_coupon_discount = ($this->get_option('prevent_double_coupon_discount') === 'yes');
         $this->exist_company = $this->get_option('exist_company') == 'yes' ? true : false;
         // - PayPlus Settings Options
         $this->use_ipn = true;
@@ -2886,7 +2888,7 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
                 $totalCartAmount += ($productPrice);
             } else {
                 if ($this->single_quantity_per_line == 'yes') {
-                    $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled) * $quantity;
+                    $productPrice = $order->get_item_subtotal($item_data, $wc_tax_enabled, !$this->prevent_double_coupon_discount) * $quantity;
                     $productPrice = round($productPrice, $this->rounding_decimals);
                     $totalCartAmount += $productPrice;
                     $name .= ' ×  ' . $quantity;
@@ -3067,15 +3069,51 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             }
             $productCouponPrice *= -1;
             $productCouponPrice = round($productCouponPrice, $this->rounding_decimals);
-            $totalCartAmount += $productCouponPrice;
 
-            $itemDetails = [
-                'name' => ($allProductSku) ? $allProductSku . " ) " : __('Discount coupons', 'payplus-payment-gateway'),
-                'barcode' => __('Discount coupons', 'payplus-payment-gateway'),
-                'quantity' => 1,
-                'price' => round($productCouponPrice, $this->rounding_decimals),
-            ];
-            $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
+            $skipDuplicateCoupon = false;
+            if ($this->prevent_double_coupon_discount) {
+                $pendingGiftCardsTotal = 0.0;
+                if (isset($this->pwGiftCardData) && isset($this->pwGiftCardData['gift_cards']) && is_array($this->pwGiftCardData['gift_cards'])) {
+                    foreach ($this->pwGiftCardData['gift_cards'] as $giftCardAmt) {
+                        $pendingGiftCardsTotal += round((float) $giftCardAmt, $this->rounding_decimals);
+                    }
+                }
+                $yithGiftCards = $order->get_meta('_ywgc_applied_gift_cards');
+                $yithAsFee = $order->get_meta('ywgc_gift_card_updated_as_fee');
+                if ($yithGiftCards && $yithAsFee == false && is_array($yithGiftCards)) {
+                    foreach ($yithGiftCards as $giftCardAmt) {
+                        $pendingGiftCardsTotal += round((float) $giftCardAmt, $this->rounding_decimals);
+                    }
+                }
+
+                $expectedBeforeGiftCards = round((float) $order->get_total() + $pendingGiftCardsTotal, $this->rounding_decimals);
+                $diffWithoutCoupon = abs(round($totalCartAmount - $expectedBeforeGiftCards, $this->rounding_decimals));
+                $diffWithCoupon = abs(round(($totalCartAmount + $productCouponPrice) - $expectedBeforeGiftCards, $this->rounding_decimals));
+                $skipDuplicateCoupon = ($diffWithoutCoupon < $diffWithCoupon && $diffWithoutCoupon <= 1);
+            }
+
+            if ($skipDuplicateCoupon) {
+                $this->payplus_add_log_all(
+                    'payplus_process_payment',
+                    sprintf(
+                        'Order #%d: skipped duplicate coupon line (%s) because items sum (%s) already matches order total (%s).',
+                        $order_id,
+                        $productCouponPrice,
+                        $totalCartAmount,
+                        $expectedBeforeGiftCards
+                    )
+                );
+            } else {
+                $totalCartAmount += $productCouponPrice;
+
+                $itemDetails = [
+                    'name' => ($allProductSku) ? $allProductSku . " ) " : __('Discount coupons', 'payplus-payment-gateway'),
+                    'barcode' => __('Discount coupons', 'payplus-payment-gateway'),
+                    'quantity' => 1,
+                    'price' => round($productCouponPrice, $this->rounding_decimals),
+                ];
+                $productsItems[] = ($json) ? wp_json_encode($itemDetails, JSON_UNESCAPED_UNICODE) : $itemDetails;
+            }
         }
 
         if (isset($this->pwGiftCardData) && isset($this->pwGiftCardData['gift_cards']) && is_array($this->pwGiftCardData['gift_cards'])) {

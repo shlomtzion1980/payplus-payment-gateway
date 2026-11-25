@@ -1105,6 +1105,14 @@ class WC_PayPlus_Form_Fields
                 'desc_tip' => true,
                 'class' => 'payplus-documents'
             ],
+            'prevent_double_coupon_discount' => [
+                'title' => __('Prevent double coupon discount & rounding drift', 'payplus-payment-gateway'),
+                'type' => 'checkbox',
+                'label' => __('Skip duplicate coupon line and avoid per-unit rounding drift when building PayPlus items', 'payplus-payment-gateway'),
+                'description' => __('Enable if a pricing/discount or bundle plugin already applies coupon discounts to item subtotals (causing PayPlus to deduct the coupon twice) or if 0-decimal rounding causes the PayPlus amount to differ from the WooCommerce order total.', 'payplus-payment-gateway'),
+                'desc_tip' => true,
+                'default' => 'no',
+            ],
             'recurring_order_set_to_paid' => [
                 'title' => __('Mark as "paid" successfully created subscription orders', 'payplus-payment-gateway'),
                 'type' => 'checkbox',

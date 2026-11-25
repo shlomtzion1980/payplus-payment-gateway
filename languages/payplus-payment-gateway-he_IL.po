@@ -4841,3 +4841,12 @@ msgstr "שגיאת זיכוי לא ידועה ב-PayPlus"
 
 msgid "Partial split refund: %1$s %2$s was refunded in PayPlus and recorded on the order, but another payment failed: %3$s"
 msgstr "זיכוי מפוצל חלקי: %1$s %2$s זוכו ב-PayPlus ונרשמו בהזמנה, אך תשלום נוסף נכשל: %3$s"
+
+msgid "Prevent double coupon discount & rounding drift"
+msgstr "מניעת כפל הנחת קופון והפרשי עיגול"
+
+msgid "Skip duplicate coupon line and avoid per-unit rounding drift when building PayPlus items"
+msgstr "דלג על שורת קופון כפולה ומנע הפרשי עיגול ליחידה בעת בניית פריטי PayPlus"
+
+msgid "Enable if a pricing/discount or bundle plugin already applies coupon discounts to item subtotals (causing PayPlus to deduct the coupon twice) or if 0-decimal rounding causes the PayPlus amount to differ from the WooCommerce order total."
+msgstr "הפעל אם תוסף הנחות/תמחור או מארזים כבר מחיל את הנחת הקופון על מחירי הפריטים (וגורם ל-PayPlus להפחית את הקופון פעמיים) או אם עיגול ללא אגורות גורם לסכום ב-PayPlus להיות שונה מסכום ההזמנה ב-WooCommerce."
