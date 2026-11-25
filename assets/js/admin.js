@@ -4,10 +4,11 @@ let table_payment = null;
 const allSum = document.getElementById("all-sum");
 
 jQuery(function ($) {
-    // Inject payplus_refund_vat_type and cancellation fee data into WooCommerce refund AJAX requests
+    // Inject payplus_refund_vat_type, cancellation fee, and split-transaction allocations into WooCommerce refund AJAX requests
     $.ajaxPrefilter(function (options, originalOptions) {
         if (originalOptions.data && typeof originalOptions.data === 'object'
-            && originalOptions.data.action === 'woocommerce_refund_line_items') {
+            && originalOptions.data.action === 'woocommerce_refund_line_items'
+            && originalOptions.data.api_refund) {
             if (window.payplusRefundVatType) {
                 options.data += '&payplus_refund_vat_type=' + encodeURIComponent(window.payplusRefundVatType);
                 window.payplusRefundVatType = null;
@@ -18,15 +19,418 @@ jQuery(function ($) {
                 window.payplusCancellationFee = null;
                 window.payplusOriginalRefundAmount = null;
             }
+            if (window.payplusRefundTransactions && window.payplusRefundTransactions.length) {
+                options.data += '&payplus_refund_transactions=' + encodeURIComponent(JSON.stringify(window.payplusRefundTransactions));
+                window.payplusRefundTransactions = null;
+            }
         }
     });
+
+    // --- PayPlus Split-Payment Inline Refund Selector (inside WooCommerce Refund panel) ---
+    var ppSyncingFromPanel = false;
+
+    function ppGetDecimalPoint() {
+        return (typeof woocommerce_admin !== 'undefined' && woocommerce_admin.mon_decimal_point)
+            ? woocommerce_admin.mon_decimal_point
+            : '.';
+    }
+
+    function ppParseAmount(val) {
+        if (val === null || typeof val === 'undefined') return 0;
+        var str = String(val).trim();
+        if (!str) return 0;
+        var dec = ppGetDecimalPoint();
+        if (dec !== '.') {
+            str = str.split(dec).join('.');
+        }
+        str = str.replace(/[^\d.-]/g, '');
+        var num = parseFloat(str);
+        return isNaN(num) ? 0 : num;
+    }
+
+    function ppFormatWcAmount(num) {
+        var dec = ppGetDecimalPoint();
+        var s = (Math.round(num * 100) / 100).toFixed(2);
+        return dec !== '.' ? s.replace('.', dec) : s;
+    }
+
+    function ppHasLineItemRefunds() {
+        var found = false;
+        $('.woocommerce_order_items .refund input.refund_line_total, .woocommerce_order_items .refund input.refund_line_tax').each(function () {
+            if (ppParseAmount($(this).val()) > 0) {
+                found = true;
+                return false;
+            }
+        });
+        return found;
+    }
+
+    function ppGetRelatedTransactions() {
+        if (typeof payplus_script_payment !== 'undefined'
+            && Array.isArray(payplus_script_payment.related_refund_transactions)
+            && payplus_script_payment.related_refund_transactions.length >= 2) {
+            return payplus_script_payment.related_refund_transactions;
+        }
+        return [];
+    }
+
+    function ppFormatMethodName(method) {
+        if (!method) return 'Credit Card';
+        return String(method).replace(/[-_]+/g, ' ').replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+    }
+
+    function ppCollectRelatedAllocations() {
+        var allocations = [];
+        var sum = 0;
+        var hasExceeded = false;
+        $('#payplus-related-refund-panel tbody tr[data-uid]').each(function () {
+            var $row = $(this);
+            var uid = $row.attr('data-uid');
+            var maxVal = parseFloat($row.attr('data-remaining')) || 0;
+            var checked = $row.find('.pp-rel-check').is(':checked');
+            var amt = ppParseAmount($row.find('.pp-rel-amount').val());
+            if (checked && amt > 0) {
+                amt = Math.round(amt * 100) / 100;
+                if (amt > maxVal + 0.001) {
+                    hasExceeded = true;
+                }
+                sum = Math.round((sum + amt) * 100) / 100;
+                allocations.push({ transaction_uid: uid, amount: amt });
+            }
+        });
+        return { allocations: allocations, sum: sum, hasExceeded: hasExceeded };
+    }
+
+    function ppShowRelatedError(msg) {
+        var $err = $('#payplus-related-refund-error');
+        if (!$err.length) return;
+        if (msg) {
+            $err.text(msg).show();
+        } else {
+            $err.text('').hide();
+        }
+    }
+
+    function ppSyncRelatedRefundState(fromPanel) {
+        var $panel = $('#payplus-related-refund-panel');
+        if (!$panel.length) return;
+        var state = ppCollectRelatedAllocations();
+        var currency = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.currency_symbol) || '';
+        var i18n = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.related_refund_i18n) || {};
+
+        if (fromPanel && !ppHasLineItemRefunds()) {
+            ppSyncingFromPanel = true;
+            $('#refund_amount').val(state.sum > 0 ? ppFormatWcAmount(state.sum) : '').trigger('change');
+            ppSyncingFromPanel = false;
+        }
+
+        var wcRefundAmount = Math.round(ppParseAmount($('#refund_amount').val()) * 100) / 100;
+        var $status = $panel.find('.pp-rel-status-text');
+        var $autoBtn = $panel.find('.pp-rel-autofill');
+
+        var statusText = (i18n.allocated || 'Selected total:') + ' ' + currency + state.sum.toFixed(2);
+        var mismatch = wcRefundAmount > 0 && Math.abs(state.sum - wcRefundAmount) > 0.01;
+        if (wcRefundAmount > 0) {
+            statusText += ' / ' + (i18n.of_refund || 'of refund amount:') + ' ' + currency + wcRefundAmount.toFixed(2);
+        }
+        $status.text(statusText).css('color', state.hasExceeded || mismatch ? '#d63638' : (state.sum > 0 ? '#007017' : '#50575e'));
+        if (mismatch) {
+            $autoBtn.show();
+        } else {
+            $autoBtn.hide();
+        }
+        ppShowRelatedError('');
+    }
+
+    function ppRenderRelatedRefundPanel() {
+        var txs = ppGetRelatedTransactions();
+        if (!txs.length) return;
+        var $refundWrap = $('.wc-order-refund-items');
+        if (!$refundWrap.length || $refundWrap.find('#payplus-related-refund-panel').length) return;
+
+        var currency = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.currency_symbol) || '';
+        var i18n = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.related_refund_i18n) || {};
+
+        var $panel = $('<div>', { id: 'payplus-related-refund-panel' }).css({
+            background: '#f9f9f9',
+            border: '1px solid #c3c4c7',
+            borderRadius: '4px',
+            padding: '12px 14px',
+            margin: '12px 0',
+            textAlign: 'start',
+        });
+
+        var $title = $('<div>').css({ fontWeight: '600', fontSize: '13px', marginBottom: '4px', color: '#1d2327' })
+            .text(i18n.title || 'PayPlus Split Payment — Choose Payment(s) to Refund');
+        var $hint = $('<div>').css({ fontSize: '12px', color: '#646970', marginBottom: '10px' })
+            .text(i18n.hint || 'Select one or more payments below. If no line items are entered, the refund amount updates automatically.');
+
+        var $table = $('<table>').css({ width: '100%', borderCollapse: 'collapse', background: '#fff', border: '1px solid #e2e4e7' });
+        var $thead = $('<thead>').append(
+            $('<tr>').css({ background: '#f0f0f1', borderBottom: '1px solid #dcdcde' }).append(
+                $('<th>').css({ padding: '7px 8px', width: '28px', textAlign: 'center' }),
+                $('<th>').css({ padding: '7px 8px', textAlign: 'start', fontSize: '12px' }).text(i18n.method || 'Payment Method'),
+                $('<th>').css({ padding: '7px 8px', textAlign: 'end', fontSize: '12px' }).text(i18n.paid || 'Paid'),
+                $('<th>').css({ padding: '7px 8px', textAlign: 'end', fontSize: '12px' }).text(i18n.refunded || 'Refunded'),
+                $('<th>').css({ padding: '7px 8px', textAlign: 'end', fontSize: '12px' }).text(i18n.remaining || 'Remaining'),
+                $('<th>').css({ padding: '7px 8px', textAlign: 'end', fontSize: '12px', width: '165px' }).text(i18n.refund_amount || 'Amount to Refund')
+            )
+        );
+        var $tbody = $('<tbody>');
+
+        txs.forEach(function (tx) {
+            var remaining = Math.max(0, Math.round((parseFloat(tx.remaining) || 0) * 100) / 100);
+            var paid = Math.round((parseFloat(tx.amount) || 0) * 100) / 100;
+            var refunded = Math.round((parseFloat(tx.refunded) || 0) * 100) / 100;
+            var isDone = remaining <= 0;
+
+            var $row = $('<tr>', {
+                'data-uid': tx.transaction_uid,
+                'data-remaining': remaining.toFixed(2),
+            }).css({ borderBottom: '1px solid #f0f0f1', opacity: isDone ? '0.6' : '1' });
+
+            var $check = $('<input>', {
+                type: 'checkbox',
+                class: 'pp-rel-check',
+                disabled: isDone,
+            });
+
+            var metaParts = [];
+            if (tx.brand_name && tx.brand_name.toLowerCase() !== String(tx.method || '').toLowerCase()) {
+                metaParts.push(tx.brand_name);
+            }
+            if (tx.four_digits) {
+                metaParts.push('•••• ' + tx.four_digits);
+            }
+            if (tx.number) {
+                metaParts.push('#' + tx.number);
+            }
+            var $methodCell = $('<td>').css({ padding: '8px', textAlign: 'start' }).append(
+                $('<div>').css({ fontWeight: '600', fontSize: '13px', color: '#1d2327' }).text(ppFormatMethodName(tx.method)),
+                metaParts.length ? $('<div>').css({ fontSize: '11px', color: '#646970' }).text(metaParts.join(' · ')) : ''
+            );
+
+            var $amountCell = $('<td>').css({ padding: '8px', textAlign: 'end', whiteSpace: 'nowrap' });
+            if (isDone) {
+                $amountCell.append(
+                    $('<span>').css({ fontSize: '12px', color: '#646970', fontStyle: 'italic' })
+                        .text(i18n.fully_refunded || 'Refunded')
+                );
+            } else {
+                var $input = $('<input>', {
+                    type: 'number',
+                    class: 'pp-rel-amount',
+                    step: '0.01',
+                    min: '0',
+                    max: remaining.toFixed(2),
+                    placeholder: '0.00',
+                }).css({ width: '92px', textAlign: 'end' });
+                var $fullBtn = $('<button>', {
+                    type: 'button',
+                    class: 'button-link pp-rel-full',
+                }).css({ marginInlineStart: '6px', fontSize: '12px', textDecoration: 'none' })
+                    .text(i18n.full || 'Full');
+                $amountCell.append($input, $fullBtn);
+            }
+
+            $row.append(
+                $('<td>').css({ padding: '8px', textAlign: 'center' }).append($check),
+                $methodCell,
+                $('<td>').css({ padding: '8px', textAlign: 'end', fontSize: '12px' }).text(currency + paid.toFixed(2)),
+                $('<td>').css({ padding: '8px', textAlign: 'end', fontSize: '12px' }).text(currency + refunded.toFixed(2)),
+                $('<td>').css({ padding: '8px', textAlign: 'end', fontSize: '12px', fontWeight: '600' }).text(currency + remaining.toFixed(2)),
+                $amountCell
+            );
+            $tbody.append($row);
+        });
+
+        $table.append($thead, $tbody);
+
+        var $footer = $('<div>').css({
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            gap: '8px',
+            marginTop: '10px',
+            fontSize: '12px',
+        });
+        var $statusText = $('<span>', { class: 'pp-rel-status-text' }).css({ fontWeight: '600', color: '#50575e' });
+        var $autoBtn = $('<button>', { type: 'button', class: 'button button-small pp-rel-autofill' })
+            .text(i18n.auto_fill || 'Auto-allocate')
+            .hide();
+        $footer.append($statusText, $autoBtn);
+
+        var $error = $('<div>', { id: 'payplus-related-refund-error' }).css({
+            display: 'none',
+            marginTop: '8px',
+            padding: '6px 10px',
+            background: '#fcf0f1',
+            borderInlineStart: '3px solid #d63638',
+            color: '#8a2424',
+            fontSize: '12px',
+            fontWeight: '500',
+        });
+
+        $panel.append($title, $hint, $table, $footer, $error);
+
+        var $actions = $refundWrap.find('.refund-actions').first();
+        if ($actions.length) {
+            $panel.insertBefore($actions);
+        } else {
+            $refundWrap.append($panel);
+        }
+        ppSyncRelatedRefundState(false);
+    }
+
+    ppRenderRelatedRefundPanel();
+
+    $(document).on('click', 'button.refund-items', function () {
+        ppRenderRelatedRefundPanel();
+        ppSyncRelatedRefundState(false);
+    });
+
+    $(document).ajaxComplete(function (event, xhr, settings) {
+        if (settings && settings.data && typeof settings.data === 'string'
+            && (settings.data.indexOf('woocommerce_load_order_items') !== -1 || settings.data.indexOf('woocommerce_refund_line_items') !== -1)) {
+            ppRenderRelatedRefundPanel();
+        }
+    });
+
+    $(document).on('change', '#payplus-related-refund-panel .pp-rel-check', function () {
+        var $row = $(this).closest('tr');
+        var $input = $row.find('.pp-rel-amount');
+        var remaining = parseFloat($row.attr('data-remaining')) || 0;
+        if ($(this).is(':checked')) {
+            if (ppParseAmount($input.val()) <= 0) {
+                var fillVal = remaining;
+                if (ppHasLineItemRefunds()) {
+                    var wcAmt = ppParseAmount($('#refund_amount').val());
+                    var otherSum = 0;
+                    $('#payplus-related-refund-panel tbody tr[data-uid]').not($row).each(function () {
+                        if ($(this).find('.pp-rel-check').is(':checked')) {
+                            otherSum += ppParseAmount($(this).find('.pp-rel-amount').val());
+                        }
+                    });
+                    var needed = Math.round((wcAmt - otherSum) * 100) / 100;
+                    if (needed > 0) {
+                        fillVal = Math.min(remaining, needed);
+                    }
+                }
+                $input.val(fillVal.toFixed(2));
+            }
+        } else {
+            $input.val('');
+        }
+        ppSyncRelatedRefundState(true);
+    });
+
+    $(document).on('input change', '#payplus-related-refund-panel .pp-rel-amount', function () {
+        var $row = $(this).closest('tr');
+        var val = ppParseAmount($(this).val());
+        $row.find('.pp-rel-check').prop('checked', val > 0);
+        ppSyncRelatedRefundState(true);
+    });
+
+    $(document).on('click', '#payplus-related-refund-panel .pp-rel-full', function (e) {
+        e.preventDefault();
+        var $row = $(this).closest('tr');
+        var remaining = parseFloat($row.attr('data-remaining')) || 0;
+        if (remaining <= 0) return;
+        $row.find('.pp-rel-check').prop('checked', true);
+        $row.find('.pp-rel-amount').val(remaining.toFixed(2));
+        ppSyncRelatedRefundState(true);
+    });
+
+    $(document).on('click', '#payplus-related-refund-panel .pp-rel-autofill', function (e) {
+        e.preventDefault();
+        var left = Math.round(ppParseAmount($('#refund_amount').val()) * 100) / 100;
+        $('#payplus-related-refund-panel tbody tr[data-uid]').each(function () {
+            var $row = $(this);
+            var remaining = parseFloat($row.attr('data-remaining')) || 0;
+            if (left > 0 && remaining > 0) {
+                var take = Math.min(remaining, left);
+                take = Math.round(take * 100) / 100;
+                $row.find('.pp-rel-check').prop('checked', true);
+                $row.find('.pp-rel-amount').val(take.toFixed(2));
+                left = Math.round((left - take) * 100) / 100;
+            } else {
+                $row.find('.pp-rel-check').prop('checked', false);
+                $row.find('.pp-rel-amount').val('');
+            }
+        });
+        ppSyncRelatedRefundState(false);
+    });
+
+    $(document).on('change keyup', '#refund_amount', function () {
+        if (!ppSyncingFromPanel) {
+            ppSyncRelatedRefundState(false);
+        }
+    });
+
+    $(document).on('click', '.wc-order-refund-items .cancel-action', function () {
+        window.payplusRefundTransactions = null;
+        ppShowRelatedError('');
+    });
+
+    function ppDeductFeeFromAllocations(allocations, fee) {
+        if (!allocations || !allocations.length || fee <= 0) return allocations;
+        var sorted = allocations.map(function (item, idx) {
+            return { idx: idx, transaction_uid: item.transaction_uid, amount: item.amount };
+        }).sort(function (a, b) {
+            return b.amount - a.amount;
+        });
+        var remainingFee = Math.round(fee * 100) / 100;
+        for (var i = 0; i < sorted.length && remainingFee > 0; i++) {
+            var deduct = Math.min(sorted[i].amount, remainingFee);
+            sorted[i].amount = Math.round((sorted[i].amount - deduct) * 100) / 100;
+            remainingFee = Math.round((remainingFee - deduct) * 100) / 100;
+        }
+        sorted.sort(function (a, b) { return a.idx - b.idx; });
+        return sorted.filter(function (item) { return item.amount > 0; }).map(function (item) {
+            return { transaction_uid: item.transaction_uid, amount: item.amount };
+        });
+    }
 
     // Capture-phase listener intercepts before WooCommerce's jQuery delegation
     document.addEventListener('click', function (e) {
         var btn = e.target.closest('button.do-api-refund');
         if (!btn) return;
 
-        var refundAmount = parseFloat($('#refund_amount').val()) || 0;
+        var refundAmount = ppParseAmount($('#refund_amount').val());
+
+        // --- Split-payment validation gate (when order has multiple related transactions) ---
+        if ($('#payplus-related-refund-panel').length
+            && btn.dataset.payplusFeeApplied !== 'true'
+            && btn.dataset.payplusVatChosen !== 'true') {
+            var splitState = ppCollectRelatedAllocations();
+            var i18n = (typeof payplus_script_payment !== 'undefined' && payplus_script_payment.related_refund_i18n) || {};
+
+            if (!splitState.allocations.length) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                ppShowRelatedError(i18n.err_none_selected || 'Select at least one PayPlus payment and enter an amount to refund.');
+                return;
+            }
+            if (splitState.hasExceeded) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                ppShowRelatedError(i18n.err_exceeds_max || 'Refund amount for a payment exceeds its remaining refundable balance.');
+                return;
+            }
+            if (refundAmount <= 0 || Math.abs(splitState.sum - refundAmount) > 0.01) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                ppShowRelatedError(i18n.err_mismatch || 'The sum of selected PayPlus payments must match the WooCommerce refund amount.');
+                return;
+            }
+            ppShowRelatedError('');
+            window.payplusRefundTransactions = splitState.allocations;
+        }
+
         if (refundAmount <= 0) return;
 
         var orderTotal = parseFloat($('#_order_total').val() || $('input.order_total').val() || 0);
@@ -39,7 +443,7 @@ jQuery(function ($) {
         var feeEnabled = typeof payplus_script_payment !== 'undefined'
             && payplus_script_payment.cancellation_fee_enabled === 'yes';
 
-        if (feeEnabled && btn.dataset.payplusFeeApplied !== 'true') {
+        if (feeEnabled && btn.dataset.payplusFeeApplied !== 'true' && btn.dataset.payplusVatChosen !== 'true') {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
@@ -85,18 +489,27 @@ jQuery(function ($) {
 
             var closeFee = function () { feeOverlay.remove(); };
             feeOverlay.on('click', function (ev) {
-                if (ev.target === feeOverlay[0]) closeFee();
+                if (ev.target === feeOverlay[0]) {
+                    window.payplusRefundTransactions = null;
+                    closeFee();
+                }
             });
 
             feeBox.find('.pp-fee-confirm').on('click', function () {
                 closeFee();
                 window.payplusCancellationFee = fee;
                 window.payplusOriginalRefundAmount = refundAmount;
-                $('#refund_amount').val(netRefund.toFixed(2));
+                if (window.payplusRefundTransactions && window.payplusRefundTransactions.length) {
+                    window.payplusRefundTransactions = ppDeductFeeFromAllocations(window.payplusRefundTransactions, fee);
+                }
+                ppSyncingFromPanel = true;
+                $('#refund_amount').val(ppFormatWcAmount(netRefund)).trigger('change');
+                ppSyncingFromPanel = false;
                 btn.dataset.payplusFeeApplied = 'true';
                 btn.click();
             });
             feeBox.find('.pp-fee-cancel').on('click', function () {
+                window.payplusRefundTransactions = null;
                 closeFee();
                 $('.wc-order-refund-items .cancel-action').trigger('click');
             });
@@ -104,7 +517,7 @@ jQuery(function ($) {
         }
         if (btn.dataset.payplusFeeApplied === 'true') {
             btn.dataset.payplusFeeApplied = '';
-            refundAmount = parseFloat($('#refund_amount').val()) || 0;
+            refundAmount = ppParseAmount($('#refund_amount').val());
         }
 
         // --- Existing VAT dialog gate (partial refunds only) ---
@@ -152,7 +565,10 @@ jQuery(function ($) {
 
         var close = function () { overlay.remove(); };
         overlay.on('click', function (ev) {
-            if (ev.target === overlay[0]) close();
+            if (ev.target === overlay[0]) {
+                window.payplusRefundTransactions = null;
+                close();
+            }
         });
 
         function proceedWithVat(vatType) {
@@ -169,6 +585,7 @@ jQuery(function ($) {
             proceedWithVat('vat-type-exempt');
         });
         box.find('.pp-vat-cancel').on('click', function () {
+            window.payplusRefundTransactions = null;
             close();
             $('.wc-order-refund-items .cancel-action').trigger('click');
         });

@@ -1342,6 +1342,307 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
      * @param string $reason
      * @return bool|WP_Error
      */
+    /**
+     * Extract approved, refundable split sub-transactions from an order's payplus_response meta.
+     * Returns an empty array unless the order has 2+ approved Charge related_transactions.
+     *
+     * @param WC_Order|int $order
+     * @return array<int, array<string, mixed>>
+     */
+    public static function get_order_related_transactions($order)
+    {
+        if (is_numeric($order)) {
+            $order = wc_get_order(absint($order));
+        }
+        if (!$order || !is_a($order, 'WC_Order')) {
+            return array();
+        }
+
+        $raw_response = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_response', true);
+        if (empty($raw_response)) {
+            return array();
+        }
+
+        $decoded = is_string($raw_response) ? json_decode($raw_response, true) : (array) $raw_response;
+        if (!is_array($decoded) || empty($decoded['related_transactions']) || !is_array($decoded['related_transactions'])) {
+            return array();
+        }
+
+        $raw_refunds = WC_PayPlus_Meta_Data::get_meta($order->get_id(), 'payplus_related_refunds', true);
+        $refunded_map = is_string($raw_refunds) && $raw_refunds !== '' ? json_decode($raw_refunds, true) : (is_array($raw_refunds) ? $raw_refunds : array());
+        if (!is_array($refunded_map)) {
+            $refunded_map = array();
+        }
+
+        $transactions = array();
+        foreach ($decoded['related_transactions'] as $tx) {
+            if (!is_array($tx)) {
+                $tx = (array) $tx;
+            }
+            $tx_uid = isset($tx['transaction_uid']) ? sanitize_text_field((string) $tx['transaction_uid']) : '';
+            $tx_type = isset($tx['type']) ? strtolower(sanitize_text_field((string) $tx['type'])) : '';
+            $tx_status_code = isset($tx['status_code']) ? (string) $tx['status_code'] : '';
+            $tx_amount = isset($tx['amount']) ? round((float) $tx['amount'], 2) : 0.0;
+
+            if ($tx_uid === '' || $tx_type !== 'charge' || $tx_status_code !== '000' || $tx_amount <= 0) {
+                continue;
+            }
+
+            $alt_method = !empty($tx['alternative_method_name']) ? strtolower(sanitize_text_field((string) $tx['alternative_method_name'])) : '';
+            $raw_method = !empty($tx['method']) ? strtolower(sanitize_text_field((string) $tx['method'])) : 'credit-card';
+            $method = $alt_method !== '' ? $alt_method : $raw_method;
+
+            $already_refunded = isset($refunded_map[$tx_uid]) ? round((float) $refunded_map[$tx_uid], 2) : 0.0;
+            $remaining = max(0.0, round($tx_amount - $already_refunded, 2));
+
+            $transactions[] = array(
+                'transaction_uid'    => $tx_uid,
+                'method'             => $method,
+                'brand_name'         => !empty($tx['brand_name']) ? sanitize_text_field((string) $tx['brand_name']) : '',
+                'four_digits'        => !empty($tx['four_digits']) ? sanitize_text_field((string) $tx['four_digits']) : '',
+                'number'             => !empty($tx['number']) ? sanitize_text_field((string) $tx['number']) : '',
+                'approval_num'       => !empty($tx['approval_num']) ? sanitize_text_field((string) $tx['approval_num']) : '',
+                'number_of_payments' => !empty($tx['number_of_payments']) ? absint($tx['number_of_payments']) : 1,
+                'amount'             => $tx_amount,
+                'refunded'           => $already_refunded,
+                'remaining'          => $remaining,
+            );
+        }
+
+        return count($transactions) >= 2 ? $transactions : array();
+    }
+
+    /**
+     * Process a refund across one or more selected related_transactions for a split-payment order.
+     *
+     * @param WC_Order $order
+     * @param float    $amount
+     * @param string   $reason
+     * @param array    $requested_allocations
+     * @param float    $refunded_amount
+     * @param bool     $invoice_manual
+     * @param string   $handle
+     * @return bool|WP_Error
+     */
+    protected function process_related_transactions_refund($order, $amount, $reason, $requested_allocations, $refunded_amount, $invoice_manual, $handle)
+    {
+        $order_id = $order->get_id();
+        $allowed_list = self::get_order_related_transactions($order);
+        if (empty($allowed_list)) {
+            $this->payplus_add_log_all($handle, 'Split refund rejected for order ' . $order_id . ': no related transactions found', 'error');
+            return new WP_Error('payplus_invalid_related_refund', __('This order does not have multiple refundable PayPlus transactions.', 'payplus-payment-gateway'));
+        }
+
+        $allowed_by_uid = array();
+        foreach ($allowed_list as $tx) {
+            $allowed_by_uid[$tx['transaction_uid']] = $tx;
+        }
+
+        $validated = array();
+        $seen_uids = array();
+        $sum_selected = 0.0;
+
+        foreach ($requested_allocations as $entry) {
+            if (!is_array($entry)) {
+                return new WP_Error('payplus_invalid_related_refund', __('Invalid split refund selection.', 'payplus-payment-gateway'));
+            }
+            $tx_uid = isset($entry['transaction_uid']) ? sanitize_text_field((string) $entry['transaction_uid']) : '';
+            $tx_amount = isset($entry['amount']) ? round((float) $entry['amount'], $this->rounding_decimals) : 0.0;
+
+            if ($tx_uid === '' || !isset($allowed_by_uid[$tx_uid])) {
+                $this->payplus_add_log_all($handle, 'Split refund rejected for order ' . $order_id . ': unknown transaction_uid ' . $tx_uid, 'error');
+                return new WP_Error('payplus_invalid_related_refund', __('Selected PayPlus transaction does not belong to this order.', 'payplus-payment-gateway'));
+            }
+            if (isset($seen_uids[$tx_uid])) {
+                return new WP_Error('payplus_invalid_related_refund', __('Duplicate PayPlus transaction in refund selection.', 'payplus-payment-gateway'));
+            }
+            $seen_uids[$tx_uid] = true;
+
+            if ($tx_amount <= 0) {
+                continue;
+            }
+            if ($tx_amount > round((float) $allowed_by_uid[$tx_uid]['remaining'], $this->rounding_decimals) + 0.001) {
+                $this->payplus_add_log_all($handle, 'Split refund rejected for order ' . $order_id . ': amount ' . $tx_amount . ' exceeds remaining ' . $allowed_by_uid[$tx_uid]['remaining'] . ' for ' . $tx_uid, 'error');
+                return new WP_Error('payplus_invalid_related_refund', __('Refund amount exceeds the remaining refundable balance of a selected payment.', 'payplus-payment-gateway'));
+            }
+
+            $sum_selected = round($sum_selected + $tx_amount, $this->rounding_decimals);
+            $validated[] = array(
+                'tx'     => $allowed_by_uid[$tx_uid],
+                'amount' => $tx_amount,
+            );
+        }
+
+        if (empty($validated)) {
+            return new WP_Error('payplus_invalid_related_refund', __('Select at least one PayPlus payment and enter an amount to refund.', 'payplus-payment-gateway'));
+        }
+
+        $expected_amount = round((float) $amount, $this->rounding_decimals);
+        if (abs($sum_selected - $expected_amount) > 0.01) {
+            $this->payplus_add_log_all($handle, 'Split refund rejected for order ' . $order_id . ': sum ' . $sum_selected . ' does not match refund amount ' . $expected_amount, 'error');
+            return new WP_Error('payplus_invalid_related_refund', __('The sum of selected PayPlus payments must match the refund amount.', 'payplus-payment-gateway'));
+        }
+
+        $raw_refunds = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_refunds', true);
+        $refunded_map = is_string($raw_refunds) && $raw_refunds !== '' ? json_decode($raw_refunds, true) : (is_array($raw_refunds) ? $raw_refunds : array());
+        if (!is_array($refunded_map)) {
+            $refunded_map = array();
+        }
+
+        $has_valid_refund_nonce = isset($_POST['security']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['security'])), 'order-item');
+
+        $refund_vat_type = ($has_valid_refund_nonce && isset($_POST['payplus_refund_vat_type']) && in_array($_POST['payplus_refund_vat_type'], ['vat-type-included', 'vat-type-exempt'], true))
+            ? sanitize_text_field(wp_unslash($_POST['payplus_refund_vat_type']))
+            : null;
+
+        $cancellationFeeNote = '';
+        if ($has_valid_refund_nonce && isset($_POST['payplus_cancellation_fee']) && floatval($_POST['payplus_cancellation_fee']) > 0) {
+            $cancellationFee = round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_cancellation_fee']))), 2);
+            $originalRefundAmount = isset($_POST['payplus_original_refund_amount'])
+                ? round(floatval(sanitize_text_field(wp_unslash($_POST['payplus_original_refund_amount']))), 2)
+                : $expected_amount;
+            $cancellationFeeNote = sprintf(
+                /* translators: %1$s: cancellation fee amount, %2$s: currency code, %3$s: original refund amount */
+                '<br />' . __('Cancellation Fee Applied: %1$s %2$s (Original refund request: %3$s %2$s)', 'payplus-payment-gateway'),
+                $cancellationFee,
+                $order->get_currency(),
+                $originalRefundAmount
+            );
+        }
+
+        $succeeded = array();
+        $succeeded_total = 0.0;
+        $failed = array();
+
+        foreach ($validated as $item) {
+            $tx = $item['tx'];
+            $tx_uid = $tx['transaction_uid'];
+            $tx_amount = $item['amount'];
+            $tx_label = $tx['method'] . ($tx['four_digits'] !== '' ? ' (•••• ' . $tx['four_digits'] . ')' : '');
+
+            $payload = array(
+                'transaction_uid' => $tx_uid,
+                'amount'          => $tx_amount,
+                'more_info'       => __('Refund for Order Number: ', 'payplus-payment-gateway') . $order_id,
+            );
+            if ($this->invoice_api->payplus_get_invoice_enable()) {
+                $payload['initial_invoice'] = false;
+            }
+
+            $payload_json = wp_json_encode($payload);
+            $this->payplus_add_log_all($handle, 'Split refund [' . $tx_label . '] ' . wp_json_encode($payload_json), 'payload');
+            $response = WC_PayPlus_Statics::payPlusRemote($this->refund_url, $payload_json);
+
+            if (is_wp_error($response)) {
+                $err_msg = $response->get_error_message();
+                $this->payplus_add_log_all($handle, 'Split refund [' . $tx_label . '] ' . wp_json_encode($response), 'error');
+                $order->add_order_note(sprintf(
+                    'PayPlus Refund is Failed (%1$s)<br />Description: %2$s',
+                    $tx_label,
+                    $err_msg
+                ));
+                $failed[] = $tx_label . ': ' . $err_msg;
+                continue;
+            }
+
+            $res = json_decode(wp_remote_retrieve_body($response));
+            if (
+                is_object($res)
+                && isset($res->results->status, $res->data->transaction->status_code)
+                && $res->results->status == "success"
+                && $res->data->transaction->status_code == "000"
+            ) {
+                $refunded_map[$tx_uid] = round((isset($refunded_map[$tx_uid]) ? (float) $refunded_map[$tx_uid] : 0.0) + $tx_amount, 2);
+                $refunded_amount = round($refunded_amount + $tx_amount, 2);
+                $succeeded_total = round($succeeded_total + $tx_amount, $this->rounding_decimals);
+
+                $insertMeta = array(
+                    'payplus_related_refunds'       => wp_json_encode($refunded_map),
+                    'payplus_total_refunded_amount' => $refunded_amount,
+                );
+                $method_meta_key = 'payplus_' . $tx['method'];
+                $existing_method_total = WC_PayPlus_Meta_Data::get_meta($order_id, $method_meta_key, true);
+                if ($existing_method_total !== '' && is_numeric($existing_method_total)) {
+                    $insertMeta[$method_meta_key] = max(0, round(floatval($existing_method_total) - $tx_amount, 2));
+                }
+                WC_PayPlus_Meta_Data::update_meta($order, $insertMeta);
+
+                $note_fee = empty($succeeded) ? $cancellationFeeNote : '';
+                $order->add_order_note(sprintf(
+                    'PayPlus Refund is Successful<br />Method: %1$s<br />Refund Transaction Number: %2$s<br />Amount: %3$s %4$s<br />Reason: %5$s',
+                    $tx_label,
+                    isset($res->data->transaction->number) ? $res->data->transaction->number : '',
+                    isset($res->data->transaction->amount) ? $res->data->transaction->amount : $tx_amount,
+                    $order->get_currency(),
+                    $reason
+                ) . $note_fee);
+
+                $this->payplus_add_log_all($handle, 'Split refund [' . $tx_label . '] ' . wp_json_encode($res), 'completed');
+
+                $tx['refund_amount'] = $tx_amount;
+                $succeeded[] = $tx;
+            } else {
+                $res_status = is_object($res) && isset($res->results->status) ? $res->results->status : 'error';
+                $res_desc = is_object($res) && isset($res->results->description) ? $res->results->description : __('Unknown PayPlus refund error', 'payplus-payment-gateway');
+                $order->add_order_note(sprintf(
+                    'PayPlus Refund is Failed (%1$s)<br />Status: %2$s<br />Description: %3$s',
+                    $tx_label,
+                    $res_status,
+                    $res_desc
+                ));
+                $this->payplus_add_log_all($handle, 'Split refund [' . $tx_label . '] ' . wp_json_encode($res), 'error');
+                $failed[] = $tx_label . ': ' . $res_desc;
+            }
+        }
+
+        if (!empty($succeeded) && $this->invoice_api->payplus_get_invoice_enable() && !$invoice_manual) {
+            $resultApps = array();
+            foreach ($succeeded as $item) {
+                $row = new stdClass();
+                $row->method_payment     = $item['method'];
+                $row->price              = round($item['refund_amount'], $this->rounding_decimals) * 100;
+                $row->four_digits        = $item['four_digits'];
+                $row->brand_name         = $item['brand_name'];
+                $row->number_of_payments = $item['number_of_payments'];
+                $row->transaction_id     = $item['approval_num'];
+                $resultApps[] = $row;
+            }
+            $this->invoice_api->payPlusCreateRefundInvoicePlus(
+                $order_id,
+                $this->invoice_api->payplus_get_invoice_type_document_refund(),
+                $resultApps,
+                $succeeded_total,
+                'payplus_order_refund_' . $order_id . '_' . wp_rand(1000, 999999),
+                $refund_vat_type
+            );
+        }
+
+        if (empty($failed)) {
+            return true;
+        }
+
+        if (!empty($succeeded)) {
+            wc_create_refund(array(
+                'amount'         => $succeeded_total,
+                'reason'         => $reason,
+                'order_id'       => $order_id,
+                'refund_payment' => false,
+            ));
+            return new WP_Error(
+                'payplus_partial_refund_failed',
+                sprintf(
+                    /* translators: %1$s: succeeded amount, %2$s: currency, %3$s: failure details */
+                    __('Partial split refund: %1$s %2$s was refunded in PayPlus and recorded on the order, but another payment failed: %3$s', 'payplus-payment-gateway'),
+                    $succeeded_total,
+                    $order->get_currency(),
+                    implode('; ', $failed)
+                )
+            );
+        }
+
+        return new WP_Error('payplus_refund_failed', implode('; ', $failed));
+    }
+
     public function process_refund($order_id, $amount = null, $reason = '')
     {
         global $wpdb;
@@ -1370,6 +1671,18 @@ class WC_PayPlus_Gateway extends WC_Payment_Gateway_CC
             /* translators: %1$s is the refunded amount, %2$s is the currency */
             $order->add_order_note(sprintf(__('PayPlus Refund is Failed<br />You cannot refund more then the refunded total amount. Refunded Amount: %1$s %2$s', 'payplus-payment-gateway'), $refunded_amount, $order->get_currency()));
             return false;
+        }
+
+        if (
+            isset($_POST['security'])
+            && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['security'])), 'order-item')
+            && !empty($_POST['payplus_refund_transactions'])
+        ) {
+            $raw_allocations = sanitize_text_field(wp_unslash($_POST['payplus_refund_transactions']));
+            $requested_allocations = json_decode($raw_allocations, true);
+            if (is_array($requested_allocations)) {
+                return $this->process_related_transactions_refund($order, $amount, $reason, $requested_allocations, $refunded_amount, $invoice_manual, $handle);
+            }
         }
         $payplusRrelatedTransactions = WC_PayPlus_Meta_Data::get_meta($order_id, 'payplus_related_transactions', true);
 

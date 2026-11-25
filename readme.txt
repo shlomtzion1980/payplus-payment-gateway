@@ -4,7 +4,7 @@ Tags: Woocommerce Payment Gateway, Credit Cards, Charges and Refunds, Subscripti
 Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 8.3.5
+Stable tag: 8.3.6
 PlugIn URL: https://www.payplus.co.il/wordpress
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -85,6 +85,10 @@ If you get stuck, you can ask for help in the Plugin Forum. or contact us direct
 8. Save your settings, now you have an active payment page!
 
 == Changelog ==
+
+== 8.3.6  - 25-11-2026 =
+
+- Feature   - Split-payment refunds: on orders paid with multiple PayPlus payment methods (e.g. Multipass / bit + credit card), WooCommerce's Refund panel lets admins choose which payment(s) and amount(s) to refund individually.
 
 == 8.3.5  - 19-11-2026 =
 

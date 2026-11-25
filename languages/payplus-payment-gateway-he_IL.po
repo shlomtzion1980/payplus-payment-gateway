@@ -4775,3 +4775,69 @@ msgstr "טוקן כרטיס PayPlus (ריק = הכרטיס של ההזמנה ה�
 
 msgid "PayPlus could not find this card token. Check the token and try again."
 msgstr "PayPlus לא מצאה את טוקן הכרטיס. נא לבדוק את הטוקן ולנסות שוב."
+
+msgid "PayPlus Split Payment — Choose Payment(s) to Refund"
+msgstr "תשלום מפוצל ב-PayPlus — בחירת אמצעי התשלום לזיכוי"
+
+msgid "Payment Method"
+msgstr "אמצעי תשלום"
+
+msgid "Paid"
+msgstr "שולם"
+
+msgid "Refunded"
+msgstr "זוכה"
+
+msgid "Remaining"
+msgstr "יתרה לזיכוי"
+
+msgid "Amount to Refund"
+msgstr "סכום לזיכוי"
+
+msgid "Full"
+msgstr "מלא"
+
+msgid "Selected total:"
+msgstr "סה״כ נבחר:"
+
+msgid "of refund amount:"
+msgstr "מתוך סכום הזיכוי:"
+
+msgid "Auto-allocate"
+msgstr "חלוקה אוטומטית"
+
+msgid "Select at least one PayPlus payment and enter an amount to refund."
+msgstr "יש לבחור לפחות תשלום PayPlus אחד ולהזין סכום לזיכוי."
+
+msgid "Refund amount for a payment exceeds its remaining refundable balance."
+msgstr "סכום הזיכוי עבור אחד התשלומים חורג מהיתרה הניתנת לזיכוי."
+
+msgid "The sum of selected PayPlus payments must match the WooCommerce refund amount."
+msgstr "סכום תשלומי PayPlus שנבחרו חייב להיות תואם לסכום הזיכוי ב-WooCommerce."
+
+msgid "Select one or more payments below. If no line items are entered, the refund amount updates automatically."
+msgstr "בחר תשלום אחד או יותר למטה. אם לא הוזנו סכומים בשורות ההזמנה, סכום הזיכוי יתעדכן אוטומטית."
+
+msgid "This order does not have multiple refundable PayPlus transactions."
+msgstr "להזמנה זו אין מספר עסקאות PayPlus הניתנות לזיכוי."
+
+msgid "Invalid split refund selection."
+msgstr "בחירת זיכוי מפוצל אינה תקינה."
+
+msgid "Selected PayPlus transaction does not belong to this order."
+msgstr "עסקת PayPlus שנבחרה אינה שייכת להזמנה זו."
+
+msgid "Duplicate PayPlus transaction in refund selection."
+msgstr "עסקת PayPlus כפולה בבחירת הזיכוי."
+
+msgid "Refund amount exceeds the remaining refundable balance of a selected payment."
+msgstr "סכום הזיכוי חורג מהיתרה הניתנת לזיכוי של התשלום שנבחר."
+
+msgid "The sum of selected PayPlus payments must match the refund amount."
+msgstr "סכום תשלומי PayPlus שנבחרו חייב להיות תואם לסכום הזיכוי."
+
+msgid "Unknown PayPlus refund error"
+msgstr "שגיאת זיכוי לא ידועה ב-PayPlus"
+
+msgid "Partial split refund: %1$s %2$s was refunded in PayPlus and recorded on the order, but another payment failed: %3$s"
+msgstr "זיכוי מפוצל חלקי: %1$s %2$s זוכו ב-PayPlus ונרשמו בהזמנה, אך תשלום נוסף נכשל: %3$s"

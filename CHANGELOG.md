@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [8.3.6]  - 11-25-2026 - (Neon)
+
+- Feature   - Split-payment refunds (related transactions): on orders paid with multiple PayPlus payment methods (e.g. Multipass / bit + credit card), WooCommerce's Refund panel now lets the admin choose which payment(s) and amount(s) to refund individually via PayPlus, tracks each payment's remaining refundable balance, and passes the refunded payment method(s) to automatic Invoice+ refund documents.
+
 ## [8.3.5]  - 11-19-2026 - (Fencing)
 
 - Feature   - WooCommerce Subscriptions "Change payment method": customers can replace the card used for renewals with a saved card or a new card (PayPlus token page, no charge), and admins can edit the "PayPlus card token" on the edit subscription screen. New tokens are confirmed with PayPlus (Token/Check) before they are saved. Every change is logged in `payplus_subscription_payment_method` with the previous and the new token.

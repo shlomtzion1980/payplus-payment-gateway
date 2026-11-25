@@ -824,7 +824,15 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             } else {
                 $res = json_decode(wp_remote_retrieve_body($response));
                 if ($res->results->status == "success" && $res->data->transaction->status_code == "000") {
-                    WC_PayPlus_Meta_Data::update_meta($order, array('payplus_total_refunded_amount' => round($refunded_amount + $amount, 2)));
+                    $club_meta_update = array('payplus_total_refunded_amount' => round($refunded_amount + $amount, 2));
+                    $raw_rel_refunds = WC_PayPlus_Meta_Data::get_meta($orderID, 'payplus_related_refunds', true);
+                    $rel_refunds_map = is_string($raw_rel_refunds) && $raw_rel_refunds !== '' ? json_decode($raw_rel_refunds, true) : (is_array($raw_rel_refunds) ? $raw_rel_refunds : array());
+                    if (!is_array($rel_refunds_map)) {
+                        $rel_refunds_map = array();
+                    }
+                    $rel_refunds_map[$transactionUid] = round((isset($rel_refunds_map[$transactionUid]) ? (float) $rel_refunds_map[$transactionUid] : 0.0) + $amount, 2);
+                    $club_meta_update['payplus_related_refunds'] = wp_json_encode($rel_refunds_map);
+                    WC_PayPlus_Meta_Data::update_meta($order, $club_meta_update);
                     $this->payplus_update_order_payment($id, $amount);
                     $this->payplus_add_log_all($handle, wp_json_encode($res), 'completed');
                     $order->add_order_note(sprintf('PayPlus Refund is Successful<br />Refund Transaction Number: %s<br />Amount: %s %s<br />Reason: %s', $res->data->transaction->number, $res->data->transaction->amount, $order->get_currency(), 'refund ' . $method));
@@ -2740,12 +2748,16 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
             }
         }
 
+        $related_refund_transactions = array();
         if (!empty($order_id)) {
             $order = wc_get_order($order_id);
             // Get the currency code
             $currency_code = $order->get_currency();
             // Get the currency symbol based on the currency code
             $currency_symbol = get_woocommerce_currency_symbol($currency_code);
+            if ($order && is_a($order, 'WC_Order')) {
+                $related_refund_transactions = WC_PayPlus_Gateway::get_order_related_transactions($order);
+            }
         } else {
             $currency_symbol = get_woocommerce_currency_symbol();
         }
@@ -2845,6 +2857,24 @@ class WC_PayPlus_Admin_Payments extends WC_PayPlus_Gateway
                 'cancellation_fee_original' => __('Original refund amount', 'payplus-payment-gateway'),
                 'cancellation_fee_confirm' => __('Confirm Refund', 'payplus-payment-gateway'),
                 'cancellation_fee_cancel'  => __('Cancel', 'payplus-payment-gateway'),
+                'related_refund_transactions' => $related_refund_transactions,
+                'related_refund_i18n' => array(
+                    'title'             => __('PayPlus Split Payment — Choose Payment(s) to Refund', 'payplus-payment-gateway'),
+                    'method'            => __('Payment Method', 'payplus-payment-gateway'),
+                    'paid'              => __('Paid', 'payplus-payment-gateway'),
+                    'refunded'          => __('Refunded', 'payplus-payment-gateway'),
+                    'remaining'         => __('Remaining', 'payplus-payment-gateway'),
+                    'refund_amount'     => __('Amount to Refund', 'payplus-payment-gateway'),
+                    'full'              => __('Full', 'payplus-payment-gateway'),
+                    'fully_refunded'    => __('Refunded', 'payplus-payment-gateway'),
+                    'allocated'         => __('Selected total:', 'payplus-payment-gateway'),
+                    'of_refund'         => __('of refund amount:', 'payplus-payment-gateway'),
+                    'auto_fill'         => __('Auto-allocate', 'payplus-payment-gateway'),
+                    'err_none_selected' => __('Select at least one PayPlus payment and enter an amount to refund.', 'payplus-payment-gateway'),
+                    'err_exceeds_max'   => __('Refund amount for a payment exceeds its remaining refundable balance.', 'payplus-payment-gateway'),
+                    'err_mismatch'      => __('The sum of selected PayPlus payments must match the WooCommerce refund amount.', 'payplus-payment-gateway'),
+                    'hint'              => __('Select one or more payments below. If no line items are entered, the refund amount updates automatically.', 'payplus-payment-gateway'),
+                ),
             )
         );
         wp_enqueue_script('wc-payplus-gateway-admin');
