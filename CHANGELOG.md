@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 - Feature   - Split-payment refunds (related transactions): on orders paid with multiple PayPlus payment methods (e.g. Multipass / bit + credit card), WooCommerce's Refund panel now lets the admin choose which payment(s) and amount(s) to refund individually via PayPlus, tracks each payment's remaining refundable balance, and passes the refunded payment method(s) to automatic Invoice+ refund documents.
 - Tweak     - New option "Prevent double coupon discount & rounding drift" (default off): avoids per-unit 0-decimal rounding drift when `single_quantity_per_line` is enabled and skips adding a duplicate coupon line when a pricing/bundle plugin already applies the coupon discount to item subtotals.
+- Tweak     - WordPress 7.2 compatibility: updated admin menu icon styling for inline SVG icons, replaced deprecated jQuery calls ahead of jQuery 4 (jQuery Migrate 3.6.0), and marked Tested up to 7.2.
+- Tweak     - "Allow J5 cancel" setting is now shown only when Transactions Type is set to Authorization.
 
 ## [8.3.5]  - 11-19-2026 - (Fencing)
 
