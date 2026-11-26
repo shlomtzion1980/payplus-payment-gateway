@@ -231,6 +231,13 @@ function putHostedFields() {
 
     // Select the existing div element that you want to move
     var $newDiv = jQuery("body > div.container.hostedFields");
+    if (!$newDiv.length) {
+        $newDiv = jQuery("div.container.hostedFields")
+            .filter(function () {
+                return !jQuery(this).closest(".pp_iframe_h").length;
+            })
+            .first();
+    }
 
     if ($paymentMethod.length && $topLi.length && $newDiv.length) {
         // Move the existing div to the top <li> of the payment method
@@ -491,12 +498,19 @@ jQuery(() => {
 
                                     if (topDiv) {
                                         // Create a new div element
-                                        const newDiv = document.querySelector(
-                                            "body > div.container.hostedFields"
-                                        );
-                                        var $hostedDiv = jQuery(
-                                            "body > div.container.hostedFields"
-                                        );
+                                        const newDiv =
+                                            document.querySelector(
+                                                "body > div.container.hostedFields"
+                                            ) ||
+                                            document.querySelector(
+                                                "div.container.hostedFields"
+                                            );
+                                        var $hostedDiv = newDiv
+                                            ? jQuery(newDiv)
+                                            : jQuery();
+                                        if (!newDiv) {
+                                            return;
+                                        }
                                         const paymentForm =
                                             document.querySelector(
                                                 "#payment-form"

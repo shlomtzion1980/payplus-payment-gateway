@@ -12,6 +12,9 @@ jQuery(function ($) {
     let payPlusHosted = "payment_method_payplus-payment-gateway-hostedfields";
     let inputPayPlus = payPlusHosted;
     var $hostedDiv = jQuery("body > div.container.hostedFields");
+    if (!$hostedDiv.length) {
+        $hostedDiv = jQuery("div.container.hostedFields").first();
+    }
     let firstTime = true;
 
     $.blockUI.defaults.overlayCSS.cursor = "default";
