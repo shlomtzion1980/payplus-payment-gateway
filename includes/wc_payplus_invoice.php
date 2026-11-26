@@ -227,7 +227,9 @@ class PayplusInvoice
              #adminmenu li.menu-top.toplevel_page_payplus:hover,
              #adminmenu li>a.menu-top.toplevel_page_payplus:focus ,
              #adminmenu li.opensub.toplevel_page_payplus>a.menu-top,
+             #adminmenu li.opensub.toplevel_page_payplus div.wp-menu-image,
              #adminmenu li.opensub.toplevel_page_payplus div.wp-menu-image:before,
+             #adminmenu li.toplevel_page_payplus div.wp-menu-image,
              #adminmenu li.toplevel_page_payplus  div.wp-menu-image:before,
              #adminmenu  li.toplevel_page_payplus a:hover
              {

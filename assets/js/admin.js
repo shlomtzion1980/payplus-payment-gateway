@@ -648,7 +648,7 @@ jQuery(function ($) {
     if (createInvoiceManual && createInvoiceManual.val() === "no") {
         invoiceManualList.parents("tr").fadeOut();
     }
-    createInvoiceManual.change(function () {
+    createInvoiceManual.on("change", function () {
         if ($(this).val() === "yes") {
             invoiceManualList.closest("tr").fadeIn();
         } else {
@@ -670,7 +670,8 @@ jQuery(function ($) {
                 );
             }
             $(".invoice-manual-list")
-                .children("option:first")
+                .children("option")
+                .first()
                 .prop("selected", false);
         }
     }
@@ -699,7 +700,7 @@ jQuery(function ($) {
     });
     // end remove tooltips for subgateways //
 
-    deleteError.click(function (event) {
+    deleteError.on("click", function (event) {
         event.preventDefault();
         $(this).closest("tr").remove();
     });
@@ -714,12 +715,12 @@ jQuery(function ($) {
     }
 
     // Ensure DOM is ready before running on page load
-    $(document).ready(function () {
+    $(function () {
         toggleIframeHeightRow();
     });
 
     // Run on change
-    iframeAutoHeight.change(function () {
+    iframeAutoHeight.on("change", function () {
         toggleIframeHeightRow();
     });
 
@@ -735,7 +736,7 @@ jQuery(function ($) {
     }
 
     // Run on page load
-    $(document).ready(function () {
+    $(function () {
         toggleIframeWidthField();
     });
 
@@ -745,11 +746,11 @@ jQuery(function ($) {
     if (!changeVatInEliat.prop("checked")) {
         keywordsEilat.closest("tr").fadeOut();
     }
-    $(".invoice-manual-list").change(function () {
+    $(".invoice-manual-list").on("change", function () {
         let value = $(this).val();
         $(".list-hidden").val(value);
     });
-    changeVatInEliat.change(function () {
+    changeVatInEliat.on("change", function () {
         if ($(this).prop("checked")) {
             keywordsEilat.closest("tr").fadeIn();
         } else {
@@ -761,7 +762,7 @@ jQuery(function ($) {
     if (!blockIpTransactions.prop("checked")) {
         blockIpTransactionsHour.closest("tr").fadeOut();
     }
-    blockIpTransactions.change(function () {
+    blockIpTransactions.on("change", function () {
         if (blockIpTransactions.prop("checked")) {
             blockIpTransactionsHour.closest("tr").fadeIn();
         } else {
@@ -774,7 +775,7 @@ jQuery(function ($) {
         if (!enableDevMode.prop("checked")) {
             preventUnpaidZeroTotalOrders.closest("tr").fadeOut();
         }
-        enableDevMode.change(function () {
+        enableDevMode.on("change", function () {
             if (enableDevMode.prop("checked")) {
                 preventUnpaidZeroTotalOrders.closest("tr").fadeIn();
             } else {
@@ -861,7 +862,7 @@ jQuery(function ($) {
         ? enableExpressOnProductPageIsOn()
         : null;
 
-    enableExpressOnProductPage.change(function () {
+    enableExpressOnProductPage.on("change", function () {
         if (
             enableExpressOnProductPage.prop("checked") &&
             shippingWooJs.prop("checked")
@@ -875,7 +876,7 @@ jQuery(function ($) {
         }
     });
 
-    shippingWooJs.change(function () {
+    shippingWooJs.on("change", function () {
         if (
             enableExpressOnProductPage.prop("checked") &&
             !shippingWooJs.prop("checked")
@@ -911,7 +912,7 @@ jQuery(function ($) {
     ) {
         globalShipping.val(0);
     }
-    shippingwoo.change(function () {
+    shippingwoo.on("change", function () {
         const checked = $(this).prop("checked");
         if (!checked) {
             globalShipping.closest("tr").fadeIn();
@@ -933,12 +934,12 @@ jQuery(function ($) {
             globalShipping.closest("tr").fadeOut();
             globalShippingTax.closest("tr").fadeOut();
             globalShippingTaxRate.closest("tr").fadeOut();
-            globalShipping.removeAttr("required");
-            globalShippingTax.removeAttr("required");
-            globalShippingTaxRate.removeAttr("required");
+            globalShipping.prop("required", false);
+            globalShippingTax.prop("required", false);
+            globalShippingTaxRate.prop("required", false);
         }
     });
-    globalShippingTax.change(function () {
+    globalShippingTax.on("change", function () {
         let value = $(this).val();
         if (value == "none") {
             globalShippingTaxRate.find("option[value=0]").val("0");
@@ -949,7 +950,7 @@ jQuery(function ($) {
             globalShippingTaxRate.parents("tr").fadeIn();
         }
     });
-    enableGooglePay.change(function (event) {
+    enableGooglePay.on("change", function (event) {
         event.preventDefault();
         const slef = $(this);
         const checked = slef.prop("checked");
@@ -987,7 +988,7 @@ jQuery(function ($) {
             });
         }
     });
-    enableApplePay.change(function () {
+    enableApplePay.on("change", function () {
         const checked = $(this).prop("checked");
         const elementFieldset = enableApplePay.parents("fieldset");
         const slef = $(this);
@@ -1028,7 +1029,8 @@ jQuery(function ($) {
         }
     });
 
-    $("#woocommerce_payplus-payment-gateway_transaction_type").change(
+    $("#woocommerce_payplus-payment-gateway_transaction_type").on(
+        "change",
         function () {
             let value = $(this).val();
             if (value == 2) {
@@ -1076,7 +1078,8 @@ jQuery(function ($) {
                 .hide();
         }
 
-        $("#payplus_invoice_option\\[payplus_invoice_enable\\]").change(
+        $("#payplus_invoice_option\\[payplus_invoice_enable\\]").on(
+            "change",
             function () {
                 if ($(this).is(":checked")) {
                     $("#payplus_invoice_option\\[display_only_invoice_docs\\]")
@@ -1450,7 +1453,7 @@ jQuery(function ($) {
         return false;
     });
 
-    $(document).ready(function () {
+    $(function () {
         $(".toggle-button").on("click", function (e) {
             e.preventDefault();
             var hiddenButtons = $(this).siblings(".hidden-buttons");
@@ -1859,7 +1862,7 @@ function payplus_obj_isObjectEmpty(obj) {
 //==================invoice not automatic  ======================
 
 //==================PayPlus Invoice Runner Management======================
-jQuery(document).ready(function($) {
+jQuery(function($) {
     // PayPlus Invoice Runner Management functionality
     $('#run-payplus-invoice-runner').on('click', function() {
         var button = $(this);

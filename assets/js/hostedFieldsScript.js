@@ -483,7 +483,7 @@ jQuery(() => {
                 hf.InitPaymentPage.then((data) => {
                     if (isCheckout) {
                         console.log("checkout page (hosted)?", isCheckout);
-                        jQuery(document).ready(function () {
+                        jQuery(function () {
                             let inputElement = document.querySelector(
                                 "#radio-control-wc-payment-method-options-payplus-payment-gateway-hostedfields"
                             );
@@ -873,7 +873,7 @@ const overlay = (remove = false) => {
     }
 };
 
-jQuery(document).ready(function () {
+jQuery(function () {
     // Watch for error message display and reset button immediately
     const errorMessageDiv = document.querySelector('.payment-error-message');
     if (errorMessageDiv) {

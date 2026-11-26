@@ -1,4 +1,4 @@
-jQuery(document).ready(function ($) {
+jQuery(function ($) {
     // setFieldReadOnly();
     payplusMenusDisplay();
     let changestatus = document.getElementById("payplus-change-status");
@@ -16,7 +16,7 @@ jQuery(document).ready(function ($) {
         });
     }
 
-    $("#display-payplus-meta-data").click(function (event) {
+    $("#display-payplus-meta-data").on("click", function (event) {
         event.preventDefault();
         const $button = $(this);
         const orderId = $button.data("order-id");
@@ -138,7 +138,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $(".do-api-refund-payplus").click(async function (event) {
+    $(".do-api-refund-payplus").on("click", async function (event) {
         event.preventDefault();
         var self = this;
         $(self).addClass("button-loading");
@@ -240,7 +240,7 @@ jQuery(document).ready(function ($) {
             });
     });
 
-    $(".select-languages-payplus").change(function (event) {
+    $(".select-languages-payplus").on("change", function (event) {
         event.preventDefault();
         let language = $(this).val();
         let html = "";
@@ -267,13 +267,13 @@ jQuery(document).ready(function ($) {
             $(".form-table").append(html);
         }
     });
-    $(".copytoken").click(function (event) {
+    $(".copytoken").on("click", function (event) {
         event.preventDefault();
         var copyText = $(".copytoken");
         navigator.clipboard.writeText(copyText.text());
     });
 
-    $("#makeTokenPayment").click(function (event) {
+    $("#makeTokenPayment").on("click", function (event) {
         event.preventDefault();
         let token = $("#ccToken").val();
         let tokenId = $("#ccToken option:selected").attr("id");
@@ -440,7 +440,7 @@ jQuery(document).ready(function ($) {
         $("body").append(overlay);
     }
 
-    $("#custom-button-get-pp").click(function () {
+    $("#custom-button-get-pp").on("click", function () {
         var btn = $(this);
         var orderId = btn.data("value");
         var history = btn.data("pruid-history");
@@ -452,7 +452,7 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    $("#create-invoice-plus-doc").click(function () {
+    $("#create-invoice-plus-doc").on("click", function () {
         if (
             !confirm(
                 "WARNING: This will create an invoice no matter what the order STATUS is... Are you sure you want to create the invoice?"
@@ -492,7 +492,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $("#get-invoice-plus-data").click(function () {
+    $("#get-invoice-plus-data").on("click", function () {
         if (
             !confirm(
                 "ATTENTION: This only pulls existing information, only visual data, this does not create any document."
@@ -621,7 +621,7 @@ jQuery(document).ready(function ($) {
             });
         }
     );
-    $("#order-payment-payplus").click(function (event) {
+    $("#order-payment-payplus").on("click", function (event) {
         event.preventDefault();
         let orderId = $(this).attr("data-id");
         $(".payplus_loader").fadeIn();
@@ -643,7 +643,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    $("#payplus-token-payment").click(function (event) {
+    $("#payplus-token-payment").on("click", function (event) {
         event.preventDefault();
         let payplusChargeAmount = $(this)
             .closest(".delayed-payment")
@@ -925,7 +925,8 @@ if (
         emvPosBrandUidDevParentTr.hide();
     }
 
-    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").change(
+    jQuery("#woocommerce_payplus-payment-gateway_api_test_mode").on(
+        "change",
         function () {
             if (
                 jQuery(
@@ -962,12 +963,14 @@ if (
 
     if (!isAuthorization) {
         jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization").closest("tr").fadeOut();
+        jQuery("#woocommerce_payplus-payment-gateway_enable_j5_cancel").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_name").closest("tr").fadeOut();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_message").closest("tr").fadeOut();
     } else {
         jQuery("#woocommerce_payplus-payment-gateway_check_amount_authorization").closest("tr").fadeIn();
+        jQuery("#woocommerce_payplus-payment-gateway_enable_j5_cancel").closest("tr").fadeIn();
         jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").closest("tr").fadeIn();
         if (jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_enabled").is(":checked")) {
             jQuery("#woocommerce_payplus-payment-gateway_j5_weight_estimate_percentage").closest("tr").fadeIn();
@@ -1026,6 +1029,9 @@ function payplusMenusDisplay() {
     const $checkAmountAuthorization = jQuery(
         "#woocommerce_payplus-payment-gateway_check_amount_authorization"
     );
+    const $enableJ5Cancel = jQuery(
+        "#woocommerce_payplus-payment-gateway_enable_j5_cancel"
+    );
     const $transactionType = jQuery(
         "#woocommerce_payplus-payment-gateway_transaction_type"
     );
@@ -1042,9 +1048,10 @@ function payplusMenusDisplay() {
         "#woocommerce_payplus-payment-gateway_j5_weight_estimate_message"
     );
 
-    $transactionType.change(function (e) {
+    $transactionType.on("change", function (e) {
         if (Number(e.target.value) === 2) {
             $checkAmountAuthorization.closest("tr").fadeIn();
+            $enableJ5Cancel.closest("tr").fadeIn();
             $j5WeightEnabled.closest("tr").fadeIn();
             if ($j5WeightEnabled.is(":checked")) {
                 $j5WeightPercentage.closest("tr").fadeIn();
@@ -1053,6 +1060,7 @@ function payplusMenusDisplay() {
             }
         } else {
             $checkAmountAuthorization.closest("tr").fadeOut();
+            $enableJ5Cancel.closest("tr").fadeOut();
             $j5WeightEnabled.closest("tr").fadeOut();
             $j5WeightPercentage.closest("tr").fadeOut();
             $j5WeightName.closest("tr").fadeOut();
@@ -1060,7 +1068,7 @@ function payplusMenusDisplay() {
         }
     });
 
-    $j5WeightEnabled.change(function () {
+    $j5WeightEnabled.on("change", function () {
         if (jQuery(this).is(":checked")) {
             $j5WeightPercentage.closest("tr").fadeIn();
             $j5WeightName.closest("tr").fadeIn();

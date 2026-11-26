@@ -310,7 +310,7 @@ jQuery(function ($) {
                             "display",
                             "block"
                         );
-                        $("input#" + inputPayPlus).removeAttr("checked");
+                        $("input#" + inputPayPlus).prop("checked", false);
                         $(".container.hostedFields").hide();
                         $(
                             ".payment_box.payment_method_payplus-payment-gateway-hostedfields"
@@ -1308,7 +1308,7 @@ jQuery(function ($) {
         },
         show_coupon_form: function () {
             $(".checkout_coupon").slideToggle(400, function () {
-                $(".checkout_coupon").find(":input:eq(0)").trigger("focus");
+                $(".checkout_coupon").find(":input").first().trigger("focus");
             });
             return false;
         },
