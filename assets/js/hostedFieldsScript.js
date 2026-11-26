@@ -644,7 +644,12 @@ hf.Upon("pp_pageExpired", (e) => {
             console.log(xhr, status, error);
         },
     });
+    if (document.getElementById("payplus-page-expired-popup")) {
+        return;
+    }
+
     const popup = document.createElement("div");
+    popup.id = "payplus-page-expired-popup";
     popup.style.position = "fixed";
     popup.style.top = "50%";
     popup.style.left = "50%";
@@ -658,15 +663,20 @@ hf.Upon("pp_pageExpired", (e) => {
             ? "Page Expired. Please refresh the page and try again."
             : "תוקף הדף פג. אנא רענן/י את הדף ונסה/י שוב."
         }</p>
-    <button id="popup-ok-button">${pageLang !== "he-IL" ? "OK" : "אישור"
+    <button type="button" id="popup-ok-button">${pageLang !== "he-IL" ? "OK" : "אישור"
         }</button>
 `;
     document.body.appendChild(popup);
 
-    document.getElementById("popup-ok-button").addEventListener("click", () => {
-        document.body.removeChild(popup);
-        window.location.href = window.location.href; // Use this method to reload the page
-    });
+    const okButton = popup.querySelector("#popup-ok-button");
+    if (okButton) {
+        okButton.addEventListener("click", () => {
+            if (popup.parentNode) {
+                popup.parentNode.removeChild(popup);
+            }
+            window.location.reload();
+        });
+    }
 });
 
 hf.Upon("pp_noAttemptedRemaining", (e) => {
